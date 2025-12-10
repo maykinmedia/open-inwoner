@@ -44,6 +44,9 @@ Deployment aandachtspunten
   de primaire kleur (CSS-variabelen ``--color-primary`` en ``--color-secondary``) is hier nu een
   stijl verandering te zien. Call-to-action elementen gebruiken nu altijd de primaire kleur. Hierdoor
   worden de knoppen in tegels niet langer in een afwijkende secundaire kleur weergegeven.
+* Controleer of de nieuwe frontend web-componenten correct functioneren. In sommige gevallen wordt de
+  frontend-bundle mogelijk niet volledig overschreven.
+
 
 Nieuwe features
 ---------------
@@ -93,12 +96,14 @@ Nieuwe features
   belangrijk kan zijn voor security audits (zoals PENTests) van bijvoorbeeld DigiD.
   Standaard blijven de hints ingeschakeld om het huidige gedrag te behouden.
 * [:taiga-us:`3580`, :pr:`2033`]: De zoekfunctie kan nu worden uitgeschakeld in de Algemene Configuratie.
-* [:taiga-is`3600`, :pr:`2046`]: 'Signing requets' toegevoegd aan admin. Beheerders kunnen nu een CSR
+* [:taiga-is:`3600`, :pr:`2046`]: 'Signing requests' toegevoegd aan admin. Beheerders kunnen nu een CSR
   (Certificate Signing Request) genereren in de admin via 'Datakoppelingen > Ondertekeningsverzoeken'.
 * [:taiga-us:`3579`, :pr:`2049`]: Het commando om de ZGW Catalogus te importeren geeft
   nu uitgebreidere informatie (bijvoorbeeld welke zaaktypes wel zijn ontvangen maar niet
   gesynchroniseerd vanwege een geconfigureerd filter), en zorgt ervoor dat alle velden
   uit de API correct worden overgenomen in de lokale versie van de catalogus.
+* [:taiga-us:`3578`, :pr:`2043`]: Nieuw Front-end ontwerp voor CMS plug-in 'Balie Afspraken' gebouwd met
+  design-tokens volgens het NLDS principe.
 
 Bugfixes
 --------

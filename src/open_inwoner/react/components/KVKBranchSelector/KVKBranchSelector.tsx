@@ -1,17 +1,15 @@
-import {
-  ChangeEventHandler,
-  FC,
-  KeyboardEventHandler,
-  MouseEventHandler,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { useIntl } from 'react-intl';
+import { MaterialIcon } from '@react/components/MaterialIcon';
+import { usePropsOrScriptData } from '@react/lib/json';
 import { useDebounce } from '@react/lib/hooks/useDebounce';
 import clsx from 'clsx';
-import { MaterialIcon } from '@react/components/MaterialIcon';
+import {
+  AnyComponent as AC,
+  InputEventHandler,
+  KeyboardEventHandler,
+  MouseEventHandler,
+} from 'preact';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useIntl } from 'react-intl';
 
 export interface ComboBoxItem {
   id: string;
@@ -24,24 +22,31 @@ export interface ComboBoxItem {
   type?: string;
 }
 
-interface KVKBranchSelectorProps {
+export interface KVKBranchSelectorProps {
   id: string;
   label: string;
   name: string;
-  branches: ComboBoxItem[];
+  branches?: ComboBoxItem[];
   selectedBranchId?: string;
+  branchesId?: string;
 }
+
+type BranchData = {
+  items?: ComboBoxItem[];
+  selected_id?: string;
+};
 
 /**
  * Accessible combobox component for branch selection with search filtering.
  * Supports keyboard navigation, mouse/touchscreen, and form submission.
  */
-export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
+const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
   id,
   label,
   name,
   branches,
   selectedBranchId,
+  branchesId,
 }) => {
   const intl = useIntl();
   const [query, setQuery] = useState('');
@@ -49,11 +54,32 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
   // Wait 300ms after user stops typing before filtering results
   const debouncedQuery = useDebounce(query, 300);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Get branches data from props or script tag
+  // Script tag format: { items: ComboBoxItem[], selected_id?: string }
+  // Props format: ComboBoxItem[]
+  const rawData = usePropsOrScriptData<BranchData | ComboBoxItem[]>(
+    branches,
+    branchesId
+  );
+
+  // Normalize data to ComboBoxItem[]
+  const data = Array.isArray(rawData)
+    ? rawData
+    : (rawData as BranchData)?.items;
+
+  // Get selected_id from script tag data if available
+  const scriptSelectedId = !Array.isArray(rawData)
+    ? (rawData as BranchData)?.selected_id
+    : undefined;
+
   // Lazy initializer with auto-select
   const [selectedId, setSelectedId] = useState<string | undefined>(() => {
+    // Priority: selectedBranchId prop > script tag selected_id > auto-select rechtspersoon
     if (selectedBranchId) return selectedBranchId;
+    if (scriptSelectedId) return scriptSelectedId;
     // Find rechtspersoon branch and auto-select it
-    const rechtspersoonBranch = branches.find((b) => b.id === 'rechtspersoon');
+    const rechtspersoonBranch = data?.find((b) => b.id === 'rechtspersoon');
     return rechtspersoonBranch ? 'rechtspersoon' : undefined;
   });
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
@@ -63,8 +89,8 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
 
   // Find the selected branch to display its name in the input
   const selectedBranch = useMemo(
-    () => branches.find((b) => b.id === selectedId),
-    [branches, selectedId]
+    () => data?.find((b) => b.id === selectedId),
+    [data, selectedId]
   );
 
   // Generate display text for selected branch with distinguishing info
@@ -92,10 +118,10 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     // If the query matches the selected branch display text exactly,
     // show all branches (user wants to see options, not search)
     if (isSelectedBranchDisplayText || debouncedQuery.trim() === '') {
-      return branches;
+      return data;
     }
 
-    return branches.filter((b) => {
+    return data?.filter((b) => {
       // Combine all searchable fields into one string
       const searchText = [
         b.label,
@@ -119,13 +145,13 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
       // Check if all search words appear as substrings somewhere in the combined text
       return searchWords.every((word) => searchText.includes(word));
     });
-  }, [branches, debouncedQuery, isSelectedBranchDisplayText]);
+  }, [data, debouncedQuery, isSelectedBranchDisplayText]);
 
   // Show clear button when input contains text
   const hasText = query !== '';
 
   const handleSelect = (id: string) => {
-    const branch = branches.find((b) => b.id === id);
+    const branch = data?.find((b) => b.id === id);
     setSelectedId(id);
     // Use display text with distinguishing info
     setQuery(branch ? getDisplayText(branch) : '');
@@ -163,7 +189,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
           setFocusedIndex(0);
         } else {
           setFocusedIndex((prev) =>
-            prev < filtered.length - 1 ? prev + 1 : prev
+            prev < (filtered?.length ?? 0) - 1 ? prev + 1 : prev
           );
         }
         break;
@@ -181,7 +207,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
 
       case 'Enter':
         e.preventDefault();
-        if (isOpen && filtered[focusedIndex]) {
+        if (isOpen && filtered?.[focusedIndex]) {
           handleSelect(filtered[focusedIndex].id);
         }
         break;
@@ -197,8 +223,8 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     }
   };
 
-  const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setQuery(e.target.value);
+  const handleInputChange: InputEventHandler<HTMLInputElement> = (e) => {
+    setQuery((e.target as HTMLInputElement).value);
     setIsOpen(true);
     setFocusedIndex(0);
   };
@@ -288,6 +314,26 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     }
   }, [selectedId, name]);
 
+  if (!data || data.length === 0) {
+    console.error(new Error('[KVKBranchSelector] No branches available'));
+    return (
+      <div
+        className="utrecht-form-field utrecht-form-field--text"
+        ref={containerRef}
+      >
+        <p
+          className="utrecht-paragraph"
+          style={{ color: 'var(--color-red-notification)' }}
+        >
+          Er is een probleem opgetreden bij het laden van de vestigingen.
+          Probeer de pagina te vernieuwen.
+        </p>
+      </div>
+    );
+  }
+
+  if (!data) return <></>;
+
   return (
     <div
       className="utrecht-form-field utrecht-form-field--text"
@@ -350,7 +396,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
           </button>
         )}
 
-        {isOpen && filtered.length > 0 && (
+        {isOpen && (filtered?.length ?? 0) > 0 && (
           <div
             className="utrecht-listbox oip-combobox__popover oip-combobox__popover--block-end"
             role="listbox"
@@ -358,7 +404,7 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
             aria-label={label}
           >
             <ul className="utrecht-listbox__list" ref={listRef}>
-              {filtered.map((item, i) => (
+              {filtered?.map((item, i) => (
                 <li
                   key={item.id}
                   role="option"
@@ -408,3 +454,5 @@ export const KVKBranchSelector: FC<KVKBranchSelectorProps> = ({
     </div>
   );
 };
+
+export default KVKBranchSelector;

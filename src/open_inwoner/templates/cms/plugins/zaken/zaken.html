@@ -3,29 +3,39 @@
 <!-- start zaken plugin -->
 {% if show_zaken_plugin %}
     {% if request.htmx %}
-        <oip-zaken-plugin-container>
-            {% if error_message %}<div slot="error">{{ error_message }}</div> {% endif %}
-            {% for zaak in zaken %}
-                <oip-zaken-plugin-zaak-item
-                    description="{{ zaak.description }}"
-                    identificatie="{{ zaak.identification }}"
-                    detail-url="{{ zaak.url }}"
-                    >
-                </oip-zaken-plugin-zaak-item>
-            {% endfor %}
-        </oip-zaken-plugin-container>
-    {% else %}
-        <oip-homepage-plugin-section
+        <oip-home-plugin-section
             title="{{ plugin_title }}"
             next-url="{{ mijn_zaken_url }}"
             show-indicator="false"
-            next-url-label="{% trans 'Bekijk alle zaken' %}">
-            <div hx-get="{{ hx_get_url }}"
-                 hx-trigger="load"
-                 hx-swap="outerHTML">
+            next-url-label="{% trans 'Bekijk alle zaken' %}"
+            columns="2"
+        >
+            {% if error_message %}<div slot="error">{{ error_message }}</div> {% endif %}
+            {% for zaak in zaken %}
+                <oip-home-plugin-card
+                    title="{{ zaak.description }}"
+                    description="{% if zaak.identification %}{% trans "Zaaknummer: " %}{{zaak.identification}}{% endif %}"
+                    identificatie="{{ zaak.identification }}"
+                    detail-url="{{ zaak.url }}"
+                    >
+                </oip-home-plugin-card>
+            {% endfor %}
+        </oip-home-plugin-section>
+    {% else %}
+        <div
+            hx-get="{{ hx_get_url }}"
+            hx-trigger="load"
+            hx-swap="outerHTML">
+            <oip-home-plugin-section
+                title="{{ plugin_title }}"
+                next-url="{{ mijn_zaken_url }}"
+                show-indicator="false"
+                next-url-label="{% trans 'Bekijk alle zaken' %}"
+                columns="1"
+            >
                 <oip-loading-spinner loading-text="{% trans 'Zaken laden...' %}"></oip-loading-spinner>
-            </div>
-        </oip-homepage-plugin-section>
+            </oip-home-plugin-section>
+        </div>
     {% endif %}
     <!-- end zaken plugin -->
 {% else %}

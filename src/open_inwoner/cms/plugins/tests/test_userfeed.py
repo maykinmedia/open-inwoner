@@ -21,8 +21,7 @@ class TestUserFeedPlugin(TestCase):
         )
 
         feed_json = context["userfeed_item_list_json"]
-        feed = json.loads(feed_json)
-        self.assertEqual(len(feed), 1)
+        self.assertEqual(len(feed_json), 1)
 
         self.assertIn("Hello", html)
         self.assertIn("Test message", html)
@@ -30,12 +29,21 @@ class TestUserFeedPlugin(TestCase):
 
         pyquery = PyQuery(html)
 
-        # make sure the json script has the correct content
-        items = pyquery.find("action-list").attr("actions")
-        self.assertEqual(
-            items,
-            '[{"title": "Test message", "message": "Hello", "action_text": "", "action_url": "http://foo.bar"}]',
-        )
+        # make sure the action-list web component is present
+        action_list = pyquery.find("action-list")
+        self.assertEqual(len(action_list), 1)
+        self.assertEqual(action_list.attr("actions-id"), "userfeed_data")
+
+        # check the script tag contains the correct JSON data
+        script = pyquery.find("script#userfeed_data")
+        self.assertEqual(len(script), 1)
+        self.assertEqual(script.attr("type"), "application/json")
+
+        script_content = json.loads(script.text())
+        self.assertEqual(len(script_content), 1)
+        self.assertEqual(script_content[0]["title"], "Test message")
+        self.assertEqual(script_content[0]["message"], "Hello")
+        self.assertEqual(script_content[0]["action_url"], "http://foo.bar")
 
     def test_multiple_plugin(self):
         simple_message(self.user, "Hi", title="My message", url="http://test.com")
@@ -46,8 +54,7 @@ class TestUserFeedPlugin(TestCase):
         html, context = cms_tools.render_plugin(
             UserFeedPlugin, plugin_data={}, user=self.user
         )
-        feed_json = context["userfeed_item_list_json"]
-        feed = json.loads(feed_json)
+        feed = context["userfeed_item_list_json"]
         self.assertEqual(len(feed), 2)  # two items
 
         self.assertIn("Hi", html)
@@ -60,9 +67,21 @@ class TestUserFeedPlugin(TestCase):
 
         pyquery = PyQuery(html)
 
-        # make sure the json script has the correct content
-        items = pyquery.find("action-list").attr("actions")
-        self.assertEqual(
-            items,
-            '[{"title": "My message", "message": "Hi", "action_text": "", "action_url": "http://test.com"}, {"title": "TEST MESSAGE 2", "message": "TEST", "action_text": "", "action_url": "http://example.com"}]',
-        )
+        # make sure the action-list web component is present
+        action_list = pyquery.find("action-list")
+        self.assertEqual(len(action_list), 1)
+        self.assertEqual(action_list.attr("actions-id"), "userfeed_data")
+
+        # check the script tag contains the correct JSON data for both items
+        script = pyquery.find("script#userfeed_data")
+        self.assertEqual(len(script), 1)
+        self.assertEqual(script.attr("type"), "application/json")
+
+        script_content = json.loads(script.text())
+        self.assertEqual(len(script_content), 2)
+        self.assertEqual(script_content[0]["title"], "My message")
+        self.assertEqual(script_content[0]["message"], "Hi")
+        self.assertEqual(script_content[0]["action_url"], "http://test.com")
+        self.assertEqual(script_content[1]["title"], "TEST MESSAGE 2")
+        self.assertEqual(script_content[1]["message"], "TEST")
+        self.assertEqual(script_content[1]["action_url"], "http://example.com")

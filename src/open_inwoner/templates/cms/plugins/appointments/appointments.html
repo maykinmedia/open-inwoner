@@ -1,25 +1,24 @@
 {% load i18n tz list_tags icon_tags grid_tags utils %}
 
 {% if appointments %}
-<section class="plugin appointments">
-    <h2 class="utrecht-heading-2">{{ instance.title }}</h2>
-    <div class="card-container card-container--columns-2 plugin-card">
-        {% url "profile:appointments" as appointment_list_url %}
+{% url "profile:appointments" as appointment_list_url %}
+    <oip-home-plugin-section
+        title="{{ instance.title }}"
+        next-url="{{ appointment_list_url }}"
+        next-url-label="{% trans 'Bekijk alle afspraken' %}"
+        columns="2"
+    >
         {% for appointment in appointments %}
-            <a href="{{ appointment_list_url }}" class="card">
-                <div class="card__body card__body--tabled">
-                    {% timezone appointment.branch.timeZone %}
-                        <p class="utrecht-paragraph tabled__value">{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i"|add:" "|add:_("uur") }}</p>
-                    {% endtimezone %}
-                    <h2 class="plugin-card__heading">
-                        <span class="status">{{ appointment.services.0.name|default:appointment.title }}</span>
-                    </h2>
-                    <span class="button button--icon-after button--transparent">
-                        {% icon icon="east" outlined=True %}
-                    </span>
-                </div>
-            </a>
+            {% timezone appointment.branch.timeZone %}
+                <oip-home-plugin-card
+                    title="{{appointment.title}}"
+                    detail-url="{{appointment_list_url}}"
+                    date="{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i" }}"
+                    status="{{ appointment.services.0.name|default:appointment.title }}"
+                    address="{{appointment.branch.addressLine2}}, {{appointment.branch.addressCity}}"
+                    identificatie="{{appointment.publicId}}">
+                </oip-home-plugin-card>
+            {% endtimezone %}
         {% endfor %}
-    </div>
-</section>
+    </oip-home-plugin-section>
 {% endif %}

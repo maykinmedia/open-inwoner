@@ -1,9 +1,8 @@
-// Web component
-export { default as ActionListWebComponent } from './web-component';
+// Preact Component
+export { default as ActionList } from './ActionList';
 
-// React component
-export {
-  default as ActionList,
-  type IActionListProps,
-  type IActionProps,
-} from './ActionList';
+// Types
+export type { IActionListProps, IActionProps } from './ActionList';
+
+// Constants
+export * from './constants';

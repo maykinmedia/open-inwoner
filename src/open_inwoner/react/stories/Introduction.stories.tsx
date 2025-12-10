@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/preact';
 
 // This page is an example of an unattached doc
 const DocsOnly = () => null;

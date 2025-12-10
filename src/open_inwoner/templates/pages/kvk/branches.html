@@ -1,17 +1,6 @@
 {% extends "master.html" %}
 {% load i18n static form_tags grid_tags button_tags card_tags %}
 
-{% block mount_modules %}
-    data-mount-modules='["kvkbranchselector"]'
-{% endblock %}
-
-{% block react_modules %}
-<script
-  type="module"
-  src="{% static 'bundles/open_inwoner-react.js' %}"
-></script>
-{% endblock %}
-
 {% block content %}
     {% render_grid %}
         {% render_column start=4 span=6 %}
@@ -28,14 +17,8 @@
                 {% endif %}
 
                 {# React combobox with data only - translations handled by react-intl #}
-                <div
-                    data-react-module="kvkbranchselector"
-                    data-id="branch-selector"
-                    data-label="{% trans 'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen' %}"
-                    data-name="branch_number"
-                >
-                    {{ vestigingen_combobox_data|json_script:"branch-data" }}
-                </div>
+                {{ vestigingen_combobox_data|json_script:"branch-data" }}
+                <kvk-branch-selector branches-id="branch-data" label="{% trans 'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen' %}" name="branch_number"></kvk-branch-selector>
 
                 <div class="form__actions form__actions--fullwidth">
                     {% button primary=True name="submit" text=_('Ga door') title=_('Ga door met gekozen vestiging') icon="east" icon_position="after" icon_outlined=True extra_classes="button--disabled" %}

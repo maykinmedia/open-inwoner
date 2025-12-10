@@ -35,20 +35,20 @@ class TestUserAppointmentsPlugin(TestCase):
         pyquery = PyQuery(html)
 
         # test item
-        items = pyquery.find(".card-container .card")
+        items = pyquery.find("oip-home-plugin-card")
         self.assertEqual(len(items), 2)
 
-        aanvraag_paspoort_date = PyQuery(items.find("p.tabled__value")[0]).text()
-        aanvraag_paspoort_title = PyQuery(items.find(".plugin-card__heading")[0]).text()
-        aanvraag_id_kaart_date = PyQuery(items.find("p.tabled__value")[1]).text()
-        aanvraag_id_kaart_title = PyQuery(items.find(".plugin-card__heading")[1]).text()
+        aanvraag_paspoort_date = items[0].attrib["date"]
+        aanvraag_paspoort_title = items[0].attrib["status"]
+        aanvraag_id_kaart_date = items[1].attrib["date"]
+        aanvraag_id_kaart_title = items[1].attrib["status"]
 
-        self.assertEqual(aanvraag_paspoort_date, "1 januari 2020 om 13:00 uur")
+        self.assertEqual(aanvraag_paspoort_date, "1 januari 2020 om 13:00")
         self.assertEqual(aanvraag_paspoort_title, "Paspoort")
-        self.assertEqual(aanvraag_id_kaart_date, "6 maart 2020 om 11:30 uur")
+        self.assertEqual(aanvraag_id_kaart_date, "6 maart 2020 om 11:30")
         self.assertEqual(aanvraag_id_kaart_title, "ID kaart")
 
-        action_url = items[0].attrib["href"]
+        action_url = items[0].attrib["detail-url"]
         self.assertEqual(action_url, reverse("profile:appointments"))
 
     def test_plugin__email_not_verified(self, m):
