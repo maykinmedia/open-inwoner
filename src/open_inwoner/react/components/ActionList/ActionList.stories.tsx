@@ -1,8 +1,14 @@
-import { Meta, StoryObj } from '@storybook/react';
-import ActionList, { IActionProps } from './ActionList';
+import { Meta, StoryObj } from '@storybook/preact';
+import {
+  ACTION_LIST_DEFINITION,
+  ActionList,
+  IActionListProps,
+  IActionProps,
+} from '.';
+import { withLoader } from '@react/lib/decorators/storybook';
 
 const meta: Meta<typeof ActionList> = {
-  title: 'React/Components/ActionList',
+  title: 'Components/ActionList',
   component: ActionList,
   parameters: {
     layout: 'padded',
@@ -27,7 +33,7 @@ This component integrates with the Den Haag Action component and provides a cons
 };
 export default meta;
 
-type Story = StoryObj<typeof ActionList>;
+type Story = StoryObj<IActionListProps>;
 
 const mockDataWithItems: IActionProps[] = [
   {
@@ -80,4 +86,20 @@ export const Empty: Story = {
       },
     },
   },
+};
+
+/**
+ * Rendered as webcomponent
+ */
+export const AsWebComponent: Story = {
+  args: { actionsId: 'test-id' },
+  decorators: withLoader(ACTION_LIST_DEFINITION.tagName),
+  render: ({ actionsId }) => (
+    <>
+      <script type="application/json" id={actionsId}>
+        {JSON.stringify(mockDataWithItems)}
+      </script>
+      <action-list actions-id={actionsId} />
+    </>
+  ),
 };

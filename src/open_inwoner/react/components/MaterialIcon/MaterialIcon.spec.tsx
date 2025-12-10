@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import { MaterialIcon } from './MaterialIcon';
+import { render, screen } from '@testing-library/preact';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { MaterialIcon, MATERIAL_ICON_DEFINITION } from '.';
+import { WebComponentLoader } from '@react/lib/web-component';
 
 // Import jest-dom matchers for extended assertions like toBeInTheDocument
 import '@testing-library/jest-dom';
@@ -52,5 +53,51 @@ describe('MaterialIcon', () => {
 
     expect(screen.getByText('mail')).toBeInTheDocument();
     expect(screen.getByText('euro')).toBeInTheDocument();
+  });
+
+  describe('Web Component', () => {
+    beforeAll(async () => {
+      // Register the web component before tests
+      await WebComponentLoader.importWebComponent(
+        MATERIAL_ICON_DEFINITION.tagName
+      );
+    });
+
+    it('renders web component and displays icon name', () => {
+      render(<material-icon name="star" />);
+
+      // Verify the icon name is rendered
+      expect(screen.getByText('star')).toBeInTheDocument();
+      expect(screen.getByText('star')).toHaveClass('material-icons-outlined');
+    });
+
+    it('renders web component with different icon names', () => {
+      const { rerender } = render(<material-icon name="home" />);
+
+      expect(screen.getByText('home')).toBeInTheDocument();
+
+      rerender(<material-icon name="search" />);
+      expect(screen.getByText('search')).toBeInTheDocument();
+      expect(screen.queryByText('home')).not.toBeInTheDocument();
+    });
+
+    it('renders web component with aria-hidden attribute', () => {
+      render(<material-icon name="favorite" />);
+
+      const iconElement = screen.getByText('favorite');
+      expect(iconElement).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('renders multiple web component icons independently', () => {
+      render(
+        <div>
+          <material-icon name="mail" />
+          <material-icon name="euro" />
+        </div>
+      );
+
+      expect(screen.getByText('mail')).toBeInTheDocument();
+      expect(screen.getByText('euro')).toBeInTheDocument();
+    });
   });
 });

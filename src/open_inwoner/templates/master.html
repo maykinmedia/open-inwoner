@@ -2,7 +2,6 @@
 <html
     lang="nl"
     class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
-    {% block mount_modules %}{% endblock %}
 >
     <head>
         <meta charset="utf-8">
@@ -32,14 +31,6 @@
         <script nonce="{{ request.csp_nonce }}">
             window.NONCE = "{{ request.csp_nonce }}";
         </script>
-
-        {# Include web components bundle #}
-        <script
-            nonce="{{ request.csp_nonce }}"
-            src="{% static 'bundles/open_inwoner-webcomponents.js' %}"
-            defer
-            type="module"
-        ></script>
 
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
@@ -205,6 +196,8 @@
         </script>
         {% endif %}
         <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="text/javascript"></script>
-        {% block react_modules %}{% endblock %}
+        {# Including this script will allow the page to use the preact web-components #}
+        {# TODO remove once we have removed webpack #}
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-react.js' %}" type="module"></script>
     </body>
 </html>

@@ -188,16 +188,6 @@ if settings.DEBUG:
             "style-demo/",
             TemplateView.as_view(template_name="components/Typography/StyleDemo.html"),
         ),
-        # provide default react template
-        path(
-            "react-demo/",
-            TemplateView.as_view(template_name="demo/ReactDemo.html"),
-        ),
-        # provide web components demo template
-        path(
-            "webcomponents-demo/",
-            TemplateView.as_view(template_name="demo/WebComponentsDemo.html"),
-        ),
         # fix annoying favicon http error
         path("favicon.ico", RedirectView.as_view(url="/static/ico/favicon.png")),
     ] + urlpatterns

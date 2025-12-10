@@ -16,10 +16,13 @@
     "moduleDetection": "force",
     "noEmit": false,
     "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "baseUrl": ".",
     "paths": {
       "@react/*": ["./src/open_inwoner/react/*"],
-      "@webcomponents/*": ["./src/open_inwoner/webcomponents/*"]
+      "react": ["./node_modules/preact/compat"],
+      "react-dom": ["./node_modules/preact/compat"],
+      "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"]
     },
 
     /* Linting */
@@ -29,9 +32,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "vite-env.d.ts",
-    "src/open_inwoner/react",
-    "src/open_inwoner/webcomponents"
-  ]
+  "include": [".storybook", "vite-env.d.ts", "src/open_inwoner/react"],
+  "exclude": ["node_modules"]
 }

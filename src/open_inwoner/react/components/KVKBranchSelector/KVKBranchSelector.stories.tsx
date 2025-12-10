@@ -1,29 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { IntlProvider } from 'react-intl';
-import { KVKBranchSelector } from '../KVKBranchSelector/KVKBranchSelector';
-import 'material-icons/iconfont/material-icons.css';
-import '@open-inwoner/design-tokens/dist/css/index.css';
+import { withLoader } from '@react/lib/decorators/storybook';
+import type { Meta, StoryObj } from '@storybook/preact';
+import {
+  KVK_BRANCH_SELECTOR_DEFINITION,
+  KVKBranchSelector,
+  KVKBranchSelectorProps,
+} from '.';
 
-const meta: Meta<typeof KVKBranchSelector> = {
-  title: 'React/Components/KVKBranchSelector',
+const meta: Meta<KVKBranchSelectorProps> = {
+  title: 'Components/KVKBranchSelector',
   component: KVKBranchSelector,
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: '500px' }}>
-        <IntlProvider
-          locale="nl"
-          messages={{
-            'kvkbranchselector.placeholder':
-              'Vul naam, adres of vestigingsnummer in...',
-            'kvkbranchselector.clear': 'Wissen',
-            'kvkbranchselector.toggle': 'Opties tonen',
-          }}
-        >
-          <Story />
-        </IntlProvider>
-      </div>
-    ),
-  ],
   args: {
     // Default args for all stories
     id: 'branch-selector',
@@ -86,7 +71,7 @@ const meta: Meta<typeof KVKBranchSelector> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof KVKBranchSelector>;
+type Story = StoryObj<KVKBranchSelectorProps>;
 
 // Reusable mock data
 const mockBranches = [
@@ -243,4 +228,30 @@ export const EmptyBranches: Story = {
       },
     },
   },
+};
+
+/**
+ * Rendered as webcomponent
+ */
+export const AsWebComponent: Story = {
+  args: {
+    id: 'kvk-wc-selector',
+    label: 'Selecteer de vestiging waarmee u wilt inloggen',
+    name: 'branch_number',
+    branchesId: 'branches-id',
+  },
+  decorators: withLoader(KVK_BRANCH_SELECTOR_DEFINITION.tagName),
+  render: ({ id, label, name, branchesId }) => (
+    <>
+      <script type="application/json" id={branchesId}>
+        {JSON.stringify(mockBranches)}
+      </script>
+      <kvk-branch-selector
+        id={id}
+        label={label}
+        name={name}
+        branches-id={branchesId}
+      />
+    </>
+  ),
 };

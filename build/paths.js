@@ -28,9 +28,6 @@ module.exports = {
   // Path to the js entry point (source)
   reactEntry: sourcesRoot + 'react/main.ts',
 
-  // Path to the web components entry point (source)
-  webComponentsEntry: sourcesRoot + 'webcomponents/index.ts',
-
   // Path to js (sources)
   jsSrc: sourcesRoot + 'js/**/*.js',
 

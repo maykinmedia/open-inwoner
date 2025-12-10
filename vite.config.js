@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import preact from '@preact/preset-vite';
 import path from 'path';
 import paths from './build/paths';
 
@@ -12,7 +12,7 @@ const useSourceMap = argv.includes('--sourcemap');
 // Export Vite build-only config
 export default defineConfig({
   plugins: [
-    react({
+    preact({
       babel: {
         plugins: [
           [
@@ -22,7 +22,6 @@ export default defineConfig({
               ast: true,
             },
           ],
-          ['@babel/plugin-proposal-decorators', { version: '2023-11' }],
         ],
       },
     }),
@@ -45,7 +44,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         [`${paths.package.name}-react`]: `${__dirname}/${paths.reactEntry}`,
-        [`${paths.package.name}-webcomponents`]: `${__dirname}/${paths.webComponentsEntry}`,
       },
       output: {
         entryFileNames: '[name].js',
@@ -70,10 +68,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
-      '@webcomponents': path.resolve(
-        __dirname,
-        'src/open_inwoner/webcomponents'
-      ),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
   },

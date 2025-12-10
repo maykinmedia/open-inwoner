@@ -47,7 +47,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("num_zaken=4", context["hx_get_url"])
 
         # Check that web component container is rendered
-        self.assertIn("oip-homepage-plugin-section", html)
+        self.assertIn("oip-home-plugin-section", html)
         self.assertIn("Mijn Zaken", html)
         self.assertIn("hx-get", html)
 
@@ -69,8 +69,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("<!-- start zaken plugin -->", html)
         self.assertIn("<!-- end zaken plugin -->", html)
         # Should not contain any actual plugin content
-        self.assertNotIn("oip-homepage-plugin-section", html)
-        self.assertNotIn("oip-zaken-plugin-container", html)
+        self.assertNotIn("oip-home-plugin-section", html)
 
     def test_plugin_does_not_render_for_anonymous_user(self):
         ZGWApiGroupConfigFactory()
@@ -162,10 +161,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
-        # Should render container with no items
-        self.assertIn("oip-zaken-plugin-container", content)
         # Should have no zaak items
-        self.assertNotIn("oip-zaken-plugin-zaak-item", content)
+        self.assertNotIn("oip-home-plugin-card", content)
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
@@ -198,13 +195,13 @@ class CMSZakenPluginTest(TestCase):
 
         # Should render zaak items
         pyquery = PyQuery(content)
-        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_items = pyquery.find("oip-home-plugin-card")
         self.assertEqual(len(zaak_items), 1)
 
         # Check attributes (note: template uses 'identificatie' not 'identification')
         zaak_item = zaak_items.eq(0)
         self.assertEqual(zaak_item.attr("identificatie"), "ZAAK-001")
-        self.assertEqual(zaak_item.attr("description"), "Test zaak beschrijving")
+        self.assertEqual(zaak_item.attr("description"), "Zaaknummer: ZAAK-001")
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
@@ -225,10 +222,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("utf-8")
 
-        # Should render container but with no items
-        self.assertIn("oip-zaken-plugin-container", content)
         # Should have no zaak items
-        self.assertNotIn("oip-zaken-plugin-zaak-item", content)
+        self.assertNotIn("oip-home-plugin-card", content)
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
@@ -262,7 +257,7 @@ class CMSZakenPluginTest(TestCase):
 
         # Should render cases that were retrieved
         pyquery = PyQuery(content)
-        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_items = pyquery.find("oip-home-plugin-card")
         self.assertEqual(len(zaak_items), 1)
 
         # Should have error message in slot
@@ -306,7 +301,7 @@ class CMSZakenPluginTest(TestCase):
         content = response.content.decode("utf-8")
 
         pyquery = PyQuery(content)
-        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_items = pyquery.find("oip-home-plugin-card")
 
         # Should only return 3 items
         self.assertEqual(len(zaak_items), 3)
@@ -363,7 +358,7 @@ class CMSZakenPluginTest(TestCase):
         response = self.client.get(url, {"num_zaken": "5"}, HTTP_HX_REQUEST="true")
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_items = pyquery.find("oip-home-plugin-card")
 
         # Should return exactly 5 items
         self.assertEqual(len(zaak_items), 5)
@@ -421,7 +416,7 @@ class CMSZakenPluginTest(TestCase):
                 self.assertEqual(response.status_code, 200)
 
                 pyquery = PyQuery(response.content.decode("utf-8"))
-                zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+                zaak_items = pyquery.find("oip-home-plugin-card")
                 # Should return MAX_CASES_DEFAULT
                 self.assertEqual(len(zaak_items), MAX_CASES_DEFAULT)
 
@@ -454,10 +449,10 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        zaak_item = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_item = pyquery.find("oip-home-plugin-card")
 
         # Verify naam is mapped to description attribute
-        self.assertEqual(zaak_item.attr("description"), "Dit is de naam van de zaak")
+        self.assertEqual(zaak_item.attr("description"), "Zaaknummer: ZAAK-001")
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
@@ -490,7 +485,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        zaak_item = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_item = pyquery.find("oip-home-plugin-card")
 
         # Verify missing fields are provided as empty strings
         self.assertEqual(zaak_item.attr("identificatie"), "")
@@ -540,7 +535,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         pyquery = PyQuery(response.content.decode("utf-8"))
-        zaak_items = pyquery.find("oip-zaken-plugin-zaak-item")
+        zaak_items = pyquery.find("oip-home-plugin-card")
 
         # Should have both items
         self.assertEqual(len(zaak_items), 2)
@@ -549,12 +544,10 @@ class CMSZakenPluginTest(TestCase):
         submission_item = zaak_items.eq(0)
         self.assertEqual(submission_item.attr("identificatie"), "SUBMISSION-001")
         self.assertEqual(
-            submission_item.attr("description"), "Open submission met naam field"
+            submission_item.attr("description"), "Zaaknummer: SUBMISSION-001"
         )
 
         # Second item should be the case with "description" field
         case_item = zaak_items.eq(1)
         self.assertEqual(case_item.attr("identificatie"), "ZAAK-001")
-        self.assertEqual(
-            case_item.attr("description"), "Regular case met description field"
-        )
+        self.assertEqual(case_item.attr("description"), "Zaaknummer: ZAAK-001")

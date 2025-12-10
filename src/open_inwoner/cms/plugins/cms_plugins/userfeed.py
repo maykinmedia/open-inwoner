@@ -1,5 +1,3 @@
-import json
-
 from django.utils.translation import gettext as _
 
 from cms.plugin_base import CMSPluginBase
@@ -34,7 +32,7 @@ class UserFeedPlugin(CMSPluginBase):
             {
                 "instance": instance,
                 "userfeed": feed,
-                "userfeed_item_list_json": json.dumps(feed_items_list),
+                "userfeed_item_list_json": feed_items_list,
             }
         )
         return context

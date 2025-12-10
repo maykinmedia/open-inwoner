@@ -1,0 +1,97 @@
+.oip-home-plugin-card {
+  // TODO: to give these back to NLDS community, add these variables to OIP design-tokens package
+  --oip-plugin-card-background-color: #fff;
+  --oip-plugin-card-color: #333;
+  --oip-plugin-card-max-inline-size: 100%;
+  --oip-plugin-card-inline-size: 100%;
+  --oip-plugin-card-border-width: 1px;
+  --oip-plugin-card-border-style: solid;
+  --oip-plugin-card-border-color: #d2d2d2;
+  --oip-plugin-card-border-radius: 3px;
+  --oip-plugin-card-box-shadow: none;
+  --oip-plugin-card-display: flex;
+  --oip-plugin-card-row-gap: 24px;
+  --oip-plugin-card-heading-color: #000;
+  --oip-plugin-card-heading-padding-inline-start: 16px;
+  --oip-plugin-card-heading-padding-inline-end: 16px;
+  --oip-plugin-card-body-display: flex;
+  --oip-plugin-card-link-display: flex;
+  --oip-plugin-card-link-hover-text-decoration-thickness: 1px;
+  --oip-plugin-card-link-hover-text-decoration-line: underline;
+  --oip-plugin-card-link-hover-text-underline-offset: auto;
+  --oip-plugin-card-link-padding: 0;
+  --oip-plugin-card-content-gap: 16px;
+  --oip-plugin-card-content-padding-block-start: 16px;
+  --oip-plugin-card-content-padding-block-end: 16px;
+  --oip-plugin-card-body-padding-inline-start: 16px;
+  --oip-plugin-card-body-padding-inline-end: 16px;
+
+  cursor: pointer;
+  border: var(--oip-plugin-card-border-width)
+    var(--oip-plugin-card-border-style) var(--oip-plugin-card-border-color);
+  box-sizing: border-box;
+  position: relative;
+  background-color: var(--oip-plugin-card-background-color);
+  border-radius: var(--oip-plugin-card-border-radius);
+  box-shadow: var(--oip-plugin-card-box-shadow);
+  color: var(--oip-plugin-card-color);
+  font-family: 'Body', Arial, sans-serif;
+  display: var(--oip-plugin-card-display);
+  flex-direction: row;
+  height: 100%;
+  inline-size: var(--oip-plugin-card-inline-size);
+  max-inline-size: var(--oip-plugin-card-max-inline-size);
+  row-gap: var(--oip-plugin-card-row-gap);
+  min-width: 100%;
+  text-decoration: none;
+
+  &__content {
+    display: var(--oip-plugin-card-link-display);
+    gap: var(--oip-plugin-card-content-gap);
+    padding: var(--oip-plugin-card-content-padding-block-start)
+      var(--oip-plugin-card-content-padding-block-end);
+    width: 100%;
+    align-items: flex-end;
+  }
+
+  &__body {
+    display: var(--oip-plugin-card-body-display);
+    flex-direction: column;
+    gap: var(--oip-plugin-card-content-gap);
+    justify-content: space-between;
+    font-family: 'Body', sans-serif;
+    width: 100%;
+    height: 100%;
+    color: var(--oip-plugin-card-heading-color);
+
+    .utrecht-paragraph {
+      color: inherit;
+      font-weight: 700;
+      margin-block: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      & + .utrecht-paragraph {
+        margin-block: 0;
+      }
+
+      &-muted {
+        color: #676767;
+        margin-block: 0;
+        font-weight: 400;
+      }
+    }
+
+    .utrecht-heading-2 {
+      font-size: 20px;
+      margin-block: 0;
+    }
+  }
+
+  .material-icons-outlined {
+    color: var(--color-primary);
+    height: auto;
+    padding: 0;
+  }
+}

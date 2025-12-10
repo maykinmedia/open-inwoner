@@ -443,7 +443,7 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         mock_solo.return_value.cookiebanner_enabled = False
 
         product = ProductFactory(
-            content="Some content [CTABUTTON]", link="http://www.example.com"
+            content="Some content [CTABUTTON]", link="https://www.example.com"
         )
 
         context = self.browser.new_context()
@@ -460,4 +460,4 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         cta_button.click()
         new_page = context.wait_for_event("page")
 
-        self.assertEqual(new_page.url, "http://www.example.com/")
+        self.assertEqual(new_page.url, "https://www.example.com/")
