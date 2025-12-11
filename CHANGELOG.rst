@@ -164,6 +164,8 @@ Bugfixes
   objecten aan te maken.
 * [:taiga-is:`3507`: :pr:`1993`]: De vaste NLDS-huisstijlkleuren (primaire-, secundaire en accent-
   kleuren) kunnen nu worden overschreven met de kleuren van de colorpicker.
+* [:taiga-is:`3471`: :pr:`2007`]: De paginatitel van de sitemap verandert nu mee met de in de
+  configuratie meegegeven site-naam.
 * [:taiga-dimpact:`358`, :pr:`2009`]: Het alternatieve telefoonnummer wordt nu correct verwerkt
   vanuit de eSuite.
 * [:taiga-is:`3590`: :pr:`2030`]: Bug opgelost waarbij tablet gebruikers geen volledig uitgevuld
