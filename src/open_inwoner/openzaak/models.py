@@ -498,6 +498,14 @@ class CatalogusConfig(models.Model):
         null=False,
     )
 
+    found_in_api = models.BooleanField(
+        verbose_name=_("Found in API"),
+        help_text=_(
+            "Whether this object is (still) present in the backend API. This field is for diagnostic purposes only. If an object is not found in the API, this may be due to a transient issue and might be solved on a subsequent syncing operation."
+        ),
+        default=True,
+    )
+
     class Meta:
         ordering = ("domein", "rsin")
 
@@ -533,6 +541,14 @@ class ZaakTypeConfig(models.Model):
         verbose_name=_("Zaaktype omschrijving"),
         max_length=80,
         blank=True,
+    )
+
+    found_in_api = models.BooleanField(
+        verbose_name=_("Found in API"),
+        help_text=_(
+            "Whether this object is (still) present in the backend API. This field is for diagnostic purposes only. If an object is not found in the API, this may be due to a transient issue and might be solved on a subsequent syncing operation."
+        ),
+        default=True,
     )
 
     # actual config
@@ -626,6 +642,14 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
         default=list,
     )
 
+    found_in_api = models.BooleanField(
+        verbose_name=_("Found in API"),
+        help_text=_(
+            "Whether this object is (still) present in the backend API. This field is for diagnostic purposes only. If an object is not found in the API, this may be due to a transient issue and might be solved on a subsequent syncing operation."
+        ),
+        default=True,
+    )
+
     # configuration
 
     document_upload_enabled = models.BooleanField(
@@ -689,6 +713,14 @@ class ZaakTypeStatusTypeConfig(models.Model):
             verbose_name=_("Zaaktype UUID"),
         ),
         default=list,
+    )
+
+    found_in_api = models.BooleanField(
+        verbose_name=_("Found in API"),
+        help_text=_(
+            "Whether this object is (still) present in the backend API. This field is for diagnostic purposes only. If an object is not found in the API, this may be due to a transient issue and might be solved on a subsequent syncing operation."
+        ),
+        default=True,
     )
 
     # configuration
@@ -819,6 +851,14 @@ class ZaakTypeResultaatTypeConfig(models.Model):
             verbose_name=_("Zaaktype UUID"),
         ),
         default=list,
+    )
+
+    found_in_api = models.BooleanField(
+        verbose_name=_("Found in API"),
+        help_text=_(
+            "Whether this object is (still) present in the backend API. This field is for diagnostic purposes only. If an object is not found in the API, this may be due to a transient issue and might be solved on a subsequent syncing operation."
+        ),
+        default=True,
     )
 
     # configuration

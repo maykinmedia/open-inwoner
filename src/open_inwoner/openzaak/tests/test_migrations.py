@@ -5,8 +5,6 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
-    ZaakTypeConfigFactory,
-    ZaakTypeStatusTypeConfigFactory,
     ZGWApiGroupConfigFactory,
 )
 from open_inwoner.utils.tests.test_migrations import (
@@ -263,9 +261,36 @@ class StatusTypeDescriptionsMigrationTest(TestSuccessfulMigrations):
     app = "openzaak"
 
     def setUpBeforeMigration(self, apps):
-        zaaktype_config = ZaakTypeConfigFactory()
+        # Use historical models to avoid field mismatch issues
+        CatalogusConfig = apps.get_model("openzaak", "CatalogusConfig")
+        ZaakTypeConfig = apps.get_model("openzaak", "ZaakTypeConfig")
+        ZaakTypeStatusTypeConfig = apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        Service = apps.get_model("zgw_consumers", "Service")
 
-        ZaakTypeStatusTypeConfigFactory(
+        # Create a service using factory, then get the historical instance
+        service_factory = ServiceFactory(api_type="ztc")
+        service = Service.objects.get(id=service_factory.id)
+
+        # Create catalogus config with historical model
+        catalogus = CatalogusConfig.objects.create(
+            url="https://example.com/api/v1/catalogussen/test",
+            domein="TEST",
+            rsin="123456789",
+            service=service,
+        )
+
+        # Create zaaktype config with historical model
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            urls=["https://example.com/api/v1/zaaktypen/test"],
+            catalogus=catalogus,
+            identificatie="TEST-ZAAKTYPE",
+            omschrijving="Test ZaakType",
+        )
+
+        # Create statustype config with historical model
+        ZaakTypeStatusTypeConfig.objects.create(
             zaaktype_config=zaaktype_config,
             omschrijving="Test Statustype",
             statustekst="Test Statustekst",
@@ -295,9 +320,36 @@ class StatusTypeDocUploadDescriptionMigrationTest(TestSuccessfulMigrations):
     app = "openzaak"
 
     def setUpBeforeMigration(self, apps):
-        zaaktype_config = ZaakTypeConfigFactory()
+        # Use historical models to avoid field mismatch issues
+        CatalogusConfig = apps.get_model("openzaak", "CatalogusConfig")
+        ZaakTypeConfig = apps.get_model("openzaak", "ZaakTypeConfig")
+        ZaakTypeStatusTypeConfig = apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        Service = apps.get_model("zgw_consumers", "Service")
 
-        ZaakTypeStatusTypeConfigFactory(
+        # Create a service using factory, then get the historical instance
+        service_factory = ServiceFactory(api_type="ztc")
+        service = Service.objects.get(id=service_factory.id)
+
+        # Create catalogus config with historical model
+        catalogus = CatalogusConfig.objects.create(
+            url="https://example.com/api/v1/catalogussen/test",
+            domein="TEST",
+            rsin="123456789",
+            service=service,
+        )
+
+        # Create zaaktype config with historical model
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            urls=["https://example.com/api/v1/zaaktypen/test"],
+            catalogus=catalogus,
+            identificatie="TEST-ZAAKTYPE",
+            omschrijving="Test ZaakType",
+        )
+
+        # Create statustype config with historical model
+        ZaakTypeStatusTypeConfig.objects.create(
             zaaktype_config=zaaktype_config,
             omschrijving="Test Statustype",
             statustekst="Test Statustekst",

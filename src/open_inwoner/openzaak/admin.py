@@ -136,12 +136,14 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         "rsin",
         "url",
         "service",
+        "found_in_api",
     ]
     fields = [
         "url",
         "domein",
         "rsin",
         "service",
+        "found_in_api",
     ]
     readonly_fields = fields
     search_fields = [
@@ -150,7 +152,10 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         "url",
     ]
     ordering = ("domein", "rsin")
-    list_filter = ("service",)
+    list_filter = (
+        "service",
+        "found_in_api",
+    )
 
     actions = ["export_catalogus_configs"]
 
@@ -307,12 +312,14 @@ class ZaakTypeInformatieObjectTypeConfigInline(admin.TabularInline):
         "document_notification_enabled",
         "informatieobjecttype_uuid",
         "zaaktype_uuids",
+        "found_in_api",
     ]
     readonly_fields = [
         "omschrijving",
         "informatieobjecttype_url",
         "informatieobjecttype_uuid",
         "zaaktype_uuids",
+        "found_in_api",
     ]
     ordering = ("omschrijving",)
 
@@ -336,6 +343,7 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
     model = ZaakTypeStatusTypeConfig
     classes = ["collapse"]
     fields = [
+        "found_in_api",
         "statustekst",
         "omschrijving",
         "statustype_url",
@@ -352,6 +360,7 @@ class ZaakTypeStatusTypeConfigInline(admin.StackedInline):
         "case_link_text",
     ]
     readonly_fields = [
+        "found_in_api",
         "statustekst",
         "omschrijving",
         "statustype_url",
@@ -374,6 +383,7 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
     model = ZaakTypeResultaatTypeConfig
     classes = ["collapse"]
     fields = [
+        "found_in_api",
         "omschrijving",
         "resultaattype_url",
         "zaaktype_uuids",
@@ -381,6 +391,7 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
         "description",
     ]
     readonly_fields = [
+        "found_in_api",
         "omschrijving",
         "resultaattype_url",
         "esuite_compat_naam",
@@ -426,6 +437,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "export_zaaktype_configs",
     ]
     fields = [
+        "found_in_api",
         "urls",
         "catalogus",
         "identificatie",
@@ -439,6 +451,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "relevante_zaakperiode",
     ]
     readonly_fields = [
+        "found_in_api",
         "urls",
         "catalogus",
         "identificatie",
@@ -459,6 +472,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "num_infotypes",
         "num_statustypes",
         "num_resulttypes",
+        "found_in_api",
     ]
     list_display_links = [
         "identificatie",
@@ -468,6 +482,7 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
         "notify_status_changes",
         HasDocNotifyListFilter,
         CatalogUsedListFilter,
+        "found_in_api",
     ]
     search_fields = [
         "identificatie",

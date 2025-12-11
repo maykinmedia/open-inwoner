@@ -212,7 +212,7 @@ class ZGWConfigExport:
                 serialized_data,
             )
 
-            # Post-process ProsemirrorModelField values
+            # Post-process ProsemirrorModelField values and remove diagnostic fields
             for item in json_data:
                 model_class = qs.model
                 for field_name, field_value in item["fields"].items():
@@ -232,6 +232,10 @@ class ZGWConfigExport:
                                 item["fields"][field_name] = ""
                         else:
                             item["fields"][field_name] = ""
+
+                # Remove found_in_api field - it's a diagnostic field that should not be exported
+                # and will be set to True during import operations
+                item["fields"].pop("found_in_api", None)
 
             yield from json_data
 

@@ -98,10 +98,12 @@ Nieuwe features
 * [:taiga-us:`3580`, :pr:`2033`]: De zoekfunctie kan nu worden uitgeschakeld in de Algemene Configuratie.
 * [:taiga-is:`3600`, :pr:`2046`]: 'Signing requests' toegevoegd aan admin. Beheerders kunnen nu een CSR
   (Certificate Signing Request) genereren in de admin via 'Datakoppelingen > Ondertekeningsverzoeken'.
-* [:taiga-us:`3579`, :pr:`2049`, :pr:`2056`]: Het commando om de ZGW Catalogus te importeren geeft
+* [:taiga-us:`3579`, :pr:`2049`, :pr:`2056`, :pr:`2064`]: Het commando om de ZGW Catalogus te importeren geeft
   nu uitgebreidere informatie (bijvoorbeeld welke zaaktypes wel zijn ontvangen maar niet
   gesynchroniseerd vanwege een geconfigureerd filter), en zorgt ervoor dat alle velden
-  uit de API correct worden overgenomen in de lokale versie van de catalogus.
+  uit de API correct worden overgenomen in de lokale versie van de catalogus. ZGW objecten
+  die niet meer in de API gevonden worden, worden nu gemarkeerd met een ``found_in_api``
+  vlag zodat verweesde configuratie makkelijk kan worden geïdentificeerd.
 * [:taiga-us:`3578`, :pr:`2043`]: Nieuw Front-end ontwerp voor CMS plug-in 'Balie Afspraken' gebouwd met
   design-tokens volgens het NLDS principe.
 * [:taiga-us:`3606`, :pr:`2051`]: Zaken en open formulieren hebben nu verschillende teksten voor de status
