@@ -17,6 +17,11 @@
     color: var(--oip-color-fg);
   }
 
+  &__row:hover .utrecht-table__cell {
+    // TODO: --utrecht-table-row-hover-cell-background-color does not exist in the NLDS Utrecht source yet
+    background-color: var(--utrecht-table-row-alternate-even-background-color);
+  }
+
   &__footer {
     .utrecht-table__row {
       .utrecht-table__cell {
