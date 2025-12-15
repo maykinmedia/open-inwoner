@@ -263,7 +263,7 @@ class CMSZakenPluginTest(TestCase):
         # Should have error message in slot
         error_slot = pyquery.find('[slot="error"]')
         self.assertEqual(len(error_slot), 1)
-        self.assertIn("technical difficulties", error_slot.text().lower())
+        self.assertIn("technisch probleem", error_slot.text().lower())
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(

@@ -211,6 +211,7 @@ Onderhoud
   omwille van de B1 taaleis.
 * [:pr:`2031`] Verouderde ``mozilla-django-oidc-db`` cache-instellingen verwijderd.
 * [:pr:`2041`]: ``certifi`` bijgewerkt naar versie ``2025.11.12``.
+* [:taiga-us:`3581`, :pr:`2050`]: Vertalingen bijgewerkt.
 
 1.35.2 (2025-11-13)
 ===================
