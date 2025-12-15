@@ -687,7 +687,10 @@ isodate==0.6.1
     #   -r requirements/base.txt
     #   maykin-python3-saml
 jinja2==3.1.6
-    # via sphinx
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   sphinx
 josepy==1.13.0
     # via
     #   -c requirements/base.txt
@@ -733,8 +736,11 @@ markuppy==1.14
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   tablib
-markupsafe==2.1.5
-    # via jinja2
+markupsafe==3.0.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   jinja2
 maykin-2fa==1.0.2
     # via
     #   -c requirements/base.txt

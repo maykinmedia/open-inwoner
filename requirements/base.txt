@@ -392,6 +392,8 @@ inflection==0.5.1
     # via drf-spectacular
 isodate==0.6.1
     # via maykin-python3-saml
+jinja2==3.1.6
+    # via -r requirements/base.in
 josepy==1.13.0
     # via mozilla-django-oidc
 jsonschema==4.1.0
@@ -414,6 +416,8 @@ markdown==3.3.6
     # via -r requirements/base.in
 markuppy==1.14
     # via tablib
+markupsafe==3.0.3
+    # via jinja2
 maykin-2fa==1.0.2
     # via -r requirements/base.in
 maykin-common[otel]==0.10.0

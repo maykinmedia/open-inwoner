@@ -819,7 +819,7 @@ markuppy==1.14
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   tablib
-markupsafe==2.1.5
+markupsafe==3.0.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

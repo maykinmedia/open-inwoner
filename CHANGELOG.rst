@@ -98,7 +98,7 @@ Nieuwe features
 * [:taiga-us:`3580`, :pr:`2033`]: De zoekfunctie kan nu worden uitgeschakeld in de Algemene Configuratie.
 * [:taiga-is:`3600`, :pr:`2046`]: 'Signing requests' toegevoegd aan admin. Beheerders kunnen nu een CSR
   (Certificate Signing Request) genereren in de admin via 'Datakoppelingen > Ondertekeningsverzoeken'.
-* [:taiga-us:`3579`, :pr:`2049`]: Het commando om de ZGW Catalogus te importeren geeft
+* [:taiga-us:`3579`, :pr:`2049`, :pr:`2056`]: Het commando om de ZGW Catalogus te importeren geeft
   nu uitgebreidere informatie (bijvoorbeeld welke zaaktypes wel zijn ontvangen maar niet
   gesynchroniseerd vanwege een geconfigureerd filter), en zorgt ervoor dat alle velden
   uit de API correct worden overgenomen in de lokale versie van de catalogus.
