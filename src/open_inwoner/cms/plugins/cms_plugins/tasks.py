@@ -1,14 +1,16 @@
 from enum import Enum
-from typing import Generator, Type, TypedDict, assert_never
+from typing import Generator, Type, TypedDict, assert_never, cast
 from urllib.parse import urlencode
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import formats
 from django.utils.translation import gettext as _
 
 import structlog
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from objectsapiclient.models import Configuration
+from objectsapiclient.models import ObjectsAPIServiceConfiguration
+from objectsapiclient.services import ObjectsAPIService
 from pydantic import ValidationError
 from requests import RequestException
 
@@ -148,9 +150,10 @@ class TasksPlugin(CMSPluginBase):
         """
         Fetch `externe taken` from Objects API
         """
-        objects_api_client = Configuration.get_solo().client
-
-        if objects_api_client is None:
+        try:
+            service = ObjectsAPIService(ObjectsAPIServiceConfiguration.get_solo())
+        except ImproperlyConfigured:
+            logger.debug("Objects API service not configured, skipping external tasks")
             return
 
         factory_map: dict[str, Type[ExternFormulierTaak | UrlTaak]] = {}
@@ -163,10 +166,17 @@ class TasksPlugin(CMSPluginBase):
             factory_map[instance.object_type_dimpact] = UrlTaak
 
         for object_type_uuid, obj_factory in factory_map.items():
-            for obj in objects_api_client.get_objects(
-                object_type_uuid=object_type_uuid
-            ):
-                taak_data = obj.record["data"] | {"url": obj.url, "uuid": obj.uuid}
+            for obj in service.get_objects(object_type_uuid=object_type_uuid):
+                record_data = obj.record.data
+                if record_data is None:
+                    logger.warning(
+                        "Object has no data field",
+                        object_uuid=obj.uuid,
+                        object_type_uuid=object_type_uuid,
+                    )
+                    continue
+
+                taak_data = cast(dict, record_data) | {"url": obj.url, "uuid": obj.uuid}
                 try:
                     yield obj_factory.validate(taak_data)
                 except ValidationError:

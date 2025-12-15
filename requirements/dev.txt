@@ -23,6 +23,7 @@ ape-pie==0.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   objects-api-client-django
     #   zgw-consumers
 asgiref==3.7.2
     # via
@@ -873,7 +874,7 @@ oath==1.4.4
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-objects-api-client-django @ git+https://github.com/maykinmedia/objects-api-client-django.git@6f26a2a2fbdb52fe89d779fd2432a99f3ee454a4#egg=objects-api-client-django
+objects-api-client-django==0.5.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1062,6 +1063,7 @@ pydantic[email]==2.9.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-setup-configuration
+    #   objects-api-client-django
     #   pydantic-settings
 pydantic-core==2.23.4
     # via
