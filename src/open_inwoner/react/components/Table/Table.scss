@@ -1,0 +1,33 @@
+@use '@utrecht/table-css/dist/index.css';
+
+.utrecht-table {
+  // Values that are not set in the community design tokens
+  &-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--spacing-giant);
+  }
+
+  &__header-cell {
+    border-block-end: 2px solid var(--oip-color-gray);
+    background-color: var(--utrecht-table-header-background-color);
+  }
+
+  &__cell {
+    color: var(--oip-color-fg);
+  }
+
+  &__footer {
+    .utrecht-table__row {
+      .utrecht-table__cell {
+        background-color: var(--utrecht-table-footer-background-color);
+        border-block-start: 2px solid
+          var(--utrecht-table-row-border-block-end-color);
+        border-block-end: 2px solid
+          var(--utrecht-table-row-border-block-end-color);
+        color: var(--utrecht-table-footer-color);
+        font-weight: bold;
+      }
+    }
+  }
+}

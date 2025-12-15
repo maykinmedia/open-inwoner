@@ -1,0 +1,19 @@
+// Context styling for Mijn Afval page
+
+.afval {
+  &-container {
+    padding-block-start: var(--spacing-large);
+    display: flex;
+    flex-direction: column;
+  }
+
+  // every table except the first one
+  &-container:not(:first-of-type) {
+    padding-block-start: calc(var(--spacing-large) + var(--spacing-large));
+  }
+
+  &-object {
+    display: flex;
+    flex-direction: column;
+  }
+}
