@@ -54,6 +54,7 @@ xsdata
 django-setup-configuration
 django-yubin
 django-structlog
+jinja2
 
 # django cms
 django-cms
