@@ -18,7 +18,6 @@ from open_inwoner.cms.utils.page_display import (
     profile_page_is_published,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.pdc.models.category import Category
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
@@ -163,22 +162,12 @@ def _get_cms_profile_pages() -> list:
 
 def _get_platform_pages(request) -> list:
     """
-    Get platform pages (home, contact form, login) for the sitemap
+    Get "platform" pages (home, login) for the sitemap
     """
     platform_pages = [
         {"url_name": "pages-root", "link_text": _("Home page")},
     ]
 
-    klant_config = KlantenSysteemConfig.get_solo()
-    if klant_config.contact_registration_enabled:
-        platform_pages.append(
-            {
-                "url_name": "openklant:contactform",
-                "link_text": _("Contactformulier"),
-            },
-        )
-
-    # Hide login links for users that are logged in
     if not request.user.is_authenticated:
         platform_pages.append(
             {"url_name": "login", "link_text": _("Login or create an account")}
