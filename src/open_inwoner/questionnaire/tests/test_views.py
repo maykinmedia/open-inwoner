@@ -8,6 +8,7 @@ from django.views.generic import FormView
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
@@ -306,6 +307,7 @@ class QuestionnaireStepListViewTestCase(WebTest):
         # cms profile apphook configuration
         ProfileConfig.objects.create(namespace=ProfileApphook.app_name)
         cms_tools.create_apphook_page(ProfileApphook)
+        cms_tools.create_apphook_page(ProductsApphook)
 
         QuestionnaireStepFactory()
         path = reverse("profile:detail")

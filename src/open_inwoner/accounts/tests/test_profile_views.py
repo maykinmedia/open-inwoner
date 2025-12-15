@@ -26,6 +26,7 @@ from open_inwoner.accounts.models import User
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
@@ -205,6 +206,7 @@ class ProfileViewTests(WebTest):
         category = CategoryFactory()
         self.user.selected_categories.add(category)
         QuestionnaireStepFactory(published=True)
+        cms_tools.create_apphook_page(ProductsApphook)
 
         response = self.app.get(self.url, user=self.user)
         self.assertEqual(response.status_code, 200)

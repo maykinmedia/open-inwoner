@@ -37,30 +37,43 @@ def _get_category_data_for_user(cat: Category, user: User) -> dict:
     }
 
 
-def _get_cms_pages() -> list:
+def _get_cms_pages(request) -> list:
     """
     Get app-specific CMS pages for the sitemap
 
     Returns a list of app-specific page dictionaries (Mijn uitkeringen, Mijn zaken, etc.)
     """
+    try:
+        profile_config = ProfileConfig.objects.get()
+    except ProfileConfig.MultipleObjectsReturned:
+        logger.warning("Multiple instances of ProfileConfig apphook found")
+        profile_config = ProfileConfig.objects.first()
+
+    user = request.user
     cms_pages = []
 
-    if benefits_page_is_published():
+    # only add to general CMS if display in profile not enabled (to avoid duplication)
+    if benefits_page_is_published() and not profile_config.ssd:
+        logger.error("SSD PUBLISHED")
         cms_pages.append(
             {"url_name": "ssd:uitkeringen", "link_text": _("Mijn uitkeringen")}
         )
-    if case_page_is_published():
+    if user.is_authenticated and case_page_is_published():
         cms_pages.append({"url_name": "cases:index", "link_text": _("Mijn zaken")})
-        cms_pages.append(
-            {"url_name": "cases:contactmoment_list", "link_text": _("Mijn vragen")}
-        )
-    if collaborate_page_is_published():
+        # check to avoid duplication
+        if not profile_config.questions:
+            cms_pages.append(
+                {"url_name": "cases:contactmoment_list", "link_text": _("Mijn vragen")}
+            )
+    if user.is_authenticated and collaborate_page_is_published():
         cms_pages.append(
             {"url_name": "collaborate:plan_list", "link_text": _("Mijn samenwerkingen")}
         )
-    if inbox_page_is_published():
+    if user.is_authenticated and inbox_page_is_published():
         cms_pages.append({"url_name": "inbox:index", "link_text": _("Mijn berichten")})
-    if products_page_is_published():
+    if products_page_is_published() and (
+        not profile_config or not profile_config.selfdiagnose
+    ):
         cms_pages.append(
             {"url_name": "products:questionnaire_list", "link_text": _("Zelftest")}
         )
@@ -87,6 +100,9 @@ def _get_cms_profile_pages() -> list:
     except ProfileConfig.MultipleObjectsReturned:
         logger.warning("Multiple instances of ProfileConfig apphook found")
         profile_config = ProfileConfig.objects.first()
+
+    if not profile_config:
+        return []
 
     if profile_config.selected_categories:
         cms_profile_pages.append(
@@ -135,14 +151,14 @@ def _get_cms_profile_pages() -> list:
                 "link_text": _("Notificatievoorkeuren"),
             }
         )
-    if profile_config.questions:
+    if profile_config.questions and case_page_is_published():
         cms_profile_pages.append(
             {
                 "url_name": "cases:contactmoment_list",
                 "link_text": _("Mijn vragen"),
             }
         )
-    if profile_config.ssd:
+    if profile_config.ssd and benefits_page_is_published():
         cms_profile_pages.append(
             {
                 "url_name": "ssd:uitkeringen",
@@ -220,7 +236,7 @@ def sitemap(request):
         ],
     }
 
-    context["cms_pages"] = _get_cms_pages()
+    context["cms_pages"] = _get_cms_pages(request)
     context["cms_profile_pages"] = _get_cms_profile_pages()
     context["platform_pages"] = _get_platform_pages(request)
     context["cms_footer_pages"] = _get_cms_footer_pages(request)
