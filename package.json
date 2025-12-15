@@ -44,7 +44,7 @@
     "@gemeente-denhaag/side-navigation": "^4.0.2",
     "@joeattardi/emoji-button": "^4.6.4",
     "@nl-design-system-candidate/number-badge-css": "^1.1.2",
-    "@open-inwoner/design-tokens": "^0.0.20",
+    "@open-inwoner/design-tokens": "^0.0.22",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "@utrecht/button-css": "^2.3.1",
     "@utrecht/document-css": "^1.5.1",
@@ -58,9 +58,9 @@
     "@utrecht/paragraph-css": "^2.3.1",
     "@utrecht/select-css": "^1.8.1",
     "@utrecht/skip-link-css": "^1.5.1",
+    "@utrecht/table-css": "^2.0.1",
     "@utrecht/textbox-css": "^2.0.0",
     "@utrecht/unordered-list-css": "^1.5.1",
-    "@utrecht/web-component-library-stencil": "^3.5.0",
     "bem.js": "^1.0.10",
     "caniuse-lite": "^1.0.30001707",
     "clsx": "^2.1.1",
@@ -151,7 +151,7 @@
     "playwright": ">=1.55.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "*",
-    "@esbuild/linux-x64": "*"
+    "@esbuild/linux-x64": "*",
+    "@rollup/rollup-linux-x64-gnu": "*"
   }
 }

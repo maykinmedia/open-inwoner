@@ -39,25 +39,41 @@
 
                                 {% if container.ledigingen %}
                                     <div class="afval-container__table-wrapper">
-                                        <table class="afval-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>{% trans "Datum ophalen" %}</th>
-                                                    <th>{% trans "Tijd ophalen" %}</th>
-                                                    <th>{% trans "Gewicht van lediging" %}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for lediging in container.ledigingen %}
-                                                    <tr>
-                                                        <td>{{ lediging.tijdstip_datum }}</td>
-                                                        <td>{{ lediging.tijdstip_tijd }}</td>
-                                                        <td>{{ lediging.gewicht }}</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                        <oip-table-container>
+                                            <oip-table>
+                                                <oip-table-caption content="Container: {{ container.identifier }}"></oip-table-caption>
+
+                                                <oip-table-header>
+                                                    <oip-table-row>
+                                                        <oip-table-header-cell content="{% trans 'Datum ophalen' %}" scope="col"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Tijd ophalen' %}" scope="col"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Gewicht van lediging' %}" scope="col"></oip-table-header-cell>
+                                                    </oip-table-row>
+                                                </oip-table-header>
+
+                                                <oip-table-body>
+                                                    {% for lediging in container.ledigingen %}
+                                                        <oip-table-row>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
+                                                        </oip-table-row>
+                                                    {% endfor %}
+                                                </oip-table-body>
+
+                                                <oip-table-footer>
+                                                    <oip-table-row>
+                                                        <oip-table-cell colspan="2" content="{% trans 'Totaal gewicht' %}"></oip-table-cell>
+                                                        <oip-table-cell content="{{ container.totaal_gewicht }} kg"></oip-table-cell>
+                                                    </oip-table-row>
+                                                </oip-table-footer>
+                                            </oip-table>
+                                        </oip-table-container>
                                     </div>
+                                {% else %}
+                                    <p class="utrecht-paragraph">
+                                        {% trans "Voor deze container zijn in deze periode geen gegevens." %}
+                                    </p>
                                 {% endif %}
                             </section>
                         {% endif %}
@@ -77,24 +93,36 @@
 
                                 {% if container.ledigingen %}
                                     <div class="afval-container__table-wrapper">
-                                        <table class="afval-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>{% trans "Datum" %}</th>
-                                                    <th>{% trans "Tijd van lediging" %}</th>
-                                                    <th>{% trans "Gewicht van lediging" %}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for lediging in container.ledigingen %}
-                                                    <tr>
-                                                        <td>{{ lediging.tijdstip_datum }}</td>
-                                                        <td>{{ lediging.tijdstip_tijd }}</td>
-                                                        <td>{{ lediging.gewicht }}</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                        <oip-table-container>
+                                            <oip-table>
+                                                <oip-table-caption content="Container: {{ container.identifier }}"></oip-table-caption>
+
+                                                <oip-table-header>
+                                                    <oip-table-row>
+                                                        <oip-table-header-cell content="{% trans 'Datum' %}"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Tijd van lediging' %}"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Gewicht van lediging' %}"></oip-table-header-cell>
+                                                    </oip-table-row>
+                                                </oip-table-header>
+
+                                                <oip-table-body>
+                                                    {% for lediging in container.ledigingen %}
+                                                        <oip-table-row>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
+                                                        </oip-table-row>
+                                                    {% endfor %}
+                                                </oip-table-body>
+
+                                                <oip-table-footer>
+                                                    <oip-table-row>
+                                                        <oip-table-cell colspan="2" content="{% trans 'Totaal gewicht' %}"></oip-table-cell>
+                                                        <oip-table-cell content="{{ container.totaal_gewicht }} kg"></oip-table-cell>
+                                                    </oip-table-row>
+                                                </oip-table-footer>
+                                            </oip-table>
+                                        </oip-table-container>
                                     </div>
                                 {% endif %}
                             </section>
@@ -110,58 +138,4 @@
             {% endfor %}
         {% endrender_column %}
     {% endrender_grid %}
-
-    <style>
-        .afval-object {
-            margin-bottom: 2rem;
-        }
-
-        .afval-object__header {
-            margin-bottom: 1.5rem;
-        }
-
-        .afval-object__separator {
-            margin: 2rem 0;
-            border: none;
-            border-top: 1px solid #ccc;
-        }
-
-        .afval-container {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .afval-container__table-wrapper {
-            margin-top: 1rem;
-            overflow-x: auto;
-        }
-
-        .afval-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
-
-        .afval-table th,
-        .afval-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .afval-table th {
-            background-color: #e9ecef;
-            font-weight: 600;
-        }
-
-        .afval-table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .afval-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-    </style>
 {% endblock content %}
