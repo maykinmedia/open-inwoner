@@ -1,6 +1,5 @@
 {% load i18n icon_tags button_tags django_htmx %}
 
-<!-- start zaken plugin -->
 {% if show_zaken_plugin %}
     {% if request.htmx %}
         <oip-home-plugin-section
@@ -37,8 +36,4 @@
             </oip-home-plugin-section>
         </div>
     {% endif %}
-    <!-- end zaken plugin -->
-{% else %}
-    <!-- Unable to render Mijn Zaken Plugin due to a configuration issue-->
 {% endif %}
-<!-- end zaken plugin -->
