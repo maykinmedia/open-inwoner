@@ -19,7 +19,7 @@ class QuestionAdmin(OrderedModelAdmin):
 
 class QuestionInline(admin.TabularInline):
     model = Question
-    extra = 1
+    extra = 0
 
     fields = [
         "question",

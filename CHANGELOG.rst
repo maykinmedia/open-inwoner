@@ -178,6 +178,8 @@ Bugfixes
   toegoevegd, en de logica voor alle login types is opgeschoond.
 * [:taiga-is:`3599`, :pr:`2045`]: Bij het bekijken van de bron code van componenten in Storybook
   wordt nu de correcte styling getoond.
+* [:taiga-ta:`3636`, :pr:`2068`]: Automatisch toegevoegen van een extra veelgestelde vraag in
+  product admin is uitgezet.
 
 Onderhoud
 ---------
