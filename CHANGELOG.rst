@@ -185,6 +185,8 @@ Bugfixes
   wordt nu de correcte styling getoond.
 * [:taiga-ta:`3636`, :pr:`2068`]: Automatisch toegevoegen van een extra veelgestelde vraag in
   product admin is uitgezet.
+* [:taiga-is:`3537`, :taiga-is:`3321`, :pr:`2061`]: Sitemap bijgewerkt: duplicaten verwijderd,
+  structuur vereenvoudigd.
 
 Onderhoud
 ---------
