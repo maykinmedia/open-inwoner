@@ -52,6 +52,10 @@
       var(--oip-plugin-card-content-padding-block-end);
     width: 100%;
     align-items: flex-end;
+    // Give minimal spacing on desktop for Openstaande Formulieren
+    @media (min-width: 768px) {
+      min-height: 70px;
+    }
   }
 
   &__body {

@@ -106,8 +106,9 @@ Nieuwe features
   vlag zodat verweesde configuratie makkelijk kan worden geïdentificeerd.
 * [:taiga-us:`3578`, :pr:`2043`]: Nieuw Front-end ontwerp voor CMS plug-in 'Balie Afspraken' gebouwd met
   design-tokens volgens het NLDS principe.
-* [:taiga-us:`3606`, :pr:`2051`]: Zaken en open formulieren hebben nu verschillende teksten voor de status
-  en actieknop/link.
+* [:taiga-us:`3615`, :pr:`2051`, :pr:`2065`]: Zaken en open formulieren hebben nu
+  verschillende teksten voor de status en actieknop/link en op de Home pagina. Het
+  zaaknummer wordt alleen getoond voor reguliere zaken, niet voor formulieren.
 * [:taiga-us:`3606`]: Experimentele client geïmplementeerd met mock data ter ondersteuning van het ontwikkelen
   van de 'Mijn Afval' module.
 * [:taiga-us:`3607`, :pr:`2075`]: Basisapp ‘Mijn Afval’ geïmplementeerd en geïntegreerd met Django CMS.

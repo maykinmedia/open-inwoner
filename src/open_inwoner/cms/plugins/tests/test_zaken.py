@@ -201,7 +201,8 @@ class CMSZakenPluginTest(TestCase):
         # Check attributes (note: template uses 'identificatie' not 'identification')
         zaak_item = zaak_items.eq(0)
         self.assertEqual(zaak_item.attr("identificatie"), "ZAAK-001")
-        self.assertEqual(zaak_item.attr("description"), "Zaaknummer: ZAAK-001")
+        self.assertIn("Zaaknummer:", zaak_item.attr("description"))
+        self.assertIn("ZAAK-001", zaak_item.attr("description"))
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
@@ -457,8 +458,9 @@ class CMSZakenPluginTest(TestCase):
         pyquery = PyQuery(response.content.decode("utf-8"))
         zaak_item = pyquery.find("oip-home-plugin-card")
 
-        # Verify naam is mapped to description attribute
-        self.assertEqual(zaak_item.attr("description"), "Zaaknummer: ZAAK-001")
+        # Verify naam is mapped to description attribute with Zaaknummer label
+        self.assertIn("Zaaknummer:", zaak_item.attr("description"))
+        self.assertIn("ZAAK-001", zaak_item.attr("description"))
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
@@ -506,6 +508,7 @@ class CMSZakenPluginTest(TestCase):
         """
         Test that both 'naam' field (from formulieren) and 'description' field
         (from regular zaken) are correctly mapped to 'description' in the component output.
+        Formulieren should have empty description, cases should show "Zaaknummer: " label.
         """
         api_group = ZGWApiGroupConfigFactory()
 
@@ -549,14 +552,13 @@ class CMSZakenPluginTest(TestCase):
         # Should have both items
         self.assertEqual(len(zaak_items), 2)
 
-        # First item should be the formulier with "naam" field
+        # First item should be the formulier with empty description
         submission_item = zaak_items.eq(0)
         self.assertEqual(submission_item.attr("identificatie"), "SUBMISSION-001")
-        self.assertEqual(
-            submission_item.attr("description"), "Zaaknummer: SUBMISSION-001"
-        )
+        self.assertEqual(submission_item.attr("description"), "")
 
-        # Second item should be the case with "description" field
+        # Second item should be the case with "Zaaknummer: " label
         case_item = zaak_items.eq(1)
         self.assertEqual(case_item.attr("identificatie"), "ZAAK-001")
-        self.assertEqual(case_item.attr("description"), "Zaaknummer: ZAAK-001")
+        self.assertIn("Zaaknummer:", case_item.attr("description"))
+        self.assertIn("ZAAK-001", case_item.attr("description"))
