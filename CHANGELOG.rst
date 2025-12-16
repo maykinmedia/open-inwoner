@@ -106,6 +106,8 @@ Nieuwe features
   design-tokens volgens het NLDS principe.
 * [:taiga-us:`3606`, :pr:`2051`]: Zaken en open formulieren hebben nu verschillende teksten voor de status
   en actieknop/link.
+* [:taiga-us:`3606`]: Experimentele client geïmplementeerd met mock data ter ondersteuning van het ontwikkelen
+  van de 'Mijn Afval' module.
 
 Bugfixes
 --------
