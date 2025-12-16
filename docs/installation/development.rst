@@ -12,7 +12,7 @@ You need the following libraries and/or programs:
 * `Python`_ 3.12 or above
 * Python `Virtualenv`_ and `Pip`_
 * `PostgreSQL`_ 10 or above with PostGIS extension
-* `Node.js`_
+* `Node.js`_ 24.12
 * `npm`_
 * `Elastic Search`_ 7.9.2 or above
 
