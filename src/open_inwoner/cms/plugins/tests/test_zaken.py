@@ -66,11 +66,9 @@ class CMSZakenPluginTest(TestCase):
         self.assertNotIn("hx_get_url", context)
         self.assertNotIn("show_zaken_plugin", context)
 
-        # Template always renders HTML comments, but no content when show_zaken_plugin is not set
-        self.assertIn("<!-- start zaken plugin -->", html)
-        self.assertIn("<!-- end zaken plugin -->", html)
         # Should not contain any actual plugin content
         self.assertNotIn("oip-home-plugin-section", html)
+        self.assertNotIn("oip-home-plugin-card", html)
 
     def test_plugin_does_not_render_for_anonymous_user(self):
         ZGWApiGroupConfigFactory()

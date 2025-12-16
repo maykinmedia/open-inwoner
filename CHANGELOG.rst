@@ -83,7 +83,7 @@ Nieuwe features
   voor links naar andere portalen gebouwd, inclusief nieuwe design-tokens volgens NLDS conventies. Opmaak is
   verbeterd voor inhoud met langere linkteksten die naar een nieuwe regel worden afgebroken.
 * [:taiga-us:`3509`, :pr:`1997`]: Ondersteuning voor eIDAS login via OIDC is toegevoegd.
-* [:taiga-us:`3575`, :pr:`2020`, :pr:`2037`, :pr:`2042`]: CMS plug-in 'Mijn Zaken' aangemaakt voor het
+* [:taiga-us:`3575`, :pr:`2020`, :pr:`2037`, :pr:`2042`, :pr:`2058`]: CMS plug-in 'Mijn Zaken' aangemaakt voor het
   ontsluiten van zaken in de startpagina.
 * [:taiga-us:`3574`, :pr:`2026`]: Aantal requests aan zaken API's configureerbaar gemaakt via
   omgevingsvariabele.
