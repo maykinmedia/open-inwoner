@@ -216,6 +216,8 @@ Onderhoud
 * [:taiga-us:`3581`, :pr:`2050`]: Vertalingen bijgewerkt.
 * [:pr:`2018`, :pr:`2063`] ``objects-api-client-django`` bijgewerkt naar nieuwste
   versie ``0.5.0``.
+* [:pr:`2057`]: ``node`` bijgewerkt naar versie ``24.12`` en ``node:20-bookworm-slim``
+  bijgewerkt naar ``node:24-bookworm-slim`` in Docker container.
 
 1.35.2 (2025-11-13)
 ===================
