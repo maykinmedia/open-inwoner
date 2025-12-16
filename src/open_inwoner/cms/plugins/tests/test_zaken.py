@@ -11,6 +11,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.plugins.cms_plugins import CMSZakenPlugin
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT
 from open_inwoner.cms.tests import cms_tools
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
@@ -141,11 +142,11 @@ class CMSZakenPluginTest(TestCase):
         return_value=[],
     )
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_endpoint_returns_empty_state(
-        self, mock_submissions, mock_cases
+        self, mock_formulieren, mock_cases
     ):
         ServiceFactory(api_root=ZAKEN_ROOT)
         ZGWApiGroupConfigFactory()
@@ -166,10 +167,10 @@ class CMSZakenPluginTest(TestCase):
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
-    def test_htmx_content_endpoint_returns_cases(self, mock_submissions, mock_cases):
+    def test_htmx_content_endpoint_returns_cases(self, mock_formulieren, mock_cases):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_case = MagicMock()
@@ -178,6 +179,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Test zaak beschrijving",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -205,10 +207,10 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
-    def test_htmx_content_endpoint_complete_failure(self, mock_submissions, mock_cases):
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    def test_htmx_content_endpoint_complete_failure(self, mock_formulieren, mock_cases):
         mock_cases.side_effect = Exception("Cases API error")
-        mock_submissions.side_effect = Exception("Submissions API error")
+        mock_formulieren.side_effect = Exception("formulieren API error")
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -226,12 +228,12 @@ class CMSZakenPluginTest(TestCase):
         self.assertNotIn("oip-home-plugin-card", content)
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
-    def test_htmx_content_endpoint_partial_failure(self, mock_submissions, mock_cases):
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    def test_htmx_content_endpoint_partial_failure(self, mock_formulieren, mock_cases):
         api_group = ZGWApiGroupConfigFactory()
 
-        # Submissions fail
-        mock_submissions.side_effect = Exception("Submissions API error")
+        # formulieren fail
+        mock_formulieren.side_effect = Exception("Formulieren API error")
 
         # Cases succeed
         mock_case = MagicMock()
@@ -240,6 +242,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Test zaak",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -267,10 +270,10 @@ class CMSZakenPluginTest(TestCase):
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
-    def test_num_zaken_parameter_limits_results(self, mock_submissions, mock_cases):
+    def test_num_zaken_parameter_limits_results(self, mock_formulieren, mock_cases):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_cases_list = []
@@ -281,6 +284,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
@@ -313,14 +317,14 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("ZAAK-002", identifications)
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
-    def test_num_zaken_parameter_with_mixed_submissions_and_cases(
-        self, mock_submissions, mock_cases
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    def test_num_zaken_parameter_with_mixed_formulieren_and_cases(
+        self, mock_formulieren, mock_cases
     ):
         api_group = ZGWApiGroupConfigFactory()
 
-        # 3 mock submissions
-        mock_submissions_list = []
+        # 3 mock formulieren
+        mock_formulieren_list = []
         for i in range(3):
             mock_submission = MagicMock()
             mock_submission.process_data.return_value = {
@@ -328,8 +332,9 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"SUBMISSION-{i:03d}",
                 "naam": f"Test submission {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.FORMULIER.value,
             }
-            mock_submissions_list.append(mock_submission)
+            mock_formulieren_list.append(mock_submission)
 
         # 7 mock cases
         mock_cases_list = []
@@ -340,10 +345,11 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
-        mock_submissions.return_value = mock_submissions_list
+        mock_formulieren.return_value = mock_formulieren_list
         mock_cases.return_value = mock_cases_list
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
@@ -354,7 +360,7 @@ class CMSZakenPluginTest(TestCase):
 
         self.client.force_login(self.user)
 
-        # Test with num_zaken=5 (should get 3 submissions + 2 cases)
+        # Test with num_zaken=5 (should get 3 formulieren + 2 cases)
         response = self.client.get(url, {"num_zaken": "5"}, HTTP_HX_REQUEST="true")
 
         pyquery = PyQuery(response.content.decode("utf-8"))
@@ -366,7 +372,7 @@ class CMSZakenPluginTest(TestCase):
         # Extract identifications (note: template uses 'identificatie' attribute)
         identifications = [pyquery(item).attr("identificatie") for item in zaak_items]
 
-        # Verify submissions come first
+        # Verify formulieren come first
         self.assertIn("SUBMISSION-000", identifications)
         self.assertIn("SUBMISSION-001", identifications)
         self.assertIn("SUBMISSION-002", identifications)
@@ -378,10 +384,10 @@ class CMSZakenPluginTest(TestCase):
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
-    def test_num_zaken_parameter_invalid_input(self, mock_submissions, mock_cases):
+    def test_num_zaken_parameter_invalid_input(self, mock_formulieren, mock_cases):
         """Test that invalid values for num_zaken fall back to MAX_CASES_DEFAULT"""
         api_group = ZGWApiGroupConfigFactory()
 
@@ -393,6 +399,7 @@ class CMSZakenPluginTest(TestCase):
                 "identification": f"ZAAK-{i:03d}",
                 "naam": f"Test zaak {i}",
                 "api_group": api_group,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
             mock_cases_list.append(mock_case)
 
@@ -422,10 +429,10 @@ class CMSZakenPluginTest(TestCase):
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
-    def test_htmx_content_maps_naam_to_description(self, mock_submissions, mock_cases):
+    def test_htmx_content_maps_naam_to_description(self, mock_formulieren, mock_cases):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_case = MagicMock()
@@ -434,6 +441,7 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "naam": "Dit is de naam van de zaak",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -456,11 +464,11 @@ class CMSZakenPluginTest(TestCase):
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_submissions",
+        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_handles_missing_optional_fields(
-        self, mock_submissions, mock_cases
+        self, mock_formulieren, mock_cases
     ):
         api_group = ZGWApiGroupConfigFactory()
 
@@ -470,6 +478,7 @@ class CMSZakenPluginTest(TestCase):
             "uuid": "test-uuid-123",
             "identification": "",  # Required for logging
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_cases.return_value = [mock_case]
 
@@ -492,23 +501,24 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(zaak_item.attr("description"), "")
 
     @patch("open_inwoner.cms.plugins.views.CaseListService.get_cases")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_submissions")
+    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
     def test_htmx_content_handles_both_naam_and_description_fields(
-        self, mock_submissions, mock_cases
+        self, mock_formulieren, mock_cases
     ):
         """
-        Test that both 'naam' field (from openstaande inzendingen) and 'description' field
+        Test that both 'naam' field (from formulieren) and 'description' field
         (from regular zaken) are correctly mapped to 'description' in the component output.
         """
         api_group = ZGWApiGroupConfigFactory()
 
-        # Mock open submission with "naam" field
+        # Mock formulier with "naam" field
         mock_submission = MagicMock()
         mock_submission.process_data.return_value = {
             "uuid": "submission-uuid-1",
             "identification": "SUBMISSION-001",
-            "naam": "Open submission met naam field",
+            "naam": "Formulier met naam field",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.FORMULIER.value,
         }
 
         # Mock regular case with "description"
@@ -518,9 +528,10 @@ class CMSZakenPluginTest(TestCase):
             "identification": "ZAAK-001",
             "description": "Regular case met description field",
             "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
 
-        mock_submissions.return_value = [mock_submission]
+        mock_formulieren.return_value = [mock_submission]
         mock_cases.return_value = [mock_case]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
@@ -540,7 +551,7 @@ class CMSZakenPluginTest(TestCase):
         # Should have both items
         self.assertEqual(len(zaak_items), 2)
 
-        # First item should be the submission with "naam" field
+        # First item should be the formulier with "naam" field
         submission_item = zaak_items.eq(0)
         self.assertEqual(submission_item.attr("identificatie"), "SUBMISSION-001")
         self.assertEqual(

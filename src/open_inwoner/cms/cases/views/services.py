@@ -12,12 +12,13 @@ from django.utils.translation import gettext_lazy as _
 import structlog
 from zgw_consumers.concurrent import parallel
 
-from open_inwoner.openzaak.api_models import OpenSubmission, Zaak
+from open_inwoner.openzaak.api_models import Formulier, Zaak
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
     ZakenClient,
     build_zgw_client_from_service,
 )
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeStatusTypeConfig,
@@ -35,38 +36,48 @@ class ResolveCaseException(Exception):
 
 
 class CaseFilterFormOption(enum.Enum):
-    OPEN_SUBMISSION = _("Openstaande formulieren")
-    OPEN_CASE = _("Lopende aanvragen")
-    CLOSED_CASE = _("Afgeronde aanvragen")
+    FORMULIER = _("Openstaande formulieren")
+    ZAAK_OPEN = _("Lopende aanvragen")
+    ZAAK_AFGEROND = _("Afgeronde aanvragen")
 
 
 @dataclass(frozen=True)
 class ZaakWithApiGroup:
     zaak: Zaak
     api_group: ZGWApiGroupConfig
+    type_aanvraag: TypeAanvraag
 
     @property
     def identification(self) -> str:
         return self.zaak.url
 
     def process_data(self) -> dict:
-        return {**self.zaak.process_data(), "api_group": self.api_group}
+        return {
+            **self.zaak.process_data(),
+            "api_group": self.api_group,
+            "type_aanvraag": self.type_aanvraag.value,
+        }
 
     def __hash__(self):
         return hash((self.identification, self.api_group.pk))
 
 
 @dataclass(frozen=True)
-class SubmissionWithApiGroup:
-    submission: OpenSubmission
+class FormulierWithApiGroup:
+    formulier: Formulier
     api_group: ZGWApiGroupConfig
+    type_aanvraag: TypeAanvraag
 
     @property
     def identification(self) -> str:
-        return self.submission.url
+        return self.formulier.url
 
     def process_data(self) -> dict:
-        return {**self.submission.process_data(), "api_group": self.api_group}
+        return {
+            **self.formulier.process_data(),
+            "api_group": self.api_group,
+            "type_aanvraag": self.type_aanvraag.value,
+        }
 
     def __hash__(self):
         return hash((self.identification, self.api_group.pk))
@@ -75,7 +86,7 @@ class SubmissionWithApiGroup:
 class Timeouts(TypedDict):
     fetch_raw_cases: int | float
     resolve_cases: int | float
-    fetch_submissions: int | float
+    fetch_formulieren: int | float
 
 
 class CaseListService:
@@ -88,7 +99,7 @@ class CaseListService:
         self._timeouts = {
             "fetch_raw_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
             "resolve_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
-            "fetch_submissions": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
+            "fetch_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
         }
         self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
 
@@ -116,50 +127,54 @@ class CaseListService:
     def _catalogi_client_factory(group: ZGWApiGroupConfig):
         return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
 
-    def _get_submissions_for_api_group(
+    def _get_formulieren_for_api_group(
         self, group: ZGWApiGroupConfig
-    ) -> list[SubmissionWithApiGroup]:
+    ) -> list[FormulierWithApiGroup]:
         if not group.forms_client:
             raise ValueError(f"{group} has no `forms_client`")
 
         return [
-            SubmissionWithApiGroup(submission=sub, api_group=group)
-            for sub in group.forms_client.fetch_open_submissions(
+            FormulierWithApiGroup(
+                formulier=formulier,
+                api_group=group,
+                type_aanvraag=TypeAanvraag.FORMULIER,
+            )
+            for formulier in group.forms_client.fetch_formulieren(
                 **get_user_fetch_parameters(
                     self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
                 )
             )
         ]
 
-    def get_submissions(self) -> list[SubmissionWithApiGroup]:
+    def get_formulieren(self) -> list[FormulierWithApiGroup]:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
                 "form_service",
             )
         )
 
-        subs_with_api_group: list[SubmissionWithApiGroup] = []
+        subs_with_api_group: list[FormulierWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
-                executor.submit(self._get_submissions_for_api_group, group)
+                executor.submit(self._get_formulieren_for_api_group, group)
                 for group in all_api_groups
             ]
 
         try:
             for task in concurrent.futures.as_completed(
                 futures,
-                timeout=self._timeouts["fetch_submissions"],
+                timeout=self._timeouts["fetch_formulieren"],
             ):
                 try:
                     subs_with_api_group.extend(task.result())
                 except BaseException:
                     logger.exception("Error fetching and pre-processing cases")
         except concurrent.futures.TimeoutError:
-            logger.warning("Timeout while fetching submissions")
+            logger.warning("Timeout while fetching formulieren")
 
-        # Sort submissions by date modified
+        # Sort formulieren by date modified
         subs_with_api_group.sort(
-            key=lambda sub: sub.submission.datum_laatste_wijziging, reverse=True
+            key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
         )
 
         return subs_with_api_group
@@ -167,19 +182,19 @@ class CaseListService:
     @staticmethod
     def get_case_filter_status(zaak: Zaak) -> CaseFilterFormOption:
         if zaak.einddatum:
-            return CaseFilterFormOption.CLOSED_CASE
+            return CaseFilterFormOption.ZAAK_AFGEROND
 
-        return CaseFilterFormOption.OPEN_CASE
+        return CaseFilterFormOption.ZAAK_OPEN
 
     def get_case_status_frequencies(
         self,
         cases: Iterable[ZaakWithApiGroup],
-        submissions: Iterable[SubmissionWithApiGroup],
+        formulieren: Iterable[FormulierWithApiGroup],
     ) -> dict[CaseFilterFormOption, int]:
         case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
 
-        # add static text for open submissions
-        case_statuses += [CaseFilterFormOption.OPEN_SUBMISSION for _ in submissions]
+        # add static text for formulieren
+        case_statuses += [CaseFilterFormOption.FORMULIER for _ in formulieren]
 
         return {
             status: case_statuses.count(status) for status in list(CaseFilterFormOption)
@@ -195,7 +210,10 @@ class CaseListService:
         )
 
         return [
-            ZaakWithApiGroup(zaak=raw_cases, api_group=group) for raw_cases in raw_cases
+            ZaakWithApiGroup(
+                zaak=raw_cases, api_group=group, type_aanvraag=TypeAanvraag.ZAAK
+            )
+            for raw_cases in raw_cases
         ]
 
     def get_cases(self) -> list[ZaakWithApiGroup]:

@@ -104,6 +104,8 @@ Nieuwe features
   uit de API correct worden overgenomen in de lokale versie van de catalogus.
 * [:taiga-us:`3578`, :pr:`2043`]: Nieuw Front-end ontwerp voor CMS plug-in 'Balie Afspraken' gebouwd met
   design-tokens volgens het NLDS principe.
+* [:taiga-us:`3606`, :pr:`2051`]: Zaken en open formulieren hebben nu verschillende teksten voor de status
+  en actieknop/link.
 
 Bugfixes
 --------

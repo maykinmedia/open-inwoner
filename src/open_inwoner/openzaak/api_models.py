@@ -142,7 +142,6 @@ class Zaak(ZGWModel):
             "result": self.result_text,
             "zaaktype_config": getattr(self, "zaaktype_config", None),
             "statustype_config": getattr(self, "statustype_config", None),
-            "case_type": "Zaak",
         }
 
 
@@ -337,7 +336,7 @@ class Notification(Model):
 
 
 @dataclass
-class OpenSubmission(Model):
+class Formulier(Model):
     url: str
     uuid: str
     naam: str
@@ -361,7 +360,6 @@ class OpenSubmission(Model):
             "vervolg_link": self.vervolg_link,
             "datum_laatste_wijziging": self.datum_laatste_wijziging,
             "eind_datum_geldigheid": self.eind_datum_geldigheid or "Geen",
-            "case_type": "OpenSubmission",
         }
 
 
