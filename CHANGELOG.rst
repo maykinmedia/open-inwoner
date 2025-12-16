@@ -214,7 +214,8 @@ Onderhoud
 * [:pr:`2031`] Verouderde ``mozilla-django-oidc-db`` cache-instellingen verwijderd.
 * [:pr:`2041`]: ``certifi`` bijgewerkt naar versie ``2025.11.12``.
 * [:taiga-us:`3581`, :pr:`2050`]: Vertalingen bijgewerkt.
-* [:pr:`2018`] ``objects-api-client-django`` bijgewerkt naar nieuwste versie ``0.5.0``.
+* [:pr:`2018`, :pr:`2063`] ``objects-api-client-django`` bijgewerkt naar nieuwste
+  versie ``0.5.0``.
 
 1.35.2 (2025-11-13)
 ===================

@@ -140,7 +140,7 @@
         ["laposta", "lapostaconfig"],
         ["notifications", "notificationsapiconfig"],
         ["notifications", "subscription"],
-        ["objectsapiclient", "objectsclientconfiguration"],
+        ["objectsapiclient", "objectsapiserviceconfiguration"],
         ["openformsclient", "configuration"],
         ["openklant", "klantcontactmomentanswer"],
         ["openklant", "klantensysteemconfig"],
