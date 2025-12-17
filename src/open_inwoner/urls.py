@@ -126,6 +126,9 @@ urlpatterns = [
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("kvk/", include("open_inwoner.kvk.urls")),
     path("", include("open_inwoner.search.urls", namespace="search")),
+    path(
+        "mijn-afval/", include("open_inwoner.mijn_afval.urls", namespace="mijn_afval")
+    ),
     path("cms-plugins/", include("open_inwoner.cms.plugins.urls")),
     re_path(r"^", include("cms.urls")),
 ]
