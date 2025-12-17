@@ -138,7 +138,7 @@ cron-descriptor==1.4.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-celery-beat
-cryptography==42.0.4
+cryptography==45.0.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -982,7 +982,7 @@ pyjwt==2.8.0
     #   gemma-zds-client
     #   messagebird
     #   zgw-consumers
-pyopenssl==24.0.0
+pyopenssl==25.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1203,6 +1203,7 @@ typing-extensions==4.10.0
     #   pydantic
     #   pydantic-core
     #   pyee
+    #   pyopenssl
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
