@@ -222,6 +222,9 @@ Onderhoud
   versie ``0.5.0``.
 * [:pr:`2057`]: ``node`` bijgewerkt naar versie ``24.12`` en ``node:20-bookworm-slim``
   bijgewerkt naar ``node:24-bookworm-slim`` in Docker container.
+* [:pr:`2070`]: ``fonttools`` bijgewerkt naar versie ``4.46.1``, ``cryptography``
+  bijgewerkt naar ``45.0.7``, ``webob`` bijgewerkt naar ``1.8.9``, en ``urllib3``
+  bijgewerkt naar ``2.6.2``.
 
 1.35.2 (2025-11-13)
 ===================
