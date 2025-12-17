@@ -355,7 +355,7 @@ faker==27.0.0
     # via zgw-consumers-oas
 fontawesomefree==6.4.2
     # via -r requirements/base.in
-fonttools[woff]==4.43.0
+fonttools[woff]==4.61.1
     # via weasyprint
 furl==2.1.3
     # via

@@ -658,7 +658,7 @@ fontawesomefree==6.4.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-fonttools[woff]==4.43.0
+fonttools[woff]==4.61.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
