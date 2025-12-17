@@ -59,7 +59,7 @@ Nieuwe features
   observability.
 * [:taiga-us:`3408`, :pr:`1881`]: Nieuw selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie voor betere UX waarmee gewiseld kan worden tussen vestigingen.
-* [:taiga-us:`3450`, :taiga-ta:`3454`]: CKEditor wordt vervangen door Prosemirror
+* [:taiga-us:`3450`, :taiga-ta:`3454`, :pr:`2067`]: CKEditor wordt vervangen door Prosemirror
 * [:taiga-us:`3408`, :pr:`1948`]: Het selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie aan Storybook toegevoegd.
 * [:taiga-us:`3499`, :pr:`1962`]: WCAG toegankelijkheidsverbeteringen op de Profiel pagina
