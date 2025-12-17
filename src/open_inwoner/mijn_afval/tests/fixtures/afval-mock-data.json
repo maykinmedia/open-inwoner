@@ -1,0 +1,114 @@
+[
+  {
+    "objectId": "10001",
+    "objectAddress": "Kerkstraat 12",
+    "totaalGewicht": 1245,
+    "containers": [
+      {
+        "identifier": "895468490654",
+        "type": "Restafval",
+        "totaalGewicht": 720,
+        "ledigingen": [
+          { "tijdstip": "2024-07-15T07:15:00", "gewicht": 48.2 },
+          { "tijdstip": "2024-08-12T06:45:00", "gewicht": 52.8 },
+          { "tijdstip": "2024-09-09T07:30:00", "gewicht": 46.5 },
+          { "tijdstip": "2024-10-07T08:00:00", "gewicht": 51.3 },
+          { "tijdstip": "2024-11-04T07:20:00", "gewicht": 49.7 },
+          { "tijdstip": "2024-12-02T06:50:00", "gewicht": 53.1 },
+          { "tijdstip": "2025-01-06T07:35:00", "gewicht": 47.9 },
+          { "tijdstip": "2025-02-03T08:10:00", "gewicht": 50.2 },
+          { "tijdstip": "2025-03-03T07:05:00", "gewicht": 48.8 },
+          { "tijdstip": "2025-04-07T06:55:00", "gewicht": 51.6 },
+          { "tijdstip": "2025-05-05T07:40:00", "gewicht": 49.3 },
+          { "tijdstip": "2025-06-02T08:20:00", "gewicht": 52.4 },
+          { "tijdstip": "2025-06-30T07:15:00", "gewicht": 47.1 },
+          { "tijdstip": "2025-07-28T06:40:00", "gewicht": 50.9 },
+          { "tijdstip": "2025-08-25T07:25:00", "gewicht": 48.6 }
+        ]
+      },
+      {
+        "identifier": "895468490655",
+        "type": "GFT",
+        "totaalGewicht": 385,
+        "ledigingen": [
+          { "tijdstip": "2024-07-20T09:15:00", "gewicht": 28.5 },
+          { "tijdstip": "2024-08-17T10:30:00", "gewicht": 31.2 },
+          { "tijdstip": "2024-09-14T09:45:00", "gewicht": 29.8 },
+          { "tijdstip": "2024-10-12T10:00:00", "gewicht": 33.1 },
+          { "tijdstip": "2024-11-09T09:20:00", "gewicht": 27.4 },
+          { "tijdstip": "2024-12-07T10:15:00", "gewicht": 30.6 },
+          { "tijdstip": "2025-01-11T09:35:00", "gewicht": 32.8 },
+          { "tijdstip": "2025-02-08T10:45:00", "gewicht": 28.9 },
+          { "tijdstip": "2025-03-08T09:50:00", "gewicht": 31.5 },
+          { "tijdstip": "2025-04-12T10:20:00", "gewicht": 29.1 },
+          { "tijdstip": "2025-05-10T09:40:00", "gewicht": 32.4 }
+        ]
+      },
+      {
+        "identifier": "895468490656",
+        "type": "Restafval",
+        "totaalGewicht": 140,
+        "ledigingen": [
+          { "tijdstip": "2024-08-05T14:10:00", "gewicht": 12.3 },
+          { "tijdstip": "2024-09-23T13:45:00", "gewicht": 13.8 },
+          { "tijdstip": "2024-11-18T14:20:00", "gewicht": 11.5 },
+          { "tijdstip": "2025-01-13T13:55:00", "gewicht": 14.2 },
+          { "tijdstip": "2025-03-10T14:35:00", "gewicht": 12.7 },
+          { "tijdstip": "2025-05-05T13:40:00", "gewicht": 13.1 },
+          { "tijdstip": "2025-06-30T14:15:00", "gewicht": 11.9 },
+          { "tijdstip": "2025-08-25T13:50:00", "gewicht": 14.5 },
+          { "tijdstip": "2025-10-20T14:25:00", "gewicht": 12.4 },
+          { "tijdstip": "2025-12-15T13:30:00", "gewicht": 13.6 }
+        ]
+      }
+    ]
+  },
+  {
+    "objectId": "10002",
+    "objectAddress": "Hoofdweg 45A",
+    "totaalGewicht": 1680,
+    "containers": [
+      {
+        "identifier": "895468490657",
+        "type": "Restafval",
+        "totaalGewicht": 1120,
+        "ledigingen": [
+          { "tijdstip": "2024-07-08T06:30:00", "gewicht": 78.5 },
+          { "tijdstip": "2024-08-05T07:15:00", "gewicht": 82.3 },
+          { "tijdstip": "2024-09-02T06:45:00", "gewicht": 76.8 },
+          { "tijdstip": "2024-09-30T07:00:00", "gewicht": 80.1 },
+          { "tijdstip": "2024-10-28T06:50:00", "gewicht": 77.4 },
+          { "tijdstip": "2024-11-25T07:20:00", "gewicht": 81.7 },
+          { "tijdstip": "2024-12-23T06:35:00", "gewicht": 79.2 },
+          { "tijdstip": "2025-01-20T07:10:00", "gewicht": 83.6 },
+          { "tijdstip": "2025-02-17T06:55:00", "gewicht": 75.9 },
+          { "tijdstip": "2025-03-17T07:25:00", "gewicht": 80.8 },
+          { "tijdstip": "2025-04-14T06:40:00", "gewicht": 78.1 },
+          { "tijdstip": "2025-05-12T07:05:00", "gewicht": 82.4 },
+          { "tijdstip": "2025-06-09T06:50:00", "gewicht": 76.5 },
+          { "tijdstip": "2025-07-07T07:30:00", "gewicht": 81.2 }
+        ]
+      },
+      {
+        "identifier": "895468490658",
+        "type": "GFT",
+        "totaalGewicht": 560,
+        "ledigingen": [
+          { "tijdstip": "2024-07-13T10:00:00", "gewicht": 42.8 },
+          { "tijdstip": "2024-08-10T09:30:00", "gewicht": 38.5 },
+          { "tijdstip": "2024-09-07T10:15:00", "gewicht": 45.2 },
+          { "tijdstip": "2024-10-05T09:45:00", "gewicht": 41.3 },
+          { "tijdstip": "2024-11-02T10:30:00", "gewicht": 39.7 },
+          { "tijdstip": "2024-11-30T09:50:00", "gewicht": 43.9 },
+          { "tijdstip": "2024-12-28T10:20:00", "gewicht": 37.6 },
+          { "tijdstip": "2025-01-25T09:40:00", "gewicht": 44.1 },
+          { "tijdstip": "2025-02-22T10:05:00", "gewicht": 40.8 },
+          { "tijdstip": "2025-03-22T09:55:00", "gewicht": 42.4 },
+          { "tijdstip": "2025-04-19T10:25:00", "gewicht": 38.2 },
+          { "tijdstip": "2025-05-17T09:35:00", "gewicht": 45.7 },
+          { "tijdstip": "2025-06-14T10:10:00", "gewicht": 41.6 }
+        ]
+      }
+    ]
+  }
+]
