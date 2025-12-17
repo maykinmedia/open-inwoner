@@ -1,0 +1,158 @@
+{% extends "master.html" %}
+{% load i18n grid_tags %}
+
+{% block content %}
+    {% render_grid %}
+        {% render_column start=3 span=8 %}
+            <h1 class="utrecht-heading-1" id="title">{% trans "Mijn Afval" %}</h1>
+
+            {% for afval_obj in data %}
+                <article class="afval-object">
+                    {# Address and Total Weight Section #}
+                    <section class="afval-object__header">
+                        <h2 class="utrecht-heading-2">{{ afval_obj.objectAddress }}</h2>
+                        <p class="utrecht-paragraph">
+                            <strong>{% trans "Totaal gewicht:" %}</strong> {{ afval_obj.totaal_gewicht }} kg
+                        </p>
+                    </section>
+
+                    {# GFT Afval Section #}
+                    {% for container in afval_obj.containers %}
+                        {% if container.type == "GFT" %}
+                            <section class="afval-container">
+                                <h3 class="utrecht-heading-3">{% trans "GFT Afval" %}</h3>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
+                                </p>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }} kg
+                                </p>
+
+                                {% if container.ledigingen %}
+                                    <div class="afval-container__table-wrapper">
+                                        <table class="afval-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{% trans "Datum ophalen" %}</th>
+                                                    <th>{% trans "Tijd ophalen" %}</th>
+                                                    <th>{% trans "Gewicht van lediging" %}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for lediging in container.ledigingen %}
+                                                    <tr>
+                                                        <td>{{ lediging.tijdstip|date:"d-m-Y" }}</td>
+                                                        <td>{{ lediging.tijdstip|date:"H:i"|default:"—" }}</td>
+                                                        <td>{{ lediging.gewicht }} kg</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                            </section>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Restafval Section #}
+                    {% for container in afval_obj.containers %}
+                        {% if container.type == "Restafval" %}
+                            <section class="afval-container">
+                                <h3 class="utrecht-heading-3">{% trans "Restafval" %}</h3>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
+                                </p>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }} kg
+                                </p>
+
+                                {% if container.ledigingen %}
+                                    <div class="afval-container__table-wrapper">
+                                        <table class="afval-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{% trans "Datum" %}</th>
+                                                    <th>{% trans "Tijd van lediging" %}</th>
+                                                    <th>{% trans "Gewicht van lediging" %}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for lediging in container.ledigingen %}
+                                                    <tr>
+                                                        <td>{{ lediging.tijdstip|date:"d-m-Y" }}</td>
+                                                        <td>{{ lediging.tijdstip|date:"H:i"|default:"—" }}</td>
+                                                        <td>{{ lediging.gewicht }} kg</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                            </section>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not forloop.last %}
+                        <hr class="afval-object__separator">
+                    {% endif %}
+                </article>
+            {% empty %}
+                <p class="utrecht-paragraph">{% trans "Geen afvalgegevens beschikbaar." %}</p>
+            {% endfor %}
+        {% endrender_column %}
+    {% endrender_grid %}
+
+    <style>
+        .afval-object {
+            margin-bottom: 2rem;
+        }
+
+        .afval-object__header {
+            margin-bottom: 1.5rem;
+        }
+
+        .afval-object__separator {
+            margin: 2rem 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+
+        .afval-container {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .afval-container__table-wrapper {
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .afval-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        .afval-table th,
+        .afval-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .afval-table th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+
+        .afval-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .afval-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+    </style>
+{% endblock content %}
