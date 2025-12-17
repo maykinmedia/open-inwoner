@@ -167,7 +167,7 @@ cron-descriptor==1.4.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-celery-beat
-cryptography==42.0.4
+cryptography==45.0.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -658,7 +658,7 @@ fontawesomefree==6.4.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-fonttools[woff]==4.43.0
+fonttools[woff]==4.61.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1098,7 +1098,7 @@ pyjwt==2.8.0
     #   gemma-zds-client
     #   messagebird
     #   zgw-consumers
-pyopenssl==24.0.0
+pyopenssl==25.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1385,6 +1385,7 @@ typing-extensions==4.10.0
     #   pydantic
     #   pydantic-core
     #   pyee
+    #   pyopenssl
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
@@ -1399,7 +1400,7 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3==2.5.0
+urllib3==2.6.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1454,7 +1455,7 @@ webencodings==0.5.1
     #   cssselect2
     #   html5lib
     #   tinycss2
-webob==1.8.7
+webob==1.8.9
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
