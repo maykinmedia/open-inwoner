@@ -59,7 +59,7 @@ Nieuwe features
   observability.
 * [:taiga-us:`3408`, :pr:`1881`]: Nieuw selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie voor betere UX waarmee gewiseld kan worden tussen vestigingen.
-* [:taiga-us:`3450`, :taiga-ta:`3454`]: CKEditor wordt vervangen door Prosemirror
+* [:taiga-us:`3450`, :taiga-ta:`3454`, :pr:`2067`]: CKEditor wordt vervangen door Prosemirror
 * [:taiga-us:`3408`, :pr:`1948`]: Het selectiescherm voor eHerkenning-inlog met zoek-
   en dropdownfunctie aan Storybook toegevoegd.
 * [:taiga-us:`3499`, :pr:`1962`]: WCAG toegankelijkheidsverbeteringen op de Profiel pagina
@@ -106,6 +106,8 @@ Nieuwe features
   design-tokens volgens het NLDS principe.
 * [:taiga-us:`3606`, :pr:`2051`]: Zaken en open formulieren hebben nu verschillende teksten voor de status
   en actieknop/link.
+* [:taiga-us:`3606`]: Experimentele client geïmplementeerd met mock data ter ondersteuning van het ontwikkelen
+  van de 'Mijn Afval' module.
 
 Bugfixes
 --------
@@ -178,6 +180,8 @@ Bugfixes
   toegoevegd, en de logica voor alle login types is opgeschoond.
 * [:taiga-is:`3599`, :pr:`2045`]: Bij het bekijken van de bron code van componenten in Storybook
   wordt nu de correcte styling getoond.
+* [:taiga-ta:`3636`, :pr:`2068`]: Automatisch toegevoegen van een extra veelgestelde vraag in
+  product admin is uitgezet.
 
 Onderhoud
 ---------
@@ -218,6 +222,9 @@ Onderhoud
   versie ``0.5.0``.
 * [:pr:`2057`]: ``node`` bijgewerkt naar versie ``24.12`` en ``node:20-bookworm-slim``
   bijgewerkt naar ``node:24-bookworm-slim`` in Docker container.
+* [:pr:`2070`]: ``fonttools`` bijgewerkt naar versie ``4.46.1``, ``cryptography``
+  bijgewerkt naar ``45.0.7``, ``webob`` bijgewerkt naar ``1.8.9``, en ``urllib3``
+  bijgewerkt naar ``2.6.2``.
 
 1.35.2 (2025-11-13)
 ===================
