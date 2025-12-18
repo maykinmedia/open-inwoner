@@ -1,15 +1,14 @@
 // External
-// @import 'material-icons/iconfont/material-icons-outlined.woff2';
-@import 'material-icons/iconfont/material-icons.css';
-@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import '~@fortawesome/fontawesome-free/scss/regular.scss';
-@import '~@fortawesome/fontawesome-free/scss/brands.scss';
-@import '~leaflet/dist/leaflet.css';
-@import '~flatpickr/dist/flatpickr.min.css';
+@use 'material-icons/iconfont/material-icons.css';
+@use '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@use '@fortawesome/fontawesome-free/scss/regular.scss';
+@use '@fortawesome/fontawesome-free/scss/brands.scss';
+@use 'leaflet/dist/leaflet.css';
+@use 'flatpickr/dist/flatpickr.min.css';
 
 // Internal
-@import 'settings';
-@import 'components';
-@import 'views';
-@import 'overwrites';
-@import './_fixes';
+@use 'settings';
+@use 'components';
+@use 'views';
+@use 'overwrites';
+@use './_fixes';

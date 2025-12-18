@@ -9,9 +9,7 @@
   "scripts": {
     "build": "npm run collect && npm run bundle",
     "build-storybook": "npx storybook build",
-    "bundle": "conc npm:bundle:*",
-    "bundle:webpack": "webpack",
-    "bundle:react": "vite build && npm run makemessages && npm run compilemessages",
+    "bundle": "vite build && npm run makemessages && npm run compilemessages",
     "collect": "cp -r node_modules/leaflet/dist/images src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff src/open_inwoner/static/bundles && cp -r node_modules/material-icons/iconfont/*.woff2 src/open_inwoner/static/bundles && cp -r node_modules/@fortawesome/fontawesome-free/webfonts src/open_inwoner/static/",
     "compilemessages": "formatjs compile-folder --ast src/open_inwoner/react/i18n/locales src/open_inwoner/react/i18n/compiled",
     "makemessages": "conc npm:makemessages:*",
@@ -26,9 +24,7 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
     "type-check": "tsc --noEmit",
-    "watch": "npm run collect && conc npm:watch:*",
-    "watch:react": "vite build --watch --mode=dev",
-    "watch:webpack": "webpack --mode=development --watch"
+    "watch": "npm run collect && vite build --watch --mode=dev"
   },
   "storybook": {
     "disableTelemetry": true
@@ -137,8 +133,7 @@
     "prettier-stylelint": "^0.4.2",
     "raw-loader": "^4.0.2",
     "regenerator-runtime": "^0.14.1",
-    "sass": "latest",
-    "sass-loader": "latest",
+    "sass-embedded": "latest",
     "simulant": "latest",
     "sinon": "latest",
     "stylelint": "^14.1.0",

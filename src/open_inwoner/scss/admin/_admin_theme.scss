@@ -3,7 +3,7 @@ Generic admin styling overrides.
 
 DO NOT PUT ANY TARGET APP-SPECIFIC RULES HERE.
 */
-@import './_vars';
+@use './_vars' as *;
 
 /* Overrides */
 body {

@@ -1,9 +1,7 @@
 const fs = require('fs');
-/** @type {{outFile: string}} */
-const argv = require('yargs').argv;
 
 // load the existing catalog to prevent overwriting messages
-const existingCatalog = JSON.parse(fs.readFileSync(argv.outFile, 'utf-8'));
+const existingCatalog = JSON.parse(fs.readFileSync(process.argv[8], 'utf-8'));
 
 const format = (messages) => {
   Object.entries(messages).forEach(([id, msg]) => {

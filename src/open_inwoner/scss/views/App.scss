@@ -1,5 +1,5 @@
-@import '@open-inwoner/design-tokens/dist/css/index.css';
-@import '@utrecht/document-css/dist/index.css';
+@use '@open-inwoner/design-tokens/dist/css';
+@use '@utrecht/document-css/dist';
 
 :root {
   // Layout.

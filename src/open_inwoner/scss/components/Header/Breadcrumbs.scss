@@ -1,4 +1,4 @@
-@import '~microscope-sass/lib/responsive';
+@use 'microscope-sass';
 
 .breadcrumbs {
   display: none;
@@ -29,6 +29,11 @@
   }
 
   .link {
-    @include responsive(line-height, 2, var(--row-height), var(--row-height));
+    @include microscope-sass.responsive(
+      line-height,
+      2,
+      var(--row-height),
+      var(--row-height)
+    );
   }
 }
