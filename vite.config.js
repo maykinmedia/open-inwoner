@@ -30,6 +30,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
+        quietDeps: true,
         includePaths: ['node_modules'],
       },
     },
@@ -37,25 +38,32 @@ export default defineConfig({
 
   build: {
     outDir: path.resolve(__dirname, paths.jsDir),
-    emptyOutDir: false, // Matches Webpack's behavior (does not wipe output)
-    sourcemap: useSourceMap,
-    minify: isProduction,
     cssCodeSplit: true,
+    // Otherwise vite resets `npm run collect`.
+    emptyOutDir: false,
+    minify: isProduction,
+    sourcemap: useSourceMap,
+    // Strict url() imports in css/scss as url and not inlined as base64 strings
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: {
         [`${paths.package.name}-react`]: `${__dirname}/${paths.reactEntry}`,
+        [`${paths.package.name}-css`]: `${__dirname}/${paths.scssEntry}`,
+        [`${paths.package.name}-js`]: `${__dirname}/${paths.jsEntry}`,
+        admin_overrides: `${__dirname}/${paths.scssSrcDir}/admin/admin_overrides.scss`,
+        'pdf-p': `${__dirname}/${paths.scssSrcDir}/pdf/pdf_portrait.scss`,
+        'django-admin': `${__dirname}/${paths.jsSrcDir}/django-admin.js`,
       },
       output: {
         entryFileNames: '[name].js',
-        chunkFileNames: '[name].bundle.js',
+        chunkFileNames: '[name]-[hash].bundle.js',
+        // Remove hash from asset file name.
+        assetFileNames: '[name].[ext]',
+
         manualChunks: (id) => {
-          if (id.includes('.css') || id.includes('.scss')) {
-            // Extract component name from path
-            const match = id.match(/\/([^\/]+)\.(css|scss)$/);
-            if (match) {
-              return `styles-${match[1]}`;
-            }
-          }
+          // Fix to make sure that every imported stylesheet is chunked.
+          const match = id.match(/\/([^\/]+)\.(css|scss)$/);
+          if (match) return `${match[1]}`;
         },
       },
     },

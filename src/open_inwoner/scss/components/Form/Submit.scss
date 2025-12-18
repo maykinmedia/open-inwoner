@@ -1,3 +1,4 @@
+@use 'sass:color';
 .submit {
   border-radius: var(--border-radius);
   background-color: #248641;
@@ -10,7 +11,7 @@
     background-color 300ms;
 
   &:hover {
-    background-color: darken(#248641, 5);
+    background-color: color.adjust(#248641, $lightness: -5%);
     transform: translateY(-1px);
   }
 }

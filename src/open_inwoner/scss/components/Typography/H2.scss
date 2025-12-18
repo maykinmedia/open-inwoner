@@ -1,5 +1,5 @@
-@import '~@utrecht/heading-2-css/dist/index.css';
-@import '~microscope-sass/lib/responsive';
+@use '@utrecht/heading-2-css/dist/index.css';
+@use 'microscope-sass';
 
 .utrecht-heading-2 {
   // Reverse font-family fallback order
@@ -10,7 +10,7 @@
     margin: var(--row-height) 0 var(--spacing-medium) 0;
   }
 
-  @include mobile-only {
+  @include microscope-sass.mobile-only {
     word-break: normal;
     overflow-wrap: break-word;
   }
