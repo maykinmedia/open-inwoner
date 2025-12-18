@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar, cast
 
-from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.functional import SimpleLazyObject
 
@@ -23,8 +22,8 @@ from zgw_consumers.service import pagination_helper
 
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
+from open_inwoner.openzaak.utils import zgw_catalogi_cache, zgw_zaken_cache
 from open_inwoner.utils.api import ClientError, get_json_response
-from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
     Formulier,
@@ -105,10 +104,7 @@ class ZakenClient(ZgwAPIClient):
 
         raise ValueError("You must supply either a bsn or kvk/rsin/vestigingsnummer")
 
-    @cache_result(
-        "{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    @zgw_zaken_cache("{self.base_url}:cases:{user_bsn}:{max_requests}:{identificatie}")
     def fetch_cases_by_bsn(
         self,
         user_bsn: str,
@@ -161,9 +157,8 @@ class ZakenClient(ZgwAPIClient):
 
         return cases
 
-    @cache_result(
-        "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    @zgw_zaken_cache(
+        "{self.base_url}:cases:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}"
     )
     def fetch_cases_for_company(
         self,
@@ -243,10 +238,7 @@ class ZakenClient(ZgwAPIClient):
 
         return cases
 
-    @cache_result(
-        "{self.base_url}:single_case:{case_uuid}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    @zgw_zaken_cache("{self.base_url}:single_case:{case_uuid}")
     def fetch_single_case(self, case_uuid: str) -> Zaak | None:
         try:
             response = self.get(f"zaken/{case_uuid}", headers=CRS_HEADERS)
@@ -277,10 +269,7 @@ class ZakenClient(ZgwAPIClient):
 
         return case
 
-    @cache_result(
-        "{self.base_url}:single_case_information_object:{url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    @zgw_zaken_cache("{self.base_url}:single_case_information_object:{url}")
     def fetch_single_case_information_object(
         self, url: str
     ) -> ZaakInformatieObject | None:
@@ -334,14 +323,11 @@ class ZakenClient(ZgwAPIClient):
 
         return statuses
 
-    @cache_result(
-        "{self.base_url}:status_history:{case_url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    @zgw_zaken_cache("{self.base_url}:status_history:{case_url}")
     def fetch_status_history(self, case_url: str) -> list[Status]:
         return self.fetch_status_history_no_cache(case_url)
 
-    @cache_result("{self.base_url}:status:{status_url}", timeout=60 * 60)
+    @zgw_zaken_cache("{self.base_url}:status:{status_url}", timeout=60 * 60)
     def fetch_single_status(self, status_url: str) -> Status | None:
         try:
             response = self.get(url=status_url)
@@ -357,10 +343,7 @@ class ZakenClient(ZgwAPIClient):
 
         return status
 
-    @cache_result(
-        "{self.base_url}:case_roles:{case_url}:{role_desc_generic}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    @zgw_zaken_cache("{self.base_url}:case_roles:{case_url}:{role_desc_generic}")
     def fetch_case_roles(
         self, case_url: str, role_desc_generic: str | None = None
     ) -> list[Rol]:
@@ -487,9 +470,8 @@ class ZakenClient(ZgwAPIClient):
 
         return case_info_objects
 
-    @cache_result(
+    @zgw_zaken_cache(
         "{self.base_url}:single_result:{result_url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_single_result(self, result_url: str) -> Resultaat | None:
         try:
@@ -563,10 +545,7 @@ class CatalogiClient(ZgwAPIClient):
 
         return result_types
 
-    @cache_result(
-        "{self.base_url}:status_type:{status_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-    )
+    @zgw_catalogi_cache("{self.base_url}:status_type:{status_type_url}")
     def fetch_single_status_type(self, status_type_url: str) -> StatusType | None:
         try:
             response = self.get(url=status_type_url)
@@ -579,10 +558,7 @@ class CatalogiClient(ZgwAPIClient):
 
         return status_type
 
-    @cache_result(
-        "{self.base_url}:resultaat_type:{resultaat_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-    )
+    @zgw_catalogi_cache("{self.base_url}:resultaat_type:{resultaat_type_url}")
     def fetch_single_resultaat_type(
         self, resultaat_type_url: str
     ) -> ResultaatType | None:
@@ -616,10 +592,7 @@ class CatalogiClient(ZgwAPIClient):
 
         return zaak_types
 
-    @cache_result(
-        "{self.base_url}:case_type:{case_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
-    )
+    @zgw_catalogi_cache("{self.base_url}:case_type:{case_type_url}")
     def fetch_single_case_type(self, case_type_url: str) -> ZaakType | None:
         try:
             response = self.get(url=case_type_url)
@@ -648,9 +621,8 @@ class CatalogiClient(ZgwAPIClient):
 
         return catalogs
 
-    @cache_result(
-        "{self.base_url}:information_object_type:{information_object_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+    @zgw_catalogi_cache(
+        "{self.base_url}:information_object_type:{information_object_type_url}"
     )
     def fetch_single_information_object_type(
         self,

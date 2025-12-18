@@ -1,7 +1,12 @@
+import functools
+
+from django.conf import settings
+
 import structlog
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.utils.decorators import cache
 
 from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
@@ -185,3 +190,13 @@ def get_user_fetch_parameters(request, use_rsin: bool = True) -> dict:
         return parameters
 
     return {}
+
+
+_base_zgw_cache = functools.partial(cache, alias="zgw")
+
+zgw_zaken_cache = functools.partial(
+    _base_zgw_cache, timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+)
+zgw_catalogi_cache = functools.partial(
+    _base_zgw_cache, timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT
+)
