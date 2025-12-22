@@ -1,10 +1,19 @@
 {% extends "master.html" %}
 {% load i18n grid_tags %}
 
+{% block title %}{{ page_heading }} - {{ site_name }}{% endblock %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
+
 {% block content %}
     {% render_grid %}
         {% render_column start=3 span=8 %}
-            <h1 class="utrecht-heading-1" id="title">{% trans "Mijn Afval" %}</h1>
+            <h1 class="utrecht-heading-1" id="title">{{ page_heading }}</h1>
+            {% if page_description %}
+                <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
+            {% endif %}
 
             {% for afval_obj in afval_data %}
                 <article class="afval-object">

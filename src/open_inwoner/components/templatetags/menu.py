@@ -484,6 +484,7 @@ def show_full_dropdown_menu(context) -> bool:
         "cases:index",
         "cases:contactmoment_list",
         "profile:appointments",
+        "mijn_afval:index",
     }
 
     is_url_with_minimal_dropdown = (

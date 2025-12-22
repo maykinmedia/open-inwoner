@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from .api_models import BAGObject
 from .clients import AfvalApiClient
@@ -92,11 +93,21 @@ def _format_bag_objects(bag_objects: list[BAGObject]) -> list[_BAGObjectData]:
     return result
 
 
-class AfvalView(LoginRequiredMixin, AppConfigMixin, TemplateView):
+class AfvalView(LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView):
     template_name = "pages/mijn_afval/index.html"
 
+    @cached_property
+    def crumbs(self):
+        current_page = self.request.current_page
+        title = current_page.get_title() if current_page else "Mijn Afval"
+        return [
+            (title, reverse("mijn_afval:index")),
+        ]
+
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and not request.user.bsn:
+        user = request.user
+
+        if user.is_authenticated and not (user.is_staff or request.user.bsn):
             return redirect(reverse("pages-root"))
 
         return super().dispatch(request, *args, **kwargs)
@@ -107,11 +118,15 @@ class AfvalView(LoginRequiredMixin, AppConfigMixin, TemplateView):
         client = AfvalApiClient(base_url="")
         data = client.fetch_bag_objects_for_bsn(bsn=self.request.user.bsn)
 
+        # check for apphook config in case it is manually deleted (defensive)
+        page_heading = self.config.page_heading if self.config else "Mijn Afval"
+        page_description = self.config.page_description if self.config else ""
+
         context.update(
             {
                 "afval_data": _format_bag_objects(data),
-                "page_heading": getattr(self.config, "page_heading", "Mijn Afval"),
-                "page_description": getattr(self.config, "page_description", ""),
+                "page_heading": page_heading,
+                "page_description": page_description,
             }
         )
 

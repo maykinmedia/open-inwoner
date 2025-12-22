@@ -231,6 +231,7 @@ INSTALLED_APPS = [
     "open_inwoner.media",
     "open_inwoner.userfeed",
     "open_inwoner.mijn_afval",
+    "open_inwoner.mijn_afval.cms",
     "open_inwoner.cms.profile",
     "open_inwoner.cms.cases",
     "open_inwoner.cms.inbox",
