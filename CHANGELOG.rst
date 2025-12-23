@@ -109,6 +109,8 @@ Nieuwe features
 * [:taiga-us:`3606`]: Experimentele client geïmplementeerd met mock data ter ondersteuning van het ontwikkelen
   van de 'Mijn Afval' module.
 * [:taiga-us:`3607`, :pr:`2075`]: Basisapp ‘Mijn Afval’ geïmplementeerd en geïntegreerd met Django CMS.
+* [:pr:`1983`]: Optie toegevoegd om zaken rollen te filteren op type betrokkene
+  (‘natuurlijke persoon’, ‘niet-natuurlijke persoon’, ‘vestiging’).
 
 Bugfixes
 --------

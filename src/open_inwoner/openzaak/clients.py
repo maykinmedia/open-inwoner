@@ -61,10 +61,18 @@ class ZgwAPIClient(APIClient):
 
 class ZakenClient(ZgwAPIClient):
     use_openzaak_120_params: bool
+    fetch_rollen_with_betrokkene_type: bool
 
-    def __init__(self, *args, use_openzaak_120_params: bool, **kwargs):
+    def __init__(
+        self,
+        *args,
+        use_openzaak_120_params: bool,
+        fetch_rollen_with_betrokkene_type: bool,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.use_openzaak_120_params = use_openzaak_120_params
+        self.fetch_rollen_with_betrokkene_type = fetch_rollen_with_betrokkene_type
 
     def fetch_cases(
         self,
@@ -358,11 +366,20 @@ class ZakenClient(ZgwAPIClient):
         return status
 
     @cache_result(
-        "{self.base_url}:case_roles:{case_url}:{role_desc_generic}",
+        "{self.base_url}:case_roles:{case_url}:{betrokkene_type}:{role_desc_generic}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_case_roles(
-        self, case_url: str, role_desc_generic: str | None = None
+        self,
+        case_url: str,
+        *,
+        betrokkene_type: Literal[
+            "natuurlijk_persoon",
+            "niet_natuurlijk_persoon",
+            "vestiging",
+        ]
+        | None = None,
+        role_desc_generic: str | None = None,
     ) -> list[Rol]:
         params = {
             "zaak": case_url,
@@ -373,6 +390,13 @@ class ZakenClient(ZgwAPIClient):
 
             params["omschrijvingGeneriek"] = role_desc_generic
 
+        if self.fetch_rollen_with_betrokkene_type:
+            if not betrokkene_type:
+                raise ValueError(
+                    "Betrokkene type mandatory if fetch_rollen_with_betrokkene_type set"
+                )
+            params["betrokkeneType"] = betrokkene_type
+
         try:
             response = self.get(
                 "rollen",
@@ -380,7 +404,7 @@ class ZakenClient(ZgwAPIClient):
             )
             data = get_json_response(response)
             all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError) as e:
+        except (RequestException, ClientError):
             logger.exception(
                 "Failed to retrieve case roles",
                 zaak_url=case_url,
@@ -403,7 +427,9 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(
+            case_url, betrokkene_type="natuurlijk_persoon"
+        )
         if not case_roles:
             return []
 
@@ -426,7 +452,9 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(
+            case_url, betrokkene_type="niet_natuurlijk_persoon"
+        )
         if not case_roles:
             return []
 
@@ -449,7 +477,7 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        case_roles = self.fetch_case_roles(case_url)
+        case_roles = self.fetch_case_roles(case_url, betrokkene_type="vestiging")
         if not case_roles:
             return []
 
@@ -987,7 +1015,8 @@ def _build_all_zgw_clients_for_type(
             client_init_kwargs = {}
             if type_ == "zaak":
                 client_init_kwargs = {
-                    "use_openzaak_120_params": api_group.fetch_eherkenning_zaken_with_openzaak_120_params
+                    "use_openzaak_120_params": api_group.fetch_eherkenning_zaken_with_openzaak_120_params,
+                    "fetch_rollen_with_betrokkene_type": api_group.fetch_rollen_with_betrokkene_type,
                 }
 
             client = build_zgw_client_from_service(service, **client_init_kwargs)

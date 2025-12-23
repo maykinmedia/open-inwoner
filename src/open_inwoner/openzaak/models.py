@@ -214,6 +214,7 @@ class ZGWApiGroupConfig(models.Model):
             self._build_client_from_attr(
                 "zrc_service",
                 use_openzaak_120_params=self.fetch_eherkenning_zaken_with_openzaak_120_params,
+                fetch_rollen_with_betrokkene_type=self.fetch_rollen_with_betrokkene_type,
             ),
         )
 
@@ -292,6 +293,15 @@ class ZGWApiGroupConfig(models.Model):
             "_vestigingsNummer and rol__betrokkeneIdentificatie__nietNatuurlijkPersoon"
             "__innNnpId query parameters. This feature is available only in OpenZaak "
             "from version 1.20 and higher."
+        ),
+    )
+
+    fetch_rollen_with_betrokkene_type = models.BooleanField(
+        verbose_name=_("Filter zaken roles by betrokkene type"),
+        default=False,
+        help_text=_(
+            "If enabled, zaken roles are filtered using the type of betrokkene "
+            "('natuurlijk persoon', 'niet-natuurlijk persoon', 'vestiging')."
         ),
     )
 

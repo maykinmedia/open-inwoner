@@ -193,6 +193,9 @@ wordt:
 **Maak gebruik van het RSIN voor ophalen eHerkenning zaken**: indien aangevinkt, zullen
 eHerkenning gebruikers geidentificeerd worden via de RSIN in plaats van het KVK nummer.
 
+**Filter zaken rollen op type betrokkene**: indien ingeschakeld, worden zaken gefilterd
+op basis van het type betrokkene ('natuurlijke persoon', 'niet-natuurlijke persoon', 'vestiging').
+
 **Klanten API back-end**: De backend waarin de klantgegevens voor deze API set staan. In
 de regel zal dit eSuite zijn voor eSuite zaaksystemeen, en Openklant 2 voor Open Zaak.
 Laat dit veld leeg indien u geen gebruik maakt van een klant systeem.

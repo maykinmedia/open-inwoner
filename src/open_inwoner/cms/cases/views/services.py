@@ -120,6 +120,7 @@ class CaseListService:
             build_zgw_client_from_service(
                 group.zrc_service,
                 use_openzaak_120_params=group.fetch_eherkenning_zaken_with_openzaak_120_params,
+                fetch_rollen_with_betrokkene_type=group.fetch_rollen_with_betrokkene_type,
             ),
         )
 
