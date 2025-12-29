@@ -18,7 +18,7 @@ class eHerkenningMockTestCase(TestCase):
 
 
 OVERRIDE_SETTINGS = dict(
-    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
     EHERKENNING_MOCK_RETURN_URL=RETURN_URL,  # url to redirect to after success
     EHERKENNING_MOCK_CANCEL_URL=CANCEL_URL,  # url to navigate to when users clicks 'cancel/annuleren'
 )

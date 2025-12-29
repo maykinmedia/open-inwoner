@@ -20,9 +20,9 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ActionForm, ActionListForm
 from open_inwoner.accounts.models import Action
-from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.components.utils import RenderableTag
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
+from open_inwoner.mijn_samenwerkingen.cms.cms_apps import CollaborateApphook
 from open_inwoner.utils.logentry import get_verbose_change_message
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin

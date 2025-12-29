@@ -17,7 +17,7 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 from .factories import DigidUserFactory, MessageFactory, UserFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()
@@ -231,18 +231,19 @@ class InboxPageTests(WebTest):
 
 
 @tag("e2e")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class InboxPagePlaywrightTests(PlaywrightSyncLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.user = DigidUserFactory.create()
-        # let's reuse the login storage_state
-        cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
-
     def setUp(self):
         super().setUp()
+
+        # Create CMS homepage before login (needed for pages-root navigation)
+        from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+
+        cms_tools.create_homepage()
+
+        self.user = DigidUserFactory.create()
+        # Create login storage_state for this test
+        self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         self.contact_1 = UserFactory.create(
             first_name="user", last_name="1", email="user1@example.com"

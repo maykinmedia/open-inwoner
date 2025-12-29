@@ -5,7 +5,7 @@ from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client
 from zgw_consumers.utils import pagination_helper
 
-from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.mijn_aanvragen.api_models import Zaak
 from open_inwoner.utils.api import ClientError, get_json_response
 
 from .api_models import (

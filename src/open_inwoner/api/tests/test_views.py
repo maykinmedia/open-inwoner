@@ -3,8 +3,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from open_inwoner.pdc.models import Category
-from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.onderwerpen.models import Category
+from open_inwoner.onderwerpen.tests.factories import CategoryFactory
 
 
 class TestPDCLocation(APITestCase):

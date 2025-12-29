@@ -4,10 +4,10 @@ from django.urls import reverse
 from pyquery import PyQuery
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class SocialMediaButtonsTest(TestCase):
     @classmethod
     def setUpTestData(cls):

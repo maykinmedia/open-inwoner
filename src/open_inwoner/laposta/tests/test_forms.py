@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
-from open_inwoner.cms.tests.cms_tools import get_request
+from open_inwoner.core.cms.utils.cms_test_utils import get_request
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.utils.test import ClearCachesMixin

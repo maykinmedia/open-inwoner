@@ -4,9 +4,9 @@ from django.test import TestCase
 
 from pyquery import PyQuery
 
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 
 
 class KCMSurveyTestCase(TestCase):

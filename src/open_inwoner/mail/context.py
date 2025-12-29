@@ -1,7 +1,7 @@
 from django.urls import reverse
 
-from open_inwoner.cms.utils.page_display import profile_page_is_published
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.page_display import profile_page_is_published
 
 
 def mail_context():

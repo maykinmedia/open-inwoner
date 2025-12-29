@@ -3,7 +3,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import ngettext
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.openzaak.constants import StatusIndicators
+from open_inwoner.mijn_aanvragen.constants import StatusIndicators
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.hooks.common import simple_message

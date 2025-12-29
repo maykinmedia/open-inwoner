@@ -4,11 +4,11 @@ from django.urls import reverse
 from cms import api
 from django_webtest import WebTest
 
+from open_inwoner.accounts.cms.mijn_profiel.cms_appconfig import ProfileConfig
 from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
-from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestShowActions(WebTest):
     def setUp(self):
         self.user = UserFactory()

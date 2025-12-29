@@ -3,7 +3,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from open_inwoner.pdc.tests.factories import ProductFactory, ProductLocationFactory
+from open_inwoner.onderwerpen.tests.factories import (
+    ProductFactory,
+    ProductLocationFactory,
+)
 
 
 class TestPDCLocation(APITestCase):

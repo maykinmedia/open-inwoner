@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 from open_inwoner.search.tests.utils import ESMixin
 
 

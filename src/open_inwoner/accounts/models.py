@@ -28,7 +28,7 @@ from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.plans.models import PlanContact
+from open_inwoner.mijn_samenwerkingen.models import PlanContact
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.validators import (
     CharFieldValidator,
@@ -642,7 +642,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             - publication status of relevant CMS page
             - user preference
         """
-        from open_inwoner.cms.utils.page_display import (
+        from open_inwoner.core.cms.utils.page_display import (
             case_page_is_published,
             collaborate_page_is_published,
             inbox_page_is_published,
@@ -777,12 +777,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
 
     def has_group_managed_categories(self) -> bool:
-        from open_inwoner.pdc.models import Category
+        from open_inwoner.onderwerpen.models import Category
 
         return Category.objects.filter(access_groups__user=self).exists()
 
     def get_group_managed_categories(self):
-        from open_inwoner.pdc.models import Category
+        from open_inwoner.onderwerpen.models import Category
 
         return Category.objects.filter(access_groups__user=self)
 

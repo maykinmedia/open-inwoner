@@ -13,8 +13,8 @@ from privates.test import temp_private_root
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.utils.tests.playwright import (
     PlaywrightSyncLiveServerTestCase,
     get_driver_name,
@@ -24,7 +24,7 @@ from .factories import ActionFactory, DigidUserFactory, UserFactory
 
 
 @temp_private_root()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ActionViewTests(WebTest):
     def setUp(self) -> None:
         # cookiebanner
@@ -318,19 +318,18 @@ class ActionViewTests(WebTest):
 
 
 @tag("e2e")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @patch("open_inwoner.configurations.models.SiteConfiguration.get_solo")
 class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.user = DigidUserFactory.create()
-        # let's reuse the login storage_state
-        cls.user_login_state = cls.get_user_bsn_login_state(cls.user)
-
     def setUp(self) -> None:
         super().setUp()
+
+        # Create CMS homepage before login (needed for pages-root navigation)
+        cms_tools.create_homepage()
+
+        self.user = DigidUserFactory.create()
+        # Create login storage_state for this test
+        self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         self.action = ActionFactory(
             name="my_action",

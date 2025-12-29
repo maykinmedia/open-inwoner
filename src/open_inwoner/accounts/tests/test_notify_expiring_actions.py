@@ -10,7 +10,7 @@ from open_inwoner.accounts.tests.factories import ActionFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ExpiringActionsNotificationTest(TestCase):
     def test_send_emails_about_expiring_actions(self):

@@ -1,6 +1,6 @@
 from django.test import TestCase, tag
 
-from open_inwoner.pdc.tests.factories import (
+from open_inwoner.onderwerpen.tests.factories import (
     CategoryFactory,
     OrganizationFactory,
     ProductFactory,

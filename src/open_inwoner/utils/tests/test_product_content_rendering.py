@@ -4,11 +4,11 @@ from django_prosemirror.config import ProsemirrorConfig
 from django_prosemirror.schema import MarkType, NodeType
 from django_prosemirror.serde import html_to_doc
 
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 from open_inwoner.utils.html import get_product_rendered_content
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class GetProductRenderedContentTest(TestCase):
     """Test the get_product_rendered_content function with ProsemirrorModelField."""
 

@@ -15,7 +15,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ContactCreateForm, ContactFilterForm
 from open_inwoner.accounts.models import Invite, User
-from open_inwoner.cms.utils.page_display import inbox_page_is_published
+from open_inwoner.core.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 

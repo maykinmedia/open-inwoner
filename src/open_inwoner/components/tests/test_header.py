@@ -12,11 +12,11 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.cms.products.cms_apps import ProductsApphook
-from open_inwoner.cms.tests import cms_tools
-from open_inwoner.cms.tests.cms_tools import create_apphook_page
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.core.cms.utils.cms_test_utils import create_apphook_page
+from open_inwoner.onderwerpen.cms.cms_apps import ProductsApphook
+from open_inwoner.onderwerpen.tests.factories import CategoryFactory
 
 
 class HeaderTest(TestCase):

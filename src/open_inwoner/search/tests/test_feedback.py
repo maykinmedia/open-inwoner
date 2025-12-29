@@ -9,14 +9,18 @@ from django_webtest import WebTest
 from furl import furl
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory, TagFactory
+from open_inwoner.onderwerpen.tests.factories import (
+    CategoryFactory,
+    ProductFactory,
+    TagFactory,
+)
 from open_inwoner.search.models import Feedback
 
 from .utils import ESMixin
 
 
 @tag("elastic")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestFeedbackFunctionality(ESMixin, WebTest):
     def setUp(self):
         self.user = UserFactory()

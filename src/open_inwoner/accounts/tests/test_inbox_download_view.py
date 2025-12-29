@@ -9,7 +9,7 @@ from .factories import MessageFactory, UserFactory
 
 
 @temp_private_root()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class InboxDownloadTests(WebTest):
     def setUp(self) -> None:
         self.message = MessageFactory(

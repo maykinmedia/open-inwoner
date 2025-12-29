@@ -8,7 +8,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from .factories import MessageFactory, UserFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class MessagesNotificationTest(TestCase):
     def test_send_emails_about_messages(self):

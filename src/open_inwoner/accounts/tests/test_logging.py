@@ -19,7 +19,7 @@ from open_inwoner.accounts.choices import LoginTypeChoices, StatusChoices
 from open_inwoner.accounts.forms import ActionForm
 from open_inwoner.accounts.models import Action, Invite, Message, User
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import CategoryFactory
+from open_inwoner.onderwerpen.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 from .factories import (
@@ -33,7 +33,7 @@ from .factories import (
 
 @disable_admin_mfa()
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestProfile(WebTest):
     csrf_checks = False
 
@@ -123,7 +123,7 @@ class TestProfile(WebTest):
             },
         )
 
-    @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
+    @patch("open_inwoner.core.cms.utils.page_display._is_published", return_value=True)
     def test_user_notifications_update_is_logged(self, mock_cms_page_display):
         config = SiteConfiguration.get_solo()
         config.notifications_messages_enabled = True
@@ -319,7 +319,7 @@ class TestProfile(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestInvites(WebTest):
     def setUp(self):
         self.invitee = UserFactory(is_active=False)
@@ -376,7 +376,7 @@ class TestInvites(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestContacts(WebTest):
     csrf_checks = False
 
@@ -455,7 +455,7 @@ class TestContacts(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestDocuments(WebTest):
     csrf_checks = False
 
@@ -506,7 +506,7 @@ class TestDocuments(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestActions(WebTest):
     def setUp(self):
         self.user = UserFactory()
@@ -633,7 +633,7 @@ class TestActions(WebTest):
 
 
 @freeze_time("2021-10-18 13:00:00")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestMessages(WebTest):
     def setUp(self):
         self.user = UserFactory()

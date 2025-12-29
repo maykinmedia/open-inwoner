@@ -144,7 +144,7 @@ INSTALLED_APPS = [
     "django.forms",
     # load user model before CMS
     "open_inwoner.accounts",
-    "open_inwoner.openzaak",
+    "open_inwoner.mijn_aanvragen",
     # Django-CMS
     "cms",
     "menus",
@@ -217,36 +217,36 @@ INSTALLED_APPS = [
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
+    "open_inwoner.core.cms.cms_plugins.banner",
+    "open_inwoner.core.cms.cms_plugins.extensions",
+    "open_inwoner.core.cms.cms_plugins.footer",
+    "open_inwoner.core.cms.cms_plugins.link",
+    "open_inwoner.core.cms.cms_plugins.text",
+    "open_inwoner.core.cms.cms_plugins.userfeed",
+    "open_inwoner.core.cms.cms_plugins.videoplayer",
+    "open_inwoner.custom_csp",
+    "open_inwoner.extended_sessions",
+    "open_inwoner.haalcentraal",
     "open_inwoner.kvk",
     "open_inwoner.laposta",
     "open_inwoner.qmatic",
-    "open_inwoner.pdc",
-    "open_inwoner.plans",
     "open_inwoner.search",
     "open_inwoner.utils",
     "open_inwoner.configurations",
-    "open_inwoner.haalcentraal",
     "open_inwoner.openklant",
     "open_inwoner.soap",
-    "open_inwoner.ssd",
     "open_inwoner.questionnaire",
-    "open_inwoner.extended_sessions",
-    "open_inwoner.custom_csp",
     "open_inwoner.mail",
     "open_inwoner.media",
     "open_inwoner.userfeed",
     "open_inwoner.mijn_afval",
     "open_inwoner.mijn_afval.cms",
-    "open_inwoner.cms.profile",
-    "open_inwoner.cms.cases",
-    "open_inwoner.cms.inbox",
-    "open_inwoner.cms.products",
-    "open_inwoner.cms.collaborate",
-    "open_inwoner.cms.banner",
-    "open_inwoner.cms.extensions",
-    "open_inwoner.cms.footer",
-    "open_inwoner.cms.plugins",
-    "open_inwoner.cms.benefits",
+    "open_inwoner.mijn_uitkeringen",
+    "open_inwoner.mijn_samenwerkingen",
+    "open_inwoner.onderwerpen",
+    "open_inwoner.accounts.cms.mijn_profiel",
+    "open_inwoner.mijn_aanvragen.cms.apps.MijnAanvragenCmsConfig",
+    "open_inwoner.cms.plugins",  # Contains: zaken (other plugins moved to respective apps)
     "djchoices",
     "django_celery_beat",
     "django_celery_monitor",
@@ -292,13 +292,13 @@ MIDDLEWARE = [
     "cms.middleware.page.CurrentPageMiddleware",
     "cms.middleware.toolbar.ToolbarMiddleware",
     "cms.middleware.language.LanguageCookieMiddleware",
-    "open_inwoner.cms.utils.middleware.DropToolbarMiddleware",
+    "open_inwoner.core.cms.utils.middleware.DropToolbarMiddleware",
     "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",
     "open_inwoner.extended_sessions.middleware.SessionTimeoutMiddleware",
     "open_inwoner.kvk.middleware.KvKLoginMiddleware",
     "open_inwoner.accounts.middleware.NecessaryFieldsMiddleware",
     "open_inwoner.accounts.middleware.EmailVerificationMiddleware",
-    "open_inwoner.cms.utils.middleware.AnonymousHomePageRedirectMiddleware",
+    "open_inwoner.utils.middleware.AnonymousHomePageRedirectMiddleware",
     "mozilla_django_oidc_db.middleware.SessionRefresh",
 ]
 
@@ -328,7 +328,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "open_inwoner.utils.context_processors.settings",
-                "open_inwoner.cms.context_processors.active_apphooks",
+                "open_inwoner.core.cms.context_processors.active_apphooks",
                 "sekizai.context_processors.sekizai",
                 "cms.context_processors.cms_settings",
                 "django.template.context_processors.i18n",
@@ -788,7 +788,7 @@ CELERY_BEAT_SCHEDULE = {
     # becomes a painpoint, it's cleaner to have the schedule easily accessible
     # here in the settings file.
     "Importeer ZGW data": {
-        "task": "open_inwoner.openzaak.tasks.import_zgw_data",
+        "task": "open_inwoner.mijn_aanvragen.tasks.import_zgw_data",
         "schedule": crontab(minute="0", hour="7", day_of_month="*"),
     },
     "Zoekindex opnieuw opbouwen": {
@@ -993,7 +993,7 @@ INVITE_EXPIRY_DAYS = config("INVITE_EXPIRY_DAYS", default=30)
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
-    os.path.join(DJANGO_PROJECT_DIR, "openzaak", "tests", "files"),
+    os.path.join(DJANGO_PROJECT_DIR, "mijn_aanvragen", "tests", "files"),
     os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 

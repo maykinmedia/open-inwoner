@@ -5,7 +5,7 @@ from django.test import TestCase, tag
 from elasticsearch.dsl import Search
 
 from open_inwoner.accounts.models import SiteConfiguration
-from open_inwoner.cms.tests.cms_tools import create_cms_page_with_content
+from open_inwoner.core.cms.utils.cms_test_utils import create_cms_page_with_content
 from open_inwoner.search.results import GenericHit
 from open_inwoner.search.views import multi_search
 

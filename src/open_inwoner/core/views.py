@@ -7,9 +7,10 @@ from django.utils.translation import gettext as _
 import structlog
 from cms.models import Page, Title
 
+from open_inwoner.accounts.cms.mijn_profiel.cms_appconfig import ProfileConfig
 from open_inwoner.accounts.models import User
-from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
-from open_inwoner.cms.utils.page_display import (
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,
     collaborate_page_is_published,
@@ -17,9 +18,8 @@ from open_inwoner.cms.utils.page_display import (
     products_page_is_published,
     profile_page_is_published,
 )
-from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.onderwerpen.models.category import Category
 from open_inwoner.openklant.models import KlantenSysteemConfig
-from open_inwoner.pdc.models.category import Category
 from open_inwoner.questionnaire.models import QuestionnaireStep
 
 logger = structlog.stdlib.get_logger(__name__)

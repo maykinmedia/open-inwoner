@@ -2,9 +2,15 @@ from drf_spectacular.utils import extend_schema_field
 from filer.models import File, Image
 from rest_framework import serializers
 
-from open_inwoner.pdc.models import Category, Product, ProductLink, Question, Tag
-from open_inwoner.pdc.models.organization import Organization
-from open_inwoner.pdc.models.product import (
+from open_inwoner.onderwerpen.models import (
+    Category,
+    Product,
+    ProductLink,
+    Question,
+    Tag,
+)
+from open_inwoner.onderwerpen.models.organization import Organization
+from open_inwoner.onderwerpen.models.product import (
     ProductCondition,
     ProductFile,
     ProductLocation,

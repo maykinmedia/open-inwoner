@@ -3,13 +3,13 @@ from django.conf import settings
 from django_setup_configuration.config_settings import ConfigSettings
 from django_setup_configuration.configuration import BaseConfigurationStep
 
-from open_inwoner.cms.benefits.cms_apps import SSDApphook
-from open_inwoner.cms.cases.cms_apps import CasesApphook
-from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
-from open_inwoner.cms.inbox.cms_apps import InboxApphook
-from open_inwoner.cms.products.cms_apps import ProductsApphook
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
+from open_inwoner.accounts.cms.mijn_berichten.cms_apps import InboxApphook
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.mijn_aanvragen.cms.cms_apps import CasesApphook
+from open_inwoner.mijn_samenwerkingen.cms.cms_apps import CollaborateApphook
+from open_inwoner.mijn_uitkeringen.cms.cms_apps import SSDApphook
+from open_inwoner.onderwerpen.cms.cms_apps import ProductsApphook
 
 
 def create_apphook_page_args(config_mapping: dict) -> dict:

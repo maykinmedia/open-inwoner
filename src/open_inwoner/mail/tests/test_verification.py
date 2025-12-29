@@ -10,11 +10,11 @@ from freezegun.api import freeze_time
 from furl.furl import furl
 from pyquery.pyquery import PyQuery
 
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.accounts.views.registration import EmailVerificationUserView
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.mail.verification import (
     BadToken,
     decode_email_verification_token,
@@ -146,7 +146,7 @@ class TestTokenVerification(TestCase):
             self.assertFalse(user.has_verified_email())
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestSendVerificationEmail(WebTest):
     def get_sole_email_html_from_outbox(self, recipient):
         self.assertEqual(len(mail.outbox), 1)
@@ -201,7 +201,7 @@ class TestSendVerificationEmail(WebTest):
         self.assertRedirects(response, target_url)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestMailVerificationView(WebTest):
     def test_mail_verification_view(self):
         user = UserFactory(email="foo@example.com")
@@ -221,7 +221,7 @@ class TestMailVerificationView(WebTest):
         self.assertRedirects(response, expected)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestMailVerificationMiddlewareFlow(WebTest):
     @classmethod
     def setUpClass(cls):

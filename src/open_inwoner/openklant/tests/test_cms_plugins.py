@@ -6,7 +6,7 @@ from django_prosemirror.schema import MarkType, NodeType
 from django_prosemirror.serde import html_to_doc
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.tests import cms_tools
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.openklant.cms_plugins import ContactFormPlugin
 from open_inwoner.openklant.forms import ContactForm
 

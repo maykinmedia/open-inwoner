@@ -14,7 +14,7 @@ from open_inwoner.utils.tests.helpers import create_image_bytes
 from .factories import DocumentFactory, UserFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class InboxPageTests(WebTest):
     def setUp(self) -> None:
         super().setUp()

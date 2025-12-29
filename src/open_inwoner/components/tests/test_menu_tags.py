@@ -11,12 +11,12 @@ from cms import api
 from cms.test_utils.testcases import CMSTestCase
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.extensions.constants import IndicatorChoices
-from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.components.templatetags.menu import (
     SideNavMenuData,
     react_sidenav_data,
 )
+from open_inwoner.core.cms.cms_plugins.extensions.constants import IndicatorChoices
+from open_inwoner.core.cms.cms_plugins.extensions.models import CommonExtension
 
 
 @override_settings(

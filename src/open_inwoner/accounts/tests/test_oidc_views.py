@@ -19,6 +19,7 @@ from mozilla_django_oidc_db.models import OpenIDConnectConfig
 from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.models import (
     OpenIDDigiDConfig,
@@ -29,10 +30,9 @@ from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
 )
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.choices import OpenIDDisplayChoices
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 
 from .factories import (
     DigidUserFactory,
@@ -505,7 +505,7 @@ class OIDCFlowTests(TestCase):
                 self.assertEqual(response.status_code, 403)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class DigiDOIDCFlowTests(WebTest):
     @classmethod
     def setUpClass(cls):
@@ -1071,7 +1071,7 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertEqual(profile_response.status_code, 200)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class eHerkenningOIDCFlowTests(WebTest):
     @classmethod
     def setUpClass(cls):

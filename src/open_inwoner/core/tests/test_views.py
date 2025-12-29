@@ -7,24 +7,29 @@ from django.utils.translation import gettext as _
 
 from cms import api
 
+from open_inwoner.accounts.cms.mijn_berichten.cms_apps import InboxApphook
+from open_inwoner.accounts.cms.mijn_profiel.cms_appconfig import ProfileConfig
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
-from open_inwoner.cms.benefits.cms_apps import SSDApphook
-from open_inwoner.cms.cases.cms_apps import CasesApphook
-from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
-from open_inwoner.cms.extensions.models import CommonExtension
-from open_inwoner.cms.inbox.cms_apps import InboxApphook
-from open_inwoner.cms.products.cms_apps import ProductsApphook
-from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
-from open_inwoner.cms.tests.cms_tools import create_apphook_page, create_homepage
+
+from open_inwoner.cms.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.cms_plugins.extensions.models import CommonExtension
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.core.cms.utils.cms_test_utils import (
+    create_apphook_page,
+    create_homepage,
+)
 from open_inwoner.core.views import _get_category_data_for_user
-from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
+from open_inwoner.mijn_aanvragen.cms.cms_apps import CasesApphook
+from open_inwoner.mijn_samenwerkingen.cms.cms_apps import CollaborateApphook
+from open_inwoner.mijn_uitkeringen.cms.cms_apps import SSDApphook
+from open_inwoner.onderwerpen.cms.cms_apps import ProductsApphook
+from open_inwoner.onderwerpen.tests.factories import CategoryFactory, ProductFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
 
@@ -291,7 +296,7 @@ class SitemapCategoryDataTest(TestCase):
                 self.assertEqual(len(res["sub_categories"]), res_company)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class SitemapViewTest(TestCase):
     def setUp(self):
         self.user = UserFactory()

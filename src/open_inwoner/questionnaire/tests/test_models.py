@@ -26,12 +26,12 @@ class QuestionnaireStepTestCase(TestCase):
         root = QuestionnaireStepFactory.create(question="foo")
         self.assertTrue("foo" in str(root))
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+    @override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
     def test_get_absolute_url_root(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         self.assertEqual("/products/questionnaire/foo", root.get_absolute_url())
 
-    @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+    @override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
     def test_get_absolute_url_descendent(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         descendent = root.add_child(code="bar", slug="bar")

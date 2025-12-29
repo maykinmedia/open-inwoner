@@ -13,9 +13,9 @@ import structlog
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
+from open_inwoner.mijn_aanvragen.clients import MultiZgwClientProxy, build_zaken_clients
+from open_inwoner.mijn_aanvragen.models import ZGWApiGroupConfig
+from open_inwoner.mijn_aanvragen.utils import get_user_fetch_parameters, is_zaak_visible
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 

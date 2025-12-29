@@ -7,14 +7,14 @@ from privates.test import temp_private_root
 
 from open_inwoner.accounts.models import Document
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 from open_inwoner.questionnaire.views import QUESTIONNAIRE_SESSION_KEY
 
 from .factories import QuestionnaireStepFactory
 
 
 @temp_private_root()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class QuestionnaireExportTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()

@@ -13,7 +13,7 @@ from open_inwoner.utils.url import uuid_from_url
 
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class eSuiteVragenServiceTestCase(TestCase):
     maxDiff = None
 

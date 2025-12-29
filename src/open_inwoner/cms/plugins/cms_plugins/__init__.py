@@ -1,18 +1,6 @@
-from .appointments import UserAppointmentsPlugin
-from .links import CMSLinkPlugin, LinkPlugin
-from .tasks import TasksPlugin
-from .text import TextPlugin
-from .userfeed import UserFeedPlugin
-from .videoplayer import VideoPlayerPlugin
-from .zaken import CMSZakenPlugin
+# Appointments plugin moved to accounts.cms.mijn_profiel.cms_plugins
+# Link plugins moved to core.cms.plugins.cms_plugins
+# Text, UserFeed, VideoPlayer plugins moved to core.cms.plugins.cms_plugins
+# CMSZakenPlugin moved to mijn_aanvragen.cms.cms_plugins
 
-__all__ = [
-    "UserAppointmentsPlugin",
-    "UserFeedPlugin",
-    "TasksPlugin",
-    "TextPlugin",
-    "VideoPlayerPlugin",
-    "CMSLinkPlugin",
-    "LinkPlugin",
-    "CMSZakenPlugin",
-]
+__all__ = []

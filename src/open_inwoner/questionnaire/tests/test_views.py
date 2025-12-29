@@ -7,13 +7,13 @@ from django.views.generic import FormView
 
 from django_webtest import WebTest
 
+from open_inwoner.accounts.cms.mijn_profiel.cms_appconfig import ProfileConfig
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.products.cms_apps import ProductsApphook
-from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
-from open_inwoner.pdc.models import Product
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.onderwerpen.cms.cms_apps import ProductsApphook
+from open_inwoner.onderwerpen.models import Product
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 from open_inwoner.questionnaire.forms import QuestionnaireStepForm
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.questionnaire.views import (
@@ -25,7 +25,7 @@ from open_inwoner.utils.test import SessionMiddleware
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class QuestionnaireResetViewTestCase(WebTest):
     def test_clears_session(self):
         path = reverse("products:reset")
@@ -46,7 +46,7 @@ class QuestionnaireResetViewTestCase(WebTest):
         self.assertEqual(reverse("pages-root"), response.url)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class QuestionnaireStepViewTestCase(TestCase):
     def test_root_step_404(self):
         path = reverse("products:root_step", kwargs={"slug": "doesnotexist"})
@@ -276,7 +276,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         self.assertEqual(response.url, descendent.get_absolute_url())
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class QuestionnaireStepListViewTestCase(WebTest):
     def setUp(self):
         self.user = UserFactory()

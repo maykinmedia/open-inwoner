@@ -1,18 +1,6 @@
-from .appointments import UserAppointments
-from .links import CMSLinkPluginConfig, ExtendedCMSLink
-from .tasks import TasksConfig
-from .text import Text
-from .userfeed import UserFeed
-from .videoplayer import VideoPlayer
-from .zaken import CMSZakenPluginConfig
+# UserAppointments moved to accounts.cms.mijn_profiel.models
+# Link models moved to core.cms.plugins.models
+# Text, UserFeed, VideoPlayer models moved to core.cms.plugins.models
+# Tasks and CMSZakenPluginConfig models moved to mijn_aanvragen.cms.models
 
-__all__ = [
-    "UserAppointments",
-    "UserFeed",
-    "TasksConfig",
-    "Text",
-    "VideoPlayer",
-    "CMSLinkPluginConfig",
-    "ExtendedCMSLink",
-    "CMSZakenPluginConfig",
-]
+__all__ = []

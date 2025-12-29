@@ -17,6 +17,7 @@ from zgw_consumers.api_models.base import factory
 from open_inwoner.accounts.signals import update_user_on_login
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.mijn_aanvragen.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
 from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import (
@@ -27,7 +28,6 @@ from open_inwoner.openklant.models import (
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
-from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.url import uuid_from_url
 
@@ -40,7 +40,7 @@ from .factories import KlantContactMomentAnswerFactory
     "open_inwoner.accounts.views.contactmoments.OpenKlant2Service",
     return_value=MockOpenKlant2Service(),
 )
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @modify_settings(
     MIDDLEWARE={"remove": ["open_inwoner.kvk.middleware.KvKLoginMiddleware"]}
 )

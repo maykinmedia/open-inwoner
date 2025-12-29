@@ -7,7 +7,7 @@ import structlog
 from mail_editor.helpers import find_template
 
 from open_inwoner.accounts.models import User
-from open_inwoner.plans.models import Plan
+from open_inwoner.mijn_samenwerkingen.models import Plan
 from open_inwoner.userfeed import hooks as userfeed_hooks
 from open_inwoner.utils.url import build_absolute_url
 

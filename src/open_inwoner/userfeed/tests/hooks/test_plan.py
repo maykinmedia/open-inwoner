@@ -6,13 +6,13 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.plans.tests.factories import PlanFactory
+from open_inwoner.mijn_samenwerkingen.tests.factories import PlanFactory
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.hooks.plan import plan_completed, plan_expiring
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class FeedHookTest(TestCase):
     @patch(
         "open_inwoner.userfeed.feed.get_active_app_names", return_value=["collaborate"]

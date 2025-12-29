@@ -9,13 +9,13 @@ from zgw_consumers.constants import APITypes
 from open_inwoner.configurations.bootstrap.openklant import (
     KlantenSysteemConfigurationStep,
 )
+from open_inwoner.mijn_aanvragen.tests.factories import ServiceFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
     KlantenSysteemConfig,
     OpenKlant2Config,
 )
-from open_inwoner.openzaak.tests.factories import ServiceFactory
 
 KLANTEN_SERVICE_API_ROOT = "https://openklant.local/klanten/api/v1/"
 CONTACTMOMENTEN_SERVICE_API_ROOT = "https://openklant.local/contactmomenten/api/v1/"

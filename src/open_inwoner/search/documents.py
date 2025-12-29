@@ -6,12 +6,12 @@ from cms.utils.page import get_page_queryset
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 
-from open_inwoner.cms.tests.cms_tools import (
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.cms_test_utils import (
     render_all_placeholders,
     render_full_page,
 )
-from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.models import Category, Organization, Product, Tag
+from open_inwoner.onderwerpen.models import Category, Organization, Product, Tag
 
 from .analyzers import html_strip, partial_analyzer, synonym_analyzer
 

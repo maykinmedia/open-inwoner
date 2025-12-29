@@ -4,9 +4,9 @@ import factory
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.mijn_aanvragen.tests.factories import ServiceFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.services import Question, QuestionValidator
-from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.url import uuid_from_url
 from openklant2.tests.helpers import OpenKlantServiceManager
 

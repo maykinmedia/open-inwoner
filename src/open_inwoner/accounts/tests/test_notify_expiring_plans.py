@@ -8,11 +8,11 @@ from django.urls import reverse
 from open_inwoner.accounts.tasks import schedule_user_notifications
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.plans.models import Plan
-from open_inwoner.plans.tests.factories import PlanFactory
+from open_inwoner.mijn_samenwerkingen.models import Plan
+from open_inwoner.mijn_samenwerkingen.tests.factories import PlanFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ExpiringPlansNotificationTest(TestCase):
     def test_send_emails_about_expiring_plans(self):

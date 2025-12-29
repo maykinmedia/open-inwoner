@@ -6,14 +6,14 @@ from django.utils.translation import gettext as _
 
 from zgw_consumers.api_models.base import factory
 
-from open_inwoner.openzaak.api_models import (
+from open_inwoner.mijn_aanvragen.api_models import (
     InformatieObject,
     Zaak,
     ZaakInformatieObject,
     ZaakType,
 )
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.tests.test_notification_data import MockAPIData
+from open_inwoner.mijn_aanvragen.models import ZGWApiGroupConfig
+from open_inwoner.mijn_aanvragen.tests.test_notification_data import MockAPIData
 from open_inwoner.userfeed.choices import FeedItemType
 from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.hooks.case_document import (
@@ -22,7 +22,7 @@ from open_inwoner.userfeed.hooks.case_document import (
 )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class FeedHookTest(TestCase):
     def setUp(self):
         MockAPIData.setUpServices()

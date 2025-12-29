@@ -3,8 +3,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
-from open_inwoner.openzaak.api_models import Zaak, ZaakInformatieObject
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.mijn_aanvragen.api_models import Zaak, ZaakInformatieObject
+from open_inwoner.mijn_aanvragen.models import ZGWApiGroupConfig
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType

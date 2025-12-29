@@ -7,7 +7,7 @@ from django.utils.timezone import make_aware
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
-from open_inwoner.plans.models import Plan
+from open_inwoner.mijn_samenwerkingen.models import Plan
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import register_item_adapter
 from open_inwoner.userfeed.choices import FeedItemType

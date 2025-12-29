@@ -1,6 +1,6 @@
 from django.test import TestCase, tag
 
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 from open_inwoner.search.models import FieldBoost
 from open_inwoner.search.searches import multi_search
 

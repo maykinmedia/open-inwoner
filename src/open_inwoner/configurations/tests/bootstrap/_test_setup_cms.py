@@ -2,15 +2,7 @@ from django.test import TestCase, override_settings
 
 from cms.models import Page
 
-from open_inwoner.cms.profile.cms_apps import ProfileConfig
-from open_inwoner.cms.utils.page_display import (
-    benefits_page_is_published,
-    case_page_is_published,
-    collaborate_page_is_published,
-    inbox_page_is_published,
-    products_page_is_published,
-    profile_page_is_published,
-)
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileConfig
 from open_inwoner.configurations.bootstrap.cms import (
     CMSBenefitsConfigurationStep,
     CMSCasesConfigurationStep,
@@ -19,11 +11,19 @@ from open_inwoner.configurations.bootstrap.cms import (
     CMSProductsConfigurationStep,
     CMSProfileConfigurationStep,
 )
+from open_inwoner.core.cms.utils.page_display import (
+    benefits_page_is_published,
+    case_page_is_published,
+    collaborate_page_is_published,
+    inbox_page_is_published,
+    products_page_is_published,
+    profile_page_is_published,
+)
 
 
 class CMSSetupConfigurationTest(TestCase):
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_PROFILE_ENABLE=True,
     )
     def test_cms_profile_configure_use_defaults(self):
@@ -55,7 +55,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_PROFILE_ENABLE=True,
         # profile config
         CMS_PROFILE_MY_DATA=False,
@@ -107,7 +107,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertEqual(extension.menu_icon, "smiley")
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
     )
     def test_cms_profile_not_configured(self):
         configuration_step = CMSProfileConfigurationStep()
@@ -127,7 +127,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_SSD_ENABLE=True,
     )
     def test_cms_ssd_configured(self):
@@ -144,7 +144,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_SSD_ENABLE=True,
         CMS_SSD_REQUIRES_AUTH=True,
         CMS_SSD_REQUIRES_AUTH_BSN_OR_KVK=True,
@@ -178,7 +178,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_CASES_ENABLE=True,
     )
     def test_cms_cases_configured(self):
@@ -195,7 +195,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_CASES_ENABLE=True,
         CMS_CASES_REQUIRES_AUTH=True,
         CMS_CASES_REQUIRES_AUTH_BSN_OR_KVK=True,
@@ -229,7 +229,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_COLLABORATE_ENABLE=True,
     )
     def test_cms_collaborate_configured(self):
@@ -246,7 +246,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_COLLABORATE_ENABLE=True,
         CMS_COLLABORATE_REQUIRES_AUTH=True,
         CMS_COLLABORATE_REQUIRES_AUTH_BSN_OR_KVK=True,
@@ -280,7 +280,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_INBOX_ENABLE=True,
     )
     def test_cms_inbox_configured(self):
@@ -297,7 +297,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_INBOX_ENABLE=True,
         CMS_INBOX_REQUIRES_AUTH=True,
         CMS_INBOX_REQUIRES_AUTH_BSN_OR_KVK=True,
@@ -331,7 +331,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(configuration_step.is_configured())
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_PRODUCTS_ENABLE=True,
     )
     def test_cms_products_configured(self):
@@ -348,7 +348,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
-        ROOT_URLCONF="open_inwoner.cms.tests.urls",
+        ROOT_URLCONF="open_inwoner.core.cms.tests.urls",
         CMS_CONFIG_PRODUCTS_ENABLE=True,
         CMS_PRODUCTS_REQUIRES_AUTH=True,
         CMS_PRODUCTS_REQUIRES_AUTH_BSN_OR_KVK=True,

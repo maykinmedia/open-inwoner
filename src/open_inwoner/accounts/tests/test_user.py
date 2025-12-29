@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
-from open_inwoner.plans.tests.factories import PlanFactory
+from open_inwoner.mijn_samenwerkingen.tests.factories import PlanFactory
 from open_inwoner.utils.hash import generate_email_from_string
 
 from .factories import UserFactory, eHerkenningVestigingUserFactory

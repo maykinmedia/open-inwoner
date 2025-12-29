@@ -4,8 +4,8 @@ from django.utils.translation import gettext as _
 
 from playwright.sync_api import expect
 
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
@@ -119,7 +119,7 @@ class TestCookieBannerDisabled(TestCase):
 
 
 @tag("e2e")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class CookieBannerPlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
     def setUp(self):
         from open_inwoner.accounts.tests.factories import DigidUserFactory

@@ -9,14 +9,14 @@ from maykin_2fa.test import disable_admin_mfa
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.plans.models import Plan
-from open_inwoner.plans.tests.factories import PlanFactory
+from open_inwoner.mijn_samenwerkingen.models import Plan
+from open_inwoner.mijn_samenwerkingen.tests.factories import PlanFactory
 from open_inwoner.utils.admin import CustomTimelineLogAdmin
 from open_inwoner.utils.logentry import LOG_ACTIONS
 
 
 @disable_admin_mfa()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestAdminTimelineLogging(WebTest):
     csrf_checks = False
 

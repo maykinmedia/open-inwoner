@@ -9,7 +9,7 @@ import requests_mock
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.tests.cms_tools import create_apphook_page
+from open_inwoner.core.cms.utils.cms_test_utils import create_apphook_page
 from open_inwoner.openklant.api_models import KlantContactRol
 from open_inwoner.openklant.cms_apps import OpenklantApphook
 from open_inwoner.openklant.constants import KlantenServiceType
@@ -40,7 +40,7 @@ from open_inwoner.utils.tests.helpers import AssertFormMixin, AssertTimelineLogM
     autospec=True,
     return_value=("", 42),
 )
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ContactFormIntegrationTest(
     ClearCachesMixin,
     AssertTimelineLogMixin,

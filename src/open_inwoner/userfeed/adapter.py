@@ -1,4 +1,4 @@
-from open_inwoner.openzaak.constants import StatusIndicators
+from open_inwoner.mijn_aanvragen.constants import StatusIndicators
 from open_inwoner.userfeed.models import FeedItemData
 
 

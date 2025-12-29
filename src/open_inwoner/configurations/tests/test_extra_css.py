@@ -5,13 +5,13 @@ from django.utils.html import escape
 
 from django_webtest import WebTest
 
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.utils.test import ClearCachesMixin, temp_media_root
 
 
 @temp_media_root()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ThemestylesheetTest(ClearCachesMixin, WebTest):
     def test_theme_stylesheet_renders_tag(self):
         cms_tools.create_homepage()
@@ -24,7 +24,7 @@ class ThemestylesheetTest(ClearCachesMixin, WebTest):
         self.assertContains(response, self.config.theme_stylesheet.url)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ExtraCSSTest(ClearCachesMixin, WebTest):
     def test_extra_css_is_cleaned_on_save(self):
         self.config = SiteConfiguration.get_solo()

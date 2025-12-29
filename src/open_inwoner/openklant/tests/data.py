@@ -6,17 +6,17 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
+from open_inwoner.mijn_aanvragen.tests.factories import (
+    ServiceFactory,
+    ZGWApiGroupConfigFactory,
+)
+from open_inwoner.mijn_aanvragen.tests.helpers import generate_oas_component_cached
+from open_inwoner.mijn_aanvragen.tests.shared import ZAKEN_ROOT
 from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
     OpenKlant2Config,
 )
-from open_inwoner.openzaak.tests.factories import (
-    ServiceFactory,
-    ZGWApiGroupConfigFactory,
-)
-from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
-from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 from open_inwoner.utils.test import paginated_response
 
 KLANTEN_ROOT = "https://klanten.nl/api/v1/"

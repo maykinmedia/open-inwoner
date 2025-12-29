@@ -10,15 +10,15 @@ from django.utils.translation import gettext_lazy as _
 from django_webtest import WebTest
 
 from open_inwoner.accounts.choices import ContactTypeChoices
+from open_inwoner.accounts.cms.mijn_berichten.cms_apps import InboxApphook
 from open_inwoner.accounts.models import User
-from open_inwoner.cms.inbox.cms_apps import InboxApphook
-from open_inwoner.cms.tests import cms_tools
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from .factories import DigidUserFactory, UserFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ContactViewTests(WebTest):
     csrf_checks = False
 

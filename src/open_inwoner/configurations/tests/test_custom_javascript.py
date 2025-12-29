@@ -3,8 +3,8 @@ from django.test import TestCase, override_settings
 
 from cms import api
 
-from open_inwoner.cms.tests.cms_tools import render_full_page
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.cms_test_utils import render_full_page
 from open_inwoner.utils.test import temp_media_root
 
 

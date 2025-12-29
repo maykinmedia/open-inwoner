@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 
-from open_inwoner.pdc.models import Category, Product
+from open_inwoner.onderwerpen.models import Category, Product
 
 from .serializers import CategoryWithChildSerializer, ProductSerializer
 

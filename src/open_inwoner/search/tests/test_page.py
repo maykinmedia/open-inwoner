@@ -5,10 +5,10 @@ from django.urls import reverse_lazy
 from django_webtest import WebTest
 from playwright.sync_api import expect
 
-from open_inwoner.cms.products.cms_apps import ProductsApphook
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import (
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.onderwerpen.cms.cms_apps import ProductsApphook
+from open_inwoner.onderwerpen.tests.factories import (
     CategoryFactory,
     OrganizationFactory,
     ProductFactory,
@@ -22,7 +22,7 @@ from .utils import ESMixin
 
 
 @tag("elastic")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
     url = reverse_lazy("search:search")
 
@@ -184,7 +184,7 @@ class SearchPageTests(ClearCachesMixin, ESMixin, WebTest):
 
 @tag("e2e")
 @tag("elastic")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class SearchPagePlaywrightTests(
     ClearCachesMixin, ESMixin, PlaywrightSyncLiveServerTestCase
 ):

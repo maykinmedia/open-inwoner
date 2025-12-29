@@ -31,7 +31,7 @@ from open_inwoner.accounts.views import (
 )
 from open_inwoner.configurations import views
 from open_inwoner.core.views import sitemap
-from open_inwoner.pdc.views import FAQView
+from open_inwoner.onderwerpen.views import FAQView
 
 handler500 = "open_inwoner.utils.views.server_error"
 admin.site.enable_nav_sidebar = False
@@ -108,7 +108,7 @@ urlpatterns = [
     path("api/", include("open_inwoner.api.urls", namespace="api")),
     path(
         "api/openzaak/",
-        include("open_inwoner.openzaak.api.urls", namespace="openzaak_api"),
+        include("open_inwoner.mijn_aanvragen.api.urls", namespace="openzaak_api"),
     ),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Views
@@ -128,8 +128,8 @@ urlpatterns = [
     path("faq/", FAQView.as_view(), name="general_faq"),
     path("kvk/", include("open_inwoner.kvk.urls")),
     path("", include("open_inwoner.search.urls", namespace="search")),
-    path("cms-plugins/", include("open_inwoner.cms.plugins.urls")),
     path("", include("maykin_common.health_checks.urls")),
+    path("cms-plugins/", include("open_inwoner.mijn_aanvragen.cms.plugin_urls")),
     re_path(r"^", include("cms.urls")),
 ]
 

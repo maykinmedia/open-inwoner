@@ -13,10 +13,10 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
-from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
-from open_inwoner.openzaak.tests.shared import (
+from open_inwoner.mijn_aanvragen.models import OpenZaakConfig
+from open_inwoner.mijn_aanvragen.tests.factories import ZGWApiGroupConfigFactory
+from open_inwoner.mijn_aanvragen.tests.helpers import generate_oas_component_cached
+from open_inwoner.mijn_aanvragen.tests.shared import (
     ANOTHER_CATALOGI_ROOT,
     ANOTHER_ZAKEN_ROOT,
     CATALOGI_ROOT,
@@ -28,7 +28,7 @@ from .utils import ESMixin
 
 
 @requests_mock.Mocker()
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 @tag("elastic")
 class TestSearchView(ESMixin, TransactionTestCase):
     def setUp(self):

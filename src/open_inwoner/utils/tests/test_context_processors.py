@@ -7,7 +7,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class ContextProcessorTest(TestCase):
     def setUp(self):
         self.user = UserFactory()

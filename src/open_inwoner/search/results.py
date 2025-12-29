@@ -9,7 +9,7 @@ from django_elasticsearch_dsl import Document
 from elasticsearch.dsl import FacetedResponse
 from elasticsearch.dsl.response import Response
 
-from open_inwoner.pdc.models import Product
+from open_inwoner.onderwerpen.models import Product
 
 from .documents import CMSPageDocument, ProductDocument
 

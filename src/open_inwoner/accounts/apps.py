@@ -73,4 +73,9 @@ class AccountsConfig(AppConfig):
             return
         self._has_run = True
 
+        # Import CMS integration to trigger autodiscovery/registration
+        import open_inwoner.accounts.cms.mijn_berichten.cms_apps  # noqa
+        import open_inwoner.accounts.cms.mijn_profiel.cms_apps  # noqa
+        import open_inwoner.accounts.cms.mijn_profiel.cms_plugins  # noqa
+
         post_migrate.connect(update_admin_index, sender=self)

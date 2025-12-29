@@ -12,7 +12,7 @@ from cms.models import Page
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 
-from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.core.cms.cms_plugins.extensions.models import CommonExtension
 
 register = template.Library()
 

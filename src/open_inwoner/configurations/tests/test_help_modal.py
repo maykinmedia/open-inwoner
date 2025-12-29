@@ -5,14 +5,14 @@ from django.utils.translation import gettext_lazy as _
 from django_webtest import WebTest
 
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.tests.factories import ProductFactory
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
+from open_inwoner.onderwerpen.tests.factories import ProductFactory
 
 from .factories import SiteConfigurationFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestHelpContext(WebTest):
     def setUp(self):
         self.user = UserFactory()

@@ -2,7 +2,7 @@ from django.test import tag
 
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.openzaak.tests.factories import ServiceFactory
+from open_inwoner.mijn_aanvragen.tests.factories import ServiceFactory
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 

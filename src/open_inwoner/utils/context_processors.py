@@ -1,7 +1,7 @@
 from django.conf import settings as django_settings
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.models import Category, Question
+from open_inwoner.onderwerpen.models import Category, Question
 from open_inwoner.search.forms import SearchForm
 
 

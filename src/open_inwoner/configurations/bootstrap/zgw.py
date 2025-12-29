@@ -4,7 +4,7 @@ from django_setup_configuration.exceptions import ConfigurationRunFailed
 from zgw_consumers.models import Service
 
 from open_inwoner.configurations.bootstrap.utils import get_service
-from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
+from open_inwoner.mijn_aanvragen.models import OpenZaakConfig, ZGWApiGroupConfig
 
 
 class ZGWAPIGroupConfigModel(ConfigurationModel):

@@ -24,7 +24,7 @@ from .factories import UserFactory
 signer = TimestampSigner()
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestSMSVerificationLogin(WebTest):
     def setUp(self):
         self.user = UserFactory(email="ex@example.com", password="secret")

@@ -15,6 +15,7 @@ from furl import furl
 from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelChoice
+from open_inwoner.accounts.cms.mijn_profiel.cms_apps import ProfileApphook
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.models import (
     OpenIDDigiDConfig,
@@ -22,12 +23,11 @@ from open_inwoner.accounts.models import (
     User,
 )
 from open_inwoner.accounts.signals import KvKClient, update_user_on_login
-from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
-from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.kvk.tests.factories import CertificateFactory
+from open_inwoner.mijn_samenwerkingen.cms.cms_apps import CollaborateApphook
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
@@ -53,7 +53,7 @@ RETURN_URL = "/"
 CANCEL_URL = reverse("login")
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class DigiDRegistrationTest(
     AssertRedirectsMixin, AssertTimelineLogMixin, HaalCentraalMixin, WebTest
 ):
@@ -587,7 +587,7 @@ class DigiDRegistrationTest(
             assert msg in dump
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     """Tests concerning the registration of eHerkenning users"""
 
@@ -1000,7 +1000,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
         )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class EmailPasswordRegistrationTest(WebTest):
     """
     Tests concerning the registration of non-digid users (email + password)
@@ -1248,7 +1248,7 @@ class EmailPasswordRegistrationTest(WebTest):
         )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class DuplicateEmailRegistrationTest(WebTest):
     """
     DigiD/eHerkenning users should be able to register with email addresses that are already in use.
@@ -1600,7 +1600,7 @@ class DuplicateEmailRegistrationTest(WebTest):
         self.assertEqual(user.last_name, "changed_last")
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     url = reverse_lazy("profile:registration_necessary")
 
@@ -2040,7 +2040,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
     def setUp(self):
         # Create a user. We need to reset their password
@@ -2161,7 +2161,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestPasswordResetFunctionality(WebTest):
     csrf_checks = False
 
@@ -2217,7 +2217,7 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 0)
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class TestPasswordChange(WebTest):
     def setUp(self):
         self.user = UserFactory()

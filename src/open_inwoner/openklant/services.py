@@ -33,6 +33,9 @@ from zgw_consumers.utils import pagination_helper
 from open_inwoner.accounts.choices import NotificationChannelChoice
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.mijn_aanvragen.api_models import Zaak
+from open_inwoner.mijn_aanvragen.clients import MultiZgwClientProxy
+from open_inwoner.mijn_aanvragen.models import ZGWApiGroupConfig
 from open_inwoner.openklant.api_models import (
     ContactMoment,
     ContactMomentCreateData,
@@ -56,9 +59,6 @@ from open_inwoner.openklant.wrap import (
     fetch_klantcontactmomenten,
     get_kcm_answer_mapping,
 )
-from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import MultiZgwClientProxy
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new

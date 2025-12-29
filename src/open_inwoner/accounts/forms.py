@@ -12,13 +12,13 @@ from django.utils.translation import gettext_lazy as _
 import structlog
 from django_registration.forms import RegistrationForm
 
-from open_inwoner.cms.utils.page_display import (
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.page_display import (
     case_page_is_published,
     collaborate_page_is_published,
     inbox_page_is_published,
 )
-from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.pdc.models.category import Category
+from open_inwoner.onderwerpen.models.category import Category
 from open_inwoner.utils.forms import (
     ErrorMessageMixin,
     LimitedUploadFileField,

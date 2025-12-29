@@ -27,21 +27,21 @@ from open_inwoner.accounts.forms import (
     UserNotificationsForm,
 )
 from open_inwoner.accounts.models import Action, User
-from open_inwoner.cms.utils.page_display import (
+from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.core.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,
     inbox_page_is_published,
     products_page_is_published,
 )
-from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
+from open_inwoner.mijn_samenwerkingen.models import Plan
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.types import PartijUpdateData
-from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin

@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.utils.html import escape, format_html
 
 from open_inwoner.accounts.models import User
-from open_inwoner.cms.utils.page_display import get_active_app_names
+from open_inwoner.core.cms.utils.page_display import get_active_app_names
 from open_inwoner.userfeed.adapter import FeedItem
 from open_inwoner.userfeed.adapters import (
     get_item_adapter_class,
