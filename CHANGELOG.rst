@@ -67,6 +67,7 @@ Onderhoud
 * [:pr:`2226`]: Verwijderde dubbele vermeldingen uit changelog.
 * [:gh:`2228`]: ``vite`` configuratie verbeterd.
 * [:gh:`2232`]: Bijgewerkte admin index-fixture.
+* [:gh:`2082`]: Elasticsearch-verbindingscache gewist in tests.
 
 2.0.2 (2026-01-27)
 ==================
