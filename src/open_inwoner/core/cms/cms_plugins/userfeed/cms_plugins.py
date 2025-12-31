@@ -5,12 +5,12 @@ from cms.plugin_pool import plugin_pool
 
 from open_inwoner.userfeed.feed import get_feed
 
-from .models import UserFeed
+from .models import UserFeedPluginConfig
 
 
 @plugin_pool.register_plugin
 class UserFeedPlugin(CMSPluginBase):
-    model = UserFeed
+    model = UserFeedPluginConfig
     module = _("General")
     name = _("User Feed")
     render_template = "cms/plugins/userfeed/userfeed.html"
@@ -37,3 +37,6 @@ class UserFeedPlugin(CMSPluginBase):
             }
         )
         return context
+
+
+__all__ = ["UserFeedPlugin"]

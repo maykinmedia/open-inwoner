@@ -159,7 +159,9 @@ class ZGWApiGroupConfigFilterTests(TestCase):
         filter_by_zgw_client_mock.assert_not_called()
         filter_by_url_root_overlap_mock.assert_not_called()
 
-    @patch("open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_service")
+    @patch(
+        "open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_service"
+    )
     @patch(
         "open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_url_root_overlap"
     )
@@ -192,7 +194,9 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                     filter_by_service_mock.assert_not_called()
                     filter_by_url_root_overlap_mock.assert_not_called()
 
-    @patch("open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_service")
+    @patch(
+        "open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_service"
+    )
     @patch(
         "open_inwoner.mijn_aanvragen.models.ZGWApiGroupConfigQuerySet.filter_by_zgw_client"
     )

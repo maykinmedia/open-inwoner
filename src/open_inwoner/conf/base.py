@@ -246,7 +246,7 @@ INSTALLED_APPS = [
     "open_inwoner.onderwerpen",
     "open_inwoner.accounts.cms.mijn_profiel",
     "open_inwoner.mijn_aanvragen.cms.apps.MijnAanvragenCmsConfig",
-    "open_inwoner.cms.plugins",  # Contains: zaken (other plugins moved to respective apps)
+    "open_inwoner.cms.plugins",  # Legacy - migrations only
     "djchoices",
     "django_celery_beat",
     "django_celery_monitor",

@@ -4,9 +4,16 @@ from django.utils.translation import gettext_lazy as _
 from cms.models import CMSPlugin
 
 
-class UserFeed(CMSPlugin):
+class UserFeedPluginConfig(CMSPlugin):
+    """
+    Configuration model for the User Feed CMS plugin.
+
+    Renamed from 'UserFeed' to 'UserFeedPluginConfig' for consistency.
+    """
+
     class Meta:
-        app_label = "plugins"  # Keep original app_label to use existing table
+        app_label = "plugins"
+        db_table = "plugins_userfeed"  # Use existing table from legacy plugins app
 
     title = models.CharField(
         _("Title"),
@@ -17,3 +24,6 @@ class UserFeed(CMSPlugin):
 
     def __str__(self):
         return self.title or super().__str__()
+
+
+__all__ = ["UserFeedPluginConfig"]

@@ -6,9 +6,16 @@ from cms.models import CMSPlugin
 from open_inwoner.media.models import Video
 
 
-class VideoPlayer(CMSPlugin):
+class VideoPlayerPluginConfig(CMSPlugin):
+    """
+    Configuration model for the Video Player CMS plugin.
+
+    Renamed from 'VideoPlayer' to 'VideoPlayerPluginConfig' for consistency.
+    """
+
     class Meta:
-        app_label = "plugins"  # Keep original app_label to use existing table
+        app_label = "plugins"
+        db_table = "plugins_videoplayer"  # Use existing table from legacy plugins app
 
     video = models.ForeignKey(
         Video,
@@ -21,3 +28,6 @@ class VideoPlayer(CMSPlugin):
             return str(self.video)
         else:
             return super().__str__()
+
+
+__all__ = ["VideoPlayerPluginConfig"]

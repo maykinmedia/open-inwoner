@@ -15,8 +15,6 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
     eHerkenningUserFactory,
 )
-
-from open_inwoner.cms.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.core.cms.cms_plugins.extensions.models import CommonExtension
 from open_inwoner.core.cms.utils import cms_test_utils as cms_tools

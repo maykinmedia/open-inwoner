@@ -13,7 +13,9 @@ from .factories import OrganizationFactory
 
 @disable_admin_mfa()
 class TestLocationFormInput(WebTest):
-    @patch("open_inwoner.onderwerpen.models.mixins.geocode_address", side_effect=IndexError)
+    @patch(
+        "open_inwoner.onderwerpen.models.mixins.geocode_address", side_effect=IndexError
+    )
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(
         self, mock_geocoding
     ):

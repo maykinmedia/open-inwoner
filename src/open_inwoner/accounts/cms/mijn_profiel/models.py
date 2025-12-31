@@ -5,8 +5,19 @@ from cms.models import CMSPlugin
 
 
 class UserAppointments(CMSPlugin):
+    """
+    CMS plugin for displaying user appointments.
+
+    This model was originally created in the 'plugins' app. The app_label and
+    db_table settings preserve compatibility until a future data migration updates
+    ContentType references.
+    """
+
     class Meta:
-        app_label = "plugins"  # Keep original app_label to use existing DB table
+        app_label = "plugins"
+        db_table = (
+            "plugins_userappointments"  # Preserve existing table from plugins app
+        )
 
     title = models.CharField(
         _("Title"),

@@ -16,7 +16,10 @@ from .factories import ConcreteSSDClient, SSDConfigFactory
 FILES_DIR = Path(__file__).parent.resolve() / "files"
 
 
-@patch("open_inwoner.mijn_uitkeringen.client.SSDBaseClient._make_request_body", return_value="")
+@patch(
+    "open_inwoner.mijn_uitkeringen.client.SSDBaseClient._make_request_body",
+    return_value="",
+)
 class SSDClientRequestInterfaceTest(TestCase):
     @requests_mock.Mocker()
     def test_tsl_with_server_cert(self, mock_request_body, mock_request):
@@ -128,7 +131,10 @@ class SSDClientRequestInterfaceTest(TestCase):
             ),
         )
 
-    @patch("open_inwoner.mijn_uitkeringen.client.requests.post", side_effect=ConnectionError)
+    @patch(
+        "open_inwoner.mijn_uitkeringen.client.requests.post",
+        side_effect=ConnectionError,
+    )
     def test_requests_exception(self, mock_request_body, mock_request_post):
         ssd_client = ConcreteSSDClient()
         ssd_client.config = SSDConfigFactory.build(

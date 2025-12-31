@@ -5,7 +5,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from djangocms_link.cms_plugins import LinkPlugin as OriginalLinkPlugin
 
-from .models import CMSLinkPluginConfig, ExtendedCMSLink
+from .models import LinkConfig, LinkPluginConfig
 
 # Replace original CMS LinkPlugin model with extended Model
 plugin_pool.unregister_plugin(OriginalLinkPlugin)
@@ -13,7 +13,7 @@ plugin_pool.unregister_plugin(OriginalLinkPlugin)
 
 @plugin_pool.register_plugin
 class CMSLinkPlugin(CMSPluginBase):
-    model = CMSLinkPluginConfig
+    model = LinkPluginConfig
     render_template = "cms/plugins/links/external-links.html"
     module = _("General")
     name = _("External Link Plugin")
@@ -34,10 +34,10 @@ class CMSLinkPlugin(CMSPluginBase):
 
 
 class CustomLinkForm(forms.ModelForm):
-    """Custom form for ExtendedCMSLink without advanced fields"""
+    """Custom form for LinkConfig without advanced fields"""
 
     class Meta:
-        model = ExtendedCMSLink
+        model = LinkConfig
         fields = ["name", "external_link", "icon", "target"]
 
     # `LinkPlugin.get_form()` from djangocms-link dynamically wraps the form class and
@@ -51,10 +51,10 @@ class CustomLinkForm(forms.ModelForm):
 @plugin_pool.register_plugin
 class LinkPlugin(OriginalLinkPlugin):
     """
-    Extension of CMS `LinkPlugin` to display additional fields (e.g. `ExtendedCMSLink.icon`)
+    Extension of CMS `LinkPlugin` to display additional fields (e.g. `LinkConfig.icon`)
     """
 
-    model = ExtendedCMSLink
+    model = LinkConfig
     form = CustomLinkForm
     allow_children = False
 
@@ -77,3 +77,6 @@ class LinkPlugin(OriginalLinkPlugin):
             },
         ),
     ]
+
+
+__all__ = ["CMSLinkPlugin", "LinkPlugin"]

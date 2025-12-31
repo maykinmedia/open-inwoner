@@ -11,10 +11,10 @@ import structlog
 from furl import furl
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
-from open_inwoner.mijn_aanvragen.cms.models import CMSZakenPluginConfig
-from open_inwoner.mijn_aanvragen.cms.models.zaken_plugin_config import (
+from open_inwoner.mijn_aanvragen.cms.models import (
     MAX_CASES_DEFAULT,
     MIN_CASES,
+    ZakenPluginConfig,
 )
 from open_inwoner.mijn_aanvragen.constants import TypeAanvraag
 from open_inwoner.mijn_aanvragen.types import UniformCase
@@ -47,9 +47,9 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
 
         # Get plugin instance for title
         try:
-            plugin_instance = CMSZakenPluginConfig.objects.get(pk=plugin_id)
+            plugin_instance = ZakenPluginConfig.objects.get(pk=plugin_id)
             plugin_title = plugin_instance.title
-        except CMSZakenPluginConfig.DoesNotExist:
+        except ZakenPluginConfig.DoesNotExist:
             logger.warning("Plugin instance not found", plugin_id=plugin_id)
             plugin_title = _("Mijn Zaken")
 

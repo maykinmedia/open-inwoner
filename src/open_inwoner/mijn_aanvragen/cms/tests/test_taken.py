@@ -8,7 +8,7 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
 )
 from open_inwoner.core.cms.utils import cms_test_utils as cms_tools
-from open_inwoner.mijn_aanvragen.cms.cms_plugins.taken_plugin import TasksPlugin
+from open_inwoner.mijn_aanvragen.cms.cms_plugins import TasksPlugin
 from open_inwoner.mijn_aanvragen.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.mijn_aanvragen.tests.mocks import ESuiteTaskData
 from open_inwoner.mijn_aanvragen.tests.shared import FORMS_ROOT

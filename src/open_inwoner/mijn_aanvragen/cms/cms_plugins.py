@@ -3,12 +3,14 @@ from typing import Generator, Type, TypedDict, assert_never, cast
 from urllib.parse import urlencode
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse
 from django.utils import formats
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 import structlog
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from furl import furl
 from objectsapiclient.models import ObjectsAPIServiceConfiguration
 from objectsapiclient.services import ObjectsAPIService
 from pydantic import ValidationError
@@ -22,7 +24,8 @@ from open_inwoner.mijn_aanvragen.cms.api_models import (
     KoppelingZaak,
     UrlTaak,
 )
-from open_inwoner.mijn_aanvragen.cms.models.taken_plugin_config import TasksConfig
+from open_inwoner.mijn_aanvragen.cms.models import TakenPluginConfig, ZakenPluginConfig
+from open_inwoner.mijn_aanvragen.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -59,7 +62,7 @@ class TasksPlugin(CMSPluginBase):
         for validation with empty defaults for the eSuite taken.
     """
 
-    model = TasksConfig
+    model = TakenPluginConfig
     name = _("Task list Plugin")
     render_template = "cms/plugins/tasks/tasks.html"
     cache = False
@@ -207,3 +210,50 @@ class TasksPlugin(CMSPluginBase):
                         yield task
                 case _:
                     assert_never(task)
+
+
+@plugin_pool.register_plugin
+class CMSZakenPlugin(CMSPluginBase):
+    model = ZakenPluginConfig
+    name = gettext_lazy("Zaken Plugin")
+    render_template = "cms/plugins/zaken/zaken.html"
+    cache = False
+
+    def render(self, context, instance, placeholder) -> dict:
+        """
+        Render the CMS Zaken Plugin
+
+        This method prepares the initial container that will use HTMX to load
+        zaken data asynchronously.
+        """
+        if not ZGWApiGroupConfig.objects.exists():
+            return context
+
+        user = context["request"].user
+        if not user.is_authenticated or not user.is_bsn_user:
+            return context
+
+        # HTMX endpoint with num_zaken parameter
+        f_url = furl(
+            reverse("cms_plugins:zaken_content", kwargs={"plugin_id": instance.pk})
+        )
+        f_url.args["num_zaken"] = instance.num_zaken
+
+        mijn_zaken_url = reverse("cases:index")
+
+        context.update(
+            {
+                "show_zaken_plugin": True,
+                "mijn_zaken_url": mijn_zaken_url,
+                "plugin_title": instance.title,
+                "hx_get_url": f_url.url,
+            }
+        )
+
+        return context
+
+
+__all__ = [
+    "TasksPlugin",
+    "CMSZakenPlugin",
+]

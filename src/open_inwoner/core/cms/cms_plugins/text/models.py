@@ -24,7 +24,4 @@ class TextPluginConfig(CMSPlugin):
         return self.body.html
 
 
-# Backward compatibility alias
-Text = TextPluginConfig
-
-__all__ = ["TextPluginConfig", "Text"]
+__all__ = ["TextPluginConfig"]

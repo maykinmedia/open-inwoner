@@ -8,9 +8,18 @@ from django_prosemirror.schema import MarkType, NodeType
 from djangocms_link.models import AbstractLink
 
 
-class CMSLinkPluginConfig(CMSPlugin):
+class LinkPluginConfig(CMSPlugin):
+    """
+    Configuration model for the Link CMS plugin.
+
+    Renamed from 'CMSLinkPluginConfig' to 'LinkPluginConfig' for consistency.
+    """
+
     class Meta:
-        app_label = "plugins"  # Keep original app_label to use existing table
+        app_label = "plugins"
+        db_table = (
+            "plugins_cmslinkpluginconfig"  # Use existing table from legacy plugins app
+        )
 
     title = models.CharField(
         verbose_name=_("Title"),
@@ -20,11 +29,18 @@ class CMSLinkPluginConfig(CMSPlugin):
     )
 
 
-class ExtendedCMSLink(AbstractLink):
-    """Extended CMS `Link` model with icon field"""
+class LinkConfig(AbstractLink):
+    """
+    Extended CMS `Link` model with icon field
+
+    Renamed from 'ExtendedCMSLink' to 'LinkConfig' for consistency.
+    """
 
     class Meta:
-        app_label = "plugins"  # Keep original app_label to use existing table
+        app_label = "plugins"
+        db_table = (
+            "plugins_extendedcmslink"  # Use existing table from legacy plugins app
+        )
 
     # Override search_fields to use our plain text property
     search_fields = ("name_text",)
@@ -68,3 +84,6 @@ class ExtendedCMSLink(AbstractLink):
 
     def get_short_description(self):
         return self.name_text or str(self.pk)
+
+
+__all__ = ["LinkPluginConfig", "LinkConfig"]
