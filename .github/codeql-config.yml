@@ -1,0 +1,9 @@
+name: 'oip-codeql-config'
+paths-ignore:
+  - '**/tests/**'
+  - '**/test/**'
+  - '**/__tests__/**'
+  - '**/*.test.*'
+  - '**/*.spec.*'
+  - 'tests/'
+  - 'test/'
