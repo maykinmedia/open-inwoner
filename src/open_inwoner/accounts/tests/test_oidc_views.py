@@ -3168,7 +3168,7 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(ROOT_URLCONF="open_inwoner.core.cms.tests.urls")
 class GenericOIDCLogoutViewTests(WebTest):
     """Tests for the generic OIDC logout view (for staff/admin users)."""
 
