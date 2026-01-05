@@ -29,7 +29,7 @@ Documentation
 
     beheerhandleiding/index
     architecture/index
-    installation/index
+    development/index
     configuration/index
     testing
     changelog
