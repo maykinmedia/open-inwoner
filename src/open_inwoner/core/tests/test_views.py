@@ -24,8 +24,6 @@ from open_inwoner.cms.tests import cms_tools
 from open_inwoner.cms.tests.cms_tools import create_apphook_page, create_homepage
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.core.views import _get_category_data_for_user
-from open_inwoner.openklant.constants import KlantenServiceType
-from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
 from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 
@@ -307,14 +305,16 @@ class SitemapViewTest(TestCase):
         response = self.client.get(reverse("sitemap"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Platform", response.content)
+        # Verify sitemap heading is present
+        self.assertContains(response, _("Links naar pagina's op "))
 
     def test_sitemap_renders_for_authenticated_user(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("sitemap"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Platform", response.content)
+        # Verify sitemap heading is present
+        self.assertContains(response, _("Links naar pagina's op "))
 
     def test_sitemap_includes_categories(self):
         cms_tools.create_apphook_page(ProductsApphook)
@@ -340,25 +340,8 @@ class SitemapViewTest(TestCase):
 
         self.assertNotIn(_("Login or create an account"), content)
 
-    def test_sitemap_includes_contact_form_when_enabled(self):
-        config = KlantenSysteemConfig.get_solo()
-        config.register_contact_email = "test@test.nl"
-        config.primary_backend = KlantenServiceType.OPENKLANT2.value
-        config.save()
-
-        response = self.client.get(reverse("sitemap"))
-        content = response.content.decode()
-
-        self.assertIn(_("Contactformulier"), content)
-
-    def test_sitemap_excludes_contact_form_when_disabled(self):
-        config = KlantenSysteemConfig.get_solo()
-        config.register_contact_email = ""
-        config.primary_backend = KlantenServiceType.OPENKLANT2.value
-        config.save()
-
-        response = self.client.get(reverse("sitemap"))
-        self.assertNotIn(b"Contactformulier", response.content)
+    # Contact form was removed from sitemap to avoid duplicates (see commit 7941087c9)
+    # It now appears in footer via CMS pages if configured
 
     def test_sitemap_includes_benefits_page_when_published(self):
         create_apphook_page(SSDApphook)

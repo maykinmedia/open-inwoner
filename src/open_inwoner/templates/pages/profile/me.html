@@ -289,7 +289,7 @@
 
             {% endif %}
             {# Benefits #}
-            {% if view.config.ssd %}
+            {% if view.config.ssd and benefits_page_is_published %}
                 <a href="{% url 'ssd:uitkeringen' %}" class="card card--compact card--stretch" id="profile-section-ssd">
                     <div class="card__body">
                         <div class="ellipsis--none">
@@ -307,7 +307,7 @@
                 </a>
             {% endif %}
             {# Questions #}
-            {% if view.config.questions %}
+            {% if view.config.questions and case_page_is_published %}
                 <a href="{% url 'cases:contactmoment_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                         <div class="ellipsis--none">
@@ -321,7 +321,7 @@
                 </a>
             {% endif %}
             {# Questionnaire #}
-            {% if questionnaire_exists and view.config.selfdiagnose %}
+            {% if questionnaire_exists and view.config.selfdiagnose and products_page_is_published %}
                 <a href="{% url 'products:questionnaire_list' %}" class="card card--compact card--stretch" id="profile-section-questions">
                     <div class="card__body">
                         <div class="ellipsis--none">

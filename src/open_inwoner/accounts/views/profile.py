@@ -29,7 +29,9 @@ from open_inwoner.accounts.forms import (
 from open_inwoner.accounts.models import Action, User
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
+    case_page_is_published,
     inbox_page_is_published,
+    products_page_is_published,
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.utils import fetch_brp
@@ -183,6 +185,8 @@ class MyProfileView(
         )
         context["inbox_page_is_published"] = inbox_page_is_published()
         context["benefits_page_is_published"] = benefits_page_is_published()
+        context["case_page_is_published"] = case_page_is_published()
+        context["products_page_is_published"] = products_page_is_published()
 
         return context
 
