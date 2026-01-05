@@ -55,39 +55,39 @@ def count_users(options: metrics.CallbackOptions) -> Collection[metrics.Observat
 
 
 meter.create_observable_gauge(
-    name="user_count",
+    name="oip.accounts.user_count",
     description="The number of application users in the database.",
     unit="",  # no unit so that the _ratio suffix is not added
     callbacks=[count_users],
 )
 
 logins = meter.create_counter(
-    "auth.logins",
-    unit="1",  # unitless count
+    "oip.auth.logins",
+    unit="{login}",
     description="The number of successful user logins.",
 )
 
 logouts = meter.create_counter(
-    "auth.logouts",
-    unit="1",  # unitless count
+    "oip.auth.logouts",
+    unit="{logout}",
     description="The number of user logouts.",
 )
 
 login_failures = meter.create_counter(
-    "auth.login_failures",
-    unit="1",  # unitless count
+    "oip.auth.login_failures",
+    unit="{failure}",
     description="The number of failed logins by users, including the admin.",
 )
 
 user_lockouts = meter.create_counter(
-    "auth.user_lockouts",
-    unit="1",  # unitless count
+    "oip.auth.user_lockouts",
+    unit="{lockout}",
     description="The number of user lockouts because of failed logins.",
 )
 
 contactmoment_list_views = meter.create_counter(
-    "contactmoments.list_views",
-    unit="1",
+    "oip.contactmoments.list_views",
+    unit="{view}",
     description=(
         "Number of times users view the contactmoments list. "
         "Attributes: num_questions_viewed (int)"
@@ -95,14 +95,14 @@ contactmoment_list_views = meter.create_counter(
 )
 
 contactmoment_detail_views = meter.create_counter(
-    "contactmoments.detail_views",
-    unit="1",
+    "oip.contactmoments.detail_views",
+    unit="{view}",
     description="Number of times users view contactmoment details",
 )
 
 contactmoment_registrations = meter.create_counter(
-    "contactmoments.registrations",
-    unit="1",
+    "oip.contactmoments.registrations",
+    unit="{registration}",
     description=(
         "Contactmoment/question registrations. "
         "Attributes: channel ('email', 'esuite', or 'openklant'), success (bool)"
@@ -110,14 +110,14 @@ contactmoment_registrations = meter.create_counter(
 )
 
 profile_updates = meter.create_counter(
-    "profile.updates",
-    unit="1",
+    "oip.accounts.profile_updates",
+    unit="{update}",
     description="Number of times users update their profile information",
 )
 
 profile_update_failures = meter.create_counter(
-    "profile.update_failures",
-    unit="1",
+    "oip.profile.update_failures",
+    unit="{failure}",
     description=(
         "Profile update failures due to API service issues. "
         "Attributes: failed_services (str), changed_fields (str)"
@@ -125,44 +125,44 @@ profile_update_failures = meter.create_counter(
 )
 
 profile_categories_updates = meter.create_counter(
-    "profile.categories_updates",
-    unit="1",
+    "oip.profile.categories_updates",
+    unit="{update}",
     description="Number of times users update their interest categories",
 )
 
 profile_newsletter_updates = meter.create_counter(
-    "profile.newsletter_updates",
-    unit="1",
+    "oip.profile.newsletter_updates",
+    unit="{update}",
     description="Number of times users update newsletter subscriptions. Attributes: success (bool)",
 )
 
 profile_notifications_updates = meter.create_counter(
-    "profile.notifications_updates",
-    unit="1",
+    "oip.profile.notifications_updates",
+    unit="{update}",
     description="Number of times users update their notification preferences",
 )
 
 profile_deletions = meter.create_counter(
-    "profile.deletions",
-    unit="1",
+    "oip.profile.deletions",
+    unit="{deletion}",
     description="Number of times users delete their account via the frontend",
 )
 
 brp_data_requests = meter.create_counter(
-    "profile.brp_data_requests",
-    unit="1",
+    "oip.profile.brp_data_requests",
+    unit="{request}",
     description="Number of times users request their BRP (personal) data",
 )
 
 invites_accepted = meter.create_counter(
-    "registration.invites_accepted",
-    unit="1",
+    "oip.registration.invites_accepted",
+    unit="{invite}",
     description="Number of invites accepted",
 )
 
 necessary_fields_completions = meter.create_counter(
-    "registration.necessary_fields_completions",
-    unit="1",
+    "oip.registration.necessary_fields_completions",
+    unit="{completion}",
     description=(
         "Number of times users complete necessary registration fields. "
         "Attributes: has_invite (bool), updated_esuite (bool), updated_openklant (bool)"
@@ -170,13 +170,13 @@ necessary_fields_completions = meter.create_counter(
 )
 
 email_verification_requests = meter.create_counter(
-    "registration.email_verification_requests",
-    unit="1",
+    "oip.registration.email_verification_requests",
+    unit="{request}",
     description="Number of email verification requests by users",
 )
 
 email_verification_completions = meter.create_counter(
-    "registration.email_verification_completions",
-    unit="1",
+    "oip.registration.email_verification_completions",
+    unit="{completion}",
     description="Number of email verification completions. Attributes: success (bool)",
 )

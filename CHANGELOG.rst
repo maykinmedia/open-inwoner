@@ -51,7 +51,7 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* [:taiga-us:`3478`, :pr:`1953`]: Extra OpenTelemetry metrics toegevoegd voor
+* [:taiga-us:`3478`, :pr:`1953`, :pr:`2089`]: Extra OpenTelemetry metrics toegevoegd voor
   account- en profiel gerelateerde acties, zoals aanmeldingen, registraties,
   uitnodigingen en profielwijzigingen.
 * [:taiga-us:`3461`, :taiga-ta:`3473`, :pr:`1932`]: Basisinfrastructuur voor
