@@ -1,7 +1,7 @@
-2.0.0 (2025-XX-XX) [UNRELEASED]
-===============================
+2.0.0 (2026-01-05)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.0`.
 
 Deployment aandachtspunten
 --------------------------
