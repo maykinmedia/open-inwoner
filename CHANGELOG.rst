@@ -44,9 +44,11 @@ Deployment aandachtspunten
   de primaire kleur (CSS-variabelen ``--color-primary`` en ``--color-secondary``) is hier nu een
   stijl verandering te zien. Call-to-action elementen gebruiken nu altijd de primaire kleur. Hierdoor
   worden de knoppen in tegels niet langer in een afwijkende secundaire kleur weergegeven.
-* Controleer of de nieuwe frontend web-componenten correct functioneren. In sommige gevallen wordt de
-  frontend-bundle mogelijk niet volledig overschreven.
-
+* Hou er rekening mee dat de nieuwe frontend web-componenten mogelijk niet meteen
+  correct worden weergegeven bij het initieel laden van de pagina. Zorg dat u in dat
+  geval een zogenaamde "hard refresh" doet om er zeker van te zijn dat de frontend
+  javascript en CSS bestanden opnieuw worden geladen (in meeste browsers is dit de
+  toetsencombinatie Shift/CTRL + F5).
 
 Nieuwe features
 ---------------
