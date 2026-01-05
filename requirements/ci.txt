@@ -1049,6 +1049,7 @@ pyyaml==6.0.2
     #   drf-spectacular
     #   gemma-zds-client
     #   pydantic-settings
+    #   sphinxcontrib-mermaid
     #   tablib
     #   vcrpy
     #   zgw-consumers-oas
@@ -1138,6 +1139,7 @@ sphinx==7.4.7
     #   sphinx-rtd-theme
     #   sphinx-tabs
     #   sphinxcontrib-jquery
+    #   sphinxcontrib-mermaid
 sphinx-markdown-tables==0.0.16
     # via -r requirements/docs.in
 sphinx-rtd-theme==3.0.2
@@ -1154,6 +1156,8 @@ sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
+sphinxcontrib-mermaid==1.2.3
+    # via -r requirements/docs.in
 sphinxcontrib-qthelp==1.0.7
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.10

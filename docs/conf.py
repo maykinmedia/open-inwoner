@@ -42,6 +42,7 @@ extensions = [
     "sphinx.ext.graphviz",
     "sphinx_tabs.tabs",
     "sphinx.ext.extlinks",
+    "sphinxcontrib.mermaid",
     "recommonmark",
     # "sphinx_markdown_tables",
     "django_setup_configuration.documentation.setup_config_example",
