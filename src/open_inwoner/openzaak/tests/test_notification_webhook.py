@@ -1,5 +1,6 @@
 import logging  # noqa: TID251 - only used for log levels
 from unittest.mock import patch
+from urllib.parse import urlencode
 
 from django.test import TestCase, override_settings
 from django.urls import reverse_lazy
@@ -133,6 +134,31 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
 
         response = self.client.post(
             self.url, raw_notification, **headers, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        mock_handle.assert_called_once()
+        notification = mock_handle.call_args.args[0]
+
+        self.assertIsInstance(notification, Notification)
+        self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
+
+    def test_query_string_effects(self, mock_handle):
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+        raw_notification = self.get_raw_notification()
+        raw_notification["kenmerken"] = {
+            "bronorganisatie": "100000009",
+            "zaaktype": f"{CATALOGI_ROOT}/zaaktypes/uuid-0002",
+            "vertrouwelijkheidaanduiding": "openbaar",
+        }
+
+        response = self.client.post(
+            self.url + "?" + urlencode({"url": "https://some.url.com"}),
+            raw_notification,
+            **headers,
+            format="json",
+            enforce_csrf_checks=True,
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
