@@ -2429,3 +2429,132 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(ZaakTypeInformatieObjectTypeConfig.objects.count(), 1)
         self.assertEqual(ZaakTypeStatusTypeConfig.objects.count(), 1)
         self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 1)
+
+    def test_import_catalogus_configs_tracks_not_found_in_api(self, m):
+        """Test that catalogus configs not found in API are tracked in result.not_found_in_api"""
+        root = self.roots[0]
+        catalog_data = CatalogMockData(root).install_mocks(m)
+        api_group = self.api_groups[0]
+
+        # Create an existing catalogus that won't be in the API response
+        orphaned_catalogus = CatalogusConfigFactory.create(
+            url=f"{root}catalogussen/dddddddd-dddd-dddd-dddd-dddddddddddd",
+            domein="ddddd",  # max 5 chars
+            rsin="999999999",
+            service=api_group.ztc_service,
+            found_in_api=True,  # Initially marked as found
+        )
+
+        # Act: import catalogus configs
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_catalogus_configs()
+
+        # Assert: orphaned catalogus is tracked in not_found_in_api
+        self.assertEqual(len(result.created), 2)
+        self.assertEqual(len(result.updated), 0)
+        self.assertEqual(len(result.excluded), 0)
+        self.assertEqual(len(result.not_found_in_api), 1)
+
+        # Verify the orphaned catalogus is in the not_found_in_api list
+        not_found = result.not_found_in_api[0]
+        self.assertEqual(not_found.pk, orphaned_catalogus.pk)
+        self.assertEqual(not_found.domein, "ddddd")
+
+        # Verify found_in_api flag was set to False
+        orphaned_catalogus.refresh_from_db()
+        self.assertFalse(orphaned_catalogus.found_in_api)
+
+    def test_import_zaaktype_configs_tracks_not_found_in_api(self, m):
+        """Test that zaaktype configs not found in API are tracked in result.not_found_in_api"""
+        root = self.roots[0]
+        catalog_data = CatalogMockData(root).install_mocks(m)
+        zaaktype_data = ZaakTypeMockData(root).install_mocks(m)
+        api_group = self.api_groups[0]
+
+        # First import catalogus
+        importer = ZGWCatalogusImporter(api_group)
+        importer.import_catalogus_configs()
+
+        # Create an orphaned zaaktype that won't be in the API response
+        catalogus = CatalogusConfig.objects.get(
+            url=f"{root}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        )
+        orphaned_zaaktype = ZaakTypeConfig.objects.create(
+            catalogus=catalogus,
+            identificatie="ORPHANED",
+            omschrijving="Orphaned ZaakType",
+            urls=[f"{root}zaaktype/orphaned-orphaned-orphaned-orphaned"],
+            found_in_api=True,  # Initially marked as found
+        )
+
+        # Act: import zaaktype configs
+        result = importer.import_zaaktype_configs()
+
+        # Assert: orphaned zaaktype is tracked in not_found_in_api
+        self.assertEqual(len(result.not_found_in_api), 1)
+
+        # Verify the orphaned zaaktype is in the not_found_in_api list
+        not_found = result.not_found_in_api[0]
+        self.assertEqual(not_found.pk, orphaned_zaaktype.pk)
+        self.assertEqual(not_found.identificatie, "ORPHANED")
+
+        # Verify found_in_api flag was set to False
+        orphaned_zaaktype.refresh_from_db()
+        self.assertFalse(orphaned_zaaktype.found_in_api)
+
+    def test_import_zaaktype_configs_multiple_api_groups_no_false_positives(self, m):
+        # Setup: Create two API groups with different catalogs and zaaktypen
+        root1 = self.roots[0]
+        root2 = self.roots[1]
+
+        catalog_data1 = CatalogMockData(root1).install_mocks(m)
+        catalog_data2 = CatalogMockData(root2).install_mocks(m)
+
+        zaaktype_data1 = ZaakTypeMockData(root1).install_mocks(m)
+        zaaktype_data2 = ZaakTypeMockData(root2).install_mocks(m)
+
+        api_group1 = self.api_groups[0]
+        api_group2 = self.api_groups[1]
+
+        # Import catalogs for both API groups
+        importer1 = ZGWCatalogusImporter(api_group1)
+        importer2 = ZGWCatalogusImporter(api_group2)
+
+        importer1.import_catalogus_configs()
+        importer2.import_catalogus_configs()
+
+        # Import zaaktypen for both API groups
+        result1 = importer1.import_zaaktype_configs()
+        result2 = importer2.import_zaaktype_configs()
+
+        # Verify both imports created zaaktypen
+        self.assertGreater(len(result1.created), 0)
+        self.assertGreater(len(result2.created), 0)
+
+        # Verify no false positives: nothing marked as "not found"
+        self.assertEqual(len(result1.not_found_in_api), 0)
+        self.assertEqual(len(result2.not_found_in_api), 0)
+
+        # Verify all created zaaktypen are marked as found_in_api
+        for zt in ZaakTypeConfig.objects.all():
+            self.assertTrue(
+                zt.found_in_api,
+                f"ZaakType {zt.identificatie} from catalogus {zt.catalogus.domein} "
+                f"should be marked as found_in_api=True",
+            )
+
+        # Now run import for API group 1 again
+        result1_reimport = importer1.import_zaaktype_configs()
+
+        # Verify that API group 2's zaaktypen are NOT marked as "not found"
+        self.assertEqual(len(result1_reimport.not_found_in_api), 0)
+
+        # Verify API group 2's zaaktypen still have found_in_api=True
+        for zt in ZaakTypeConfig.objects.filter(
+            catalogus__service=api_group2.ztc_service
+        ):
+            self.assertTrue(
+                zt.found_in_api,
+                f"ZaakType {zt.identificatie} from API group 2 should not be affected "
+                f"by API group 1's import",
+            )

@@ -60,6 +60,7 @@ class ImportResult[T]:
     created: list[T] = field(default_factory=list)
     updated: list[T] = field(default_factory=list)
     excluded: list[ExcludedObject] = field(default_factory=list)
+    not_found_in_api: list[T] = field(default_factory=list)
 
     @property
     def total_synced(self) -> int:
@@ -68,6 +69,10 @@ class ImportResult[T]:
     @property
     def total_excluded(self) -> int:
         return len(self.excluded)
+
+    @property
+    def total_not_found_in_api(self) -> int:
+        return len(self.not_found_in_api)
 
 
 @dataclass
@@ -78,6 +83,7 @@ class ZaakTypeRelatedImportResult[T]:
     created: list[T] = field(default_factory=list)
     updated: list[T] = field(default_factory=list)
     excluded: list[ExcludedObject] = field(default_factory=list)
+    not_found_in_api: list[T] = field(default_factory=list)
 
     @property
     def total_synced(self) -> int:
@@ -86,6 +92,10 @@ class ZaakTypeRelatedImportResult[T]:
     @property
     def total_excluded(self) -> int:
         return len(self.excluded)
+
+    @property
+    def total_not_found_in_api(self) -> int:
+        return len(self.not_found_in_api)
 
 
 @dataclass
@@ -142,7 +152,13 @@ class FullImportResult:
             {%- endif %}
             {%- endfor %}
             {%- endif %}
-            {%- if not created_items and not updated_items and not excluded_items %}
+            {%- if not_found_items %}
+              🔍 Not Found in API ({{ not_found_items|length }}):
+            {%- for item in not_found_items %}
+                 - {{ item }}
+            {%- endfor %}
+            {%- endif %}
+            {%- if not created_items and not updated_items and not excluded_items and not not_found_items %}
               No changes
             {%- endif %}
         """).strip()
@@ -166,6 +182,10 @@ class FullImportResult:
             }
             for exc in self.catalogi.excluded
         ]
+        cat_not_found = [
+            f"{cat.domein} (RSIN: {cat.rsin or 'N/A'})"
+            for cat in self.catalogi.not_found_in_api
+        ]
         sections.append(
             {
                 "emoji": "📂",
@@ -173,6 +193,7 @@ class FullImportResult:
                 "created_items": sorted(cat_created),
                 "updated_items": sorted(cat_updated),
                 "excluded_items": sorted(cat_excluded, key=lambda x: x["label"]),
+                "not_found_items": sorted(cat_not_found),
             }
         )
 
@@ -191,6 +212,10 @@ class FullImportResult:
             }
             for exc in self.zaaktypen.excluded
         ]
+        zt_not_found = [
+            f"{zt.identificatie}: {zt.omschrijving}"
+            for zt in self.zaaktypen.not_found_in_api
+        ]
         sections.append(
             {
                 "emoji": "📋",
@@ -198,6 +223,7 @@ class FullImportResult:
                 "created_items": sorted(zt_created),
                 "updated_items": sorted(zt_updated),
                 "excluded_items": sorted(zt_excluded, key=lambda x: x["label"]),
+                "not_found_items": sorted(zt_not_found),
             }
         )
 
@@ -205,6 +231,7 @@ class FullImportResult:
         iot_created = []
         iot_updated = []
         iot_excluded = []
+        iot_not_found = []
         for result in self.informatieobjecttypen:
             zt_id = (
                 result.zaaktype_config.identificatie
@@ -227,6 +254,12 @@ class FullImportResult:
                     for exc in result.excluded
                 ]
             )
+            iot_not_found.extend(
+                [
+                    f"{item.omschrijving} (ZaakType: {zt_id})"
+                    for item in result.not_found_in_api
+                ]
+            )
 
         sections.append(
             {
@@ -235,6 +268,7 @@ class FullImportResult:
                 "created_items": sorted(iot_created),
                 "updated_items": sorted(iot_updated),
                 "excluded_items": sorted(iot_excluded, key=lambda x: x["label"]),
+                "not_found_items": sorted(iot_not_found),
             }
         )
 
@@ -242,6 +276,7 @@ class FullImportResult:
         st_created = []
         st_updated = []
         st_excluded = []
+        st_not_found = []
         for result in self.statustypen:
             zt_id = (
                 result.zaaktype_config.identificatie
@@ -264,6 +299,12 @@ class FullImportResult:
                     for exc in result.excluded
                 ]
             )
+            st_not_found.extend(
+                [
+                    f"{item.omschrijving} (ZaakType: {zt_id})"
+                    for item in result.not_found_in_api
+                ]
+            )
 
         sections.append(
             {
@@ -272,6 +313,7 @@ class FullImportResult:
                 "created_items": sorted(st_created),
                 "updated_items": sorted(st_updated),
                 "excluded_items": sorted(st_excluded, key=lambda x: x["label"]),
+                "not_found_items": sorted(st_not_found),
             }
         )
 
@@ -279,6 +321,7 @@ class FullImportResult:
         rt_created = []
         rt_updated = []
         rt_excluded = []
+        rt_not_found = []
         for result in self.resultaattypen:
             zt_id = (
                 result.zaaktype_config.identificatie
@@ -301,6 +344,12 @@ class FullImportResult:
                     for exc in result.excluded
                 ]
             )
+            rt_not_found.extend(
+                [
+                    f"{item.omschrijving} (ZaakType: {zt_id})"
+                    for item in result.not_found_in_api
+                ]
+            )
 
         sections.append(
             {
@@ -309,6 +358,7 @@ class FullImportResult:
                 "created_items": sorted(rt_created),
                 "updated_items": sorted(rt_updated),
                 "excluded_items": sorted(rt_excluded, key=lambda x: x["label"]),
+                "not_found_items": sorted(rt_not_found),
             }
         )
 
@@ -316,6 +366,7 @@ class FullImportResult:
         total_created = sum(len(s["created_items"]) for s in sections)
         total_updated = sum(len(s["updated_items"]) for s in sections)
         total_excluded = sum(len(s["excluded_items"]) for s in sections)
+        total_not_found = sum(len(s["not_found_items"]) for s in sections)
 
         # Build output
         output_parts = [
@@ -338,6 +389,7 @@ class FullImportResult:
                 f"Total Created:  {total_created}",
                 f"Total Updated:  {total_updated}",
                 f"Total Excluded: {total_excluded}",
+                f"Total Not Found: {total_not_found}",
                 "=" * 80,
             ]
         )
@@ -424,11 +476,31 @@ class ZGWCatalogusImporter:
         if not catalogi:
             return result
 
+        # Get existing catalogus configs by URL (url is globally unique).
+        # We query all configs regardless of service because:
+        # 1. The url field has a global unique constraint
+        # 2. A catalogus might have been imported from a different service previously
+        # 3. We intentionally update the service field to take ownership (see below)
+        # This prevents UniqueViolation errors when a catalogus switches services.
+        catalogus_urls = [c.url for c in catalogi]
         existing_configs = {
-            config.url: config for config in CatalogusConfig.objects.all()
+            config.url: config
+            for config in CatalogusConfig.objects.filter(url__in=catalogus_urls)
         }
 
+        # Also get configs from current service not in this import (for orphan detection).
+        # We only mark configs as orphaned if they belong to the current service,
+        # preventing Service A from marking Service B's catalogus as orphaned.
+        existing_service_configs = {
+            config.url: config
+            for config in CatalogusConfig.objects.filter(
+                service=self.catalogi_client.configured_from
+            )
+        }
+
+        catalogus_urls_seen = set()
         for catalogus in catalogi:
+            catalogus_urls_seen.add(catalogus.url)
             if existing := existing_configs.get(catalogus.url):
                 # Update existing
                 updated = False
@@ -444,6 +516,11 @@ class ZGWCatalogusImporter:
 
                 if existing.domein != catalogus.domein:
                     existing.domein = catalogus.domein
+                    updated = True
+
+                # Mark as found in API
+                if not existing.found_in_api:
+                    existing.found_in_api = True
                     updated = True
 
                 if updated:
@@ -470,6 +547,7 @@ class ZGWCatalogusImporter:
                     rsin=catalogus.rsin or "",
                     domein=catalogus.domein,
                     service=self.catalogi_client.configured_from,
+                    found_in_api=True,
                 )
                 try:
                     new_config.save()
@@ -488,6 +566,25 @@ class ZGWCatalogusImporter:
                             error_message=f"Save failed: {exc}",
                         )
                     )
+
+        # Handle CatalogusConfig objects that were not seen in the API response
+        # Only check configs that belong to the current service being imported
+        not_found_configs = []
+        for config_url, config in existing_service_configs.items():
+            if config_url not in catalogus_urls_seen:
+                # This catalogus no longer exists in the API for this service
+                logger.info(
+                    "Catalogus config exists in database but not found in API",
+                    url=config_url,
+                    service=config.service,
+                )
+                not_found_configs.append(config)
+                result.not_found_in_api.append(config)
+
+        if not_found_configs:
+            CatalogusConfig.objects.filter(
+                id__in=[c.id for c in not_found_configs]
+            ).update(found_in_api=False)
 
         return result
 
@@ -541,9 +638,12 @@ class ZGWCatalogusImporter:
         catalog_lookup = {c.url: c for c in CatalogusConfig.objects.all()}
         existing_ztc = {
             (ztc.catalogus_id, ztc.identificatie): ztc
-            for ztc in ZaakTypeConfig.objects.all()
+            for ztc in ZaakTypeConfig.objects.filter(
+                catalogus__service=self.zgw_api_group.ztc_service
+            )
         }
 
+        zaaktype_keys_seen = set()
         for zaak_type in filtered_zaak_types:
             try:
                 catalog = catalog_lookup[zaak_type.catalogus]
@@ -561,6 +661,7 @@ class ZGWCatalogusImporter:
                 continue
 
             key = (catalog.id, zaak_type.identificatie)
+            zaaktype_keys_seen.add(key)
 
             if ztc := existing_ztc.get(key):
                 # Update existing
@@ -574,6 +675,11 @@ class ZGWCatalogusImporter:
                 # Update omschrijving if changed
                 if ztc.omschrijving != zaak_type.omschrijving:
                     ztc.omschrijving = zaak_type.omschrijving
+                    updated = True
+
+                # Mark as found in API
+                if not ztc.found_in_api:
+                    ztc.found_in_api = True
                     updated = True
 
                 if updated:
@@ -604,6 +710,7 @@ class ZGWCatalogusImporter:
                     catalogus=catalog,
                     identificatie=zaak_type.identificatie,
                     omschrijving=zaak_type.omschrijving,
+                    found_in_api=True,
                 )
                 try:
                     ztc.save()
@@ -625,6 +732,24 @@ class ZGWCatalogusImporter:
                             error_message=f"Save failed: {exc}",
                         )
                     )
+
+        # Handle ZaakTypeConfig objects that were not seen in the API response
+        not_found_configs = []
+        for key, config in existing_ztc.items():
+            if key not in zaaktype_keys_seen:
+                # This zaaktype no longer exists in the API
+                logger.info(
+                    "ZaakType config exists in database but not found in API",
+                    identificatie=config.identificatie,
+                    catalogus_url=config.catalogus.url if config.catalogus else None,
+                )
+                not_found_configs.append(config)
+                result.not_found_in_api.append(config)
+
+        if not_found_configs:
+            ZaakTypeConfig.objects.filter(
+                id__in=[c.id for c in not_found_configs]
+            ).update(found_in_api=False)
 
         return result
 
@@ -670,6 +795,7 @@ class ZGWCatalogusImporter:
             for ztiotc in ztc.zaaktypeinformatieobjecttypeconfig_set.all()
         }
 
+        iot_urls_seen = set()
         if info_queue:
             for iot_url, using_zaak_types in info_queue.items():
                 try:
@@ -707,6 +833,8 @@ class ZGWCatalogusImporter:
                     )
                     continue
 
+                iot_urls_seen.add(info_type.url)
+
                 if ztiotc := existing_map.get(info_type.url):
                     # Update existing
                     updated = False
@@ -721,6 +849,11 @@ class ZGWCatalogusImporter:
                         if using.uuid not in ztiotc.zaaktype_uuids:
                             ztiotc.zaaktype_uuids.append(using.uuid)
                             updated = True
+
+                    # Mark as found in API
+                    if not ztiotc.found_in_api:
+                        ztiotc.found_in_api = True
+                        updated = True
 
                     if updated:
                         try:
@@ -751,6 +884,7 @@ class ZGWCatalogusImporter:
                         informatieobjecttype_url=info_type.url,
                         omschrijving=info_type.omschrijving,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
+                        found_in_api=True,
                     )
                     try:
                         ztiotc.save()
@@ -773,6 +907,25 @@ class ZGWCatalogusImporter:
                                 },
                             )
                         )
+
+        # Handle InformatieObjectType configs that were not seen in the API response
+        not_found_configs = []
+        for iot_url in existing_map:
+            if iot_url not in iot_urls_seen:
+                # This informatieobjecttype is no longer associated with this zaaktype
+                logger.info(
+                    "InformatieObjectType config exists for zaaktype but not found in API",
+                    informatieobjecttype_url=iot_url,
+                    zaaktype_identificatie=ztc.identificatie,
+                )
+                config = existing_map[iot_url]
+                not_found_configs.append(config)
+                result.not_found_in_api.append(config)
+
+        if not_found_configs:
+            ZaakTypeInformatieObjectTypeConfig.objects.filter(
+                id__in=[c.id for c in not_found_configs]
+            ).update(found_in_api=False)
 
         return result
 
@@ -805,6 +958,7 @@ class ZGWCatalogusImporter:
             for ztstc in ztc.zaaktypestatustypeconfig_set.all()
         }
 
+        statustype_urls_seen = set()
         if status_queue:
             for statustype_url, using_zaak_types in status_queue.items():
                 try:
@@ -840,6 +994,8 @@ class ZGWCatalogusImporter:
                     )
                     continue
 
+                statustype_urls_seen.add(status_type.url)
+
                 if ztstc := existing_map.get(status_type.url):
                     # Update existing
                     updated = False
@@ -858,6 +1014,11 @@ class ZGWCatalogusImporter:
                         if using.uuid not in ztstc.zaaktype_uuids:
                             ztstc.zaaktype_uuids.append(using.uuid)
                             updated = True
+
+                    # Mark as found in API
+                    if not ztstc.found_in_api:
+                        ztstc.found_in_api = True
+                        updated = True
 
                     if updated:
                         try:
@@ -889,6 +1050,7 @@ class ZGWCatalogusImporter:
                         omschrijving=status_type.omschrijving,
                         statustekst=status_type.statustekst,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
+                        found_in_api=True,
                     )
                     try:
                         ztstc.save()
@@ -911,6 +1073,25 @@ class ZGWCatalogusImporter:
                                 },
                             )
                         )
+
+        # Handle StatusType configs that were not seen in the API response
+        not_found_configs = []
+        for statustype_url in existing_map:
+            if statustype_url not in statustype_urls_seen:
+                # This statustype is no longer associated with this zaaktype
+                logger.info(
+                    "StatusType config exists for zaaktype but not found in API",
+                    statustype_url=statustype_url,
+                    zaaktype_identificatie=ztc.identificatie,
+                )
+                config = existing_map[statustype_url]
+                not_found_configs.append(config)
+                result.not_found_in_api.append(config)
+
+        if not_found_configs:
+            ZaakTypeStatusTypeConfig.objects.filter(
+                id__in=[c.id for c in not_found_configs]
+            ).update(found_in_api=False)
 
         return result
 
@@ -944,6 +1125,7 @@ class ZGWCatalogusImporter:
             for url in zaak_type.resultaattypen:
                 resultaat_queue[url].append(zaak_type)
 
+        resultaattype_urls_seen = set()
         if resultaat_queue:
             for resultaattype_url, using_zaak_types in resultaat_queue.items():
                 try:
@@ -979,6 +1161,8 @@ class ZGWCatalogusImporter:
                     )
                     continue
 
+                resultaattype_urls_seen.add(resultaat_type.url)
+
                 if ztrtc := existing_map.get(resultaat_type.url):
                     # Update existing
                     updated = False
@@ -993,6 +1177,11 @@ class ZGWCatalogusImporter:
                         if using.uuid not in ztrtc.zaaktype_uuids:
                             ztrtc.zaaktype_uuids.append(using.uuid)
                             updated = True
+
+                    # Mark as found in API
+                    if not ztrtc.found_in_api:
+                        ztrtc.found_in_api = True
+                        updated = True
 
                     if updated:
                         try:
@@ -1023,6 +1212,7 @@ class ZGWCatalogusImporter:
                         resultaattype_url=resultaat_type.url,
                         omschrijving=resultaat_type.omschrijving,
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
+                        found_in_api=True,
                     )
                     try:
                         ztrtc.save()
@@ -1045,5 +1235,24 @@ class ZGWCatalogusImporter:
                                 },
                             )
                         )
+
+        # Handle ResultaatType configs that were not seen in the API response
+        not_found_configs = []
+        for resultaattype_url in existing_map:
+            if resultaattype_url not in resultaattype_urls_seen:
+                # This resultaattype is no longer associated with this zaaktype
+                logger.info(
+                    "ResultaatType config exists for zaaktype but not found in API",
+                    resultaattype_url=resultaattype_url,
+                    zaaktype_identificatie=ztc.identificatie,
+                )
+                config = existing_map[resultaattype_url]
+                not_found_configs.append(config)
+                result.not_found_in_api.append(config)
+
+        if not_found_configs:
+            ZaakTypeResultaatTypeConfig.objects.filter(
+                id__in=[c.id for c in not_found_configs]
+            ).update(found_in_api=False)
 
         return result

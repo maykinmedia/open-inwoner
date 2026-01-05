@@ -326,6 +326,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
             "Total Created:  11",
             "Total Updated:  1",
             "Total Excluded: 1",
+            "Total Not Found: 0",
             "=" * 80,
             "=" * 80,
             f"ZGW Import Results for {self.api_groups[1]}",
@@ -369,6 +370,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
             "Total Created:  11",
             "Total Updated:  1",
             "Total Excluded: 1",
+            "Total Not Found: 0",
             "=" * 80,
         ]
         expected = "\n".join(expected_lines)
@@ -418,6 +420,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
             "Total Created:  0",
             "Total Updated:  0",
             "Total Excluded: 1",
+            "Total Not Found: 0",
             "=" * 80,
             "=" * 80,
             f"ZGW Import Results for {self.api_groups[1]}",
@@ -447,6 +450,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
             "Total Created:  0",
             "Total Updated:  0",
             "Total Excluded: 1",
+            "Total Not Found: 0",
             "=" * 80,
         ]
         expected_second = "\n".join(expected_second_run)
