@@ -22,6 +22,9 @@ Deployment aandachtspunten
 * De YAML structuur van ``django-setup-configuration`` voor het configureren van het
   klantensysteem is aangepast. De nieuwe structuur is omschreven in de `documentatie
   <https://docs.openinwoner.nl/en/latest/configuration/index.html>`_.
+* Zaaktype Configuraties die in eerdere versies zijn geëxporteerd, kunnen niet worden
+  geïmporteerd in versie ``2.0.0`` vanwege wijzigingen in het database formaat. Upgrade
+  eerst uw bronomgeving naar ``2.0.0`` zodat bron en bestemming hetzelfde formaat hanteren.
 * De vervanging van CKEditor door Prosemirror vereiste het converteren van gegevens in HTML en
   markdown naar een nieuwe structuur. In sommige gevallen (vooral wanneer de gegevens tabellen
   of andere geavanceerde elementen bevatten) is de opmaak mogelijk niet behouden gebleven. In
