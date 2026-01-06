@@ -613,7 +613,7 @@ ruamel-yaml==0.18.10
     # via django-setup-configuration
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-sentry-sdk[django]==2.19.2
+sentry-sdk[django]==2.48.0
     # via -r requirements/base.in
 simplejson==3.19.2
     # via mail-parser
