@@ -1,3 +1,9 @@
+[tool.uv.pip]
+no-emit-package = [
+  "pip",
+  "setuptools",
+]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
