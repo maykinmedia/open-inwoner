@@ -7,11 +7,10 @@ from ordered_model.models import OrderedModelQuerySet
 from treebeard.mp_tree import MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
+from open_inwoner.cms.cases.views.services import CaseListService
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
+from open_inwoner.openzaak.api_models import Zaak, ZaakType
 from open_inwoner.openzaak.models import ZaakTypeConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.views import LogMixin
 
 
@@ -55,13 +54,8 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
         if not request.user.bsn and not request.user.kvk:
             return self
 
-        clients = build_zaken_clients()
-        proxy_result = MultiZgwClientProxy(clients)
-        proxy_result = proxy_result.fetch_cases(**get_user_fetch_parameters(request))
-        if proxy_result.has_errors:
-            self.log_system_action("unable to retrieve cases", user=request.user)
-
-        cases = proxy_result.join_results()
+        service = CaseListService(request)
+        cases = [c.zaak for c in service.get_cases()]
 
         return self.filter_by_zaken(cases)
 
@@ -84,10 +78,15 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
         for case in cases:
             # TODO This can occur if the import ZGW data is missing entries or if the
             # user has Zaken for zaaktypen with indicatie intern
-            if case.zaaktype not in url_to_identificatie_mapping:
+            zaaktype_ref = (
+                case.zaaktype.url
+                if isinstance(case.zaaktype, ZaakType)
+                else case.zaaktype
+            )
+            if zaaktype_ref not in url_to_identificatie_mapping:
                 continue
 
-            zaaktype_identificatie = url_to_identificatie_mapping[case.zaaktype]
+            zaaktype_identificatie = url_to_identificatie_mapping[zaaktype_ref]
 
             duration_since_start = relativedelta(date.today(), case.startdatum)
             if (
