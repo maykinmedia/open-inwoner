@@ -17,3 +17,4 @@ class Icons(models.TextChoices):
     group = "group", _("Collaborate")
     help_outline = "help_outline", _("Help")
     euro = "euro", _("Benefits")
+    trash = "delete", _("Afval")

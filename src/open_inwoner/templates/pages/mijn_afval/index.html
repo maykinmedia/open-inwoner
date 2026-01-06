@@ -1,18 +1,27 @@
 {% extends "master.html" %}
 {% load i18n grid_tags %}
 
+{% block title %}{{ page_heading }} - {{ site_name }}{% endblock %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
+
 {% block content %}
     {% render_grid %}
         {% render_column start=3 span=8 %}
-            <h1 class="utrecht-heading-1" id="title">{% trans "Mijn Afval" %}</h1>
+            <h1 class="utrecht-heading-1" id="title">{{ page_heading }}</h1>
+            {% if page_description %}
+                <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
+            {% endif %}
 
-            {% for afval_obj in data %}
+            {% for afval_obj in afval_data %}
                 <article class="afval-object">
                     {# Address and Total Weight Section #}
                     <section class="afval-object__header">
-                        <h2 class="utrecht-heading-2">{{ afval_obj.objectAddress }}</h2>
+                        <h2 class="utrecht-heading-2">{{ afval_obj.object_address }}</h2>
                         <p class="utrecht-paragraph">
-                            <strong>{% trans "Totaal gewicht:" %}</strong> {{ afval_obj.totaal_gewicht }} kg
+                            <strong>{% trans "Totaal gewicht:" %}</strong> {{ afval_obj.totaal_gewicht }}
                         </p>
                     </section>
 
@@ -25,7 +34,7 @@
                                     <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
                                 </p>
                                 <p class="utrecht-paragraph">
-                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }} kg
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
                                 </p>
 
                                 {% if container.ledigingen %}
@@ -41,9 +50,9 @@
                                             <tbody>
                                                 {% for lediging in container.ledigingen %}
                                                     <tr>
-                                                        <td>{{ lediging.tijdstip|date:"d-m-Y" }}</td>
-                                                        <td>{{ lediging.tijdstip|date:"H:i"|default:"—" }}</td>
-                                                        <td>{{ lediging.gewicht }} kg</td>
+                                                        <td>{{ lediging.tijdstip_datum }}</td>
+                                                        <td>{{ lediging.tijdstip_tijd }}</td>
+                                                        <td>{{ lediging.gewicht }}</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -63,7 +72,7 @@
                                     <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
                                 </p>
                                 <p class="utrecht-paragraph">
-                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }} kg
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
                                 </p>
 
                                 {% if container.ledigingen %}
@@ -79,9 +88,9 @@
                                             <tbody>
                                                 {% for lediging in container.ledigingen %}
                                                     <tr>
-                                                        <td>{{ lediging.tijdstip|date:"d-m-Y" }}</td>
-                                                        <td>{{ lediging.tijdstip|date:"H:i"|default:"—" }}</td>
-                                                        <td>{{ lediging.gewicht }} kg</td>
+                                                        <td>{{ lediging.tijdstip_datum }}</td>
+                                                        <td>{{ lediging.tijdstip_tijd }}</td>
+                                                        <td>{{ lediging.gewicht }}</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>

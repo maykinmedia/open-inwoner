@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import afval_view
+from .views import AfvalView
 
 app_name = "mijn_afval"
 
 
-urlpatterns = [path("", afval_view, name="index")]
+urlpatterns = [path("", AfvalView.as_view(), name="index")]
