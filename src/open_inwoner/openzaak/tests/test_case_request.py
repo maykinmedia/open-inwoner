@@ -36,7 +36,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def test_case_is_retrieved(self, m):
         m.get(self.zaak["url"], json=self.zaak)
 
-        case = self.zaken_client.fetch_single_case(
+        case = self.zaken_client.fetch_single_zaak(
             "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
         )
 
@@ -48,7 +48,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def test_no_case_is_retrieved_when_http_404(self, m):
         m.get(self.zaak["url"], status_code=404)
 
-        case = self.zaken_client.fetch_single_case(
+        case = self.zaken_client.fetch_single_zaak(
             "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
         )
 
@@ -60,7 +60,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
             status_code=500,
         )
 
-        case = self.zaken_client.fetch_single_case(
+        case = self.zaken_client.fetch_single_zaak(
             "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
         )
 

@@ -70,7 +70,7 @@ class ZaakTypeConfigModelTestCase(TestCase):
             catalogus=catalog,
             identificatie="AAAA",
         )
-        case_type = factory(
+        zaaktype = factory(
             ZaakType,
             generate_oas_component(
                 "ztc",
@@ -82,7 +82,7 @@ class ZaakTypeConfigModelTestCase(TestCase):
             ),
         )
 
-        actual = list(ZaakTypeConfig.objects.filter_case_type(case_type))
+        actual = list(ZaakTypeConfig.objects.filter_zaak_type(zaaktype))
         self.assertEqual(actual, [zaak_type_config])
 
 
@@ -200,7 +200,7 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
             informatieobjecttype_url="https://example.com/v1/infoobject/bbb",
             zaaktype_uuids=["aaaaaaaa-aaaa-bbbb-aaaa-aaaaaaaaaaaa"],
         )
-        case_type = factory(
+        zaaktype = factory(
             ZaakType,
             generate_oas_component(
                 "ztc",
@@ -213,7 +213,7 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
         )
 
         actual = list(
-            ZaakTypeInformatieObjectTypeConfig.objects.filter_case_type(case_type)
+            ZaakTypeInformatieObjectTypeConfig.objects.filter_zaak_type(zaaktype)
         )
         self.assertEqual(actual, [a1])
 
@@ -221,25 +221,25 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
 class UserCaseStatusNotificationTests(TestCase):
     def test_status_has_received_similar_notes_within(self):
         user = UserFactory()
-        case_uuid = uuid4()
+        zaak_uuid = uuid4()
         other_case_uuid = uuid4()
 
         with freeze_time("2023-01-01 01:00:00"):
             # create unrelated sent note for different case
             UserCaseStatusNotificationFactory(
-                user=user, case_uuid=other_case_uuid, is_sent=True
+                user=user, status_uuid=other_case_uuid, is_sent=True
             )
             # create a related note we didn't send
             UserCaseStatusNotificationFactory(
                 user=user,
-                case_uuid=case_uuid,
+                case_uuid=zaak_uuid,
                 is_sent=False,
                 collision_key="case_status_notification",
             )
             # create our note
             note = UserCaseStatusNotificationFactory(
                 user=user,
-                case_uuid=case_uuid,
+                case_uuid=zaak_uuid,
                 is_sent=True,
                 collision_key="case_status_notification",
             )
@@ -253,7 +253,7 @@ class UserCaseStatusNotificationTests(TestCase):
         # advance half hour
         with freeze_time("2023-01-01 01:30:00"):
             note = UserCaseStatusNotificationFactory(
-                user=user, case_uuid=case_uuid, is_sent=True
+                user=user, case_uuid=zaak_uuid, is_sent=True
             )
             # nothing is past 10 minutes
             self.assertFalse(
@@ -270,7 +270,7 @@ class UserCaseStatusNotificationTests(TestCase):
 
     def test_case_info_has_received_similar_notes_within(self):
         user = UserFactory()
-        case_uuid = uuid4()
+        zaak_uuid = uuid4()
         other_case_uuid = uuid4()
 
         with freeze_time("2023-01-01 01:00:00"):
@@ -284,14 +284,14 @@ class UserCaseStatusNotificationTests(TestCase):
             # create a related note we didn't send
             UserCaseInfoObjectNotificationFactory(
                 user=user,
-                case_uuid=case_uuid,
+                case_uuid=zaak_uuid,
                 is_sent=False,
                 collision_key="case_document_notification",
             )
             # create our note
             note = UserCaseInfoObjectNotificationFactory(
                 user=user,
-                case_uuid=case_uuid,
+                case_uuid=zaak_uuid,
                 is_sent=True,
                 collision_key="case_document_notification",
             )
@@ -306,7 +306,7 @@ class UserCaseStatusNotificationTests(TestCase):
         with freeze_time("2023-01-01 01:30:00"):
             note = UserCaseInfoObjectNotificationFactory(
                 user=user,
-                case_uuid=case_uuid,
+                case_uuid=zaak_uuid,
                 is_sent=True,
                 collision_key="case_document_notification",
             )

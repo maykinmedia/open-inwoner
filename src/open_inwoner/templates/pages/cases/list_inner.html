@@ -33,24 +33,24 @@
 
 <div class="card__grid">
 {% render_grid %}
-    {% if not cases %}
+    {% if not zaken %}
         <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></p>
     {% endif %}
 
-    {% for case in cases %}
+    {% for zaak in zaken %}
         {% render_column start=forloop.counter_0|multiply:4 span=4 %}
             {# "openstaande formulieren/inzendingen" #}
-            {% if case.type_aanvraag == "Formulier" %}
-                <a href="{{ case.vervolg_link }}" class="card card card__description-card card--stretch" target="_blank">
+            {% if zaak.type_aanvraag == "Formulier" %}
+                <a href="{{ zaak.vervolg_link }}" class="card card card__description-card card--stretch" target="_blank">
                     <div class="card__body">
 
-                        <h2 class="card__heading-2">{{ case.naam }}</h2>
+                        <h2 class="card__heading-2">{{ zaak.naam }}</h2>
                         {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
-                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=case.statustype_config.status_indicator status_indicator_text=case.statustype_config.status_indicator_text %}
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
 
                         {% render_list %}
                             <li class="list-item list-item--compact">
-                                {% with date_modified=case.datum_laatste_wijziging|date %}
+                                {% with date_modified=zaak.datum_laatste_wijziging|date %}
                                     <p class="card__caption card__text--small"><span>{% trans "Laatst gewijzigd op:" %}</span><span class="card__text--dark">{{ date_modified }}</span></p>
                                 {% endwith %}
                             </li>
@@ -64,30 +64,30 @@
                 </a>
             {# other aanvragen #}
             {% else %}
-                <a href="{% url 'cases:case_detail' api_group_id=case.api_group.id  object_id=case.uuid %}" class="card card card__description-card card--stretch">
+                <a href="{% url 'cases:case_detail' api_group_id=zaak.api_group.id  object_id=zaak.uuid %}" class="card card card__description-card card--stretch">
                     <div class="card__body">
 
-                        <h2 class="card__heading-2">{{ case.description }}</h2>
+                        <h2 class="card__heading-2">{{ zaak.description }}</h2>
                         {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
-                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=case.statustype_config.status_indicator status_indicator_text=case.statustype_config.status_indicator_text %}
+                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
 
                         {% render_list %}
                             <li class="list-item list-item--compact">
-                                <p class="card__caption card__text--small"><span>{% trans "Zaak ingediend op:" %}</span><span class="card__text--dark">{{ case.start_date }}</span></p>
+                                <p class="card__caption card__text--small"><span>{% trans "Zaak ingediend op:" %}</span><span class="card__text--dark">{{ zaak.start_date }}</span></p>
                             </li>
-                            {% if case.result %}
-                                {% list_item case.result caption=_("Resultaat") compact=True strong=False %}
+                            {% if zaak.result %}
+                                {% list_item zaak.result caption=_("Resultaat") compact=True strong=False %}
                             {% else %}
-                                {% list_item case.current_status caption=_("Status") compact=True strong=False %}
+                                {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
                             {% endif %}
                             <li class="list-item list-item--compact">
                                <p class="utrecht-paragraph list-item__caption">Zaaknummer</p>
-                               <p class="utrecht-paragraph skip-phone-parsing">&zwj;{{ case.identification }}</p>
+                               <p class="utrecht-paragraph skip-phone-parsing">&zwj;{{ zaak.identification }}</p>
                             </li>
                         {% endrender_list %}
 
                         <span class="link link--icon link--bold link--primary">
-                        <span class="link__text">{{ case.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
+                        <span class="link__text">{{ zaak.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
                     </div>
@@ -99,6 +99,6 @@
 {% endrender_grid %}
 </div>
 
-{% if cases %}
+{% if zaken %}
     {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
 {% endif %}

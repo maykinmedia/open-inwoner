@@ -84,8 +84,8 @@ class FormulierWithApiGroup:
 
 
 class Timeouts(TypedDict):
-    fetch_raw_cases: int | float
-    resolve_cases: int | float
+    fetch_raw_zaken: int | float
+    resolve_zaken: int | float
     fetch_formulieren: int | float
 
 
@@ -97,8 +97,8 @@ class CaseListService:
     def __init__(self, request: HttpRequest):
         self.request = request
         self._timeouts = {
-            "fetch_raw_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
-            "resolve_cases": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
+            "fetch_raw_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
+            "resolve_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
             "fetch_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
         }
         self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
@@ -169,7 +169,7 @@ class CaseListService:
                 try:
                     subs_with_api_group.extend(task.result())
                 except BaseException:
-                    logger.exception("Error fetching and pre-processing cases")
+                    logger.exception("Error fetching and pre-processing zaken")
         except concurrent.futures.TimeoutError:
             logger.warning("Timeout while fetching formulieren")
 
@@ -181,30 +181,30 @@ class CaseListService:
         return subs_with_api_group
 
     @staticmethod
-    def get_case_filter_status(zaak: Zaak) -> CaseFilterFormOption:
+    def get_zaak_filter_status(zaak: Zaak) -> CaseFilterFormOption:
         if zaak.einddatum:
             return CaseFilterFormOption.ZAAK_AFGEROND
 
         return CaseFilterFormOption.ZAAK_OPEN
 
-    def get_case_status_frequencies(
+    def get_zaak_status_frequencies(
         self,
-        cases: Iterable[ZaakWithApiGroup],
+        zaken: Iterable[ZaakWithApiGroup],
         formulieren: Iterable[FormulierWithApiGroup],
     ) -> dict[CaseFilterFormOption, int]:
-        case_statuses = [self.get_case_filter_status(case.zaak) for case in cases]
+        zaak_statuses = [self.get_zaak_filter_status(zaak.zaak) for zaak in zaken]
 
         # add static text for formulieren
-        case_statuses += [CaseFilterFormOption.FORMULIER for _ in formulieren]
+        zaak_statuses += [CaseFilterFormOption.FORMULIER for _ in formulieren]
 
         return {
-            status: case_statuses.count(status) for status in list(CaseFilterFormOption)
+            status: zaak_statuses.count(status) for status in list(CaseFilterFormOption)
         }
 
-    def _get_raw_cases_for_api_group(
+    def _get_raw_zaken_for_api_group(
         self, group: ZGWApiGroupConfig
     ) -> list[ZaakWithApiGroup]:
-        raw_cases = group.zaken_client.fetch_cases(
+        raw_zaken = group.zaken_client.fetch_zaken(
             **get_user_fetch_parameters(
                 self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
             )
@@ -212,12 +212,12 @@ class CaseListService:
 
         return [
             ZaakWithApiGroup(
-                zaak=raw_cases, api_group=group, type_aanvraag=TypeAanvraag.ZAAK
+                zaak=raw_zaak, api_group=group, type_aanvraag=TypeAanvraag.ZAAK
             )
-            for raw_cases in raw_cases
+            for raw_zaak in raw_zaken
         ]
 
-    def get_cases(self) -> list[ZaakWithApiGroup]:
+    def get_zaken(self) -> list[ZaakWithApiGroup]:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related(
                 "zrc_service",
@@ -227,35 +227,35 @@ class CaseListService:
             ).all()
         )
 
-        # Get the raw cases for all groups
-        fetched_cases: list[ZaakWithApiGroup] = []
-        fetch_raw_cases_futures: list[
+        # Get the raw zaken for all groups
+        fetched_zaken: list[ZaakWithApiGroup] = []
+        fetch_raw_zaken_futures: list[
             concurrent.futures.Future[list[ZaakWithApiGroup]]
         ] = []
         with parallel(max_workers=self._max_workers) as executor:
-            fetch_raw_cases_futures.extend(
-                executor.submit(self._get_raw_cases_for_api_group, group)
+            fetch_raw_zaken_futures.extend(
+                executor.submit(self._get_raw_zaken_for_api_group, group)
                 for group in all_api_groups
             )
 
         try:
             for task in concurrent.futures.as_completed(
-                fetch_raw_cases_futures,
-                timeout=self._timeouts["fetch_raw_cases"],
+                fetch_raw_zaken_futures,
+                timeout=self._timeouts["fetch_raw_zaken"],
             ):
-                raw_cases_for_group = task.result()
-                fetched_cases.extend(raw_cases_for_group)
+                raw_zaken_for_group = task.result()
+                fetched_zaken.extend(raw_zaken_for_group)
         except concurrent.futures.TimeoutError:
             # This happens, but it is not an error as such. We also want to continue
-            # execution with the cases we _did_ manage to resolve.
-            logger.warning("Timed out fetching raw cases for group", exc_info=True)
+            # execution with the zaken we _did_ manage to resolve.
+            logger.warning("Timed out fetching raw zaken for group", exc_info=True)
         except BaseException:
-            logger.exception("Unhandled error fetching raw cases")
+            logger.exception("Unhandled error fetching raw zaken")
 
-        # Resolve cases
+        # Resolve zaken
         # Submit all futures and track which futures belong to which case
         all_futures: list[concurrent.futures.Future[None]] = []
-        case_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
+        zaak_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
             defaultdict(list)
         )
 
@@ -266,35 +266,35 @@ class CaseListService:
         ]
 
         with parallel(max_workers=self._max_workers) as executor:
-            for case_with_group in fetched_cases:
+            for zaak_with_group in fetched_zaken:
                 # We have three independent resolver functions we want to resolve
                 # concurrently. Only if all three tasks complete do we want to
-                # add the case to the final list of resolved cases. Therefore, we keep
-                # track of the futures on a per-case basis to be able to verify all
+                # add the zaak to the final list of resolved zaken. Therefore, we keep
+                # track of the futures on a per-zaak basis to be able to verify all
                 # futures completed once the timeout has elapsed.
                 for func in resolver_functions:
-                    future = executor.submit(func, case_with_group)
+                    future = executor.submit(func, zaak_with_group)
                     all_futures.append(future)
-                    case_futures[case_with_group].append(future)
+                    zaak_futures[zaak_with_group].append(future)
 
         # Wait for futures to complete or timeout
         try:
             concurrent.futures.wait(
                 all_futures,
-                timeout=self._timeouts["resolve_cases"],
+                timeout=self._timeouts["resolve_zaken"],
             )
         except concurrent.futures.TimeoutError:
             # This happens, but it is not an error as such. We also want to
-            # continue execution with the cases we _did_ manage to resolve.
-            logger.warning("Timed out resolving cases", exc_info=True)
+            # continue execution with the zaken we _did_ manage to resolve.
+            logger.warning("Timed out resolving zaken", exc_info=True)
         except BaseException:
             logger.exception("Unhandled error during zaak resolution")
 
-        # Now check which cases had all 3 futures complete successfully. If we did not
+        # Now check which zaken had all 3 futures complete successfully. If we did not
         # manage to complete the resolutions for zaak, status and resultaat type, we
         # exclude the case from the final list.
-        resolved_cases: list[ZaakWithApiGroup] = []
-        for zaak, futures in case_futures.items():
+        resolved_zaken: list[ZaakWithApiGroup] = []
+        for zaak, futures in zaak_futures.items():
             # Check if all 3 futures completed without exceptions...
             if not all(f.done() and not f.exception() for f in futures):
                 logger.warning(
@@ -309,24 +309,24 @@ class CaseListService:
             )
 
             if is_zaak_visible(zaak_with_resolved_zgw_refs.zaak):
-                resolved_cases.append(zaak_with_resolved_zgw_refs)
+                resolved_zaken.append(zaak_with_resolved_zgw_refs)
             else:
                 logger.debug(
                     "Culling zaak %s because it is invisible",
                     zaak_with_resolved_zgw_refs.identification,
                 )
 
-        # Filter and sort cases
-        resolved_cases.sort(key=lambda case: case.zaak.startdatum, reverse=True)
-        resolved_cases.sort(key=lambda c: all_api_groups.index(c.api_group))
-        return resolved_cases
+        # Filter and sort zaken
+        resolved_zaken.sort(key=lambda case: case.zaak.startdatum, reverse=True)
+        resolved_zaken.sort(key=lambda c: all_api_groups.index(c.api_group))
+        return resolved_zaken
 
     def _replace_catalogus_api_with_model_refs(
         self,
         zaak_with_api_group: ZaakWithApiGroup,
     ) -> ZaakWithApiGroup:
         try:
-            zaaktype_config = ZaakTypeConfig.objects.filter_case_type(
+            zaaktype_config = ZaakTypeConfig.objects.filter_zaak_type(
                 zaak_with_api_group.zaak.zaaktype
             ).get()
 
@@ -364,7 +364,7 @@ class CaseListService:
         """
         Resolve `case.zaaktype` (`str`) to a `ZaakType(ZGWModel)` object
 
-        Note: the result of `fetch_single_case_type` is cached, hence a request
+        Note: the result of `fetch_single_zaaktype` is cached, hence a request
             is only made for new case type urls
         """
         client = CaseListService._catalogi_client_factory(zaak_with_group.api_group)
@@ -375,14 +375,14 @@ class CaseListService:
             )
             return
 
-        case_type = client.fetch_single_case_type(zaak_with_group.zaak.zaaktype)
-        if not case_type:
+        zaaktype = client.fetch_single_zaaktype(zaak_with_group.zaak.zaaktype)
+        if not zaaktype:
             raise ResolveCaseException(
                 f"Unable to resolve zaaktype for url: {zaak_with_group.zaak.zaaktype}"
             )
 
         with self._zaak_update_lock:
-            zaak_with_group.zaak.zaaktype = case_type
+            zaak_with_group.zaak.zaaktype = zaaktype
 
     def _resolve_status_and_status_type(
         self,

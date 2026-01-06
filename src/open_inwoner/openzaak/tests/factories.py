@@ -170,7 +170,6 @@ class UserCaseStatusNotificationFactory(factory.django.DjangoModelFactory):
 
 class UserCaseInfoObjectNotificationFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
-    case_uuid = factory.Faker("uuid4")
     zaak_info_object_uuid = factory.Faker("uuid4")
 
     class Meta:

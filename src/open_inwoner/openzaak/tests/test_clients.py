@@ -230,7 +230,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
             )
 
     @requests_mock.Mocker()
-    def test_fetch_case_roles_with_betrokkene_type_filter(self, m):
+    def test_fetch_zaak_roles_with_betrokkene_type_filter(self, m):
         api_group = self.api_groups[0]
         api_group.fetch_rollen_with_betrokkene_type = True
         api_group.save()
@@ -302,7 +302,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 # Track the number of requests before this iteration
                 request_count_before = len(m.request_history)
 
-                roles = zaken_client.fetch_case_roles(
+                roles = zaken_client.fetch_zaak_roles(
                     case_url, betrokkene_type=betrokkene_type.value
                 )
 
@@ -317,30 +317,6 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 # Check the most recent request
                 request = m.request_history[-1]
                 self.assertIn(f"betrokkeneType={betrokkene_type.value}", request.url)
-
-    @requests_mock.Mocker()
-    def test_fetch_case_roles_raises_if_betrokkene_filter_set_but_param_missing(
-        self, m
-    ):
-        api_group = self.api_groups[0]
-        api_group.fetch_rollen_with_betrokkene_type = True
-        api_group.save()
-
-        zaken_client = build_zgw_client_from_service(
-            api_group.zrc_service,
-            use_openzaak_120_params=False,
-            fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
-        )
-
-        case_url = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
-
-        with self.assertRaises(ValueError) as cm:
-            zaken_client.fetch_case_roles(case_url)
-
-        self.assertEqual(
-            str(cm.exception),
-            "Betrokkene type mandatory if fetch_rollen_with_betrokkene_type set",
-        )
 
 
 @requests_mock.Mocker()

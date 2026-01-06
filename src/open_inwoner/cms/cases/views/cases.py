@@ -71,11 +71,11 @@ class InnerCaseListView(
 
         # update ctx with formulieren and cases (possibly filtered)
         formulieren: Sequence[UniformCase] = case_service.get_formulieren()
-        preprocessed_cases: Sequence[UniformCase] = case_service.get_cases()
+        preprocessed_zaken: Sequence[UniformCase] = case_service.get_zaken()
 
         if config.zaken_filter_enabled:
-            case_status_frequencies = case_service.get_case_status_frequencies(
-                cases=preprocessed_cases,
+            case_status_frequencies = case_service.get_zaak_status_frequencies(
+                zaken=preprocessed_zaken,
                 formulieren=formulieren,
             )
             # Separate frequency data from statusname
@@ -101,22 +101,22 @@ class InnerCaseListView(
                 formulieren = (
                     formulieren if CaseFilterFormOption.FORMULIER in statuses else []
                 )
-                preprocessed_cases = [
-                    case
-                    for case in preprocessed_cases
-                    if case_service.get_case_filter_status(case.zaak) in statuses
+                preprocessed_zaken = [
+                    zaak
+                    for zaak in preprocessed_zaken
+                    if case_service.get_zaak_filter_status(zaak.zaak) in statuses
                 ]
 
-        paginator_dict = self.paginate_with_context([*formulieren, *preprocessed_cases])
-        case_dicts = [case.process_data() for case in paginator_dict["object_list"]]
+        paginator_dict = self.paginate_with_context([*formulieren, *preprocessed_zaken])
+        zaken_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 
-        context["cases"] = case_dicts
+        context["zaken"] = zaken_dicts
         context.update(paginator_dict)
 
         # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
 
-        self.log_case_list_accessed(case_dicts)
+        self.log_case_list_accessed(zaken_dicts)
 
         return context

@@ -20,26 +20,26 @@ class CaseUploadForm(forms.Form):
     )
     files = MultipleFileField(label=_("Bestand"))
 
-    def __init__(self, case, **kwargs):
+    def __init__(self, zaak, **kwargs):
         self.oz_config = OpenZaakConfig.get_solo()
         super().__init__(**kwargs)
 
         help_text = f"Grootte max. {self.oz_config.max_upload_size} MB, toegestane document formaten: {', '.join(self.oz_config.allowed_file_extensions)}."
 
         try:
-            ztc = ZaakTypeConfig.objects.filter_case_type(case.zaaktype).get()
+            ztc = ZaakTypeConfig.objects.filter_zaak_type(zaak.zaaktype).get()
             help_text = ztc.description or help_text
         except (AttributeError, ObjectDoesNotExist):
             pass
 
         self.fields["files"].help_text = help_text
 
-        if case:
+        if zaak:
             self.fields[
                 "type"
             ].queryset = (
-                ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_case_type(
-                    case.zaaktype
+                ZaakTypeInformatieObjectTypeConfig.objects.filter_enabled_for_zaak_type(
+                    zaak.zaaktype
                 )
             )
 
