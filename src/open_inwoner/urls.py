@@ -27,6 +27,7 @@ from open_inwoner.accounts.views import (
     PasswordResetView,
     ResendTokenView,
     VerifyTokenView,
+    generic_oidc_logout,
 )
 from open_inwoner.configurations import views
 from open_inwoner.core.views import sitemap
@@ -118,6 +119,7 @@ urlpatterns = [
         "sessions/",
         include("open_inwoner.extended_sessions.urls", namespace="sessions"),
     ),
+    path("oidc/logout/", generic_oidc_logout, name="oidc_logout"),
     path("oidc/", include("mozilla_django_oidc.urls")),
     path("digid-oidc/", include("open_inwoner.accounts.digid_urls")),
     path("eherkenning-oidc/", include("open_inwoner.accounts.eherkenning_urls")),

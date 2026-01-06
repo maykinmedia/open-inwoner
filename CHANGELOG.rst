@@ -14,6 +14,8 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh-issue:`2091`]: Beheerders toestaan om uit te loggen via frontend.
+
 Onderhoud
 ---------
 

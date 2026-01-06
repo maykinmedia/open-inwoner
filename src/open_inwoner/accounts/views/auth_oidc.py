@@ -19,6 +19,7 @@ from mozilla_django_oidc_db.views import (
     OIDCInit,
 )
 
+from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import (
     OpenIDDigiDConfig,
     OpenIDEHerkenningConfig,
@@ -140,6 +141,43 @@ class OIDCLogoutView(View):
 
         logger.warning("No OIDC logout endpoint defined")
         return HttpResponseRedirect(self.get_success_url())
+
+
+class GenericOIDCLogoutView(OIDCLogoutView):
+    """
+    Generic OIDC logout view that doesn't require a specific config class.
+    This is used for the generic admin OIDC logout endpoint.
+
+    Note: This view should only be used for users with login_type=oidc.
+    DigiD/eHerkenning/eIDAS users should use their respective logout endpoints
+    which handle SSO logout at the identity provider.
+    """
+
+    config_class = None
+
+    def get(self, request):
+        if request.user.is_authenticated and hasattr(request.user, "login_type"):
+            if request.user.login_type != LoginTypeChoices.oidc:
+                correct_logout_url = request.user.get_logout_url()
+                logger.warning(
+                    "User with non-generic OIDC login_type attempted to use generic "
+                    "OIDC logout endpoint, redirecting to correct logout URL",
+                    user_id=request.user.id,
+                    login_type=request.user.login_type,
+                    redirect_to=correct_logout_url,
+                )
+                return HttpResponseRedirect(correct_logout_url)
+
+        # For generic OIDC logout, we don't have a specific config to check
+        # Just log out the user and redirect
+        if "oidc_login_next" in request.session:
+            del request.session["oidc_login_next"]
+
+        auth.logout(request)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+generic_oidc_logout = GenericOIDCLogoutView.as_view()
 
 
 class DigiDOIDCAuthenticationCallbackView(CallbackView):

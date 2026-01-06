@@ -3166,3 +3166,106 @@ class EIDASOIDCFlowTests(WebTest):
             "duplicate-pseudo-id",
             msg="User's eIDAS pseudo_id must remain unchanged",
         )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class GenericOIDCLogoutViewTests(WebTest):
+    """Tests for the generic OIDC logout view (for staff/admin users)."""
+
+    def test_generic_oidc_logout_accepts_get_request_for_oidc_users(self):
+        """
+        Test that the generic OIDC logout view accepts GET requests for users
+        with login_type=oidc.
+
+        Needed because staff users who log in via OIDC need to be able to log
+        out using a simple link (GET request), not a form POST.
+        """
+        user = UserFactory.create(login_type=LoginTypeChoices.oidc)
+        self.client.force_login(user)
+
+        logout_url = reverse("oidc_logout")
+
+        # Verify user is logged in
+        self.assertTrue(self.client.session.get("_auth_user_id"))
+
+        # Perform logout via GET request
+        response = self.client.get(logout_url)
+
+        # Should redirect to logout redirect URL
+        self.assertRedirects(
+            response,
+            settings.LOGOUT_REDIRECT_URL,
+            fetch_redirect_response=False,
+        )
+
+        # User should be logged out
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_generic_oidc_logout_redirects_non_oidc_users_to_correct_endpoint(self):
+        """
+        Test that users with non-OIDC login types who manually navigate to
+        /oidc/logout/ are redirected to their proper logout endpoint which
+        handles SSO logout.
+        """
+        # Map login types to appropriate factory and any required fields
+        login_type_configs = {
+            LoginTypeChoices.default: {
+                "factory": UserFactory,
+                "kwargs": {},
+            },
+            LoginTypeChoices.digid: {
+                "factory": DigidUserFactory,
+                "kwargs": {},
+            },
+            LoginTypeChoices.eherkenning: {
+                "factory": eHerkenningUserFactory,
+                "kwargs": {},
+            },
+            LoginTypeChoices.eidas_person_bsn: {
+                "factory": UserFactory,
+                "kwargs": {
+                    "login_type": LoginTypeChoices.eidas_person_bsn,
+                    "bsn": "123456782",
+                    "eidas_pseudo_id": "eidas-bsn-pseudo-123",
+                },
+            },
+            LoginTypeChoices.eidas_person_pseudo_id: {
+                "factory": UserFactory,
+                "kwargs": {
+                    "login_type": LoginTypeChoices.eidas_person_pseudo_id,
+                    "eidas_pseudo_id": "eidas-person-pseudo-456",
+                },
+            },
+            LoginTypeChoices.eidas_company: {
+                "factory": UserFactory,
+                "kwargs": {
+                    "login_type": LoginTypeChoices.eidas_company,
+                    "kvk": "12345678",
+                    "eidas_pseudo_id": "eidas-bsn-pseudo-789",
+                },
+            },
+        }
+
+        for login_type, config in login_type_configs.items():
+            with self.subTest(login_type=login_type):
+                factory = config["factory"]
+                kwargs = config["kwargs"]
+                user = factory.create(**kwargs)
+
+                self.client.force_login(user)
+
+                # User with non-OIDC login_type tries to use generic OIDC logout
+                response = self.client.get(reverse("oidc_logout"))
+
+                # Should redirect to the correct logout URL for their login type
+                expected_logout_url = user.get_logout_url()
+                self.assertRedirects(
+                    response, expected_logout_url, fetch_redirect_response=False
+                )
+
+                # User should still be logged in (redirect happened before logout)
+                self.assertTrue(self.client.session.get("_auth_user_id"))
+
+                # Clean up for next iteration
+                self.client.logout()

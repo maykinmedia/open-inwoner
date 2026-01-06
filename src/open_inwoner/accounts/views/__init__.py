@@ -28,6 +28,7 @@ from .auth_oidc import (
     eidas_callback,
     eidas_init,
     eidas_logout,
+    generic_oidc_logout,
 )
 from .contacts import (
     ContactApprovalView,
@@ -104,4 +105,5 @@ __all__ = [
     "eidas_init",
     "eidas_callback",
     "eidas_logout",
+    "generic_oidc_logout",
 ]
