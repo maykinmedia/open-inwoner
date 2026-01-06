@@ -1,3 +1,20 @@
+2.1.0 (2026-XX-XX) [UNRELEASED]
+===============================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+Nieuwe features
+---------------
+
+Bugfixes
+--------
+
+Onderhoud
+---------
+
 2.0.0 (2026-01-05)
 ==================
 
