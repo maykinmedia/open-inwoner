@@ -14,7 +14,7 @@ plugin_pool.unregister_plugin(OriginalLinkPlugin)
 @plugin_pool.register_plugin
 class CMSLinkPlugin(CMSPluginBase):
     model = LinkPluginConfig
-    render_template = "cms/plugins/links/external-links.html"
+    render_template = "core/cms/link/external-links.html"
     module = _("General")
     name = _("External Link Plugin")
     allow_children = True

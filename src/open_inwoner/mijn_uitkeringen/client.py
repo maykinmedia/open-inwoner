@@ -124,7 +124,10 @@ class JaaropgaveClient(SSDBaseClient):
     SSD client for retrieving yearly reports
     """
 
-    html_template = BASE_DIR / "mijn_uitkeringen/templates/jaaropgave.html"
+    html_template = (
+        BASE_DIR
+        / "mijn_uitkeringen/templates/mijn_uitkeringen/uitkeringen_jaaropgave_detail.html"
+    )
     request_template = BASE_DIR / "soap/templates/ssd/jaaropgave.xml"
     soap_action = (
         "http://www.centric.nl/GWS/Diensten/JaarOpgaveClient-v0400/JaarOpgaveInfo"
@@ -177,7 +180,10 @@ class UitkeringClient(SSDBaseClient):
     SSD client for retrieving monthly reports
     """
 
-    html_template = BASE_DIR / "mijn_uitkeringen/templates/maandspecificatie.html"
+    html_template = (
+        BASE_DIR
+        / "mijn_uitkeringen/templates/mijn_uitkeringen/uitkeringen_maandspecificatie_detail.html"
+    )
     request_template = BASE_DIR / "soap/templates/ssd/maandspecificatie.xml"
     soap_action = "http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfo"
 

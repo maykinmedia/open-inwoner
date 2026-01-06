@@ -13,7 +13,7 @@ class UserFeedPlugin(CMSPluginBase):
     model = UserFeedPluginConfig
     module = _("General")
     name = _("User Feed")
-    render_template = "cms/plugins/userfeed/userfeed.html"
+    render_template = "core/cms/userfeed/userfeed.html"
 
     def render(self, context, instance, placeholder):
         request = context["request"]

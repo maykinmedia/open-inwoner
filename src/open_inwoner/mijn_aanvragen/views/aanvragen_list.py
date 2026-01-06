@@ -26,7 +26,7 @@ class OuterCaseListView(
 ):
     """View on the case list while content is loaded via htmx"""
 
-    template_name = "pages/cases/list_outer.html"
+    template_name = "mijn_aanvragen/aanvragen_list_wrapper.html"
 
     @cached_property
     def crumbs(self):
@@ -57,7 +57,7 @@ class InnerCaseListView(
     PaginationMixin,
     TemplateView,
 ):
-    template_name = "pages/cases/list_inner.html"
+    template_name = "mijn_aanvragen/aanvragen_list.html"
     paginate_by = 9
 
     def page_title(self):

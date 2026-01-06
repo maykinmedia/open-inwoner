@@ -43,7 +43,7 @@ class ContactFormPlugin(CMSPluginBase):
     model = ContactFormConfig
     app_hook = "OpenKlantApphook"
     name = _("Contact form plugin")
-    render_template = "cms/contactform/form_inner.html"
+    render_template = "openklant/contactform/form_inner.html"
     cache = False
 
     def render(self, context, instance, placeholder):

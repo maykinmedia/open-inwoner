@@ -1,4 +1,4 @@
-from .zaken_detail import (
+from .aanvragen_detail import (
     CaseContactFormView,
     CaseDocumentDownloadView,
     CaseDocumentUploadFormView,
@@ -6,7 +6,7 @@ from .zaken_detail import (
     LegacyCaseDetailHandler,
     OuterCaseDetailView,
 )
-from .zaken_list import InnerCaseListView, OuterCaseListView
+from .aanvragen_list import InnerCaseListView, OuterCaseListView
 
 __all__ = [
     "InnerCaseListView",

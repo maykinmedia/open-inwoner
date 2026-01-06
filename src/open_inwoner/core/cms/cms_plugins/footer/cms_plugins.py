@@ -17,7 +17,7 @@ logger = structlog.stdlib.get_logger(__name__)
 @plugin_pool.register_plugin
 class FooterPagesPlugin(CMSPluginBase):
     name = _("Pages List")
-    render_template = "cms/footer/footer_pages_plugin.html"
+    render_template = "core/cms/footer/footer_pages_plugin.html"
     cache = False
 
     def render(self, context, instance, placeholder):
@@ -35,7 +35,7 @@ class FooterPagesPlugin(CMSPluginBase):
                     cms_pages.remove(page)
 
         contact_form_pages = Page.objects.filter(
-            template="cms/contactform/form_outer.html", publisher_is_draft=False
+            template="openklant/contactform/form_outer.html", publisher_is_draft=False
         )
 
         # Use the first page if it exists
@@ -50,7 +50,7 @@ class FooterPagesPlugin(CMSPluginBase):
 class CMSFlatPagePlugin(CMSPluginBase):
     name = _("CMS Flatpage Plugin")
     model = CMSFlatPageModel
-    render_template = "cms/cms_flatpage.html"
+    render_template = "core/cms/footer/cms_flatpage.html"
 
     def render(self, context, instance, placeholder):
         cms_plugin_placeholder = instance.placeholder

@@ -191,7 +191,7 @@ class CaseAccessMixin(AccessMixin):
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
-            return TemplateResponse(self.request, "pages/cases/403.html")
+            return TemplateResponse(self.request, "mijn_aanvragen/403.html")
 
         return super().handle_no_permission()
 

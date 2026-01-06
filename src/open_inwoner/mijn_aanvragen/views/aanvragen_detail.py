@@ -96,7 +96,7 @@ class OuterCaseDetailView(
     CaseAccessMixin,
     TemplateView,
 ):
-    template_name = "pages/cases/status_outer.html"
+    template_name = "mijn_aanvragen/aanvragen_detail_wrapper.html"
     zaak: Zaak | None = None
 
     @cached_property
@@ -147,7 +147,7 @@ class InnerCaseDetailView(
     CaseAccessMixin,
     FormView,
 ):
-    template_name = "pages/cases/status_inner.html"
+    template_name = "mijn_aanvragen/aanvragen_detail.html"
     form_class = CaseUploadForm
     contact_form_class = CaseContactForm
     zaak: Zaak | None = None
@@ -867,7 +867,7 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
 
 class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
-    template_name = "pages/cases/document_form.html"
+    template_name = "mijn_aanvragen/includes/aanvragen_document_form.html"
     form_class = CaseUploadForm
 
     def post(self, request, *args, **kwargs):
@@ -983,7 +983,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
 
 
 class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
-    template_name = "pages/cases/contact_form.html"
+    template_name = "mijn_aanvragen/includes/aanvragen_contact_form.html"
     form_class = CaseContactForm
 
     def post(self, request, *args, **kwargs):

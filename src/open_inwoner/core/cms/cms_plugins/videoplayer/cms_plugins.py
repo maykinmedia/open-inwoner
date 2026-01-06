@@ -11,7 +11,7 @@ class VideoPlayerPlugin(CMSPluginBase):
     model = VideoPlayerPluginConfig
     module = _("Media")
     name = _("Video Player")
-    render_template = "cms/plugins/videoplayer/videoplayer.html"
+    render_template = "core/cms/videoplayer/videoplayer.html"
 
     def render(self, context, instance, placeholder):
         context.update({"instance": instance})

@@ -32,7 +32,7 @@ from open_inwoner.mijn_aanvragen.constants import (
     ZaakBetrokkeneRol,
 )
 from open_inwoner.mijn_aanvragen.models import OpenZaakConfig
-from open_inwoner.mijn_aanvragen.views.zaken_list import (
+from open_inwoner.mijn_aanvragen.views.aanvragen_list import (
     CaseFilterFormOption,
     InnerCaseListView,
 )

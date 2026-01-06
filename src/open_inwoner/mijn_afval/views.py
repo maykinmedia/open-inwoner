@@ -194,15 +194,17 @@ def _format_bag_objects(bag_objects: list[BAGObject]) -> list[_BAGObjectData]:
     return result
 
 
-class AfvalView(LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView):
-    template_name = "pages/mijn_afval/index.html"
+class MijnAfvalListView(
+    LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
+):
+    template_name = "mijn_afval/mijn_afval_list.html"
 
     @cached_property
     def crumbs(self):
         current_page = self.request.current_page
         title = current_page.get_title() if current_page else _("Mijn Afval")
         return [
-            (title, reverse("mijn_afval:index")),
+            (title, reverse("mijn_afval:list")),
         ]
 
     def dispatch(self, request, *args, **kwargs):

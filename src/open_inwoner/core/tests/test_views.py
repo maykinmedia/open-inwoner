@@ -521,7 +521,7 @@ class SitemapViewTest(TestCase):
 
     def test_sitemap_includes_footer_cms_pages(self):
         page = api.create_page(
-            "Privacy Policy", "cms/fullwidth.html", "nl", in_navigation=True
+            "Privacy Policy", "core/cms/pages/fullwidth.html", "nl", in_navigation=True
         )
         page.publish("nl")
         self.config.cms_pages.add(page)
@@ -534,7 +534,7 @@ class SitemapViewTest(TestCase):
     def test_sitemap_excludes_auth_required_footer_pages_for_anonymous(self):
         # Create a CMS page that requires auth
         page = api.create_page(
-            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+            "Members Only", "core/cms/pages/fullwidth.html", "nl", in_navigation=True
         )
         page.publish("nl")
         published_page = page.get_public_object()
@@ -552,7 +552,7 @@ class SitemapViewTest(TestCase):
     def test_sitemap_includes_auth_required_footer_pages_for_authenticated(self):
         # Create a CMS page that requires auth
         page = api.create_page(
-            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+            "Members Only", "core/cms/pages/fullwidth.html", "nl", in_navigation=True
         )
         page.publish("nl")
         published_page = page.get_public_object()

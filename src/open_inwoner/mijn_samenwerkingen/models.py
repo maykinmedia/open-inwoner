@@ -54,7 +54,9 @@ class PlanTemplate(models.Model):
         return self.name
 
     def string_preview(self):
-        return render_to_string("plans/preview.html", {"plan_template": self})
+        return render_to_string(
+            "mijn_samenwerkingen/samenwerkingen_preview.html", {"plan_template": self}
+        )
 
 
 class ActionTemplate(models.Model):

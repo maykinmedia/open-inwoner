@@ -10,7 +10,7 @@ from .models import TextPluginConfig
 class TextPlugin(CMSPluginBase):
     model = TextPluginConfig
     name = _("Text")
-    render_template = "cms/plugins/text.html"
+    render_template = "core/cms/text/text.html"
     cache = False
 
 

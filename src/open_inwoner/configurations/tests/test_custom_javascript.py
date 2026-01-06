@@ -20,7 +20,7 @@ class CustomJavaScriptInclusionTests(TestCase):
 
         self.page = api.create_page(
             title="Test Page",
-            template="cms/fullwidth.html",
+            template="core/cms/pages/fullwidth.html",
             language="nl",
             in_navigation=True,
         )

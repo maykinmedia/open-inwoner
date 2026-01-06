@@ -29,7 +29,11 @@ def create_homepage():
     helper to create an empty, published homepage
     """
     p = api.create_page(
-        "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
+        "Home",
+        "core/cms/pages/fullwidth.html",
+        "nl",
+        in_navigation=True,
+        reverse_id="home",
     )
     p.set_as_homepage()
 
@@ -196,7 +200,7 @@ def create_apphook_page(
 ):
     p = api.create_page(
         (title or hook_class.name),
-        "cms/fullwidth.html",
+        "core/cms/pages/fullwidth.html",
         "nl",
         slug=hook_class.app_name,
         apphook=hook_class.__name__,
@@ -227,7 +231,9 @@ def create_cms_page_with_content(
     *, title: str, content: str, language: str = "nl"
 ) -> Page:
     """Create a CMS page with `content` text in the content slot."""
-    page = api.create_page(title, "cms/fullwidth.html", language, in_navigation=True)
+    page = api.create_page(
+        title, "core/cms/pages/fullwidth.html", language, in_navigation=True
+    )
     if not page.publish(language):
         raise Exception("failed to publish page")
 

@@ -63,7 +63,7 @@ OPENKLANT2_ROOT = "http://localhost:8338/klantinteracties/api/v1/"
 
 @requests_mock.Mocker()
 @patch(
-    "open_inwoner.mijn_aanvragen.views.zaken_detail.send_contact_confirmation_mail",
+    "open_inwoner.mijn_aanvragen.views.aanvragen_detail.send_contact_confirmation_mail",
     autospec=True,
 )
 @patch.object(
@@ -596,7 +596,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
     @factory.django.mute_signals(signals.user_logged_in)
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.OpenKlant2Service",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     def test_form_success_with_api_openklant(

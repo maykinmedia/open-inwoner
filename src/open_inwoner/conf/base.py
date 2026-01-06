@@ -214,9 +214,12 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     *default_health_check_apps,
-    # Project applications.
-    "open_inwoner.core",
+    # Project applications - sorted alphabetically
+    "open_inwoner._legacy.cms.plugins",  # Legacy - migrations only
+    "open_inwoner.accounts.cms.mijn_profiel",
     "open_inwoner.components",
+    "open_inwoner.configurations",
+    "open_inwoner.core",
     "open_inwoner.core.cms.cms_plugins.banner",
     "open_inwoner.core.cms.cms_plugins.extensions",
     "open_inwoner.core.cms.cms_plugins.footer",
@@ -229,27 +232,24 @@ INSTALLED_APPS = [
     "open_inwoner.haalcentraal",
     "open_inwoner.kvk",
     "open_inwoner.laposta",
-    "open_inwoner.qmatic",
-    "open_inwoner.search",
-    "open_inwoner.utils",
-    "open_inwoner.configurations",
-    "open_inwoner.openklant",
-    "open_inwoner.soap",
-    "open_inwoner.questionnaire",
     "open_inwoner.mail",
     "open_inwoner.media",
-    "open_inwoner.userfeed",
+    "open_inwoner.mijn_aanvragen.cms.apps.MijnAanvragenCmsConfig",
     "open_inwoner.mijn_afval",
     "open_inwoner.mijn_afval.cms",
-    "open_inwoner.mijn_uitkeringen",
     "open_inwoner.mijn_samenwerkingen",
+    "open_inwoner.mijn_uitkeringen",
     "open_inwoner.onderwerpen",
-    "open_inwoner.accounts.cms.mijn_profiel",
-    "open_inwoner.mijn_aanvragen.cms.apps.MijnAanvragenCmsConfig",
-    "open_inwoner._legacy.cms.plugins",  # Legacy - migrations only
-    "djchoices",
+    "open_inwoner.openklant",
+    "open_inwoner.qmatic",
+    "open_inwoner.questionnaire",
+    "open_inwoner.search",
+    "open_inwoner.soap",
+    "open_inwoner.userfeed",
+    "open_inwoner.utils",
     "django_celery_beat",
     "django_celery_monitor",
+    "djchoices",
     # Temporary fix: the notifications lib interferes with
     # celery's task loading meachanism, which prevents certain
     # tasks from showing up in the admin when OIP is run with
@@ -648,9 +648,9 @@ CMS_PLACEHOLDER_CACHE = False
 CMS_PLUGIN_CACHE = False
 
 CMS_TEMPLATES = [
-    ("cms/fullwidth.html", "Home page template"),
-    ("cms/cms_flatpage_template.html", "CMS Flatpage Template"),
-    ("cms/contactform/form_outer.html", "CMS Contactformulier Template"),
+    ("core/cms/pages/fullwidth.html", "Home page template"),
+    ("core/cms/footer/cms_flatpage_template.html", "CMS Flatpage Template"),
+    ("openklant/contactform/form_outer.html", "CMS Contactformulier Template"),
 ]
 CMS_PLACEHOLDER_CONF = {
     # TODO properly configure this based on actual available plugins

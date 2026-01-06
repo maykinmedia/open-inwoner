@@ -19,7 +19,7 @@
         {% render_column start=4 span=6 %}
             {#  Status history #}
             <section id="statuses_component" class="statuses__section">
-                {% include 'pages/cases/statuses.html' %}
+                {% include 'mijn_aanvragen/includes/aanvragen_statuses.html' %}
             </section>
 
             {% if zaak.internal_upload_enabled %}
@@ -43,7 +43,7 @@
 
                 {#  Upload document form #}
                 <section id="form_upload" class="form__open-upload">
-                    {% include 'pages/cases/document_form.html' %}
+                    {% include 'mijn_aanvragen/includes/aanvragen_document_form.html' %}
                 </section>
 
             {% elif zaak.external_upload_enabled %}
@@ -85,7 +85,7 @@
             {% if zaak.contact_form_enabled %}
             <section id="cases-contact-form" class="form_contact">
                 <div id="cases-contact-form-content" class="spaced">
-                    {% include 'pages/cases/contact_form.html' %}
+                    {% include 'mijn_aanvragen/includes/aanvragen_contact_form.html' %}
                 </div>
             </section>
             {% endif %}

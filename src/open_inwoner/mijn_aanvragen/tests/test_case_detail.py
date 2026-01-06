@@ -39,7 +39,7 @@ from open_inwoner.mijn_aanvragen.tests.factories import (
     ZaakTypeResultaatTypeConfigFactory,
     ZaakTypeStatusTypeConfigFactory,
 )
-from open_inwoner.mijn_aanvragen.views.zaken_detail import (
+from open_inwoner.mijn_aanvragen.views.aanvragen_detail import (
     InnerCaseDetailView,
     SimpleFile,
 )
@@ -1071,7 +1071,7 @@ class TestCaseDetailView(
 
     @freeze_time("2021-01-12 17:00:00")
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.OpenKlant2Service",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
@@ -1230,7 +1230,7 @@ class TestCaseDetailView(
 
     @freeze_time("2021-01-12 17:00:00")
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.OpenKlant2Service",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     @patch("open_inwoner.userfeed.hooks.case_status_seen", autospec=True)
@@ -1288,7 +1288,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.OpenKlant2Service",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.OpenKlant2Service",
         return_value=MockOpenKlant2Service(),
     )
     def test_pass_endstatus_type_data_if_endstatus_not_reached(
@@ -1828,7 +1828,7 @@ class TestCaseDetailView(
         )
         response = self.app.get(self.case_detail_url, user=user)
 
-        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertTemplateUsed("mijn_aanvragen/403.html")
         self.assertContains(
             response, _("Sorry, you don't have access to this page (403)")
         )
@@ -1868,7 +1868,7 @@ class TestCaseDetailView(
         # )
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertTemplateUsed("mijn_aanvragen/403.html")
         self.assertContains(
             response, _("Sorry, you don't have access to this page (403)")
         )
@@ -1908,7 +1908,7 @@ class TestCaseDetailView(
                     self.case_detail_url, user=self.eherkenning_user
                 )
 
-                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertTemplateUsed("mijn_aanvragen/403.html")
                 self.assertContains(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
@@ -1998,7 +1998,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertTemplateUsed("mijn_aanvragen/403.html")
                 self.assertContains(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
@@ -2035,7 +2035,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
 
-        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertTemplateUsed("mijn_aanvragen/403.html")
         self.assertContains(
             response, _("Sorry, you don't have access to this page (403)")
         )
@@ -2091,7 +2091,7 @@ class TestCaseDetailView(
             user=self.user,
         )
 
-        self.assertTemplateUsed("pages/cases/403.html")
+        self.assertTemplateUsed("mijn_aanvragen/403.html")
         self.assertContains(
             response, _("Sorry, you don't have access to this page (403)")
         )
@@ -2164,7 +2164,7 @@ class TestCaseDetailView(
         self.assertEqual(info_card.text.strip(), "info\nFoobar")
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_expected_information_object_types_are_available_in_upload_form(
@@ -2219,7 +2219,7 @@ class TestCaseDetailView(
         self.assertEqual(sorted(type_field.options), sorted(expected_choices))
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_internal_file_upload_enabled",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_internal_file_upload_enabled",
         autospec=True,
     )
     def test_case_type_config_description_is_rendered_when_internal_upload(
@@ -2251,7 +2251,7 @@ class TestCaseDetailView(
         self.assertContains(response, _("some description content"))
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_internal_file_upload_enabled",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_internal_file_upload_enabled",
         autospec=True,
     )
     def test_fixed_text_is_rendered_when_no_description_in_internal_upload(
@@ -2327,7 +2327,7 @@ class TestCaseDetailView(
         self.assertNotIn("document-upload", response.forms)
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_document_upload_multiple_backends(self, m, upload):
@@ -2398,7 +2398,7 @@ class TestCaseDetailView(
                 )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_successful_document_upload_flow_with_uppercase_extension(self, m, upload):
@@ -2458,7 +2458,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_upload_file_flow_fails_with_invalid_file_extension(self, m, upload):
@@ -2501,7 +2501,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_upload_with_larger_file_size_fails(self, m, upload):
@@ -2707,7 +2707,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_request_error_in_uploading_document_shows_proper_message(self, m, upload):
@@ -2762,7 +2762,7 @@ class TestCaseDetailView(
         )
 
     @patch(
-        "open_inwoner.mijn_aanvragen.views.zaken_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
+        "open_inwoner.mijn_aanvragen.views.aanvragen_detail.InnerCaseDetailView.is_file_upload_enabled_for_statustype",
         autospec=True,
     )
     def test_request_error_in_connecting_doc_with_zaak_shows_proper_message(

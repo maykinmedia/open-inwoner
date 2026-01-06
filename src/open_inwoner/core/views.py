@@ -151,7 +151,7 @@ def _get_footer_pages(is_authenticated: bool) -> list:
 
     # Add contact form page at the beginning if enabled
     contact_form_pages = Page.objects.filter(
-        template="cms/contactform/form_outer.html", publisher_is_draft=False
+        template="openklant/contactform/form_outer.html", publisher_is_draft=False
     )
     if contact_form_pages.exists() and klant_config.contact_registration_enabled:
         cms_footer_pages.insert(0, contact_form_pages.first())

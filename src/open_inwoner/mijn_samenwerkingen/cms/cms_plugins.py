@@ -11,7 +11,7 @@ from open_inwoner.mijn_samenwerkingen.models import Plan
 class ActivePlansPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("Collaborate")
     name = _("Active Plans Plugin")
-    render_template = "cms/collaborate/active_plans_plugin.html"
+    render_template = "mijn_samenwerkingen/cms/active_plans_plugin.html"
     cache = False
     disable_child_plugins = True
     app_hook = "CollaborateApphook"

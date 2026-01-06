@@ -25,7 +25,7 @@ from open_inwoner.mijn_aanvragen.clients import (
     build_zaken_clients,
 )
 from open_inwoner.mijn_aanvragen.models import OpenZaakConfig
-from open_inwoner.mijn_aanvragen.views.zaken_detail import SimpleFile
+from open_inwoner.mijn_aanvragen.views.aanvragen_detail import SimpleFile
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from .factories import (

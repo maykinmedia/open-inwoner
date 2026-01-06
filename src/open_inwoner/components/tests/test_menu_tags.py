@@ -36,7 +36,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         # Create home page with correct reverse_id
         self.home_page = api.create_page(
             "Home",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             reverse_id="home",
             in_navigation=True,
@@ -63,7 +63,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_draft_page_visibility_differs_for_staff_and_regular_users(self):
         published_page = api.create_page(
             "Published Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -72,7 +72,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
 
         draft_page = api.create_page(
             "Draft Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -115,7 +115,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_menu_icons_from_draft_page_common_extension(self):
         page_with_icon = api.create_page(
             "Page With Icon",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -165,7 +165,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_menu_icons_on_draft_only_pages_for_staff(self):
         draft_page = api.create_page(
             "Draft Page With Icon",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -201,7 +201,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_menu_pages_without_common_extension_show_no_icon(self):
         page_without_icon = api.create_page(
             "Page Without Icon",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -247,7 +247,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         # Create page with icon on draft (most common)
         page_draft_icon = api.create_page(
             "Page Draft Icon",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -297,7 +297,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         # Create page with inbox message indicator
         inbox_page = api.create_page(
             "My Messages",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -335,7 +335,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         # Create two pages to test current detection
         visited_page = api.create_page(
             "Visited Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -345,7 +345,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
 
         other_page = api.create_page(
             "Other Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -384,7 +384,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_pages_only_published_in_other_languages_are_hidden_from_menu(self):
         dutch_page = api.create_page(
             "Dutch Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,
@@ -393,7 +393,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
 
         en_page = api.create_page(
             "English Only Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "en",
             parent=self.home_page,
             in_navigation=True,
@@ -420,7 +420,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def test_invalid_counter_values_are_handled_gracefully(self):
         page_with_broken_counter = api.create_page(
             "Broken Counter Page",
-            "cms/fullwidth.html",
+            "core/cms/pages/fullwidth.html",
             "nl",
             parent=self.home_page,
             in_navigation=True,

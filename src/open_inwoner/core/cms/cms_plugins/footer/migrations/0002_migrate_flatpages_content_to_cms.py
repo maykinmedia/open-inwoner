@@ -21,7 +21,7 @@ def create_cms_pages(apps, schema_editor):
 
         page = create_page(
             title=title,
-            template="cms/cms_flatpage_template.html",
+            template="core/cms/footer/cms_flatpage_template.html",
             language=language,
             slug=slug,
             published=True,

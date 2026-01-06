@@ -12,7 +12,7 @@ class BannerImagePlugin(CMSPluginBase):
     model = BannerImage
     form = BannerImageForm
     name = _("Banner Image Plugin")
-    render_template = "cms/banner/banner_image_plugin.html"
+    render_template = "core/cms/banner/banner_image_plugin.html"
     cache = False
 
 
@@ -21,5 +21,5 @@ class BannerTextPlugin(CMSPluginBase):
     model = BannerText
     form = BannerTextForm
     name = _("Banner Text Plugin")
-    render_template = "cms/banner/banner_text_plugin.html"
+    render_template = "core/cms/banner/banner_text_plugin.html"
     cache = False

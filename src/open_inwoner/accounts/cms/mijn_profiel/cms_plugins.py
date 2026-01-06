@@ -16,7 +16,7 @@ class UserAppointmentsPlugin(CMSPluginBase):
     model = UserAppointments
     module = _("Profile")
     name = _("My appointments")
-    render_template = "cms/plugins/appointments/appointments.html"
+    render_template = "mijn_profiel/appointments.html"
 
     def render(self, context, instance, placeholder):
         request = context["request"]

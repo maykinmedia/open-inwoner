@@ -103,7 +103,7 @@ class PlanListView(
     BasePlanFilter,
     ListView,
 ):
-    template_name = "pages/mijn_samenwerkingen/list.html"
+    template_name = "mijn_samenwerkingen/samenwerkingen_list.html"
     model = Plan
     paginate_by = 10
 
@@ -197,7 +197,7 @@ class PlanDetailView(
     BaseActionFilter,
     DetailView,
 ):
-    template_name = "pages/mijn_samenwerkingen/detail.html"
+    template_name = "mijn_samenwerkingen/samenwerkingen_detail.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -252,7 +252,7 @@ class PlanTemplateChoiceView(
     BaseBreadcrumbMixin,
     FormView,
 ):
-    template_name = "pages/mijn_samenwerkingen/template-choice.html"
+    template_name = "mijn_samenwerkingen/parts/samenwerkingen_template-choice.html"
     model = Plan
     form_class = PlanTemplateChoiceForm
 
@@ -306,7 +306,7 @@ class PlanCreateView(
     BaseBreadcrumbMixin,
     CreateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/create.html"
+    template_name = "mijn_samenwerkingen/samenwerkingen_create.html"
     model = Plan
     form_class = PlanForm
 
@@ -346,7 +346,7 @@ class PlanCreateFromTemplateView(
     BaseBreadcrumbMixin,
     CreateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/create-with-template.html"
+    template_name = "mijn_samenwerkingen/samenwerkingen_create-with-template.html"
     model = Plan
     form_class = CreatePlanFromTemplateForm
 
@@ -391,7 +391,7 @@ class PlanEditView(
     BaseBreadcrumbMixin,
     UpdateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/edit.html"
+    template_name = "mijn_samenwerkingen/samenwerkingen_edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -434,7 +434,7 @@ class PlanGoalEditView(
     BaseBreadcrumbMixin,
     UpdateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/goal_edit.html"
+    template_name = "mijn_samenwerkingen/parts/samenwerkingen_goal-edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -476,7 +476,7 @@ class PlanFileUploadView(
     BaseBreadcrumbMixin,
     UpdateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/file_upload_form.html"
+    template_name = "mijn_samenwerkingen/parts/samenwerkingen_file-upload-form.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
@@ -538,7 +538,7 @@ class PlanNoteEditView(
     BaseBreadcrumbMixin,
     UpdateView,
 ):
-    template_name = "pages/mijn_samenwerkingen/note_edit.html"
+    template_name = "mijn_samenwerkingen/parts/samenwerkingen_note-edit.html"
     model = Plan
     slug_field = "uuid"
     slug_url_kwarg = "uuid"

@@ -81,7 +81,7 @@ class BenefitsFormView(
 
 
 class MonthlyBenefitsFormView(BenefitsFormView):
-    template_name = "pages/mijn_uitkeringen/monthly_reports_list.html"
+    template_name = "mijn_uitkeringen/uitkeringen_maandspecificatie_list.html"
     form_class = MonthlyReportsForm
 
     def get_context_data(self, **kwargs):
@@ -98,7 +98,7 @@ class MonthlyBenefitsFormView(BenefitsFormView):
 
 
 class YearlyBenefitsFormView(BenefitsFormView):
-    template_name = "pages/mijn_uitkeringen/yearly_reports_list.html"
+    template_name = "mijn_uitkeringen/uitkeringen_jaaropgave_list.html"
     form_class = YearlyReportsForm
 
     def get_context_data(self, **kwargs):

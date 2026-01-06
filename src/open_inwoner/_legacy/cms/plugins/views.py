@@ -97,7 +97,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                 "plugin_title": plugin_title,
                 "mijn_zaken_url": reverse("cases:index"),
             }
-            return render(request, "cms/plugins/zaken/zaken.html", context)
+            return render(request, "mijn_aanvragen/cms/zaken_plugin.html", context)
 
         # process and combine zaken
         zaken_dicts = [
@@ -147,7 +147,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             "mijn_zaken_url": reverse("cases:index"),
         }
 
-        return render(request, "cms/plugins/zaken/zaken.html", context)
+        return render(request, "mijn_aanvragen/cms/zaken_plugin.html", context)
 
 
 zaken_plugin_content_view = ZakenPluginContentView.as_view()

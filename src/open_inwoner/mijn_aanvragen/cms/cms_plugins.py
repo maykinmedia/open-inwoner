@@ -64,7 +64,7 @@ class TasksPlugin(CMSPluginBase):
 
     model = TakenPluginConfig
     name = _("Task list Plugin")
-    render_template = "cms/plugins/tasks/tasks.html"
+    render_template = "mijn_aanvragen/cms/taken_plugin.html"
     cache = False
 
     def render(self, context, instance, placeholder) -> dict[str, str]:
@@ -216,7 +216,7 @@ class TasksPlugin(CMSPluginBase):
 class CMSZakenPlugin(CMSPluginBase):
     model = ZakenPluginConfig
     name = gettext_lazy("Zaken Plugin")
-    render_template = "cms/plugins/zaken/zaken.html"
+    render_template = "mijn_aanvragen/cms/zaken_plugin.html"
     cache = False
 
     def render(self, context, instance, placeholder) -> dict:

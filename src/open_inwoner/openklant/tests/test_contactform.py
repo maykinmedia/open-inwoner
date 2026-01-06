@@ -78,7 +78,7 @@ class ContactFormIntegrationTest(
         klant_config.save()
 
         # bypass CMS for rendering form template directly via ContactFormView
-        ContactFormView.template_name = "cms/contactform/form_inner.html"
+        ContactFormView.template_name = "openklant/contactform/form_inner.html"
 
     def test_no_form_shown_if_contactform_not_enabled(
         self, m, mock_captcha, mock_send_confirm

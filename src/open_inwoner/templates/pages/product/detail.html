@@ -53,7 +53,7 @@
 
     {% if object.video %}
         {# duck-type the fact the videoplayer plugin also uses .video for the Video #}
-        {% include "cms/plugins/videoplayer/videoplayer.html" with instance=object %}
+        {% include "core/cms/videoplayer/videoplayer.html" with instance=object %}
     {% endif %}
 
     {% if object.question_set.exists or object.files.exists or object.conditions.exists or object.locations.exists or product_links.exists or object.related_products.published.exists or object.contacts.exists %}

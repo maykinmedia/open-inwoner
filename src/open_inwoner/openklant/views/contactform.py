@@ -46,7 +46,7 @@ class ContactFormView(
     """
 
     form_class = ContactForm
-    template_name = "cms/contactform/form_outer.html"
+    template_name = "openklant/contactform/form_outer.html"
     klanten_config = KlantenSysteemConfig
     klanten_client: KlantenClient | None
     vragen_service: OpenKlant2Service | eSuiteVragenService | None
