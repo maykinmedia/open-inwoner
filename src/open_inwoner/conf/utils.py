@@ -1,3 +1,4 @@
+import logging  # noqa: TID251
 import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
@@ -8,6 +9,7 @@ from django.conf import settings
 import structlog
 from decouple import Csv, config as _config, undefined
 from sentry_sdk.integrations import DidNotEnable, django, redis
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -40,6 +42,10 @@ def get_sentry_integrations() -> list:
     default = [
         django.DjangoIntegration(),
         redis.RedisIntegration(),
+        LoggingIntegration(
+            level=logging.INFO,  # breadcrumbs
+            event_level=logging.ERROR,
+        ),
     ]
     extra = []
 
