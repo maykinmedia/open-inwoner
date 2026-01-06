@@ -16,6 +16,8 @@ Nieuwe features
 * [:gh-issue:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
 * [:gh-issue:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor
   gebruik in Docker/Kubernetes.
+* [:gh-issue:`2107`, :pr:`2117`]: Productie logs worden weggeschreven als JSON voor
+  gebruik in log analyse tools.
 
 Bugfixes
 --------
