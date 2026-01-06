@@ -144,10 +144,6 @@
     "url-loader": "latest",
     "vite": "^6.3.5",
     "vitest": "^3.2.4",
-    "webpack": "latest",
-    "webpack-cli": "latest",
-    "webpack-dev-server": "^4.7.3",
-    "webpack-stream": "latest",
     "yargs": "latest"
   },
   "overrides": {
