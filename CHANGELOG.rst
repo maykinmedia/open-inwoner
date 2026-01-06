@@ -6,6 +6,8 @@ Bugfixes
 
 * [:gh-issue:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
   waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
+* [:gh-issue:`2107`]: Productie logs worden weggeschreven als JSON voor
+  gebruik in log analyse tools.
 
 2.0.0 (2026-01-05)
 ==================
