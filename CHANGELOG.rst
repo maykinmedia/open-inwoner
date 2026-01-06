@@ -1,7 +1,24 @@
-2.0.0 (2025-XX-XX) [UNRELEASED]
+2.1.0 (2026-XX-XX) [UNRELEASED]
 ===============================
 
 Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+Nieuwe features
+---------------
+
+Bugfixes
+--------
+
+Onderhoud
+---------
+
+2.0.0 (2026-01-05)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.0`.
 
 Deployment aandachtspunten
 --------------------------
@@ -22,6 +39,9 @@ Deployment aandachtspunten
 * De YAML structuur van ``django-setup-configuration`` voor het configureren van het
   klantensysteem is aangepast. De nieuwe structuur is omschreven in de `documentatie
   <https://docs.openinwoner.nl/en/latest/configuration/index.html>`_.
+* Zaaktype Configuraties die in eerdere versies zijn geëxporteerd, kunnen niet worden
+  geïmporteerd in versie ``2.0.0`` vanwege wijzigingen in het database formaat. Upgrade
+  eerst uw bronomgeving naar ``2.0.0`` zodat bron en bestemming hetzelfde formaat hanteren.
 * De vervanging van CKEditor door Prosemirror vereiste het converteren van gegevens in HTML en
   markdown naar een nieuwe structuur. In sommige gevallen (vooral wanneer de gegevens tabellen
   of andere geavanceerde elementen bevatten) is de opmaak mogelijk niet behouden gebleven. In
@@ -44,9 +64,11 @@ Deployment aandachtspunten
   de primaire kleur (CSS-variabelen ``--color-primary`` en ``--color-secondary``) is hier nu een
   stijl verandering te zien. Call-to-action elementen gebruiken nu altijd de primaire kleur. Hierdoor
   worden de knoppen in tegels niet langer in een afwijkende secundaire kleur weergegeven.
-* Controleer of de nieuwe frontend web-componenten correct functioneren. In sommige gevallen wordt de
-  frontend-bundle mogelijk niet volledig overschreven.
-
+* Hou er rekening mee dat de nieuwe frontend web-componenten mogelijk niet meteen
+  correct worden weergegeven bij het initieel laden van de pagina. Zorg dat u in dat
+  geval een zogenaamde "hard refresh" doet om er zeker van te zijn dat de frontend
+  javascript en CSS bestanden opnieuw worden geladen (in meeste browsers is dit de
+  toetsencombinatie Shift/CTRL + F5).
 
 Nieuwe features
 ---------------
