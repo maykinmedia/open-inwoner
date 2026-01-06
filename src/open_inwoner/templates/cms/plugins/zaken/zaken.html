@@ -12,11 +12,11 @@
             {% if error_message %}<div slot="error">{{ error_message }}</div> {% endif %}
             {% for zaak in zaken %}
                 <oip-home-plugin-card
-                    title="{{ zaak.description }}"
-                    description="{% if zaak.identification %}{% trans "Zaaknummer: " %}{{zaak.identification}}{% endif %}"
+                    title="{{ zaak.title }}"
+                    description="{{ zaak.detail_label }}"
                     identificatie="{{ zaak.identification }}"
                     detail-url="{{ zaak.url }}"
-                    >
+                >
                 </oip-home-plugin-card>
             {% endfor %}
         </oip-home-plugin-section>

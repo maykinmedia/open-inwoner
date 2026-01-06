@@ -15,6 +15,7 @@ from open_inwoner.cms.cases.views.services import CaseListService
 from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.types import UniformCase
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -24,6 +25,19 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
     """
     HTMX endpoint that fetches and returns content for the `CMSZakenPlugin`.
     """
+
+    def _get_detail_label(self, zaak: dict) -> str:
+        """
+        Generate the detail label to display under the card title.
+        """
+
+        is_formulier = zaak.get("type_aanvraag") == TypeAanvraag.FORMULIER.value
+        identification = zaak.get("identification", "")
+
+        if is_formulier or not identification:
+            return ""
+
+        return _("Zaaknummer: %(identification)s") % {"identification": identification}
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
         case_service = CaseListService(request)
@@ -111,7 +125,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                     "identification": zaak.get("identification", ""),
                     # for 'formulieren':
                     # "naam" from API -> "description" for web component
-                    "description": zaak.get("naam", zaak.get("description", "")),
+                    "title": zaak.get("naam", zaak.get("description", "")),
+                    "detail_label": self._get_detail_label(zaak),
                 }
             except (AttributeError, KeyError):
                 logger.error(
