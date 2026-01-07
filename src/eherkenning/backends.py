@@ -29,7 +29,7 @@ class eHerkenningBackend(_eHerkenningBackend):
         return company_branch_number
 
     def get_or_create_user(self, request, saml_response, saml_attributes):
-        kvk = self.get_kvk_number(saml_attributes)
+        kvk = self.get_legal_subject_kvk(saml_attributes)
         if kvk == "":
             raise eHerkenningError(
                 "Login failed due to no KvK being returned by eHerkenning."
