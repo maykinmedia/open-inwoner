@@ -31,6 +31,8 @@ Onderhoud
 
 * [:taiga-us:`3615`]: zgw-klassen, methoden en variabelen hernoemd om Nederlandse
   termen te gebruiken
+* [:gh-issue:`2104`]: Verwijderen in ongebruik geraakte NPM dependencies en configuratie
+  bestanden (``stylelint.rc``).
 
 2.0.0 (2026-01-05)
 ==================
