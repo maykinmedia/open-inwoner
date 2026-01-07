@@ -1,5 +1,0 @@
-[pip]
-no-emit-package = [
-  "pip",
-  "setuptools",
-]

@@ -1,3 +1,15 @@
+[project]
+name = "open-inwoner"
+version = "2.0.0-dev"
+requires-python = "== 3.12"
+
+[tool.uv.pip]
+no-emit-package = [
+  "pip",
+  "setuptools",
+]
+
+[tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".bzr",
@@ -48,7 +60,7 @@ indent-width = 4
 # Assume Python 3.12
 target-version = "py312"
 
-[lint]
+[tool.ruff.lint]
 select = [
     # https://docs.astral.sh/ruff/rules/#error-e
     "E",
@@ -112,7 +124,7 @@ unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Ad hoc exceptions
-[lint.pep8-naming]
+[tool.ruff.lint.pep8-naming]
 ignore-names = [
     # N801
     "eHerkenning*",
@@ -126,13 +138,13 @@ ignore-names = [
     "innNnpId",
 ]
 
-[lint.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Ignore security rules in test files
 "**/test_*.py" = ["S"]
 "**/tests/**/*.py" = ["S"]
 
 # Import sorting configuration (equivalent to isort)
-[lint.isort]
+[tool.ruff.lint.isort]
 combine-as-imports = true
 force-wrap-aliases = false
 known-first-party = ["open_inwoner"]
@@ -148,12 +160,12 @@ section-order = [
     "local-folder",
 ]
 
-[lint.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 # Disallow relative imports from parents, but allow from siblings
 ban-relative-imports = "parents"
 
-[format]
+[tool.ruff.format]
 line-ending = "lf"
 
-[lint.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "logging".msg = "Use `structlog.get_logger(__name__)` instead of the stdlib logging module."
