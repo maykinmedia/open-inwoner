@@ -404,7 +404,7 @@ LOGGING = {
                 structlog.stdlib.add_logger_name,
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.PositionalArgumentsFormatter(),
-                structlog.processors.format_exc_info,
+                structlog.processors.dict_tracebacks,
             ],
         },
         "plain_console": {
