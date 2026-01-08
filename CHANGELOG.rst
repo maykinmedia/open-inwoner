@@ -10,6 +10,7 @@ Nieuwe features
 ---------------
 
 * [:taiga-us:`3607`, :pr:`2075`, :pr:`2079`]: Basisapp ‘Mijn Afval’ geïmplementeerd en geïntegreerd met Django CMS.
+* [:gh-issue:`2098`, :pr:`2062`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn Afval.
 
 Bugfixes
 --------

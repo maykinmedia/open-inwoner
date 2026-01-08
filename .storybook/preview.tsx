@@ -4,7 +4,7 @@ import {
   withIntl,
   withThemeClass,
 } from '../src/open_inwoner/react/lib/decorators';
-import '../src/open_inwoner/static/bundles/open_inwoner-css.css';
+import '../src/open_inwoner/scss/screen.scss';
 
 const preview: Preview = {
   decorators: [withThemeClass, withIntl],
