@@ -1,9 +1,9 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableHeaderCellProps {
   content?: string;
   scope?: 'col' | 'row';
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableHeaderCell: AC<ITableHeaderCellProps> = ({

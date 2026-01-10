@@ -1,7 +1,7 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableRowProps {
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableRow: AC<ITableRowProps> = ({ children }) => {

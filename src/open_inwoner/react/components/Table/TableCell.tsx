@@ -1,9 +1,9 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableCellProps {
   colSpan?: number | string;
   content?: string; // not available in NLDS
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableCell: AC<ITableCellProps> = ({ colSpan, content, children }) => {

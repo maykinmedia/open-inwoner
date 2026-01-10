@@ -1,8 +1,8 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableProps {
   caption?: string;
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const Table: AC<ITableProps> = ({ caption, children }) => {

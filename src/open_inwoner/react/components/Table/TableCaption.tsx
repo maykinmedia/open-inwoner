@@ -1,8 +1,8 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableCaptionProps {
   content?: string; // not available in NLDS
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableCaption: AC<ITableCaptionProps> = ({ content, children }) => {

@@ -1,8 +1,8 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 import './Table.scss';
 
 export interface ITableContainerProps {
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableContainer: AC<ITableContainerProps> = ({ children }) => {

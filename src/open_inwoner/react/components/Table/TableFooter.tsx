@@ -1,7 +1,7 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableFooterProps {
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableFooter: AC<ITableFooterProps> = ({ children }) => {

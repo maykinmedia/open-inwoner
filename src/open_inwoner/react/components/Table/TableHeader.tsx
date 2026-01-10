@@ -1,7 +1,7 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 
 export interface ITableHeaderProps {
-  children?: any;
+  children?: ComponentChildren;
 }
 
 const TableHeader: AC<ITableHeaderProps> = ({ children }) => {
