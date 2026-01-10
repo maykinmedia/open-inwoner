@@ -34,7 +34,7 @@
                                     <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
                                 </p>
                                 <p class="utrecht-paragraph">
-                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
+                                    <strong>{% trans "Container totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
                                 </p>
 
                                 {% if container.ledigingen %}
@@ -54,8 +54,8 @@
                                                 <oip-table-body>
                                                     {% for lediging in container.ledigingen %}
                                                         <oip-table-row>
-                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
-                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip_dag }} {{ lediging.tijdstip_datum }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip_tijd }}"></oip-table-cell>
                                                             <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
                                                         </oip-table-row>
                                                     {% endfor %}
@@ -63,7 +63,7 @@
 
                                                 <oip-table-footer>
                                                     <oip-table-row>
-                                                        <oip-table-cell colspan="2" content="{% trans 'Totaal gewicht' %}"></oip-table-cell>
+                                                        <oip-table-cell colspan="2" content="{% trans 'Container totaal gewicht' %}"></oip-table-cell>
                                                         <oip-table-cell content="{{ container.totaal_gewicht }} kg"></oip-table-cell>
                                                     </oip-table-row>
                                                 </oip-table-footer>
@@ -88,7 +88,7 @@
                                     <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
                                 </p>
                                 <p class="utrecht-paragraph">
-                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
+                                    <strong>{% trans "Container totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
                                 </p>
 
                                 {% if container.ledigingen %}
@@ -99,17 +99,17 @@
 
                                                 <oip-table-header>
                                                     <oip-table-row>
-                                                        <oip-table-header-cell content="{% trans 'Datum' %}"></oip-table-header-cell>
-                                                        <oip-table-header-cell content="{% trans 'Tijd van lediging' %}"></oip-table-header-cell>
-                                                        <oip-table-header-cell content="{% trans 'Gewicht van lediging' %}"></oip-table-header-cell>
+                                                        <oip-table-cell content="{{ lediging.tijdstip_dag }} {{ lediging.tijdstip_datum }}"></oip-table-cell>
+                                                        <oip-table-cell content="{{ lediging.tijdstip_tijd }}"></oip-table-cell>
+                                                        <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
                                                     </oip-table-row>
                                                 </oip-table-header>
 
                                                 <oip-table-body>
                                                     {% for lediging in container.ledigingen %}
                                                         <oip-table-row>
-                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
-                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip_dag }} {{ lediging.tijdstip_datum }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip_tijd }}"></oip-table-cell>
                                                             <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
                                                         </oip-table-row>
                                                     {% endfor %}
@@ -117,7 +117,7 @@
 
                                                 <oip-table-footer>
                                                     <oip-table-row>
-                                                        <oip-table-cell colspan="2" content="{% trans 'Totaal gewicht' %}"></oip-table-cell>
+                                                        <oip-table-cell colspan="2" content="{% trans 'Container totaal gewicht' %}"></oip-table-cell>
                                                         <oip-table-cell content="{{ container.totaal_gewicht }} kg"></oip-table-cell>
                                                     </oip-table-row>
                                                 </oip-table-footer>
