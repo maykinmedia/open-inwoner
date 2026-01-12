@@ -13,6 +13,7 @@ Nieuwe features
 * [:gh-issue:`2098`, :pr:`2062`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn Afval.
 * [:gh-issue:`2096`, :pr:`2060`, :oip-nlds:`32`]: Table component toegevoegd ten behoeve van
   de ‘Mijn Afval’ app inclusief NL Design-System design-tokens.
+* [:gh-issue:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
 
 Bugfixes
 --------

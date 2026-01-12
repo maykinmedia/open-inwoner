@@ -280,36 +280,3 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: docker push $IMAGE_NAME:$RELEASE_VERSION
-
-  storybook:
-    name: Build Storybook
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: '.nvmrc'
-      - run: npm ci
-
-      # Build frontend assets first to generate CSS bundle
-      - run: npm run build
-
-      # Build Storybook with the CSS bundle available
-      - run: npm run build-storybook
-
-      - name: Upload Storybook build
-        uses: actions/upload-artifact@v4
-        with:
-          name: storybook-static
-          path: storybook-static/
-#  storybook tests:
-#    name: Run Storybook tests
-#    runs-on: ubuntu-latest
-#    needs:
-#      - storybook
-#
-#  chromatic:
-#    name: Visual regression test with Chromatic
-#    runs-on: ubuntu-latest
-#    needs:
-#      - storybook
