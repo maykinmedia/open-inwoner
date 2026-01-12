@@ -19,6 +19,8 @@ Bugfixes
 --------
 
 * [:gh-issue:`2091`]: Beheerders toestaan om uit te loggen via frontend.
+* [:gh-issue:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
+  waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
 
 Onderhoud
 ---------
