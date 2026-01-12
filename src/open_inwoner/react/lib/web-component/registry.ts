@@ -7,6 +7,8 @@ import { LOADING_SPINNER_DEFINITION } from '@react/components/Spinner/constants'
 import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCard';
 import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
+import { FILTER_TAG_DEFINITION } from '@react/components/FilterTag/constants';
+import { FILTERS_BAR_DEFINITION } from '@react/components/FiltersBar/constants';
 import { CHART_DEFINITION } from '@react/components/Chart/constants';
 
 /**
@@ -30,5 +32,7 @@ export const WEB_COMPONENT_REGISTRY = {
   [HOME_PLUGIN_CARD_ITEM_DEFINITION.tagName]: HOME_PLUGIN_CARD_ITEM_DEFINITION,
   [ACCORDION_DEFINITION.tagName]: ACCORDION_DEFINITION,
   [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
+  [FILTER_TAG_DEFINITION.tagName]: FILTER_TAG_DEFINITION,
+  [FILTERS_BAR_DEFINITION.tagName]: FILTERS_BAR_DEFINITION,
   [CHART_DEFINITION.tagName]: CHART_DEFINITION,
 } as const;

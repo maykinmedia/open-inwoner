@@ -1,0 +1,45 @@
+// FilterTag - Active filter pills/tags
+
+.oip-filter-tags {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-medium, 0.75rem);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-large, 1rem);
+  margin-top: var(--spacing-medium, 0.75rem);
+}
+
+.oip-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-small, 0.5rem);
+  padding: 12px 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 3px;
+  background-color: white;
+  color: var(--font-color-body);
+  font-size: var(--font-size-body, 1rem);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--color-gray-lightest);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.oip-filter-tag__label {
+  font-weight: 500;
+}
+
+.oip-filter-tag__close {
+  font-size: var(--font-size-body-large, 1.0625rem);
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+}

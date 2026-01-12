@@ -120,6 +120,21 @@ class _BAGObjectData(TypedDict):
     containers: list[_AfvalContainerData]
 
 
+class _FilterChoice(TypedDict):
+    """A single choice in a filter group."""
+
+    value: str
+    label: str
+
+
+class _FilterGroup(TypedDict):
+    """A group of filter choices."""
+
+    name: str
+    label: str
+    choices: list[_FilterChoice]
+
+
 def _format_container_for_table(
     ledigingen: list[_LedigingData],
     totaal_gewicht: str,
@@ -260,6 +275,89 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
     return result
 
 
+def _extract_filter_options(afval_data: list[_BAGObjectData]) -> list[_FilterGroup]:
+    """
+    Extract unique filter options from the formatted afval data.
+
+    Args:
+        afval_data: List of formatted BAG object data
+
+    Returns:
+        List of filter groups with their available choices
+    """
+    addresses: dict[str, str] = {}  # value: label
+    container_types: dict[str, str] = {}  # value: label
+    periods: dict[str, str] = {}  # year: year (as label)
+
+    # Extract unique values from the data
+    for bag_obj in afval_data:
+        # Extract address
+        if bag_obj["object_address"]:
+            addresses[bag_obj["object_address"]] = bag_obj["object_address"]
+
+        # Extract container types and periods
+        for container in bag_obj["containers"]:
+            # Container type
+            container_type = container["type"]
+            if container_type not in container_types:
+                container_types[container_type] = _get_container_type_label(
+                    container_type
+                )
+
+            # Extract years from ledigingen dates
+            for lediging in container["ledigingen"]:
+                # Date format is "dd-mm-yyyy", extract year
+                date_parts = lediging["tijdstip_datum"].split("-")
+                if len(date_parts) == 3:
+                    year = date_parts[2]
+                    if year not in periods:
+                        periods[year] = _("Jaar {year}").format(year=year)
+
+    # Build filter groups
+    filter_groups: list[_FilterGroup] = []
+
+    # Adres filter
+    if addresses:
+        filter_groups.append(
+            {
+                "name": "adres",
+                "label": _("Adres"),
+                "choices": [
+                    {"value": value, "label": label}
+                    for value, label in sorted(addresses.items())
+                ],
+            }
+        )
+
+    # Type container filter
+    if container_types:
+        filter_groups.append(
+            {
+                "name": "type-container",
+                "label": _("Type container"),
+                "choices": [
+                    {"value": value, "label": label}
+                    for value, label in sorted(container_types.items())
+                ],
+            }
+        )
+
+    # Periode filter (sorted by year descending)
+    if periods:
+        filter_groups.append(
+            {
+                "name": "periode",
+                "label": _("Periode"),
+                "choices": [
+                    {"value": value, "label": label}
+                    for value, label in sorted(periods.items(), reverse=True)
+                ],
+            }
+        )
+
+    return filter_groups
+
+
 class AfvalProfielView(
     LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
 ):
@@ -305,7 +403,7 @@ class AfvalProfielView(
         afval_config = MijnAfvalConfig.get_solo()
 
         if not (openafval_service := afval_config.openafval_service):
-            messages.error(_("This module is not yet configured"))
+            messages.error(self.request, _("This module is not yet configured"))
             return context
 
         api_client = build_zgw_client(
@@ -320,11 +418,19 @@ class AfvalProfielView(
             messages.error(
                 self.request,
                 _(
-                    "We kunnen uw afvalgegevens momenteel niet ophalen. "
-                    "Probeer het later opnieuw."
+                    "We kunnen uw afvalgegevens momenteel niet ophalen. Probeer het later opnieuw."
                 ),
             )
             afval_data = []
 
-        context["afval_data"] = afval_data
+        # Extract filter options from the formatted data for the frontend filters
+        filter_groups = _extract_filter_options(afval_data)
+
+        context.update(
+            {
+                "afval_data": afval_data,
+                "filter_groups": filter_groups,
+            }
+        )
+
         return context
