@@ -1,4 +1,6 @@
 .accordion {
+  display: flex;
+  flex-direction: column;
   margin-block-start: var(--oip-accordion-margin-block-start, 0);
   margin-block-end: var(--oip-accordion-margin-block-end, 0);
 

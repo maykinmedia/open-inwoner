@@ -134,4 +134,5 @@ extlinks = {
     "gh": ("https://github.com/maykinmedia/open-inwoner/issues/%s", "#%s"),
     "release": ("https://github.com/maykinmedia/open-inwoner/releases/tag/%s", "%s"),
     "cve": ("https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s", "%s"),
+    "oip-nlds": ("https://github.com/maykinmedia/open-inwoner-design-tokens/pull/%s", "PR %s"),
 }

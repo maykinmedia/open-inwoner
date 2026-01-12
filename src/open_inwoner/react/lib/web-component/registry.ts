@@ -6,6 +6,7 @@ import { HOME_PLUGIN_SECTION_DEFINITION } from '@react/components/HomePluginSect
 import { LOADING_SPINNER_DEFINITION } from '@react/components/Spinner/constants';
 import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCard';
 import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
+import { TABLE_DEFINITION } from '@react/components/Table/constants';
 
 /**
  * Web component registry
@@ -27,4 +28,5 @@ export const WEB_COMPONENT_REGISTRY = {
   [LOADING_SPINNER_DEFINITION.tagName]: LOADING_SPINNER_DEFINITION,
   [HOME_PLUGIN_CARD_ITEM_DEFINITION.tagName]: HOME_PLUGIN_CARD_ITEM_DEFINITION,
   [ACCORDION_DEFINITION.tagName]: ACCORDION_DEFINITION,
+  [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
 } as const;

@@ -17,82 +17,18 @@
 
             {% for afval_obj in afval_data %}
                 <article class="afval-object">
-                    {# Address and Total Weight Section #}
-                    <oip-accordion title="{{ afval_obj.object_address }}" subtitle="{% trans "Totaal gewicht:" %} {{ afval_obj.totaal_gewicht }}">
-                        {# GFT Afval Section #}
+                    {# Accordion wrapping address and all containers #}
+                    <oip-accordion title="{{ afval_obj.object_address }}" subtitle="{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}">
+                        {# Container Sections - Same rendering for all types #}
                         {% for container in afval_obj.containers %}
-                            {% if container.type == "GFT" %}
-                                <section class="afval-container">
-                                    <h3 class="utrecht-heading-3">{% trans "GFT Afval" %}</h3>
-                                    <p class="utrecht-paragraph">
-                                        <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
-                                    </p>
-                                    <p class="utrecht-paragraph">
-                                        <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
-                                    </p>
-
-                                    {% if container.ledigingen %}
-                                        <div class="afval-container__table-wrapper">
-                                            <table class="afval-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{% trans "Datum ophalen" %}</th>
-                                                        <th>{% trans "Tijd ophalen" %}</th>
-                                                        <th>{% trans "Gewicht van lediging" %}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for lediging in container.ledigingen %}
-                                                        <tr>
-                                                            <td>{{ lediging.tijdstip_datum }}</td>
-                                                            <td>{{ lediging.tijdstip_tijd }}</td>
-                                                            <td>{{ lediging.gewicht }}</td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    {% endif %}
-                                </section>
-                            {% endif %}
-                        {% endfor %}
-
-                        {# Restafval Section #}
-                        {% for container in afval_obj.containers %}
-                            {% if container.type == "Restafval" %}
-                                <section class="afval-container">
-                                    <h3 class="utrecht-heading-3">{% trans "Restafval" %}</h3>
-                                    <p class="utrecht-paragraph">
-                                        <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
-                                    </p>
-                                    <p class="utrecht-paragraph">
-                                        <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
-                                    </p>
-
-                                    {% if container.ledigingen %}
-                                        <div class="afval-container__table-wrapper">
-                                            <table class="afval-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{% trans "Datum" %}</th>
-                                                        <th>{% trans "Tijd van lediging" %}</th>
-                                                        <th>{% trans "Gewicht van lediging" %}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for lediging in container.ledigingen %}
-                                                        <tr>
-                                                            <td>{{ lediging.tijdstip_datum }}</td>
-                                                            <td>{{ lediging.tijdstip_tijd }}</td>
-                                                            <td>{{ lediging.gewicht }}</td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    {% endif %}
-                                </section>
-                            {% endif %}
+                            <section class="afval-container">
+                                <div class="afval-container__table-wrapper">
+                                    {% with script_id="table-"|add:container.identifier %}
+                                        {{ container.table_data|json_script:script_id }}
+                                        <oip-table json-script-id="{{ script_id }}"></oip-table>
+                                    {% endwith %}
+                                </div>
+                            </section>
                         {% endfor %}
                     </oip-accordion>
                 </article>

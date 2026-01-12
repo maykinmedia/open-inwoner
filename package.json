@@ -58,6 +58,7 @@
     "@utrecht/paragraph-css": "^2.3.1",
     "@utrecht/select-css": "^1.8.1",
     "@utrecht/skip-link-css": "^1.5.1",
+    "@utrecht/table-css": "^2.0.1",
     "@utrecht/textbox-css": "^2.0.0",
     "@utrecht/unordered-list-css": "^1.5.1",
     "@utrecht/web-component-library-stencil": "^3.5.0",
@@ -109,6 +110,7 @@
     "@types/lodash.unescape": "^4.0.9",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
+    "@utrecht/component-library-react": "10.3.10",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^9.0.0",
     "babel-loader": "^8.2.5",
@@ -151,7 +153,7 @@
     "playwright": ">=1.55.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "*",
-    "@esbuild/linux-x64": "*"
+    "@esbuild/linux-x64": "*",
+    "@rollup/rollup-linux-x64-gnu": "*"
   }
 }
