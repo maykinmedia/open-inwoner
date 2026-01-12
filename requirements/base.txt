@@ -424,7 +424,7 @@ maykin-2fa==1.0.2
     # via -r requirements/base.in
 maykin-common[otel]==0.10.0
     # via -r requirements/base.in
-maykin-django-prosemirror[images]==0.3.0
+maykin-django-prosemirror[images]==0.4.0
     # via -r requirements/base.in
 maykin-python3-saml==1.16.1
     # via
