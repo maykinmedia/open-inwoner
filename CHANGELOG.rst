@@ -14,6 +14,8 @@ Nieuwe features
 * [:gh-issue:`2096`, :pr:`2060`, :oip-nlds:`32`]: Table component toegevoegd ten behoeve van
   de ‘Mijn Afval’ app inclusief NL Design-System design-tokens.
 * [:gh-issue:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
+* [:gh-issue:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor
+  gebruik in Docker/Kubernetes.
 
 Bugfixes
 --------

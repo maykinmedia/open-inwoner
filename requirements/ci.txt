@@ -109,6 +109,7 @@ click==8.1.3
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   typer
 click-didyoumean==0.3.0
     # via
     #   -c requirements/base.txt
@@ -199,6 +200,7 @@ django==4.2.27
     #   django-filer
     #   django-filter
     #   django-formtools
+    #   django-health-check
     #   django-htmx
     #   django-import-export
     #   django-js-asset
@@ -344,6 +346,11 @@ django-formtools==2.3
     #   -r requirements/base.txt
     #   django-cms
     #   django-two-factor-auth
+django-health-check==3.20.8
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   maykin-common
 django-htmx==1.23.0
     # via
     #   -c requirements/base.txt
@@ -732,6 +739,11 @@ markdown==3.3.6
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   sphinx-markdown-tables
+markdown-it-py==4.0.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   rich
 markuppy==1.14
     # via
     #   -c requirements/base.txt
@@ -746,7 +758,7 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-common[otel]==0.10.0
+maykin-common[cli, health-checks, otel]==0.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -759,6 +771,11 @@ maykin-python3-saml==1.16.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
+mdurl==0.1.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   markdown-it-py
 messagebird==2.1.0
     # via
     #   -c requirements/base.txt
@@ -971,8 +988,11 @@ pyee==12.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
-pygments==2.18.0
+pygments==2.19.2
     # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   rich
     #   sphinx
     #   sphinx-tabs
 pyjwt==2.8.0
@@ -1027,6 +1047,7 @@ python-decouple==3.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   maykin-common
 python-dotenv==1.0.1
     # via
     #   -c requirements/base.txt
@@ -1080,6 +1101,7 @@ requests==2.32.5
     #   django-open-forms-client
     #   gemma-zds-client
     #   mail-editor
+    #   maykin-common
     #   maykin-python3-saml
     #   messagebird
     #   mozilla-django-oidc
@@ -1090,6 +1112,11 @@ requests==2.32.5
     #   zgw-consumers
 requests-mock==1.12.1
     # via -r requirements/test-tools.in
+rich==14.2.0
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   typer
 ruamel-yaml==0.18.10
     # via
     #   -c requirements/base.txt
@@ -1106,6 +1133,11 @@ sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+shellingham==1.5.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   typer
 simplejson==3.19.2
     # via
     #   -c requirements/base.txt
@@ -1187,6 +1219,11 @@ tinycss2==1.1.1
     #   cssselect2
     #   svglib
     #   weasyprint
+typer==0.21.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   maykin-common
 typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
@@ -1204,6 +1241,7 @@ typing-extensions==4.10.0
     #   pydantic-core
     #   pyee
     #   pyopenssl
+    #   typer
     #   xsdata
     #   zgw-consumers
     #   zgw-consumers-oas
