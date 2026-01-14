@@ -173,8 +173,8 @@ class ZaakType(ZGWModel):
     # besluittypen: list
 
     # TODO: broken in DECOS
-    # begin_geldigheid: Optional[date] = None
-    # einde_geldigheid: Optional[date] = None
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
     versiedatum: Optional[date] = None
     concept: Optional[bool] = None
 
@@ -197,8 +197,8 @@ class InformatieObjectType(ZGWModel):
     omschrijving: str
     vertrouwelijkheidaanduiding: str
     # Decos gives missing as empty strings
-    # begin_geldigheid: Optional[date] = None
-    # einde_geldigheid: Optional[date] = None
+    begin_geldigheid: Optional[date] = None
+    einde_geldigheid: Optional[date] = None
     concept: bool = False
 
 
