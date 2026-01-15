@@ -129,6 +129,7 @@ urlpatterns = [
     path("kvk/", include("open_inwoner.kvk.urls")),
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("cms-plugins/", include("open_inwoner.cms.plugins.urls")),
+    path("", include("maykin_common.health_checks.urls")),
     re_path(r"^", include("cms.urls")),
 ]
 

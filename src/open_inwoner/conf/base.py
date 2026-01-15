@@ -7,6 +7,10 @@ import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.formatters import HttpFormatter
+from maykin_common.health_checks import (
+    default_health_check_apps,
+    default_health_check_subsets,
+)
 
 from .utils import config, get_sentry_integrations
 
@@ -209,6 +213,7 @@ INSTALLED_APPS = [
     "notifications",
     "custom_migrations",
     "objectsapiclient",
+    *default_health_check_apps,
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
@@ -298,6 +303,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "open_inwoner.urls"
+
+# Health check
+HEALTH_CHECK = {
+    "SUBSETS": default_health_check_subsets,
+}
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
