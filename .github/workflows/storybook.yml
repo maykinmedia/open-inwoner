@@ -15,11 +15,6 @@ on:
       - ready_for_review
   workflow_dispatch:
 
-# Allow one concurrent deployment
-concurrency:
-  group: 'pages-${{ github.ref_name }}' # unique builds for branch/tag name
-  cancel-in-progress: true
-
 jobs:
   storybook:
     name: Create storybook build
@@ -47,6 +42,11 @@ jobs:
       contents: read
       pages: write
       id-token: write
+
+    # Allow one concurrent deployment
+    concurrency:
+      group: 'pages-${{ github.ref_name }}' # unique builds for branch/tag name
+      cancel-in-progress: true
 
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push' # Exclude PRs
