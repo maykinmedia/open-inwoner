@@ -70,7 +70,7 @@
     "flatpickr": "^4.6.9",
     "gumshoejs": "^5.1.2",
     "html-minifier": "^4.0.0",
-    "htmx.org": "^2.0.4",
+    "htmx.org": "^2.0.1",
     "leaflet": "^1.7.1",
     "material-icons": "^1.13.12",
     "microscope-sass": "latest",
