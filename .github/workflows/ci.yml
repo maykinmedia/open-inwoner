@@ -15,7 +15,7 @@ env:
 
 jobs:
   test_frontend:
-    name: Extract messages, compile i18n, and bundle React
+    name: Run frontend tests and verify build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
