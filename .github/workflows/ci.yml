@@ -23,6 +23,8 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
+      - name: Check for lock file changes
+        run: git diff --exit-code package-lock.json
       - run: npm run test:ci
       - run: npm run type-check
       - run: npm run build
