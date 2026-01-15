@@ -247,7 +247,8 @@ class Rol(ZGWModel):
     roltype: Union[str, RolType]
     omschrijving: str
     omschrijving_generiek: str
-    roltoelichting: str
+    # Decos Workaround: required, but absent
+    roltoelichting: str = ""
     indicatie_machtiging: Optional[str] = ""
     registratiedatum: Optional[datetime] = None
     betrokkene: Optional[str] = ""
