@@ -1,8 +1,8 @@
-.. _installation_development:
+.. _development_environment:
 
-===========
-Development
-===========
+===================
+Environment Setup
+===================
 
 Prerequisites
 -------------

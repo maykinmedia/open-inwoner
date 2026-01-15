@@ -1180,6 +1180,7 @@ pyyaml==6.0.2
     #   gemma-zds-client
     #   pre-commit
     #   pydantic-settings
+    #   sphinxcontrib-mermaid
     #   tablib
     #   vcrpy
     #   zgw-consumers-oas
@@ -1285,6 +1286,7 @@ sphinx==7.4.7
     #   sphinx-rtd-theme
     #   sphinx-tabs
     #   sphinxcontrib-jquery
+    #   sphinxcontrib-mermaid
 sphinx-markdown-tables==0.0.16
     # via
     #   -c requirements/ci.txt
@@ -1322,6 +1324,10 @@ sphinxcontrib-jsmath==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
+sphinxcontrib-mermaid==1.2.3
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 sphinxcontrib-qthelp==1.0.7
     # via
     #   -c requirements/ci.txt
