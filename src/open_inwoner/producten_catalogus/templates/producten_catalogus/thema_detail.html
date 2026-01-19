@@ -1,0 +1,10 @@
+{% extends 'master.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+
+    {% if object.omschrijving %}
+        <p class="utrecht-paragraph">{{ object.omschrijving }}</p>
+    {% endif %}
+{% endblock content %}

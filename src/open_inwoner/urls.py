@@ -42,6 +42,8 @@ admin.site.index_title = "Welkom op de OpenInwoner beheeromgeving"
 monkeypatch_admin()
 
 urlpatterns = [
+    path("product-catalogus/", include("open_inwoner.producten_catalogus.urls")),
+    path("mijn-producten/", include("open_inwoner.mijn_producten.urls")),
     re_path(
         r"^.well-known/security\.txt$",
         views.redirect_to_configured_security_txt,

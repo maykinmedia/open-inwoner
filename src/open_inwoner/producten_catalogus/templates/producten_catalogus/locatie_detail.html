@@ -1,0 +1,37 @@
+{% extends 'master.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+
+    {% if object.omschrijving %}
+        <p class="utrecht-paragraph">{{ object.omschrijving }}</p>
+    {% endif %}
+
+    {% if object.straat or object.huisnummer or object.postcode or object.plaats %}
+        <div>
+            <h2 class="utrecht-heading-2">{% trans "Adres" %}</h2>
+            {% if object.straat or object.huisnummer %}
+                <p class="utrecht-paragraph">{{ object.straat }} {{ object.huisnummer }}</p>
+            {% endif %}
+            {% if object.postcode or object.plaats %}
+                <p class="utrecht-paragraph">{{ object.postcode }} {{ object.plaats }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if object.telefoonnummer or object.email or object.website %}
+        <div>
+            <h2 class="utrecht-heading-2">{% trans "Contact" %}</h2>
+            {% if object.telefoonnummer %}
+                <p class="utrecht-paragraph">{% trans "Telefoon" %}: {{ object.telefoonnummer }}</p>
+            {% endif %}
+            {% if object.email %}
+                <p class="utrecht-paragraph">{% trans "Email" %}: {{ object.email }}</p>
+            {% endif %}
+            {% if object.website %}
+                <p class="utrecht-paragraph">{% trans "Website" %}: {{ object.website }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock content %}
