@@ -14,7 +14,11 @@ class ContentElementResource(ResourceMixin):
     base_path: str = "content"
 
     def list(
-        self, *, params: ListContentElementParams | None = None
+        self,
+        /,
+        product_type_uuid_or_id: str | uuid.UUID | int,
+        *,
+        params: ListContentElementParams | None = None,
     ) -> PaginatedResponseBody[ContentElement]:
         """
         List all content elements with optional filtering.
@@ -28,7 +32,9 @@ class ContentElementResource(ResourceMixin):
         Returns:
             Paginated response containing content element objects
         """
-        response = self._get(self.base_path, params=params)
+        response = self._get(
+            f"producttypen/{product_type_uuid_or_id}/content", params=params
+        )
         response.raise_for_status()
         return response.json()
 

@@ -2,9 +2,13 @@
 {% load i18n %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+    <h1 class="utrecht-heading-1">{{ object.product_type.naam }}</h1>
 
     {% if object.omschrijving %}
-        <p class="utrecht-paragraph">{{ object.omschrijving }}</p>
+        <p class="utrecht-paragraph">{{ object.product_type.omschrijving }}</p>
     {% endif %}
+
+    {% for content_element in object.content_elementen %}
+        {{ content_element.content }}
+    {% endfor %}
 {% endblock content %}

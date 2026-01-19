@@ -147,23 +147,26 @@ class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
         """
         product_type_id = self.kwargs.get(self.slug_url_kwarg)
 
-        # TODO: Replace with actual API client
-        # client = get_product_type_client()
-        # return client.get_product_type_by_id(product_type_id)
+        open_product_client = OpenProductclient.from_env()
+        product_type_detail = open_product_client.ProductType.product_type.retrieve(
+            product_type_id
+        )
+        content_elements = open_product_client.ProductType.content_element.list(
+            product_type_id
+        )
 
         # Mock data
-        return SimpleNamespace(
-            id=product_type_id,
-            naam=f"Product Type {product_type_id}",
-            omschrijving="Dit is een voorbeeld product type omschrijving.",
-        )
+        return {
+            "product_type": product_type_detail,
+            "content_elementen": content_elements,
+        }
 
     @cached_property
     def crumbs(self):
         return [
             (_("Product types"), "#"),
-            (self.object.naam, self.request.path),
+            (self.object["product_type"]["naam"], self.request.path),
         ]
 
     def page_title(self):
-        return self.object.naam
+        return self.object["product_type"]["naam"]
