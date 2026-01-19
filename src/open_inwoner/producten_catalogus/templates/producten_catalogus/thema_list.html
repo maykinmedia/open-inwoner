@@ -4,20 +4,5 @@
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans "Themas" %}</h1>
 
-    {% if themas %}
-        <ul class="utrecht-unordered-list">
-            {% for thema in themas %}
-                <li class="utrecht-unordered-list__item">
-                    <a href="{% url 'producten_catalogus:thema-detail' slug=thema.slug %}">
-                        <strong>{{ thema.naam }}</strong>
-                    </a>
-                    {% if thema.omschrijving %}
-                        <p class="utrecht-paragraph">{{ thema.omschrijving }}</p>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="utrecht-paragraph">{% trans "Geen themas beschikbaar." %}</p>
-    {% endif %}
+    <pre>{{ themas_json }}</pre>
 {% endblock content %}

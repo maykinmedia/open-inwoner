@@ -18,7 +18,7 @@ urlpatterns = [
     ),
     # Thema detail view - uses slug
     path(
-        "themas/<slug:slug>/",
+        "themas/<uuid:thema_uuid>/",
         ThemaDetailView.as_view(),
         name="thema-detail",
     ),
