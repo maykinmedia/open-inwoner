@@ -51,3 +51,7 @@
 .utrecht-paragraph + .utrecht-heading-2 {
   margin-top: var(--spacing-large);
 }
+
+.utrecht-heading-2 ~ oip-card-grid {
+  margin-bottom: var(--spacing-large);
+}

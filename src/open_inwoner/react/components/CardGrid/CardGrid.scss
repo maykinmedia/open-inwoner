@@ -1,0 +1,9 @@
+.card-grid {
+  &__content {
+    .card-container {
+      display: grid;
+      gap: var(--gutter-width);
+      grid-template-columns: repeat(var(--card-columns), 1fr);
+    }
+  }
+}

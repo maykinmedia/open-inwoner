@@ -7,6 +7,8 @@ import { LOADING_SPINNER_DEFINITION } from '@react/components/Spinner/constants'
 import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCard';
 import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
+import { CARD_TILE_DEFINITION } from '@react/components/CardTile/constants';
+import { CARD_GRID_DEFINITION } from '@react/components/CardGrid/constants';
 
 /**
  * Web component registry
@@ -29,4 +31,6 @@ export const WEB_COMPONENT_REGISTRY = {
   [HOME_PLUGIN_CARD_ITEM_DEFINITION.tagName]: HOME_PLUGIN_CARD_ITEM_DEFINITION,
   [ACCORDION_DEFINITION.tagName]: ACCORDION_DEFINITION,
   [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
+  [CARD_TILE_DEFINITION.tagName]: CARD_TILE_DEFINITION,
+  [CARD_GRID_DEFINITION.tagName]: CARD_GRID_DEFINITION,
 } as const;

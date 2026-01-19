@@ -1,7 +1,56 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n utils menu %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+    <header class="oip-header-group">
+        <h1 class="utrecht-heading-1">
+            {{ object.naam }}
+        </h1>
+    </header>
 
+    {% if object.beschrijving %}
+        <p class="utrecht-paragraph">{{ object.beschrijving|markdown|safe }}</p>
+    {% endif %}
+
+    {% if subthemas|length > 0 %}
+        <hr class="divider">
+        <h2 class="utrecht-heading-2">{% trans "Subthema's" %}</h2>
+
+        <oip-card-grid columns="2">
+            {% for subthema in subthemas %}
+                <oip-card-tile
+                    title="{{ subthema.naam }}"
+                    description="{{ subthema.beschrijving|truncatewords:25 }}"
+                    identificatie="{{ subthema.uuid }}"
+                    detail-url="/product-catalogus/themas/{{ subthema.uuid }}/"
+                ></oip-card-tile>
+            {% endfor %}
+        </oip-card-grid>
+    {% endif %}
+
+    {% if object.producttypen|length > 0 %}
+        <hr class="divider">
+        <h2 class="utrecht-heading-2">{% trans "Producttypen" %}</h2>
+
+        <oip-card-grid columns="1">
+            {% for producttype in object.producttypen %}
+                <oip-card-tile
+                    title="{{ producttype.uniforme_product_naam|title }}"
+                    identificatie="{{ producttype.uuid }}"
+                    detail-url="/product-catalogus/product-typen/{{ producttype.uuid }}/"
+                    code="{{ producttype.code }}"
+                    keywords="{{ producttype.keywords|join:', ' }}"
+                    toegestane-statussen="{{ producttype.toegestane_statussen|join:', ' }}"
+                    gepubliceerd="{{ producttype.gepubliceerd|lower }}"
+                    publicatie-start-datum="{{ producttype.publicatie_start_datum }}"
+                ></oip-card-tile>
+            {% endfor %}
+        </oip-card-grid>
+    {% else %}
+        <p class="utrecht-paragraph">{% trans "Geen producttypen beschikbaar." %}</p>
+    {% endif %}
 {% endblock content %}

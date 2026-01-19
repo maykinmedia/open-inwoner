@@ -72,6 +72,26 @@ class ThemaDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
 
         return thema_detail
 
+    def get_context_data(self, **kwargs):
+        """
+        Add subthema's to context if this thema is a hoofdthema (has children).
+        """
+        context = super().get_context_data(**kwargs)
+
+        # Fetch all thema's to find subthema's (thema's that have this object as parent)
+        open_product_client = OpenProductclient.from_env()
+        all_themas_response = open_product_client.ProductType.thema.list()
+        all_themas = all_themas_response.get("results", [])
+
+        # Filter for subthema's (thema's where hoofd_thema matches current thema's uuid)
+        current_thema_uuid = self.object.get("uuid")
+        subthemas = [
+            t for t in all_themas if t.get("hoofd_thema") == current_thema_uuid
+        ]
+
+        context["subthemas"] = subthemas
+        return context
+
     @cached_property
     def crumbs(self):
         return [
