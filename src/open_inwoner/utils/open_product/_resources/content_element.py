@@ -1,7 +1,6 @@
 import uuid
 
 from open_inwoner.utils.open_product._resources.base import ResourceMixin
-from open_inwoner.utils.open_product.types.pagination import PaginatedResponseBody
 from open_inwoner.utils.open_product.types.resources.content_element import (
     ContentElement,
     ListContentElementParams,
@@ -19,7 +18,7 @@ class ContentElementResource(ResourceMixin):
         product_type_uuid_or_id: str | uuid.UUID | int,
         *,
         params: ListContentElementParams | None = None,
-    ) -> PaginatedResponseBody[ContentElement]:
+    ) -> list[ContentElement]:
         """
         List all content elements with optional filtering.
 

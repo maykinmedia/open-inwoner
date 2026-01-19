@@ -8,7 +8,6 @@
         <p class="utrecht-paragraph">{{ object.product_type.omschrijving }}</p>
     {% endif %}
 
-    {% for content_element in object.content_elementen %}
-        {{ content_element.content }}
-    {% endfor %}
+    Voorwaarden: {{ object.voorwaarden }}<br/>
+    Benodigheden: {{ object.benodigheden }}
 {% endblock content %}

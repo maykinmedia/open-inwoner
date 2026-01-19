@@ -1,3 +1,4 @@
+import contextlib
 import json
 from types import SimpleNamespace
 
@@ -155,10 +156,24 @@ class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
             product_type_id
         )
 
-        # Mock data
+        voorwaarden = None
+        with contextlib.suppress(StopIteration):
+            voorwaarden = next(
+                ce for ce in content_elements if "Voorwaarden" in ce["labels"]
+            )
+            voorwaarden = voorwaarden["content"]
+
+        benodigdheden = None
+        with contextlib.suppress(StopIteration):
+            benodigdheden = next(
+                ce for ce in content_elements if "Benodigheden" in ce["labels"]
+            )
+            benodigdheden = benodigdheden["content"]
+
         return {
             "product_type": product_type_detail,
-            "content_elementen": content_elements,
+            "voorwaarden": voorwaarden,
+            "benodigdheden": benodigdheden,
         }
 
     @cached_property
