@@ -9,6 +9,7 @@ from django.views.generic import DetailView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.utils.open_product.product_client import ProductClient
 from open_inwoner.utils.views import CommonPageMixin
 
 
@@ -42,6 +43,8 @@ class ProductListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        producten_client = ProductClient
 
         # TODO: Replace with actual API client
         # client = get_product_client()
