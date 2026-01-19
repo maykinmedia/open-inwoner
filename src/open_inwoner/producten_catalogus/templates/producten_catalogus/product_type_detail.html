@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n utils %}
 
 {% block content %}
     <h1 class="utrecht-heading-1">{{ object.product_type.naam }}</h1>
@@ -8,6 +8,6 @@
         <p class="utrecht-paragraph">{{ object.product_type.omschrijving }}</p>
     {% endif %}
 
-    Voorwaarden: {{ object.voorwaarden }}<br/>
+    Voorwaarden: {{ object.voorwaarden|markdown|safe }}<br/>
     Benodigheden: {{ object.benodigheden }}
 {% endblock content %}
