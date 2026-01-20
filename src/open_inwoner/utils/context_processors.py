@@ -1,8 +1,11 @@
+import json
+
 from django.conf import settings as django_settings
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models import Category, Question
 from open_inwoner.search.forms import SearchForm
+from open_inwoner.utils.open_product.client import OpenProductclient
 
 
 def settings(request):
@@ -15,6 +18,8 @@ def settings(request):
     )
 
     config = SiteConfiguration.get_solo()
+
+    open_product_client = OpenProductclient.from_env()
 
     context = {
         "site_name": config.name,
@@ -108,6 +113,22 @@ def settings(request):
         "warning_banner_font_color": config.warning_banner_font_color,
         "eherkenning_enabled": config.eherkenning_enabled,
         "contactmoment_contact_form_enabled": config.contactmoment_contact_form_enabled,
+        "themes": [
+            t
+            for t in OpenProductclient.from_env().ProductType.thema.list()["results"]
+            if t["gepubliceerd"] and not t["hoofd_thema"]
+        ],
+        "themes_json": json.dumps(
+            [
+                t
+                for t in open_product_client.ProductType.thema.list()["results"]
+                if t["gepubliceerd"] and not t["hoofd_thema"]
+            ],
+            indent=2,
+        ),
+        "products": open_product_client.Product.product.list(
+            params={"eigenaren__bsn": "111222333"}
+        )["results"],
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):

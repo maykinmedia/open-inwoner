@@ -1,8 +1,38 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n grid_tags %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
+    {% render_grid %}
+        {% render_column start=1 span=12 %}
+            <h1 class="utrecht-heading-1" id="title">{% trans "Mijn producten" %}</h1>
+            <p class="utrecht-paragraph">{% trans "Hier vindt u een overzicht van al uw producten." %}</p>
 
-    {{ producten_json }}
+            {% if producten %}
+                <div class="card-container card-container--columns-3">
+                    {% for product in producten.results %}
+                        <oip-card
+                            title="{{ product.naam|default:product.producttype.uniforme_product_naam }}"
+                            subtitle="{{ product.producttype.code }}"
+                            status="{% trans 'Status' %}: {{ product.status }}"
+                            href="{% url 'mijn_producten:mijn-product-detail' product_uuid=product.uuid %}"
+                            footer="{% trans 'Aanvraagdatum' %}: {{ product.aanmaak_datum }}"
+                        ></oip-card>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="utrecht-paragraph">{% trans "U heeft nog geen producten." %}</p>
+            {% endif %}
 
+            {% if request.user.is_staff %}
+                <details style="margin-top: 2rem;">
+                    <summary class="utrecht-paragraph utrecht-paragraph--small">{% trans "Toon ruwe JSON data" %}</summary>
+                    <pre style="background: var(--color-gray-100, #f5f5f5); padding: 1rem; overflow-x: auto; font-size: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">{{ producten_json }}</pre>
+                </details>
+            {% endif %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}

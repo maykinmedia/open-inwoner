@@ -9,6 +9,8 @@ import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
 import { CARD_TILE_DEFINITION } from '@react/components/CardTile/constants';
 import { CARD_GRID_DEFINITION } from '@react/components/CardGrid/constants';
+import { OIP_CARD_DEFINITION } from '@react/components/Card/constants';
+import { OIP_BADGE_DEFINITION } from '@react/components/Badge/constants';
 
 /**
  * Web component registry
@@ -33,4 +35,6 @@ export const WEB_COMPONENT_REGISTRY = {
   [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
   [CARD_TILE_DEFINITION.tagName]: CARD_TILE_DEFINITION,
   [CARD_GRID_DEFINITION.tagName]: CARD_GRID_DEFINITION,
+  [OIP_CARD_DEFINITION.tagName]: OIP_CARD_DEFINITION,
+  [OIP_BADGE_DEFINITION.tagName]: OIP_BADGE_DEFINITION,
 } as const;
