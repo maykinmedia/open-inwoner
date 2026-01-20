@@ -1,7 +1,6 @@
 from django import template
 from django.conf import settings
 from django.http import HttpRequest
-from django.template.defaultfilters import stringfilter
 from django.utils.html import format_html
 
 import markdown as md
@@ -102,7 +101,22 @@ def cookies_accepted(request: HttpRequest) -> bool:
     return request.COOKIES.get("cookieBannerAccepted") == "true"
 
 
-@register.filter()
-@stringfilter
+@register.filter(is_safe=True)
 def markdown(value):
     return md.markdown(value, extensions=["markdown.extensions.fenced_code"])
+
+
+@register.filter(is_safe=True)
+def product_markdown(value):
+    """Process markdown with backslash-escaped characters. Removes backslashes and marks output as safe."""
+    from django.utils.safestring import mark_safe
+
+    if value is None:
+        return ""
+
+    # Remove backslash escape sequences (e.g., \, \. etc.)
+    text = str(value).replace("\\", "")
+
+    # Process markdown and mark as safe
+    html_output = md.markdown(text, extensions=["markdown.extensions.fenced_code"])
+    return mark_safe(html_output)  # noqa: S308
