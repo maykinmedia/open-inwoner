@@ -18,7 +18,7 @@ urlpatterns = [
     ),
     # Thema detail view - uses slug
     path(
-        "themas/<slug:slug>/",
+        "themas/<uuid:thema_uuid>/",
         ThemaDetailView.as_view(),
         name="thema-detail",
     ),
@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     # ProductType detail view - uses ID
     path(
-        "product-typen/<int:product_type_id>/",
+        "product-typen/<uuid:product_type_id>/",
         ProductTypeDetailView.as_view(),
         name="product-type-detail",
     ),

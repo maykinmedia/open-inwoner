@@ -1,0 +1,2011 @@
+openapi: 3.0.3
+info:
+  title: Producten API
+  version: 1.4.0
+  description: |2+
+
+    Een API voor Producten.
+
+    De Producten API heeft 1 endpoint `producten`. Hiermee kunnen producten zelf, de bijbehorende eigenaren en documenten/zaken/taken worden aangemaakt.
+
+    ## Uitleg per resource
+
+    ### Product
+    Een product is een instantie van een producttype (zie producttypen API), in een product worden onder andere de gegevens van de eigenaar, de benodigde data voor het product en bijvoorbeeld de status vastgelegd.
+    Specifieke product data kan worden opgeslagen in de JSON velden `dataobject` en `verbruiksobject`. Deze velden worden gevalideerd door de `verbruiksobject_schema` & `dataobject_schema` velden van het producttype ([zie jsonschema](https://json-schema.org)).
+    De status van een product kan alleen worden veranderd naar de een van de `toegestane statussen` gedefineerd op het producttype.
+
+    ### Eigenaar
+    Aan een product kunnen één of meerdere eigenaren worden gelinkt. Een eigenaar kan een Klant/Partij (Klantinteracties API), natuurlijk of niet natuurlijke persoon zijn.
+
+    ### Document, Zaak, Taak
+    Een document is een verwijzing naar een `EnkelvoudigInformatieObject` uit de [documenten API](https://vng-realisatie.github.io/gemma-zaken/standaard/documenten/).
+    Een zaak is een verwijzing naar een `Zaak` uit de [zaken API](https://vng-realisatie.github.io/gemma-zaken/standaard/zaken/).
+    Taken is een verwijzingen naar taken uit externe API's.
+    Een verwijzing kan als een URN en/of URL worden opgeslagen waarna via URN_MAPPING_CONFIG de missende urn/url automatisch wordt ingevuld.
+
+    ---
+    *Zie de opmerkingen bij de endpoints voor verdere toelichting op specifieke velden.*
+
+    ### Notificaties
+
+    Deze API publiceert notificaties op het kanaal `producten`.
+
+    **Main resource**
+
+    `product`
+
+
+
+    **Kenmerken**
+
+    * `producttype.uuid`: uuid van het producttype
+    * `producttype.uniforme_product_naam`: Uniforme product naam gedefinieerd door de overheid.
+    * `producttype.code`: code van het producttype.
+
+    **Resources en acties**
+    - `product`: create, update, destroy
+
+
+
+    ### Autorisatie
+
+    Voor schrijfacties (POST, PUT, PATCH, DELETE) moet de user de juiste permissie hebben. Deze permissies zijn in te stellen in de Admin.
+    - CREATE: ``producten.add_product``
+    - UPDATE: ``producten.change_product``
+    - DELETE: ``producten.delete_product``
+
+    De producten endpoints worden daarnaast geautoriseerd via producttypen. Een user moet read/write permissies hebben om producten van een producttype te kunnen lezen/aanmaken/updaten of verwijderen.
+    Deze permissies zijn ook in te stellen in de Admin.
+
+
+  contact:
+    email: support@maykinmedia.nl
+    name: Maykin Media
+    url: https://www.maykinmedia.nl
+  license:
+    name: EUPL 1.2
+    url: https://opensource.org/licenses/EUPL-1.2
+paths:
+  /producten:
+    get:
+      operationId: producten_list
+      description: Deze lijst kan gefilterd wordt met query-string parameters.
+      summary: Alle PRODUCTEN opvragen.
+      parameters:
+        - in: query
+          name: aanmaak_datum
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object is aangemaakt.
+        - in: query
+          name: aanmaak_datum__gte
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object is aangemaakt.
+        - in: query
+          name: aanmaak_datum__lte
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object is aangemaakt.
+        - in: query
+          name: aanvraag_zaak_url
+          schema:
+            type: string
+          description: De zaak waaruit dit product is ontstaan.
+        - in: query
+          name: aanvraag_zaak_url__contains
+          schema:
+            type: string
+          description: De zaak waaruit dit product is ontstaan.
+        - in: query
+          name: aanvraag_zaak_urn
+          schema:
+            type: string
+          description:
+            De zaak waaruit dit product is ontstaan.
+            (<organisatie>:<systeem>:<component>:<resource>:<identificatie>)
+        - in: query
+          name: aanvraag_zaak_urn__contains
+          schema:
+            type: string
+          description:
+            De zaak waaruit dit product is ontstaan.
+            (<organisatie>:<systeem>:<component>:<resource>:<identificatie>)
+        - in: query
+          name: dataobject_attr
+          schema:
+            type: string
+          description: |2
+
+          Een json filter parameter heeft de format `key__operator__waarde`.
+          `key` is de naam van de attribuut, `operator` is de operator die gebruikt moet worden en `waarde` is de waarde waarop zal worden gezocht.
+
+          Waardes kunnen een string, nummer of datum (ISO format; YYYY-MM-DD) zijn.
+
+          De ondersteunde operators zijn:
+          * `exact` - gelijk aan
+          * `gt` - groter dan
+          * `gte` - groter dan of gelijk aan
+          * `lt` - kleiner dan
+          * `lte` - kleiner dan of gelijk aan
+          * `icontains` - hoofdletterongevoelige gedeeltelijke match
+          * `in` - in een lijst van waarden gescheiden door `|`
+
+          `key` mag ook geen komma's bevatten.
+
+          Voorbeeld: om producten met `kenteken`: `AA-111-B` in het dataobject vinden: `dataobject_attr=kenteken__exact__AA-111-B`.
+          Als `kenteken` genest zit in `auto`: `dataobject_attr=auto__kenteken__exact__AA-111-B`
+
+
+
+          Meerdere filters kunnen worden toegevoegd door `dataobject_attr` meerdere keren aan het request toe te voegen.
+          Bijvoorbeeld: `dataobject_attr=kenteken__exact__AA-111-B&objectdata_attr=zone__exact__B`
+        - in: query
+          name: documenten__url
+          schema:
+            type: string
+        - in: query
+          name: documenten__url__contains
+          schema:
+            type: string
+        - in: query
+          name: documenten__urn
+          schema:
+            type: string
+        - in: query
+          name: documenten__urn__contains
+          schema:
+            type: string
+        - in: query
+          name: eigenaren__bsn
+          schema:
+            type: string
+          description:
+            Het BSN van de product eigenaar, BSN van 8 karakters moet met een
+            extra 0 beginnen.
+        - in: query
+          name: eigenaren__klantnummer
+          schema:
+            type: string
+          description:
+            generiek veld voor de identificatie van een klant of partij.
+        - in: query
+          name: eigenaren__kvk_nummer
+          schema:
+            type: string
+          description: Het kvk nummer van de product eigenaar
+        - in: query
+          name: eigenaren__uuid
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: eigenaren__vestigingsnummer
+          schema:
+            type: string
+          description: Een korte unieke aanduiding van een vestiging.
+        - in: query
+          name: eind_datum
+          schema:
+            type: string
+            format: date
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        - in: query
+          name: eind_datum__gte
+          schema:
+            type: string
+            format: date
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        - in: query
+          name: eind_datum__lte
+          schema:
+            type: string
+            format: date
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        - in: query
+          name: frequentie
+          schema:
+            type: string
+            title: Prijs frequentie
+            enum:
+              - eenmalig
+              - jaarlijks
+              - maandelijks
+          description: |-
+            De frequentie van betalingen.
+
+            * `eenmalig` - Eenmalig
+            * `maandelijks` - Maandelijks
+            * `jaarlijks` - Jaarlijks
+        - in: query
+          name: gepubliceerd
+          schema:
+            type: boolean
+          description: Geeft aan of het product getoond kan worden.
+        - in: query
+          name: naam
+          schema:
+            type: string
+          description: De naam van dit product.
+        - name: page
+          required: false
+          in: query
+          description: Een pagina binnen de gepagineerde set resultaten.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Het aantal resultaten terug te geven per pagina.
+          schema:
+            type: integer
+        - in: query
+          name: prijs
+          schema:
+            type: number
+          description: De prijs van het product.
+        - in: query
+          name: prijs__gte
+          schema:
+            type: number
+          description: De prijs van het product.
+        - in: query
+          name: prijs__lte
+          schema:
+            type: number
+          description: De prijs van het product.
+        - in: query
+          name: producttype__code
+          schema:
+            type: string
+          description: code van het producttype.
+        - in: query
+          name: producttype__code__in
+          schema:
+            type: array
+            items:
+              type: string
+          description: Meerdere waarden kunnen gescheiden worden door komma's.
+          explode: false
+          style: form
+        - in: query
+          name: producttype__gepubliceerd
+          schema:
+            type: boolean
+        - in: query
+          name: producttype__locaties__uuid
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: producttype__naam
+          schema:
+            type: string
+          description: De Nederlandse naam van het producttype
+        - in: query
+          name: producttype__naam__in
+          schema:
+            type: array
+            items:
+              type: string
+          description: De Nederlandse naam van het producttype
+          explode: false
+          style: form
+        - in: query
+          name: producttype__organisaties__code
+          schema:
+            type: string
+          description: code van de organisatie.
+        - in: query
+          name: producttype__organisaties__uuid
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: producttype__themas__naam
+          schema:
+            type: string
+          description: Naam van het thema.
+        - in: query
+          name: producttype__themas__naam__in
+          schema:
+            type: array
+            items:
+              type: string
+          description: Lijst van thema namen waarop kan worden gezocht.
+          explode: false
+          style: form
+        - in: query
+          name: producttype__themas__uuid
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: producttype__themas__uuid__in
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Lijst van thema uuids waarop kan worden gezocht.
+          explode: false
+          style: form
+        - in: query
+          name: producttype__uuid
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: producttype__uuid__in
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Meerdere waarden kunnen gescheiden worden door komma's.
+          explode: false
+          style: form
+        - in: query
+          name: start_datum
+          schema:
+            type: string
+            format: date
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        - in: query
+          name: start_datum__gte
+          schema:
+            type: string
+            format: date
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        - in: query
+          name: start_datum__lte
+          schema:
+            type: string
+            format: date
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - actief
+              - gereed
+              - geweigerd
+              - in_aanvraag
+              - ingetrokken
+              - initieel
+              - verlopen
+          description: |-
+            De status opties worden bepaald door het veld 'toegestane statussen' van het gerelateerde producttype. Via start & eind_datum kan de status automatisch naar ACTIEF of VERLOPEN worden gezet (mits deze statussen zijn toegestaan op het producttype).
+
+            * `initieel` - Initieel
+            * `in_aanvraag` - In aanvraag
+            * `gereed` - Gereed
+            * `actief` - Actief
+            * `ingetrokken` - Ingetrokken
+            * `geweigerd` - Geweigerd
+            * `verlopen` - Verlopen
+        - in: query
+          name: taken__url
+          schema:
+            type: string
+        - in: query
+          name: taken__url__contains
+          schema:
+            type: string
+        - in: query
+          name: taken__urn
+          schema:
+            type: string
+        - in: query
+          name: taken__urn__contains
+          schema:
+            type: string
+        - in: query
+          name: uniforme_product_naam
+          schema:
+            type: string
+          description: Uniforme product naam
+        - in: query
+          name: update_datum
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        - in: query
+          name: update_datum__gte
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        - in: query
+          name: update_datum__lte
+          schema:
+            type: string
+            format: date-time
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        - in: query
+          name: verbruiksobject_attr
+          schema:
+            type: string
+          description: |2
+
+          Een json filter parameter heeft de format `key__operator__waarde`.
+          `key` is de naam van de attribuut, `operator` is de operator die gebruikt moet worden en `waarde` is de waarde waarop zal worden gezocht.
+
+          Waardes kunnen een string, nummer of datum (ISO format; YYYY-MM-DD) zijn.
+
+          De ondersteunde operators zijn:
+          * `exact` - gelijk aan
+          * `gt` - groter dan
+          * `gte` - groter dan of gelijk aan
+          * `lt` - kleiner dan
+          * `lte` - kleiner dan of gelijk aan
+          * `icontains` - hoofdletterongevoelige gedeeltelijke match
+          * `in` - in een lijst van waarden gescheiden door `|`
+
+          `key` mag ook geen komma's bevatten.
+
+          Voorbeeld: om producten met `kenteken`: `AA-111-B` in het dataobject vinden: `dataobject_attr=kenteken__exact__AA-111-B`.
+          Als `kenteken` genest zit in `auto`: `dataobject_attr=auto__kenteken__exact__AA-111-B`
+
+
+
+          Meerdere filters kunnen worden toegevoegd door `dataobject_attr` meerdere keren aan het request toe te voegen.
+          Bijvoorbeeld: `dataobject_attr=kenteken__exact__AA-111-B&objectdata_attr=zone__exact__B`
+        - in: query
+          name: zaken__url
+          schema:
+            type: string
+        - in: query
+          name: zaken__url__contains
+          schema:
+            type: string
+        - in: query
+          name: zaken__urn
+          schema:
+            type: string
+        - in: query
+          name: zaken__urn__contains
+          schema:
+            type: string
+      tags:
+        - producten
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '200':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+              examples:
+                ProductResponse:
+                  value:
+                    count: 123
+                    next: http://api.example.org/accounts/?page=4
+                    previous: http://api.example.org/accounts/?page=2
+                    results:
+                      - uuid: da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                        url: https://gemeente.open-product.nl/producten/api/v0/producten/da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                        naam: 'verhuurvergunning: straatweg 14'
+                        start_datum: '2024-12-01'
+                        eind_datum: '2026-12-01'
+                        aanmaak_datum: '2019-08-24T14:15:22Z'
+                        update_datum: '2019-08-24T14:15:22Z'
+                        producttype:
+                          uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          code: 129380-A21231
+                          keywords:
+                            - auto
+                          uniforme_product_naam: parkeervergunning
+                          toegestane_statussen:
+                            - gereed
+                          gepubliceerd: true
+                          aanmaak_datum: '2019-08-24T14:15:22Z'
+                          update_datum: '2019-08-24T14:15:22Z'
+                          themas:
+                            - uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                              naam: Parkeren
+                              beschrijving: '.....'
+                              gepubliceerd: true
+                              aanmaak_datum: '2019-08-24T14:15:22Z'
+                              update_datum: '2019-08-24T14:15:22Z'
+                              hoofd_thema: 41ec14a8-ca7d-43a9-a4a8-46f9587c8d91
+                              publicatie_start_datum: '2019-09-24'
+                              publicatie_eind_datum: '2030-09-24'
+                        gepubliceerd: true
+                        eigenaren:
+                          - uuid: 9de01697-7fc5-4113-803c-a8c9a8dad4f2
+                            bsn: '111222333'
+                        documenten:
+                          - urn: maykin:abc:drc:document:99a8bd4f-4144-4105-9850-e477628852fc
+                            url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                        zaken:
+                          - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                            url: https://gemeente-a.zgw.nl/zaken/eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                        taken:
+                          - urn: maykin:abc:ttc:taak:cec996f4-2efa-4307-a035-32c2c9032e89
+                            url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                        status: gereed
+                        prijs: '20.20'
+                        frequentie: eenmalig
+                        verbruiksobject:
+                          uren: 130
+                        dataobject:
+                          max_uren: 150
+                        aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                        aanvraag_zaak_url: https://maykin.ztc.com/zaken/d42613cd-ee22-4455-808c-c19c7b8442a2
+                  summary: product response
+          description: ''
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+    post:
+      operationId: producten_create
+      summary: Maak een PRODUCT aan.
+      tags:
+        - producten
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+            examples:
+              ProductRequest:
+                value:
+                  naam: 'verhuurvergunning: straatweg 14'
+                  start_datum: '2024-12-01'
+                  eind_datum: '2026-12-01'
+                  producttype_uuid: 95792000-d57f-4d3a-b14c-c4c7aa964907
+                  gepubliceerd: false
+                  eigenaren:
+                    - bsn: '111222333'
+                  status: gereed
+                  prijs: '20.20'
+                  frequentie: eenmalig
+                  verbruiksobject:
+                    uren: 130
+                  dataobject:
+                    max_uren: 150
+                  documenten:
+                    - url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                  zaken:
+                    - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                  taken:
+                    - url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                  aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                summary: product request
+        required: true
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '201':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                ProductResponse:
+                  value:
+                    uuid: da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    url: https://gemeente.open-product.nl/producten/api/v0/producten/da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    naam: 'verhuurvergunning: straatweg 14'
+                    start_datum: '2024-12-01'
+                    eind_datum: '2026-12-01'
+                    aanmaak_datum: '2019-08-24T14:15:22Z'
+                    update_datum: '2019-08-24T14:15:22Z'
+                    producttype:
+                      uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      code: 129380-A21231
+                      keywords:
+                        - auto
+                      uniforme_product_naam: parkeervergunning
+                      toegestane_statussen:
+                        - gereed
+                      gepubliceerd: true
+                      aanmaak_datum: '2019-08-24T14:15:22Z'
+                      update_datum: '2019-08-24T14:15:22Z'
+                      themas:
+                        - uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          naam: Parkeren
+                          beschrijving: '.....'
+                          gepubliceerd: true
+                          aanmaak_datum: '2019-08-24T14:15:22Z'
+                          update_datum: '2019-08-24T14:15:22Z'
+                          hoofd_thema: 41ec14a8-ca7d-43a9-a4a8-46f9587c8d91
+                          publicatie_start_datum: '2019-09-24'
+                          publicatie_eind_datum: '2030-09-24'
+                    gepubliceerd: true
+                    eigenaren:
+                      - uuid: 9de01697-7fc5-4113-803c-a8c9a8dad4f2
+                        bsn: '111222333'
+                    documenten:
+                      - urn: maykin:abc:drc:document:99a8bd4f-4144-4105-9850-e477628852fc
+                        url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                    zaken:
+                      - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                        url: https://gemeente-a.zgw.nl/zaken/eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                    taken:
+                      - urn: maykin:abc:ttc:taak:cec996f4-2efa-4307-a035-32c2c9032e89
+                        url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                    status: gereed
+                    prijs: '20.20'
+                    frequentie: eenmalig
+                    verbruiksobject:
+                      uren: 130
+                    dataobject:
+                      max_uren: 150
+                    aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                    aanvraag_zaak_url: https://maykin.ztc.com/zaken/d42613cd-ee22-4455-808c-c19c7b8442a2
+                  summary: product response
+          description: ''
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+  /producten/{uuid}:
+    get:
+      operationId: producten_retrieve
+      summary: Een specifiek PRODUCT opvragen.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - producten
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '200':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                ProductResponse:
+                  value:
+                    uuid: da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    url: https://gemeente.open-product.nl/producten/api/v0/producten/da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    naam: 'verhuurvergunning: straatweg 14'
+                    start_datum: '2024-12-01'
+                    eind_datum: '2026-12-01'
+                    aanmaak_datum: '2019-08-24T14:15:22Z'
+                    update_datum: '2019-08-24T14:15:22Z'
+                    producttype:
+                      uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      code: 129380-A21231
+                      keywords:
+                        - auto
+                      uniforme_product_naam: parkeervergunning
+                      toegestane_statussen:
+                        - gereed
+                      gepubliceerd: true
+                      aanmaak_datum: '2019-08-24T14:15:22Z'
+                      update_datum: '2019-08-24T14:15:22Z'
+                      themas:
+                        - uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          naam: Parkeren
+                          beschrijving: '.....'
+                          gepubliceerd: true
+                          aanmaak_datum: '2019-08-24T14:15:22Z'
+                          update_datum: '2019-08-24T14:15:22Z'
+                          hoofd_thema: 41ec14a8-ca7d-43a9-a4a8-46f9587c8d91
+                          publicatie_start_datum: '2019-09-24'
+                          publicatie_eind_datum: '2030-09-24'
+                    gepubliceerd: true
+                    eigenaren:
+                      - uuid: 9de01697-7fc5-4113-803c-a8c9a8dad4f2
+                        bsn: '111222333'
+                    documenten:
+                      - urn: maykin:abc:drc:document:99a8bd4f-4144-4105-9850-e477628852fc
+                        url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                    zaken:
+                      - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                        url: https://gemeente-a.zgw.nl/zaken/eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                    taken:
+                      - urn: maykin:abc:ttc:taak:cec996f4-2efa-4307-a035-32c2c9032e89
+                        url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                    status: gereed
+                    prijs: '20.20'
+                    frequentie: eenmalig
+                    verbruiksobject:
+                      uren: 130
+                    dataobject:
+                      max_uren: 150
+                    aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                    aanvraag_zaak_url: https://maykin.ztc.com/zaken/d42613cd-ee22-4455-808c-c19c7b8442a2
+                  summary: product response
+          description: ''
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+    put:
+      operationId: producten_update
+      summary: Werk een PRODUCT in zijn geheel bij.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - producten
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+            examples:
+              ProductRequest:
+                value:
+                  naam: 'verhuurvergunning: straatweg 14'
+                  start_datum: '2024-12-01'
+                  eind_datum: '2026-12-01'
+                  producttype_uuid: 95792000-d57f-4d3a-b14c-c4c7aa964907
+                  gepubliceerd: false
+                  eigenaren:
+                    - bsn: '111222333'
+                  status: gereed
+                  prijs: '20.20'
+                  frequentie: eenmalig
+                  verbruiksobject:
+                    uren: 130
+                  dataobject:
+                    max_uren: 150
+                  documenten:
+                    - url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                  zaken:
+                    - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                  taken:
+                    - url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                  aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                summary: product request
+        required: true
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '200':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                ProductResponse:
+                  value:
+                    uuid: da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    url: https://gemeente.open-product.nl/producten/api/v0/producten/da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    naam: 'verhuurvergunning: straatweg 14'
+                    start_datum: '2024-12-01'
+                    eind_datum: '2026-12-01'
+                    aanmaak_datum: '2019-08-24T14:15:22Z'
+                    update_datum: '2019-08-24T14:15:22Z'
+                    producttype:
+                      uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      code: 129380-A21231
+                      keywords:
+                        - auto
+                      uniforme_product_naam: parkeervergunning
+                      toegestane_statussen:
+                        - gereed
+                      gepubliceerd: true
+                      aanmaak_datum: '2019-08-24T14:15:22Z'
+                      update_datum: '2019-08-24T14:15:22Z'
+                      themas:
+                        - uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          naam: Parkeren
+                          beschrijving: '.....'
+                          gepubliceerd: true
+                          aanmaak_datum: '2019-08-24T14:15:22Z'
+                          update_datum: '2019-08-24T14:15:22Z'
+                          hoofd_thema: 41ec14a8-ca7d-43a9-a4a8-46f9587c8d91
+                          publicatie_start_datum: '2019-09-24'
+                          publicatie_eind_datum: '2030-09-24'
+                    gepubliceerd: true
+                    eigenaren:
+                      - uuid: 9de01697-7fc5-4113-803c-a8c9a8dad4f2
+                        bsn: '111222333'
+                    documenten:
+                      - urn: maykin:abc:drc:document:99a8bd4f-4144-4105-9850-e477628852fc
+                        url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                    zaken:
+                      - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                        url: https://gemeente-a.zgw.nl/zaken/eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                    taken:
+                      - urn: maykin:abc:ttc:taak:cec996f4-2efa-4307-a035-32c2c9032e89
+                        url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                    status: gereed
+                    prijs: '20.20'
+                    frequentie: eenmalig
+                    verbruiksobject:
+                      uren: 130
+                    dataobject:
+                      max_uren: 150
+                    aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                    aanvraag_zaak_url: https://maykin.ztc.com/zaken/d42613cd-ee22-4455-808c-c19c7b8442a2
+                  summary: product response
+          description: ''
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+    patch:
+      operationId: producten_partial_update
+      summary: Werk een PRODUCT deels bij.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - producten
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+            examples:
+              ProductRequest:
+                value:
+                  naam: 'verhuurvergunning: straatweg 14'
+                  start_datum: '2024-12-01'
+                  eind_datum: '2026-12-01'
+                  producttype_uuid: 95792000-d57f-4d3a-b14c-c4c7aa964907
+                  gepubliceerd: false
+                  eigenaren:
+                    - bsn: '111222333'
+                  status: gereed
+                  prijs: '20.20'
+                  frequentie: eenmalig
+                  verbruiksobject:
+                    uren: 130
+                  dataobject:
+                    max_uren: 150
+                  documenten:
+                    - url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                  zaken:
+                    - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                  taken:
+                    - url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                  aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                summary: product request
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '200':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              examples:
+                ProductResponse:
+                  value:
+                    uuid: da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    url: https://gemeente.open-product.nl/producten/api/v0/producten/da0df49a-cd71-4e24-9bae-5be8b01f2c36
+                    naam: 'verhuurvergunning: straatweg 14'
+                    start_datum: '2024-12-01'
+                    eind_datum: '2026-12-01'
+                    aanmaak_datum: '2019-08-24T14:15:22Z'
+                    update_datum: '2019-08-24T14:15:22Z'
+                    producttype:
+                      uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      code: 129380-A21231
+                      keywords:
+                        - auto
+                      uniforme_product_naam: parkeervergunning
+                      toegestane_statussen:
+                        - gereed
+                      gepubliceerd: true
+                      aanmaak_datum: '2019-08-24T14:15:22Z'
+                      update_datum: '2019-08-24T14:15:22Z'
+                      themas:
+                        - uuid: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          naam: Parkeren
+                          beschrijving: '.....'
+                          gepubliceerd: true
+                          aanmaak_datum: '2019-08-24T14:15:22Z'
+                          update_datum: '2019-08-24T14:15:22Z'
+                          hoofd_thema: 41ec14a8-ca7d-43a9-a4a8-46f9587c8d91
+                          publicatie_start_datum: '2019-09-24'
+                          publicatie_eind_datum: '2030-09-24'
+                    gepubliceerd: true
+                    eigenaren:
+                      - uuid: 9de01697-7fc5-4113-803c-a8c9a8dad4f2
+                        bsn: '111222333'
+                    documenten:
+                      - urn: maykin:abc:drc:document:99a8bd4f-4144-4105-9850-e477628852fc
+                        url: https://gemeente-a.zgw.nl/documenten/99a8bd4f-4144-4105-9850-e477628852fc
+                    zaken:
+                      - urn: maykin:abc:ztc:zaak:eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                        url: https://gemeente-a.zgw.nl/zaken/eb188bea-51f2-44f0-8acc-eec1c710b4bf
+                    taken:
+                      - urn: maykin:abc:ttc:taak:cec996f4-2efa-4307-a035-32c2c9032e89
+                        url: https://gemeente-a.zgw.nl/taken/cec996f4-2efa-4307-a035-32c2c9032e89
+                    status: gereed
+                    prijs: '20.20'
+                    frequentie: eenmalig
+                    verbruiksobject:
+                      uren: 130
+                    dataobject:
+                      max_uren: 150
+                    aanvraag_zaak_urn: maykin:abc:ztc:zaak:d42613cd-ee22-4455-808c-c19c7b8442a1
+                    aanvraag_zaak_url: https://maykin.ztc.com/zaken/d42613cd-ee22-4455-808c-c19c7b8442a2
+                  summary: product response
+          description: ''
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+    delete:
+      operationId: producten_destroy
+      summary: Verwijder een PRODUCT.
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - producten
+      security:
+        - jwtAuth: []
+        - tokenAuth: []
+      responses:
+        '204':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          description: No response body
+        '400':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                BadRequestExample:
+                  value:
+                    veld_a:
+                      - Dit veld is vereist.
+                    veld_b:
+                      - ‘<uuid>’ is geen geldige UUID.
+                  summary: Bad request example
+                  description:
+                    Errors worden per veld teruggegeven. Hieronder volgt een
+                    voorbeeld.
+          description: Validation error
+        '403':
+          headers:
+            API-version:
+              schema:
+                type: string
+              description:
+                'Geeft een specifieke API-versie aan in de context van een
+                specifieke aanroep. Voorbeeld: 1.2.1.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailError'
+          description: ''
+components:
+  schemas:
+    BlankEnum:
+      enum:
+        - ''
+    DetailError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+        - detail
+    Eigenaar:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        bsn:
+          type: string
+          title: Burgerservicenummer
+          description:
+            Het BSN van de product eigenaar, BSN van 8 karakters moet met een
+            extra 0 beginnen.
+        kvk_nummer:
+          type: string
+          description: Het kvk nummer van de product eigenaar
+          pattern: ^[0-9]*$
+          maxLength: 8
+          minLength: 8
+        vestigingsnummer:
+          type: string
+          description: Een korte unieke aanduiding van een vestiging.
+          maxLength: 24
+        klantnummer:
+          type: string
+          description:
+            generiek veld voor de identificatie van een klant of partij.
+          maxLength: 50
+    EigenaarRequest:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        bsn:
+          type: string
+          title: Burgerservicenummer
+          description:
+            Het BSN van de product eigenaar, BSN van 8 karakters moet met een
+            extra 0 beginnen.
+        kvk_nummer:
+          type: string
+          description: Het kvk nummer van de product eigenaar
+          pattern: ^[0-9]*$
+          maxLength: 8
+          minLength: 8
+        vestigingsnummer:
+          type: string
+          description: Een korte unieke aanduiding van een vestiging.
+          maxLength: 24
+        klantnummer:
+          type: string
+          description:
+            generiek veld voor de identificatie van een klant of partij.
+          maxLength: 50
+    Error:
+      type: object
+      properties:
+        veld_a:
+          type: array
+          items:
+            type: string
+        veld_b:
+          type: array
+          items:
+            type: string
+      required:
+        - veld_a
+        - veld_b
+    FrequentieEnum:
+      enum:
+        - eenmalig
+        - maandelijks
+        - jaarlijks
+      type: string
+      description: |-
+        * `eenmalig` - Eenmalig
+        * `maandelijks` - Maandelijks
+        * `jaarlijks` - Jaarlijks
+    NestedDocument:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    NestedDocumentRequest:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    NestedProductType:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          description: code van het producttype.
+          pattern: ^[A-Z0-9-]+$
+          maxLength: 255
+        keywords:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          description: Lijst van keywords waarop kan worden gezocht.
+        uniforme_product_naam:
+          type: string
+          description: Uniforme product naam
+        toegestane_statussen:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToegestaneStatussenEnum'
+          description: toegestane statussen voor producten van dit type.
+        gepubliceerd:
+          type: boolean
+          readOnly: true
+          description: Geeft aan of het producttype getoond kan worden.
+        publicatie_start_datum:
+          type: string
+          format: date
+          nullable: true
+          title: Publicatie startdatum
+          description: De datum waarop het producttype gepubliceerd is
+        publicatie_eind_datum:
+          type: string
+          format: date
+          nullable: true
+          title: Publicatie startdatum
+          description: De datum waarop het producttype gepubliceerd is
+        aanmaak_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object is aangemaakt.
+        update_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        themas:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedThema'
+      required:
+        - aanmaak_datum
+        - code
+        - gepubliceerd
+        - themas
+        - uniforme_product_naam
+        - update_datum
+        - uuid
+    NestedProductTypeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          description: code van het producttype.
+          pattern: ^[A-Z0-9-]+$
+          maxLength: 255
+        keywords:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          description: Lijst van keywords waarop kan worden gezocht.
+        uniforme_product_naam:
+          type: string
+          minLength: 1
+          description: Uniforme product naam
+        toegestane_statussen:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToegestaneStatussenEnum'
+          description: toegestane statussen voor producten van dit type.
+        publicatie_start_datum:
+          type: string
+          format: date
+          nullable: true
+          title: Publicatie startdatum
+          description: De datum waarop het producttype gepubliceerd is
+        publicatie_eind_datum:
+          type: string
+          format: date
+          nullable: true
+          title: Publicatie startdatum
+          description: De datum waarop het producttype gepubliceerd is
+        themas:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedThemaRequest'
+      required:
+        - code
+        - themas
+        - uniforme_product_naam
+    NestedTaak:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    NestedTaakRequest:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    NestedThema:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        naam:
+          type: string
+          description: Naam van het thema.
+          maxLength: 255
+        beschrijving:
+          type: string
+          description: Beschrijving van het thema, ondersteund markdown format.
+        gepubliceerd:
+          type: boolean
+          description: Geeft aan of het thema getoond kan worden.
+        aanmaak_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object is aangemaakt.
+        update_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        hoofd_thema:
+          type: string
+          format: uuid
+          description: Het hoofd thema waaronder dit thema valt.
+      required:
+        - aanmaak_datum
+        - hoofd_thema
+        - naam
+        - update_datum
+        - uuid
+    NestedThemaRequest:
+      type: object
+      properties:
+        naam:
+          type: string
+          minLength: 1
+          description: Naam van het thema.
+          maxLength: 255
+        beschrijving:
+          type: string
+          description: Beschrijving van het thema, ondersteund markdown format.
+        gepubliceerd:
+          type: boolean
+          description: Geeft aan of het thema getoond kan worden.
+        hoofd_thema:
+          type: string
+          format: uuid
+          description: Het hoofd thema waaronder dit thema valt.
+      required:
+        - hoofd_thema
+        - naam
+    NestedZaak:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    NestedZaakRequest:
+      type: object
+      properties:
+        urn:
+          type: string
+          nullable: true
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+    PaginatedProductList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PatchedProductRequest:
+      type: object
+      properties:
+        naam:
+          type: string
+          description: De naam van dit product.
+          maxLength: 255
+        start_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        eind_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        producttype_uuid:
+          type: string
+          format: uuid
+          writeOnly: true
+        gepubliceerd:
+          type: boolean
+          description: Geeft aan of het product getoond kan worden.
+        eigenaren:
+          type: array
+          items:
+            $ref: '#/components/schemas/EigenaarRequest'
+        documenten:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedDocumentRequest'
+        zaken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedZaakRequest'
+        taken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedTaakRequest'
+        status:
+          allOf:
+            - $ref: '#/components/schemas/StatusEnum'
+          description: |-
+            De status opties worden bepaald door het veld 'toegestane statussen' van het gerelateerde producttype. Via start & eind_datum kan de status automatisch naar ACTIEF of VERLOPEN worden gezet (mits deze statussen zijn toegestaan op het producttype).
+
+            * `initieel` - Initieel
+            * `in_aanvraag` - In aanvraag
+            * `gereed` - Gereed
+            * `actief` - Actief
+            * `ingetrokken` - Ingetrokken
+            * `geweigerd` - Geweigerd
+            * `verlopen` - Verlopen
+        prijs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+          description: De prijs van het product.
+        frequentie:
+          title: Prijs frequentie
+          description: |-
+            De frequentie van betalingen.
+
+            * `eenmalig` - Eenmalig
+            * `maandelijks` - Maandelijks
+            * `jaarlijks` - Jaarlijks
+          oneOf:
+            - $ref: '#/components/schemas/FrequentieEnum'
+            - $ref: '#/components/schemas/BlankEnum'
+        verbruiksobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Verbruiksobject van dit product. Wordt gevalideerd met het
+            `verbruiksobject_schema` uit het producttype.
+        dataobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Dataobject van dit product. Wordt gevalideerd met het
+            `dataobject_schema` uit het producttype.
+        aanvraag_zaak_urn:
+          type: string
+          nullable: true
+          description:
+            De zaak waaruit dit product is ontstaan.
+            (<organisatie>:<systeem>:<component>:<resource>:<identificatie>)
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        aanvraag_zaak_url:
+          type: string
+          format: uri
+          nullable: true
+          description: De zaak waaruit dit product is ontstaan.
+          maxLength: 200
+    Product:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          readOnly: true
+          minLength: 1
+          maxLength: 1000
+          description:
+            URL-referentie naar dit object. Dit is de unieke identificatie en
+            locatie van dit object.
+        naam:
+          type: string
+          description: De naam van dit product.
+          maxLength: 255
+        start_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        eind_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        aanmaak_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object is aangemaakt.
+        update_datum:
+          type: string
+          format: date-time
+          readOnly: true
+          description: De datum waarop het object voor het laatst is gewijzigd.
+        producttype:
+          allOf:
+            - $ref: '#/components/schemas/NestedProductType'
+          readOnly: true
+        gepubliceerd:
+          type: boolean
+          description: Geeft aan of het product getoond kan worden.
+        eigenaren:
+          type: array
+          items:
+            $ref: '#/components/schemas/Eigenaar'
+        documenten:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedDocument'
+        zaken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedZaak'
+        taken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedTaak'
+        status:
+          allOf:
+            - $ref: '#/components/schemas/StatusEnum'
+          description: |-
+            De status opties worden bepaald door het veld 'toegestane statussen' van het gerelateerde producttype. Via start & eind_datum kan de status automatisch naar ACTIEF of VERLOPEN worden gezet (mits deze statussen zijn toegestaan op het producttype).
+
+            * `initieel` - Initieel
+            * `in_aanvraag` - In aanvraag
+            * `gereed` - Gereed
+            * `actief` - Actief
+            * `ingetrokken` - Ingetrokken
+            * `geweigerd` - Geweigerd
+            * `verlopen` - Verlopen
+        prijs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+          description: De prijs van het product.
+        frequentie:
+          title: Prijs frequentie
+          description: |-
+            De frequentie van betalingen.
+
+            * `eenmalig` - Eenmalig
+            * `maandelijks` - Maandelijks
+            * `jaarlijks` - Jaarlijks
+          oneOf:
+            - $ref: '#/components/schemas/FrequentieEnum'
+            - $ref: '#/components/schemas/BlankEnum'
+        verbruiksobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Verbruiksobject van dit product. Wordt gevalideerd met het
+            `verbruiksobject_schema` uit het producttype.
+        dataobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Dataobject van dit product. Wordt gevalideerd met het
+            `dataobject_schema` uit het producttype.
+        aanvraag_zaak_urn:
+          type: string
+          nullable: true
+          description:
+            De zaak waaruit dit product is ontstaan.
+            (<organisatie>:<systeem>:<component>:<resource>:<identificatie>)
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        aanvraag_zaak_url:
+          type: string
+          format: uri
+          nullable: true
+          description: De zaak waaruit dit product is ontstaan.
+          maxLength: 200
+      required:
+        - aanmaak_datum
+        - eigenaren
+        - producttype
+        - update_datum
+        - url
+        - uuid
+    ProductRequest:
+      type: object
+      properties:
+        naam:
+          type: string
+          description: De naam van dit product.
+          maxLength: 255
+        start_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De start datum van dit product. Op deze datum zal de status van het
+            product automatisch naar ACTIEF worden gezet. Op het moment dat de
+            start_datum wordt ingevuld moet de status ACTIEF op het producttype
+            zijn toegestaan.
+        eind_datum:
+          type: string
+          format: date
+          nullable: true
+          description:
+            De einddatum van dit product. Op deze datum zal de status van het
+            product automatisch naar VERLOPEN worden gezet. Op het moment dat de
+            eind_datum wordt ingevuld moet de status VERLOPEN op het producttype
+            zijn toegestaan.
+        producttype_uuid:
+          type: string
+          format: uuid
+          writeOnly: true
+        gepubliceerd:
+          type: boolean
+          description: Geeft aan of het product getoond kan worden.
+        eigenaren:
+          type: array
+          items:
+            $ref: '#/components/schemas/EigenaarRequest'
+        documenten:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedDocumentRequest'
+        zaken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedZaakRequest'
+        taken:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedTaakRequest'
+        status:
+          allOf:
+            - $ref: '#/components/schemas/StatusEnum'
+          description: |-
+            De status opties worden bepaald door het veld 'toegestane statussen' van het gerelateerde producttype. Via start & eind_datum kan de status automatisch naar ACTIEF of VERLOPEN worden gezet (mits deze statussen zijn toegestaan op het producttype).
+
+            * `initieel` - Initieel
+            * `in_aanvraag` - In aanvraag
+            * `gereed` - Gereed
+            * `actief` - Actief
+            * `ingetrokken` - Ingetrokken
+            * `geweigerd` - Geweigerd
+            * `verlopen` - Verlopen
+        prijs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+          description: De prijs van het product.
+        frequentie:
+          title: Prijs frequentie
+          description: |-
+            De frequentie van betalingen.
+
+            * `eenmalig` - Eenmalig
+            * `maandelijks` - Maandelijks
+            * `jaarlijks` - Jaarlijks
+          oneOf:
+            - $ref: '#/components/schemas/FrequentieEnum'
+            - $ref: '#/components/schemas/BlankEnum'
+        verbruiksobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Verbruiksobject van dit product. Wordt gevalideerd met het
+            `verbruiksobject_schema` uit het producttype.
+        dataobject:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description:
+            Dataobject van dit product. Wordt gevalideerd met het
+            `dataobject_schema` uit het producttype.
+        aanvraag_zaak_urn:
+          type: string
+          nullable: true
+          description:
+            De zaak waaruit dit product is ontstaan.
+            (<organisatie>:<systeem>:<component>:<resource>:<identificatie>)
+          pattern: ^([a-z-]+):([a-z-]+):([a-z-]+):([a-z-]+):([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})$
+        aanvraag_zaak_url:
+          type: string
+          format: uri
+          nullable: true
+          description: De zaak waaruit dit product is ontstaan.
+          maxLength: 200
+      required:
+        - eigenaren
+        - producttype_uuid
+    StatusEnum:
+      enum:
+        - initieel
+        - in_aanvraag
+        - gereed
+        - actief
+        - ingetrokken
+        - geweigerd
+        - verlopen
+      type: string
+      description: |-
+        * `initieel` - Initieel
+        * `in_aanvraag` - In aanvraag
+        * `gereed` - Gereed
+        * `actief` - Actief
+        * `ingetrokken` - Ingetrokken
+        * `geweigerd` - Geweigerd
+        * `verlopen` - Verlopen
+    ToegestaneStatussenEnum:
+      enum:
+        - in_aanvraag
+        - gereed
+        - actief
+        - ingetrokken
+        - geweigerd
+        - verlopen
+      type: string
+      description: |-
+        * `in_aanvraag` - In aanvraag
+        * `gereed` - Gereed
+        * `actief` - Actief
+        * `ingetrokken` - Ingetrokken
+        * `geweigerd` - Geweigerd
+        * `verlopen` - Verlopen
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+servers:
+  - url: /producten/api/v1
+tags:
+  - name: producten
+    description: |2
+
+    ## Opvragen en bewerken van PRODUCTEN.
+
+    ### Opmerkingen
+    - Bij het aanmaken van een PRODUCT kunnen één of meerdere eigenaren worden toegevoegd, een eigenaar moet een bsn (en/of klantnummer) of een kvk nummer (met of zonder vestigingsnummer) hebben."
+    - De status opties van een PRODUCT zijn afhankelijk van de `toegestane_statussen` van het producttype.
+    - Via `start_datum` & `eind_datum` kan de status van een product automatisch op ACTIEF en VERLOPEN worden gezet.
+        - Op het moment dat deze velden worden gezet moeten deze statussen zijn toegestaan op het producttype.
+        - De status zal via de start_datum alleen naar ACTIEF veranderen mits de status INITIEEL, IN AANVRAAG of GEREED is. Voor de eind_datum zijn dit INTIEEL, IN AANVRAAG, GEREED of ACTIEF.
+    - `verbruiksobject` & `dataobject` zijn JSON velden en worden gevalideerd vanuit `verbruiksobject_schema` & `dataobject_schema` van het producttype.
+    - De velden `documenten`, `zaken` en `taken` wordt samen met het product genest aangemaakt of gewijzigd.
+        - dit veld is een lijst van objecten.
+        - Bij een PUT request word de bestaande lijst overschreven met de nieuwe lijst.
+        - Bij een PATCH request wordt de lijst alleen overschreven als `documenten` wordt meegegeven.
+
+    - Het veld `eigenaren` wordt samen met het product genest aangemaakt of gewijzigd maar heeft een paar verschillen met de hiervoor beschreven velden.
+        - Bij een PUT request word de bestaande lijst overschreven met de nieuwe lijst.
+        - Bij een PATCH request wordt de lijst alleen overschreven als het veld wordt meegegeven.
+        - In een PUT of PATCH kan in een eigenaar object een bestaand `uuid` worden meegegeven zodat een bestaande eigenaar blijft bestaan.
+        Zo kan ook een bestaande eigenaar worden gewijzigd.
+        - eigenaren zonder `uuid` zullen worden aangemaakt in een PUT of PATCH.
+        - bestaande eigenaren die niet in de lijst voorkomen met hun id zullen worden verwijderd.

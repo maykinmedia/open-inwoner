@@ -1,10 +1,13 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n utils %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+    <h1 class="utrecht-heading-1">{{ object.product_type.naam }}</h1>
 
     {% if object.omschrijving %}
-        <p class="utrecht-paragraph">{{ object.omschrijving }}</p>
+        <p class="utrecht-paragraph">{{ object.product_type.omschrijving }}</p>
     {% endif %}
+
+    Voorwaarden: {{ object.voorwaarden|markdown|safe }}<br/>
+    Benodigheden: {{ object.benodigheden }}
 {% endblock content %}

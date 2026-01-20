@@ -2,23 +2,7 @@
 {% load i18n %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{% trans "Mijn Producten" %}</h1>
 
-    {% if products %}
-        <ul class="utrecht-unordered-list">
-            {% for product in products %}
-                <li class="utrecht-unordered-list__item">
-                    <a href="{% url 'mijn_producten:mijn-product-detail' pk=product.id %}">
-                        <strong>{{ product.naam }}</strong>
-                    </a>
-                    <p class="utrecht-paragraph">
-                        {% trans "Type" %}: {{ product.type }} |
-                        {% trans "Status" %}: {{ product.status }}
-                    </p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="utrecht-paragraph">{% trans "U heeft geen producten." %}</p>
-    {% endif %}
+    {{ producten_json }}
+
 {% endblock content %}
