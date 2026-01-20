@@ -27,6 +27,7 @@ import { CookieBanner } from './cookie-consent';
 import './datepicker';
 import { Dropdown } from './dropdown';
 import './emoji-button';
+import './fieldlab/date-format-string';
 import './FilterBar';
 import './form';
 import './header';
