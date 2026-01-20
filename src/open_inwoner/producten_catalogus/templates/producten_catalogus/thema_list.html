@@ -1,8 +1,28 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n utils menu static %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{% trans "Themas" %}</h1>
+    <h1 class="utrecht-heading-1">{% trans "Thema's" %}</h1>
 
-    <pre>{{ themas_json }}</pre>
+    {% if themas %}
+        <h2 class="utrecht-heading-2">{% trans "Hoofdthema's" %}</h2>
+        <oip-card-grid columns="2">
+            {% for thema in themas %}
+                {% if not thema.hoofd_thema %}
+                    <oip-card-tile
+                        title="{{ thema.naam }}"
+                        description="{{ thema.beschrijving|truncatewords:25 }}"
+                        identificatie="{{ thema.uuid }}"
+                        detail-url="/product-catalogus/themas/{{ thema.uuid }}/"
+                    ></oip-card-tile>
+                {% endif %}
+            {% endfor %}
+        </oip-card-grid>
+    {% else %}
+        <p class="utrecht-paragraph">{% trans "Geen themas beschikbaar." %}</p>
+    {% endif %}
 {% endblock content %}

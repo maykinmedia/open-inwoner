@@ -1,5 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n utils %}
+{% load i18n utils button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags static menu %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
     <h1 class="utrecht-heading-1">{{ object.product_type.naam }}</h1>
@@ -9,5 +13,5 @@
     {% endif %}
 
     Voorwaarden: {{ object.voorwaarden|markdown|safe }}<br/>
-    Benodigheden: {{ object.benodigheden }}
+    Benodigheden: {{ object.benodigheden|markdown|safe }}
 {% endblock content %}

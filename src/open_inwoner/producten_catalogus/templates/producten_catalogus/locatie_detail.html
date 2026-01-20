@@ -1,5 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n utils button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags static menu %}
+
+{% block sidebar_content %}
+    {% include "components/Sidenav/Sidenav.html" %}
+{% endblock %}
 
 {% block content %}
     <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
@@ -21,17 +25,47 @@
     {% endif %}
 
     {% if object.telefoonnummer or object.email or object.website %}
-        <div>
-            <h2 class="utrecht-heading-2">{% trans "Contact" %}</h2>
-            {% if object.telefoonnummer %}
-                <p class="utrecht-paragraph">{% trans "Telefoon" %}: {{ object.telefoonnummer }}</p>
-            {% endif %}
-            {% if object.email %}
-                <p class="utrecht-paragraph">{% trans "Email" %}: {{ object.email }}</p>
-            {% endif %}
-            {% if object.website %}
-                <p class="utrecht-paragraph">{% trans "Website" %}: {{ object.website }}</p>
-            {% endif %}
+        <div class="contact-block">
+            <h3 class="utrecht-heading-3" id="contact">{% trans "Contact" %}</h3>
+
+            <div class="grid grid--compact">
+                <div class="column column--start-1 column--span-12">
+                    <h4 class="utrecht-heading-4">{{ object.naam }}</h4>
+                </div>
+
+                {% if object.telefoonnummer %}
+                    <div class="column column--start-1 column--span-6">
+                        <span class="utrecht-paragraph">{% trans "Telefoon" %}</span>
+                    </div>
+                    <div class="column column--start-7 column--span-6">
+                        <a href="tel:{{ object.telefoonnummer }}" class="link link--secondary" aria-label="{{ object.telefoonnummer }}" title="{{ object.telefoonnummer }}">
+                            <span class="link__text">{{ object.telefoonnummer }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+
+                {% if object.email %}
+                    <div class="column column--start-1 column--span-6">
+                        <p class="utrecht-paragraph">{% trans "Email" %}</p>
+                    </div>
+                    <div class="column column--start-7 column--span-6">
+                        <a href="mailto:{{ object.email }}" class="link link--secondary" aria-label="{{ object.email }}" title="{{ object.email }}">
+                            <span class="link__text">{{ object.email }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+
+                {% if object.website %}
+                    <div class="column column--start-1 column--span-6">
+                        <p class="utrecht-paragraph">{% trans "Website" %}</p>
+                    </div>
+                    <div class="column column--start-7 column--span-6">
+                        <a href="{{ object.website }}" class="link link--secondary" aria-label="{{ object.website }}" title="{{ object.website }}" target="_blank" rel="noopener noreferrer">
+                            <span class="link__text">{{ object.website }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     {% endif %}
 {% endblock content %}

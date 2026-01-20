@@ -1,0 +1,15 @@
+oip-card-tile {
+  --card-color-background: #fff;
+  --card-color-border: var(--color-gray);
+  --card-size-border: var(--border-width-thin);
+  --card-size-dog-ear: var(--gutter-width);
+  --card-spacing: var(--spacing-large);
+  --card-spacing-vertical: var(--spacing-giant);
+  --card-spacing-horizontal: var(--spacing-extra-large);
+  background-color: var(--card-color-background);
+  border: var(--card-size-border) solid var(--card-color-border);
+
+  .card {
+    border: none;
+  }
+}
