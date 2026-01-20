@@ -129,6 +129,10 @@ def settings(request):
         "products": open_product_client.Product.product.list(
             params={"eigenaren__bsn": "111222333"}
         )["results"],
+        "locaties": [
+            t
+            for t in OpenProductclient.from_env().ProductType.locatie.list()["results"]
+        ],
     }
 
     if hasattr(django_settings, "SENTRY_CONFIG"):
