@@ -13,16 +13,34 @@
     {% endif %}
 
     {% if object.straat or object.huisnummer or object.postcode or object.plaats %}
-        <div>
-            <h2 class="utrecht-heading-2">{% trans "Adres" %}</h2>
+        <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="notifications">Adres
+                    </h2>
+                    <div class="tabled__item--mobile-big">
+                        &nbsp;
+                    </div>
+                </header>
+
+            </div>
             {% if object.straat or object.huisnummer %}
-                <p class="utrecht-paragraph">{{ object.straat }} {{ object.huisnummer }}</p>
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">Straat en huisnummer</div>
+                    <div class="tabled__item tabled__value">{{ object.straat }} {{ object.huisnummer }}</div>
+                </div>
             {% endif %}
             {% if object.postcode or object.plaats %}
-                <p class="utrecht-paragraph">{{ object.postcode }} {{ object.plaats }}</p>
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">Ontvang meldingen over</div>
+                    <div class="tabled__item tabled__value">
+                        <div class="item__option">{{ object.postcode }} {{ object.plaats }}</div>
+                    </div>
+                </div>
             {% endif %}
-        </div>
+        </section>
     {% endif %}
+
 
     {% if object.telefoonnummer or object.email or object.website %}
         <div class="contact-block">
