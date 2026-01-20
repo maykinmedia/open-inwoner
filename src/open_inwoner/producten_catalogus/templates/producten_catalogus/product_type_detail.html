@@ -6,7 +6,7 @@
         {% if object.product_type.links %}
             <li class="anchor-menu__list-item">
                 {% with object.product_type.links.0 as first_link %}
-                    {% button href=first_link.url size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                    {% button href=first_link.url size="big" text="Aanvraag starten" primary=True icon="arrow_forward" icon_position="before" %}
                 {% endwith %}
             </li>
         {% endif %}
