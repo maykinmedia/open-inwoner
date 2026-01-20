@@ -1,18 +1,191 @@
 {% extends 'master.html' %}
-{% load i18n utils button_tags string_tags pagination_tags helpers form_tags link_tags cms_tags static menu %}
+{% load i18n l10n button_tags file_tags grid_tags icon_tags link_tags notification_tags utils render_tags anchor_menu_tags string_tags %}
 
 {% block sidebar_content %}
-    {% include "components/Sidenav/Sidenav.html" %}
-{% endblock %}
+    {% anchor_menu anchors=anchors desktop=True %}
+        {% if object.product_type.links %}
+            <li class="anchor-menu__list-item">
+                {% with object.product_type.links.0 as first_link %}
+                    {% button href=first_link.url size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                {% endwith %}
+            </li>
+        {% endif %}
+    {% endanchor_menu %}
+{% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.product_type.naam }}</h1>
 
-    {% if object.omschrijving %}
-        <p class="utrecht-paragraph">{{ object.product_type.omschrijving }}</p>
+    <h1 class="utrecht-heading-1" id="title">
+        {{ object.product_type.naam }}
+        {% if request.user.is_staff %}
+            {% button icon="edit" text=_("Bewerken in de Admin") hide_text=True href="admin:producten_catalogus_producttype_change" object_id=object.product_type.uuid %}
+        {% endif %}
+    </h1>
+
+    {% if object.product_type.keywords %}
+        <aside class="oip-tag-list" aria-label="{% trans "Tag lijst" %}">
+            <ul class="oip-tag-list__list">
+                {% for keyword in object.product_type.keywords %}
+                    <li class="oip-tag-list__list-item">
+                        <span class="oip-tag">{{ keyword }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </aside>
     {% endif %}
 
-    Voorwaarden: {{ object.voorwaarden|markdown|safe }}<br/>
-    Benodigheden: {{ object.benodigheden|markdown|safe }}
-    Actuele prijs: {{ actuele_prijs }}
+    {% if object.product_type.samenvatting %}
+        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-summary">{{ object.product_type.samenvatting|product_markdown }}</p>
+    {% endif %}
+
+    {% if object.voorwaarden %}
+        <div class="product-info__section">
+            <h2 class="utrecht-heading-3" id="voorwaarden">{% trans "Voorwaarden" %}</h2>
+            <div class="utrecht-paragraph">{{ object.voorwaarden|product_markdown }}</div>
+        </div>
+    {% endif %}
+
+    {% if object.actuele_prijs.actuele_prijs %}
+        <div class="product-info__section">
+            <h2 class="utrecht-heading-2" id="kosten">{% trans "Kosten" %}</h2>
+            <dl class="kosten-list">
+                {% for prijsoptie in object.actuele_prijs.actuele_prijs.prijsopties %}
+                    <div class="kosten-item">
+                        <dt>{{ prijsoptie.beschrijving|capfirst }}</dt>
+                        <dd class="kosten-item__bedrag">&euro; {{ prijsoptie.bedrag }}</dd>
+                    </div>
+                {% endfor %}
+            </dl>
+        </div>
+    {% endif %}
+
+    {% if object.benodigdheden %}
+        <div class="product-info__section">
+            <h2 class="utrecht-heading-3" id="benodigdheden">{% trans "Wat heb je nodig?" %}</h2>
+            <div class="utrecht-paragraph">{{ object.benodigdheden|product_markdown }}</div>
+        </div>
+    {% endif %}
+
+    {% if object.product_type.links or object.product_type.bestanden or object.product_type.contacten or object.product_type.locaties or object.product_type.themas %}
+        <hr class="divider">
+    {% endif %}
+
+    <div class="product-info">
+        {% if object.product_type.bestanden %}
+            <div class="product-info__section">
+                <h2 class="utrecht-heading-3" id="bestanden">{% trans "Bestanden" %}</h2>
+                <ul class="link-list__list">
+                    {% for bestand in object.product_type.bestanden %}
+                        <li class="link-list__list-item link-list__list-item--wrap">
+                            {% link href=bestand.url secondary=True text=bestand.naam %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% render_grid %}
+            {% render_column span=5 %}
+                {% if object.product_type.links %}
+                    <nav class="link-list" aria-label="{% trans "links" %}">
+                        <h2 class="utrecht-heading-3" id="links">{% trans "Links" %}</h2>
+                        <ul class="link-list__list">
+                            {% for link in object.product_type.links %}
+                                <li class="link-list__list-item link-list__list-item--wrap">
+                                    {% link href=link.url secondary=True text=link.naam %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endrender_column %}
+
+            {% render_column start=7 span=4 compact=True %}
+                {% if object.product_type.themas %}
+                    <nav class="link-list" aria-label="{% trans "Gerelateerde thema's" %}">
+                        <h2 class="utrecht-heading-3" id="themas">{% trans "Thema's" %}</h2>
+                        <ul class="link-list__list">
+                            {% for thema in object.product_type.themas %}
+                                <li class="link-list__list-item link-list__list-item--wrap">
+                                    {% link href="/product-catalogus/themas/"|add:thema.uuid|add:"/" secondary=True text=thema.naam %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endrender_column %}
+
+            {% render_column span=9 %}
+                {% if object.product_type.contacten %}
+                    <div class="contact-block">
+                        <h2 class="utrecht-heading-3" id="contact">{% trans 'Contact' %}</h2>
+
+                        {% for contact in object.product_type.contacten %}
+                            {% render_grid compact=True %}
+                                {% render_column span=12 %}
+                                    <h4 class="utrecht-heading-4">{{ contact.naam }}</h4>
+                                {% endrender_column %}
+
+                                {% if contact.telefoonnummer %}
+                                    {% render_column span=6 %}
+                                        <span class="utrecht-paragraph">{% trans "Telefoonnummer" %}</span>
+                                    {% endrender_column %}
+
+                                    {% render_column start=7 span=6 %}
+                                        {% link href='tel:'|add:contact.telefoonnummer text=contact.telefoonnummer secondary=True %}
+                                    {% endrender_column %}
+                                {% endif %}
+
+                                {% if contact.email %}
+                                    {% render_column span=6 %}
+                                        <p class="utrecht-paragraph">{% trans "E-mail" %}</p>
+                                    {% endrender_column %}
+
+                                    {% render_column start=7 span=6 %}
+                                        {% link href='mailto:'|add:contact.email text=contact.email secondary=True %}
+                                    {% endrender_column %}
+                                {% endif %}
+                            {% endrender_grid %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endrender_column %}
+        {% endrender_grid %}
+
+        {% if object.product_type.locaties %}
+            <div class="product-info__section">
+                <h2 class="utrecht-heading-3" id="locaties">{% trans "Locaties" %}</h2>
+                {% render_grid %}
+                    {% for locatie in object.product_type.locaties %}
+                        {% render_column span=4 %}
+                            <div class="location-card">
+                                <h4 class="utrecht-heading-4">{{ locatie.naam }}</h4>
+                                {% if locatie.straatnaam %}
+                                    <p class="utrecht-paragraph">
+                                        {{ locatie.straatnaam }} {{ locatie.huisnummer }}<br>
+                                        {{ locatie.postcode }} {{ locatie.plaats }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endrender_column %}
+                    {% endfor %}
+                {% endrender_grid %}
+            </div>
+        {% endif %}
+    </div>
+
+    <hr class="divider">
+
+    <details class="debug-details" style="margin-top: 2rem; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+        <summary style="cursor: pointer; font-weight: bold; margin-bottom: 1rem;">🔍 Debug: Raw API Data</summary>
+        <div style="overflow-x: auto;">
+            <h4>Product Type Data</h4>
+            <pre style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;">{{ object|pprint }}</pre>
+
+            <pre style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;">{{ object.product_type|pprint }}</pre>
+
+            <h4 style="margin-top: 1rem;">Actuele Prijs</h4>
+            <pre style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word;">{{ object.actuele_prijs|pprint }}</pre>
+        </div>
+    </details>
 {% endblock content %}

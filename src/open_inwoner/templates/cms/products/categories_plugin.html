@@ -61,7 +61,7 @@
     </div>
 </section>
 
-{% if products %}
+{% if products and request.user.is_authenticated %}
     <oip-home-plugin-section
         title="{% trans "Mijn producten" %}"
         next-url="/"
