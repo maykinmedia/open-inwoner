@@ -175,6 +175,9 @@ class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
         content_elements = open_product_client.ProductType.content_element.list(
             product_type_id
         )
+        actuele_prijs = open_product_client.ProductType.product_type.get_actuele_prijs(
+            product_type_id
+        )
 
         voorwaarden = None
         with contextlib.suppress(StopIteration):
@@ -194,6 +197,7 @@ class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
             "product_type": product_type_detail,
             "voorwaarden": voorwaarden,
             "benodigdheden": benodigdheden,
+            "actuele_prijs": actuele_prijs,
         }
 
     @cached_property

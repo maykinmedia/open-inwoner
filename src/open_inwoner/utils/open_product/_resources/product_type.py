@@ -6,6 +6,7 @@ from open_inwoner.utils.open_product.types.resources.content_element import (
     ListContentElementParams,
     NestedContentElement,
 )
+from open_inwoner.utils.open_product.types.resources.prijs import ActuelePrijs
 from open_inwoner.utils.open_product.types.resources.product_type import (
     ListProductTypeParams,
     ProductType,
@@ -77,5 +78,14 @@ class ProductTypeResource(ResourceMixin):
         response = self._get(
             f"{self.base_path}/{str(uuid_or_id)}/content", params=params
         )
+        response.raise_for_status()
+        return response.json()
+
+    def get_actuele_prijs(
+        self,
+        /,
+        uuid_or_id: str | uuid.UUID,
+    ) -> ActuelePrijs:
+        response = self._get(f"{self.base_path}/{str(uuid_or_id)}/actuele-prijs")
         response.raise_for_status()
         return response.json()

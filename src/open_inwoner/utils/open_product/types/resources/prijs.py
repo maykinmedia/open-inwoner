@@ -40,3 +40,13 @@ class Prijs(TypedDict):
     prijsopties: NotRequired[list[PrijsOptie]]
     prijsregels: NotRequired[list[PrijsRegel]]
     actief_vanaf: str
+
+
+class ActuelePrijs(TypedDict):
+    """Prijs (price) response object."""
+
+    uuid: str
+    code: str
+    upl_naam: str
+    upl_uri: str
+    actuele_prijs: Prijs
