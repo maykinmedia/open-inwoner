@@ -104,7 +104,7 @@ class LocatieDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
         locatie = open_product_client.ProductType.locatie.retrieve(locatie_id)
 
         product_typen = open_product_client.ProductType.product_type.list(
-            params={"locaties__uuid": locatie_id}
+            params={"locaties__uuid": locatie_id, "gepubliceerd": True}
         )
 
         return {"locatie": locatie, "product_typen": product_typen}

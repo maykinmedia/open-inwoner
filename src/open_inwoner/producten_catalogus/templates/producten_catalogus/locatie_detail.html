@@ -6,13 +6,13 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+    <h1 class="utrecht-heading-1">{{ object.locatie.naam }}</h1>
 
-    {% if object.omschrijving %}
-        <p class="utrecht-paragraph">{{ object.omschrijving }}</p>
+    {% if object.locatie.omschrijving %}
+        <p class="utrecht-paragraph">{{ object.locatie.omschrijving }}</p>
     {% endif %}
 
-    {% if object.straat or object.huisnummer or object.postcode or object.plaats %}
+    {% if object.locatie.straat or object.locatie.huisnummer or object.locatie.postcode or object.locatie.plaats %}
         <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
             <div class="tabled__section">
                 <header class="oip-header-group title">
@@ -24,17 +24,54 @@
                 </header>
 
             </div>
-            {% if object.straat or object.huisnummer %}
+            {% if object.locatie.straat or object.locatie.huisnummer %}
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">Straat en huisnummer</div>
-                    <div class="tabled__item tabled__value">{{ object.straat }} {{ object.huisnummer }}</div>
+                    <div class="tabled__item tabled__value">{{ object.locatie.straat }} {{ object.locatie.huisnummer }}</div>
                 </div>
             {% endif %}
-            {% if object.postcode or object.plaats %}
+            {% if object.locatie.postcode or object.locatie.plaats %}
                 <div class="tabled__row tabled__row--blank">
                     <div class="tabled__item tabled__key">Ontvang meldingen over</div>
                     <div class="tabled__item tabled__value">
-                        <div class="item__option">{{ object.postcode }} {{ object.plaats }}</div>
+                        <div class="item__option">{{ object.locatie.postcode }} {{ object.locatie.plaats }}</div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    {% if object.locatie.telefoonnummer or object.locatie.email or object.locatie.website %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-contact">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="contact">Contactgegevens
+                    </h2>
+                    <div class="tabled__item--mobile-big">
+                        &nbsp;
+                    </div>
+                </header>
+
+            </div>
+            {% if object.locatie.telefoonnummer %}
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">Telefoon</div>
+                    <div class="tabled__item tabled__value">{{ object.locatie.telefoonnummer }}</div>
+                </div>
+            {% endif %}
+            {% if object.locatie.email %}
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">Email</div>
+                    <div class="tabled__item tabled__value">
+                        <div class="item__option">{{ object.locatie.email }}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if object.locatie.website %}
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">Website</div>
+                    <div class="tabled__item tabled__value">
+                        <div class="item__option">{{ object.locatie.website }}</div>
                     </div>
                 </div>
             {% endif %}
@@ -42,48 +79,30 @@
     {% endif %}
 
 
-    {% if object.telefoonnummer or object.email or object.website %}
-        <div class="contact-block">
-            <h3 class="utrecht-heading-3" id="contact">{% trans "Contact" %}</h3>
-
-            <div class="grid grid--compact">
-                <div class="column column--start-1 column--span-12">
-                    <h4 class="utrecht-heading-4">{{ object.naam }}</h4>
-                </div>
-
-                {% if object.telefoonnummer %}
-                    <div class="column column--start-1 column--span-6">
-                        <span class="utrecht-paragraph">{% trans "Telefoon" %}</span>
+    {% if object.product_typen.results|length > 0 %}
+    <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-contact">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="contact">Producttypen
+                    </h2>
+                    <div class="tabled__item--mobile-big">
+                        &nbsp;
                     </div>
-                    <div class="column column--start-7 column--span-6">
-                        <a href="tel:{{ object.telefoonnummer }}" class="link link--secondary" aria-label="{{ object.telefoonnummer }}" title="{{ object.telefoonnummer }}">
-                            <span class="link__text">{{ object.telefoonnummer }}</span>
-                        </a>
-                    </div>
-                {% endif %}
-
-                {% if object.email %}
-                    <div class="column column--start-1 column--span-6">
-                        <p class="utrecht-paragraph">{% trans "Email" %}</p>
-                    </div>
-                    <div class="column column--start-7 column--span-6">
-                        <a href="mailto:{{ object.email }}" class="link link--secondary" aria-label="{{ object.email }}" title="{{ object.email }}">
-                            <span class="link__text">{{ object.email }}</span>
-                        </a>
-                    </div>
-                {% endif %}
-
-                {% if object.website %}
-                    <div class="column column--start-1 column--span-6">
-                        <p class="utrecht-paragraph">{% trans "Website" %}</p>
-                    </div>
-                    <div class="column column--start-7 column--span-6">
-                        <a href="{{ object.website }}" class="link link--secondary" aria-label="{{ object.website }}" title="{{ object.website }}" target="_blank" rel="noopener noreferrer">
-                            <span class="link__text">{{ object.website }}</span>
-                        </a>
-                    </div>
-                {% endif %}
+                </header>
             </div>
-        </div>
+        <oip-card-grid columns="2">
+            {% for producttype in object.product_typen.results %}
+                <oip-card-tile
+                    title="{{ producttype.naam|title }}"
+                    identificatie="{{ producttype.uuid }}"
+                    detail-url="/product-catalogus/product-typen/{{ producttype.uuid }}/"
+                    code="{{ producttype.code }}"
+                    keywords="{{ producttype.keywords|join:', ' }}"
+                    toegestane-statussen="{{ producttype.toegestane_statussen|join:', ' }}"
+                    gepubliceerd="{{ producttype.gepubliceerd|lower }}"
+                    publicatie-start-datum="{{ producttype.publicatie_start_datum }}"
+                ></oip-card-tile>
+            {% endfor %}
+        </oip-card-grid>
     {% endif %}
 {% endblock content %}

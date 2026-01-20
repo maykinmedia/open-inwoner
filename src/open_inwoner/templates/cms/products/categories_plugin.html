@@ -38,26 +38,18 @@
         <div class="card-container card-container--columns-4">
         {% endif %}
     {% endwith %}
-        {% url "producten_catalogus:locatie-detail" 123 as test %}
-        <oip-card
-            variant="location"
-            location-name="Stadhuis"
-            location-url="{{test}}"
-            address-line-1="Stadhuisplein 1"
-            address-line-2="1000 AA Utrecht"
-            phone-number="030 1234567"
-            email="stadhuis@gemeente.nl"
-        ></oip-card>
-
-        <oip-card
-            variant="location"
-            location-name="Wijkbureau Oost"
-            location-url="{{test}}"
-            address-line-1="Ooststraat 25"
-            address-line-2="1001 BB Utrecht"
-            phone-number="030 7654321"
-            email="wijkbureau.oost@gemeente.nl"
-        ></oip-card>
+        {% for location in locaties %}
+            {% url "producten_catalogus:locatie-detail" location.uuid as test %}
+            <oip-card
+                variant="location"
+                location-name="{{location.naam}}"
+                location-url="{{test}}"
+                address-line-1="{{location.straat}} {{location.huis_nummer}}"
+                address-line-2="{{location.postcode}}, {{location.stad}}"
+                phone-number="{{location.phone_number}}"
+                email="{{location.email}}"
+            ></oip-card>
+        {% endfor %}
     </div>
 </section>
 
