@@ -96,3 +96,39 @@ class ProductDetailView(
         open_product_client = OpenProductclient.from_env()
         product = open_product_client.Product.product.retrieve(pk)
         return product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Build dynamic anchors based on available data
+        anchors = [
+            ("#title", _("Overzicht")),
+            ("#info", _("Productgegevens")),
+        ]
+
+        if self.object.get("acties"):
+            anchors.append(("#acties", _("Wat kan ik regelen")))
+
+        anchors.append(("#producttype", _("Producttype")))
+
+        if self.object.get("eigenaren"):
+            anchors.append(("#eigenaren", _("Eigenaren")))
+
+        if self.object.get("documenten"):
+            anchors.append(("#documenten", _("Documenten")))
+
+        if self.object.get("zaken"):
+            anchors.append(("#zaken", _("Gekoppelde zaken")))
+
+        if self.object.get("taken"):
+            anchors.append(("#taken", _("Taken")))
+
+        if self.object.get("verbruiksobject"):
+            anchors.append(("#verbruiksobject", _("Verbruiksobject")))
+
+        if self.object.get("dataobject"):
+            anchors.append(("#dataobject", _("Extra gegevens")))
+
+        context["anchors"] = anchors
+        context["product_json"] = json.dumps(self.object, indent=2, default=str)
+        return context

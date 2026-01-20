@@ -1,7 +1,362 @@
 {% extends 'master.html' %}
-{% load i18n %}
+{% load i18n anchor_menu_tags icon_tags link_tags button_tags grid_tags list_tags %}
+
+{% block sidebar_content %}
+    {% anchor_menu anchors=anchors desktop=True %}
+{% endblock sidebar_content %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1">{{ object.naam }}</h1>
+<div class="product-detail">
+    {# Header Section #}
+    <section class="tabled tabled--flexible">
+        <h1 class="utrecht-heading-1" id="title">{{ object.naam|default:object.producttype.uniforme_product_naam }}</h1>
 
+        {% if object.status %}
+            <p class="tabled__key">
+                {% trans "Status" %}:
+                <span class="tabled__value">
+                    <span class="tag tag--status">{{ object.status }}</span>
+                </span>
+            </p>
+        {% endif %}
+    </section>
+
+    {# Product Information Dashboard #}
+    <section class="tabled tabled--flexible profile-section profile-section--bordered">
+        <div class="tabled__section">
+            <header class="oip-header-group title">
+                <h2 class="utrecht-heading-2" id="info">{% trans "Productgegevens" %}</h2>
+            </header>
+        </div>
+
+        {% if object.start_datum %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Startdatum" %}</div>
+                <div class="tabled__item tabled__value">{{ object.start_datum }}</div>
+            </div>
+        {% endif %}
+
+        {% if object.eind_datum %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Einddatum" %}</div>
+                <div class="tabled__item tabled__value">{{ object.eind_datum }}</div>
+            </div>
+        {% endif %}
+
+        {% if object.prijs %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Prijs" %}</div>
+                <div class="tabled__item tabled__value">&euro; {{ object.prijs }}{% if object.frequentie %} {{ object.frequentie }}{% endif %}</div>
+            </div>
+        {% endif %}
+
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Aangemaakt op" %}</div>
+            <div class="tabled__item tabled__value">{{ object.aanmaak_datum }}</div>
+        </div>
+
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Laatst bijgewerkt" %}</div>
+            <div class="tabled__item tabled__value">{{ object.update_datum }}</div>
+        </div>
+    </section>
+
+    {# Product Type Section #}
+    <section class="tabled tabled--flexible profile-section profile-section--bordered">
+        <div class="tabled__section">
+            <header class="oip-header-group title">
+                <h2 class="utrecht-heading-2" id="producttype">{% trans "Producttype" %}</h2>
+            </header>
+        </div>
+
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Naam" %}</div>
+            <div class="tabled__item tabled__value">{{ object.producttype.uniforme_product_naam }}</div>
+        </div>
+
+        <div class="tabled__row tabled__row--blank">
+            <div class="tabled__item tabled__key">{% trans "Code" %}</div>
+            <div class="tabled__item tabled__value">
+                <code class="code-inline">{{ object.producttype.code }}</code>
+            </div>
+        </div>
+
+        {% if object.producttype.keywords %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Trefwoorden" %}</div>
+                <div class="tabled__item tabled__value">
+                    {% for keyword in object.producttype.keywords %}
+                        <span class="tag">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if object.producttype.themas %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Thema's" %}</div>
+                <div class="tabled__item tabled__value">
+                    {% for thema in object.producttype.themas %}
+                        <span class="tag tag--secondary">{{ thema.naam }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if object.producttype.toegestane_statussen %}
+            <div class="tabled__row tabled__row--blank">
+                <div class="tabled__item tabled__key">{% trans "Toegestane statussen" %}</div>
+                <div class="tabled__item tabled__value">
+                    {% for status in object.producttype.toegestane_statussen %}
+                        <span class="tag tag--outline">{{ status }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </section>
+
+    {# Owners Section #}
+    {% if object.eigenaren %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="eigenaren">{% trans "Eigenaren" %}</h2>
+                </header>
+            </div>
+
+            {% for eigenaar in object.eigenaren %}
+                {% if eigenaar.bsn %}
+                    <div class="tabled__row tabled__row--blank">
+                        <div class="tabled__item tabled__key">{% trans "BSN" %}</div>
+                        <div class="tabled__item tabled__value">{{ eigenaar.bsn }}</div>
+                    </div>
+                {% endif %}
+
+                {% if eigenaar.kvk_nummer %}
+                    <div class="tabled__row tabled__row--blank">
+                        <div class="tabled__item tabled__key">{% trans "KvK nummer" %}</div>
+                        <div class="tabled__item tabled__value">{{ eigenaar.kvk_nummer }}</div>
+                    </div>
+                {% endif %}
+
+                {% if eigenaar.vestigingsnummer %}
+                    <div class="tabled__row tabled__row--blank">
+                        <div class="tabled__item tabled__key">{% trans "Vestigingsnummer" %}</div>
+                        <div class="tabled__item tabled__value">{{ eigenaar.vestigingsnummer }}</div>
+                    </div>
+                {% endif %}
+
+                {% if eigenaar.klantnummer %}
+                    <div class="tabled__row tabled__row--blank">
+                        <div class="tabled__item tabled__key">{% trans "Klantnummer" %}</div>
+                        <div class="tabled__item tabled__value">{{ eigenaar.klantnummer }}</div>
+                    </div>
+                {% endif %}
+
+                {% if not forloop.last %}
+                    <hr class="divider divider--subtle">
+                {% endif %}
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Documents Section #}
+    {% if object.documenten %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="documenten">{% trans "Documenten" %}</h2>
+                </header>
+            </div>
+
+            {% for document in object.documenten %}
+                <aside class="file">
+                    <div class="file__container">
+                        <div class="file__file">
+                            <div class="file__symbol">
+                                {% icon icon="insert_drive_file" outlined=True %}
+                            </div>
+                            <div class="file__data">
+                                <span class="file__name">
+                                    {% if document.url %}
+                                        {{ document.url }}
+                                    {% else %}
+                                        {{ document.urn }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if document.url %}
+                                {% link href=document.url text=_("Download") primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" blank=True %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </aside>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Cases Section #}
+    {% if object.zaken %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="zaken">{% trans "Gekoppelde zaken" %}</h2>
+                </header>
+            </div>
+
+            <div class="card__grid">
+                {% render_grid %}
+                    {% for zaak in object.zaken %}
+                        {% render_column span=4 %}
+                            <a href="{{ zaak.url|default:'#' }}" class="card card__description-card card--stretch"{% if zaak.url %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                                <div class="card__body">
+                                    <h3 class="card__heading-3">
+                                        <span class="link link__text">{% trans "Gekoppelde zaak" %}</span>
+                                    </h3>
+                                    {% if zaak.urn %}
+                                        {% render_list %}
+                                            <li class="list-item list-item--compact">
+                                                <p class="card__caption card__text--small">
+                                                    <span>{% trans "Referentie" %}:</span>
+                                                    <span class="card__text--dark">{{ zaak.urn }}</span>
+                                                </p>
+                                            </li>
+                                        {% endrender_list %}
+                                    {% endif %}
+                                    <span class="link link--icon link--bold link--primary">
+                                        <span class="link__text">{% trans "Bekijk zaak" %}</span>
+                                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                    </span>
+                                </div>
+                            </a>
+                        {% endrender_column %}
+                    {% endfor %}
+                {% endrender_grid %}
+            </div>
+        </section>
+    {% endif %}
+
+    {# Tasks Section #}
+    {% if object.taken %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="taken">{% trans "Taken" %}</h2>
+                </header>
+            </div>
+
+            <div class="card__grid">
+                {% render_grid %}
+                    {% for taak in object.taken %}
+                        {% render_column span=4 %}
+                            <a href="{{ taak.url|default:'#' }}" class="card card__description-card card--stretch"{% if taak.url %} target="_blank" rel="noopener noreferrer"{% endif %}>
+                                <div class="card__body">
+                                    <h3 class="card__heading-3">
+                                        <span class="link link__text">{% trans "Taak" %}</span>
+                                    </h3>
+                                    {% if taak.urn %}
+                                        {% render_list %}
+                                            <li class="list-item list-item--compact">
+                                                <p class="card__caption card__text--small">
+                                                    <span>{% trans "Referentie" %}:</span>
+                                                    <span class="card__text--dark">{{ taak.urn }}</span>
+                                                </p>
+                                            </li>
+                                        {% endrender_list %}
+                                    {% endif %}
+                                    <span class="link link--icon link--bold link--primary">
+                                        <span class="link__text">{% trans "Bekijk taak" %}</span>
+                                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                    </span>
+                                </div>
+                            </a>
+                        {% endrender_column %}
+                    {% endfor %}
+                {% endrender_grid %}
+            </div>
+        </section>
+    {% endif %}
+
+    {# Consumption Object Section #}
+    {% if object.verbruiksobject %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="verbruiksobject">{% trans "Verbruiksobject" %}</h2>
+                </header>
+            </div>
+
+            {% for key, value in object.verbruiksobject.items %}
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">{{ key }}</div>
+                    <div class="tabled__item tabled__value">{{ value }}</div>
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Data Object Section #}
+    {% if object.dataobject %}
+        <section class="tabled tabled--flexible profile-section profile-section--bordered">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2" id="dataobject">{% trans "Extra gegevens" %}</h2>
+                </header>
+            </div>
+
+            {% for key, value in object.dataobject.items %}
+                <div class="tabled__row tabled__row--blank">
+                    <div class="tabled__item tabled__key">{{ key }}</div>
+                    <div class="tabled__item tabled__value">{{ value }}</div>
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Debug Section (Staff Only) #}
+    {% if request.user.is_staff %}
+        <section class="tabled tabled--flexible profile-section">
+            <div class="tabled__section">
+                <header class="oip-header-group title">
+                    <h2 class="utrecht-heading-2">{% trans "Debug informatie" %}</h2>
+                </header>
+            </div>
+            <details>
+                <summary class="utrecht-paragraph utrecht-paragraph--small">{% trans "Toon ruwe JSON data" %}</summary>
+                <pre style="background: var(--color-gray-100, #f5f5f5); padding: 1rem; overflow-x: auto; font-size: 0.75rem; border-radius: 4px; margin-top: 0.5rem;">{{ product_json }}</pre>
+            </details>
+        </section>
+    {% endif %}
+</div>
+
+<style>
+/* Action list styling */
+.action-list {
+    display: flex;
+    flex-direction: column;
+}
+.action-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-gray-200, #e5e5e5);
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.action-list__item:hover {
+    color: var(--color-primary, #007bc7);
+}
+.action-list__item:first-child {
+    border-top: 1px solid var(--color-gray-200, #e5e5e5);
+}
+.action-list__text {
+    flex: 1;
+}
+.action-list__item .material-icons,
+.action-list__item .material-icons-outlined {
+    color: var(--color-primary, #007bc7);
+}
+</style>
 {% endblock content %}

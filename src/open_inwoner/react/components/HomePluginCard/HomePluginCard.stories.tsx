@@ -47,6 +47,16 @@ export const WithDateAndTime: Story = {
   },
 };
 
+export const ForLocation: Story = {
+  args: {
+    description: 'Hoofkantoor',
+    identificatie: 'abcdef',
+    detailUrl: '/mijn-aanvragen/1/abcdef/status/',
+    renderAsHeading: true,
+    title: 'Melding openbare ruimte',
+  },
+};
+
 export const AsWebComponent: Story = {
   args: {
     description: 'Melding openbare ruimte',

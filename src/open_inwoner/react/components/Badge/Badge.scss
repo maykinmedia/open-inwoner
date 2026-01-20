@@ -1,0 +1,51 @@
+.oip-badge {
+  --badge-background-color: #e8e8e8;
+  --badge-color: #333;
+  --badge-border-color: #d2d2d2;
+  --badge-padding-block: 4px;
+  --badge-padding-inline: 8px;
+  --badge-border-radius: 4px;
+  --badge-font-size: 12px;
+  --badge-font-weight: 600;
+
+  display: inline-flex;
+  align-items: center;
+  padding: var(--badge-padding-block) var(--badge-padding-inline);
+  background-color: var(--badge-background-color);
+  color: var(--badge-color);
+  border: 1px solid var(--badge-border-color);
+  border-radius: var(--badge-border-radius);
+  font-size: var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  font-family: 'Body', Arial, sans-serif;
+  line-height: 1;
+  white-space: nowrap;
+
+  // Success variant (green - for "Nieuw", positive states)
+  &--success {
+    --badge-background-color: #e6f4ea;
+    --badge-color: #1e7e34;
+    --badge-border-color: #b7dfbf;
+  }
+
+  // Warning variant (yellow/orange)
+  &--warning {
+    --badge-background-color: #fff3cd;
+    --badge-color: #856404;
+    --badge-border-color: #ffeeba;
+  }
+
+  // Error variant (red)
+  &--error {
+    --badge-background-color: #f8d7da;
+    --badge-color: #721c24;
+    --badge-border-color: #f5c6cb;
+  }
+
+  // Info variant (blue)
+  &--info {
+    --badge-background-color: #d1ecf1;
+    --badge-color: #0c5460;
+    --badge-border-color: #bee5eb;
+  }
+}

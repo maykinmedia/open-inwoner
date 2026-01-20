@@ -1,23 +1,85 @@
 {% load i18n button_tags menu %}
-{% if categories %}
+{% has_sidenav_items as has_menu %}
+
+{% if themes %}
     <section class="plugin plugin__categories">
         <header class="oip-header-group">
-            <h2 class="utrecht-heading-2">{{ configurable_text.home_page.home_theme_title }}</h2>
-            {% trans "Alle onderwerpen" as button_text %}
-            {% button href='products:category_list' text=button_text transparent=True icon="arrow_forward" icon_position="after" %}
+            <h2 class="utrecht-heading-2">{% trans "Thema's" %}</h2>
+            {% trans "Alle thema's" as button_text %}
+            {% button href='producten_catalogus:thema-list' text=button_text transparent=True icon="arrow_forward" icon_position="after" %}
         </header>
-
-        <p class="utrecht-paragraph">{{ configurable_text.home_page.home_theme_intro|linebreaksbr }}</p>
-
-        {% has_sidenav_items as has_menu %}
-        {% if request.user.is_authenticated %}
-            {% if has_menu %}
-                {% include "components/Card/CardContainer.html" with categories=categories columns=3 image_object_fit="cover" only %}
+        {% with auth=request.user.is_authenticated %}
+            {% if auth and has_menu %}
+                <div class="card-container card-container--columns-3">
             {% else %}
-                {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
+                <div class="card-container card-container--columns-4">
             {% endif %}
-        {% else %}
-            {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}
-        {% endif %}
+        {% endwith %}
+            {% for thema in themes %}
+                <oip-card
+                    title="{{ thema.naam }}"
+                    description="{{ thema.omschrijving }}"
+                    href="{% url 'producten_catalogus:thema-detail' thema_uuid=thema.uuid %}"
+                ></oip-card>
+            {% endfor %}
+        </div>
     </section>
+{% endif %}
+
+<section class="plugin plugin__categories">
+    <header class="oip-header-group">
+        <h2 class="utrecht-heading-2">{% trans "Locatie's" %}</h2>
+    </header>
+    {% has_sidenav_items as has_menu %}
+    {% with auth=request.user.is_authenticated %}
+        {% if auth and has_menu %}
+        <div class="card-container card-container--columns-3">
+        {% else %}
+        <div class="card-container card-container--columns-4">
+        {% endif %}
+    {% endwith %}
+        {% url "producten_catalogus:locatie-detail" 123 as test %}
+        <oip-card
+            variant="location"
+            location-name="Stadhuis"
+            location-url="{{test}}"
+            address-line-1="Stadhuisplein 1"
+            address-line-2="1000 AA Utrecht"
+            phone-number="030 1234567"
+            email="stadhuis@gemeente.nl"
+        ></oip-card>
+
+        <oip-card
+            variant="location"
+            location-name="Wijkbureau Oost"
+            location-url="{{test}}"
+            address-line-1="Ooststraat 25"
+            address-line-2="1001 BB Utrecht"
+            phone-number="030 7654321"
+            email="wijkbureau.oost@gemeente.nl"
+        ></oip-card>
+    </div>
+</section>
+
+{% if products %}
+    <oip-home-plugin-section
+        title="{% trans "Mijn producten" %}"
+        next-url="/"
+        show-indicator="false"
+        next-url-label="{% trans "Bekijk alle producten" %}"
+        columns="2"
+    >
+        {% for product in products %}
+            <oip-card
+                title="{{product.naam}}"
+                subtitle="ZB65 Oost-3a"
+                status="Status: {{product.status}}"
+                href="{% url "mijn_producten:mijn-product-detail" product_uuid=product.uuid %}"
+                badge-label="Nieuw"
+                badge-variant="success"
+                footer="Aanvraagdatum: {{ product.aanmaak_datum }}"
+                data-prod="{{product}}"
+            ></oip-card>
+        {% endfor %}
+    </oip-home-plugin-section>
 {% endif %}

@@ -48,17 +48,17 @@
                         {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
                             <li class="primary-navigation__list-item dropdown-nav__toggle">
                                 <a href="#" class="link link--toggle link--icon link--icon-position-before" aria-label="{% trans "Onderwerpen" %}" title="{% trans "Onderwerpen" %}" aria-expanded="false">
-                                    <span >{% trans "Onderwerpen" %}</span>
+                                    <span >{% trans "Thema's" %}</span>
                                     <span aria-hidden="true" class="material-icons-outlined ">source</span>
                                     {% icon icon="expand_more" icon_position="after" icon_outlined=True %}
                                 </a>
 
-                                {% if menu_categories %}
+                                {% if themes %}
                                     <ul class="primary-navigation__list subpage-list">
-                                        {% for category in menu_categories %}
+                                        {% for theme in themes %}
                                             <li class="primary-navigation__list-item">
-                                                {% url 'products:category_detail' slug=category.slug as category_href %}
-                                                {% link text=category.name href=category_href %}
+                                                {% url 'producten_catalogus:thema-detail' thema_uuid=theme.uuid as theme_href %}
+                                                {% link text=theme.naam href=theme_href %}
                                             </li>
                                         {% endfor %}
                                     </ul>

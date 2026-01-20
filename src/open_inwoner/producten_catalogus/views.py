@@ -1,5 +1,4 @@
 import contextlib
-import json
 from types import SimpleNamespace
 
 from django.urls import reverse
@@ -29,24 +28,6 @@ class ThemaListView(CommonPageMixin, BaseBreadcrumbMixin, TemplateView):
 
     def page_title(self):
         return _("Themas")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        open_product_client = OpenProductclient.from_env()
-        # TODO: Filter by published status
-
-        thema_response = open_product_client.ProductType.thema.list()
-        root_level_themas = [t for t in thema_response["results"] if t["gepubliceerd"]]
-
-        context.update(
-            {
-                "themas": root_level_themas,
-                "themas_json": json.dumps(root_level_themas, indent=2),
-            }
-        )
-
-        return context
 
 
 class ThemaDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
