@@ -13,11 +13,10 @@
     </header>
 
     {% if object.beschrijving %}
-        <p class="utrecht-paragraph">{{ object.beschrijving|markdown|safe }}</p>
+        <p class="utrecht-paragraph">{{ object.beschrijving|product_markdown }}</p>
     {% endif %}
 
     {% if subthemas|length > 0 %}
-        <hr class="divider">
         <h2 class="utrecht-heading-2">{% trans "Subthema's" %}</h2>
 
         <oip-card-grid columns="2">
@@ -33,10 +32,9 @@
     {% endif %}
 
     {% if object.producttypen|length > 0 %}
-        <hr class="divider">
         <h2 class="utrecht-heading-2">{% trans "Producttypen" %}</h2>
 
-        <oip-card-grid columns="1">
+        <oip-card-grid columns="2">
             {% for producttype in object.producttypen %}
                 <oip-card-tile
                     title="{{ producttype.uniforme_product_naam|title }}"

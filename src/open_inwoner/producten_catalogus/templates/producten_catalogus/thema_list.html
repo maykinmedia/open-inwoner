@@ -8,10 +8,10 @@
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans "Thema's" %}</h1>
 
-    {% if themas %}
+    {% if themes %}
         <h2 class="utrecht-heading-2">{% trans "Hoofdthema's" %}</h2>
         <oip-card-grid columns="2">
-            {% for thema in themas %}
+            {% for thema in themes %}
                 {% if not thema.hoofd_thema %}
                     <oip-card-tile
                         title="{{ thema.naam }}"
@@ -23,6 +23,6 @@
             {% endfor %}
         </oip-card-grid>
     {% else %}
-        <p class="utrecht-paragraph">{% trans "Geen themas beschikbaar." %}</p>
+        <p class="utrecht-paragraph">{% trans "Geen themes beschikbaar." %}</p>
     {% endif %}
 {% endblock content %}

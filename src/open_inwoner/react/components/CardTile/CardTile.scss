@@ -12,4 +12,8 @@ oip-card-tile {
   .card {
     border: none;
   }
+
+  .card .card__content .utrecht-paragraph {
+    margin-top: var(--spacing-small);
+  }
 }

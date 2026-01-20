@@ -52,6 +52,15 @@
   margin-top: var(--spacing-large);
 }
 
-.utrecht-heading-2 ~ oip-card-grid {
-  margin-bottom: var(--spacing-large);
+.utrecht-heading-2 + oip-card-tile,
+.utrecht-heading-2 + oip-card-grid {
+  margin-top: var(--spacing-large);
+}
+
+oip-card-grid + .utrecht-heading-2 {
+  margin-top: var(--row-height);
+}
+
+.utrecht-heading-1 + .utrecht-heading-2 {
+  margin-top: var(--spacing-large);
 }
