@@ -407,14 +407,25 @@ class SideNavMenuData:
             logger.warning("Could not add FAQ menu item", exc_info=True)
             return extra_items
 
-        extra_items.append(
-            {
-                "href": faq_url,
-                "label": str(_("Veelgestelde vragen")),
-                "icon": "question_answer",
-                "current": is_current,
-                "counter": None,
-            }
+        extra_items.extend(
+            [
+                {
+                    "href": faq_url,
+                    "label": str(_("Veelgestelde vragen")),
+                    "icon": "question_answer",
+                    "current": is_current,
+                    "counter": None,
+                },
+                {
+                    "href": reverse("mijn_producten:mijn-product-list"),
+                    "label": "Mijn Producten",
+                    "icon": "shopping_bag",
+                    "current": request.path.startswith(
+                        reverse("mijn_producten:mijn-product-list")
+                    ),
+                    "counter": None,
+                },
+            ]
         )
 
         logger.debug("Generated extra menu items", count=len(extra_items))
@@ -486,7 +497,8 @@ def show_full_dropdown_menu(context) -> bool:
         "profile:appointments",
         "mijn_afval:index",
         "mijn_producten:mijn-product-list",
-        "producten_catalogus/thema_list",
+        "producten_catalogus:thema_list",
+        "mijn_producten:mijn-product-list",
     }
 
     is_url_with_minimal_dropdown = (
