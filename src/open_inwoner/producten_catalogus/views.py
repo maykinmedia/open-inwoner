@@ -1,5 +1,4 @@
 import contextlib
-from types import SimpleNamespace
 
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -101,34 +100,24 @@ class LocatieDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
         For now returns mock data.
         """
         locatie_id = self.kwargs.get(self.slug_url_kwarg)
+        open_product_client = OpenProductclient.from_env()
+        locatie = open_product_client.ProductType.locatie.retrieve(locatie_id)
 
-        # TODO: Replace with actual API client
-        # client = get_locatie_client()
-        # return client.get_locatie_by_id(locatie_id)
-
-        # Mock data
-        return SimpleNamespace(
-            id=locatie_id,
-            naam=f"Locatie {locatie_id}",
-            omschrijving="Dit is een voorbeeld locatie omschrijving.",
-            straat="Keizersgracht",
-            huisnummer="117",
-            postcode="1015 CJ",
-            plaats="Amsterdam",
-            telefoonnummer="020-1234567",
-            email="info@example.com",
-            website="https://example.com",
+        product_typen = open_product_client.ProductType.product_type.list(
+            params={"locaties__uuid": locatie_id}
         )
+
+        return {"locatie": locatie, "product_typen": product_typen}
 
     @cached_property
     def crumbs(self):
         return [
             (_("Locaties"), "#"),
-            (self.object.naam, self.request.path),
+            (self.object["locatie"]["naam"], self.request.path),
         ]
 
     def page_title(self):
-        return self.object.naam
+        return self.object["locatie"]["naam"]
 
 
 class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):

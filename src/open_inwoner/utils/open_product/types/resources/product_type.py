@@ -18,6 +18,20 @@ class ListProductTypeParams(TypedDict, total=False):
     locaties__uuid__in: list[str]
 
 
+class ListLocatieParams(TypedDict, total=False):
+    """Query parameters for listing locaties."""
+
+    email__iexact: str
+    huisnummer__iexact: str
+    naam__iexact: str
+    page: int
+    page_size: int
+    postcode: str
+    stad: str
+    straat__iexact: str
+    telefoonnummer__contains: str
+
+
 class NestedThema(TypedDict):
     """Nested Thema object in ProductType responses."""
 
@@ -35,10 +49,12 @@ class Locatie(TypedDict):
 
     uuid: str
     naam: str
-    straatnaam: NotRequired[str]
+    email: NotRequired[str]
+    telefoonnummer: NotRequired[str]
+    straat: NotRequired[str]
     huisnummer: NotRequired[str]
     postcode: NotRequired[str]
-    plaats: NotRequired[str]
+    stad: NotRequired[str]
 
 
 class Organisatie(TypedDict):
