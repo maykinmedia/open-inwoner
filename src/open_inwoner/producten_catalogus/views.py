@@ -170,7 +170,7 @@ class ProductTypeDetailView(CommonPageMixin, BaseBreadcrumbMixin, DetailView):
         benodigdheden = None
         with contextlib.suppress(StopIteration):
             benodigdheden = next(
-                ce for ce in content_elements if "Benodigheden" in ce["labels"]
+                ce for ce in content_elements if "Benodigdheden" in ce["labels"]
             )
             benodigdheden = benodigdheden["content"]
 

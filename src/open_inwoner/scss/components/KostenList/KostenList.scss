@@ -1,0 +1,21 @@
+.kosten-list {
+  margin: 1rem 0;
+  background: var(--oip-color-gray-100, #f8f9fa);
+  padding: 1.5rem;
+  border-radius: 8px;
+
+  .kosten-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--oip-color-gray-300, #e0e0e0);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .kosten-item__bedrag {
+    font-weight: 600;
+  }
+}
