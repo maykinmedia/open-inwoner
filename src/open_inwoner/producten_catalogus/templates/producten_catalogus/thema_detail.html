@@ -37,7 +37,7 @@
         <oip-card-grid columns="2">
             {% for producttype in object.producttypen %}
                 <oip-card-tile
-                    title="{{ producttype.naam|title }}"
+                    title="{{ producttype.uniforme_product_naam|title }}"
                     identificatie="{{ producttype.uuid }}"
                     detail-url="/product-catalogus/product-typen/{{ producttype.uuid }}/"
                     code="{{ producttype.code }}"

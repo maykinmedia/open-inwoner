@@ -6,7 +6,7 @@
         {% if object.product_type.links %}
             <li class="anchor-menu__list-item">
                 {% with object.product_type.links.0 as first_link %}
-                    {% button href=first_link.url size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                    {% button href=first_link.url size="big" text="Aanvraag starten" primary=True icon="arrow_forward" icon_position="before" %}
                 {% endwith %}
             </li>
         {% endif %}
@@ -38,6 +38,13 @@
         <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-summary">{{ object.product_type.samenvatting|product_markdown }}</p>
     {% endif %}
 
+    {% if object.benodigdheden %}
+        <div class="product-info__section">
+            <h2 class="utrecht-heading-3" id="benodigdheden">{% trans "Wat heb je nodig?" %}</h2>
+            <div class="utrecht-paragraph">{{ object.benodigdheden|product_markdown }}</div>
+        </div>
+    {% endif %}
+
     {% if object.voorwaarden %}
         <div class="product-info__section">
             <h2 class="utrecht-heading-3" id="voorwaarden">{% trans "Voorwaarden" %}</h2>
@@ -58,19 +65,4 @@
             </dl>
         </div>
     {% endif %}
-
-    {% if object.benodigdheden %}
-        <div class="product-info__section">
-            <h2 class="utrecht-heading-3" id="benodigdheden">{% trans "Wat heb je nodig?" %}</h2>
-            <div class="utrecht-paragraph">{{ object.benodigdheden|product_markdown }}</div>
-        </div>
-    {% endif %}
-
-    {% if object.product_type.links or object.product_type.bestanden or object.product_type.contacten or object.product_type.locaties or object.product_type.themas %}
-        <hr class="divider">
-    {% endif %}
-
-    Voorwaarden: {{ object.voorwaarden|markdown|safe }}<br/>
-    Benodigheden: {{ object.benodigheden|markdown|safe }}
-    Actuele prijs: {{ actuele_prijs }}
 {% endblock content %}
