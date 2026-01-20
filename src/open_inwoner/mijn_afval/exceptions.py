@@ -1,0 +1,2 @@
+class MijnAfvalException(Exception):
+    pass

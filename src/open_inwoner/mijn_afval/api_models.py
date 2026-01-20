@@ -2,8 +2,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, alias_generators
 
-from .constants import AfvalType
-
 
 class PydanticModel(BaseModel):
     model_config = ConfigDict(
@@ -12,23 +10,52 @@ class PydanticModel(BaseModel):
     )
 
 
-class Lediging(PydanticModel):
-    tijdstip: datetime
-    gewicht: float
+class Klant(PydanticModel):
+    id: str
+    bsn: str
+    naam: str
+
+
+class Periode(PydanticModel):
+    eerste_lediging: datetime
+    laatste_lediging: datetime
+
+
+class Summary(PydanticModel):
+    totaal_gewicht: float
+    totaal_gewicht_per_afval_type: dict[str, float]
+    aantal_ledigingen: int
+    aantal_containers: int
+    aantal_container_locaties: int
+    periode: Periode
 
 
 class AfvalContainer(PydanticModel):
-    identifier: str
-    type: AfvalType
-    totaal_gewicht: int
-    ledigingen: list[Lediging]
-    description: str | None = None
+    id: str
+    afval_type: str
+    is_verzamelcontainer: bool
+    heeft_sleutel: bool
+    totaal_gewicht: float
 
 
-class BAGObject(PydanticModel):
-    """Basisregistratie Adressen en Gebouwen"""
+class AfvalContainerLocatie(PydanticModel):
+    id: str
+    adres: str
+    totaal_gewicht: float
 
-    object_id: str
-    object_address: str
-    totaal_gewicht: int
+
+class AfvalLediging(PydanticModel):
+    id: str
+    container_location: str
+    klant: str
+    container: str
+    gewicht: float
+    geleegd_op: datetime
+
+
+class AfvalProfiel(PydanticModel):
+    klant: Klant
+    summary: Summary
     containers: list[AfvalContainer]
+    container_locaties: list[AfvalContainerLocatie]
+    ledigingen: list[AfvalLediging]
