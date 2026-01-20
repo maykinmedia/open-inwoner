@@ -54,9 +54,10 @@
 </section>
 
 {% if products and request.user.is_authenticated %}
+    {% url "mijn_producten:mijn-product-list" as producten_url %}
     <oip-home-plugin-section
         title="{% trans "Mijn producten" %}"
-        next-url="/"
+        next-url="{{producten_url}}"
         show-indicator="false"
         next-url-label="{% trans "Bekijk alle producten" %}"
         columns="2"

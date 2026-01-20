@@ -16,6 +16,7 @@ class NestedProductType(TypedDict):
 
     uuid: str
     code: str
+    naam: str
     keywords: NotRequired[list[str]]
     uniforme_product_naam: str
     toegestane_statussen: NotRequired[list[str]]
