@@ -8,6 +8,7 @@ from open_inwoner.utils.open_product._resources.content_element import (
 from open_inwoner.utils.open_product._resources.content_label import (
     ContentLabelResource,
 )
+from open_inwoner.utils.open_product._resources.locatie import LocatieResource
 from open_inwoner.utils.open_product._resources.prijs import PrijsResource
 from open_inwoner.utils.open_product._resources.product_type import ProductTypeResource
 from open_inwoner.utils.open_product._resources.thema import ThemaResource
@@ -20,6 +21,8 @@ class ProductTypeClient(APIClient):
     product_type: ProductTypeResource
     content_element: ContentElementResource
     content_label: ContentLabelResource
+    locatie: LocatieResource
+    prijs: PrijsResource
 
     def __init__(
         self,
@@ -33,3 +36,4 @@ class ProductTypeClient(APIClient):
         self.content_element = ContentElementResource(self)
         self.content_label = ContentLabelResource(self)
         self.prijs = PrijsResource(self)
+        self.locatie = LocatieResource(self)

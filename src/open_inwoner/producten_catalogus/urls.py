@@ -24,7 +24,7 @@ urlpatterns = [
     ),
     # Locatie detail view - uses ID
     path(
-        "locaties/<int:locatie_id>/",
+        "locaties/<uuid:locatie_id>/",
         LocatieDetailView.as_view(),
         name="locatie-detail",
     ),
