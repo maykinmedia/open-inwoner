@@ -9,7 +9,7 @@ Open Inwoner
 :Documentation: https://docs.openinwoner.nl
 :PythonVersion: 3.12
 
-|build-status| |docker| |black| |python-versions|
+|build-status| |docker| |ruff| |python-versions| |storybook|
 
 Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
@@ -42,7 +42,7 @@ commands.
 License
 =======
 
-Copyright © Maykin Media, 2024
+Copyright © Maykin Media, 2026
 
 Licensed under the EUPL_.
 
@@ -60,16 +60,20 @@ References
     :alt: Build status
     :target: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml
 
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :alt: Code style
-    :target: https://github.com/psf/black
+.. |ruff| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+    :alt: Ruff
+    :target: https://github.com/astral-sh/ruff
 
 .. |docker| image:: https://img.shields.io/docker/v/maykinmedia/open-inwoner
     :alt: Docker image
     :target: https://hub.docker.com/r/maykinmedia/open-inwoner
 
-.. |python-versions| image:: https://img.shields.io/badge/python-3.8%2B-blue.svg
+.. |python-versions| image:: https://img.shields.io/badge/python-3.12%2B-blue.svg
     :alt: Supported Python version
+
+.. |storybook| image:: https://img.shields.io/badge/storybook-live-FF4785.svg?logo=storybook
+    :alt: Open Inwoner Storybook
+    :target: https://maykinmedia.github.io/open-inwoner
 
 
 .. _Maykin Media B.V.: https://www.maykinmedia.nl
