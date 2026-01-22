@@ -79,7 +79,7 @@ elastic-apm  # Elastic APM integration
 beautifulsoup4
 
 # DigidLocal
-django-digid-eherkenning[oidc]
+git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning[oidc]
 maykin-python3-saml
 pyopenssl
 django-sessionprofile

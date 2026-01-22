@@ -342,7 +342,7 @@ django-csp-reports==1.9.1
     #   -r requirements/ci.txt
 django-debug-toolbar==3.2.2
     # via -r requirements/dev.in
-django-digid-eherkenning[oidc]==0.19.2
+django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -815,6 +815,7 @@ mozilla-django-oidc==4.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-digid-eherkenning
     #   mozilla-django-oidc-db
 mozilla-django-oidc-db[setup-configuration]==0.23.0
     # via

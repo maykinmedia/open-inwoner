@@ -191,7 +191,7 @@ django-csp==3.7
     # via -r requirements/base.in
 django-csp-reports==1.9.1
     # via -r requirements/base.in
-django-digid-eherkenning[oidc]==0.19.2
+django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning
     # via -r requirements/base.in
 django-elasticsearch-dsl==8.2
     # via -r requirements/base.in
@@ -408,7 +408,9 @@ maykin-python3-saml==1.16.1
 messagebird==2.1.0
     # via -r requirements/base.in
 mozilla-django-oidc==4.0.1
-    # via mozilla-django-oidc-db
+    # via
+    #   django-digid-eherkenning
+    #   mozilla-django-oidc-db
 mozilla-django-oidc-db[setup-configuration]==0.23.0
     # via
     #   -r requirements/base.in
