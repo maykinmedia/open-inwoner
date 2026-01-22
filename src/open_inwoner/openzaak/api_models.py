@@ -196,7 +196,6 @@ class InformatieObjectType(ZGWModel):
     catalogus: str
     omschrijving: str
     vertrouwelijkheidaanduiding: str
-    # Decos gives missing as empty strings
     begin_geldigheid: Optional[date] = None
     einde_geldigheid: Optional[date] = None
     concept: bool = False
@@ -211,6 +210,7 @@ class InformatieObject(ZGWModel):
     titel: str
     vertrouwelijkheidaanduiding: str
     auteur: str
+    status: str
     formaat: str
     taal: str
     versie: int
@@ -222,7 +222,6 @@ class InformatieObject(ZGWModel):
     informatieobjecttype: Union[str, InformatieObjectType]
     locked: bool
     # bestandsdelen: List[str]
-    status: Optional[str] = ""
     beschrijving: Optional[str] = ""
     link: Optional[str] = ""
     ontvangstdatum: Optional[str] = ""
