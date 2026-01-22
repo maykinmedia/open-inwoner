@@ -1,5 +1,5 @@
 import { withLoader } from '@react/lib/decorators/storybook';
-import { Meta, StoryObj } from '@storybook/preact';
+import { Meta, StoryObj } from '@storybook/preact-vite';
 import 'material-icons/iconfont/material-icons.css';
 import { SIDE_NAV_DEFINITION } from '.';
 import SideNav, { SideNavProps } from './SideNav';

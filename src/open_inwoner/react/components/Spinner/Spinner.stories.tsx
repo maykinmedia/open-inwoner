@@ -1,14 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/preact';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
 import { withLoader } from '@react/lib/decorators/storybook';
-import { LOADING_SPINNER_DEFINITION, LoadingSpinner } from '.';
-import './Spinner';
+import {
+  LOADING_SPINNER_DEFINITION,
+  LoadingSpinner,
+  ILoadingSpinnerProps,
+} from '.';
 
-interface SpinnerProps {
-  loadingText?: string;
-  iconName?: string;
-}
-
-const meta: Meta<SpinnerProps> = {
+const meta: Meta<ILoadingSpinnerProps> = {
   title: 'Components/Spinner',
   component: LoadingSpinner,
   parameters: {
@@ -29,7 +27,7 @@ A simple loading spinner preact and web component using Material Icons.
 
 export default meta;
 
-type Story = StoryObj<SpinnerProps>;
+type Story = StoryObj<ILoadingSpinnerProps>;
 
 export const Default: Story = {
   args: {

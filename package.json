@@ -26,9 +26,6 @@
     "type-check": "tsc --noEmit",
     "watch": "npm run collect && vite build --watch --mode=dev"
   },
-  "storybook": {
-    "disableTelemetry": true
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/maykinmedia/open_inwoner.git"
@@ -89,21 +86,17 @@
     "@babel/preset-env": "latest",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
-    "@chromatic-com/storybook": "^3.2.7",
     "@formatjs/cli": "^6.7.2",
     "@formatjs/ts-transformer": "^3.14.0",
     "@preact/preset-vite": "^2.10.2",
-    "@storybook/addon-actions": "^8.6.14",
-    "@storybook/addon-docs": "^8.6.14",
-    "@storybook/addon-essentials": "^8.6.14",
-    "@storybook/addon-links": "^8.6.14",
-    "@storybook/cli": "^8.6.14",
-    "@storybook/html": "^8.6.14",
-    "@storybook/preact-vite": "^8.6.14",
-    "@storybook/test": "^8.6.14",
-    "@storybook/test-runner": "^0.22.1",
-    "@storybook/types": "^8.6.14",
+    "@storybook/addon-a11y": "^10.1.11",
+    "@storybook/addon-docs": "^10.1.11",
+    "@storybook/addon-links": "^10.1.11",
+    "@storybook/cli": "^10.1.11",
+    "@storybook/html": "^10.1.11",
+    "@storybook/preact-vite": "^10.1.11",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/preact": "^3.2.4",
     "@types/leaflet": "^1.7.6",
     "@types/lodash.escape": "^4.0.9",
@@ -138,6 +131,7 @@
     "sass-embedded": "latest",
     "simulant": "latest",
     "sinon": "latest",
+    "storybook": "^10.1.11",
     "stylelint": "^14.1.0",
     "stylelint-config-sass-guidelines": "^9.0.1",
     "ts-loader": "^9.5.2",
@@ -150,7 +144,7 @@
   },
   "overrides": {
     "form-data": ">=2.5.4 || <3.0.0 || >=3.0.4 || <4.0.0 || >=4.0.4",
-    "playwright": ">=1.55.1"
+    "playwright": ">=1.57.1"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "*",

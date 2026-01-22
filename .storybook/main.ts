@@ -7,10 +7,11 @@ const config: StorybookConfig = {
   },
   core: {
     disableWhatsNewNotifications: true,
+    disableTelemetry: true,
   },
-  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
-  addons: ['@storybook/addon-essentials', '@chromatic-com/storybook'],
-  docs: { autodocs: true },
+  stories: ['../src/**/*.stories.@(ts|tsx|mdx)'],
+  addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  staticDirs: [{ from: '../src/open_inwoner/static', to: '/static' }],
 };
 
 export default config;

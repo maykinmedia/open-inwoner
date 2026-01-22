@@ -1,5 +1,4 @@
-import '@open-inwoner/design-tokens/dist/css/index.css';
-import type { Meta, StoryObj } from '@storybook/preact';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
 import { withLoader } from '@react/lib/decorators/storybook';
 import { HOME_PLUGIN_CARD_ITEM_DEFINITION, HomepageCardTypes } from '.';
 import './HomePluginCard';

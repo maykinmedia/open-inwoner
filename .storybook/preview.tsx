@@ -1,10 +1,11 @@
 import '@open-inwoner/design-tokens/dist/css/index.css';
-import { Preview } from '@storybook/preact';
+import '../src/open_inwoner/scss/screen.scss'; // Let storybook compile the SCSS with vite.
+
+import { Preview } from '@storybook/preact-vite';
 import {
   withIntl,
   withThemeClass,
 } from '../src/open_inwoner/react/lib/decorators';
-import '../src/open_inwoner/scss/screen.scss';
 
 const preview: Preview = {
   decorators: [withThemeClass, withIntl],

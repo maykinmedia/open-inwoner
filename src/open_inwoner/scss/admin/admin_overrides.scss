@@ -2,7 +2,7 @@
 @use 'leaflet/dist/leaflet.css';
 
 //Internal
-@import './admin_theme';
-@import './app_overrides';
-@import './django-prosemirror-overrides';
-@import '../components/Map/Map.scss';
+@use './admin_theme';
+@use './app_overrides';
+@use './django-prosemirror-overrides';
+@use '../components/Map/Map.scss';
