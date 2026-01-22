@@ -1,5 +1,5 @@
 import { withLoader } from '@react/lib/decorators/storybook';
-import type { Meta, StoryObj } from '@storybook/preact';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
 import {
   KVK_BRANCH_SELECTOR_DEFINITION,
   KVKBranchSelector,

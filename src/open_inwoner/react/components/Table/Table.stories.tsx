@@ -1,8 +1,8 @@
-import { Meta, StoryObj } from '@storybook/preact';
-import Table from './Table';
-import type { ITableProps } from './Table';
-import { TABLE_DEFINITION } from './constants';
 import { withLoader } from '@react/lib/decorators/storybook';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
+import type { ITableProps } from './Table';
+import Table from './Table';
+import { TABLE_DEFINITION } from './constants';
 
 const meta: Meta<ITableProps> = {
   title: 'Components/Table',

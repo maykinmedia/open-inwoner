@@ -31,6 +31,7 @@ Onderhoud
 
 * [:taiga-us:`3615`]: zgw-klassen, methoden en variabelen hernoemd om Nederlandse
   termen te gebruiken
+* [:gh-issue:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.1.11``.
 
 2.0.0 (2026-01-05)
 ==================

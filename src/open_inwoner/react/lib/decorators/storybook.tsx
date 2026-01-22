@@ -1,5 +1,5 @@
-import { StoryFn } from '@storybook/preact';
 import { I18nProvider } from '@react/i18n';
+import type { StoryFn } from '@storybook/preact-vite';
 import { WebComponentLoader, WebComponentTagName } from '../web-component';
 /**
  * Decorator that adds the openinwoner-theme class to the body

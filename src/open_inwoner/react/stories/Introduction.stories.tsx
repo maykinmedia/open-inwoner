@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/preact';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
 
 // This page is an example of an unattached doc
 const DocsOnly = () => null;

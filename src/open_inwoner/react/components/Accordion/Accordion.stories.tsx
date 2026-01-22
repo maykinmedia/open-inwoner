@@ -1,5 +1,5 @@
 import { withLoader } from '@react/lib/decorators/storybook';
-import { Meta, StoryObj } from '@storybook/preact';
+import type { Meta, StoryObj } from '@storybook/preact-vite';
 import { ACCORDION_DEFINITION, Accordion, IAccordionProps } from '.';
 import { ActionList } from '../ActionList';
 
