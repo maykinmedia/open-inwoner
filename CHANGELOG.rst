@@ -48,6 +48,7 @@ Onderhoud
 * [:gh:`2104`]: Verwijderen in ongebruik geraakte NPM dependencies, ``jest`` en ``karma``
   test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
   ``.babelrc`` en ``.jshintrc``).
+* [:gh:`2166`]:  ``weasyprint`` bijgewerkt naar versie ``0.68``.
 
 2.0.1 (2026-01-26)
 ==================
