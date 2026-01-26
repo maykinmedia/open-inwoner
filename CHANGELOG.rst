@@ -8,6 +8,7 @@ Bugfixes
   waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
 * [:gh-issue:`2107`]: Productie logs worden weggeschreven als JSON voor
   gebruik in log analyse tools.
+* [:gh-issue:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
 
 2.0.0 (2026-01-05)
 ==================
