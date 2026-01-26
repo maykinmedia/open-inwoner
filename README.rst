@@ -84,36 +84,6 @@ Infrastructure
 * **Observability**: OpenTelemetry instrumentation for distributed tracing
 * **Health Checks**: Django health check framework
 
-
-Project Structure
-=================
-
-::
-
-    src/open_inwoner/
-    ├── accounts/       # User authentication & profiles
-    ├── pdc/            # Products and Services Catalog (main service listings)
-    ├── plans/          # Collaboration plans between citizens and government
-    ├── cms/            # Content management (Django CMS)
-    ├── api/            # REST API endpoints
-    ├── search/         # Elasticsearch-powered search
-    ├── questionnaire/  # Form/questionnaire builder
-    ├── openzaak/       # Open Zaak API integration (case management)
-    ├── openklant/      # Open Klant API integration (customer data)
-    ├── haalcentraal/   # Haal Centraal API integration (citizen data)
-    ├── kvk/            # Dutch Chamber of Commerce integration
-    ├── laposta/        # External Newsletter integration
-    ├── qmatic/         # External appointment management integration
-    ├── mail/           # Email/messaging functionality
-    ├── userfeed/       # User activity feed
-    ├── components/     # Reusable component library
-    ├── htmx/           # HTMX integration for dynamic updates
-    ├── react/          # React frontend components
-    ├── static/         # CSS, JS, assets
-    ├── templates/      # Django HTML templates
-    └── utils/          # Shared utilities
-
-
 Integrations
 ============
 
@@ -138,18 +108,6 @@ Other Services
 * **KvK (Kamer van Koophandel)** - Dutch Chamber of Commerce for business data
 * **Qmatic** - External appointment management system
 * **Laposta** - Newsletter and mailing list integration
-
-
-Architecture Highlights
-=======================
-
-* **Multi-frontend approach**: Combines Django templates for server-rendered pages, React components for interactive UI, and HTMX for lightweight dynamic updates
-* **API-first design**: REST API with Django REST Framework and OpenAPI/Swagger documentation
-* **Modular architecture**: Each feature area is a self-contained Django app with models, views, serializers, and templates
-* **Security-by-default**: CSP headers, 2FA/WebAuthn for admin, government-grade authentication integrations
-* **Geospatial capabilities**: PostGIS support with Leaflet mapping for location-based services
-* **12-factor app**: Environment-driven configuration for easy deployment
-
 
 Documentation
 =============
