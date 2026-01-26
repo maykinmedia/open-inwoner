@@ -4,12 +4,12 @@
 Bugfixes
 --------
 
-* [:gh-issue:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
+* [:gh:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
   waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
-* [:gh-issue:`2107`]: Productie logs worden weggeschreven als JSON voor
+* [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor
   gebruik in log analyse tools.
-* [:gh-issue:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
-* [:gh-issue:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie
+* [:gh:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
+* [:gh:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie
   ``10.27.3``.
 
 2.0.0 (2026-01-05)
