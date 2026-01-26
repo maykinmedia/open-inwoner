@@ -1,5 +1,7 @@
-2.0.1 (2026-XX-YY)
+2.0.1 (2026-01-26)
 ==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.1`.
 
 Bugfixes
 --------
