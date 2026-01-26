@@ -41,6 +41,9 @@ Onderhoud
 * [:gh:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en
   copyright.
 * [:gh:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie ``10.27.3``.
+* [:gh:`2104`]: Verwijderen in ongebruik geraakte NPM dependencies, ``jest`` en ``karma``
+  test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
+  ``.babelrc`` en ``.jshintrc``).
 
 2.0.0 (2026-01-05)
 ==================
