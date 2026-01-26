@@ -72,7 +72,7 @@ JavaScript Framework React 18 with TypeScript
 Build Tool           Vite
 Component Library    Storybook
 Dynamic UI           HTMX for lightweight dynamic updates
-Design System        Utrecht design system components
+Design System        NLDS design system components
 ==================== ===================================================
 
 Infrastructure
@@ -92,17 +92,17 @@ Project Structure
 
     src/open_inwoner/
     ├── accounts/       # User authentication & profiles
-    ├── pdc/            # Product Data Catalog (main service listings)
+    ├── pdc/            # Products and Services Catalog (main service listings)
     ├── plans/          # Collaboration plans between citizens and government
     ├── cms/            # Content management (Django CMS)
     ├── api/            # REST API endpoints
     ├── search/         # Elasticsearch-powered search
     ├── questionnaire/  # Form/questionnaire builder
     ├── openzaak/       # Open Zaak API integration (case management)
-    ├── openklant/      # OpenKlant API integration (customer data)
+    ├── openklant/      # Open Klant API integration (customer data)
     ├── haalcentraal/   # Haal Centraal API integration (citizen data)
     ├── kvk/            # Dutch Chamber of Commerce integration
-    ├── laposta/        # Newsletter integration
+    ├── laposta/        # External Newsletter integration
     ├── qmatic/         # External appointment management integration
     ├── mail/           # Email/messaging functionality
     ├── userfeed/       # User activity feed
@@ -128,8 +128,8 @@ Authentication
 Common Ground / ZGW
 -------------------
 
-* **Open Zaak** - Case management (Zaakgericht Werken)
-* **OpenKlant** - Customer/citizen data management
+* **Open Zaak** - Case management (Zaakgericht Werken APIs)
+* **Open Klant** - Customer/citizen data management (Klantinteractie APIs)
 * **Haal Centraal BRP** - Citizen data retrieval from the BRP (Basisregistratie Personen)
 
 Other Services
@@ -137,7 +137,7 @@ Other Services
 
 * **KvK (Kamer van Koophandel)** - Dutch Chamber of Commerce for business data
 * **Qmatic** - External appointment management system
-* **LaPoSta** - Newsletter and mailing list integration
+* **Laposta** - Newsletter and mailing list integration
 
 
 Architecture Highlights
@@ -163,7 +163,7 @@ Full documentation is available at https://docs.openinwoner.nl
 License
 =======
 
-Copyright © Maykin Media, 2024
+Copyright © Maykin Media, 2026
 
 Licensed under the EUPL_.
 
