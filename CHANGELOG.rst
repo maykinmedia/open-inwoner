@@ -35,6 +35,7 @@ Onderhoud
   termen te gebruiken
 * [:gh-issue:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.1.11``.
 * [:gh-issue:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en copyright.
+* [:cve:`CVE-2026-22028`, :gh-issue:`2164`] ``preact`` bijgewerkt naar versie ``10.27.3``.
 
 2.0.0 (2026-01-05)
 ==================
