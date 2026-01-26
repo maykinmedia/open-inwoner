@@ -68,7 +68,7 @@ Frontend
 ==================== ===================================================
 Component            Technology
 ==================== ===================================================
-JavaScript Framework React 18 with TypeScript
+JavaScript Framework Preact (web components) with TypeScript
 Build Tool           Vite
 Component Library    Storybook
 Dynamic UI           HTMX for lightweight dynamic updates
