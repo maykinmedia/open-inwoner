@@ -26,6 +26,7 @@ Bugfixes
 * [:gh-issue:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
   waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
 * [:gh-issue:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
+* [:gh-issue:`2131`]: Probleem met ``vite`` bundler opgelost waardoor de marker van de kaart weer correct wordt geladen.
 
 Onderhoud
 ---------
