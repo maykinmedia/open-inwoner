@@ -14,6 +14,7 @@ export const withThemeClass = (Story: StoryFn) => {
  * This is useful for components that use react-intl hooks like useIntl()
  */
 export const withIntl = (Story: StoryFn) => {
+  document.documentElement.lang = 'nl';
   return (
     <I18nProvider>
       <Story />

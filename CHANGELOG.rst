@@ -20,6 +20,7 @@ Nieuwe features
   in Docker/Kubernetes.
 * [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor gebruik in log analyse
   tools.
+* [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de ‘Mijn Afval’ app.
 
 Bugfixes
 --------

@@ -1,6 +1,5 @@
 // Declare types
 
-import { AnyComponent } from 'preact';
+import { AnyComponent as AC } from 'preact';
 
-export type ExtractGeneric<Type> =
-  Type extends AnyComponent<infer P> ? P : never;
+export type ExtractGeneric<Type> = Type extends AC<infer P> ? P : never;

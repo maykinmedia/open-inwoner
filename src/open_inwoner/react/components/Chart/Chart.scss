@@ -1,0 +1,9 @@
+.afval-chart {
+  border: 1px solid var(--color-gray);
+  border-radius: 2px;
+
+  &__container {
+    min-height: 320px;
+    max-height: 400px;
+  }
+}

@@ -1,5 +1,5 @@
 import { I18nProvider } from '@react/i18n';
-import { AnyComponent } from 'preact';
+import { AnyComponent as AC } from 'preact';
 
 /**
  * Higher-order component that wraps a web component with IntlProvider
@@ -8,10 +8,8 @@ import { AnyComponent } from 'preact';
  * This is automatically used when a web-component has the true for
  * option i18n
  */
-export function withIntl<P = {}, S = {}>(
-  Component: AnyComponent<P, S>
-): AnyComponent<P, S> {
-  const ComponentWithIntl: AnyComponent<P, S> = (props) => {
+export function withIntl<P = {}, S = {}>(Component: AC<P, S>): AC<P, S> {
+  const ComponentWithIntl: AC<P, S> = (props) => {
     return (
       <I18nProvider>
         <Component {...props} />
