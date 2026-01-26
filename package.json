@@ -73,7 +73,7 @@
     "leaflet": "^1.7.1",
     "material-icons": "^1.13.12",
     "microscope-sass": "latest",
-    "preact": "^10.27.2",
+    "preact": "^10.27.3",
     "preact-custom-element": "^4.6.0",
     "proj4leaflet": "^1.0.2",
     "react": "^18.3.1",
