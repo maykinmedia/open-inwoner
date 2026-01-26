@@ -1,0 +1,874 @@
+[
+  {
+    "object_id": "10001",
+    "object_address": "Kerkstraat 12",
+    "totaal_gewicht": "1.245",
+    "containers": [
+      {
+        "identifier": "895468490654",
+        "type": "Restafval",
+        "totaal_gewicht": "720",
+        "ledigingen": [
+          {
+            "tijdstip_datum": "15-07-2024",
+            "tijdstip_tijd": "07:15",
+            "tijdstip_dag": "maandag",
+            "gewicht": "48,2"
+          },
+          {
+            "tijdstip_datum": "12-08-2024",
+            "tijdstip_tijd": "06:45",
+            "tijdstip_dag": "maandag",
+            "gewicht": "52,8"
+          },
+          {
+            "tijdstip_datum": "09-09-2024",
+            "tijdstip_tijd": "07:30",
+            "tijdstip_dag": "maandag",
+            "gewicht": "46,5"
+          },
+          {
+            "tijdstip_datum": "07-10-2024",
+            "tijdstip_tijd": "08:00",
+            "tijdstip_dag": "maandag",
+            "gewicht": "51,3"
+          },
+          {
+            "tijdstip_datum": "04-11-2024",
+            "tijdstip_tijd": "07:20",
+            "tijdstip_dag": "maandag",
+            "gewicht": "49,7"
+          },
+          {
+            "tijdstip_datum": "02-12-2024",
+            "tijdstip_tijd": "06:50",
+            "tijdstip_dag": "maandag",
+            "gewicht": "53,1"
+          },
+          {
+            "tijdstip_datum": "06-01-2025",
+            "tijdstip_tijd": "07:35",
+            "tijdstip_dag": "maandag",
+            "gewicht": "47,9"
+          },
+          {
+            "tijdstip_datum": "03-02-2025",
+            "tijdstip_tijd": "08:10",
+            "tijdstip_dag": "maandag",
+            "gewicht": "50,2"
+          },
+          {
+            "tijdstip_datum": "03-03-2025",
+            "tijdstip_tijd": "07:05",
+            "tijdstip_dag": "maandag",
+            "gewicht": "48,8"
+          },
+          {
+            "tijdstip_datum": "07-04-2025",
+            "tijdstip_tijd": "06:55",
+            "tijdstip_dag": "maandag",
+            "gewicht": "51,6"
+          },
+          {
+            "tijdstip_datum": "05-05-2025",
+            "tijdstip_tijd": "07:40",
+            "tijdstip_dag": "maandag",
+            "gewicht": "49,3"
+          },
+          {
+            "tijdstip_datum": "02-06-2025",
+            "tijdstip_tijd": "08:20",
+            "tijdstip_dag": "maandag",
+            "gewicht": "52,4"
+          },
+          {
+            "tijdstip_datum": "30-06-2025",
+            "tijdstip_tijd": "07:15",
+            "tijdstip_dag": "maandag",
+            "gewicht": "47,1"
+          },
+          {
+            "tijdstip_datum": "28-07-2025",
+            "tijdstip_tijd": "06:40",
+            "tijdstip_dag": "maandag",
+            "gewicht": "50,9"
+          },
+          {
+            "tijdstip_datum": "25-08-2025",
+            "tijdstip_tijd": "07:25",
+            "tijdstip_dag": "maandag",
+            "gewicht": "48,6"
+          }
+        ],
+        "table_data": {
+          "caption": "Container: Restafval - 895468490654",
+          "columns": [
+            {
+              "header": "Datum ophalen",
+              "key": "date"
+            },
+            {
+              "header": "Tijd ophalen",
+              "key": "time"
+            },
+            {
+              "header": "Gewicht (kg)",
+              "key": "weight"
+            }
+          ],
+          "rows": [
+            {
+              "date": "maandag 15-07-2024",
+              "time": "07:15",
+              "weight": "48,2"
+            },
+            {
+              "date": "maandag 12-08-2024",
+              "time": "06:45",
+              "weight": "52,8"
+            },
+            {
+              "date": "maandag 09-09-2024",
+              "time": "07:30",
+              "weight": "46,5"
+            },
+            {
+              "date": "maandag 07-10-2024",
+              "time": "08:00",
+              "weight": "51,3"
+            },
+            {
+              "date": "maandag 04-11-2024",
+              "time": "07:20",
+              "weight": "49,7"
+            },
+            {
+              "date": "maandag 02-12-2024",
+              "time": "06:50",
+              "weight": "53,1"
+            },
+            {
+              "date": "maandag 06-01-2025",
+              "time": "07:35",
+              "weight": "47,9"
+            },
+            {
+              "date": "maandag 03-02-2025",
+              "time": "08:10",
+              "weight": "50,2"
+            },
+            {
+              "date": "maandag 03-03-2025",
+              "time": "07:05",
+              "weight": "48,8"
+            },
+            {
+              "date": "maandag 07-04-2025",
+              "time": "06:55",
+              "weight": "51,6"
+            },
+            {
+              "date": "maandag 05-05-2025",
+              "time": "07:40",
+              "weight": "49,3"
+            },
+            {
+              "date": "maandag 02-06-2025",
+              "time": "08:20",
+              "weight": "52,4"
+            },
+            {
+              "date": "maandag 30-06-2025",
+              "time": "07:15",
+              "weight": "47,1"
+            },
+            {
+              "date": "maandag 28-07-2025",
+              "time": "06:40",
+              "weight": "50,9"
+            },
+            {
+              "date": "maandag 25-08-2025",
+              "time": "07:25",
+              "weight": "48,6"
+            }
+          ],
+          "footerRow": {
+            "date": "Totaal gewicht",
+            "time": "",
+            "weight": "720"
+          },
+          "footerColSpan": 2,
+          "emptyStateMessage": "Voor deze container zijn in deze periode geen gegevens."
+        }
+      },
+      {
+        "identifier": "895468490655",
+        "type": "GFT",
+        "totaal_gewicht": "385",
+        "ledigingen": [
+          {
+            "tijdstip_datum": "20-07-2024",
+            "tijdstip_tijd": "09:15",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "28,5"
+          },
+          {
+            "tijdstip_datum": "17-08-2024",
+            "tijdstip_tijd": "10:30",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "31,2"
+          },
+          {
+            "tijdstip_datum": "14-09-2024",
+            "tijdstip_tijd": "09:45",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "29,8"
+          },
+          {
+            "tijdstip_datum": "12-10-2024",
+            "tijdstip_tijd": "10:00",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "33,1"
+          },
+          {
+            "tijdstip_datum": "09-11-2024",
+            "tijdstip_tijd": "09:20",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "27,4"
+          },
+          {
+            "tijdstip_datum": "07-12-2024",
+            "tijdstip_tijd": "10:15",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "30,6"
+          },
+          {
+            "tijdstip_datum": "11-01-2025",
+            "tijdstip_tijd": "09:35",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "32,8"
+          },
+          {
+            "tijdstip_datum": "08-02-2025",
+            "tijdstip_tijd": "10:45",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "28,9"
+          },
+          {
+            "tijdstip_datum": "08-03-2025",
+            "tijdstip_tijd": "09:50",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "31,5"
+          },
+          {
+            "tijdstip_datum": "12-04-2025",
+            "tijdstip_tijd": "10:20",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "29,1"
+          },
+          {
+            "tijdstip_datum": "10-05-2025",
+            "tijdstip_tijd": "09:40",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "32,4"
+          }
+        ],
+        "table_data": {
+          "caption": "Container: Groente, Fruit en Tuin afval (GFT) - 895468490655",
+          "columns": [
+            {
+              "header": "Datum ophalen",
+              "key": "date"
+            },
+            {
+              "header": "Tijd ophalen",
+              "key": "time"
+            },
+            {
+              "header": "Gewicht (kg)",
+              "key": "weight"
+            }
+          ],
+          "rows": [
+            {
+              "date": "zaterdag 20-07-2024",
+              "time": "09:15",
+              "weight": "28,5"
+            },
+            {
+              "date": "zaterdag 17-08-2024",
+              "time": "10:30",
+              "weight": "31,2"
+            },
+            {
+              "date": "zaterdag 14-09-2024",
+              "time": "09:45",
+              "weight": "29,8"
+            },
+            {
+              "date": "zaterdag 12-10-2024",
+              "time": "10:00",
+              "weight": "33,1"
+            },
+            {
+              "date": "zaterdag 09-11-2024",
+              "time": "09:20",
+              "weight": "27,4"
+            },
+            {
+              "date": "zaterdag 07-12-2024",
+              "time": "10:15",
+              "weight": "30,6"
+            },
+            {
+              "date": "zaterdag 11-01-2025",
+              "time": "09:35",
+              "weight": "32,8"
+            },
+            {
+              "date": "zaterdag 08-02-2025",
+              "time": "10:45",
+              "weight": "28,9"
+            },
+            {
+              "date": "zaterdag 08-03-2025",
+              "time": "09:50",
+              "weight": "31,5"
+            },
+            {
+              "date": "zaterdag 12-04-2025",
+              "time": "10:20",
+              "weight": "29,1"
+            },
+            {
+              "date": "zaterdag 10-05-2025",
+              "time": "09:40",
+              "weight": "32,4"
+            }
+          ],
+          "footerRow": {
+            "date": "Totaal gewicht",
+            "time": "",
+            "weight": "385"
+          },
+          "footerColSpan": 2,
+          "emptyStateMessage": "Voor deze container zijn in deze periode geen gegevens."
+        }
+      },
+      {
+        "identifier": "895468490656",
+        "type": "Restafval",
+        "totaal_gewicht": "140",
+        "ledigingen": [
+          {
+            "tijdstip_datum": "05-08-2024",
+            "tijdstip_tijd": "14:10",
+            "tijdstip_dag": "maandag",
+            "gewicht": "12,3"
+          },
+          {
+            "tijdstip_datum": "23-09-2024",
+            "tijdstip_tijd": "13:45",
+            "tijdstip_dag": "maandag",
+            "gewicht": "13,8"
+          },
+          {
+            "tijdstip_datum": "18-11-2024",
+            "tijdstip_tijd": "14:20",
+            "tijdstip_dag": "maandag",
+            "gewicht": "11,5"
+          },
+          {
+            "tijdstip_datum": "13-01-2025",
+            "tijdstip_tijd": "13:55",
+            "tijdstip_dag": "maandag",
+            "gewicht": "14,2"
+          },
+          {
+            "tijdstip_datum": "10-03-2025",
+            "tijdstip_tijd": "14:35",
+            "tijdstip_dag": "maandag",
+            "gewicht": "12,7"
+          },
+          {
+            "tijdstip_datum": "05-05-2025",
+            "tijdstip_tijd": "13:40",
+            "tijdstip_dag": "maandag",
+            "gewicht": "13,1"
+          },
+          {
+            "tijdstip_datum": "30-06-2025",
+            "tijdstip_tijd": "14:15",
+            "tijdstip_dag": "maandag",
+            "gewicht": "11,9"
+          },
+          {
+            "tijdstip_datum": "25-08-2025",
+            "tijdstip_tijd": "13:50",
+            "tijdstip_dag": "maandag",
+            "gewicht": "14,5"
+          },
+          {
+            "tijdstip_datum": "20-10-2025",
+            "tijdstip_tijd": "14:25",
+            "tijdstip_dag": "maandag",
+            "gewicht": "12,4"
+          },
+          {
+            "tijdstip_datum": "15-12-2025",
+            "tijdstip_tijd": "13:30",
+            "tijdstip_dag": "maandag",
+            "gewicht": "13,6"
+          }
+        ],
+        "table_data": {
+          "caption": "Container: Restafval - 895468490656",
+          "columns": [
+            {
+              "header": "Datum ophalen",
+              "key": "date"
+            },
+            {
+              "header": "Tijd ophalen",
+              "key": "time"
+            },
+            {
+              "header": "Gewicht (kg)",
+              "key": "weight"
+            }
+          ],
+          "rows": [
+            {
+              "date": "maandag 05-08-2024",
+              "time": "14:10",
+              "weight": "12,3"
+            },
+            {
+              "date": "maandag 23-09-2024",
+              "time": "13:45",
+              "weight": "13,8"
+            },
+            {
+              "date": "maandag 18-11-2024",
+              "time": "14:20",
+              "weight": "11,5"
+            },
+            {
+              "date": "maandag 13-01-2025",
+              "time": "13:55",
+              "weight": "14,2"
+            },
+            {
+              "date": "maandag 10-03-2025",
+              "time": "14:35",
+              "weight": "12,7"
+            },
+            {
+              "date": "maandag 05-05-2025",
+              "time": "13:40",
+              "weight": "13,1"
+            },
+            {
+              "date": "maandag 30-06-2025",
+              "time": "14:15",
+              "weight": "11,9"
+            },
+            {
+              "date": "maandag 25-08-2025",
+              "time": "13:50",
+              "weight": "14,5"
+            },
+            {
+              "date": "maandag 20-10-2025",
+              "time": "14:25",
+              "weight": "12,4"
+            },
+            {
+              "date": "maandag 15-12-2025",
+              "time": "13:30",
+              "weight": "13,6"
+            }
+          ],
+          "footerRow": {
+            "date": "Totaal gewicht",
+            "time": "",
+            "weight": "140"
+          },
+          "footerColSpan": 2,
+          "emptyStateMessage": "Voor deze container zijn in deze periode geen gegevens."
+        }
+      }
+    ]
+  },
+  {
+    "object_id": "10002",
+    "object_address": "Hoofdweg 45A",
+    "totaal_gewicht": "1.680",
+    "containers": [
+      {
+        "identifier": "895468490657",
+        "type": "Restafval",
+        "totaal_gewicht": "1.120",
+        "ledigingen": [
+          {
+            "tijdstip_datum": "08-07-2024",
+            "tijdstip_tijd": "06:30",
+            "tijdstip_dag": "maandag",
+            "gewicht": "78,5"
+          },
+          {
+            "tijdstip_datum": "05-08-2024",
+            "tijdstip_tijd": "07:15",
+            "tijdstip_dag": "maandag",
+            "gewicht": "82,3"
+          },
+          {
+            "tijdstip_datum": "02-09-2024",
+            "tijdstip_tijd": "06:45",
+            "tijdstip_dag": "maandag",
+            "gewicht": "76,8"
+          },
+          {
+            "tijdstip_datum": "30-09-2024",
+            "tijdstip_tijd": "07:00",
+            "tijdstip_dag": "maandag",
+            "gewicht": "80,1"
+          },
+          {
+            "tijdstip_datum": "28-10-2024",
+            "tijdstip_tijd": "06:50",
+            "tijdstip_dag": "maandag",
+            "gewicht": "77,4"
+          },
+          {
+            "tijdstip_datum": "25-11-2024",
+            "tijdstip_tijd": "07:20",
+            "tijdstip_dag": "maandag",
+            "gewicht": "81,7"
+          },
+          {
+            "tijdstip_datum": "23-12-2024",
+            "tijdstip_tijd": "06:35",
+            "tijdstip_dag": "maandag",
+            "gewicht": "79,2"
+          },
+          {
+            "tijdstip_datum": "20-01-2025",
+            "tijdstip_tijd": "07:10",
+            "tijdstip_dag": "maandag",
+            "gewicht": "83,6"
+          },
+          {
+            "tijdstip_datum": "17-02-2025",
+            "tijdstip_tijd": "06:55",
+            "tijdstip_dag": "maandag",
+            "gewicht": "75,9"
+          },
+          {
+            "tijdstip_datum": "17-03-2025",
+            "tijdstip_tijd": "07:25",
+            "tijdstip_dag": "maandag",
+            "gewicht": "80,8"
+          },
+          {
+            "tijdstip_datum": "14-04-2025",
+            "tijdstip_tijd": "06:40",
+            "tijdstip_dag": "maandag",
+            "gewicht": "78,1"
+          },
+          {
+            "tijdstip_datum": "12-05-2025",
+            "tijdstip_tijd": "07:05",
+            "tijdstip_dag": "maandag",
+            "gewicht": "82,4"
+          },
+          {
+            "tijdstip_datum": "09-06-2025",
+            "tijdstip_tijd": "06:50",
+            "tijdstip_dag": "maandag",
+            "gewicht": "76,5"
+          },
+          {
+            "tijdstip_datum": "07-07-2025",
+            "tijdstip_tijd": "07:30",
+            "tijdstip_dag": "maandag",
+            "gewicht": "81,2"
+          }
+        ],
+        "table_data": {
+          "caption": "Container: Restafval - 895468490657",
+          "columns": [
+            {
+              "header": "Datum ophalen",
+              "key": "date"
+            },
+            {
+              "header": "Tijd ophalen",
+              "key": "time"
+            },
+            {
+              "header": "Gewicht (kg)",
+              "key": "weight"
+            }
+          ],
+          "rows": [
+            {
+              "date": "maandag 08-07-2024",
+              "time": "06:30",
+              "weight": "78,5"
+            },
+            {
+              "date": "maandag 05-08-2024",
+              "time": "07:15",
+              "weight": "82,3"
+            },
+            {
+              "date": "maandag 02-09-2024",
+              "time": "06:45",
+              "weight": "76,8"
+            },
+            {
+              "date": "maandag 30-09-2024",
+              "time": "07:00",
+              "weight": "80,1"
+            },
+            {
+              "date": "maandag 28-10-2024",
+              "time": "06:50",
+              "weight": "77,4"
+            },
+            {
+              "date": "maandag 25-11-2024",
+              "time": "07:20",
+              "weight": "81,7"
+            },
+            {
+              "date": "maandag 23-12-2024",
+              "time": "06:35",
+              "weight": "79,2"
+            },
+            {
+              "date": "maandag 20-01-2025",
+              "time": "07:10",
+              "weight": "83,6"
+            },
+            {
+              "date": "maandag 17-02-2025",
+              "time": "06:55",
+              "weight": "75,9"
+            },
+            {
+              "date": "maandag 17-03-2025",
+              "time": "07:25",
+              "weight": "80,8"
+            },
+            {
+              "date": "maandag 14-04-2025",
+              "time": "06:40",
+              "weight": "78,1"
+            },
+            {
+              "date": "maandag 12-05-2025",
+              "time": "07:05",
+              "weight": "82,4"
+            },
+            {
+              "date": "maandag 09-06-2025",
+              "time": "06:50",
+              "weight": "76,5"
+            },
+            {
+              "date": "maandag 07-07-2025",
+              "time": "07:30",
+              "weight": "81,2"
+            }
+          ],
+          "footerRow": {
+            "date": "Totaal gewicht",
+            "time": "",
+            "weight": "1.120"
+          },
+          "footerColSpan": 2,
+          "emptyStateMessage": "Voor deze container zijn in deze periode geen gegevens."
+        }
+      },
+      {
+        "identifier": "895468490658",
+        "type": "GFT",
+        "totaal_gewicht": "560",
+        "ledigingen": [
+          {
+            "tijdstip_datum": "13-07-2024",
+            "tijdstip_tijd": "10:00",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "42,8"
+          },
+          {
+            "tijdstip_datum": "10-08-2024",
+            "tijdstip_tijd": "09:30",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "38,5"
+          },
+          {
+            "tijdstip_datum": "07-09-2024",
+            "tijdstip_tijd": "10:15",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "45,2"
+          },
+          {
+            "tijdstip_datum": "05-10-2024",
+            "tijdstip_tijd": "09:45",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "41,3"
+          },
+          {
+            "tijdstip_datum": "02-11-2024",
+            "tijdstip_tijd": "10:30",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "39,7"
+          },
+          {
+            "tijdstip_datum": "30-11-2024",
+            "tijdstip_tijd": "09:50",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "43,9"
+          },
+          {
+            "tijdstip_datum": "28-12-2024",
+            "tijdstip_tijd": "10:20",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "37,6"
+          },
+          {
+            "tijdstip_datum": "25-01-2025",
+            "tijdstip_tijd": "09:40",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "44,1"
+          },
+          {
+            "tijdstip_datum": "22-02-2025",
+            "tijdstip_tijd": "10:05",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "40,8"
+          },
+          {
+            "tijdstip_datum": "22-03-2025",
+            "tijdstip_tijd": "09:55",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "42,4"
+          },
+          {
+            "tijdstip_datum": "19-04-2025",
+            "tijdstip_tijd": "10:25",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "38,2"
+          },
+          {
+            "tijdstip_datum": "17-05-2025",
+            "tijdstip_tijd": "09:35",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "45,7"
+          },
+          {
+            "tijdstip_datum": "14-06-2025",
+            "tijdstip_tijd": "10:10",
+            "tijdstip_dag": "zaterdag",
+            "gewicht": "41,6"
+          }
+        ],
+        "table_data": {
+          "caption": "Container: Groente, Fruit en Tuin afval (GFT) - 895468490658",
+          "columns": [
+            {
+              "header": "Datum ophalen",
+              "key": "date"
+            },
+            {
+              "header": "Tijd ophalen",
+              "key": "time"
+            },
+            {
+              "header": "Gewicht (kg)",
+              "key": "weight"
+            }
+          ],
+          "rows": [
+            {
+              "date": "zaterdag 13-07-2024",
+              "time": "10:00",
+              "weight": "42,8"
+            },
+            {
+              "date": "zaterdag 10-08-2024",
+              "time": "09:30",
+              "weight": "38,5"
+            },
+            {
+              "date": "zaterdag 07-09-2024",
+              "time": "10:15",
+              "weight": "45,2"
+            },
+            {
+              "date": "zaterdag 05-10-2024",
+              "time": "09:45",
+              "weight": "41,3"
+            },
+            {
+              "date": "zaterdag 02-11-2024",
+              "time": "10:30",
+              "weight": "39,7"
+            },
+            {
+              "date": "zaterdag 30-11-2024",
+              "time": "09:50",
+              "weight": "43,9"
+            },
+            {
+              "date": "zaterdag 28-12-2024",
+              "time": "10:20",
+              "weight": "37,6"
+            },
+            {
+              "date": "zaterdag 25-01-2025",
+              "time": "09:40",
+              "weight": "44,1"
+            },
+            {
+              "date": "zaterdag 22-02-2025",
+              "time": "10:05",
+              "weight": "40,8"
+            },
+            {
+              "date": "zaterdag 22-03-2025",
+              "time": "09:55",
+              "weight": "42,4"
+            },
+            {
+              "date": "zaterdag 19-04-2025",
+              "time": "10:25",
+              "weight": "38,2"
+            },
+            {
+              "date": "zaterdag 17-05-2025",
+              "time": "09:35",
+              "weight": "45,7"
+            },
+            {
+              "date": "zaterdag 14-06-2025",
+              "time": "10:10",
+              "weight": "41,6"
+            }
+          ],
+          "footerRow": {
+            "date": "Totaal gewicht",
+            "time": "",
+            "weight": "560"
+          },
+          "footerColSpan": 2,
+          "emptyStateMessage": "Voor deze container zijn in deze periode geen gegevens."
+        }
+      }
+    ]
+  }
+]

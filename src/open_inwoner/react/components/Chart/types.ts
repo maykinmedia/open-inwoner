@@ -1,0 +1,36 @@
+export interface AfvalLediging {
+  tijdstip_dag?: string;
+  tijdstip_datum: string;
+  tijdstip_tijd?: string;
+  gewicht: string;
+}
+
+export interface AfvalContainer {
+  identifier: string;
+  type: 'Restafval' | 'GFT';
+  totaal_gewicht: string;
+  ledigingen: AfvalLediging[];
+}
+
+export interface AfvalObject {
+  object_id: string;
+  object_address: string;
+  totaal_gewicht: string;
+  containers: AfvalContainer[];
+}
+
+export type AfvalData = AfvalObject[];
+
+export type ChartPeriod = 'week' | 'month' | 'year';
+
+export interface ChartDataPoint {
+  x: string;
+  y: number | null;
+}
+
+export interface ContainerSeries {
+  type: 'GFT' | 'Restafval';
+  address: string;
+  containerIndex: number;
+  points: ChartDataPoint[];
+}

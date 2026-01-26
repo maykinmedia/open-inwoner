@@ -60,7 +60,9 @@
     "@utrecht/web-component-library-stencil": "^3.5.0",
     "bem.js": "^1.0.10",
     "caniuse-lite": "^1.0.30001707",
+    "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "emojibase-data": "^7.0.1",
     "escape-html": "^1.0.3",
     "flatpickr": "^4.6.9",
@@ -144,7 +146,8 @@
   },
   "overrides": {
     "form-data": ">=2.5.4 || <3.0.0 || >=3.0.4 || <4.0.0 || >=4.0.4",
-    "playwright": ">=1.57.1"
+    "playwright": ">=1.57.1",
+    "date-fns": "^4.1.0"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "*",
