@@ -9,33 +9,37 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* [:taiga-us:`3607`, :pr:`2075`, :pr:`2079`]: Basisapp ‘Mijn Afval’ geïmplementeerd en geïntegreerd met Django CMS.
-* [:gh-issue:`2098`, :pr:`2062`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn Afval.
-* [:gh-issue:`2096`, :pr:`2060`, :oip-nlds:`32`]: Table component toegevoegd ten behoeve van
-  de ‘Mijn Afval’ app inclusief NL Design-System design-tokens.
-* [:gh-issue:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
-* [:gh-issue:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor
-  gebruik in Docker/Kubernetes.
-* [:gh-issue:`2107`, :pr:`2117`]: Productie logs worden weggeschreven als JSON voor
-  gebruik in log analyse tools.
+* [:taiga-us:`3607`, :pr:`2075`, :pr:`2079`]: Basisapp ‘Mijn Afval’ geïmplementeerd en
+  geïntegreerd met Django CMS.
+* [:gh:`2098`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn
+  Afval.
+* [:gh:`2096`, :oip-nlds:`32`]: Table component toegevoegd ten behoeve van de ‘Mijn
+  Afval’ app inclusief NL Design-System design-tokens.
+* [:gh:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
+* [:gh:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor gebruik
+  in Docker/Kubernetes.
+* [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor gebruik in log analyse
+  tools.
 
 Bugfixes
 --------
 
-* [:gh-issue:`2091`]: Beheerders toestaan om uit te loggen via frontend.
-* [:gh-issue:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
-  waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
-* [:gh-issue:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
-* [:gh-issue:`2131`]: Probleem met ``vite`` bundler opgelost waardoor de marker van de kaart weer correct wordt geladen.
+* [:gh:`2091`]: Beheerders toestaan om uit te loggen via frontend.
+* [:gh:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost, waardoor de
+  Prosemirror editor op alle pagina's naar verwachting werkt.
+* [:gh:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
+* [:gh:`2131`]: Probleem met ``vite`` bundler opgelost waardoor de marker van de kaart
+  weer correct wordt geladen.
 
 Onderhoud
 ---------
 
-* [:taiga-us:`3615`]: zgw-klassen, methoden en variabelen hernoemd om Nederlandse
-  termen te gebruiken
-* [:gh-issue:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.1.11``.
-* [:gh-issue:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en copyright.
-* [:cve:`CVE-2026-22028`, :gh-issue:`2164`] ``preact`` bijgewerkt naar versie ``10.27.3``.
+* [:taiga-us:`3615`]: zgw-klassen, methoden en variabelen hernoemd om Nederlandse termen
+  te gebruiken
+* [:gh:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.1.11``.
+* [:gh:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en
+  copyright.
+* [:gh:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie ``10.27.3``.
 
 2.0.0 (2026-01-05)
 ==================
