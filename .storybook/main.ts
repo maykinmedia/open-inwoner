@@ -12,6 +12,13 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx|mdx)'],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   staticDirs: [{ from: '../src/open_inwoner/static', to: '/static' }],
+  viteFinal: async (config) => {
+    // Set base path for GitHub Pages deployment at /open-inwoner/
+    if (process.env.NODE_ENV === 'production') {
+      config.base = '/open-inwoner/';
+    }
+    return config;
+  },
 };
 
 export default config;
