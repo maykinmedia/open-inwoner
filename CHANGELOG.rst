@@ -49,6 +49,8 @@ Onderhoud
   test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
   ``.babelrc`` en ``.jshintrc``).
 * [:gh:`2166`]:  ``weasyprint`` bijgewerkt naar versie ``0.68``.
+* [:gh:`2179`, :cve:`CVE-2025-13465`]: ``@utrecht/component-library-react`` bijgewerkt naar versie ``12.0.0``
+  en ``loadash-es`` override bijgewerkt naar versie ``4.17.23`` om :cve:`CVE-2025-13465` te mitigeren.
 
 2.0.1 (2026-01-26)
 ==================
