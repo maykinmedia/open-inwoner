@@ -33,6 +33,8 @@ Bugfixes
 * [:gh:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
 * [:gh:`2131`]: Probleem met ``vite`` bundler opgelost waardoor de marker van de kaart
   weer correct wordt geladen.
+* [:gh:`2125`]: ``django-digid-eherkenning`` bijgewerkt naar custom release zodat de
+  juiste DigiD SAML Foutmeldingen worden gebruikt.
 
 Onderhoud
 ---------
