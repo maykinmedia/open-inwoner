@@ -1,3 +1,14 @@
+2.0.2 (2026-01-27)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.2`.
+
+Bugfixes
+--------
+
+...
+
+
 2.0.1 (2026-01-26)
 ==================
 
