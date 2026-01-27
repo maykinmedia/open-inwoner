@@ -100,7 +100,7 @@ export class BarChartBuilder {
         const pointsMap = ledigingen.reduce<Map<number, ChartDataPoint>>(
           (acc, { gewicht, tijdstip_datum }) => {
             const [day, month, year] = tijdstip_datum.split('-');
-            const date = new Date(`${month}-${day}-${year}`);
+            const date = new Date(Number(year), Number(month) - 1, Number(day));
             const timestamp = this.getPeriodTimestamp(date, period);
 
             allTimestamps.add(timestamp);
