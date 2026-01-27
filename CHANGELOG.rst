@@ -47,6 +47,22 @@ Onderhoud
   test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
   ``.babelrc`` en ``.jshintrc``).
 
+2.0.1 (2026-01-26)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.1`.
+
+Bugfixes
+--------
+
+* [:gh:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost,
+  waardoor de Prosemirror editor op alle pagina's naar verwachting werkt.
+* [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor
+  gebruik in log analyse tools.
+* [:gh:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
+* [:gh:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie
+  ``10.27.3``.
+
 2.0.0 (2026-01-05)
 ==================
 
