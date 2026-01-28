@@ -23,6 +23,7 @@ Nieuwe features
 * [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor gebruik in log analyse
   tools.
 * [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de ‘Mijn Afval’ app.
+* [:gh:`2119`, :gh:`2182`, :pr:`2151`]: API-client en configuratie voor 'Mijn Afval' aangemaakt.
 
 Bugfixes
 --------
