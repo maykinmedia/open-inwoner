@@ -32,7 +32,7 @@ For Linux (Debian) they are following:
 .. _Node.js: http://nodejs.org/
 .. _npm: https://www.npmjs.com/
 .. _Elastic Search: https://www.elastic.co/
-.. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
+.. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2
 .. _GDAL: https://gdal.org/
 
 
