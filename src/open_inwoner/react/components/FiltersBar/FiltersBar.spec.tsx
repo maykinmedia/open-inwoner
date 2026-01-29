@@ -98,4 +98,22 @@ describe('FiltersBar', () => {
     const label = container.querySelector('.oip-filters-bar__label');
     expect(label).toHaveTextContent('Filter op:');
   });
+
+  it('accepts addDynamicPeriods prop without crashing', () => {
+    const { container } = render(
+      <FiltersBar
+        currentUrl="http://localhost:8000/mijn-afval/"
+        baseUrl="http://localhost:8000/mijn-afval/"
+        addDynamicPeriods={true}
+      />
+    );
+
+    // Component should render successfully with the prop
+    expect(
+      container.querySelector('.oip-filters-bar--desktop')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('.oip-filters-bar--mobile-button')
+    ).toBeInTheDocument();
+  });
 });

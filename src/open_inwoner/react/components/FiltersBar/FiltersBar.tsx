@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { AnyComponent as AC } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 import { MaterialIcon } from '../MaterialIcon';
+import { getDynamicPeriodOptions } from './dynamic-period-options';
 import './FiltersBar.scss';
 
 export interface IFilterChoice {
@@ -18,11 +19,13 @@ export interface IFilterGroup {
 export interface IFiltersBarProps {
   currentUrl?: string;
   baseUrl?: string;
+  addDynamicPeriods?: boolean;
 }
 
 const FiltersBar: AC<IFiltersBarProps> = ({
   currentUrl = '',
   baseUrl = '',
+  addDynamicPeriods = false,
 }) => {
   const [element, setElement] = useState<HTMLElement | null>(null);
   const [filterGroups, setFilterGroups] = useState<IFilterGroup[]>([]);
@@ -55,6 +58,16 @@ const FiltersBar: AC<IFiltersBarProps> = ({
     console.log('FiltersBar: Parsing attributes from element');
     const attributes = Array.from(element.attributes);
     console.log('FiltersBar: Total attributes:', attributes.length);
+
+    // Check if dynamic periods should be added
+    // Data attributes come as strings, so convert "true" to boolean
+    const shouldAddDynamicPeriods =
+      addDynamicPeriods === true ||
+      element.getAttribute('data-add-dynamic-periods') === 'true';
+    console.log(
+      'FiltersBar: shouldAddDynamicPeriods:',
+      shouldAddDynamicPeriods
+    );
 
     const groups: Record<number, IFilterGroup> = {};
     const selected: Record<string, string[]> = {};
@@ -108,8 +121,24 @@ const FiltersBar: AC<IFiltersBarProps> = ({
     });
 
     // Convert to array and sort by group number
-    const sortedGroups = Object.values(groups).filter((g) => g.name && g.label);
+    let sortedGroups = Object.values(groups).filter((g) => g.name && g.label);
     console.log('FiltersBar: Parsed groups:', sortedGroups);
+
+    // Add dynamic period options if enabled
+    if (shouldAddDynamicPeriods) {
+      console.log('FiltersBar: Adding dynamic period options');
+      sortedGroups = sortedGroups.map((group) => {
+        if (group.name === 'periode') {
+          const dynamicOptions = getDynamicPeriodOptions('nl');
+          console.log('FiltersBar: Dynamic options:', dynamicOptions);
+          return {
+            ...group,
+            choices: [...dynamicOptions, ...group.choices],
+          };
+        }
+        return group;
+      });
+    }
 
     // Initialize selected filters from URL params
     sortedGroups.forEach((group) => {
@@ -124,7 +153,7 @@ const FiltersBar: AC<IFiltersBarProps> = ({
     console.log('FiltersBar: Selected filters:', selected);
     setFilterGroups(sortedGroups);
     setSelectedFilters(selected);
-  }, [element, currentUrl]);
+  }, [element, currentUrl, addDynamicPeriods]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

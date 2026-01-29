@@ -18,6 +18,7 @@
             <oip-filters-bar
                 data-current-url="{{ request.get_full_path }}"
                 data-base-url="{% url 'mijn_afval:afval-profiel' %}"
+                data-add-dynamic-periods="true"
                 {% for filter_group in filter_groups %}data-filter-{{ forloop.counter }}-name="{{ filter_group.name }}" data-filter-{{ forloop.counter }}-label="{{ filter_group.label }}"{% for choice in filter_group.choices %} data-filter-{{ forloop.parentloop.counter }}-choice-{{ forloop.counter }}-value="{{ choice.value }}" data-filter-{{ forloop.parentloop.counter }}-choice-{{ forloop.counter }}-label="{{ choice.label }}"{% endfor %}{% endfor %}
             ></oip-filters-bar>
             {# Active Filter Tags - Shows removable filter pills #}
