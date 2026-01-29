@@ -298,14 +298,16 @@ class AfvalProfielView(
             }
         )
         if not self.request.user.bsn:
-            messages.info(_("Gegevens alleen beschikbaar voor gebruikers met BSN."))
+            messages.info(
+                self.request, _("Gegevens alleen beschikbaar voor gebruikers met BSN.")
+            )
             return context
 
         # fetch data from API
         afval_config = MijnAfvalConfig.get_solo()
 
         if not (openafval_service := afval_config.openafval_service):
-            messages.error(_("This module is not yet configured"))
+            messages.error(self.request, _("This module is not yet configured"))
             return context
 
         api_client = build_zgw_client(

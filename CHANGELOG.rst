@@ -36,6 +36,8 @@ Bugfixes
   weer correct wordt geladen.
 * [:gh:`2125`]: ``django-digid-eherkenning`` bijgewerkt naar custom release zodat de
   juiste DigiD SAML Foutmeldingen worden gebruikt.
+* [:gh:`2191`]: Foutmnelding opgelost in Afval Profiel pagina waar `messages.error()` en `messages.info()`
+  zonder verplicht `request` argument werden aangeroepn.
 
 Onderhoud
 ---------
