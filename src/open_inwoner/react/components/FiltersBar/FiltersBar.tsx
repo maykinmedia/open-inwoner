@@ -345,7 +345,7 @@ const FiltersBar: AC<IFiltersBarProps> = ({
             <button
               type="button"
               class={clsx('button button--primary button--transparent', {
-                hide: !isFiltered,
+                'oip-filters-bar--hidden': !isFiltered,
               })}
               onClick={handleReset}
               title="Wis alle filters"
