@@ -9,7 +9,7 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* [:taiga-us:`3607`, :pr:`2075`, :pr:`2079`]: Basisapp ‘Mijn Afval’ geïmplementeerd en
+* [:taiga-us:`3607`, :pr:`2075`, :pr:`2079`, :pr:`2193`]: Basisapp ‘Mijn Afval’ geïmplementeerd en
   geïntegreerd met Django CMS.
 * [:gh:`2101`, :oip-nlds:`30`, :oip-nlds:`34`]: Styling van tegels op de Home pagina en van externe-links plugin
   op de Home pagina overgezet naar design-tokens zodat deze volgens de NLDS principes gebruikt kunnen worden.
