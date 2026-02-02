@@ -12,7 +12,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class OpenAfvalAPIClient(APIClient):
     def get_afval_profiel(self, bsn: str) -> AfvalProfiel:
         try:
-            response = self.get("afval-profiel/987654321")
+            response = self.get(f"afval-profiel/{bsn}")
             response.raise_for_status()
         except requests.exceptions.HTTPError as exc:
             status_code = exc.response.status_code
