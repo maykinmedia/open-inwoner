@@ -99,7 +99,7 @@ export const AsWebComponent: Story = {
       <script type="application/json" id={actionsId}>
         {JSON.stringify(mockDataWithItems)}
       </script>
-      <action-list actions-id={actionsId} />
+      <action-list actions-id={actionsId} is="table" />
     </>
   ),
 };

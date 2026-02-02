@@ -50,6 +50,22 @@ export interface WebComponentPlugin {
 }
 
 /**
+ * Internals configuration for ElementInternals
+ * Sets ARIA roles and properties on the custom element
+ */
+export interface InternalsConfig {
+  role?: string;
+  ariaLabel?: string;
+  ariaBusy?: string;
+  ariaDisabled?: string;
+  ariaExpanded?: string;
+  ariaHidden?: string;
+  ariaSelected?: string;
+  ariaChecked?: string;
+  ariaPressed?: string;
+}
+
+/**
  * Extra options for web component registration
  */
 export type WebComponentRegisterExtraOptions = {
@@ -58,6 +74,15 @@ export type WebComponentRegisterExtraOptions = {
    * @default false
    */
   i18n?: boolean;
+  /**
+   * Whether this element participates in form submission
+   * @default false
+   */
+  formAssociated?: boolean;
+  /**
+   * ElementInternals configuration - sets ARIA roles/properties via attachInternals()
+   */
+  internals?: ElementInternals;
 };
 
 /**

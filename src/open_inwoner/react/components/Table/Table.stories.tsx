@@ -1,8 +1,15 @@
-import { withLoader } from '@react/lib/decorators/storybook';
 import type { Meta, StoryObj } from '@storybook/preact-vite';
 import type { ITableProps } from './Table';
 import Table from './Table';
-import { TABLE_DEFINITION } from './constants';
+import TableCaption from './TableCaption';
+import TableHeader from './TableHeader';
+import TableHeaderCell from './TableHeaderCell';
+import TableBody from './TableBody';
+import TableRow from './TableRow';
+import TableCell from './TableCell';
+import TableFooter from './TableFooter';
+import TableContainer from './TableContainer';
+import { WebComponentLoader } from '@react/lib/web-component';
 
 const meta: Meta<ITableProps> = {
   title: 'Components/Table',
@@ -12,72 +19,20 @@ const meta: Meta<ITableProps> = {
     docs: {
       description: {
         component: `
-The Table component structures data in rows and columns. It can be used as a React component or as a web component.
+The Table component uses ElementInternals to set ARIA roles on custom elements.
+Each component renders only its children - the semantic roles are applied via \`attachInternals()\`.
 
-**Features:**
-- Table Caption for semantic HTML
-- Optional Table Footer for totals or summary data
-- Configurable columns with headers
-- Multiple rows of data
-- Built from @utrecht/component-library-react library and @utrecht/table-css styles
-
-**Props:**
-- \`jsonScriptId\`: Optional string - ID of a script tag containing JSON data for web component usage
-- \`caption\`: Optional string - Title/label for the table
-- \`columns\`: Optional array of objects with \`header\` (string) and \`key\` (string) properties
-- \`rows\`: Optional array of objects where each key matches a column's \`key\` property
-- \`footerRow\`: Optional object for footer data, uses same key structure as rows
-- \`footerColSpan\`: Optional number or string - Column span for the first cell in the footer
-
-**Web Component usage in HTML:**
-\`\`\`
-<script type="application/json" id="table-data">
-{
-  "caption": "My Table",
-  "columns": [
-    { "header": "Name", "key": "name" },
-    { "header": "Value", "key": "value" }
-  ],
-  "rows": [
-    { "name": "Item 1", "value": "100" }
-  ],
-  "footerRow": {
-    "name": "Total",
-    "value": "100"
-  },
-  "footerColSpan": 1
-}
-</script>
-<utrecht-table json-script-id="table-data"></utrecht-table>
-\`\`\`
+**Component Structure:**
+- \`<oip-table>\` → role="table"
+- \`<oip-table-caption>\` → role="caption"
+- \`<oip-table-header>\` → role="rowgroup"
+- \`<oip-table-header-cell>\` → role="columnheader"
+- \`<oip-table-body>\` → role="rowgroup"
+- \`<oip-table-row>\` → role="row"
+- \`<oip-table-cell>\` → role="cell"
+- \`<oip-table-footer>\` → role="rowgroup"
         `,
       },
-    },
-  },
-  argTypes: {
-    jsonScriptId: {
-      control: 'text',
-      description: 'ID of the script tag containing JSON table data',
-    },
-    caption: {
-      control: 'text',
-      description: 'Table caption',
-    },
-    columns: {
-      control: 'object',
-      description: 'Column definitions (header + key)',
-    },
-    rows: {
-      control: 'object',
-      description: 'Table rows (array of records)',
-    },
-    footerRow: {
-      control: 'object',
-      description: 'Optional footer row',
-    },
-    footerColSpan: {
-      control: 'number',
-      description: 'Optional column span for first footer cell',
     },
   },
   tags: ['autodocs'],
@@ -86,106 +41,166 @@ The Table component structures data in rows and columns. It can be used as a Rea
 export default meta;
 type Story = StoryObj<ITableProps>;
 
-const gftColumns = [
-  { header: 'Datum ophalen', key: 'date' },
-  { header: 'Tijd ophalen', key: 'time' },
-  { header: 'Gewicht (kg)', key: 'weight' },
-];
-
-const gftRows = [
-  { date: 'vrijdag 14-11-2025', time: '11:07', weight: '17,0' },
-  { date: 'vrijdag 31-10-2025', time: '11:07', weight: '14,5' },
-  { date: 'vrijdag 17-10-2025', time: '11:07', weight: '20,0' },
-  { date: 'vrijdag 03-10-2025', time: '11:07', weight: '25,5' },
-  { date: 'vrijdag 19-09-2025', time: '11:07', weight: '18,5' },
-];
-
-const gftFooter = {
-  date: 'Totaal gewicht',
-  time: '',
-  weight: '95,5',
-};
-
-const emptyFooter = {
-  date: 'Totaal gewicht',
-  time: '',
-  weight: '',
-};
-
-export const Default: Story = {
-  args: {
-    caption:
-      'Groente, Fruit en Tuin afval (GFT) - Container 8701969 000000 00006 29 - 240 liter',
-    columns: gftColumns,
-    rows: gftRows,
-    footerRow: gftFooter,
-    footerColSpan: 2, // Span first 2 columns
-  },
-};
-
-export const Empty: Story = {
-  args: {
-    caption:
-      'Groente, Fruit en Tuin afval (GFT) - Container 8701969 000000 00006 29 - 240 liter',
-    columns: gftColumns,
-    rows: [],
-    footerRow: emptyFooter,
-    emptyStateMessage:
-      'Voor deze container zijn in deze periode geen gegevens.',
-  },
-};
-
 /**
- * Rendered using script data but still through the Preact Table component
+ * Basic table with header, body, and data rows.
+ * Each component just renders children - roles are set via ElementInternals.
  */
-export const WithScriptData: Story = {
-  args: {
-    jsonScriptId: 'storybook-preact-script-table',
-  },
-  render: ({ jsonScriptId }) => {
-    const data = {
-      caption:
-        'Groente, Fruit en Tuin afval (GFT) - Container 8701969 000000 00006 29 - 240 liter',
-      columns: gftColumns,
-      rows: gftRows,
-      footerRow: gftFooter,
-      footerColSpan: 2,
-    };
-
-    return (
-      <>
-        <script type="application/json" id={jsonScriptId}>
-          {JSON.stringify(data)}
-        </script>
-        <Table jsonScriptId={jsonScriptId} />
-      </>
-    );
-  },
+export const Default: Story = {
+  render: () => (
+    <TableContainer>
+      <Table>
+        <TableCaption>
+          Groente, Fruit en Tuin afval (GFT) - Container 240 liter
+        </TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderCell>Datum ophalen</TableHeaderCell>
+            <TableHeaderCell>Tijd ophalen</TableHeaderCell>
+            <TableHeaderCell>Gewicht (kg)</TableHeaderCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>vrijdag 14-11-2025</TableCell>
+            <TableCell>11:07</TableCell>
+            <TableCell>17,0</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>vrijdag 31-10-2025</TableCell>
+            <TableCell>11:07</TableCell>
+            <TableCell>14,5</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>vrijdag 17-10-2025</TableCell>
+            <TableCell>11:07</TableCell>
+            <TableCell>20,0</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  ),
 };
 
 /**
- * Rendered as webcomponent
+ * Table with a footer row for totals.
+ */
+export const WithFooter: Story = {
+  render: () => (
+    <TableContainer>
+      <Table>
+        <TableCaption>GFT Container - Met totaal</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderCell>Datum</TableHeaderCell>
+            <TableHeaderCell>Gewicht (kg)</TableHeaderCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>14-11-2025</TableCell>
+            <TableCell>17,0</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>31-10-2025</TableCell>
+            <TableCell>14,5</TableCell>
+          </TableRow>
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell>Totaal</TableCell>
+            <TableCell>31,5</TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
+    </TableContainer>
+  ),
+};
+
+/**
+ * Simple table without caption.
+ */
+export const Simple: Story = {
+  render: () => (
+    <TableContainer>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderCell>Name</TableHeaderCell>
+            <TableHeaderCell>Value</TableHeaderCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>Item 1</TableCell>
+            <TableCell>100</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Item 2</TableCell>
+            <TableCell>200</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  ),
+};
+
+/**
+ * Table rendered as web components with ElementInternals.
+ * Each custom element has its ARIA role set via attachInternals().
  */
 export const AsWebComponent: Story = {
-  args: { jsonScriptId: 'gft-table-data' },
-  decorators: withLoader(TABLE_DEFINITION.tagName),
-  render: ({ jsonScriptId }) => {
-    const data = {
-      caption:
-        'Groente, Fruit en Tuin afval (GFT) - Container 8701969 000000 00006 29 - 240 liter',
-      columns: gftColumns,
-      rows: gftRows,
-      footerRow: gftFooter,
-      footerColSpan: 2,
-    };
-
-    return (
-      <>
-        <script type="application/json" id={jsonScriptId}>
-          {JSON.stringify(data)}
-        </script>
-        <oip-table json-script-id={jsonScriptId} />
-      </>
-    );
-  },
+  loaders: [
+    async () => {
+      await Promise.all([
+        WebComponentLoader.importWebComponent('oip-table-container'),
+        WebComponentLoader.importWebComponent('oip-table'),
+        WebComponentLoader.importWebComponent('oip-table-caption'),
+        WebComponentLoader.importWebComponent('oip-table-header'),
+        WebComponentLoader.importWebComponent('oip-table-header-cell'),
+        WebComponentLoader.importWebComponent('oip-table-body'),
+        WebComponentLoader.importWebComponent('oip-table-row'),
+        WebComponentLoader.importWebComponent('oip-table-cell'),
+        WebComponentLoader.importWebComponent('oip-table-footer'),
+      ]);
+    },
+  ],
+  render: () => (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: `
+          <oip-table-container>
+            <oip-table is="table">
+              <oip-table-caption>GFT Container - Web Components</oip-table-caption>
+              <oip-table-header role="row-group">
+                <oip-table-row is="tr" role="row">
+                  <oip-table-header-cell>Datum</oip-table-header-cell>
+                  <oip-table-header-cell>Tijd</oip-table-header-cell>
+                  <oip-table-header-cell>Gewicht (kg)</oip-table-header-cell>
+                </oip-table-row>
+              </oip-table-header>
+              <oip-table-body>
+                <oip-table-row>
+                  <oip-table-cell>14-11-2025</oip-table-cell>
+                  <oip-table-cell>11:07</oip-table-cell>
+                  <oip-table-cell>17,0</oip-table-cell>
+                </oip-table-row>
+                <oip-table-row>
+                  <oip-table-cell>31-10-2025</oip-table-cell>
+                  <oip-table-cell>11:07</oip-table-cell>
+                  <oip-table-cell>14,5</oip-table-cell>
+                </oip-table-row>
+              </oip-table-body>
+              <oip-table-footer>
+                <oip-table-row>
+                  <oip-table-cell>Totaal</oip-table-cell>
+                  <oip-table-cell></oip-table-cell>
+                  <oip-table-cell>31,5</oip-table-cell>
+                </oip-table-row>
+              </oip-table-footer>
+            </oip-table>
+          </oip-table-container>
+        `,
+      }}
+    />
+  ),
 };

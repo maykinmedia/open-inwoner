@@ -1,30 +1,25 @@
 @use '@utrecht/table-css/dist/index.css';
 
-.utrecht-table {
+oip-table {
   // Values that are not set in the community design tokens
   &-container {
     display: flex;
     flex-direction: column;
-    row-gap: var(--spacing-giant);
+    row-gap: 32px;
   }
 
-  &__header-cell {
-    border-block-end: 2px solid var(--oip-color-gray);
+  &-header-cell {
+    border-block-end: 3px solid var(--oip-color-gray);
     background-color: var(--utrecht-table-header-background-color);
   }
 
-  &__cell {
+  &-cell {
     color: var(--oip-color-fg);
   }
 
-  &__row:hover .utrecht-table__cell {
-    // TODO: --utrecht-table-row-hover-cell-background-color does not exist in the NLDS Utrecht source yet
-    background-color: var(--utrecht-table-row-alternate-even-background-color);
-  }
-
-  &__footer {
-    .utrecht-table__row {
-      .utrecht-table__cell {
+  &-footer {
+    oip-table-row {
+      oip-table-cell {
         background-color: var(--utrecht-table-footer-background-color);
         border-block-start: 2px solid
           var(--utrecht-table-row-border-block-end-color);
@@ -35,4 +30,29 @@
       }
     }
   }
+}
+
+// web components styled as if they are semantic
+//
+oip-table {
+  display: block;
+}
+oip-table-caption {
+  display: table-caption;
+}
+oip-table-header {
+  display: table-header-group;
+}
+oip-table-header-cell,
+oip-table-cell {
+  display: table-cell;
+}
+oip-table-body {
+  display: table-row-group;
+}
+oip-table-row {
+  display: table-row;
+}
+oip-table-footer {
+  display: table-footer-group;
 }

@@ -23,15 +23,108 @@
                         {# Container Sections - Same rendering for all types #}
                         {% for container in afval_obj.containers %}
                             <section class="afval-container">
-                                <div class="afval-container__table-wrapper">
-                                    {% with script_id="table-"|add:container.identifier %}
-                                        {{ container.table_data|json_script:script_id }}
-                                        <oip-table json-script-id="{{ script_id }}"></oip-table>
-                                    {% endwith %}
-                                </div>
+                                <h3 class="utrecht-heading-3">{% trans "GFT Afval" %}</h3>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
+                                </p>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
+                                </p>
+
+                                {% if container.ledigingen %}
+                                    <div class="afval-container__table-wrapper">
+                                        <oip-table-container>
+                                            <oip-table>
+                                                <oip-table-caption content="Container: {{ container.identifier }}"></oip-table-caption>
+
+                                                <oip-table-header>
+                                                    <oip-table-row>
+                                                        <oip-table-header-cell scope="col">{% trans 'Datum ophalen' %}</oip-table-header-cell>
+                                                        <oip-table-header-cell scope="col">{% trans 'Tijd ophalen' %}</oip-table-header-cell>
+                                                        <oip-table-header-cell scope="col">{% trans 'Gewicht van lediging' %}</oip-table-header-cell>
+                                                    </oip-table-row>
+                                                </oip-table-header>
+
+                                                <oip-table-body>
+                                                    {% for lediging in container.ledigingen %}
+                                                        <oip-table-row>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
+                                                        </oip-table-row>
+                                                    {% endfor %}
+                                                </oip-table-body>
+
+                                                <oip-table-footer>
+                                                    <oip-table-row>
+                                                        <oip-table-cell aria-col-span="2">{% trans 'Totaal gewicht' %}</oip-table-cell>
+                                                        <oip-table-cell>{{ container.totaal_gewicht }} kg</oip-table-cell>
+                                                    </oip-table-row>
+                                                </oip-table-footer>
+                                            </oip-table>
+                                        </oip-table-container>
+                                    </div>
+                                {% else %}
+                                    <p class="utrecht-paragraph">
+                                        {% trans "Voor deze container zijn in deze periode geen gegevens." %}
+                                    </p>
+                                {% endif %}
                             </section>
                         {% endfor %}
-                    </oip-accordion>
+
+                    {# Restafval Section #}
+                    {% for container in afval_obj.containers %}
+                        {% if container.type == "Restafval" %}
+                            <section class="afval-container">
+                                <h3 class="utrecht-heading-3">{% trans "Restafval" %}</h3>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Container nummer:" %}</strong> {{ container.identifier }}
+                                </p>
+                                <p class="utrecht-paragraph">
+                                    <strong>{% trans "Totaal gewicht:" %}</strong> {{ container.totaal_gewicht }}
+                                </p>
+
+                                {% if container.ledigingen %}
+                                    <div class="afval-container__table-wrapper">
+                                        <oip-table-container>
+                                            <oip-table>
+                                                <oip-table-caption content="Container: {{ container.identifier }}"></oip-table-caption>
+
+                                                <oip-table-header>
+                                                    <oip-table-row>
+                                                        <oip-table-header-cell content="{% trans 'Datum' %}"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Tijd van lediging' %}"></oip-table-header-cell>
+                                                        <oip-table-header-cell content="{% trans 'Gewicht van lediging' %}"></oip-table-header-cell>
+                                                    </oip-table-row>
+                                                </oip-table-header>
+
+                                                <oip-table-body>
+                                                    {% for lediging in container.ledigingen %}
+                                                        <oip-table-row>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'d-m-Y' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.tijdstip|date:'H:i'|default:'—' }}"></oip-table-cell>
+                                                            <oip-table-cell content="{{ lediging.gewicht }} kg"></oip-table-cell>
+                                                        </oip-table-row>
+                                                    {% endfor %}
+                                                </oip-table-body>
+
+                                                <oip-table-footer>
+                                                    <oip-table-row>
+                                                        <oip-table-cell colspan="2" content="{% trans 'Totaal gewicht' %}"></oip-table-cell>
+                                                        <oip-table-cell content="{{ container.totaal_gewicht }} kg"></oip-table-cell>
+                                                    </oip-table-row>
+                                                </oip-table-footer>
+                                            </oip-table>
+                                        </oip-table-container>
+                                    </div>
+                                {% endif %}
+                            </section>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not forloop.last %}
+                        <hr class="afval-object__separator">
+                    {% endif %}
                 </article>
             {% empty %}
                 <p class="utrecht-paragraph">{% trans "Geen afvalgegevens beschikbaar." %}</p>

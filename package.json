@@ -67,7 +67,7 @@
     "material-icons": "^1.13.12",
     "microscope-sass": "latest",
     "preact": "^10.27.3",
-    "preact-custom-element": "^4.6.0",
+    "preact-custom-element": "file:../../../../Users/stefan/Desktop/Werkmap/preact-custom-element",
     "proj4leaflet": "^1.0.2",
     "react-intl": "^7.1.11"
   },

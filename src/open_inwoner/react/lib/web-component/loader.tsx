@@ -1,4 +1,4 @@
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, h, render } from 'preact';
 import register from 'preact-custom-element';
 import { withIntlWebComponent } from '../decorators';
 import {
@@ -14,6 +14,14 @@ import type {
   WebComponentTagName,
 } from '.';
 import { ExtractGeneric } from '../types';
+
+export type PreactCustomElement = HTMLElement & {
+  _root: ShadowRoot | HTMLElement;
+  _vdomComponent: AC;
+  _vdom: ReturnType<typeof h> | null;
+  _props: Record<string, unknown>;
+  internals?: ElementInternals;
+};
 
 export class WebComponentLoader {
   constructor() {}
@@ -116,13 +124,24 @@ export class WebComponentLoader {
     propNames?: (keyof P)[],
     options: WebComponentRegisterOptions = { shadow: false, i18n: false }
   ): HTMLElement {
-    // Remove i18n from options before passing to preact-custom-element
-    const { i18n, ...registerOptions } = options;
+    // Extract our custom options
+    const {
+      i18n,
+      internals: internalsConfig,
+      formAssociated = false,
+      ...registerOptions
+    } = options;
 
     // If i18n option is enabled, wrap the component with IntlProvider
     const ComponentToRegister = i18n
       ? withIntlWebComponent(Component)
       : Component;
+
+    ComponentToRegister.formAssociated = true;
+
+    // ComponentToRegister.internals = {
+    //   role: 'list',
+    // };
 
     return register(ComponentToRegister, tagName, propNames, registerOptions);
   }
