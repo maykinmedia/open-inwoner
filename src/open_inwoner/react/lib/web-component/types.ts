@@ -5,7 +5,7 @@
  * These types are foundational and have no dependencies on the registry.
  */
 
-import { AnyComponent as FC } from 'preact';
+import { AnyComponent as AC } from 'preact';
 import { WEB_COMPONENT_REGISTRY } from './registry';
 import { KebabCasedProperties } from 'type-fest';
 
@@ -98,7 +98,7 @@ export interface WebComponentDefinition<T extends string, P = {}> {
   options?: WebComponentRegisterOptions;
   /** Dynamic import function for lazy loading */
   importer: () => Promise<{
-    default: FC<P>;
+    default: AC<P>;
   }>;
 }
 

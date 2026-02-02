@@ -13,7 +13,6 @@ const RES = [
   3.36, 1.68, 0.84, 0.42,
 ];
 
-/*jshint multistr: true */
 const RD =
   '+proj=sterea \
 +lat_0=52.15616055555555 \

@@ -1,4 +1,10 @@
 {
+  "chart.default": [
+    {
+      "type": 0,
+      "value": "The chart is not created. See tables below for the data."
+    }
+  ],
   "kvkbranchselector.clear": [
     {
       "type": 0,

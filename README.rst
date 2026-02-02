@@ -9,7 +9,7 @@ Open Inwoner
 :Documentation: https://docs.openinwoner.nl
 :PythonVersion: 3.12
 
-|build-status| |docker| |black| |python-versions|
+|build-status| |docker| |ruff| |python-versions| |storybook|
 
 Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
@@ -139,9 +139,9 @@ References
     :alt: Build status
     :target: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml
 
-.. |black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :alt: Code style
-    :target: https://github.com/psf/black
+.. |ruff| image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json
+    :alt: Ruff
+    :target: https://github.com/astral-sh/ruff
 
 .. |docker| image:: https://img.shields.io/docker/v/maykinmedia/open-inwoner
     :alt: Docker image
@@ -149,6 +149,10 @@ References
 
 .. |python-versions| image:: https://img.shields.io/badge/python-3.12-blue.svg
     :alt: Supported Python version
+
+.. |storybook| image:: https://img.shields.io/badge/storybook-live-FF4785.svg?logo=storybook
+    :alt: Open Inwoner Storybook
+    :target: https://maykinmedia.github.io/open-inwoner
 
 
 .. _Common Ground: https://commonground.nl/

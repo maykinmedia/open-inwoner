@@ -1,4 +1,9 @@
 {
+  "chart.default": {
+    "defaultMessage": "The chart is not created. See tables below for the data.",
+    "description": "The default message of the chart.",
+    "originalDefault": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
+  },
   "kvkbranchselector.clear": {
     "defaultMessage": "Clear",
     "description": "Clear search button label",

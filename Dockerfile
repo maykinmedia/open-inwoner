@@ -40,7 +40,7 @@ WORKDIR /app
 
 # copy configuration/build files
 COPY ./build /app/build/
-COPY ./*.json ./*.js ./*.mjs ./*.ts ./.babelrc /app/
+COPY ./*.json ./*.js ./*.mjs ./*.ts /app/
 
 # Ensure the target directory for npm run collect exists
 RUN mkdir -p /app/src/open_inwoner/static/bundles/images

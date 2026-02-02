@@ -44,7 +44,6 @@ fontawesomefree
 django-timeline-logger
 django-csp
 django-csp-reports
-mozilla-django-oidc-db[setup-configuration]
 django-open-forms-client
 django-htmx
 playwright
@@ -82,7 +81,11 @@ elastic-apm  # Elastic APM integration
 beautifulsoup4
 
 # DigidLocal
-django-digid-eherkenning[oidc]
+
+# Pinned to fix #2125 -- we can't upgrade to the latest django-digid-eherkenning due
+# to it being dependent on the newest version of django-mozilla-django-oidc-db
+git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning[oidc]
+mozilla-django-oidc-db[setup-configuration]
 maykin-python3-saml
 pyopenssl
 django-sessionprofile

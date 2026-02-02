@@ -1,8 +1,10 @@
 from django.urls import path
 
-from .views import AfvalView
+from .views import AfvalProfielView
 
 app_name = "mijn_afval"
 
 
-urlpatterns = [path("", AfvalView.as_view(), name="index")]
+urlpatterns = [
+    path("", AfvalProfielView.as_view(), name="afval-profiel"),
+]

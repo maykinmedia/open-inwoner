@@ -1,26 +1,38 @@
-import json
-from pathlib import Path
-
+import requests
+import structlog
 from ape_pie.client import APIClient
+from pydantic import ValidationError
 
-from .api_models import BAGObject
+from .api_models import AfvalProfiel
+from .exceptions import MijnAfvalException
 
-DATA_PATH = (
-    Path(__file__).resolve().parent / "tests" / "fixtures" / "afval-mock-data.json"
-)
+logger = structlog.stdlib.get_logger(__name__)
 
 
-class AfvalApiClient(APIClient):
-    def _load_data(self):
-        return json.loads(DATA_PATH.read_text())
+class OpenAfvalAPIClient(APIClient):
+    def get_afval_profiel(self, bsn: str) -> AfvalProfiel:
+        try:
+            response = self.get("afval-profiel/987654321")
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as exc:
+            status_code = exc.response.status_code
+            if status_code < 500:
+                logger.exception("Client error", status_code=status_code)
+            else:
+                logger.exception("Server error", status_code=status_code)
+            raise MijnAfvalException from exc
+        except requests.exceptions.RequestException as exc:
+            logger.exception("Network error when fetching Afval profiel")
+            raise MijnAfvalException from exc
 
-    def fetch_bag_objects_for_bsn(self, bsn: str) -> list[BAGObject]:
-        """
-        Fetch 'Basisregistratie Adressen en Gebouwen' objects for specific BSN
-        """
-        data = self._load_data()
+        try:
+            response_json = response.json()
+        except requests.exceptions.JSONDecodeError as exc:
+            logger.exception("Invalid JSON from OpenAfval API")
+            raise MijnAfvalException from exc
 
-        if not data:
-            return []
-
-        return [BAGObject.model_validate(obj) for obj in data]
+        try:
+            return AfvalProfiel.model_validate(response_json)
+        except ValidationError as exc:
+            logger.exception("Invalid data for AfvalProfiel")
+            raise MijnAfvalException from exc

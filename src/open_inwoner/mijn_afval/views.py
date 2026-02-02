@@ -1,5 +1,8 @@
+import re
+from collections import defaultdict
 from typing import TypedDict
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -10,9 +13,12 @@ from django.views.generic import TemplateView
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
+from zgw_consumers.client import build_client as build_zgw_client
 
-from .api_models import BAGObject
-from .clients import AfvalApiClient
+from .api_models import AfvalProfiel
+from .clients import OpenAfvalAPIClient
+from .exceptions import MijnAfvalException
+from .models import MijnAfvalConfig
 
 
 def _format_number(value: int | float) -> str:
@@ -20,6 +26,20 @@ def _format_number(value: int | float) -> str:
 
     decimal_places = 0 if isinstance(value, int) else 1
     return number_format(value, decimal_pos=decimal_places, force_grouping=False)
+
+
+def _normalize_afval_type(afval_type: str) -> str:
+    """
+    Normalize afval_type from API to match template expectations.
+
+    API returns lowercase (e.g., "restafval", "gft")
+    Template expects capitalized (e.g., "Restafval", "GFT")
+    """
+    normalization_map = {
+        "restafval": "Restafval",
+        "gft": "GFT",
+    }
+    return normalization_map.get(afval_type.lower(), afval_type)
 
 
 def _get_container_type_label(container_type: str) -> str:
@@ -31,6 +51,27 @@ def _get_container_type_label(container_type: str) -> str:
         return _("Restafval")
     else:
         return container_type
+
+
+def _format_address(address: str) -> str:
+    """
+    Format address from API format to display format.
+
+    API format: "Dorpsstraat 12 [1234AB AMSTERDAM]"
+    Display format: "Dorpsstraat 12, 1234 AB, Amsterdam"
+    """
+    # Match pattern: street_part [postcodeCity]
+    match = re.match(r"^(.+?)\s*\[([0-9]{4})([A-Z]{2})\s+(.+?)\]$", address)
+
+    if match:
+        street = match.group(1).strip()
+        postcode_digits = match.group(2)
+        postcode_letters = match.group(3)
+        city = match.group(4).strip().title()
+        return f"{street}, {postcode_digits} {postcode_letters}, {city}"
+
+    # Return original if pattern doesn't match
+    return address
 
 
 class _LedigingData(TypedDict):
@@ -137,55 +178,80 @@ def _format_container_for_table(
     }
 
 
-def _format_bag_objects(bag_objects: list[BAGObject]) -> list[_BAGObjectData]:
+def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
     """
-    Convert BAGObject Pydantic model instances to formatted TypedDict data with
-    all string values, including table-ready data.
+    Convert AfvalProfiel (flat structure with ID references) to formatted nested
+    TypedDict data grouped by BAG object → containers → ledigingen.
+
+    Args:
+        profiel: AfvalProfiel from the OpenAfval API
+
+    Returns:
+        List of formatted BAG object data for template consumption
     """
+    # Lookup dict
+    containers_by_id = {container.id: container for container in profiel.containers}
+
+    # Group ledigingen by container ID
+    ledigingen_by_container: dict[str, list] = defaultdict(list)
+    for lediging in profiel.ledigingen:
+        ledigingen_by_container[lediging.container].append(lediging)
+
+    # Build nested structure grouped by container location
     result: list[_BAGObjectData] = []
 
-    for bag_obj in bag_objects:
+    for bag_obj in profiel.container_locaties:
         containers_data: list[_AfvalContainerData] = []
 
-        for container in bag_obj.containers:
-            ledigingen_data: list[_LedigingData] = []
+        # Find all containers that have ledigingen for this container location
+        for container_id, ledigingen in ledigingen_by_container.items():
+            # Check if any lediging for this container references this container location
+            if not any(
+                lediding.container_location == bag_obj.id for lediding in ledigingen
+            ):
+                continue
 
-            for lediging in container.ledigingen:
-                # Format datetime to separate date and time strings
-                # Use date_format to get localized day name
-                lediging_data: _LedigingData = {
-                    "tijdstip_datum": lediging.tijdstip.strftime("%d-%m-%Y"),
-                    "tijdstip_tijd": lediging.tijdstip.strftime("%H:%M"),
-                    "tijdstip_dag": date_format(
-                        lediging.tijdstip, "l"
-                    ),  # "l" = localized day name
-                    "gewicht": _format_number(lediging.gewicht),
-                }
-                ledigingen_data.append(lediging_data)
+            container = containers_by_id[container_id]
+
+            # Format ledigingen for this container
+            ledigingen_data: list[_LedigingData] = []
+            for lediging in ledigingen:
+                if lediging.container_location == bag_obj.id:
+                    lediging_data: _LedigingData = {
+                        "tijdstip_datum": lediging.geleegd_op.strftime("%d-%m-%Y"),
+                        "tijdstip_tijd": lediging.geleegd_op.strftime("%H:%M"),
+                        "tijdstip_dag": date_format(lediging.geleegd_op, "l"),
+                        "gewicht": _format_number(lediging.gewicht),
+                    }
+                    ledigingen_data.append(lediging_data)
 
             # Format container data
             totaal_gewicht = _format_number(container.totaal_gewicht)
 
-            # Generate table data (keep as dict, json_script filter will handle serialization)
+            # Normalize afval_type for template compatibility
+            normalized_type = _normalize_afval_type(container.afval_type)
+
+            # Generate table data
             table_data: _TableData = _format_container_for_table(
                 ledigingen_data,
                 totaal_gewicht,
-                container.identifier,
-                _get_container_type_label(container.type.value),
+                container.id,
+                _get_container_type_label(normalized_type),
             )
 
             container_data: _AfvalContainerData = {
-                "identifier": container.identifier,
-                "type": container.type.value,
+                "identifier": container.id,
+                "type": normalized_type,
                 "totaal_gewicht": totaal_gewicht,
                 "ledigingen": ledigingen_data,
-                "table_data": table_data,  # Dict, not JSON string
+                "table_data": table_data,
             }
             containers_data.append(container_data)
 
+        # Build BAG object data
         bag_obj_data: _BAGObjectData = {
-            "object_id": bag_obj.object_id,
-            "object_address": bag_obj.object_address,
+            "object_id": bag_obj.id,
+            "object_address": _format_address(bag_obj.adres),
             "totaal_gewicht": _format_number(bag_obj.totaal_gewicht),
             "containers": containers_data,
         }
@@ -194,15 +260,20 @@ def _format_bag_objects(bag_objects: list[BAGObject]) -> list[_BAGObjectData]:
     return result
 
 
-class AfvalView(LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView):
-    template_name = "pages/mijn_afval/index.html"
+class AfvalProfielView(
+    LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
+):
+    template_name = "pages/mijn_afval/afval-profiel.html"
 
     @cached_property
     def crumbs(self):
         current_page = self.request.current_page
         title = current_page.get_title() if current_page else _("Mijn Afval")
         return [
-            (title, reverse("mijn_afval:index")),
+            (
+                title,
+                reverse("mijn_afval:afval-profiel"),
+            ),
         ]
 
     def dispatch(self, request, *args, **kwargs):
@@ -216,19 +287,46 @@ class AfvalView(LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, Templat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        client = AfvalApiClient(base_url="")
-        data = client.fetch_bag_objects_for_bsn(bsn=self.request.user.bsn)
-
         # check for apphook config in case it is manually deleted (defensive)
         page_heading = self.config.page_heading if self.config else _("Mijn Afval")
         page_description = self.config.page_description if self.config else ""
 
         context.update(
             {
-                "afval_data": _format_bag_objects(data),
                 "page_heading": page_heading,
                 "page_description": page_description,
             }
         )
+        if not self.request.user.bsn:
+            messages.info(
+                self.request, _("Gegevens alleen beschikbaar voor gebruikers met BSN.")
+            )
+            return context
 
+        # fetch data from API
+        afval_config = MijnAfvalConfig.get_solo()
+
+        if not (openafval_service := afval_config.openafval_service):
+            messages.error(self.request, _("This module is not yet configured"))
+            return context
+
+        api_client = build_zgw_client(
+            service=openafval_service,
+            client_factory=OpenAfvalAPIClient,
+        )
+
+        try:
+            afval_profiel = api_client.get_afval_profiel(bsn=self.request.user.bsn)
+            afval_data = _format_afval_profiel(afval_profiel)
+        except MijnAfvalException:
+            messages.error(
+                self.request,
+                _(
+                    "We kunnen uw afvalgegevens momenteel niet ophalen. "
+                    "Probeer het later opnieuw."
+                ),
+            )
+            afval_data = []
+
+        context["afval_data"] = afval_data
         return context

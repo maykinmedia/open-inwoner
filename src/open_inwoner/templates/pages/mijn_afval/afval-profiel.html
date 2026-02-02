@@ -14,7 +14,8 @@
             {% if page_description %}
                 <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
             {% endif %}
-
+            {{afval_data|json_script:"afval_data"}}
+            <oip-chart data-id="afval_data"></oip-chart>
             {% for afval_obj in afval_data %}
                 <article class="afval-object">
                     {# Accordion wrapping address and all containers #}

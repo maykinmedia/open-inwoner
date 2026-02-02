@@ -12,7 +12,7 @@
     margin-block-start: var(--spacing-extra-large);
     margin-block-end: 0;
     padding-inline-start: 0;
-    grid-row-gap: var(--spacing-medium);
+    grid-row-gap: var(--spacing-large);
     grid-column-gap: var(--spacing-giant);
   }
 
@@ -49,6 +49,11 @@
     padding-block-end: var(--oip-external-link-body-padding-block-end);
     padding-inline-start: var(--oip-external-link-body-padding-inline-start);
     padding-inline-end: var(--oip-external-link-body-padding-inline-end);
+    margin:
+      var(--oip-external-link-body-margin-block-start),
+      var(--oip-external-link-body-margin-block-end),
+      var(--oip-external-link-body-margin-inline-start),
+      var(--oip-external-link-body-margin-inline-end);
     background-color: var(--oip-external-link-background-color);
     font-family: var(--oip-external-link-font-family);
     font-size: var(--oip-external-link-content-font-size);
