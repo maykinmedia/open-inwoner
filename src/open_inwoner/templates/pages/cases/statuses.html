@@ -32,16 +32,16 @@
                         </h3>
 
                         <div class="status-list__notification-content {% if zaak.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
-                            <p class="utrecht-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                            <p class="nl-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                                 {# Configurable texts #}
                                 {% if zaak.end_statustype_data %}<span>{{ status.description|default:"" }}</span>{% endif %}
                                 {% if not case.end_statustype_data %}<span class="status--result">{{ zaak.result_description|default:"" }}</span>{% endif %}
                             </p>
-                            <p class="utrecht-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
+                            <p class="nl-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
 			    {% if status.call_to_action_url %}
                                 {% button href=status.call_to_action_url text=status.call_to_action_text title=status.call_to_action_text primary=True icon="arrow_forward" icon_position="after" %}
                             {% else %}
-                                <p class="utrecht-paragraph status-list__upload {% if zaak.end_statustype_data %}status-list__upload--enabled{% endif %}">
+                                <p class="nl-paragraph status-list__upload {% if zaak.end_statustype_data %}status-list__upload--enabled{% endif %}">
                                 {% if zaak.internal_upload_enabled or case.external_upload_enabled %}
                                     {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
                                 {% endif %}
@@ -63,11 +63,11 @@
                             <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><span class="link link-success">{{ status.label }}</span>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
                         </h3>
                         <div class="status-list__notification-content" id="{{ completed_id }}">
-                            <p class="utrecht-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                            <p class="nl-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                                 {# Configurable texts #}
                                 <span>{{ status.description|default:"" }}</span>
                             </p>
-                            <p class="utrecht-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
+                            <p class="nl-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
                         </div>
                     </div>
                 </li>

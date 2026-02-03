@@ -73,7 +73,7 @@
                                 <div class="feedback__remark">
                                     <div class="form__control">
                                         <label class="label">
-                                            <span class="feedback__label-text utrecht-paragraph"></span>
+                                            <span class="feedback__label-text nl-paragraph"></span>
                                             {{ feedback_form.remark|addclass:"textarea" }}
                                         </label>
                                     </div>
@@ -100,7 +100,7 @@
                         {% if configurable_text.search_page.search_zero_results_text.html %}
                             {{ configurable_text.search_page.search_zero_results_text.html|safe }}
                         {% else %}
-                            <p class="utrecht-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
+                            <p class="nl-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
                             <ul class="ul">
                                 <li class="li">{% trans "Zorg ervoor dat alle woorden goed gespeld zijn." %}</li>
                                 <li class="li">{% trans "Probeer andere zoektermen." %}</li>

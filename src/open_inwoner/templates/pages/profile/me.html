@@ -152,7 +152,7 @@
                 <h2 class="utrecht-heading-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
             </header>
         </div>
-            <p class="utrecht-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
+            <p class="nl-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
                 {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}

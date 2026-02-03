@@ -17,7 +17,7 @@
     <aside class="dashboard plan-contact" aria-label="Dashboard">
         <ul class="dashboard__list">
             <li class="dashboard__list-item">
-                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                <p class="nl-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                     <span class="dashboard__item-label">{% trans "Aangemaakt door" %}:</span>
                     <span class="plan-contact__information">
                     <span class="plan-contact__info">{{ object.created_by.get_full_name }}</span>
@@ -26,7 +26,7 @@
                 </p>
             </li>
             <li class="dashboard__list-item">
-                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                <p class="nl-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                     <span class="dashboard__item-label">{% trans "Deelnemers" %}:</span>
                 <span class="plan-contact__information">
                 {% for user in contact_users %}
@@ -37,7 +37,7 @@
                 </p>
             </li>
             <li class="dashboard__list-item">
-                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+                <p class="nl-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                     <span class="dashboard__item-label">{% trans "Samenwerking loopt tot" %}:</span>
                 <span class="plan-contact__information">
                     <span class="plan-contact__info">{{ object.end_date }}</span>
@@ -60,11 +60,11 @@
         </div>
         <div class="tabled__inner">
             <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
-            <p class="utrecht-paragraph">{{ object.goal|linebreaksbr }}</p>
+            <p class="nl-paragraph">{{ object.goal|linebreaksbr }}</p>
 
             {% if object.description %}
                 <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
-                <p class="utrecht-paragraph">{{ object.description|linebreaksbr }}</p>
+                <p class="nl-paragraph">{{ object.description|linebreaksbr }}</p>
             {% endif %}
         </div>
     </section>
@@ -119,10 +119,10 @@
         <div class="tabled__inner">
         {% if object.note %}
             <div class="wysiwyg">
-                <p class="utrecht-paragraph">{{ object.note|linebreaksbr }}</p>
+                <p class="nl-paragraph">{{ object.note|linebreaksbr }}</p>
             </div>
         {% else %}
-            <p class="utrecht-paragraph"><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></p>
+            <p class="nl-paragraph"><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></p>
             <p class="utrecht-paragraph--oip">
                 {% trans "Klik op 'Bewerk' om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld." %}
             </p>

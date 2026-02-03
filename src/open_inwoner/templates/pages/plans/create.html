@@ -28,7 +28,7 @@
 
                         {% date_field form.end_date icon="calendar_today" icon_position="after" %}
                         <div class="plan__contacts">
-                            <p class="utrecht-paragraph">Contactpersoon</p>
+                            <p class="nl-paragraph">Contactpersoon</p>
                             {% checkboxes form.plan_contacts %}
                         </div>
 
@@ -43,7 +43,7 @@
                         </div>
                     {% endrender_form %}
                 {% else %}
-                    <p class="utrecht-paragraph plan__no-contacts">
+                    <p class="nl-paragraph plan__no-contacts">
                         {% url 'profile:contact_create' as contact_create %}
                         {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
                     </p>

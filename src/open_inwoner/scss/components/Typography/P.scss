@@ -51,11 +51,11 @@ body [class^='utrecht-heading'] + .nl-paragraph,
 }
 
 .oip-tag-list + .nl-paragraph,
-.utrecht-paragraph + .form {
+.nl-paragraph + .form {
   margin-top: var(--spacing-extra-large);
 }
 
-.utrecht-paragraph .link {
+.nl-paragraph .link {
   .content {
     text-decoration: underline;
   }

@@ -15,13 +15,13 @@
             </div>
         </div>
         <div class="filter-bar__mobile-button">
-            <p class="utrecht-paragraph filter-bar__heading">Filters</p>
+            <p class="nl-paragraph filter-bar__heading">Filters</p>
             <div class="filter-bar__mobile-selection" id="selectionFilterBar">
                 {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
                 {% icon icon="check" icon_position="after" outlined=True %}
                 <span class="sr-only">Gekozen filters</span>
             </div>
-            <p class="utrecht-paragraph filter-bar__status-text">Status</p>
+            <p class="nl-paragraph filter-bar__status-text">Status</p>
         </div>
         <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
             <span class="filter-bar__label">{% trans 'Filter op' %}:</span>
@@ -34,7 +34,7 @@
 <div class="card__grid">
 {% render_grid %}
     {% if not zaken %}
-        <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></p>
+        <p class="nl-paragraph"><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></p>
     {% endif %}
 
     {% for zaak in zaken %}
@@ -81,8 +81,8 @@
                                 {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
                             {% endif %}
                             <li class="list-item list-item--compact">
-                               <p class="utrecht-paragraph list-item__caption">Zaaknummer</p>
-                               <p class="utrecht-paragraph skip-phone-parsing">&zwj;{{ zaak.identification }}</p>
+                               <p class="nl-paragraph list-item__caption">Zaaknummer</p>
+                               <p class="nl-paragraph skip-phone-parsing">&zwj;{{ zaak.identification }}</p>
                             </li>
                         {% endrender_list %}
 
