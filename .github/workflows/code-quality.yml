@@ -106,6 +106,24 @@ jobs:
             echo "✅ SUCCESS: Ruff versions match ($CI_VERSION)"
           fi
 
+  commit-message-check:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version-file: 'pyproject.toml'
+      - name: Install commitizen
+        run: pip install commitizen==4.16.3
+      - name: Check commit messages
+        run: |
+          cz check --rev-range origin/${GITHUB_BASE_REF}..${{ github.sha }}
+
   zizmor:
     name: GitHub Actions Security Analysis with zizmor 🌈
     runs-on: ubuntu-latest
