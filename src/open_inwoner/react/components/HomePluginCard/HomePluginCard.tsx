@@ -24,7 +24,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
           <Heading
             id={!addressLineFirst ? id : undefined}
             class={clsx({
-              ['utrecht-heading-2']: !addressLineFirst,
+              ['nl-heading--level-2']: !addressLineFirst,
               ['utrecht-paragraph']: addressLineFirst,
             })}
           >

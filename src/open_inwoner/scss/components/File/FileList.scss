@@ -34,11 +34,11 @@
 /// Contextual
 ///
 
-.file-list + .utrecht-heading-2,
+.file-list + .nl-heading--level-2,
 .file-list + .nl-paragraph {
   margin-top: var(--spacing-large);
 }
 
-.utrecht-heading-2 + .file-list {
+.nl-heading--level-2 + .file-list {
   margin-top: var(--spacing-extra-large);
 }

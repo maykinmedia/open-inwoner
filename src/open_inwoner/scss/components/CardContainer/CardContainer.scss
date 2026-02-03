@@ -41,7 +41,7 @@
 
 .card-container + .card-container,
 .map + .card-container,
-.card-container + .utrecht-heading-2,
+.card-container + .nl-heading--level-2,
 .nl-paragraph + .card-container {
   margin-top: var(--gutter-width);
 }

@@ -1,4 +1,6 @@
 @use '@utrecht/paragraph-css/dist/index.css';
+//@import '@nl-design-system-candidate/paragraph-css/dist/paragraph.css';
+//not available as @use module?
 
 .nl-paragraph {
   // Takes style values from NLDS community
@@ -37,7 +39,7 @@ body [class^='utrecht-heading'] + .nl-paragraph,
 }
 
 .nl-paragraph + .nl-heading--level-1,
-.nl-paragraph + .utrecht-heading-2,
+.nl-paragraph + .nl-heading--level-2,
 .nl-paragraph + .utrecht-heading-3 {
   margin-top: var(--gutter-width);
 }

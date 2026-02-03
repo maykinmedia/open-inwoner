@@ -1,8 +1,9 @@
-@use '@utrecht/heading-1-css/dist/index.css';
 @use 'microscope-sass';
+@import '@nl-design-system-candidate/heading-css/dist/html/heading.css';
+//not available as @use module?
 
 .nl-heading {
-  .nl-heading--level-1 {
+  &.nl-heading--level-1 {
     // Reverse font-family fallback order
     font-family:
       var(--utrecht-heading-font-family), var(--nl-heading--level-1-font-family);

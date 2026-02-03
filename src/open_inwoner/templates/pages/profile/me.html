@@ -24,7 +24,7 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__business-overview">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
+                <h2 class="nl-heading--level-2" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% session_is_branch_restricted as is_branch_restricted %}
                     {% if not is_branch_restricted %}
@@ -77,7 +77,7 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__personal-info" id="personal-info">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2 " id="personal-overview">{% trans "Persoonlijke gegevens" %}</h2>
+                <h2 class="nl-heading--level-2 " id="personal-overview">{% trans "Persoonlijke gegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% button href="profile:edit" text=_("Bewerk") aria_label=_("Bewerk persoonsgegevens") icon="edit" transparent=True icon_outlined=True %}
                     {% if user.is_bsn_user_with_brp and view.config.my_data %}
@@ -123,7 +123,7 @@
         <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
             <div class="tabled__section">
                 <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
+                    <h2 class="nl-heading--level-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                     </h2>
                     <div class="tabled__item--mobile-big">
                         {% button href="profile:notifications" text=_("Bewerk") aria_label=_("Bewerk meldingsvoorkeuren") icon="edit" transparent=True icon_outlined=True %}
@@ -149,7 +149,7 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__newsletters" id="profile-newsletters">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
+                <h2 class="nl-heading--level-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
             </header>
         </div>
             <p class="nl-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
@@ -184,7 +184,7 @@
     {# Overview #}
     <section class="profile-section profile-section__overview">
         <header class="oip-header-group title">
-            <h2 class="utrecht-heading-2" id="overview">{% trans "Overzicht" %}</h2>
+            <h2 class="nl-heading--level-2" id="overview">{% trans "Overzicht" %}</h2>
         </header>
         <div class="profile-cards card-container card-container--columns-3">
             {# Selected categories #}
@@ -354,7 +354,7 @@
     <section class="tabled profile-section profile-section--bordered profile-section__remove">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="profile-remove">{% trans "Profiel verwijderen" %}</h2>
+                <h2 class="nl-heading--level-2" id="profile-remove">{% trans "Profiel verwijderen" %}</h2>
             </header>
         </div>
             <div class="tabled">

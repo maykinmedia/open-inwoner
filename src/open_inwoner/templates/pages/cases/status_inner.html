@@ -23,7 +23,7 @@
             </section>
 
             {% if zaak.internal_upload_enabled %}
-                <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Documenten" %}</h2>
+                <h2 class="nl-heading--level-2" id="documents-upload">{% trans "Documenten" %}</h2>
                 <h3 class="utrecht-heading-3 documents-upload__h3">{% trans "Voeg documenten toe" %}</h3>
 
                 <div class="document-upload-notification">
@@ -47,7 +47,7 @@
                 </section>
 
             {% elif zaak.external_upload_enabled %}
-                <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
+                <h2 class="nl-heading--level-2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if zaak.case_type_config_description %}
                     <p class="nl-paragraph">{{ zaak.case_type_config_description }}</p>
                 {% else %}
@@ -62,7 +62,7 @@
             {% if zaak.documents %}
                 <section class="case-detail__documents">
                     <div class="heading-2__indicator">
-                        <h2 class="utrecht-heading-2 {% if zaak.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
+                        <h2 class="nl-heading--level-2 {% if zaak.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
                         {% if zaak.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
                     </div>
                     {% case_document_list zaak.documents %}
