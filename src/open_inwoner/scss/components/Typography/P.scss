@@ -1,24 +1,24 @@
 @use '@utrecht/paragraph-css/dist/index.css';
 
-.utrecht-paragraph {
+.nl-paragraph {
   // Takes style values from NLDS community
 
   &--oip {
     // Takes style values from our own design-tokens NPM package
     margin: 0;
 
-    // Extensions of the utrecht-paragraph component with OIP-specific styles.
+    // Extensions of the nl-paragraph component with OIP-specific styles.
     &-muted {
-      color: var(--oip-utrecht-paragraph-muted-color);
+      color: var(--oip-nl-paragraph-muted-color);
     }
 
     &-centered {
-      text-align: var(--oip-utrecht-paragraph-centered-text-align);
+      text-align: var(--oip-nl-paragraph-centered-text-align);
     }
 
     &-compact {
-      margin-top: var(--oip-utrecht-paragraph-compact-margin-top);
-      margin-bottom: var(--oip-utrecht-paragraph-compact-margin-bottom);
+      margin-top: var(--oip-nl-paragraph-compact-margin-top);
+      margin-bottom: var(--oip-nl-paragraph-compact-margin-bottom);
     }
 
     &:empty {
@@ -31,26 +31,26 @@
   }
 }
 
-body [class^='utrecht-heading'] + .utrecht-paragraph,
-.oip-header-group + .utrecht-paragraph {
+body [class^='utrecht-heading'] + .nl-paragraph,
+.oip-header-group + .nl-paragraph {
   margin-top: var(--spacing-small);
 }
 
-.utrecht-paragraph + .utrecht-heading-1,
-.utrecht-paragraph + .utrecht-heading-2,
-.utrecht-paragraph + .utrecht-heading-3 {
+.nl-paragraph + .utrecht-heading-1,
+.nl-paragraph + .utrecht-heading-2,
+.nl-paragraph + .utrecht-heading-3 {
   margin-top: var(--gutter-width);
 }
 
-.utrecht-paragraph + .utrecht-heading-4 {
+.nl-paragraph + .utrecht-heading-4 {
   margin-top: var(--row-height-small);
 }
 
-.utrecht-paragraph + .utrecht-paragraph {
+.nl-paragraph + .nl-paragraph {
   margin-top: var(--font-line-height-body);
 }
 
-.oip-tag-list + .utrecht-paragraph,
+.oip-tag-list + .nl-paragraph,
 .utrecht-paragraph + .form {
   margin-top: var(--spacing-extra-large);
 }

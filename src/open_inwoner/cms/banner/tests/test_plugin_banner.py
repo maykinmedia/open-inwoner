@@ -48,4 +48,4 @@ class TestBannerText(TestCase):
         )
 
         self.assertIn(f'<h1 class="utrecht-heading-1">{title} </h1>', html)
-        self.assertIn(f'<p class="utrecht-paragraph">{description}</p>', html)
+        self.assertIn(f'<p class="nl-paragraph">{description}</p>', html)

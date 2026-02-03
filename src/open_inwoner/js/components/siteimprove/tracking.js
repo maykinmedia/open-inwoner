@@ -236,7 +236,7 @@ const specificClickSelectors = {
     'Click',
     'Open Aanvraag via tegel',
   ],
-  '#cases-content > .card__grid a.card ul > li > p.utrecht-paragraph': [
+  '#cases-content > .card__grid a.card ul > li > p.nl-paragraph': [
     'event',
     'Mijn zaken',
     'Click',
@@ -254,7 +254,7 @@ const specificClickSelectors = {
     'Click',
     'Open Aanvraag via tegel',
   ],
-  '#cases-content > .card__grid a.card ul > li .utrecht-paragraph': [
+  '#cases-content > .card__grid a.card ul > li .nl-paragraph': [
     'event',
     'Mijn zaken',
     'Click',
@@ -282,7 +282,7 @@ const specificClickSelectors = {
     ],
   // Detail Case view
   '.file__delete': ['event', 'Aanvraag detail', 'Click', 'Verwijder bestand'],
-  '#statuses_component .status-list__notification-content > p.utrecht-paragraph.status-list__upload.status-list__upload--enabled > a':
+  '#statuses_component .status-list__notification-content > p.nl-paragraph.status-list__upload.status-list__upload--enabled > a':
     ['event', 'Aanvraag detail', 'Scroll click', 'Scroll omlaag'],
   '#cases-detail-content .column.column--start-4.column--span-6 > section.case-detail__documents > .file-list > ul > li > aside > div > div > *':
     ['event', 'Aanvraag detail', 'Click', 'Download document'],
@@ -384,13 +384,13 @@ const specificClickSelectors = {
     'Click',
     'Filter op persoon',
   ],
-  '#profile-section-mentors .list .list-item .utrecht-paragraph': [
+  '#profile-section-mentors .list .list-item .nl-paragraph': [
     'event',
     'Mijn Profiel Overzicht',
     'Click',
     'Ga naar Begeleiders via tegel',
   ],
-  '#profile-section-contacts .list .list-item .utrecht-paragraph': [
+  '#profile-section-contacts .list .list-item .nl-paragraph': [
     'event',
     'Mijn Profiel Overzicht',
     'Click',
@@ -477,11 +477,10 @@ const partialClickSelectors = {
       category: 'Mijn berichten',
       label: 'Click naar bericht',
     },
-  '.view--inbox-index #content .grid__sidebar ul li > a > p.utrecht-paragraph':
-    {
-      category: 'Mijn berichten',
-      label: 'Click naar bericht',
-    },
+  '.view--inbox-index #content .grid__sidebar ul li > a > p.nl-paragraph': {
+    category: 'Mijn berichten',
+    label: 'Click naar bericht',
+  },
   // Hide personal data from inputs
   'input[type="text"]': { label: 'Click in invoerveld' },
   'input[type="email"]': { label: 'Click in e-mail invoerveld' },

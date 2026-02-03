@@ -13,7 +13,7 @@
   }
 }
 
-.utrecht-paragraph + .map {
+.nl-paragraph + .map {
   margin-top: var(--spacing-large);
 }
 
@@ -32,7 +32,7 @@
   &.container--no-margin {
     margin-top: var(--spacing-small);
 
-    & > .utrecht-paragraph {
+    & > .nl-paragraph {
       margin: 0 !important;
     }
 

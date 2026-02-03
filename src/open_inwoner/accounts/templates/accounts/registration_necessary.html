@@ -7,7 +7,7 @@
         {% render_column start=5 span=5 %}
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
-            {% if config.registration_text %}<p class="utrecht-paragraph">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
+            {% if config.registration_text %}<p class="nl-paragraph">{{ config.registration_text|urlize|linebreaksbr }}</p>{% endif %}
             <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form form__choice-list" novalidate>
                 {% csrf_token %}
 
@@ -74,7 +74,7 @@
 
                     {# Choice of zaken notification channel #}
                     {% if form.case_notification_channel %}
-                        <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze meldingen ontvangen?" %}</p>
+                        <p class="nl-paragraph choice-list__p">{% trans "Hoe wilt u deze meldingen ontvangen?" %}</p>
                         {% with form.case_notification_channel as field %}
                             {% choice_list single=True cols=True %}
                                 {% for choice in field.field.choices %}
