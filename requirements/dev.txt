@@ -1024,7 +1024,7 @@ orderedmultidict==1.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   furl
-packaging==23.0
+packaging==26.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
