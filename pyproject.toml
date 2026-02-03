@@ -177,3 +177,52 @@ line-ending = "lf"
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "logging".msg = "Use `structlog.get_logger(__name__)` instead of the stdlib logging module."
 "open_inwoner.openzaak.clients.MultiZgwClientProxy".msg = "Use ZGWService instead of MultiZgwClientProxy directly."
+
+[tool.commitizen]
+name = "cz_customize"
+tag_format = "v$version"
+version_scheme = "semver2"
+version_provider = "pep621"
+update_changelog_on_bump = true
+
+[tool.commitizen.customize]
+commit_parser = "^(?P<change_type>feat|fix|docs|style|refactor|test|build|ci|chore|revert)(?:\\((?P<scope>[^)]+)\\))?!?:\\s(?P<message>.+)"
+changelog_pattern = "^(feat|fix|docs|style|refactor|test|build|ci|chore|revert)(\\(.+\\))?(!)?:"
+message_template = "{{change_type}}:{% if issue %} [#{{ issue }}]{% endif %} {{subject}}{% if body %}\n\n{{body}}{% endif %}{% if footer %}\n\n{{footer}}{% endif %}"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+message = "Select the type of change you are committing"
+choices = [
+    {value = "feat", name = "feat: A new feature. Correlates with MINOR in SemVer"},
+    {value = "fix", name = "fix: A bug fix. Correlates with PATCH in SemVer"},
+    {value = "docs", name = "docs: Documentation only changes"},
+    {value = "style", name = "style: Changes that do not affect the meaning of the code"},
+    {value = "refactor", name = "refactor: A code change that neither fixes a bug nor adds a feature"},
+    {value = "test", name = "test: Adding missing tests or correcting existing tests"},
+    {value = "build", name = "build: Changes that affect the build system or external dependencies"},
+    {value = "ci", name = "ci: Changes to CI configuration files and scripts"},
+    {value = "chore", name = "chore: Other changes that don't modify src or test files"},
+    {value = "revert", name = "revert: Reverts a previous commit"},
+]
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "issue"
+message = "Provide the issue number: (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "Write a short and imperative summary of the code changes: (lower case and no period)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Provide additional contextual information about the code changes: (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "footer"
+message = "Information about Breaking Changes and reference issues that this commit closes: (press [enter] to skip)"
