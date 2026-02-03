@@ -36,7 +36,7 @@ body [class^='utrecht-heading'] + .nl-paragraph,
   margin-top: var(--spacing-small);
 }
 
-.nl-paragraph + .utrecht-heading-1,
+.nl-paragraph + .nl-heading--level-1,
 .nl-paragraph + .utrecht-heading-2,
 .nl-paragraph + .utrecht-heading-3 {
   margin-top: var(--gutter-width);

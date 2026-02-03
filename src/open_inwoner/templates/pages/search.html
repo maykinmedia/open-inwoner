@@ -3,7 +3,7 @@
 
 {% block main_inner %}
     {#  search term section #}
-    <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
+    <h1 class="nl-heading nl-heading--level-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
     <p class="search-results__title-small">{{ paginator.count }} {% trans "resultaten" %} </p>
 
     {#  facets and results section #}

@@ -38,7 +38,7 @@ class TestBannerText(TestCase):
             BannerTextPlugin, plugin_data={"title": title}
         )
 
-        self.assertIn(f'<h1 class="utrecht-heading-1">{title} </h1>', html)
+        self.assertIn(f'<h1 class="nl-heading nl-heading--level-1">{title} </h1>', html)
 
     def test_banner_text_with_description_is_rendered_in_plugin(self):
         title = "A title for the banner"
@@ -47,5 +47,5 @@ class TestBannerText(TestCase):
             BannerTextPlugin, plugin_data={"title": title, "description": description}
         )
 
-        self.assertIn(f'<h1 class="utrecht-heading-1">{title} </h1>', html)
+        self.assertIn(f'<h1 class="nl-heading nl-heading--level-1">{title} </h1>', html)
         self.assertIn(f'<p class="nl-paragraph">{description}</p>', html)

@@ -5,7 +5,7 @@
     {% if question %}
         {% render_grid %}
             {% render_column span=12 %}
-                <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
+                <h1 class="nl-heading nl-heading--level-1" id="title">{{ question.subject }}</h1>
                 {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
             {% endrender_column %}
         {% endrender_grid %}

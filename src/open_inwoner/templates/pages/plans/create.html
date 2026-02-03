@@ -4,7 +4,7 @@
 {% block content %}
     <div class="plan-create">
         <div class="plan-template__header">
-            <h1 class="utrecht-heading-1">{% trans "Start een nieuwe samenwerking" %}</h1>
+            <h1 class="nl-heading nl-heading--level-1">{% trans "Start een nieuwe samenwerking" %}</h1>
             <div class="plan-template__header-nav">
                 {% if request.user.get_active_contacts %}
                     {% button href="collaborate:plan_choose_template" text=_("Gebruik sjabloon") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}

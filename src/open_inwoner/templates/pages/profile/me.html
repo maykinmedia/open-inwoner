@@ -12,7 +12,7 @@
 {% get_solo 'configurations.SiteConfiguration' as siteconfig %}
 
 <section class="tabled tabled--flexible">
-    <h1 class="utrecht-heading-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.display_name }}{% endif %}</h1>
+    <h1 class="nl-heading nl-heading--level-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.display_name }}{% endif %}</h1>
     <p class="tabled__key">
     {% trans "Voor het laatst ingelogd op" %}: <span
     class="tabled__value">{% firstof user.previous_login|date:"j F Y" user.last_login|date:"j F Y" %} om {% firstof user.previous_login|date:"G:i" user.last_login|date:"G:i" %} uur</span>

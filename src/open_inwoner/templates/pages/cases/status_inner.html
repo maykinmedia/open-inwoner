@@ -12,7 +12,7 @@
     {% render_grid %}
         {% render_column span=12 %}
             {# Title/dashboard #}
-            <h1 class="utrecht-heading-1" id="title">{{ zaak.description }}</h1>
+            <h1 class="nl-heading nl-heading--level-1" id="title">{{ zaak.description }}</h1>
             {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
         {% endrender_column %}
 

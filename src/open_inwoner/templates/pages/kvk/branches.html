@@ -5,9 +5,9 @@
     {% render_grid %}
         {% render_column start=4 span=6 %}
             {% if user.vestiging %}
-                <h1 class="utrecht-heading-1" id="title">{% trans "Wissel van vestiging" %}</h1>
+                <h1 class="nl-heading nl-heading--level-1" id="title">{% trans "Wissel van vestiging" %}</h1>
             {% else %}
-                <h1 class="utrecht-heading-1" id="title">{% trans "Log in" %}</h1>
+                <h1 class="nl-heading nl-heading--level-1" id="title">{% trans "Log in" %}</h1>
             {% endif %}
 
             <form method="POST" id="eherkenning-branch-form" class="form">
