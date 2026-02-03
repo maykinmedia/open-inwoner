@@ -524,7 +524,7 @@ opentelemetry-util-http==0.58b0
     #   opentelemetry-instrumentation-wsgi
 orderedmultidict==1.0.1
     # via furl
-packaging==23.0
+packaging==26.0
     # via
     #   django-cms
     #   djangocms-versioning
