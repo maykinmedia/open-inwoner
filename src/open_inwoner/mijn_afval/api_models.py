@@ -21,15 +21,6 @@ class Periode(PydanticModel):
     laatste_lediging: datetime
 
 
-class Summary(PydanticModel):
-    totaal_gewicht: float
-    totaal_gewicht_per_afval_type: dict[str, float]
-    aantal_ledigingen: int
-    aantal_containers: int
-    aantal_container_locaties: int
-    periode: Periode
-
-
 class AfvalContainer(PydanticModel):
     id: str
     afval_type: str
@@ -55,7 +46,6 @@ class AfvalLediging(PydanticModel):
 
 class AfvalProfiel(PydanticModel):
     klant: Klant
-    summary: Summary
     containers: list[AfvalContainer]
     container_locaties: list[AfvalContainerLocatie]
     ledigingen: list[AfvalLediging]
