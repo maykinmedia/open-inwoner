@@ -127,7 +127,14 @@ class EHerkenningSAMLBackendTestCase(TestCase):
             request,
             None,
             saml_attributes={
-                "urn:etoegang:1.11:attribute-represented:KvKnr": [self.user.kvk]
+                "urn:etoegang:core:LegalSubjectID": [
+                    {
+                        "NameID": {
+                            "NameQualifier": "urn:etoegang:1.9:EntityConcernedID:KvKnr",
+                            "value": self.user.kvk,
+                        }
+                    },
+                ]
             },
         )
 
@@ -144,8 +151,13 @@ class EHerkenningSAMLBackendTestCase(TestCase):
             request,
             None,
             saml_attributes={
-                "urn:etoegang:1.11:attribute-represented:KvKnr": [
-                    self.vestiging_user.kvk
+                "urn:etoegang:core:LegalSubjectID": [
+                    {
+                        "NameID": {
+                            "NameQualifier": "urn:etoegang:1.9:EntityConcernedID:KvKnr",
+                            "value": self.vestiging_user.kvk,
+                        },
+                    },
                 ],
                 "urn:etoegang:1.9:ServiceRestriction:Vestigingsnr": self.vestiging_user.vestiging,
             },
@@ -165,7 +177,14 @@ class EHerkenningSAMLBackendTestCase(TestCase):
             request,
             None,
             saml_attributes={
-                "urn:etoegang:1.11:attribute-represented:KvKnr": ["12345678"]
+                "urn:etoegang:core:LegalSubjectID": [
+                    {
+                        "NameID": {
+                            "NameQualifier": "urn:etoegang:1.9:EntityConcernedID:KvKnr",
+                            "value": "12345678",
+                        }
+                    },
+                ]
             },
         )
 
@@ -185,7 +204,14 @@ class EHerkenningSAMLBackendTestCase(TestCase):
             request,
             None,
             saml_attributes={
-                "urn:etoegang:1.11:attribute-represented:KvKnr": ["12345678"],
+                "urn:etoegang:core:LegalSubjectID": [
+                    {
+                        "NameID": {
+                            "NameQualifier": "urn:etoegang:1.9:EntityConcernedID:KvKnr",
+                            "value": "12345678",
+                        },
+                    },
+                ],
                 "urn:etoegang:1.9:ServiceRestriction:Vestigingsnr": "123456789012",
             },
         )
