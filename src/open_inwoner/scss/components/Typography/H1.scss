@@ -1,6 +1,5 @@
+@use '@utrecht/heading-1-css/dist/index.css';
 @use 'microscope-sass';
-@import '@nl-design-system-candidate/heading-css/dist/html/heading.css';
-//not available as @use module?
 
 .nl-heading {
   &.nl-heading--level-1 {

@@ -135,7 +135,7 @@
                         {% for contact in object.contacts.all %}
                             {% render_grid compact=True %}
                                 {% render_column span=12 %}
-                                    <h4 class="utrecht-heading-4">{{ contact.first_name }} {{ contact.last_name }}</h4>
+                                    <h4 class="nl-heading nl-heading--level-4">{{ contact.first_name }} {{ contact.last_name }}</h4>
                                 {% endrender_column %}
 
                                 {% if contact.phonenumber %}

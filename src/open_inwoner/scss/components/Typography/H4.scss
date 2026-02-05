@@ -1,7 +1,7 @@
 @use '@utrecht/heading-4-css/dist/index.css';
 
-.utrecht-heading-4 {
+.nl-heading--level-4 {
   // Reverse font-family fallback order
   font-family:
-    var(--utrecht-heading-font-family), var(--utrecht-heading-4-font-family);
+    var(--utrecht-heading-font-family), var(--heading--level-4-font-family);
 }

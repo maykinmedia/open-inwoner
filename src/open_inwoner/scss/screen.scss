@@ -12,3 +12,8 @@
 @use 'views';
 @use 'overwrites';
 @use './_fixes';
+
+// NLDS
+// requires @import instead of @use due to NLDS package gen.
+@import url('../../../node_modules/@nl-design-system-candidate/heading-css/dist/html/heading.css');
+@import url('../../../node_modules/@nl-design-system-candidate/paragraph-css/dist/html/paragraph.css');
