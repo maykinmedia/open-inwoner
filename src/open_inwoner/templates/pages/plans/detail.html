@@ -50,7 +50,7 @@
     <section class="tabled tabled--flexible oip-section oip-section--bordered" aria-labelledby="goal">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="nl-heading--level-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% if is_creator %}
                         {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") aria_label=_("Doel en omschrijving bewerken") transparent=True %}
@@ -72,7 +72,7 @@
     <section class="tabled tabled--flexible oip-section" aria-labelledby="files">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="nl-heading--level-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
             </header>
         </div>
         <div class="plan__file">
@@ -110,7 +110,7 @@
     <section class="tabled tabled--flexible oip-section oip-section--bordered" aria-labelledby="notes">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="nl-heading--level-2" id="notes">{% trans "Notities" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="notes">{% trans "Notities" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") aria_label=_("Notitie aanvullen") transparent=True %}
                 </div>
@@ -133,7 +133,7 @@
     <section class="tabled tabled--flexible oip-section">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="nl-heading--level-2" id="actions">{% trans "Acties" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="actions">{% trans "Acties" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% button href="collaborate:plan_action_create" uuid=object.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
                 </div>

@@ -45,7 +45,7 @@
                 {% render_grid %}
                     {% render_column start=1 span=7 %}
                         <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
-                            <h2 class="nl-heading--level-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
+                            <h2 class="nl-heading nl-heading--level-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
                             {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
                                 {% csrf_token %}
                                 {{ feedback_form.errors }}
@@ -94,7 +94,7 @@
                 <div class="search-results search-results--no-results">
                     <div class="search-results--no-results-column">{% icon icon="info" icon_position="before" extra_classes="icon--info" outlined=True %}</div>
                     <div class="search-results--no-results-column">
-                        <h2 class="nl-heading--level-2 search-results__title">
+                        <h2 class="nl-heading nl-heading--level-2 search-results__title">
                             {% trans "We konden geen zoekresultaten vinden" %}
                         </h2>
                         {% if configurable_text.search_page.search_zero_results_text.html %}
