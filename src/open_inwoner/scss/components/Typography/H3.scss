@@ -1,11 +1,12 @@
 @use '@utrecht/heading-3-css/dist/index.css';
 
-.utrecht-heading-3 {
+.nl-heading--level-3 {
   // Reverse font-family fallback order
   font-family:
-    var(--utrecht-heading-font-family), var(--utrecht-heading-3-font-family);
+    var(--utrecht-heading-font-family),
+    var(--nl-heading nl-heading--level-3-font-family);
 }
 
-.nl-paragraph + .utrecht-heading-3 {
+.nl-paragraph + .nl-heading--level-3 {
   margin-top: var(--spacing-large);
 }

@@ -10,7 +10,7 @@
             {% for plan in plans %}
                 {% render_card image_object_fit="cover" href=plan.get_absolute_url %}
                 <div class="card__content">
-                    <h3 class="utrecht-heading-3 card__heading-3 plan-list">{{ plan.title }}</h3>
+                    <h3 class="nl-heading nl-heading--level-3 card__heading-3 plan-list">{{ plan.title }}</h3>
                     <p class="nl-paragraph">{{ plan.goal|truncatewords:20 }}</p>
                     <p class="nl-paragraph">{{ plan.description|truncatewords:20 }}</p>
                     <span class="spacer"></span>

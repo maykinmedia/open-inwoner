@@ -59,11 +59,11 @@
             </header>
         </div>
         <div class="tabled__inner">
-            <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
+            <h3 class="nl-heading nl-heading--level-3">{% trans "Doel" %}</h3>
             <p class="nl-paragraph">{{ object.goal|linebreaksbr }}</p>
 
             {% if object.description %}
-                <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
+                <h3 class="nl-heading nl-heading--level-3" id="description">{% trans "Description" %}</h3>
                 <p class="nl-paragraph">{{ object.description|linebreaksbr }}</p>
             {% endif %}
         </div>
@@ -88,7 +88,7 @@
             {% endif %}
         </div>
         <div class="plan__upload-document">
-            <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
+            <h3 class="nl-heading nl-heading--level-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
 
             <div id="form_upload_wrapper">
                 <div id="form_upload"

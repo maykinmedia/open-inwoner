@@ -40,7 +40,7 @@ body [class^='utrecht-heading'] + .nl-paragraph,
 
 .nl-paragraph + .nl-heading--level-1,
 .nl-paragraph + .nl-heading--level-2,
-.nl-paragraph + .utrecht-heading-3 {
+.nl-paragraph + .nl-heading--level-3 {
   margin-top: var(--gutter-width);
 }
 

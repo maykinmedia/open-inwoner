@@ -15,7 +15,7 @@
                     {% icon icon="circle" extra_classes="status-step" %}
                     <span class="sr-only">{% trans "Niet voltooid" %}</span>
                     <div class="status-list__notification status-list__notification--{{ status.status_indicator }}">
-                        <h3 class="utrecht-heading-3 utrecht-accordion__header">
+                        <h3 class="nl-heading nl-heading--level-3 utrecht-accordion__header">
                             {# Interactive accordion when case is ongoing, and active status is shown as expanded  #}
                             {% if zaak.end_statustype_data %}
                                 <button class="button--borderless status-list__button" aria-controls="{{ content_id }}" aria-expanded="true" id="{{ id }}">
@@ -59,7 +59,7 @@
                     {% icon icon="task_alt" %}
                     <span class="sr-only">{% trans "Voltooid" %}</span>
                     <div class="status-list__notification">
-                        <h3 class="utrecht-heading-3 utrecht-accordion__header">
+                        <h3 class="nl-heading nl-heading--level-3 utrecht-accordion__header">
                             <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><span class="link link-success">{{ status.label }}</span>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
                         </h3>
                         <div class="status-list__notification-content" id="{{ completed_id }}">
