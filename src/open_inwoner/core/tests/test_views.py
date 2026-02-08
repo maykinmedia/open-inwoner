@@ -21,7 +21,11 @@ from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
-from open_inwoner.cms.tests.cms_tools import create_apphook_page, create_homepage
+from open_inwoner.cms.tests.cms_tools import (
+    _publish_page,
+    create_apphook_page,
+    create_homepage,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.core.views import _get_category_data_for_user
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
@@ -518,9 +522,13 @@ class SitemapViewTest(TestCase):
 
     def test_sitemap_includes_footer_cms_pages(self):
         page = api.create_page(
-            "Privacy Policy", "cms/fullwidth.html", "nl", in_navigation=True
+            "Privacy Policy",
+            "cms/fullwidth.html",
+            "nl",
+            in_navigation=True,
+            created_by=self.user,
         )
-        page.publish("nl")
+        _publish_page(page, "nl")
         self.config.cms_pages.add(page)
 
         response = self.client.get(reverse("sitemap"))
@@ -531,13 +539,14 @@ class SitemapViewTest(TestCase):
     def test_sitemap_excludes_auth_required_footer_pages_for_anonymous(self):
         # Create a CMS page that requires auth
         page = api.create_page(
-            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+            "Members Only",
+            "cms/fullwidth.html",
+            "nl",
+            in_navigation=True,
+            created_by=self.user,
         )
-        page.publish("nl")
-        published_page = page.get_public_object()
-        CommonExtension.objects.create(
-            extended_object=published_page, requires_auth=True
-        )
+        _publish_page(page, "nl")
+        CommonExtension.objects.create(extended_object=page, requires_auth=True)
         # Add to site configuration
         self.config.cms_pages.add(page)
 
@@ -549,13 +558,14 @@ class SitemapViewTest(TestCase):
     def test_sitemap_includes_auth_required_footer_pages_for_authenticated(self):
         # Create a CMS page that requires auth
         page = api.create_page(
-            "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
+            "Members Only",
+            "cms/fullwidth.html",
+            "nl",
+            in_navigation=True,
+            created_by=self.user,
         )
-        page.publish("nl")
-        published_page = page.get_public_object()
-        CommonExtension.objects.create(
-            extended_object=published_page, requires_auth=True
-        )
+        _publish_page(page, "nl")
+        CommonExtension.objects.create(extended_object=page, requires_auth=True)
         # Add to site configuration
         self.config.cms_pages.add(page)
         self.client.force_login(self.user)

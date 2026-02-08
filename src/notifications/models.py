@@ -1,15 +1,33 @@
+import time
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+import jwt
 from ape_pie import APIClient
-from zds_client import ClientAuth
 from zgw_consumers.client import build_client
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 
 from .query import NotificationsConfigManager
+
+
+def generate_jwt_auth(client_id: str, secret: str) -> str:
+    """
+    Generate a ZGW-style JWT authorization header value.
+
+    This replaces the zds_client.ClientAuth functionality which was removed
+    due to pkg_resources compatibility issues with Python 3.12+.
+    """
+    payload = {
+        "iss": client_id,
+        "iat": int(time.time()),
+        "client_id": client_id,
+    }
+    token = jwt.encode(payload, secret, algorithm="HS256")
+    return f"Bearer {token}"
 
 
 class NotificationsAPIConfig(models.Model):
@@ -112,15 +130,13 @@ class Subscription(models.Model):
 
         # This authentication is for the NC to call us. Thus, it's *not* for
         # calling the NC to create a subscription.
-        # TODO replace with `TokenAuth`?
-        # see: https://github.com/maykinmedia/notifications-api-common/pull/1#discussion_r941450384
-        self_auth = ClientAuth(
+        auth_header = generate_jwt_auth(
             client_id=self.client_id,
             secret=self.secret,
         )
         data = {
             "callbackUrl": self.callback_url,
-            "auth": self_auth.credentials()["Authorization"],
+            "auth": auth_header,
             "kanalen": [
                 {
                     "naam": channel,

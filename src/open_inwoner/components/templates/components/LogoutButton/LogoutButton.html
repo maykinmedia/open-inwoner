@@ -1,0 +1,14 @@
+{% load i18n icon_tags %}
+{# Django 5.x requires POST for logout - this component wraps logout in a form #}
+<form method="post" action="{{ logout_url }}" class="logout-form">
+    {% csrf_token %}
+    <button type="submit" class="link link--primary{% if extra_classes %} {{ extra_classes }}{% endif %}">
+        {% if icon and icon_position == "before" %}
+            {% icon icon=icon outlined=icon_outlined %}
+        {% endif %}
+        <span class="link__text">{{ text }}</span>
+        {% if icon and icon_position == "after" %}
+            {% icon icon=icon outlined=icon_outlined %}
+        {% endif %}
+    </button>
+</form>

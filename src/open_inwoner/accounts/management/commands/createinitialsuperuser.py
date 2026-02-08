@@ -1,3 +1,6 @@
+import secrets
+import string
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -24,7 +27,9 @@ class Command(BaseCommand):
             )
             return
 
-        password = User.objects.make_random_password(length=20)
+        # Django 5.x removed make_random_password from UserManager
+        alphabet = string.ascii_letters + string.digits
+        password = "".join(secrets.choice(alphabet) for _ in range(20))
         User.objects.create_superuser(email=email, password=password)
 
         try:

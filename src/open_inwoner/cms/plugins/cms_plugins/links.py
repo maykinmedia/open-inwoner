@@ -38,10 +38,11 @@ class CustomLinkForm(forms.ModelForm):
 
     class Meta:
         model = ExtendedCMSLink
-        fields = ["name", "external_link", "icon", "target"]
+        # In djangocms-link 5.x, external_link was renamed to link
+        fields = ["name", "link", "icon", "target"]
 
     # `LinkPlugin.get_form()` from djangocms-link dynamically wraps the form class and
-    # calls `for_site()`, which filters the `linternal_link` field's queryset to only show
+    # calls `for_site()`, which filters the `internal_link` field's queryset to only show
     # CMS pages from the current site. We don't support internal links so the method
     # can be empty, but must be present to avoid `AttributeError` when editing links
     def for_site(self, site):
@@ -64,7 +65,8 @@ class LinkPlugin(OriginalLinkPlugin):
             {
                 "fields": (
                     "name",
-                    "external_link",
+                    # In djangocms-link 5.x, external_link was renamed to link
+                    "link",
                     "icon",
                 )
             },

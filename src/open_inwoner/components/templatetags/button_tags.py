@@ -132,3 +132,33 @@ def button(text, **kwargs):
     kwargs["classes"] = get_classes()
     kwargs["text"] = text
     return {**kwargs}
+
+
+@register.inclusion_tag("components/LogoutButton/LogoutButton.html", takes_context=True)
+def logout_button(context, text, **kwargs):
+    """
+    Creating a logout button that uses POST (required by Django 5.x).
+
+    Usage:
+        {% logout_button text="Logout" icon="logout" icon_position="before" %}
+
+    Variables:
+        + text: string | the button text.
+        - icon: string | the icon to display.
+        - icon_position: enum[before, after] | where the icon should be positioned.
+        - icon_outlined: bool | if the outlined icons should be used.
+        - extra_classes: string | Extra classes for the button.
+    """
+    request = context.get("request")
+    logout_url = ""
+    if request and hasattr(request, "user") and request.user.is_authenticated:
+        logout_url = request.user.get_logout_url()
+
+    return {
+        "text": text,
+        "logout_url": logout_url,
+        "icon": kwargs.get("icon"),
+        "icon_position": kwargs.get("icon_position"),
+        "icon_outlined": kwargs.get("icon_outlined", False),
+        "extra_classes": kwargs.get("extra_classes", ""),
+    }

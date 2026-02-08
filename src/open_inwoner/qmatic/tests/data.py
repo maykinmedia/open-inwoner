@@ -1,9 +1,9 @@
 from django.urls import reverse
 
 from zgw_consumers.constants import APITypes
-from zgw_consumers.test.factories import ServiceFactory
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.qmatic.models import QmaticConfig
 from open_inwoner.qmatic.tests.factories import (
     AppointmentFactory,

@@ -3,7 +3,7 @@ Pillow>=9.0.0 # handle images
 psycopg2  # database driver
 pytz  # handle timezones
 python-dotenv  # environment variables for secrets
-python-decouple  # processing of envvar configs
+python-decouple>=3.8  # processing of envvar configs (3.8+ needed for Python 3.12)
 geopy # geo decoder
 glom # processing nested data
 furl # processing urls
@@ -14,10 +14,13 @@ pydantic[email]
 typing-extensions
 
 # Framework libraries
-Django>=4.2,<5.0
+Django>=5.2,<6.0
 django-admin-index
-django-axes
+django-axes>=7.0.0  # 7.0+ needed for Python 3.12
+django-formtools>=2.5  # 2.5+ needed for Python 3.12
 django-filer
+django-polymorphic>=4.0.0  # 4.0+ removes pkg_resources dependency (needed for Python 3.12+)
+easy-thumbnails>=2.9  # 2.9+ needed for Django 5.x
 django-ordered-model
 django-redis
 django-sniplates
@@ -55,11 +58,13 @@ django-yubin
 django-structlog
 jinja2
 
-# django cms
-django-cms
-djangocms-link
-djangocms-file
-djangocms-picture
+# django cms (upgraded to 4.x for Django 5.2 compatibility)
+django-cms>=4.1.0,<5.0
+djangocms-versioning  # provides publishing workflow for CMS 4.x
+djangocms-text  # replaces djangocms-text-ckeditor in CMS 4.x
+djangocms-link>=4.0.0
+djangocms-file  # Note: 3.0.1 may need patches for CMS 4.x
+djangocms-picture>=4.0.0
 # djangocms-video
 # djangocms-googlemap
 # djangocms-snippet
@@ -99,7 +104,7 @@ git+https://github.com/maykinmedia/django-celery-monitor@74b1252#egg=django_cele
 # Common Ground integration
 zgw-consumers
 zgw-consumers-oas
-notifications-api-common
+notifications-api-common>=0.10.0  # 0.10+ drops gemma-zds-client dependency (pkg_resources issue)
 objects-api-client-django
 
 

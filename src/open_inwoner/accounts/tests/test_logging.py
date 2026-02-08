@@ -206,7 +206,7 @@ class TestProfile(WebTest):
         )
 
     def test_logout_is_logged(self):
-        self.app.get(reverse("logout"), user=self.user)
+        self.app.post(reverse("logout"), user=self.user)
         log_entry = TimelineLog.objects.last()
 
         self.assertEqual(

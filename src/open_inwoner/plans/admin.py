@@ -35,4 +35,5 @@ class PlanAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
         "created_by",
     )
     inlines = [PlanContactInlineAdmin, ActionInlineAdmin]
-    filter_horizontal = ("plan_contacts",)
+    # Note: filter_horizontal cannot be used with plan_contacts because it uses a through model
+    # The PlanContactInlineAdmin handles editing contacts instead

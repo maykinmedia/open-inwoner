@@ -2,7 +2,6 @@ import re
 
 import jwt
 from jwt import InvalidTokenError
-from zds_client.auth import JWT_ALG
 
 from notifications.models import Subscription
 from open_inwoner.openzaak.exceptions import (
@@ -10,6 +9,9 @@ from open_inwoner.openzaak.exceptions import (
     InvalidAuthForClientID,
     NoSubscriptionForClientID,
 )
+
+# ZGW standard JWT algorithm (was imported from zds_client.auth.JWT_ALG)
+JWT_ALG = "HS256"
 
 
 def get_valid_subscription_from_request(request) -> Subscription:

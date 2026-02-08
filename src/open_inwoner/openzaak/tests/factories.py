@@ -8,7 +8,7 @@ from zgw_consumers.api_models.base import factory as zwg_factory
 from zgw_consumers.api_models.constants import RolOmschrijving
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
-from zgw_consumers.test import generate_oas_component
+from zgw_consumers_oas import generate_oas_component
 
 from notifications.models import NotificationsAPIConfig, Subscription
 from open_inwoner.accounts.tests.factories import UserFactory

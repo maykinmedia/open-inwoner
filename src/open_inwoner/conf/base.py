@@ -62,8 +62,6 @@ TIME_ZONE = "Europe/Amsterdam"  # note: this *may* affect the output of DRF date
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 USE_THOUSAND_SEPARATOR = True
@@ -150,6 +148,8 @@ INSTALLED_APPS = [
     "menus",
     "treebeard",
     "sekizai",
+    "djangocms_versioning",  # CMS 4.x versioning/publishing workflow
+    # "djangocms_text",  # Not used - project has custom TextPlugin
     # "djangocms_admin_style",
     "djangocms_link",
     "djangocms_file",
@@ -247,7 +247,6 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
-    "djchoices",
     "django_celery_beat",
     "django_celery_monitor",
     # Temporary fix: the notifications lib interferes with
@@ -642,6 +641,9 @@ SHOW_ALERT = True
 #
 # Django CMS
 #
+
+# Confirm upgrade to django-cms 4.x
+CMS_CONFIRM_VERSION4 = True
 
 CMS_PAGE_CACHE = False
 CMS_PLACEHOLDER_CACHE = False

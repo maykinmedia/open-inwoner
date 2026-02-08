@@ -1,3 +1,5 @@
+from django.test import override_settings
+
 from django_webtest import WebTest
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
@@ -5,7 +7,7 @@ from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests.cms_tools import create_apphook_page
+from open_inwoner.cms.tests.cms_tools import _unpublish_page, create_apphook_page
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,
@@ -16,6 +18,7 @@ from open_inwoner.cms.utils.page_display import (
 )
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CMSPageDisplayTests(WebTest):
     def test_published_pages_helpers(self):
         # check blank
@@ -54,8 +57,8 @@ class CMSPageDisplayTests(WebTest):
             {"inbox", "cases", "collaborate", "ssd", "profile"},
         )
 
-        # check unpublishing
-        inbox.unpublish("nl")
+        # check unpublishing using CMS 4.x versioning API
+        _unpublish_page(inbox)
         self.assertFalse(inbox_page_is_published())
         self.assertEqual(
             set(get_active_app_names()),

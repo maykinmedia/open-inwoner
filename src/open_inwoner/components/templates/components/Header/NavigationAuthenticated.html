@@ -32,7 +32,7 @@
                         {% endif %}
                     {% endif %}
                     <li class="primary-navigation__list-item primary-navigation__list-item--always-visible">
-                        {% link text=_("Logout") href=request.user.get_logout_url icon="logout" icon_position="before" primary=True %}
+                        {% logout_button text=_("Logout") icon="logout" icon_position="before" %}
                     </li>
                 </ul>
             </li>

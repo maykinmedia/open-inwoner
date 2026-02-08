@@ -96,6 +96,8 @@ class OIDCFlowTests(TestCase):
         super().setUpClass()
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
+        # Clean up CMS test user to avoid interfering with user count assertions
+        cms_tools._cleanup_cms_test_user()
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -145,7 +147,7 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("admin:index"), fetch_redirect_response=True
         )
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         user.refresh_from_db()
 
@@ -201,7 +203,7 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("pages-root"), fetch_redirect_response=True
         )
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         user.refresh_from_db()
 
@@ -264,7 +266,7 @@ class OIDCFlowTests(TestCase):
             callback_response, reverse("pages-root"), fetch_redirect_response=True
         )
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         user.refresh_from_db()
 
@@ -512,6 +514,8 @@ class DigiDOIDCFlowTests(WebTest):
         super().setUpClass()
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
+        # Clean up CMS test user to avoid interfering with user count assertions
+        cms_tools._cleanup_cms_test_user()
 
     @patch("open_inwoner.haalcentraal.signals.update_brp_data_in_db")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
@@ -565,9 +569,9 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertRedirects(
             callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
-        db_user = User.objects.get()
+        db_user = cms_tools.user_queryset().get()
 
         # User data was prepopulated, so this should not be called
         mock_brp.assert_not_called()
@@ -983,7 +987,7 @@ class DigiDOIDCFlowTests(WebTest):
             self.app, "digid", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.bsn, "123456782")
@@ -1057,7 +1061,7 @@ class DigiDOIDCFlowTests(WebTest):
             self.app, "digid", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.bsn, "123456782")
@@ -1078,6 +1082,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         super().setUpClass()
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
+        # Clean up CMS test user to avoid interfering with user count assertions
+        cms_tools._cleanup_cms_test_user()
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
@@ -1129,7 +1135,7 @@ class eHerkenningOIDCFlowTests(WebTest):
                 with self.assertRaises(ValueError):
                     self.client.get(callback_url, {"code": "mock", "state": "mock"})
 
-                self.assertEqual(User.objects.count(), 0)
+                self.assertEqual(cms_tools.user_queryset().count(), 0)
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
@@ -1177,7 +1183,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertRedirects(
             callback_response, reverse("oidc-error"), fetch_redirect_response=False
         )
-        self.assertEqual(User.objects.count(), 0)
+        self.assertEqual(cms_tools.user_queryset().count(), 0)
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
     @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
@@ -1249,9 +1255,9 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertRedirects(
             callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
-        db_user = User.objects.get()
+        db_user = cms_tools.user_queryset().get()
 
         # User data was prepopulated, so this should not be called
         mock_retrieve_rsin_with_kvk.assert_not_called()
@@ -1409,7 +1415,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertEqual(existing_user.kvk, new_user.kvk)
         self.assertEqual(existing_user.vestiging, "")
 
-        self.assertEqual(set(User.objects.all()), {existing_user, new_user})
+        self.assertEqual(set(cms_tools.user_queryset()), {existing_user, new_user})
 
         self.assertEqual(callback_response.wsgi_request.user, new_user)
         self.assertTrue(
@@ -1478,7 +1484,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertRedirects(
             callback_response, reverse("pages-root"), fetch_redirect_response=False
         )
-        db_user = User.objects.get()
+        db_user = cms_tools.user_queryset().get()
 
         mock_retrieve_rsin_with_kvk.assert_not_called()
         self.assertEqual(db_user.pk, existing_user.pk)
@@ -1996,7 +2002,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
 
-        self.assertEqual(User.objects.count(), 0)
+        self.assertEqual(cms_tools.user_queryset().count(), 0)
 
         redirect_url = reverse("profile:detail")
 
@@ -2004,7 +2010,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.app, "eherkenning", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.kvk, "12345678")
@@ -2121,7 +2127,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         redirect_url = reverse("profile:detail")
 
@@ -2129,7 +2135,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.app, "eherkenning", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.kvk, "12345678")
@@ -2206,7 +2212,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         redirect_url = reverse("profile:detail")
 
@@ -2214,7 +2220,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.app, "eherkenning", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.kvk, "12345678")
@@ -2294,7 +2300,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
 
-        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(cms_tools.user_queryset().count(), 1)
 
         redirect_url = reverse("profile:detail")
 
@@ -2302,7 +2308,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             self.app, "eherkenning", redirect_url=redirect_url
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(user.pk, int(self.app.session.get("_auth_user_id")))
         self.assertEqual(user.kvk, "12345678")
@@ -2326,6 +2332,8 @@ class EIDASOIDCFlowTests(WebTest):
         super().setUpClass()
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
+        # Clean up CMS test user to avoid interfering with user count assertions
+        cms_tools._cleanup_cms_test_user()
 
     def setUp(self):
         super().setUp()
@@ -2370,7 +2378,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2385,12 +2395,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should be created after authentication",
         )
 
-        new_user = User.objects.get()
+        new_user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             new_user.eidas_pseudo_id,
@@ -2458,7 +2468,7 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should exist before authentication",
         )
@@ -2475,12 +2485,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="No new user should be created when existing user with matching pseudo_id logs in",
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             user.id,
@@ -2522,7 +2532,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2537,12 +2549,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should be created after authentication",
         )
 
-        new_user = User.objects.get()
+        new_user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             new_user.eidas_pseudo_id,
@@ -2609,7 +2621,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2624,12 +2638,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should be created after authentication",
         )
 
-        new_user = User.objects.get()
+        new_user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             new_user.eidas_pseudo_id,
@@ -2695,7 +2709,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2710,7 +2726,7 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             0,
             msg="No user should be created when pseudo_id claim is missing",
         )
@@ -2752,7 +2768,7 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should exist before authentication",
         )
@@ -2769,12 +2785,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="No new user should be created when existing user logs in",
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             user.id,
@@ -2834,7 +2850,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2849,12 +2867,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should be created after authentication",
         )
 
-        new_user = User.objects.get()
+        new_user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             new_user.login_type,
@@ -2900,7 +2918,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -2920,7 +2940,7 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             0,
             msg="No user should be created when user cancels authentication",
         )
@@ -3053,7 +3073,9 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(), 0, msg="No users should exist before authentication"
+            cms_tools.user_queryset().count(),
+            0,
+            msg="No users should exist before authentication",
         )
 
         callback_response = self.client.get(
@@ -3073,7 +3095,7 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             0,
             msg="No user should be created when authentication error occurs",
         )
@@ -3132,7 +3154,7 @@ class EIDASOIDCFlowTests(WebTest):
         callback_url = reverse("eidas_oidc:callback")
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="Exactly one user should exist before authentication",
         )
@@ -3149,12 +3171,12 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
         self.assertEqual(
-            User.objects.count(),
+            cms_tools.user_queryset().count(),
             1,
             msg="No new user should be created when pseudo_id already exists",
         )
 
-        user = User.objects.get()
+        user = cms_tools.user_queryset().get()
 
         self.assertEqual(
             user.id,

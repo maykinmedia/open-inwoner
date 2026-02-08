@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 
 from cms.models import Page
-from cms.utils.page import get_page_queryset
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
 
@@ -10,6 +9,7 @@ from open_inwoner.cms.tests.cms_tools import (
     render_all_placeholders,
     render_full_page,
 )
+from open_inwoner.cms.utils import get_page_content, get_published_pages
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models import Category, Organization, Product, Tag
 
@@ -114,7 +114,14 @@ class CMSPageDocument(Document):
     url = fields.TextField()
 
     def prepare_description(self, instance: Page):
-        return instance.get_meta_description(fallback=False, language="nl")
+        # CMS 4.x: get_meta_description may not be available on Page
+        if hasattr(instance, "get_meta_description"):
+            return instance.get_meta_description(fallback=False, language="nl")
+        # Fallback: try to get description from PageContent
+        page_content = get_page_content(instance, language="nl")
+        if page_content and hasattr(page_content, "meta_description"):
+            return page_content.meta_description or ""
+        return ""
 
     def prepare_rendered_html(self, instance: Page):
         content = render_full_page(instance)
@@ -129,7 +136,8 @@ class CMSPageDocument(Document):
         return str(instance)
 
     def prepare_url(self, instance: Page):
-        return instance.get_public_url() or ""
+        # CMS 4.x: get_public_url() removed, use get_absolute_url() instead
+        return instance.get_absolute_url() or ""
 
     def get_queryset(self):
         site_config = SiteConfiguration.get_solo()
@@ -137,7 +145,7 @@ class CMSPageDocument(Document):
             return Page.objects.none()
 
         site = Site.objects.get_current()
-        return get_page_queryset(site, draft=False, published=True)
+        return get_published_pages(site)
 
     class Index:
         name = settings.ES_INDEX_CMS_PAGES

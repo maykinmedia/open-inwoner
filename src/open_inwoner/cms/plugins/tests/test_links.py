@@ -25,6 +25,7 @@ class CMSLinkPluginTest(TestCase):
 
         # Add child Link plugins
         # Note: name is a ProsemirrorModelField, so we pass a document structure
+        # In CMS 4.x with djangocms-link, link data is stored in a JSON 'link' field
         add_plugin(
             placeholder,
             LinkPlugin,
@@ -40,7 +41,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/first",
+            link={"external_link": "https://example.com/first"},
             icon="arrow_forward",
         )
         add_plugin(
@@ -58,7 +59,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/second",
+            link={"external_link": "https://example.com/second"},
             icon="check",
         )
 
@@ -93,6 +94,7 @@ class CMSLinkPluginTest(TestCase):
         )
 
         # Add child Link plugins
+        # In CMS 4.x with djangocms-link, link data is stored in a JSON 'link' field
         add_plugin(
             placeholder,
             LinkPlugin,
@@ -108,7 +110,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/first",
+            link={"external_link": "https://example.com/first"},
             icon="arrow_forward",
         )
 

@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
-from zgw_consumers.test import generate_oas_component
+from zgw_consumers_oas import generate_oas_component
 
 from open_inwoner.openzaak.api_models import InformatieObject, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig

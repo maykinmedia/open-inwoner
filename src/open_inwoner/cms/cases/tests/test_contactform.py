@@ -18,6 +18,7 @@ from zgw_consumers.api_models.constants import (
 )
 from zgw_consumers.constants import APITypes
 
+import open_inwoner.utils.compat  # noqa: F401 - Django 5.x timezone.utc fix
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
     eHerkenningUserFactory,

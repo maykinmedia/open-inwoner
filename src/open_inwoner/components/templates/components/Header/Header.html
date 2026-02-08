@@ -91,7 +91,7 @@
                                 {% endif %}
                             {% endif %}
                             <li class="header__list-item">
-                                {% link text=_("Logout") href=request.user.get_logout_url icon="login" icon_position="before" primary=True icon_outlined=True %}
+                                {% logout_button text=_("Logout") icon="login" icon_position="before" icon_outlined=True %}
                             </li>
                         </ul>
                     {% elif config.login_show %}

@@ -2042,6 +2042,8 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
+    csrf_checks = False
+
     def setUp(self):
         # Create a user. We need to reset their password
         # because otherwise we do not have access to the raw one associated.
@@ -2155,8 +2157,8 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
 
     def test_logout(self):
         """Test that a user is able to log out and page redirects to root endpoint."""
-        # Log out user and redirection
-        logout_response = self.app.get(reverse("logout"), user=self.user)
+        # Log out user and redirection (Django 5.x requires POST for logout)
+        logout_response = self.app.post(reverse("logout"), user=self.user)
         self.assertRedirects(logout_response, reverse("login"))
         self.assertFalse(logout_response.follow().context["user"].is_authenticated)
 

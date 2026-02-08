@@ -13,6 +13,7 @@ class KCMSurveyTestCase(TestCase):
     css_selector = ".kcm-survey"
 
     def setUp(self):
+        cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
 
     @patch(

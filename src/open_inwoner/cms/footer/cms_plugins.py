@@ -34,9 +34,10 @@ class FooterPagesPlugin(CMSPluginBase):
                 ):
                     cms_pages.remove(page)
 
+        # In CMS 4.x, template is stored on PageContent, not Page
         contact_form_pages = Page.objects.filter(
-            template="cms/contactform/form_outer.html", publisher_is_draft=False
-        )
+            pagecontent_set__template="cms/contactform/form_outer.html"
+        ).distinct()
 
         # Use the first page if it exists
         if contact_form_pages.exists() and klant_config.contact_registration_enabled:

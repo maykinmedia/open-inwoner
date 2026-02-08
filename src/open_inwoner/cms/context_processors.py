@@ -1,6 +1,4 @@
-from django.db.models import Q
-
-from cms.models import Page
+from open_inwoner.cms.utils import get_published_pages_with_apphooks
 
 
 def active_apphooks(request):
@@ -12,10 +10,8 @@ def active_apphooks(request):
         "profile": True,
     }
     """
-    active_app_hooks = (
-        Page.objects.published()
-        .exclude(Q(application_urls="") | Q(application_urls__isnull=True))
-        .values_list("application_urls", "application_namespace")
+    active_app_hooks = get_published_pages_with_apphooks().values_list(
+        "application_urls", "application_namespace"
     )
 
     lookup = dict()

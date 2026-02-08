@@ -10,6 +10,7 @@ from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
 
 def create_cms_pages(apps, schema_editor):
     FlatPage = apps.get_model("flatpages", "FlatPage")
+    PageContent = apps.get_model("cms", "PageContent")
 
     language = "nl"
 
@@ -19,16 +20,22 @@ def create_cms_pages(apps, schema_editor):
         if not slug:
             slug = slugify(flatpage.title)
 
+        # CMS 4.x: create_page doesn't support 'published' parameter
         page = create_page(
             title=title,
             template="cms/cms_flatpage_template.html",
             language=language,
             slug=slug,
-            published=True,
             in_navigation=True,
         )
 
-        placeholder = page.placeholders.get(slot="content")
+        # CMS 4.x: placeholders are on PageContent, not Page
+        # Note: apps.get_model() doesn't have custom managers, use .objects
+        page_content = PageContent.objects.filter(page=page, language=language).first()
+        if not page_content:
+            continue
+
+        placeholder = page_content.placeholders.get(slot="content")
 
         add_plugin(
             placeholder=placeholder,
@@ -43,7 +50,7 @@ def link_cms_pages_with_siteconfig(apps, schema_editor):
     SiteConfiguration = apps.get_model("configurations", "SiteConfiguration")
     SiteConfigurationPage = apps.get_model("configurations", "SiteConfigurationPage")
 
-    Page = apps.get_model("cms", "Page")
+    PageContent = apps.get_model("cms", "PageContent")
     CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
 
     # remove existing pages for clean slate
@@ -53,13 +60,17 @@ def link_cms_pages_with_siteconfig(apps, schema_editor):
 
     for order, cms_model in enumerate(CMSFlatPageModel.objects.all()):
         placeholder = cms_model.placeholder
-        cms_page = Page.objects.filter(placeholders=placeholder).first()
+        # CMS 4.x: placeholders are on PageContent, find the page through PageContent
+        # Note: apps.get_model() doesn't have custom managers, use .objects
+        page_content = PageContent.objects.filter(placeholders=placeholder).first()
+        cms_page = page_content.page if page_content else None
 
-        SiteConfigurationPage.objects.create(
-            configuration=site_config,
-            cms_page=cms_page,
-            order=order,
-        )
+        if cms_page:
+            SiteConfigurationPage.objects.create(
+                configuration=site_config,
+                cms_page=cms_page,
+                order=order,
+            )
 
 
 def delete_flatpages(apps, schema_editor):

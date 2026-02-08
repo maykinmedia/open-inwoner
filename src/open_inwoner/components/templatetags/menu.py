@@ -13,6 +13,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 
 from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.cms.utils import get_page_content, is_page_published
 
 register = template.Library()
 
@@ -107,25 +108,8 @@ class SideNavMenuData:
             if icon := try_get_icon(page):
                 return icon
 
-            # If not found and this is a public page, try the draft version
-            if not page.publisher_is_draft and hasattr(page, "publisher_public"):
-                try:
-                    draft_page = page.publisher_public
-                    if icon := try_get_icon(draft_page, " on draft"):
-                        return icon
-                except AttributeError:
-                    pass
-
-            # If not found and this is a draft page, try the public version
-            if page.publisher_is_draft and getattr(page, "publisher_public_id", None):
-                try:
-                    public_page = Page.objects.get(
-                        pk=getattr(page, "publisher_public_id")
-                    )
-                    if icon := try_get_icon(public_page, " on public"):
-                        return icon
-                except Page.DoesNotExist:
-                    pass
+            # In CMS 4.x with versioning, the page returned is already the correct version
+            # No need to look up draft/public variants
 
         except Exception:
             logger.exception("Error extracting icon")
@@ -265,39 +249,28 @@ class SideNavMenuData:
 
     def _is_visible_to_user(self, node: NavigationNode) -> bool:
         try:
-            # Note how draft status works: there are typically two physical Page objects
-            # for the same logical page: one draft, one published. Which one is returned
-            # depends on the request context, and is handled by Django CMS, by selecting
-            # the appropriate node for that context. Thus, we can assume `node` will
-            # contain the relevant ID for the current context.
+            # In CMS 4.x with versioning, we need to check if the page has a
+            # published PageContent version for the current language.
             page = Page.objects.get(pk=node.id)
             current_language = get_language()
-            is_published_for_language = page.is_published(current_language)
-            is_draft = page.publisher_is_draft
             is_staff = self.request.user.is_staff
 
-            # Staff users can see all pages (including drafts) if published for language
-            # OR if it's a draft page with content in the current language
+            # Check if page has published content for the current language
+            is_published_for_language = is_page_published(page, current_language)
+
+            # Staff users can see all pages if published for language
+            # or if the page has content in the current language
             if is_staff:
                 if is_published_for_language:
                     return True
 
-                # For unpublished draft pages, check if they have content in current
-                # language as a hack to answer the question "Does the unpublished draft
-                # version have any content?". This allows staff users to still see the
-                # menu when they are in edit mode.
-                if is_draft:
-                    try:
-                        title = page.get_title_obj(
-                            language=current_language, fallback=False
-                        )
-                        if title:
-                            return True
-                    except Exception:
-                        logger.warning(
-                            "unable to get page title for the current node",
-                            page=page,
-                        )
+                # For unpublished pages, check if they have content in current language
+                # This allows staff users to still see the menu when in edit mode
+                page_content = get_page_content(
+                    page, current_language, include_drafts=True
+                )
+                if page_content:
+                    return True
 
                 logger.debug(
                     "Skipping node for staff user: not published and no content for language",
@@ -306,14 +279,7 @@ class SideNavMenuData:
                 )
                 return False
 
-            # Regular users only see published (non-draft) pages
-            if is_draft:
-                logger.debug(
-                    "Skipping node for regular user: page is draft",
-                    node_title=node.title,
-                )
-                return False
-
+            # Regular users only see published pages
             if not is_published_for_language:
                 logger.debug(
                     "Skipping node for regular user: not published for language",

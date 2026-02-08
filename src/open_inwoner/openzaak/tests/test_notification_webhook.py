@@ -7,8 +7,8 @@ from django.urls import reverse_lazy
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from zds_client import ClientAuth
 
+from notifications.models import generate_jwt_auth
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscriptions_from_bearer
 from open_inwoner.openzaak.exceptions import (
@@ -22,21 +22,9 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 from .shared import CATALOGI_ROOT, ZAKEN_ROOT
 
 
-def generate_auth(client_id, secret):
-    # this emulates the token creation from Subscription.register()
-    client_auth = ClientAuth(
-        # note we only add the fields we're interested in
-        client_id=client_id,
-        secret=secret,
-    )
-    return client_auth
-
-
 def generate_auth_header_value(client_id, secret):
     # this emulates the token creation from Subscription.register()
-    client_auth = generate_auth(client_id, secret)
-    auth_value = client_auth.credentials()["Authorization"]
-    return auth_value
+    return generate_jwt_auth(client_id, secret)
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPAGATES=True)

@@ -318,8 +318,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Stuur een bericht"))
 
         # case 3: published message page
-        page.publish("nl")
-        page.save()
+        cms_tools._publish_page(page)
 
         response = self.app.get(self.url, user=self.user)
 
@@ -966,9 +965,9 @@ class ProfileDeleteTest(WebTest):
         response = response.forms["delete-form"].submit()
         self.assertIsNone(User.objects.first())
 
-        # check redirect
+        # check redirect (Django 5.x requires POST for logout)
         self.assertRedirects(
-            self.app.get(response.url),
+            self.app.post(response.url),
             reverse("login"),
             status_code=302,
             target_status_code=200,
@@ -985,9 +984,9 @@ class ProfileDeleteTest(WebTest):
         response = response.forms["delete-form"].submit()
         self.assertIsNone(User.objects.first())
 
-        # check redirect
+        # check redirect (Django 5.x requires POST for logout)
         self.assertRedirects(
-            self.app.get(response.url),
+            self.app.post(response.url),
             reverse("login"),
             status_code=302,
             target_status_code=200,
@@ -1326,7 +1325,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("messages_notifications", form.fields)
 
         # inbox page published
-        page.publish("nl")
+        cms_tools._publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1349,7 +1348,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("cases_notifications", form.fields)
 
         # cases page published
-        page.publish("nl")
+        cms_tools._publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1371,7 +1370,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("plans_notifications", form.fields)
 
         # collaborate page published
-        page.publish("nl")
+        cms_tools._publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 

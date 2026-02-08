@@ -34,8 +34,7 @@ class MenuModifier(Modifier):
             page_nodes = {n.id: n for n in nodes if n.attr["is_page"]}
             pages = (
                 Page.objects.filter(id__in=page_nodes.keys())
-                # optimise and only retrieve id and related object
-                .only("id")
+                # In Django 5.x, only() cannot be used with select_related on the same field
                 .select_related("commonextension")
             )
             num_indicators = 0
@@ -63,11 +62,15 @@ class MenuModifier(Modifier):
                 # check if we got indicator lookups
                 indicator_lookup = menu_indicator_lookups.get(ext.menu_indicator)
                 if indicator_lookup:
-                    node.indicator = indicator_lookup(request, namespace)
+                    indicator_value = indicator_lookup(request, namespace)
+                    # Ensure indicator is a valid integer
+                    if isinstance(indicator_value, int):
+                        node.indicator = indicator_value
+                        num_indicators += indicator_value
+                    else:
+                        node.indicator = 0
                 else:
                     node.indicator = 0
-
-                num_indicators += node.indicator
 
             # store total on something we can access from outside the template tags
             request.user.num_indicators = num_indicators
