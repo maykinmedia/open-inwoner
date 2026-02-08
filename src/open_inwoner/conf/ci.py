@@ -6,8 +6,12 @@ os.environ.setdefault("ENVIRONMENT", "ci")
 os.environ.setdefault("SECRET_KEY", "for-testing-purposes-only")
 os.environ.setdefault("IS_HTTPS", "no")
 os.environ.setdefault("ALLOWED_HOSTS", "")
+# Disable request logging to avoid structlog middleware issues with parallel tests
+os.environ.setdefault("LOG_REQUESTS", "no")
 
 from .base import *  # noqa isort:skip
+
+import structlog
 
 # Disable all logging
 LOGGING = {
@@ -88,3 +92,26 @@ PASSWORD_HASHERS = [
 # Sip the auto-loading of the django-admin-index fixture on startup.
 # It doesn't add anything in CI, and just adds time to the run.
 SKIP_ADMIN_INDEX_FIXTURE = True
+
+#
+# Structlog configuration for parallel tests
+#
+# Disable logger caching to prevent MaybeEncodingError when running tests in
+# parallel with multiprocessing. Cached loggers can contain unpicklable state
+# that fails to serialize when sending test results between processes.
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=False,  # Prevent caching issues with multiprocessing
+)
