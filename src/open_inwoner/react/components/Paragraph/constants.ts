@@ -6,7 +6,7 @@ export const PARAGRAPH_DEFINITION: WebComponentDefinition<
   IParagraphProps
 > = {
   tagName: 'nl-paragraph',
-  propNames: ['lead'],
+  propNames: ['lead', 'extraClasses'],
   options: { shadow: false },
   importer: () => import('./Paragraph'),
 };

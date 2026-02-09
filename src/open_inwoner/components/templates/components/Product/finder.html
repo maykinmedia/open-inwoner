@@ -2,7 +2,7 @@
 
 {% render_column span=6 compact=True extra_classes="product-finder" %}
     <h2 class="nl-heading nl-heading--level-2">{{configurable_text.home_page.home_product_finder_title}}</h2>
-    <p class="utrecht-paragraph">{{configurable_text.home_page.home_product_finder_intro|linebreaksbr}}</p>
+    <nl-paragraph>{{configurable_text.home_page.home_product_finder_intro|linebreaksbr}}</nl-paragraph>
 
     <div class="product-finder__form">
         {% if not conditions_done %}

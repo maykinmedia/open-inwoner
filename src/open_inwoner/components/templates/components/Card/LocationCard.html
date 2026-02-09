@@ -6,7 +6,7 @@
     {% endif %}
         <div class="card__body--flex container--no-margin">
             <nl-paragraph>{{ address_line_1 }}</nl-paragraph>
-            <p class="utrecht-paragraph">{{ address_line_2 }}</p>
+            <nl-paragraph>{{ address_line_2 }}</nl-paragraph>
             {% if phonenumber %}
                 {% link href='tel:'|addstr:phonenumber secondary=True text=phonenumber %}
             {% endif %}

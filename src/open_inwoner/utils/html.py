@@ -13,7 +13,7 @@ CLASS_ADDERS = [
     ("h6", "utrecht-heading-6"),
     ("img", "image"),
     ("li", "li"),
-    ("p", "utrecht-paragraph"),
+    ("p", "nl-paragraph"),
     ("a", "link link--secondary"),
     ("table", "table table--content"),
     ("thead", "table__heading"),

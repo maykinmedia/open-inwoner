@@ -358,9 +358,9 @@
             </header>
         </div>
             <div class="tabled">
-                <p class="utrecht-paragraph">
+                <nl-paragraph>
                     {% trans "Wilt u uw profiel verwijderen? Dan worden al uw persoonlijke voorkeuren verwijderd binnen deze MijnOmgeving. Uw persoonsgegevens en uw zaken worden niet verwijderd." %}
-                </p>
+                </nl-paragraph>
             </div>
             {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren binnen deze MijnOmgeving verwijderd. Uw persoonsgegevens en uw zaken worden niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
             {% csrf_token %}

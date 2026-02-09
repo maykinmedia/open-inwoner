@@ -15,7 +15,7 @@
             role="status"
          {% endif %} tabindex="-1">
         {% if title %}<h2 class="nl-heading nl-heading--level-2">{{ title }}</h2>{% endif %}
-        {% if notification %}<p class="utrecht-paragraph">{{ notification }}</p>{% endif %}
+        {% if notification %}<nl-paragraph>{{ notification }}</nl-paragraph>{% endif %}
         {% if action %}{% button href=action text=action_text %}{% endif %}
         {% if contents %}
             {{ contents }}

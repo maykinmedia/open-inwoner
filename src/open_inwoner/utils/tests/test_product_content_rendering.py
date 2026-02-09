@@ -28,7 +28,7 @@ class GetProductRenderedContentTest(TestCase):
         html = str(rendered)
 
         # Check that paragraph has proper class
-        self.assertIn('class="utrecht-paragraph"', html)
+        self.assertIn('class="nl-paragraph"', html)
         self.assertIn("This is a test paragraph", html)
 
     def test_renders_ctabutton_with_link(self):
