@@ -1129,6 +1129,11 @@ sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+setuptools==80.10.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   josepy
 shellingham==1.5.4
     # via
     #   -c requirements/base.txt
@@ -1355,6 +1360,3 @@ zopfli==0.1.9
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   fonttools
-
-# The following packages were excluded from the output:
-# setuptools
