@@ -189,15 +189,15 @@
       }
     }
 
-    &#particulier {
-      #column__email-toggle,
-      #column__login-form {
+    &[id='particulier'] {
+      [id='column__email-toggle'],
+      [id='column__login-form'] {
         &.hide {
           display: none;
         }
       }
 
-      #column__login-form .button--transparent {
+      [id='column__login-form'] .button--transparent {
         color: var(--color-primary);
         padding-left: 0;
       }

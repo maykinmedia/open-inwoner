@@ -1,7 +1,3 @@
-#login-form {
-  //display: none;
-
-  &.active {
-    display: grid;
-  }
+body [id='login-form'].active {
+  display: grid;
 }

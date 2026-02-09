@@ -253,7 +253,7 @@
 
   &--inline {
     grid-template-columns: 1fr auto;
-    align-items: start;
+    align-items: flex-start;
 
     .form__actions {
       grid-column-start: auto;

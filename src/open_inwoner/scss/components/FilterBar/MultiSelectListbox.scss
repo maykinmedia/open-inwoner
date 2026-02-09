@@ -84,7 +84,7 @@
     }
   }
 
-  #selectButton .close-icon {
+  [id='selectButton'] .close-icon {
     border-radius: var(--border-radius);
     display: flex;
     height: var(--spacing-large);
@@ -148,7 +148,7 @@
 
       .checkbox:has(input[type='checkbox']) {
         display: flex;
-        justify-content: start;
+        justify-content: flex-start;
         color: var(--color-gray-dark-900);
         border: 1px solid var(--color-gray-lightest);
         border-top: none;

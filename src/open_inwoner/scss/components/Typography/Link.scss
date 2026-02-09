@@ -70,8 +70,8 @@
       text-decoration: underline;
     }
 
-    *[class*='icons'],
-    *[class*='Icons'] {
+    [class*='icons'],
+    [class*='Icons'] {
       text-decoration: none;
     }
   }
@@ -93,8 +93,7 @@
     }
   }
 
-  *[class*='icons']:first-child,
-  *[class*='Icons']:first-child {
+  *[class*='icons' i]:first-child {
     transform: scale(1);
   }
 }
