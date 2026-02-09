@@ -51,7 +51,7 @@ class MockOpenKlant2Service:
             url="http://openklant/api/test/klantcontacten/9431676d-07ce-45e9-bfa8-db86c229b916",
             question_kcm_uuid="9431676d-07ce-45e9-bfa8-db86c229b916",
             question="What?",
-            answer=None,
+            answers=[],
             onderwerp="Coffee zaak",
             kanaal="email",
             taal="nl",

@@ -1,9 +1,14 @@
-from unittest.mock import Mock, patch
+import datetime
+from unittest.mock import Mock, call, patch
 
 from django.test import TestCase
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
-from open_inwoner.openklant.services import OpenKlant2Service
+from open_inwoner.openklant.services import (
+    OpenKlant2Answer,
+    OpenKlant2Question,
+    OpenKlant2Service,
+)
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 
 
@@ -321,3 +326,429 @@ class GetOrCreatePartijForUserTestCase(TestCase):
             call_data,
             "Should not include identificatoren when user has no BSN",
         )
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class OpenKlant2QuestionAnswerTestCase(TestCase):
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+
+    def test_answer_property_returns_none_when_no_answers(self, mock_client_class):
+        question = OpenKlant2Question(
+            url="http://example.com/question/1",
+            question="What is the final answer?",
+            question_kcm_uuid="q-uuid-1",
+            onderwerp="Philosophy",
+            kanaal="online",
+            taal="nld",
+            nummer="0001",
+            plaatsgevonden_op=datetime.datetime(
+                2024, 10, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
+            ),
+            answers=[],
+        )
+
+        self.assertIsNone(question.answer)
+
+    def test_answer_property_returns_newest(self, mock_client_class):
+        """
+        Verify that the field_validator automatically sorts answers by datetime (newest first).
+        """
+        answer_old = OpenKlant2Answer(
+            answer="First answer",
+            answer_kcm_uuid="a-uuid-1",
+            nummer="0002",
+            plaatsgevonden_op=datetime.datetime(
+                2024, 10, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
+            ),
+        )
+        answer_middle = OpenKlant2Answer(
+            answer="Updated answer",
+            answer_kcm_uuid="a-uuid-2",
+            nummer="0003",
+            plaatsgevonden_op=datetime.datetime(
+                2025, 10, 2, 14, 30, 0, tzinfo=datetime.timezone.utc
+            ),
+        )
+        answer_new = OpenKlant2Answer(
+            answer="Final answer",
+            answer_kcm_uuid="a-uuid-3",
+            nummer="0004",
+            plaatsgevonden_op=datetime.datetime(
+                2026, 10, 2, 15, 0, 0, tzinfo=datetime.timezone.utc
+            ),
+        )
+
+        test_cases = [
+            [answer_old, answer_middle, answer_new],
+            [answer_old, answer_new, answer_middle],
+            [answer_middle, answer_old, answer_new],
+            [answer_middle, answer_new, answer_old],
+            [answer_new, answer_middle, answer_old],
+            [answer_new, answer_old, answer_middle],
+        ]
+        for answers in test_cases:
+            with self.subTest():
+                question = OpenKlant2Question(
+                    url="http://example.com/question/1",
+                    question="What is the final answer?",
+                    question_kcm_uuid="q-uuid-1",
+                    onderwerp="Philosophy",
+                    kanaal="online",
+                    taal="nld",
+                    nummer="0001",
+                    plaatsgevonden_op=datetime.datetime(
+                        2024, 10, 2, 14, 0, 0, tzinfo=datetime.timezone.utc
+                    ),
+                    answers=answers,
+                )
+
+                self.assertEqual(question.answer, answer_new)
+                self.assertEqual(question.answer.answer, "Final answer")
+                self.assertEqual(question.answers[0], answer_new)
+                self.assertEqual(question.answers[1], answer_middle)
+                self.assertEqual(question.answers[2], answer_old)
+                self.assertGreater(
+                    question.answer.plaatsgevonden_op,
+                    answer_middle.plaatsgevonden_op,
+                )
+                self.assertGreater(
+                    question.answer.plaatsgevonden_op,
+                    answer_old.plaatsgevonden_op,
+                )
+
+    def test_questions_for_partij_with_no_questions(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        with patch.object(service, "klantcontacten_for_partij", return_value=[]):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(questions, [])
+
+    def test_questions_for_partij_question_without_answers(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        question_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": "What was the question?",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-02T14:00:00Z",
+            "url": "http://example.com/question/1",
+            "gingOverOnderwerpobjecten": [],
+        }
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question_kc]
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q-uuid-1")
+        self.assertEqual(questions[0].question, "What was the question?")
+        self.assertEqual(questions[0].answers, [])
+        self.assertIsNone(questions[0].answer)
+
+    def test_questions_for_partij_with_question_and_one_answer(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        # Question klantcontact
+        question_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": "What was the question?",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-02T14:00:00Z",
+            "url": "http://example.com/question/1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q-uuid-1"}],
+        }
+
+        # Answer klantcontact
+        answer_kc = {
+            "uuid": "a-uuid-1",
+            "inhoud": "42",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0002",
+            "plaatsgevondenOp": "2024-10-02T15:00:00Z",
+            "url": "http://example.com/answer/1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a-uuid-1"}],
+        }
+
+        # Onderwerp_object for question (wasKlantcontact is None/empty)
+        question_oo = {
+            "uuid": "oo-q-uuid-1",
+            "klantcontact": {"uuid": "q-uuid-1"},
+            "wasKlantcontact": None,
+        }
+        # Onderwerp_object for answer (wasKlantcontact points to question)
+        answer_oo = {
+            "uuid": "oo-a-uuid-1",
+            "klantcontact": {"uuid": "a-uuid-1"},
+            "wasKlantcontact": {"uuid": "q-uuid-1"},
+        }
+
+        # Mock the onderwerp_object.retrieve calls
+        mock_client.onderwerp_object.retrieve.side_effect = [
+            question_oo,  # First call for question
+            answer_oo,  # Second call for answer
+        ]
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question_kc, answer_kc]
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q-uuid-1")
+        self.assertEqual(questions[0].question, "What was the question?")
+        self.assertEqual(len(questions[0].answers), 1)
+        self.assertEqual(questions[0].answer.answer, "42")
+        self.assertEqual(questions[0].answer.answer_kcm_uuid, "a-uuid-1")
+
+        # Verify onderwerp_object.retrieve was called correctly
+        self.assertEqual(mock_client.onderwerp_object.retrieve.call_count, 2)
+        mock_client.onderwerp_object.retrieve.assert_has_calls(
+            [call("oo-q-uuid-1"), call("oo-a-uuid-1")]
+        )
+
+    def test_questions_for_partij_with_multiple_answers(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        question_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": "What was the question?",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-02T14:00:00Z",
+            "url": "http://example.com/question/1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q-uuid-1"}],
+        }
+        answer_old = {
+            "uuid": "a-uuid-1",
+            "inhoud": "First answer: 42",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0002",
+            "plaatsgevondenOp": "2024-10-02T15:00:00Z",
+            "url": "http://example.com/answer/1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a-uuid-1"}],
+        }
+        answer_middle = {
+            "uuid": "a-uuid-2",
+            "inhoud": "Updated answer: 43",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0003",
+            "plaatsgevondenOp": "2024-10-02T16:00:00Z",
+            "url": "http://example.com/answer/2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a-uuid-2"}],
+        }
+        answer_new = {
+            "uuid": "a-uuid-3",
+            "inhoud": "Final answer: 44",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0004",
+            "plaatsgevondenOp": "2024-10-02T17:00:00Z",
+            "url": "http://example.com/answer/3",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a-uuid-3"}],
+        }
+
+        # Onderwerp_objecten representing answers
+        question_oo = {
+            "uuid": "oo-q-uuid-1",
+            "klantcontact": {"uuid": "q-uuid-1"},
+            "wasKlantcontact": None,
+        }
+        answer_oo_old = {
+            "uuid": "oo-a-uuid-1",
+            "klantcontact": {"uuid": "a-uuid-1"},
+            "wasKlantcontact": {"uuid": "q-uuid-1"},
+        }
+        answer_oo_middle = {
+            "uuid": "oo-a-uuid-2",
+            "klantcontact": {"uuid": "a-uuid-2"},
+            "wasKlantcontact": {"uuid": "q-uuid-1"},
+        }
+        answer_oo_new = {
+            "uuid": "oo-a-uuid-3",
+            "klantcontact": {"uuid": "a-uuid-3"},
+            "wasKlantcontact": {"uuid": "q-uuid-1"},
+        }
+
+        # Return klantcontacten in random order to test sorting
+        mock_client.onderwerp_object.retrieve.side_effect = [
+            answer_oo_middle,
+            question_oo,
+            answer_oo_new,
+            answer_oo_old,
+        ]
+
+        with patch.object(
+            service,
+            "klantcontacten_for_partij",
+            return_value=[answer_middle, question_kc, answer_new, answer_old],
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q-uuid-1")
+        self.assertEqual(len(questions[0].answers), 3)
+
+        # Verify answers are sorted newest first
+        self.assertEqual(questions[0].answers[0].answer_kcm_uuid, "a-uuid-3")
+        self.assertEqual(questions[0].answers[0].answer, "Final answer: 44")
+        self.assertEqual(questions[0].answers[1].answer_kcm_uuid, "a-uuid-2")
+        self.assertEqual(questions[0].answers[1].answer, "Updated answer: 43")
+        self.assertEqual(questions[0].answers[2].answer_kcm_uuid, "a-uuid-1")
+        self.assertEqual(questions[0].answers[2].answer, "First answer: 42")
+
+        # Verify .answer property returns the newest
+        self.assertEqual(questions[0].answer.answer_kcm_uuid, "a-uuid-3")
+        self.assertEqual(questions[0].answer.answer, "Final answer: 44")
+
+    def test_questions_for_partij_with_multiple_questions(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        # Question 1: no answers
+        q1_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": "Question 1?",
+            "onderwerp": "Topic 1",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-01T10:00:00Z",
+            "url": "http://example.com/q1",
+            "gingOverOnderwerpobjecten": [],
+        }
+
+        # Question 2: one answer
+        q2_kc = {
+            "uuid": "q-uuid-2",
+            "inhoud": "Question 2?",
+            "onderwerp": "Topic 2",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0002",
+            "plaatsgevondenOp": "2024-10-02T10:00:00Z",
+            "url": "http://example.com/q2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q2"}],
+        }
+        a2_kc = {
+            "uuid": "a-uuid-2",
+            "inhoud": "Answer to Q2",
+            "onderwerp": "Topic 2",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0003",
+            "plaatsgevondenOp": "2024-10-02T11:00:00Z",
+            "url": "http://example.com/a2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a2"}],
+        }
+
+        # Question 3: two answers
+        q3_kc = {
+            "uuid": "q-uuid-3",
+            "inhoud": "Question 3?",
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0004",
+            "plaatsgevondenOp": "2024-10-03T10:00:00Z",
+            "url": "http://example.com/q3",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q3"}],
+        }
+        a3_1_kc = {
+            "uuid": "a-uuid-3-1",
+            "inhoud": "First answer to Q3",
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0005",
+            "plaatsgevondenOp": "2024-10-03T11:00:00Z",
+            "url": "http://example.com/a3-1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a3-1"}],
+        }
+        a3_2_kc = {
+            "uuid": "a-uuid-3-2",
+            "inhoud": "Second answer to Q3",
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0006",
+            "plaatsgevondenOp": "2024-10-03T12:00:00Z",
+            "url": "http://example.com/a3-2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a3-2"}],
+        }
+
+        # Onderwerp_objecten representing answers
+        q2_oo = {"uuid": "oo-q2", "wasKlantcontact": None}
+        a2_oo = {"uuid": "oo-a2", "wasKlantcontact": {"uuid": "q-uuid-2"}}
+        q3_oo = {"uuid": "oo-q3", "wasKlantcontact": None}
+        a3_1_oo = {"uuid": "oo-a3-1", "wasKlantcontact": {"uuid": "q-uuid-3"}}
+        a3_2_oo = {"uuid": "oo-a3-2", "wasKlantcontact": {"uuid": "q-uuid-3"}}
+
+        mock_client.onderwerp_object.retrieve.side_effect = [
+            q2_oo,
+            a2_oo,
+            q3_oo,
+            a3_1_oo,
+            a3_2_oo,
+        ]
+
+        with patch.object(
+            service,
+            "klantcontacten_for_partij",
+            return_value=[q1_kc, q2_kc, a2_kc, q3_kc, a3_1_kc, a3_2_kc],
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 3)
+
+        q1 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-1")
+        q2 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-2")
+        q3 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-3")
+
+        # Q1: no answers
+        self.assertEqual(q1.question, "Question 1?")
+        self.assertEqual(len(q1.answers), 0)
+        self.assertIsNone(q1.answer)
+
+        # Q2: one answer
+        self.assertEqual(q2.question, "Question 2?")
+        self.assertEqual(len(q2.answers), 1)
+        self.assertEqual(q2.answer.answer, "Answer to Q2")
+
+        # Q3: two answers (sorted newest first)
+        self.assertEqual(q3.question, "Question 3?")
+        self.assertEqual(len(q3.answers), 2)
+        self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
+        self.assertEqual(q3.answers[1].answer, "First answer to Q3")
+        self.assertEqual(q3.answer.answer, "Second answer to Q3")
