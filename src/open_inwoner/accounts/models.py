@@ -679,27 +679,30 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def get_logout_url(self) -> str:
-        match self.login_type:
-            case LoginTypeChoices.digid:
-                return (
-                    reverse("digid_oidc:logout")
-                    if OpenIDDigiDConfig.get_solo().enabled
-                    else reverse("digid:logout")
-                )
-            case LoginTypeChoices.eherkenning:
-                return reverse("eherkenning_oidc:logout")
-            case LoginTypeChoices.oidc:
-                return reverse("oidc_logout")
-            case (
-                LoginTypeChoices.eidas_person_bsn
-                | LoginTypeChoices.eidas_person_pseudo_id
-                | LoginTypeChoices.eidas_company
-            ):
-                return reverse("eidas_oidc:logout")
-            case LoginTypeChoices.default:
-                return reverse("logout")
-            case _ as unreachable:
-                assert_never(cast(Any, unreachable))
+        # Use if/elif instead of match statement because Python's structural
+        # pattern matching may not work correctly with Django's TextChoices
+        login_type = self.login_type
+
+        if login_type == LoginTypeChoices.digid:
+            return (
+                reverse("digid_oidc:logout")
+                if OpenIDDigiDConfig.get_solo().enabled
+                else reverse("digid:logout")
+            )
+        elif login_type == LoginTypeChoices.eherkenning:
+            return reverse("eherkenning_oidc:logout")
+        elif login_type == LoginTypeChoices.oidc:
+            return reverse("oidc_logout")
+        elif login_type in (
+            LoginTypeChoices.eidas_person_bsn,
+            LoginTypeChoices.eidas_person_pseudo_id,
+            LoginTypeChoices.eidas_company,
+        ):
+            return reverse("eidas_oidc:logout")
+        elif login_type == LoginTypeChoices.default:
+            return reverse("logout")
+        else:
+            assert_never(cast(Any, login_type))
 
     @property
     def has_usable_email(self) -> bool:
