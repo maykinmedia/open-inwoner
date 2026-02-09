@@ -8,6 +8,7 @@ import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCa
 import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
 import { CHART_DEFINITION } from '@react/components/Chart/constants';
+import { PARAGRAPH_DEFINITION } from '@react/components/Paragraph/constants';
 
 /**
  * Web component registry
@@ -31,4 +32,5 @@ export const WEB_COMPONENT_REGISTRY = {
   [ACCORDION_DEFINITION.tagName]: ACCORDION_DEFINITION,
   [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
   [CHART_DEFINITION.tagName]: CHART_DEFINITION,
+  [PARAGRAPH_DEFINITION.tagName]: PARAGRAPH_DEFINITION,
 } as const;

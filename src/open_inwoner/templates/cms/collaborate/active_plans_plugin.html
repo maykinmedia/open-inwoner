@@ -11,8 +11,8 @@
                 {% render_card image_object_fit="cover" href=plan.get_absolute_url %}
                 <div class="card__content">
                     <h3 class="nl-heading nl-heading--level-3 card__heading-3 plan-list">{{ plan.title }}</h3>
-                    <p class="nl-paragraph">{{ plan.goal|truncatewords:20 }}</p>
-                    <p class="nl-paragraph">{{ plan.description|truncatewords:20 }}</p>
+                    <nl-paragraph>{{ plan.goal|truncatewords:20 }}</nl-paragraph>
+                    <nl-paragraph>{{ plan.description|truncatewords:20 }}</nl-paragraph>
                     <span class="spacer"></span>
                     <span class="button button--icon-before button--transparent">
                     {% icon icon="arrow_forward" outlined=True %}
@@ -22,7 +22,7 @@
             {% endfor %}
         </div>
         {% else %}
-            <p class="nl-paragraph">{{ configurable_text.plans_page.plans_no_plans_message }}</p>
+            <nl-paragraph>{{ configurable_text.plans_page.plans_no_plans_message }}</nl-paragraph>
         {% endif %}
     </section>
 {% endif %}

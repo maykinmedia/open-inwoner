@@ -150,7 +150,7 @@
 
                                 {% if contact.email %}
                                     {% render_column span=6 %}
-                                        <p class="nl-paragraph">{{ contact.organization|default:_('E-mail')}}</p>
+                                        <nl-paragraph>{{ contact.organization|default:_('E-mail')}}</nl-paragraph>
                                     {% endrender_column %}
 
                                     {% render_column start=7 span=6 %}

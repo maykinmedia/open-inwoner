@@ -3,7 +3,7 @@
 
 {% block content %}
     <h2 class="nl-heading nl-heading--level-2">{% trans 'Account verificatie' %}</h2>
-    <p class="nl-paragraph">
+    <nl-paragraph>
         {% blocktrans trimmed %}
             U ontvangt binnen 1 minuut een sms-bericht op uw mobiele telefoon.
             Vul de code die in het bericht staat hieronder in en klik op
@@ -11,7 +11,7 @@
             Mocht het niet lukken om de code binnen deze tijd in te voeren, klik
             dan op <em>Verstuur nieuwe SMS</em>.
         {% endblocktrans %}
-    </p>
+    </nl-paragraph>
 
     {% render_form id="verify-token-form" form=form no_action=True method="POST" %}
         {% csrf_token %}

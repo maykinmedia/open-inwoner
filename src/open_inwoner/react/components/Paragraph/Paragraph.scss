@@ -1,0 +1,72 @@
+//.nl-paragraph {
+//  // Takes style values from NLDS community
+//
+//  &--oip {
+//    // Takes style values from our own design-tokens NPM package
+//    margin: 0;
+//
+//    // Extensions of the nl-paragraph component with OIP-specific styles.
+//    &-muted {
+//      color: var(--oip-nl-paragraph-muted-color);
+//    }
+//
+//    &-centered {
+//      text-align: var(--oip-nl-paragraph-centered-text-align);
+//    }
+//
+//    &-compact {
+//      margin-top: var(--oip-nl-paragraph-compact-margin-top);
+//      margin-bottom: var(--oip-nl-paragraph-compact-margin-bottom);
+//    }
+//
+//    &:empty {
+//      margin: 0 !important;
+//    }
+//  }
+//
+//  &:empty {
+//    margin: 0 !important;
+//  }
+//}
+//
+//*[class^='utrecht-heading'] + .nl-paragraph,
+//.oip-header-group + .nl-paragraph {
+//  margin-top: var(--spacing-small);
+//}
+//
+//.nl-paragraph + .nl-heading--level-1,
+//.nl-paragraph + .nl-heading--level-2,
+//.nl-paragraph + .nl-heading--level-3 {
+//  margin-top: var(--gutter-width);
+//}
+//
+//.nl-paragraph + .nl-heading--level-4 {
+//  margin-top: var(--row-height-small);
+//}
+//
+//.nl-paragraph + .nl-paragraph {
+//  margin-top: var(--font-line-height-body);
+//}
+//
+//.oip-tag-list + .nl-paragraph,
+//.nl-paragraph + .form {
+//  margin-top: var(--spacing-extra-large);
+//}
+//
+//.nl-paragraph .link {
+//  .content {
+//    text-decoration: underline;
+//  }
+//
+//  &:hover {
+//    text-decoration: none;
+//  }
+//
+//  .material-icons {
+//    text-decoration: none;
+//
+//    &:hover {
+//      text-decoration: none;
+//    }
+//  }
+//}

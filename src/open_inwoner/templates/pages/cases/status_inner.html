@@ -49,9 +49,9 @@
             {% elif zaak.external_upload_enabled %}
                 <h2 class="nl-heading nl-heading--level-2" id="documents-upload">{% trans "Document toevoegen" %}</h2>
                 {% if zaak.case_type_config_description %}
-                    <p class="nl-paragraph">{{ zaak.case_type_config_description }}</p>
+                    <nl-paragraph>{{ zaak.case_type_config_description }}</nl-paragraph>
                 {% else %}
-                    <p class="nl-paragraph">{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</p>
+                    <nl-paragraph>{% trans "By clicking the button below you can upload a document. This is an external link and you will be redirected to a different system." %}</nl-paragraph>
                 {% endif %}
                 {% button_row %}
                     {% button href=zaak.external_upload_url text=_("Document uploaden") title=_("Opens new window") primary=True icon="open_in_new" icon_position="after" %}
@@ -93,6 +93,6 @@
         {% endrender_column %}
     {% endrender_grid %}
 {% else %}
-    <p class="nl-paragraph"><strong>{% trans 'There is no available data at the moment.' %}</strong></p>
+    <nl-paragraph><strong>{% trans 'There is no available data at the moment.' %}</strong></nl-paragraph>
 {% endif %}
 </div>
