@@ -630,6 +630,10 @@ ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
 sentry-sdk[django]==2.19.2
     # via -r requirements/base.in
+setuptools==80.10.2
+    # via
+    #   -r requirements/base.in
+    #   josepy
 shellingham==1.5.4
     # via typer
 simplejson==3.19.2
@@ -736,6 +740,3 @@ zipp==3.23.0
     # via importlib-metadata
 zopfli==0.1.9
     # via fonttools
-
-# The following packages were excluded from the output:
-# setuptools

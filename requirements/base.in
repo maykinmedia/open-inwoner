@@ -1,4 +1,5 @@
 # Core python libraries
+setuptools<81  # pin for pkg_resources compatibility (django-axes, django-formtools)
 Pillow>=9.0.0 # handle images
 psycopg2  # database driver
 pytz  # handle timezones
