@@ -1,6 +1,12 @@
 import os
 import warnings
 
+# Enable traceback pickling for parallel test runner
+# This must be done early before any exceptions are raised
+import tblib.pickling_support
+
+tblib.pickling_support.install()
+
 os.environ.setdefault("DEBUG", "no")
 os.environ.setdefault("ENVIRONMENT", "ci")
 os.environ.setdefault("SECRET_KEY", "for-testing-purposes-only")
@@ -11,7 +17,7 @@ os.environ.setdefault("LOG_REQUESTS", "no")
 
 from .base import *  # noqa isort:skip
 
-import structlog
+import structlog  # noqa: E402
 
 # Disable all logging
 LOGGING = {
