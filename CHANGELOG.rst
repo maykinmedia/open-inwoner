@@ -38,6 +38,8 @@ Bugfixes
   juiste DigiD SAML Foutmeldingen worden gebruikt.
 * [:gh:`2191`]: Foutmnelding opgelost in Afval Profiel pagina waar `messages.error()` en `messages.info()`
   zonder verplicht `request` argument werden aangeroepn.
+* [:gh:`2209`, :pr:`2213`]: Ckeditor opnieuw toegevoegd aan INSTALLED_APPS voor compatibiliteit met
+  mail-editor.
 
 Onderhoud
 ---------
