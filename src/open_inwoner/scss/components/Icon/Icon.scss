@@ -8,11 +8,11 @@
   }
 }
 
-*[class*='icon'].icon--large {
+body [class*='icon'].icon--large {
   font-size: 40px;
 }
 
-*[class*='icons'],
+body [class*='icons'],
 i {
   pointer-events: none;
 }

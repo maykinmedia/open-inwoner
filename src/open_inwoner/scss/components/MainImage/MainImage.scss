@@ -22,7 +22,7 @@ $image-height: 261px;
 }
 
 @media (max-width: 767px) {
-  #search-form ~ .banner:has(~ .container--fullwidth) .main-image {
+  body [id='search-form'] ~ .banner:has(~ .container--fullwidth) .main-image {
     height: var(--image-height-mobile);
   }
 }

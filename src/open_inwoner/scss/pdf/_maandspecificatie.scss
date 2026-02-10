@@ -70,21 +70,24 @@
   }
 
   // table: details
-  #monthly-report__table-details .monthly-report__td {
+  [id='monthly-report__table-details'] .monthly-report__td {
     width: 24%;
   }
-  #monthly-report__table-details .monthly-report__td:first-child {
+  [id='monthly-report__table-details'] .monthly-report__td:first-child {
     width: 30%;
   }
 
   // table: inkomstenkorting
-  #monthly-report__table-inkomstenkorting .monthly-report__td:first-child {
+  [id='monthly-report__table-inkomstenkorting']
+    .monthly-report__td:first-child {
     width: 30%;
   }
-  #monthly-report__table-inkomstenkorting .monthly-report__td:nth-child(2) {
+  [id='monthly-report__table-inkomstenkorting']
+    .monthly-report__td:nth-child(2) {
     width: 4%;
   }
-  #monthly-report__table-inkomstenkorting .monthly-report__td:nth-child(3) {
+  [id='monthly-report__table-inkomstenkorting']
+    .monthly-report__td:nth-child(3) {
     width: 10%;
   }
 

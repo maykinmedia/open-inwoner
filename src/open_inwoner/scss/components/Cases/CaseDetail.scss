@@ -67,11 +67,11 @@
     gap: 0;
   }
 
-  #toggle-hide-elements {
+  [id='toggle-hide-elements'] {
     padding-left: 0;
   }
 
-  #cases-contact-form-content > .utrecht-heading-2 {
+  [id='cases-contact-form-content'] > .utrecht-heading-2 {
     margin-top: var(--spacing-extra-large);
   }
 
