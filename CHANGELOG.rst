@@ -18,6 +18,8 @@ Bugfixes
 * [:gh:`2210`]: Exports en imports van de ZGW catalogi via bestanden gaat nu correct om
   met prosemirror velden. Tevens zullen via een datamigratie de bestaande velden in de
   ZGW catalogus gechecked worden op valide waarden voor de prosemirror velden.
+* [:gh:`2209`, :pr:`2213`]: Ckeditor opnieuw toegevoegd aan INSTALLED_APPS voor
+  compatibiliteit met mail-editor.
 
 2.0.2 (2026-01-27)
 ==================

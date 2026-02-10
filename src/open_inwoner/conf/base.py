@@ -171,6 +171,7 @@ INSTALLED_APPS = [
     # 'django.contrib.sitemaps',
     # External applications.
     "corsheaders",
+    "ckeditor",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
