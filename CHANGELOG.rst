@@ -56,6 +56,7 @@ Onderhoud
   en ``loadash-es`` override bijgewerkt naar versie ``4.17.23`` om :cve:`CVE-2025-13465` te mitigeren.
 * [:gh:`2198`, :pr:`2197`]: Django bijgewerkt naar versie ``4.2.28``.
 * [:gh:`2206`, :pr:`2207`]: `setuptools` bijgewerkt naar versie ``<81``.
+* [:gh:`2178`, :cve:`CVE-2023-44270`]: ``autoprefixer`` bijgewerkt naar versie ``10.4.23``.
 
 2.0.1 (2026-01-26)
 ==================
