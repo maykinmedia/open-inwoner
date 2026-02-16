@@ -40,6 +40,8 @@ Bugfixes
   zonder verplicht `request` argument werden aangeroepn.
 * [:gh:`2209`, :pr:`2213`]: Ckeditor opnieuw toegevoegd aan INSTALLED_APPS voor compatibiliteit met
   mail-editor.
+* [:gh:`2214`, :pr:`2224`]: Verwijderde djangocms_text_ckeditor_text-instanties en tabel die de
+  publicatie van CMS-pagina's blokkeerden.
 
 Onderhoud
 ---------
