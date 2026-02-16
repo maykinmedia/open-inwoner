@@ -5,6 +5,24 @@
       "value": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
     }
   ],
+  "file.confirmDelete": [
+    {
+      "type": 0,
+      "value": "Weet u zeker dat u dit bestand wilt verwijderen?"
+    }
+  ],
+  "file.delete": [
+    {
+      "type": 0,
+      "value": "Verwijderen"
+    }
+  ],
+  "file.download": [
+    {
+      "type": 0,
+      "value": "Downloaden"
+    }
+  ],
   "filter.adres_filter": [
     {
       "type": 0,

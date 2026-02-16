@@ -35,6 +35,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@gemeente-denhaag/action": "^4.0.1",
+    "@gemeente-denhaag/file": "^2.3.0",
     "@gemeente-denhaag/side-navigation": "^4.0.2",
     "@open-inwoner/design-tokens": "^0.0.27",
     "@tarekraafat/autocomplete.js": "^10.2.6",

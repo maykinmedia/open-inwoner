@@ -78,7 +78,12 @@
         <div class="plan__file">
             {% if object.get_latest_file %}
                 {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
-                {% file file=object.get_latest_file.file created=file.created_on extension=plan_template.file.extension size=plan_template.file.size show_download=True download_url=download_url %}
+
+                <file-denhaag
+                    name="{{ object.get_latest_file.file.name }}"
+                    href="{{ download_url }}"
+                    size="{{ object.get_latest_file.file.size }}"
+                ></file-denhaag>
 
                 {% if object.get_other_files %}
                     {% file_table files=object.get_other_files download_view="profile:documents_download" %}

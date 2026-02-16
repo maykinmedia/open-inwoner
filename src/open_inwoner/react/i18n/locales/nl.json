@@ -4,6 +4,21 @@
     "description": "The default message of the chart.",
     "originalDefault": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
   },
+  "file.confirmDelete": {
+    "defaultMessage": "Weet u zeker dat u dit bestand wilt verwijderen?",
+    "description": "Confirmation dialog when deleting a file",
+    "originalDefault": "Are you sure you want to delete this file?"
+  },
+  "file.delete": {
+    "defaultMessage": "Verwijderen",
+    "description": "Delete button label",
+    "originalDefault": "Delete"
+  },
+  "file.download": {
+    "defaultMessage": "Downloaden",
+    "description": "Download button label",
+    "originalDefault": "Download"
+  },
   "filter.adres_filter": {
     "defaultMessage": "Adres",
     "description": "The label for the filter adres",

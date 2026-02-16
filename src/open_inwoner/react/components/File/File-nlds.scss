@@ -1,0 +1,48 @@
+.denhaag-file {
+  // remove these when tokens are filled
+  --denhaag-file-border-width: 1px;
+  --denhaag-file-border-style: solid;
+  --denhaag-file-focus-outline-width: 1px;
+  --denhaag-file-focus-outline-style: solid;
+  --denhaag-file-link-icon-width: 20px;
+  --denhaag-file-border-color: var(--oip-color-border);
+  --denhaag-file-hover-color: var(--oip-color-primary-darker);
+  --denhaag-file-focus-outline-color: var(--oip-color-border);
+  --denhaag-file-left-padding-inline-start: var(--oip-spacing-large);
+  --denhaag-file-left-padding-inline-end: var(--oip-spacing-large);
+  --denhaag-file-left-background-color: var(--oip-color-gray-lightest);
+  --denhaag-file-right-gap: var(--oip-spacing-tiny);
+  --denhaag-file-right-padding-block-start: var(--oip-spacing-large);
+  --denhaag-file-right-padding-block-end: var(--oip-spacing-large);
+  --denhaag-file-right-padding-inline-start: var(--oip-spacing-large);
+  --denhaag-file-right-padding-inline-end: var(--oip-spacing-large);
+  --denhaag-file-link-color: var(--oip-color-primary);
+  --denhaag-file-link-gap: var(--oip-spacing-small);
+
+  // Adding missing values that are not in denhaag-file design tokens
+  &__link {
+    text-decoration: none;
+
+    &.denhaag-link--remove {
+      background-color: var(--color-white);
+      border: none;
+      font-family: var(--oip-typography-sans-serif-font-family);
+      font-size: inherit;
+      padding-block-start: 0;
+      padding-block-end: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 0;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+    }
+  }
+
+  &__label {
+    hyphens: auto;
+  }
+
+  // Overwriting existing denhaag-file token values
+  font-family: var(--oip-typography-sans-serif-font-family);
+}
