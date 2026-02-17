@@ -31,7 +31,7 @@ Bugfixes
   weer correct wordt geladen.
 * [:gh:`2125`]: ``django-digid-eherkenning`` bijgewerkt naar custom release zodat de
   juiste DigiD SAML Foutmeldingen worden gebruikt.
-* [:gh:`2191`]: Foutmnelding opgelost in Afval Profiel pagina waar `messages.error()` en `messages.info()`
+* [:gh:`2191`]: Foutmelding opgelost in Afval Profiel pagina waar `messages.error()` en `messages.info()`
   zonder verplicht `request` argument werden aangeroepn.
 * [:gh:`2209`, :pr:`2213`]: Ckeditor opnieuw toegevoegd aan INSTALLED_APPS voor compatibiliteit met
   mail-editor.
@@ -40,6 +40,8 @@ Bugfixes
   formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
   fallback strategieën voor ongeldige HTML. Na succesvolle migratie wordt de oude
   tabel verwijderd.
+* [:gh:`2208`]: Link plugin rendert nu correct HTML uit ProsemirrorModelField in plaats van
+  markup als tekst weer te geven.
 
 Onderhoud
 ---------

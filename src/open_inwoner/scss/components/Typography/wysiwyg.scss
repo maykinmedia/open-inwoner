@@ -11,6 +11,10 @@
     gap: var(--spacing-small);
     color: var(--color-secondary);
     word-wrap: break-word;
+
+    > p {
+      margin: 0;
+    }
   }
 
   h1,
