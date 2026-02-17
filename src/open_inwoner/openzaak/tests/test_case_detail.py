@@ -44,6 +44,11 @@ from open_inwoner.openklant.models import (
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.factories import make_question_from_contactmoment
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
+from open_inwoner.openklant.tests.validators import (
+    KlantContactValidator,
+    OnderwerpObjectValidator,
+    PartijValidator,
+)
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.constants import StatusIndicators
 from open_inwoner.openzaak.models import OpenZaakConfig
@@ -55,9 +60,6 @@ from open_inwoner.openzaak.tests.factories import (
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response, uuid_from_url
 from open_inwoner.utils.tests.helpers import AssertRedirectsMixin
-from openklant2.types.resources.klant_contact import KlantContactValidator
-from openklant2.types.resources.onderwerp_object import OnderwerpObjectValidator
-from openklant2.types.resources.partij import PartijValidator
 
 from .factories import CatalogusConfigFactory, ServiceFactory, ZGWApiGroupConfigFactory
 from .helpers import generate_oas_component_cached

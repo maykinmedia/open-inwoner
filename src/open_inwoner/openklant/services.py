@@ -22,6 +22,28 @@ from django.utils.translation import gettext_lazy as _
 import glom
 import structlog
 from ape_pie.client import APIClient
+from openklant_client import OpenKlantClient
+from openklant_client.types.common import ForeignKeyRef
+from openklant_client.types.resources.betrokkene import (
+    Betrokkene,
+    BetrokkeneCreateData,
+    CreateContactnaam,
+)
+from openklant_client.types.resources.digitaal_adres import (
+    DigitaalAdres,
+    DigitaalAdresCreateData,
+)
+from openklant_client.types.resources.interne_taak import InterneTaak
+from openklant_client.types.resources.klant_contact import (
+    KlantContact,
+    ListKlantContactParams,
+)
+from openklant_client.types.resources.partij import (
+    CreatePartijPersoonData,
+    Partij,
+    PartijListParams,
+)
+from openklant_client.types.resources.partij_identificator import PartijIdentificator
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from requests.exceptions import RequestException
 from typing_extensions import TypedDict
@@ -63,28 +85,6 @@ from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import LogMixin
-from openklant2.client import OpenKlant2Client
-from openklant2.types.common import ForeignKeyRef
-from openklant2.types.resources.betrokkene import (
-    Betrokkene,
-    BetrokkeneCreateData,
-    CreateContactnaam,
-)
-from openklant2.types.resources.digitaal_adres import (
-    DigitaalAdres,
-    DigitaalAdresCreateData,
-)
-from openklant2.types.resources.interne_taak import InterneTaak
-from openklant2.types.resources.klant_contact import (
-    KlantContact,
-    ListKlantContactParams,
-)
-from openklant2.types.resources.partij import (
-    CreatePartijPersoonData,
-    Partij,
-    PartijListParams,
-)
-from openklant2.types.resources.partij_identificator import PartijIdentificator
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -939,18 +939,15 @@ class OpenKlant2Service(
     KlantenService,
 ):
     config: OpenKlant2Config
-    client: OpenKlant2Client
+    client: OpenKlantClient
 
     def __init__(self, config: OpenKlant2Config | None = None):
         self.config = config or OpenKlant2Config.get_solo()
         if not self.config.service:
             raise ImproperlyConfigured("No openklant2 Service object configured")
 
-        self.client = OpenKlant2Client(
-            base_url=self.config.service.api_root,
-            request_kwargs={
-                "headers": {"Authorization": f"Token {self.config.service.secret}"}
-            },
+        self.client = OpenKlantClient(
+            base_url=self.config.service.api_root, token=self.config.service.secret
         )
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
