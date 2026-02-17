@@ -57,16 +57,52 @@ repository is forked, you can clone it to your local machine.
 On your local machine, create a new branch, and name it like:
 
 - `feature/some-new-feature`, if the changes implement a new feature
-- `issue/some-issue`, if the changes fix an issue
+- `fix/some-bug`, if the changes fix a bug
+- `issue/some-issue`, for all other code changes
 
 Once you have made changes or additions to the code, you can commit them (try to
-keep the commit message descriptive but short). If an issue already exists in
-the list of existing [issues][issues] for the changes you made, be sure to
-format your commit message like
-`:gitmoji: Fixes #<issue_id> -- description of changes made`, where `<issue_id>`
-corresponds to the number of the issue on GitHub. To demonstrate that the
-changes implement the new feature/fix the issue, make sure to also add tests to
-the existing Django testsuite.
+keep the commit message descriptive but short). Commits should follow the
+[Conventional Commits](https://www.conventionalcommits.org/) pattern:
+
+```
+<type>: [#issue-reference] <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+Common types include `feat`, `fix`, `docs`, `style`, `refactor`, `test`, and
+`chore`. If an issue already exists in the list of existing [issues][issues] for
+the changes you made, be sure to reference it in the commit message, e.g.
+`feat: [#1234] add new feature`, and optionally in the footer. Use imperative
+mood to describe the change. It can help to think of your messages as starting
+with "If applied, this commit will.." (`add new feature` instead of
+`added new feature`).
+
+#### Using Commitizen
+
+To facilitate creating commits that comply with the conventional commit format,
+you can use the [Commitizen](https://github.com/commitizen-tools/commitizen) CLI
+tool. This interactive tool will guide you through creating properly formatted
+commit messages.
+
+To install Commitizen:
+
+- **Linux**: `pip install --user commitizen` or `pipx install commitizen`
+- **macOS**: `brew install commitizen` or `pip install --user commitizen`
+
+Once installed, instead of `git commit`, use:
+
+```
+$ cz commit
+```
+
+This will interactively prompt you for the commit type, description, and other
+fields to build a compliant commit message.
+
+To demonstrate that the changes implement the new feature/fix the issue, make
+sure to also add tests to the existing Django testsuite.
 
 ### Making a pull request
 
