@@ -4,7 +4,7 @@ import { MATERIAL_ICON_DEFINITION } from '@react/components/MaterialIcon/constan
 import { SIDE_NAV_DEFINITION } from '@react/components/SideNav/constants';
 import { HOME_PLUGIN_SECTION_DEFINITION } from '@react/components/HomePluginSection/constants';
 import { LOADING_SPINNER_DEFINITION } from '@react/components/Spinner/constants';
-import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCard';
+import { HOME_PLUGIN_CARD_ITEM_DEFINITION } from '@react/components/HomePluginCard/constants';
 import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
 import { CHART_DEFINITION } from '@react/components/Chart/constants';
