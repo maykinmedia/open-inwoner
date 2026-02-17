@@ -1,3 +1,17 @@
+2.0.3 (2026-02-20)
+==================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Bugfixes
+--------
+
+* [:gh:`2214`]: Datamigratie toegevoegd die oude ``djangocms_text_ckeditor_text`` tabel
+  opruimt door CKEditor TextPlugin instanties te migreren naar het nieuwe Prosemirror
+  formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
+  fallback strategieën voor ongeldige HTML. Na succesvolle migratie wordt de oude
+  tabel verwijderd.
+
 2.0.2 (2026-01-27)
 ==================
 
