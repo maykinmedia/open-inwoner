@@ -246,7 +246,7 @@ describe('Accordion', () => {
 
     it('web component opens when initialOpen is true', () => {
       const { container } = render(
-        <oip-accordion title="Test Accordion" initial-open={true} />
+        <oip-accordion title="Test Accordion" initial-open="true" />
       );
 
       const details = container.querySelector('details');
@@ -278,7 +278,7 @@ describe('Accordion', () => {
       render(
         <div>
           <oip-accordion title="First Accordion" />
-          <oip-accordion title="Second Accordion" initial-open={true} />
+          <oip-accordion title="Second Accordion" initial-open="true" />
         </div>
       );
 
