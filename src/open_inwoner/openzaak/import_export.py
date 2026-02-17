@@ -227,11 +227,29 @@ class ZGWConfigExport:
                                     if isinstance(field_value, str)
                                     else field_value
                                 )
-                                item["fields"][field_name] = decoded or ""
+                                # Sanity check: ProseMirror documents should be dicts with structure like:
+                                # {"type": "doc", "content": [...]}
+                                # If it's not a dict, treat it as invalid
+                                if decoded and not isinstance(decoded, dict):
+                                    logger.warning(
+                                        "ProseMirror field contains non-dict value, treating as invalid",
+                                        model=model_class.__name__,
+                                        field=field_name,
+                                        value_type=type(decoded).__name__,
+                                        value=decoded,
+                                    )
+                                    item["fields"][field_name] = None
+                                # Use None instead of "" for empty values to avoid migration issues
+                                # Setting "" causes problems because it's stored as a JSON string
+                                # which then gets imported back and causes validation errors
+                                elif decoded:
+                                    item["fields"][field_name] = decoded
+                                else:
+                                    item["fields"][field_name] = None
                             except (json.JSONDecodeError, TypeError):
-                                item["fields"][field_name] = ""
+                                item["fields"][field_name] = None
                         else:
-                            item["fields"][field_name] = ""
+                            item["fields"][field_name] = None
 
                 # Remove found_in_api field - it's a diagnostic field that should not be exported
                 # and will be set to True during import operations
