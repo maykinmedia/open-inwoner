@@ -20,18 +20,13 @@ Nieuwe features
 * [:gh:`2099`] De OIP Storybook is nu beschikbaar via GitHub pages.
 * [:gh:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor gebruik
   in Docker/Kubernetes.
-* [:gh:`2107`]: Productie logs worden weggeschreven als JSON voor gebruik in log analyse
-  tools.
-* [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de ‘Mijn Afval’ app.
+* [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de 'Mijn Afval' app.
 * [:gh:`2119`, :gh:`2182`, :pr:`2151`]: API-client en configuratie voor 'Mijn Afval' aangemaakt.
 
 Bugfixes
 --------
 
 * [:gh:`2091`]: Beheerders toestaan om uit te loggen via frontend.
-* [:gh:`2116`]: Naamgeving conflict tussen Prosemirror en Leaflet opgelost, waardoor de
-  Prosemirror editor op alle pagina's naar verwachting werkt.
-* [:gh:`2158`]: PDC product content editor mag nu ook lijsten gebruiken.
 * [:gh:`2131`]: Probleem met ``vite`` bundler opgelost waardoor de marker van de kaart
   weer correct wordt geladen.
 * [:gh:`2125`]: ``django-digid-eherkenning`` bijgewerkt naar custom release zodat de
@@ -49,7 +44,6 @@ Onderhoud
 * [:gh:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.2.0``.
 * [:gh:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en
   copyright.
-* [:gh:`2164`, :cve:`CVE-2026-22028`] ``preact`` bijgewerkt naar versie ``10.27.3``.
 * [:gh:`2104`]: Verwijderen in ongebruik geraakte NPM dependencies, ``jest`` en ``karma``
   test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
   ``.babelrc`` en ``.jshintrc``).
@@ -60,6 +54,17 @@ Onderhoud
 * [:gh:`2206`, :pr:`2207`]: `setuptools` bijgewerkt naar versie ``<81``.
 * [:gh:`2178`, :cve:`CVE-2023-44270`]: ``autoprefixer`` bijgewerkt naar versie ``10.4.23``.
 * [:gh:`2181`]: Alle (huidige) postcss waarschuwingen opgelost.
+* [:pr:`2226`]: Verwijderde dubbele vermeldingen uit changelog.
+
+2.0.2 (2026-01-27)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.2`.
+
+Bugfixes
+--------
+
+* [:gh:`2166`]: ``weasyprint`` bijgewerkt naar versie ``0.68``.
 
 2.0.1 (2026-01-26)
 ==================
