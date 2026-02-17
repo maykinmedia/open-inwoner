@@ -35,6 +35,11 @@ Bugfixes
   zonder verplicht `request` argument werden aangeroepn.
 * [:gh:`2209`, :pr:`2213`]: Ckeditor opnieuw toegevoegd aan INSTALLED_APPS voor compatibiliteit met
   mail-editor.
+* [:gh:`2214`]: Datamigratie toegevoegd die oude ``djangocms_text_ckeditor_text`` tabel
+  opruimt door CKEditor TextPlugin instanties te migreren naar het nieuwe Prosemirror
+  formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
+  fallback strategieën voor ongeldige HTML. Na succesvolle migratie wordt de oude
+  tabel verwijderd.
 
 Onderhoud
 ---------
