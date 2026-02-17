@@ -11,6 +11,8 @@ Bugfixes
   formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
   fallback strategieën voor ongeldige HTML. Na succesvolle migratie wordt de oude
   tabel verwijderd.
+* [:gh:`2208`]: Link plugin rendert nu correct HTML uit ProsemirrorModelField in plaats van
+  markup als tekst weer te geven.
 
 2.0.2 (2026-01-27)
 ==================
