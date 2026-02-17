@@ -197,6 +197,6 @@
         {% endif %}
         <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
         {# Including this script will allow the page to use the preact web-components #}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-react.js' %}" type="module"></script>
+        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-frontend.js' %}" type="module"></script>
     </body>
 </html>

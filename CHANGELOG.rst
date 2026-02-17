@@ -55,6 +55,7 @@ Onderhoud
 * [:gh:`2178`, :cve:`CVE-2023-44270`]: ``autoprefixer`` bijgewerkt naar versie ``10.4.23``.
 * [:gh:`2181`]: Alle (huidige) postcss waarschuwingen opgelost.
 * [:pr:`2226`]: Verwijderde dubbele vermeldingen uit changelog.
+* [:gh:`2228`]: ``vite`` configuratie verbeterd.
 
 2.0.2 (2026-01-27)
 ==================
