@@ -57,6 +57,17 @@ class LinkPlugin(OriginalLinkPlugin):
     model = ExtendedCMSLink
     form = CustomLinkForm
     allow_children = False
+    render_template = "cms/plugins/links/link.html"
+
+    def get_render_template(self, context, instance, placeholder):
+        """
+        Override to use our custom template that supports ProsemirrorModelField
+
+        Note: setting the template via the render_template attribute does not work;
+        template resolution seems to be broken by inheritance. Revisit when upgrading to
+        Django CMS 4
+        """
+        return self.render_template
 
     fieldsets = [
         (
