@@ -11,7 +11,7 @@ from open_inwoner.utils.tests.playwright import PlaywrightSyncLiveServerTestCase
 
 
 @tag("e2e")
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls", DEBUG=True)
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
     uploaded_bytes = b"fake pdf"
     uploaded_filename = "upload_test.pdf"
