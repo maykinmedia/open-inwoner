@@ -12,6 +12,7 @@ repos:
         entry: npx prettier --write --ignore-unknown
         language: system
         types_or: [javascript, jsx, ts, tsx, css, scss, json, yaml, markdown]
+        stages: [pre-commit]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -25,3 +26,18 @@ repos:
     rev: v1.22.0
     hooks:
       - id: zizmor
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.16.3
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+        args:
+          - --allow-abort
+          - --allowed-prefixes
+          - Merge
+          - Revert
+          - Pull request
+          - fixup!
+          - squash!
+          - amend!
+          - --commit-msg-file
