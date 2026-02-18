@@ -1,7 +1,7 @@
 2.0.3 (2026-02-20)
 ==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.3`.
 
 Bugfixes
 --------
