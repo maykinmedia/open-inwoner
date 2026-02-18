@@ -1,5 +1,6 @@
 import dataclasses
 import io
+import json
 import uuid
 
 from django.core.files.storage.memory import InMemoryStorage
@@ -59,8 +60,8 @@ class ZGWExportImportMockData:
             zaaktype_uuids=[self.original_uuid],
             status_indicator="",
             status_indicator_text="",
-            document_upload_description="",
-            description="status",
+            document_upload_description=None,
+            description=None,
             notify_status_change=True,
             action_required=False,
             document_upload_enabled=True,
@@ -204,8 +205,8 @@ class ZaakTypeConfigExportTest(TestCase):
                     "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
                     "status_indicator": "",
                     "status_indicator_text": "",
-                    "document_upload_description": "",
-                    "description": "status",
+                    "document_upload_description": None,
+                    "description": None,
                     "notify_status_change": True,
                     "action_required": False,
                     "document_upload_enabled": True,
@@ -289,8 +290,8 @@ class TestCatalogusExport(TestCase):
                     "zaaktype_uuids": '["a1591906-3368-470a-a957-4b8634c275a1"]',
                     "status_indicator": "",
                     "status_indicator_text": "",
-                    "document_upload_description": "",
-                    "description": "status",
+                    "document_upload_description": None,
+                    "description": None,
                     "notify_status_change": True,
                     "action_required": False,
                     "document_upload_enabled": True,
@@ -330,9 +331,9 @@ class TestCatalogusExport(TestCase):
             "\n",
             '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "informatieobjecttype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-1", "DM-1", "123456789"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             "\n",
             '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "description": ""}}',
             "\n",
@@ -350,11 +351,11 @@ class TestCatalogusImport(TestCase):
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://bar.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
             '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://bar.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
             '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "https://bar.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": true, "document_notification_enabled": true}}',
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": "description new"}}',
         ]
         self.json_dupes = [
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "zaaktype_uuids": "[]", "description": "description new"}}',
         ]
         self.jsonl = "\n".join(self.json_lines)
@@ -442,7 +443,7 @@ class TestCatalogusImport(TestCase):
 
         # missing ZaakTypeStatusTypeConfig
         json_line_extra = [
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "bogus", "statustekst": "bogus", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "bogus", "statustekst": "bogus", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
         ]
         json_lines = "\n".join(self.json_lines + json_line_extra)
 
@@ -488,7 +489,7 @@ class TestCatalogusImport(TestCase):
 
         # import fails due to missing ZaakTypeConfig
         json_line_extra = [
-            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["bogus", "DM-1", "666666666"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": "", "description": "status", "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
+            '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["bogus", "DM-1", "666666666"], "statustype_url": "https://foo.1.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
         ]
         json_lines = "\n".join(self.json_lines + json_line_extra)
 
@@ -709,3 +710,159 @@ class ImportExportTestCase(TestCase):
         import_result = ZGWConfigImport.from_jsonl_stream_or_string(export.as_jsonl())
 
         self.assertEqual(import_result.total_rows_processed, 5)
+
+    def test_export_empty_prosemirror_fields_as_null_not_empty_string(self):
+        """
+        Test that empty ProseMirror fields are exported as null, not "".
+
+        This prevents the bug where "" gets imported back as a JSON string,
+        causing validation errors when migrations try to process it.
+        """
+        # Create a status config with empty ProseMirror fields (None)
+        status_config = ZaakTypeStatusTypeConfig.objects.first()
+        status_config.description = None
+        status_config.document_upload_description = None
+        status_config.save()
+
+        # Export the config
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
+        exported_dicts = export.as_dicts()
+
+        # Find the exported status config
+        status_config_export = next(
+            item
+            for item in exported_dicts
+            if item["model"] == "openzaak.zaaktypestatustypeconfig"
+        )
+
+        # Verify that empty ProseMirror fields are exported as None, not ""
+        self.assertIsNone(
+            status_config_export["fields"]["description"],
+            "Empty ProseMirror field should be exported as None, not empty string",
+        )
+        self.assertIsNone(
+            status_config_export["fields"]["document_upload_description"],
+            "Empty ProseMirror field should be exported as None, not empty string",
+        )
+
+    def test_import_null_prosemirror_fields_stays_null(self):
+        """
+        Test that importing null ProseMirror fields results in None, not "".
+
+        This ensures the round-trip export → import doesn't introduce "" values.
+        """
+        # Get the existing status config and set ProseMirror fields to non-null values
+        status_config = ZaakTypeStatusTypeConfig.objects.first()
+        status_config.description.html = "<p>Some content</p>"
+        status_config.document_upload_description.html = "<p>Upload info</p>"
+        status_config.save()
+
+        # Export the current state, then modify the export to have null ProseMirror fields
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
+        exported_dicts = export.as_dicts()
+
+        # Find and modify the status config to have null ProseMirror fields
+        for item in exported_dicts:
+            if item["model"] == "openzaak.zaaktypestatustypeconfig":
+                item["fields"]["description"] = None
+                item["fields"]["document_upload_description"] = None
+
+        # Convert back to JSONL
+        jsonl_lines = [json.dumps(item, ensure_ascii=False) for item in exported_dicts]
+        jsonl_string = "\n".join(jsonl_lines)
+
+        # Import the data (this will UPDATE the existing record)
+        import_result = ZGWConfigImport.from_jsonl_stream_or_string(jsonl_string)
+
+        # Verify import succeeded
+        self.assertEqual(import_result.zaak_status_type_configs_imported, 1)
+        self.assertEqual(len(import_result.import_errors), 0)
+
+        # Check that the imported null values became None, not ""
+        # Note: ProseMirrorModelField wraps values, so we check the raw_data
+        status_config.refresh_from_db()
+
+        # The field wrapper should exist but raw_data should be None (not "")
+        self.assertIsNone(
+            status_config.description.raw_data,
+            "Imported null ProseMirror field should have None as raw_data, not empty string",
+        )
+        self.assertIsNone(
+            status_config.document_upload_description.raw_data,
+            "Imported null ProseMirror field should have None as raw_data, not empty string",
+        )
+
+    def test_export_import_prosemirror_field_with_content(self):
+        """
+        Test that ProseMirror fields with actual content export and import correctly.
+
+        This verifies the full round-trip for non-empty ProseMirror fields.
+        """
+        # Set up a status config with valid ProseMirror content
+        original_status_config = ZaakTypeStatusTypeConfig.objects.first()
+        original_status_config.description.html = (
+            "<p>Status description with <strong>formatting</strong></p>"
+        )
+        original_status_config.document_upload_description.html = (
+            "<p>Please upload your <em>documents</em> here</p>"
+        )
+        original_status_config.save()
+
+        # Refresh to get the wrapped field objects with proper raw_data
+        original_status_config.refresh_from_db()
+
+        # Verify the data was stored as proper ProseMirror documents (not strings)
+        self.assertIsNotNone(original_status_config.description.raw_data)
+        self.assertIsInstance(original_status_config.description.raw_data, dict)
+        self.assertIsNotNone(
+            original_status_config.document_upload_description.raw_data
+        )
+        self.assertIsInstance(
+            original_status_config.document_upload_description.raw_data, dict
+        )
+
+        # Store the original values for comparison
+        original_description_data = original_status_config.description.raw_data
+        original_doc_upload_desc_data = (
+            original_status_config.document_upload_description.raw_data
+        )
+
+        # Export the config
+        export = ZGWConfigExport.from_catalogus_configs(CatalogusConfig.objects.all())
+        exported_jsonl = export.as_jsonl()
+
+        # Import the data back (this will UPDATE existing records, not create new ones)
+        import_result = ZGWConfigImport.from_jsonl_stream_or_string(exported_jsonl)
+
+        # Verify import succeeded
+        self.assertEqual(import_result.total_rows_processed, 5)
+        self.assertEqual(len(import_result.import_errors), 0)
+
+        # Check that both ProseMirror fields' content was preserved
+        original_status_config.refresh_from_db()
+        self.assertEqual(
+            original_status_config.description.raw_data,
+            original_description_data,
+            "description ProseMirror field content should be preserved through export/import",
+        )
+        self.assertEqual(
+            original_status_config.document_upload_description.raw_data,
+            original_doc_upload_desc_data,
+            "document_upload_description ProseMirror field content should be preserved through export/import",
+        )
+
+        # Verify the content is a valid ProseMirror document (dict with 'type' and 'content')
+        self.assertIsInstance(original_status_config.description.raw_data, dict)
+        self.assertEqual(original_status_config.description.raw_data.get("type"), "doc")
+        self.assertIn("content", original_status_config.description.raw_data)
+
+        self.assertIsInstance(
+            original_status_config.document_upload_description.raw_data, dict
+        )
+        self.assertEqual(
+            original_status_config.document_upload_description.raw_data.get("type"),
+            "doc",
+        )
+        self.assertIn(
+            "content", original_status_config.document_upload_description.raw_data
+        )
