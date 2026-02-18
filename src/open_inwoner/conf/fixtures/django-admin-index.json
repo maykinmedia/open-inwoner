@@ -138,6 +138,7 @@
       "slug": "koppelingen",
       "models": [
         ["laposta", "lapostaconfig"],
+        ["mijn_afval", "mijnafvalconfig"],
         ["notifications", "notificationsapiconfig"],
         ["notifications", "subscription"],
         ["objectsapiclient", "objectsapiserviceconfiguration"],
