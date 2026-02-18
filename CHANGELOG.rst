@@ -42,6 +42,9 @@ Bugfixes
   tabel verwijderd.
 * [:gh:`2208`]: Link plugin rendert nu correct HTML uit ProsemirrorModelField in plaats van
   markup als tekst weer te geven.
+* [:gh:`2210`]: Exports en imports van de ZGW catalogi via bestanden gaat nu correct om
+  met prosemirror velden. Tevens zullen via een datamigratie de bestaande velden in de
+  ZGW catalogus gechecked worden op valide waarden voor de prosemirror velden.
 
 Onderhoud
 ---------
