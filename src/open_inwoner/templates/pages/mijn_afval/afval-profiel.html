@@ -19,7 +19,7 @@
             {% for afval_obj in afval_data %}
                 <article class="afval-object">
                     {# Accordion wrapping address and all containers #}
-                    <oip-accordion title="{{ afval_obj.object_address }}" subtitle="{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}">
+                    <oip-accordion title="{{ afval_obj.object_address }}" subtitle="{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}" initial-open="{{ forloop.first|lower }}">
                         {# Container Sections - Same rendering for all types #}
                         {% for container in afval_obj.containers %}
                             <section class="afval-container">

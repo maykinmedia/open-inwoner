@@ -13,7 +13,7 @@ Nieuwe features
   geïntegreerd met Django CMS.
 * [:gh:`2101`, :oip-nlds:`30`, :oip-nlds:`34`]: Styling van tegels op de Home pagina en van externe-links plugin
   op de Home pagina overgezet naar design-tokens zodat deze volgens de NLDS principes gebruikt kunnen worden.
-* [:gh:`2098`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn
+* [:gh:`2098`, :gh:`2177`]: Nieuw accordion web component toegevoegd dat gebruikt wordt in Mijn
   Afval.
 * [:gh:`2096`, :oip-nlds:`32`]: Table component toegevoegd ten behoeve van de ‘Mijn
   Afval’ app inclusief NL Design-System design-tokens.
