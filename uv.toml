@@ -1,5 +1,7 @@
 [pip]
 no-emit-package = [
+# Note: setuptools is NOT excluded because it must be explicitly installed
+# to ensure pkg_resources is available for legacy dependencies (django-axes,
+# django-formtools). See requirements/base.in for setuptools<81 pin.
   "pip",
-  "setuptools",
 ]

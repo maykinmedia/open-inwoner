@@ -1242,6 +1242,15 @@ sentry-sdk[django]==2.19.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+setuptools==80.10.2
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   josepy
+    #   locust
+    #   pip-tools
+    #   zope-event
+    #   zope-interface
 simple-websocket==1.1.0
     # via python-engineio
 simplejson==3.19.2
@@ -1534,4 +1543,3 @@ zopfli==0.1.9
 
 # The following packages were excluded from the output:
 # pip
-# setuptools

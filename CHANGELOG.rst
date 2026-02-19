@@ -6,6 +6,8 @@ Voor een volledig overzicht van alle commits, zie ...
 Bugfixes
 --------
 
+* [:gh:`2206`]: ``setuptools`` versie vastgezet op <81 om ``pkg_resources`` beschikbaar te
+  houden voor legacy dependencies (``django-axes``, ``django-formtools``).
 * [:gh:`2214`]: Datamigratie toegevoegd die oude ``djangocms_text_ckeditor_text`` tabel
   opruimt door CKEditor TextPlugin instanties te migreren naar het nieuwe Prosemirror
   formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
