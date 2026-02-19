@@ -69,6 +69,27 @@ Onderhoud
 * [:gh:`2232`]: Bijgewerkte admin index-fixture.
 * [:gh:`2082`]: Elasticsearch-verbindingscache gewist in tests.
 
+2.0.3 (2026-02-20)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.3`.
+
+Bugfixes
+--------
+
+* [:gh:`2206`]: ``setuptools`` versie vastgezet op <81 om ``pkg_resources`` beschikbaar te
+  houden voor legacy dependencies (``django-axes``, ``django-formtools``).
+* [:gh:`2214`]: Datamigratie toegevoegd die oude ``djangocms_text_ckeditor_text`` tabel
+  opruimt door CKEditor TextPlugin instanties te migreren naar het nieuwe Prosemirror
+  formaat. HTML content wordt geconverteerd naar Prosemirror's JSON structuur, met
+  fallback strategieën voor ongeldige HTML. Na succesvolle migratie wordt de oude
+  tabel verwijderd.
+* [:gh:`2208`]: Link plugin rendert nu correct HTML uit ProsemirrorModelField in plaats van
+  markup als tekst weer te geven.
+* [:gh:`2210`]: Exports en imports van de ZGW catalogi via bestanden gaat nu correct om
+  met prosemirror velden. Tevens zullen via een datamigratie de bestaande velden in de
+  ZGW catalogus gechecked worden op valide waarden voor de prosemirror velden.
+
 2.0.2 (2026-01-27)
 ==================
 
