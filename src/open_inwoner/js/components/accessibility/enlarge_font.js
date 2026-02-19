@@ -13,7 +13,7 @@ export class EnlargeFont {
     this.styles = {
       bodyFontSizeDefault: '--utrecht-document-font-size',
       paragraphFontSizeDefault: '--nl-paragraph-font-size',
-      paragraphFontSizeSmall: '--nl-paragraph-small-font-size',
+      paragraphFontSizeSmall: '--utrecht-paragraph-small-font-size',
       headingThreeFontSize: '--utrecht-heading-3-font-size',
       headingFourFontSize: '--utrecht-heading-4-font-size',
       // OIP specific card-heading
