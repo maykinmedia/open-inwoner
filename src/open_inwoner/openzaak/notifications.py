@@ -1,5 +1,7 @@
-import logging  # noqa: TID251 - only used for log levels
+from dataclasses import dataclass
 from datetime import date, timedelta
+from enum import Enum
+from functools import partial
 
 from django.conf import settings
 from django.urls import reverse
@@ -44,95 +46,119 @@ logger = structlog.stdlib.get_logger(__name__)
 # Create a helper instance for logging
 _log_helper = WebhookLogMixin()
 
+# Create log partial for notification drops
+log_dropped = partial(logger.info, "Notification dropped")
+log_skipped = partial(logger.info, "Notification skipped")
+
+
+class NotificationStatus(Enum):
+    """Status of notification processing."""
+
+    DROPPED = "dropped"
+    """Dropped before handling - preliminary checks failed."""
+
+    DISPATCHED_SKIPPED = "dispatched_skipped"
+    """Dispatched to handling stage but no emails sent - all users skipped."""
+
+    DISPATCHED_SENT = "dispatched_sent"
+    """Dispatched and successfully sent one or more notification emails."""
+
+
+@dataclass
+class NotificationResult:
+    """Result of processing a notification."""
+
+    status: NotificationStatus
+    """Outcome of notification processing."""
+
+    sent_count: int = 0
+    """Number of emails successfully sent (only relevant if status=DISPATCHED_SENT)."""
+
+    reason: str | None = None
+    """
+    - If DROPPED: why dropped in preliminary stage
+    - If DISPATCHED_SKIPPED: why no emails were sent
+    - If DISPATCHED_SENT: summary of what was sent/skipped
+    """
+
 
 # TODO: check siteconfig for notification enabled
-def handle_zaken_notification(notification: Notification):
+def handle_zaken_notification(notification: Notification) -> NotificationResult:
     """
     Perform basic checks, then dispatch to
         - `handle_status_notification` or
         - `handle_zaakinformatieobject_notification`
     """
     if notification.kanaal != "zaken":
-        raise Exception(
-            f"handler expects kanaal 'zaken' but received '{notification.kanaal}'"
-        )
+        reason = f"handler expects kanaal 'zaken' but received '{notification.kanaal}'"
+        log_dropped(reason=reason, kanaal=notification.kanaal)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     # on the 'zaken' channel the hoofd_object is always the zaak
     zaak_url = notification.hoofd_object
 
     # we're only interested in some updates
     resources = ("status", "zaakinformatieobject")
-    r = notification.resource  # short alias for logging
+    r = notification.resource  # short alias
 
     if notification.resource not in resources:
-        log_system_action(
-            f"ignored {r} notification: resource is not "
-            f"{_wrap_join(resources, 'or')} but '{notification.resource}' for zaak {zaak_url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = f"resource is not {_wrap_join(resources, 'or')} but '{notification.resource}'"
+        log_dropped(reason=reason, resource=notification.resource, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     try:
         api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=zaak_url)
     except ZGWApiGroupConfig.DoesNotExist:
-        logger.error("No API group defined for zaak", zaak_url=zaak_url)
-        return
+        reason = "no API group defined for zaak"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     zaken_client = api_group.zaken_client
 
     # check if we have users that need to be informed about this case
     if not (roles := zaken_client.fetch_zaak_roles(zaak_url)):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve rollen for zaak {zaak_url}",
-            # NOTE this used to be logging.ERROR, but as this is also our first call
-            # we get a lot of 403 "Niet geautoriseerd voor zaaktype"
-            log_level=logging.INFO,
-        )
-        return
+        reason = "cannot retrieve rollen for zaak"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     inform_users = _get_initiator_users_from_roles(roles, api_group=api_group)
     if not inform_users:
-        log_system_action(
-            f"ignored {r} notification: no users with bsn/nnp_id as (mede)initiators in zaak {zaak_url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = "no users with bsn/nnp_id as (mede)initiators"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     # check if this case is visible
     if not (zaak := zaken_client.fetch_zaak_by_url_no_cache(zaak_url)):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaak {zaak_url}",
-            log_level=logging.ERROR,
-        )
-        return
+        reason = "cannot retrieve zaak"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     zaaktype = api_group.catalogi_client.fetch_single_zaaktype(zaak.zaaktype)
 
     if not zaaktype:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaaktype {zaak.zaaktype} for zaak {zaak_url}",
-            log_level=logging.ERROR,
-        )
-        return
+        reason = f"cannot retrieve zaaktype {zaak.zaaktype}"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     zaak.zaaktype = zaaktype
 
     if not is_zaak_visible(zaak):
-        log_system_action(
-            f"ignored {r} notification: zaak not visible after applying website "
-            f"visibility filter for zaak {zaak_url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = "zaak not visible after applying visibility filter"
+        log_dropped(reason=reason, zaak_url=zaak_url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
-    if notification.resource == "status":
-        _handle_status_notification(notification, zaak, inform_users, api_group)
-    elif notification.resource == "zaakinformatieobject":
-        _handle_zaakinformatieobject_notification(
-            notification, zaak, inform_users, api_group
-        )
-    else:
-        raise NotImplementedError("programmer error in earlier resource filter")
+    # Dispatch to specific handlers
+    match notification.resource:
+        case "status":
+            return _handle_status_notification(
+                notification, zaak, inform_users, api_group
+            )
+        case "zaakinformatieobject":
+            return _handle_zaakinformatieobject_notification(
+                notification, zaak, inform_users, api_group
+            )
+        case _:
+            raise NotImplementedError("programmer error in earlier resource filter")
 
 
 def send_case_update_email(
@@ -198,9 +224,8 @@ def _handle_zaakinformatieobject_notification(
     zaak: Zaak,
     inform_users: list[User],
     api_group: ZGWApiGroupConfig,
-):
+) -> NotificationResult:
     oz_config = api_group.open_zaak_config
-    r = notification.resource  # short alias for logging
 
     # check if this is a zaakinformatieobject we want to inform on
     ziobj_url = notification.resource_url
@@ -208,57 +233,74 @@ def _handle_zaakinformatieobject_notification(
     ziobj = api_group.zaken_client.fetch_single_zaak_information_object(ziobj_url)
 
     if not ziobj:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaakinformatieobject {ziobj_url} for zaak {zaak.url}",
-            log_level=logging.ERROR,
-        )
-        return
+        reason = f"cannot retrieve zaakinformatieobject {ziobj_url}"
+        log_skipped(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     info_object = fetch_single_information_object_from_url(
         ziobj.informatieobject, api_group=api_group
     )
     if not info_object:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve informatieobject "
-            f"{ziobj.informatieobject} for zaak {zaak.url}",
-            log_level=logging.ERROR,
-        )
-        return
+        reason = f"cannot retrieve informatieobject {ziobj.informatieobject}"
+        log_skipped(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     ziobj.informatieobject = info_object
 
     if not is_info_object_visible(info_object, oz_config.document_max_confidentiality):
-        log_system_action(
-            f"ignored {r} notification: informatieobject not visible after "
-            f"applying website visibility filter for zaak {zaak.url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = "informatieobject not visible after applying visibility filter"
+        log_skipped(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     # NOTE for documents we don't check the statustype.informeren
     ztiotc = get_zaak_type_info_object_type_config(
         zaak.zaaktype, info_object.informatieobjecttype
     )
     if not ztiotc:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve info_type "
-            f"configuration {info_object.informatieobjecttype} and zaak {zaak.url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = f"cannot retrieve info_type configuration {info_object.informatieobjecttype}"
+        log_skipped(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
     elif not ztiotc.document_notification_enabled:
-        log_system_action(
-            f"ignored {r} notification: info_type configuration "
-            f"'{ztiotc.omschrijving}' {info_object.informatieobjecttype} "
-            f"found but 'document_notification_enabled' is False for zaak {zaak.url}",
-            log_level=logging.INFO,
-        )
-        return
+        reason = f"info_type configuration '{ztiotc.omschrijving}' has 'document_notification_enabled' disabled"
+        log_skipped(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     # reaching here means we're going to inform users
     _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
+
+    sent_count = 0
+    skipped_count = 0
+    skip_reasons = []
+
     for user in inform_users:
-        _handle_zaakinformatieobject_update(notification, user, zaak, ziobj, api_group)
+        user_result = _handle_zaakinformatieobject_update(
+            notification, user, zaak, ziobj, api_group
+        )
+        if user_result.sent_count > 0:
+            sent_count += 1
+        else:
+            skipped_count += 1
+            if user_result.reason and user_result.reason not in skip_reasons:
+                skip_reasons.append(user_result.reason)
+
+    if sent_count > 0:
+        reason = f"sent {sent_count} email(s)"
+        if skipped_count > 0:
+            reason += f", skipped {skipped_count} ({', '.join(skip_reasons)})"
+        log_system_action(
+            f"Sent {sent_count} document notification email(s) for zaak {zaak.url}"
+        )
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SENT,
+            sent_count=sent_count,
+            reason=reason,
+        )
+    else:
+        reason = f"all {len(inform_users)} user(s) skipped: {', '.join(skip_reasons)}"
+        logger.info(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED, sent_count=0, reason=reason
+        )
 
 
 def _handle_zaakinformatieobject_update(
@@ -267,7 +309,7 @@ def _handle_zaakinformatieobject_update(
     zaak: Zaak,
     zaak_info_object: ZaakInformatieObject,
     api_group: ZGWApiGroupConfig,
-):
+) -> NotificationResult:
     template_name = "case_document_notification"
 
     # hook into userfeed
@@ -277,7 +319,11 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_blocked_by_user(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED,
+            sent_count=0,
+            reason="user disabled notifications or has no contact email",
+        )
 
     note = UserCaseInfoObjectNotification.objects.record_if_unique_notification(
         user,
@@ -289,7 +335,11 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_duplicate(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED,
+            sent_count=0,
+            reason="duplicate",
+        )
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
@@ -297,7 +347,11 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_rate_limited(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED,
+            sent_count=0,
+            reason="rate limited",
+        )
 
     send_case_update_email(user, zaak, template_name, api_group=api_group)
     note.mark_sent()
@@ -305,6 +359,7 @@ def _handle_zaakinformatieobject_update(
     _log_helper.log_notification_email_sent(
         notification, user, zaak_info_object.url, zaak.url
     )
+    return NotificationResult(status=NotificationStatus.DISPATCHED_SENT, sent_count=1)
 
 
 #
@@ -312,28 +367,21 @@ def _handle_zaakinformatieobject_update(
 #
 def _check_status_history(
     notification: Notification, zaak: Zaak, client: ZakenClient
-) -> list[Status] | None:
+) -> tuple[list[Status] | None, str | None]:
     """
-    Check if more than one status exists for `zaak` (else notifications are skipped)
+    Check if more than one status exists for `zaak` (else notifications are skipped).
+
+    Returns: (status_history, error_reason) where error_reason is None on success.
     """
-    resource = notification.resource
     status_history = client.fetch_status_history_no_cache(zaak.url)
 
     if not status_history:
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status_history for zaak {zaak.url}",
-            log_level=logging.ERROR,
-        )
-        return None
+        return None, "cannot retrieve status_history"
 
     if len(status_history) == 1:
-        log_system_action(
-            f"ignored {resource} notification: skip initial status notification for zaak {zaak.url}",
-            log_level=logging.INFO,
-        )
-        return None
+        return None, "skip initial status notification"
 
-    return status_history
+    return status_history, None
 
 
 def _check_status(
@@ -341,13 +389,15 @@ def _check_status(
     zaak: Zaak,
     status_history: list[Status],
     client: ZakenClient,
-) -> Status | None:
+) -> tuple[Status | None, str | None]:
     """
-    Check if this is a status we want to inform on
+    Check if this is a status we want to inform on.
+
+    Returns: (status, error_reason) where error_reason is None on success.
     """
-    resource = notification.resource
     status_url = notification.resource_url
 
+    status = None
     for s in status_history:
         if s.url == status_url:
             status = s
@@ -358,13 +408,9 @@ def _check_status(
             status = client.fetch_single_status(status_url)
 
     if not status:
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status {status_url} for zaak {zaak.url}",
-            log_level=logging.ERROR,
-        )
-        return None
+        return None, f"cannot retrieve status {status_url}"
 
-    return status
+    return status, None
 
 
 def _check_status_type(
@@ -373,76 +419,63 @@ def _check_status_type(
     status: Status,
     oz_config: OpenZaakConfig,
     catalogi_client: CatalogiClient,
-) -> StatusType | None:
+) -> tuple[StatusType | None, str | None]:
     """
-    Check if a status_type exists for `status` and if notifications are enabled
+    Check if a status_type exists for `status` and if notifications are enabled.
+
+    Returns: (status_type, error_reason) where error_reason is None on success.
     """
     status_type = catalogi_client.fetch_single_status_type(status.statustype)
-    resource = notification.resource
 
     if not status_type:
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status_type "
-            f"{status.statustype} for zaak {zaak.url}",
-            log_level=logging.ERROR,
-        )
-        return None
+        return None, f"cannot retrieve status_type {status.statustype}"
 
     if (
         not oz_config.skip_notification_statustype_informeren
         and not status_type.informeren
     ):
-        log_system_action(
-            f"ignored {resource} notification: status_type.informeren is false for "
-            f"status {status.url} and zaak {zaak.url}",
-            log_level=logging.INFO,
-        )
-        return None
+        return None, "status_type.informeren is false"
 
-    return status_type
+    return status_type, None
 
 
 def _check_zaaktype_config(
-    notification: Notification,
     zaak: Zaak,
     oz_config: OpenZaakConfig,
-) -> ZaakTypeConfig | None:
+) -> tuple[ZaakTypeConfig | None, str | None]:
     """
-    Check if zaaktype_config exists and notifications are enabled
+    Check if zaaktype_config exists and notifications are enabled.
+
+    Returns: (zaaktype_config, error_reason) where error_reason is None on success.
     """
-    resource = notification.resource
     ztc = get_zaak_type_config(zaak.zaaktype)
 
     if oz_config.skip_notification_statustype_informeren:
         if not ztc:
-            log_system_action(
-                f"ignored {resource} notification: 'skip_notification_statustype_informeren' "
-                f"is True but cannot retrieve zaaktype configuration '{zaak.zaaktype.identificatie}' "
-                f"for zaak {zaak.url}",
-                log_level=logging.INFO,
+            zaaktype_id = getattr(zaak.zaaktype, "identificatie", str(zaak.zaaktype))
+            return (
+                None,
+                f"'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{zaaktype_id}'",
             )
-            return None
         elif not ztc.notify_status_changes:
-            log_system_action(
-                f"ignored {resource} notification: zaaktype configuration "
-                f"'{zaak.zaaktype.identificatie}' found but 'notify_status_changes' is False "
-                f"for zaak {zaak.url}",
-                log_level=logging.INFO,
+            zaaktype_id = getattr(zaak.zaaktype, "identificatie", str(zaak.zaaktype))
+            return (
+                None,
+                f"zaaktype configuration '{zaaktype_id}' found but 'notify_status_changes' is False",
             )
-            return None
 
-    return ztc
+    return ztc, None
 
 
 def _check_statustype_config(
-    notification: Notification,
     zaak: Zaak,
     ztc: ZaakTypeConfig,
-) -> ZaakTypeStatusTypeConfig | None:
+) -> tuple[ZaakTypeStatusTypeConfig | None, str | None]:
     """
-    Check if statustype_config exists and notifications are enabled
+    Check if statustype_config exists and notifications are enabled.
+
+    Returns: (statustype_config, error_reason) where error_reason is None on success.
     """
-    resource = notification.resource
     statustype_url = zaak.status.statustype
 
     try:
@@ -450,23 +483,15 @@ def _check_statustype_config(
             zaaktype_config=ztc, statustype_url=statustype_url
         )
     except ZaakTypeStatusTypeConfig.DoesNotExist:
-        log_system_action(
-            "ignored {resource} notification: ZaakTypeStatusTypeConfig could not be found for statustype {url}",
-            resource=resource,
-            url=statustype_url,
-            log_level=logging.INFO,
+        return (
+            None,
+            f"ZaakTypeStatusTypeConfig could not be found for statustype {statustype_url}",
         )
-        return None
 
     if not statustype_config.notify_status_change:
-        log_system_action(
-            f"ignored {resource} notification: 'notify_status_change' is False for "
-            f"the status type configuration of the status of this zaak ({zaak.url})",
-            log_level=logging.INFO,
-        )
-        return None
+        return None, "'notify_status_change' is False for the status type configuration"
 
-    return statustype_config
+    return statustype_config, None
 
 
 def _check_user_status_notitifactions(
@@ -498,7 +523,7 @@ def _handle_status_notification(
     zaak: Zaak,
     inform_users: list[User],
     api_group: ZGWApiGroupConfig,
-):
+) -> NotificationResult:
     """
     Check status notification settings of user and case-related objects/configs
     """
@@ -506,45 +531,88 @@ def _handle_status_notification(
     catalogi_client = api_group.catalogi_client
     zaken_client = api_group.zaken_client
 
-    if not (status_history := _check_status_history(notification, zaak, zaken_client)):
-        return
+    status_history, error = _check_status_history(notification, zaak, zaken_client)
+    if error:
+        log_skipped(reason=error, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=error)
 
-    if not (status := _check_status(notification, zaak, status_history, zaken_client)):
-        return
+    status, error = _check_status(notification, zaak, status_history, zaken_client)
+    if error:
+        log_skipped(reason=error, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=error)
 
-    if not (
-        status_type := _check_status_type(
-            notification, zaak, status, oz_config, catalogi_client
-        )
-    ):
-        return
+    status_type, error = _check_status_type(
+        notification, zaak, status, oz_config, catalogi_client
+    )
+    if error:
+        log_skipped(reason=error, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=error)
 
-    if not (ztc := _check_zaaktype_config(notification, zaak, oz_config)):
-        return
+    ztc, error = _check_zaaktype_config(zaak, oz_config)
+    if error:
+        log_skipped(reason=error, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=error)
 
     status = zaken_client.fetch_single_status(zaak.status)
     if not status:
         # TODO: check if should we return or continue if the case has no status
-        logger.error("Unable to fetch status", status_url=zaak.status)
-        return
+        reason = "Unable to fetch status"
+        log_skipped(reason=reason, status_url=zaak.status, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=reason)
 
     zaak.status = status
-    if not (status_type_config := _check_statustype_config(notification, zaak, ztc)):
-        return
+    status_type_config, error = _check_statustype_config(zaak, ztc)
+    if error:
+        log_skipped(reason=error, zaak_url=zaak.url)
+        return NotificationResult(status=NotificationStatus.DROPPED, reason=error)
 
     status.statustype = status_type
+
+    # all checks have passed - now attempt to inform users
+    _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
+
+    sent_count = 0
+    skipped_count = 0
+    skip_reasons = []
 
     for user in inform_users:
         if not _check_user_status_notitifactions(
             notification, user, zaak, status, status_type_config
         ):
-            return
+            skipped_count += 1
+            reason = "notifications disabled or no contact email"
+            if reason not in skip_reasons:
+                skip_reasons.append(reason)
+            continue
 
-        # all checks have passed
-        _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
         # TODO: replace with notify_about_status_update(...args, method: Callable)
-        _handle_status_update(
+        user_result = _handle_status_update(
             notification, user, zaak, status, status_type_config, api_group
+        )
+        if user_result.sent_count > 0:
+            sent_count += 1
+        else:
+            skipped_count += 1
+            if user_result.reason and user_result.reason not in skip_reasons:
+                skip_reasons.append(user_result.reason)
+
+    if sent_count > 0:
+        reason = f"sent {sent_count} email(s)"
+        if skipped_count > 0:
+            reason += f", skipped {skipped_count} ({', '.join(skip_reasons)})"
+        log_system_action(
+            f"Sent {sent_count} status notification email(s) for zaak {zaak.url}"
+        )
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SENT,
+            sent_count=sent_count,
+            reason=reason,
+        )
+    else:
+        reason = f"all {len(inform_users)} user(s) skipped: {', '.join(skip_reasons)}"
+        logger.info(reason=reason, zaak_url=zaak.url)
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED, sent_count=0, reason=reason
         )
 
 
@@ -555,7 +623,7 @@ def _handle_status_update(
     status: Status,
     status_type_config: ZaakTypeStatusTypeConfig,
     api_group: ZGWApiGroupConfig,
-):
+) -> NotificationResult:
     # choose template
     if status_type_config.action_required:
         template_name = "case_status_notification_action_required"
@@ -576,7 +644,11 @@ def _handle_status_update(
         _log_helper.log_notification_email_duplicate(
             notification, user, status.url, zaak.url
         )
-        return
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED,
+            sent_count=0,
+            reason="duplicate",
+        )
 
     # let's not spam the users
     period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
@@ -584,7 +656,11 @@ def _handle_status_update(
         _log_helper.log_notification_email_rate_limited(
             notification, user, status.url, zaak.url
         )
-        return
+        return NotificationResult(
+            status=NotificationStatus.DISPATCHED_SKIPPED,
+            sent_count=0,
+            reason="rate limited",
+        )
 
     send_case_update_email(
         user, zaak, template_name, api_group=api_group, status=status
@@ -592,6 +668,7 @@ def _handle_status_update(
     note.mark_sent()
 
     _log_helper.log_notification_email_sent(notification, user, status.url, zaak.url)
+    return NotificationResult(status=NotificationStatus.DISPATCHED_SENT, sent_count=1)
 
 
 # - - - - -

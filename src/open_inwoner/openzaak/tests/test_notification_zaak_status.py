@@ -14,6 +14,8 @@ from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig, UserCaseStatusNotification
 from open_inwoner.openzaak.notifications import (
+    NotificationResult,
+    NotificationStatus,
     _handle_status_update,
     handle_zaken_notification,
 )
@@ -47,6 +49,11 @@ class StatusNotificationHandlerTestCase(
         """
         Happy flow (with multiple ZGW backends) for notifications about zaak status updates
         """
+        # Configure mock to return NotificationResult
+        mock_handle.return_value = NotificationResult(
+            status=NotificationStatus.DISPATCHED_SENT, sent_count=1
+        )
+
         data = MockAPIData().install_mocks(m)
         data_alt = MockAPIDataAlt().install_mocks(m)
 
@@ -178,37 +185,48 @@ class StatusNotificationHandlerTestCase(
 
     def test_status_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
         notification = NotificationFactory(kanaal="not_zaken")
-        with self.assertRaisesRegex(
-            Exception, r"^handler expects kanaal 'zaken' but received 'not_zaken'"
-        ):
-            handle_zaken_notification(notification)
+        result = handle_zaken_notification(notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="handler expects kanaal 'zaken' but received 'not_zaken'",
+            ),
+        )
         mock_handle.assert_not_called()
 
     def test_status_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
         notification = NotificationFactory(resource="not_status")
 
-        handle_zaken_notification(notification)
+        result = handle_zaken_notification(notification)
 
-        mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="resource is not 'status' or 'zaakinformatieobject' but 'not_status'",
+            ),
         )
+        mock_handle.assert_not_called()
 
     def test_status_bails_when_no_roles_found_for_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["case_roles"])
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
-        mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored status notification: cannot retrieve rollen for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="cannot retrieve rollen for zaak",
+            ),
         )
+        mock_handle.assert_not_called()
 
     def test_status_bails_when_no_emailable_users_are_found_for_roles(
         self, m, mock_handle: Mock
@@ -217,21 +235,32 @@ class StatusNotificationHandlerTestCase(
         data.user_initiator.delete()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
-        mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored status notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="no users with bsn/nnp_id as (mede)initiators",
+            ),
         )
+        mock_handle.assert_not_called()
 
     def test_status_bails_when_cannot_fetch_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak"])
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="cannot retrieve zaak",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: cannot retrieve zaak https://",
@@ -243,8 +272,16 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_type"])
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"cannot retrieve zaaktype {data.zaak['zaaktype']}",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: cannot retrieve zaaktype https://",
@@ -259,8 +296,16 @@ class StatusNotificationHandlerTestCase(
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="zaak not visible after applying visibility filter",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: zaak not visible after applying website visibility filter for zaak https://",
@@ -275,8 +320,16 @@ class StatusNotificationHandlerTestCase(
         data.zaak_type["indicatieInternOfExtern"] = "intern"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="zaak not visible after applying visibility filter",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: zaak not visible after applying website visibility filter for zaak https://",
@@ -292,8 +345,16 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["status_history"])
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="cannot retrieve status_history",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: cannot retrieve status_history for zaak https://",
@@ -308,8 +369,16 @@ class StatusNotificationHandlerTestCase(
         data.status_history = [data.status_initial]
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="skip initial status notification",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             "ignored status notification: skip initial status notification for zaak https://",
@@ -321,8 +390,16 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["status_type_final"])
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"cannot retrieve status_type {data.status_type_final['url']}",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: cannot retrieve status_type {data.status_type_final['url']} for zaak https://",
@@ -337,8 +414,16 @@ class StatusNotificationHandlerTestCase(
         data.status_type_final["informeren"] = False
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="status_type.informeren is false",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: status_type.informeren is false for status {data.status_final['url']} and zaak https://",
@@ -356,8 +441,16 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}'",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
@@ -375,8 +468,16 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}'",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
@@ -387,6 +488,11 @@ class StatusNotificationHandlerTestCase(
     def test_status_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
     ):
+        # Configure mock to return NotificationResult
+        mock_handle.return_value = NotificationResult(
+            status=NotificationStatus.DISPATCHED_SENT, sent_count=1
+        )
+
         oz_config = OpenZaakConfig.get_solo()
         oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
@@ -452,8 +558,16 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason="'notify_status_change' is False for the status type configuration",
+            ),
+        )
         mock_handle.assert_not_called()
 
         self.assertTimelineLog(
@@ -478,8 +592,16 @@ class StatusNotificationHandlerTestCase(
             notify_status_changes=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"zaaktype configuration '{data.zaak_type['identificatie']}' found but 'notify_status_changes' is False",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: zaaktype configuration '{data.zaak_type['identificatie']}' found but 'notify_status_changes' is False for zaak https://",
@@ -503,8 +625,16 @@ class StatusNotificationHandlerTestCase(
             notify_status_changes=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DROPPED,
+                sent_count=0,
+                reason=f"'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}'",
+            ),
+        )
         mock_handle.assert_not_called()
         self.assertTimelineLog(
             f"ignored status notification: 'skip_notification_statustype_informeren' is True but cannot retrieve zaaktype configuration '{data.zaak_type['identificatie']}' for zaak https://",
@@ -536,13 +666,26 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=True,
         )
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DISPATCHED_SKIPPED,
+                sent_count=0,
+                reason="all 1 user(s) skipped: notifications disabled or no contact email",
+            ),
+        )
         mock_handle.assert_not_called()
 
     def test_action_required_notifications_cannot_be_disabled(
         self, m, mock_handle: Mock
     ):
+        # Configure mock to return NotificationResult
+        mock_handle.return_value = NotificationResult(
+            status=NotificationStatus.DISPATCHED_SENT, sent_count=1
+        )
+
         oz_config = OpenZaakConfig.get_solo()
         oz_config.skip_notification_statustype_informeren = True
         oz_config.save()
@@ -595,8 +738,16 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=True,
         )
 
-        handle_zaken_notification(data.status_notification)
+        result = handle_zaken_notification(data.status_notification)
 
+        self.assertEqual(
+            result,
+            NotificationResult(
+                status=NotificationStatus.DISPATCHED_SKIPPED,
+                sent_count=0,
+                reason="all 1 user(s) skipped: notifications disabled or no contact email",
+            ),
+        )
         mock_handle.assert_not_called()
 
 

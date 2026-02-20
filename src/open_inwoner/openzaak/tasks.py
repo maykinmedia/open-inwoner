@@ -29,4 +29,9 @@ def import_zgw_data():
 def process_zaken_notification(notification_data: dict):
     logger.info("Started process_zaken_notification() task")
     notification = factory(Notification, notification_data)
-    handle_zaken_notification(notification)
+    result = handle_zaken_notification(notification)
+
+    result_str = f"status={result.status.value}, sent_count={result.sent_count}, reason={result.reason}"
+    logger.info("Finished process_zaken_notification() task", result=result_str)
+
+    return result_str
