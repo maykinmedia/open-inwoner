@@ -10,7 +10,8 @@ Deployment aandachtspunten
 
 Nieuwe features
 ---------------
-
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
+  web-component, zodat deze hergebruikt kan worden.
 * ...
 
 Bugfixes
