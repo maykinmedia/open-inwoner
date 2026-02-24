@@ -44,7 +44,7 @@ from openklant_client.types.resources.partij import (
     PartijListParams,
 )
 from openklant_client.types.resources.partij_identificator import PartijIdentificator
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
 from requests.exceptions import RequestException
 from typing_extensions import TypedDict
 from zgw_consumers.api_models.base import factory
@@ -897,7 +897,6 @@ class OpenKlant2Answer:
         )
 
 
-@dataclass(frozen=True)
 class OpenKlant2Question(BaseModel):
     url: str
     question: str
@@ -908,13 +907,35 @@ class OpenKlant2Question(BaseModel):
     nummer: str
     plaatsgevonden_op: datetime.datetime
 
-    answer: OpenKlant2Answer | None = None
+    # List of answers, sorted by datetime (newest first)
+    answers: list[OpenKlant2Answer] = []
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
+
+    @field_validator("answers")
+    @classmethod
+    def sort_answers_by_datetime(
+        cls, answers: list[OpenKlant2Answer]
+    ) -> list[OpenKlant2Answer]:
+        """
+        Ensure answers are always sorted by datetime (newest first), with nummer as
+        secondary sort key.
+
+        This validator guarantees that regardless of how an OpenKlant2Question object
+        is created, the answers list will be properly sorted.
+        """
+        if not answers:
+            return answers
+
+        return sorted(
+            answers,
+            key=lambda a: (a.plaatsgevonden_op, a.nummer),
+            reverse=True,
+        )
 
     @classmethod
-    def from_klantcontact_and_answer(
-        cls, klantcontact: KlantContact, answer: OpenKlant2Answer | None = None
+    def from_klantcontact_and_answers(
+        cls, klantcontact: KlantContact, answers: list[OpenKlant2Answer] | None = None
     ) -> Self:
         if klantcontact["inhoud"] is None:
             raise ValueError("Klantcontact did not contain any content in `inhoud`")
@@ -929,9 +950,14 @@ class OpenKlant2Question(BaseModel):
             plaatsgevonden_op=datetime.datetime.fromisoformat(
                 klantcontact["plaatsgevondenOp"]
             ),
-            answer=answer,
+            answers=answers or [],
             url=klantcontact["url"],
         )
+
+    @property
+    def answer(self) -> OpenKlant2Answer | None:
+        """Return the newest/latest answer (first in the sorted list), or None if no answers."""
+        return self.answers[0] if self.answers else None
 
 
 class OpenKlant2Service(
@@ -1545,7 +1571,7 @@ class OpenKlant2Service(
         )
         self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
 
-        return OpenKlant2Question.from_klantcontact_and_answer(klantcontact)
+        return OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
 
     def create_question_with_betrokkene(
         self,
@@ -1578,7 +1604,7 @@ class OpenKlant2Service(
 
         self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
 
-        return OpenKlant2Question.from_klantcontact_and_answer(klantcontact)
+        return OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
 
     def create_question_for_zaak(
         self,
@@ -1708,9 +1734,31 @@ class OpenKlant2Service(
         return klantcontacten_for_initiator
 
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
-        answers_for_klantcontact_uuid = {}
+        """
+        Retrieve all questions for a partij (party/user) along with their answers.
+
+        Each question can have multiple answers, which are automatically sorted by
+        the OpenKlant2Question field validator in descending order (newest first).
+
+        Args:
+            partij_uuid: The UUID of the partij to retrieve questions for
+
+        Returns:
+            A list of OpenKlant2Question objects, each containing:
+            - The question details (klantcontact without wasKlantcontact reference)
+            - All answers (klantcontacten with wasKlantcontact reference to the question)
+            - Answers are automatically sorted newest-first by the field validator
+
+        Note:
+            Questions are distinguished from answers by checking the onderwerpobject's
+            wasKlantcontact field. If wasKlantcontact is null/empty, it's a question.
+            If wasKlantcontact references another klantcontact, it's an answer to that question.
+        """
+        # Map question UUID to list of answer UUIDs
+        answers_for_klantcontact_uuid: dict[str, list[str]] = {}
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
+
         for klantcontact in self.klantcontacten_for_partij(
             partij_uuid, kanaal=self.config.mijn_vragen_kanaal
         ):
@@ -1721,21 +1769,26 @@ class OpenKlant2Service(
             if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
                 # Determine if the klantcontact is an answer by checking `wasKlantcontact` in
                 # the related onderwerp_object; otherwise, treat it as question
-                #
-                # TODO: is it sufficient to pick the first onderwerp_object?
-                # TODO: our use of `onderwerp_object` to model the relation of a klantcontact
-                # to different kinds of objects like answers, zaken etc. needs to be
-                # revisited
-                answer_onderwerp_object = self.client.onderwerp_object.retrieve(
-                    onderwerp_objecten[0]["uuid"]
-                )
-                if not answer_onderwerp_object["wasKlantcontact"]:
-                    question_uuids.append(klantcontact["uuid"])
-                    continue
 
-                # Map the question to the answer
-                question_uuid = answer_onderwerp_object["wasKlantcontact"]["uuid"]
-                answers_for_klantcontact_uuid[question_uuid] = klantcontact["uuid"]
+                # Collect all answers for a question by checking all onderwerp_objecten
+                for oo_ref in onderwerp_objecten:
+                    answer_onderwerp_object = self.client.onderwerp_object.retrieve(
+                        oo_ref["uuid"]
+                    )
+                    if not answer_onderwerp_object["wasKlantcontact"]:
+                        # Treat as question
+                        question_uuids.append(klantcontact["uuid"])
+                        break
+                    else:
+                        # Treat as answer
+                        question_uuid = answer_onderwerp_object["wasKlantcontact"][
+                            "uuid"
+                        ]
+                        if question_uuid not in answers_for_klantcontact_uuid:
+                            answers_for_klantcontact_uuid[question_uuid] = []
+                        answers_for_klantcontact_uuid[question_uuid].append(
+                            klantcontact["uuid"]
+                        )
             else:
                 # No onderwerp object, so we treat this klantcontact as a question
                 question_uuids.append(klantcontact["uuid"])
@@ -1743,18 +1796,16 @@ class OpenKlant2Service(
         question_objs: list[OpenKlant2Question] = []
         for question_uuid in question_uuids:
             question = klantcontact_uuid_to_klantcontact_object[question_uuid]
-            try:
-                answer_uuid = answers_for_klantcontact_uuid[question_uuid]
-                answer = klantcontact_uuid_to_klantcontact_object[answer_uuid]
-            except KeyError:
-                answer = None
 
-            answer_obj = None
-            if answer:
-                answer_obj = OpenKlant2Answer.from_klantcontact(answer)
+            # Get all answers for this question
+            answer_uuids = answers_for_klantcontact_uuid.get(question_uuid, [])
+            answer_objs = []
+            for answer_uuid in answer_uuids:
+                answer = klantcontact_uuid_to_klantcontact_object[answer_uuid]
+                answer_objs.append(OpenKlant2Answer.from_klantcontact(answer))
 
             question_objs.append(
-                OpenKlant2Question.from_klantcontact_and_answer(question, answer_obj)
+                OpenKlant2Question.from_klantcontact_and_answers(question, answer_objs)
             )
 
         question_objs.sort(key=lambda o: o.plaatsgevonden_op)
@@ -1947,7 +1998,7 @@ class OpenKlant2Service(
         )
 
         questions = [
-            OpenKlant2Question.from_klantcontact_and_answer(klantcontact, None)
+            OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
             for klantcontact in klantcontacten_for_initiator
         ]
         return self._build_question_dtos(questions_ok2=questions, user=user)
