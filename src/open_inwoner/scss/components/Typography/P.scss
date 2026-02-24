@@ -1,4 +1,6 @@
 @use '@utrecht/paragraph-css/dist/index.css';
+// When shadow DOM is on, we need to import these styles for paragraphs that are not a web component:
+@use '@nl-design-system-candidate/paragraph-css/paragraph.scss';
 
 .utrecht-paragraph {
   // Takes style values from NLDS community
@@ -17,17 +19,11 @@
     }
 
     &-compact {
-      margin-top: var(--oip-utrecht-paragraph-compact-margin-top);
-      margin-bottom: var(--oip-utrecht-paragraph-compact-margin-bottom);
+      margin-block-start: var(
+        --oip-utrecht-paragraph-compact-margin-block-start
+      );
+      margin-block-end: var(--oip-utrecht-paragraph-compact-margin-block-end);
     }
-
-    &:empty {
-      margin: 0 !important;
-    }
-  }
-
-  &:empty {
-    margin: 0 !important;
   }
 }
 
@@ -71,4 +67,12 @@ body [class^='utrecht-heading'] + .utrecht-paragraph,
       text-decoration: none;
     }
   }
+}
+
+// Context styles for elements that directly follow the web component paragraph
+
+// Home page plug-ins
+nl-paragraph + .card-container,
+nl-paragraph + .map {
+  margin-block-start: var(--spacing-large);
 }

@@ -10,7 +10,8 @@ Deployment aandachtspunten
 
 Nieuwe features
 ---------------
-
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
+  web-component, zodat deze hergebruikt kan worden.
 * [:gh:`2211`]: Elasticsearch ondersteunt nu HTTP basic authenticatie via de
   omgevingsvariabelen ``ES_USERNAME`` en ``ES_PASSWORD``. Wanneer beide zijn ingesteld,
   wordt de verbinding met Elasticsearch beveiligd met een gebruikersnaam en wachtwoord.

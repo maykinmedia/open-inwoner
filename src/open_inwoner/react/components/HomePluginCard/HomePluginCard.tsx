@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import kebabCase from 'lodash/kebabCase';
 import { AnyComponent as AC } from 'preact';
+import { Paragraph } from '../Paragraph';
 import { MaterialIcon } from '../MaterialIcon';
 import './HomePluginCard.scss';
 import type { HomepageCardTypes } from './types';
@@ -25,7 +26,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
             id={!addressLineFirst ? id : undefined}
             class={clsx({
               ['utrecht-heading-2']: !addressLineFirst,
-              ['utrecht-paragraph']: addressLineFirst,
+              ['nl-paragraph']: addressLineFirst,
             })}
           >
             {addressLineFirst ? (
@@ -37,12 +38,9 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
               title
             )}
           </Heading>
-          <p
-            class={clsx('utrecht-paragraph', 'utrecht-paragraph-muted')}
-            id={addressLineFirst ? id : undefined}
-          >
+          <Paragraph id={addressLineFirst ? id : undefined}>
             {addressLineFirst ? title : description}
-          </p>
+          </Paragraph>
         </div>
 
         <MaterialIcon name="arrow_forward" />
