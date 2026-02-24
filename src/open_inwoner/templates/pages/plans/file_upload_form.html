@@ -8,9 +8,9 @@
     {# Name of the file is a hidden input #}
     {% file_input form.file multiple=False primary_text=_("Upload document") max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
     <div class="non-field-error" hidden>
-        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small utrecht-paragraph--oip-centered">
+        <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">
             {% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}
-        </p>
+        </nl-paragraph>
     </div>
 {% endrender_form %}
 </div>

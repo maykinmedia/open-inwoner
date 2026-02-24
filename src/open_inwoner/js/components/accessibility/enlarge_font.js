@@ -12,8 +12,8 @@ export class EnlargeFont {
     // Target specific sizes that need to be enlarged
     this.styles = {
       bodyFontSizeDefault: '--utrecht-document-font-size',
-      paragraphFontSizeDefault: '--utrecht-paragraph-font-size',
-      paragraphFontSizeSmall: '--utrecht-paragraph-small-font-size',
+      paragraphFontSizeDefault: '--nl-paragraph-font-size',
+      paragraphFontSizeSmall: '--oip-text-small-font-size',
       headingThreeFontSize: '--utrecht-heading-3-font-size',
       headingFourFontSize: '--utrecht-heading-4-font-size',
       // OIP specific card-heading

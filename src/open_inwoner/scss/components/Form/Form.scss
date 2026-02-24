@@ -98,11 +98,11 @@
     transform: translateY(-5px);
   }
 
-  &__control > .label .utrecht-paragraph:last-child {
+  &__control > .label nl-paragraph:last-child {
     font-size: var(--font-size-body-small);
   }
 
-  &__control > .label .utrecht-paragraph.utrecht-paragraph--oip-compact {
+  &__control > .label nl-paragraph {
     font-size: var(--font-size-body);
   }
 
@@ -161,6 +161,10 @@
     legend {
       opacity: 0;
       height: 0;
+    }
+
+    + .notifications {
+      margin-top: var(--spacing-large);
     }
   }
 

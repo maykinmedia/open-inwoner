@@ -43,10 +43,10 @@
                         </div>
                     {% endrender_form %}
                 {% else %}
-                    <p class="utrecht-paragraph plan__no-contacts">
+                    <nl-paragraph>
                         {% url 'profile:contact_create' as contact_create %}
                         {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
-                    </p>
+                    </nl-paragraph>
                 {% endif %}
 
             {% endrender_column %}

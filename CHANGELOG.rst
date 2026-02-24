@@ -39,14 +39,9 @@ Nieuwe features
 * [:gh:`2517`]: ``min-release-age=2`` toegevoegd aan ``.npmrc``, minimale npm-versie
   vastgelegd via ``engines`` in ``package.json`` en node bijgewerkt naar ``24.15`` (LTS).
 * [:gh:`2142`]: Verbeterde foutafhandeling voor Klanten API-services en clients.
-* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Alle utrecht paragrafen vervangen door 'nl' paragrafen
-  waardoor hun huisstijl overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
-* [:gh:`2203`, :gh:`2394`, :gh:`2429`, :oip-nlds:`41`, :oip-nlds:`42`]: Alle utrecht paragrafen
-  vervangen door 'nl' paragrafen, als web component, waardoor hun huisstijl overschrijfbaar wordt
-  met de nieuwe candidate NL design-tokens.
-* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
-  web-component, zodat deze hergebruikt kan worden.
-* ...
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42` :oip-nlds:`43`]: Alle 'utrecht' paragrafen
+  vervangen door 'nl' paragrafen, als herbruikbaar web component, waardoor hun huisstijl
+  overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
 
 Bugfixes
 --------

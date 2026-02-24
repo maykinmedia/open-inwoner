@@ -150,7 +150,9 @@ class ContactMomentViewsTestCase(
             [kcm.contactmoment], data.user
         )
 
-        status_item = response.pyquery.find(f"p:contains('{_('Status')}')").parent()
+        status_item = response.pyquery.find(
+            f".list-item__caption:contains('{_('Status')}')"
+        ).parent()
 
         self.assertIn(f"{_('Status')}\n{_('Onbekend')}", status_item.text())
         self.assertIn(f"{_('Status')}\n{_('Afgehandeld')}", status_item.text())
@@ -263,7 +265,9 @@ class ContactMomentViewsTestCase(
             [kcm.contactmoment], data.user
         )
 
-        status_item = response.pyquery.find(f"p:contains('{_('Status')}')").parent()
+        status_item = response.pyquery.find(
+            f".list-item__caption:contains('{_('Status')}')"
+        ).parent()
 
         self.assertIn(f"{_('Status')}\n{_('Onbekend')}", status_item.text())
         self.assertIn(f"{_('Status')}\n{_('Afgehandeld')}", status_item.text())

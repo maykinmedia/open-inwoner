@@ -69,9 +69,7 @@
     }
   }
 
-  .wysiwyg {
-    > .utrecht-paragraph {
-      margin-top: var(--spacing-large);
-    }
+  .wysiwyg > nl-paragraph {
+    margin-block-start: var(--spacing-large);
   }
 }

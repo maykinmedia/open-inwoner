@@ -42,6 +42,6 @@
   }
 }
 
-.utrecht-paragraph--oip-summary {
-  margin-bottom: var(--gutter-width) !important;
+nl-paragraph[purpose='lead'] {
+  margin-bottom: var(--gutter-width);
 }

@@ -204,10 +204,10 @@ export const SearchFiltering: Story = {
 //           Ga door →
 //         </button>
 //       </div>
-//       <p className="utrecht-paragraph">
+//       <nl-paragraph>
 //         💡 Note: The submit button becomes enabled after selecting a branch.
 //         When selection is cleared, the button becomes disabled.
-//       </p>
+//       </nl-paragraph>
 //     </form>
 //   ),
 //   parameters: {

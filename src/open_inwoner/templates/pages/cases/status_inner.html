@@ -25,11 +25,8 @@
             {% if zaak.internal_upload_enabled %}
                 <h2 class="utrecht-heading-2" id="documents-upload">{% trans "Documenten" %}</h2>
                 <h3 class="utrecht-heading-3 documents-upload__h3">{% trans "Voeg documenten toe" %}</h3>
-
-                <div class="document-upload-notification">
+                {#  Upload notification #}
                 {% notifications messages show_local_messages=True closable=False %}
-                </div>
-
 
                 {% if zaak.case_type_document_upload_description.html %}
                 <div class="card card--compact card--info">
