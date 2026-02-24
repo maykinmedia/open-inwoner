@@ -11,6 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
+import structlog
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.client import build_client as build_zgw_client
@@ -20,58 +21,120 @@ from .clients import OpenAfvalAPIClient
 from .exceptions import MijnAfvalException
 from .models import MijnAfvalConfig
 
-
-def _format_number(value: int | float) -> str:
-    """Format a number according to the current locale."""
-
-    decimal_places = 0 if isinstance(value, int) else 1
-    return number_format(value, decimal_pos=decimal_places, force_grouping=False)
+logger = structlog.stdlib.get_logger(__name__)
 
 
-def _normalize_afval_type(afval_type: str) -> str:
-    """
-    Normalize afval_type from API to match template expectations.
+class AfvalProfielView(
+    LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
+):
+    template_name = "pages/mijn_afval/afval-profiel.html"
 
-    API returns lowercase (e.g., "restafval", "gft")
-    Template expects capitalized (e.g., "Restafval", "GFT")
-    """
-    normalization_map = {
-        "restafval": "Restafval",
-        "gft": "GFT",
-    }
-    return normalization_map.get(afval_type.lower(), afval_type)
+    @cached_property
+    def crumbs(self):
+        return [
+            (
+                self.request.current_page.get_title(),
+                reverse("mijn_afval:afval-profiel"),
+            ),
+        ]
 
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
 
-def _get_container_type_label(container_type: str) -> str:
-    """Get the localized label for a container type."""
+        if user.is_authenticated and not (user.is_staff or request.user.bsn):
+            return redirect(reverse("pages-root"))
 
-    if container_type == "GFT":
-        return _("Groente, Fruit en Tuin afval (GFT)")
-    elif container_type == "Restafval":
-        return _("Restafval")
-    else:
-        return container_type
+        return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-def _format_address(address: str) -> str:
-    """
-    Format address from API format to display format.
+        # check for apphook config in case it is manually deleted (defensive)
+        page_heading = self.config.page_heading if self.config else _("Mijn Afval")
+        page_description = self.config.page_description if self.config else ""
 
-    API format: "Dorpsstraat 12 [1234AB AMSTERDAM]"
-    Display format: "Dorpsstraat 12, 1234 AB, Amsterdam"
-    """
-    # Match pattern: street_part [postcodeCity]
-    match = re.match(r"^(.+?)\s*\[([0-9]{4})([A-Z]{2})\s+(.+?)\]$", address)
+        context.update(
+            {
+                "page_heading": page_heading,
+                "page_description": page_description,
+            }
+        )
+        if not self.request.user.bsn:
+            messages.info(
+                self.request, _("Gegevens alleen beschikbaar voor gebruikers met BSN.")
+            )
+            return context
 
-    if match:
-        street = match.group(1).strip()
-        postcode_digits = match.group(2)
-        postcode_letters = match.group(3)
-        city = match.group(4).strip().title()
-        return f"{street}, {postcode_digits} {postcode_letters}, {city}"
+        afval_config = MijnAfvalConfig.get_solo()
 
-    # Return original if pattern doesn't match
-    return address
+        if not (openafval_service := afval_config.openafval_service):
+            messages.error(self.request, _("This module is not yet configured"))
+            return context
+
+        api_client = build_zgw_client(
+            service=openafval_service,
+            client_factory=OpenAfvalAPIClient,
+        )
+
+        try:
+            # CALL 1: Fetch unfiltered data to extract available filter options
+            unfiltered_profiel = api_client.get_afval_profiel(bsn=self.request.user.bsn)
+            filter_options = _extract_filter_options(unfiltered_profiel)
+
+            # Extract query params from request
+            adres_raw_list = self.request.GET.getlist("adres")
+            afval_types = self.request.GET.getlist("afval-type")
+            period = self.request.GET.get("periode")
+
+            # Determine afval_type filter for API
+            # If both types selected (or none), don't filter by type (show all)
+            afval_type = afval_types[0] if len(afval_types) == 1 else None
+
+            # Convert period (year as string) to startdatum/einddatum
+            startdatum, einddatum = _convert_period_to_dates(period)
+
+            # Convert formatted addresses back to API format
+            # (Frontend sends formatted addresses, API expects raw format)
+            adressen = [
+                loc.adres
+                for loc in unfiltered_profiel.container_locaties
+                if _format_address(loc.adres) in adres_raw_list
+            ]
+
+            # CALL 2: Fetch filtered data (or reuse unfiltered if no filters applied)
+            if any([adressen, afval_type, startdatum, einddatum]):
+                filtered_profiel = api_client.get_afval_profiel(
+                    bsn=self.request.user.bsn,
+                    adressen=adressen,
+                    afval_type=afval_type,
+                    startdatum=startdatum,
+                    einddatum=einddatum,
+                )
+                afval_data = _format_afval_profiel(filtered_profiel)
+            else:
+                # No filters applied, reuse unfiltered data
+                afval_data = _format_afval_profiel(unfiltered_profiel)
+
+        except MijnAfvalException:
+            logger.warning("Error during fetch of Mijn Afval profiel", exc_info=True)
+            messages.error(
+                self.request,
+                _(
+                    "We kunnen uw afvalgegevens momenteel niet ophalen. "
+                    "Probeer het later opnieuw."
+                ),
+            )
+            afval_data = []
+            filter_options = {
+                "addresses": [],
+                "afval_types": [],
+                "earliest_year": None,
+                "latest_year": None,
+            }
+
+        context["afval_data"] = afval_data
+        context["filter_options"] = filter_options
+        return context
 
 
 class _LedigingData(TypedDict):
@@ -105,19 +168,84 @@ class _AfvalContainerData(TypedDict):
     """Formatted container data for template/JavaScript consumption."""
 
     identifier: str
-    type: str  # "GFT" or "Restafval"
-    totaal_gewicht: str  # Total weight (in kg) as string
+    type: str  # "gft" or "restafval"
+    totaal_gewicht: str
     ledigingen: list[_LedigingData]
     table_data: _TableData  # Table component data dict
 
 
-class _BAGObjectData(TypedDict):
-    """Formatted BAG object data for template/JavaScript consumption."""
+class _ContainerLocationData(TypedDict):
+    """Formatted container location data for template/JavaScript consumption."""
 
     object_id: str
     object_address: str
-    totaal_gewicht: str  # Total weight (in kg) as string
+    totaal_gewicht: str
     containers: list[_AfvalContainerData]
+
+
+def _format_number(value: int | float) -> str:
+    """Format a number according to the current locale."""
+
+    decimal_places = 0 if isinstance(value, int) else 1
+    return number_format(value, decimal_pos=decimal_places, force_grouping=False)
+
+
+def _get_container_type_label(container_type: str) -> str:
+    """Get the localized label for a container type."""
+
+    if container_type == "gft":
+        return _("Groente, Fruit en Tuin afval (GFT)")
+    elif container_type == "restafval":
+        return _("Restafval")
+    else:
+        return container_type
+
+
+def _format_address(address: str) -> str:
+    """
+    Format address from API format to display format.
+
+    API format: "Dorpsstraat 12 [1234AB AMSTERDAM]"
+    Display format: "Dorpsstraat 12, 1234 AB, Amsterdam"
+    """
+    # Remove newlines and whitespace
+    address = address.replace("\n", " ").replace("\r", " ")
+    address = re.sub(r"\s+", " ", address).strip()
+
+    # Match pattern: street_part [postcodeCity]
+    match = re.match(r"^(.+?)\s*\[([0-9]{4})([A-Z]{2})\s+(.+?)\]$", address)
+
+    if match:
+        street = match.group(1).strip()
+        postcode_digits = match.group(2)
+        postcode_letters = match.group(3)
+        city = match.group(4).strip().title()
+        return f"{street}, {postcode_digits} {postcode_letters}, {city}"
+
+    return address
+
+
+def _convert_period_to_dates(
+    period: str | None,
+) -> tuple[str | None, str | None]:
+    """
+    Convert a period (year as string) to startdatum and einddatum.
+
+    Args:
+        period: Year as string (e.g., "2024") or None
+
+    Returns:
+        Tuple of (startdatum, einddatum) in YYYY-MM-DD format, or (None, None)
+    """
+    if not period:
+        return None, None
+
+    try:
+        year = int(period)
+    except (ValueError, TypeError):
+        return None, None
+
+    return f"{year}-01-01", f"{year}-12-31"
 
 
 def _format_container_for_table(
@@ -178,16 +306,56 @@ def _format_container_for_table(
     }
 
 
-def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
+def _extract_filter_options(profiel: AfvalProfiel) -> dict:
     """
-    Convert AfvalProfiel (flat structure with ID references) to formatted nested
-    TypedDict data grouped by BAG object → containers → ledigingen.
+    Extract available filter options from AfvalProfiel.
 
     Args:
         profiel: AfvalProfiel from the OpenAfval API
 
     Returns:
-        List of formatted BAG object data for template consumption
+        dict with keys:
+            - addresses: list[str] - All unique addresses (formatted)
+            - afval_types: list[dict] - [{"value": "gft", "label": "..."}, ...]
+            - earliest_year: int | None - First year with data (None if no ledigingen)
+            - latest_year: int | None - Last year with data (None if no ledigingen)
+    """
+    # Extract unique addresses and format them
+    addresses = sorted({loc.adres for loc in profiel.container_locaties})
+    formatted_addresses = [_format_address(addr) for addr in addresses]
+
+    # Afval types (hardcoded as per requirements)
+    afval_types = [
+        {"value": "gft", "label": _("Groente, Fruit en Tuin afval (GFT)")},
+        {"value": "restafval", "label": _("Restafval")},
+    ]
+
+    # Calculate year range from ledigingen
+    earliest_year = None
+    latest_year = None
+    if profiel.ledigingen:
+        dates = [lediging.geleegd_op for lediging in profiel.ledigingen]
+        earliest_year = min(dates).year
+        latest_year = max(dates).year
+
+    return {
+        "addresses": formatted_addresses,
+        "afval_types": afval_types,
+        "earliest_year": earliest_year,
+        "latest_year": latest_year,
+    }
+
+
+def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]:
+    """
+    Convert AfvalProfiel (flat structure with ID references) to formatted nested
+    TypedDict data grouped by container location → containers → ledigingen.
+
+    Args:
+        profiel: AfvalProfiel from the OpenAfval API
+
+    Returns:
+        List of formatted container location data for template consumption
     """
     # Lookup dict
     containers_by_id = {container.id: container for container in profiel.containers}
@@ -195,19 +363,22 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
     # Group ledigingen by container ID
     ledigingen_by_container: dict[str, list] = defaultdict(list)
     for lediging in profiel.ledigingen:
+        if lediging.container not in containers_by_id:
+            continue
         ledigingen_by_container[lediging.container].append(lediging)
 
     # Build nested structure grouped by container location
-    result: list[_BAGObjectData] = []
+    result: list[_ContainerLocationData] = []
 
-    for bag_obj in profiel.container_locaties:
+    for container_location in profiel.container_locaties:
         containers_data: list[_AfvalContainerData] = []
 
         # Find all containers that have ledigingen for this container location
         for container_id, ledigingen in ledigingen_by_container.items():
             # Check if any lediging for this container references this container location
             if not any(
-                lediding.container_location == bag_obj.id for lediding in ledigingen
+                lediding.container_location == container_location.id
+                for lediding in ledigingen
             ):
                 continue
 
@@ -216,7 +387,7 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
             # Format ledigingen for this container
             ledigingen_data: list[_LedigingData] = []
             for lediging in ledigingen:
-                if lediging.container_location == bag_obj.id:
+                if lediging.container_location == container_location.id:
                     lediging_data: _LedigingData = {
                         "tijdstip_datum": lediging.geleegd_op.strftime("%d-%m-%Y"),
                         "tijdstip_tijd": lediging.geleegd_op.strftime("%H:%M"),
@@ -227,106 +398,32 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_BAGObjectData]:
 
             # Format container data
             totaal_gewicht = _format_number(container.totaal_gewicht)
-
-            # Normalize afval_type for template compatibility
-            normalized_type = _normalize_afval_type(container.afval_type)
+            afval_type = container.afval_type
 
             # Generate table data
             table_data: _TableData = _format_container_for_table(
                 ledigingen_data,
                 totaal_gewicht,
                 container.id,
-                _get_container_type_label(normalized_type),
+                _get_container_type_label(afval_type),
             )
 
             container_data: _AfvalContainerData = {
                 "identifier": container.id,
-                "type": normalized_type,
+                "type": afval_type,
                 "totaal_gewicht": totaal_gewicht,
                 "ledigingen": ledigingen_data,
                 "table_data": table_data,
             }
             containers_data.append(container_data)
 
-        # Build BAG object data
-        bag_obj_data: _BAGObjectData = {
-            "object_id": bag_obj.id,
-            "object_address": _format_address(bag_obj.adres),
-            "totaal_gewicht": _format_number(bag_obj.totaal_gewicht),
+        # Build container location data
+        location_data: _ContainerLocationData = {
+            "object_id": container_location.id,
+            "object_address": _format_address(container_location.adres),
+            "totaal_gewicht": _format_number(container_location.totaal_gewicht),
             "containers": containers_data,
         }
-        result.append(bag_obj_data)
+        result.append(location_data)
 
     return result
-
-
-class AfvalProfielView(
-    LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
-):
-    template_name = "pages/mijn_afval/afval-profiel.html"
-
-    @cached_property
-    def crumbs(self):
-        current_page = self.request.current_page
-        title = current_page.get_title() if current_page else _("Mijn Afval")
-        return [
-            (
-                title,
-                reverse("mijn_afval:afval-profiel"),
-            ),
-        ]
-
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
-
-        if user.is_authenticated and not (user.is_staff or request.user.bsn):
-            return redirect(reverse("pages-root"))
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # check for apphook config in case it is manually deleted (defensive)
-        page_heading = self.config.page_heading if self.config else _("Mijn Afval")
-        page_description = self.config.page_description if self.config else ""
-
-        context.update(
-            {
-                "page_heading": page_heading,
-                "page_description": page_description,
-            }
-        )
-        if not self.request.user.bsn:
-            messages.info(
-                self.request, _("Gegevens alleen beschikbaar voor gebruikers met BSN.")
-            )
-            return context
-
-        # fetch data from API
-        afval_config = MijnAfvalConfig.get_solo()
-
-        if not (openafval_service := afval_config.openafval_service):
-            messages.error(self.request, _("This module is not yet configured"))
-            return context
-
-        api_client = build_zgw_client(
-            service=openafval_service,
-            client_factory=OpenAfvalAPIClient,
-        )
-
-        try:
-            afval_profiel = api_client.get_afval_profiel(bsn=self.request.user.bsn)
-            afval_data = _format_afval_profiel(afval_profiel)
-        except MijnAfvalException:
-            messages.error(
-                self.request,
-                _(
-                    "We kunnen uw afvalgegevens momenteel niet ophalen. "
-                    "Probeer het later opnieuw."
-                ),
-            )
-            afval_data = []
-
-        context["afval_data"] = afval_data
-        return context

@@ -10,9 +10,42 @@ logger = structlog.stdlib.get_logger(__name__)
 
 
 class OpenAfvalAPIClient(APIClient):
-    def get_afval_profiel(self, bsn: str) -> AfvalProfiel:
+    def get_afval_profiel(
+        self,
+        bsn: str,
+        adressen: list[str] | None = None,
+        afval_type: str | None = None,
+        startdatum: str | None = None,
+        einddatum: str | None = None,
+    ) -> AfvalProfiel:
+        """
+        Fetch AfvalProfiel for a BSN with optional filters.
+
+        Args:
+            bsn: BSN of the customer
+            adressen: Filter container locations by address (multiple allowed)
+            afval_type: Filter containers by waste type (e.g., 'gft', 'restafval')
+            startdatum: Filter ledigingen from this date (YYYY-MM-DD)
+            einddatum: Filter ledigingen until this date (YYYY-MM-DD)
+
+        Returns:
+            AfvalProfiel model instance
+
+        Raises:
+            MijnAfvalException: On any API or validation error
+        """
+        params = {}
+        if adressen:
+            params["adres"] = adressen
+        if afval_type:
+            params["afval-type"] = afval_type
+        if startdatum:
+            params["startdatum"] = startdatum
+        if einddatum:
+            params["einddatum"] = einddatum
+
         try:
-            response = self.get(f"afval-profiel/{bsn}")
+            response = self.get(f"afval-profiel/{bsn}/", params=params)
             response.raise_for_status()
         except requests.exceptions.HTTPError as exc:
             status_code = exc.response.status_code
