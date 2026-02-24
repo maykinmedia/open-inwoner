@@ -25,7 +25,7 @@ def optional_paragraph(optional_text: str) -> str:
     if not optional_text:
         return ""
     return format_html(
-        '<p class="utrecht-paragraph">{optional_text}</p>'.format(
+        "<nl-paragraph>{optional_text}</nl-paragraph>".format(
             optional_text=linebreaksbr(optional_text)
         )
     )

@@ -34,6 +34,9 @@ Nieuwe features
   zodat duplicaten die door OpenZaak worden aangemaakt (vermeldingen met dezelfde
   'omschrijving' als bestaande vermeldingen) automatisch worden ingevuld met de
   configuratiewaarden van bestaande vermeldingen in OIP.
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
+  web-component, zodat deze hergebruikt kan worden.
+* ...
 
 Bugfixes
 --------
