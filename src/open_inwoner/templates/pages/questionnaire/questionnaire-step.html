@@ -23,7 +23,7 @@
             <legend class="utrecht-heading-4" id="question">{{ form.instance.question }}</legend>
 
             {% if form.instance.help_text %}
-                <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ form.instance.help_text }}</p>
+                <nl-paragraph>{{ form.instance.help_text }}</nl-paragraph>
             {% endif %}
 
             {% firstof form.instance.get_parent.get_absolute_url as secondary_href %}

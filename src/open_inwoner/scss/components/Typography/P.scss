@@ -1,57 +1,42 @@
-@use '@utrecht/paragraph-css/dist/index.css';
 // When shadow DOM is on, we need to import these styles for paragraphs that are not a web component:
 @use '@nl-design-system-candidate/paragraph-css/paragraph.scss';
 
-.utrecht-paragraph {
-  // Takes style values from NLDS community
-
-  &--oip {
-    // Takes style values from our own design-tokens NPM package
-    margin: 0;
-
-    // Extensions of the utrecht-paragraph component with OIP-specific styles.
-    &-muted {
-      color: var(--oip-utrecht-paragraph-muted-color);
-    }
-
-    &-centered {
-      text-align: var(--oip-utrecht-paragraph-centered-text-align);
-    }
-
-    &-compact {
-      margin-block-start: var(
-        --oip-utrecht-paragraph-compact-margin-block-start
-      );
-      margin-block-end: var(--oip-utrecht-paragraph-compact-margin-block-end);
-    }
-  }
+body [class^='utrecht-heading'] + nl-paragraph,
+body [class^='utrecht-heading'] + .nl-paragraph,
+.oip-header-group + nl-paragraph,
+.oip-header-group + .nl-paragraph {
+  margin-block-start: var(--spacing-small);
 }
 
-body [class^='utrecht-heading'] + .utrecht-paragraph,
-.oip-header-group + .utrecht-paragraph {
-  margin-top: var(--spacing-small);
+nl-paragraph + .utrecht-heading-1,
+nl-paragraph + .utrecht-heading-2,
+nl-paragraph + .utrecht-heading-3,
+.nl-paragraph + .utrecht-heading-1,
+.nl-paragraph + .utrecht-heading-2,
+.nl-paragraph + .utrecht-heading-3 {
+  margin-block-start: var(--gutter-width);
 }
 
-.utrecht-paragraph + .utrecht-heading-1,
-.utrecht-paragraph + .utrecht-heading-2,
-.utrecht-paragraph + .utrecht-heading-3 {
-  margin-top: var(--gutter-width);
+nl-paragraph + .utrecht-heading-4,
+.nl-paragraph + .utrecht-heading-4 {
+  margin-block-start: var(--row-height-small);
 }
 
-.utrecht-paragraph + .utrecht-heading-4 {
-  margin-top: var(--row-height-small);
+nl-paragraph + nl-paragraph,
+.nl-paragraph + nl-paragraph,
+nl-paragraph + .nl-paragraph {
+  margin-block-start: var(--font-line-height-body);
 }
 
-.utrecht-paragraph + .utrecht-paragraph {
-  margin-top: var(--font-line-height-body);
+.oip-tag-list + nl-paragraph,
+.oip-tag-list + .nl-paragraph,
+nl-paragraph + .form,
+.nl-paragraph + .form {
+  margin-block-start: var(--spacing-extra-large);
 }
 
-.oip-tag-list + .utrecht-paragraph,
-.utrecht-paragraph + .form {
-  margin-top: var(--spacing-extra-large);
-}
-
-.utrecht-paragraph .link {
+nl-paragraph .link,
+.nl-paragraph .link {
   .content {
     text-decoration: underline;
   }
@@ -69,7 +54,14 @@ body [class^='utrecht-heading'] + .utrecht-paragraph,
   }
 }
 
-/// Web components
+/// Web components only
+
+// All page headings
+.utrecht-heading-1 + nl-paragraph,
+.utrecht-heading-1 + div,
+.oip-header-group + nl-paragraph {
+  margin-block-start: var(--spacing-extra-large);
+}
 
 // Context styles for elements that directly follow the web component paragraph
 
@@ -79,14 +71,24 @@ nl-paragraph + .map {
   margin-block-start: var(--spacing-large);
 }
 
+// Search page
+nl-paragraph + .grid {
+  margin-block-start: var(--spacing-large);
+}
+
 /// HTML only
 
 // Product pages
+
+.oip-header-group + .nl-paragraph,
+.oip-header-group + .card-container {
+  margin-block-start: var(--spacing-extra-large);
+}
 
 .nl-paragraph + .card-container {
   margin-block-start: var(--spacing-large);
 }
 
 .nl-paragraph + .nl-paragraph {
-  margin-block-start: var(--font-line-height-body);
+  margin-block-start: var(--font-line-height-body-small);
 }

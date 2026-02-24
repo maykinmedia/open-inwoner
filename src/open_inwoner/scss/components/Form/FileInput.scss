@@ -91,7 +91,12 @@
     }
   }
 
-  > .utrecht-paragraph {
+  &__help-text {
+    text-align: center;
+  }
+
+  > .nl-paragraph {
+    //non-web-component generated from JS
     margin: calc(0.5 * var(--gutter-width)) 0;
     display: block;
     text-align: center;
@@ -109,7 +114,7 @@
     .file__file.error {
       border-color: var(--color-red-notification);
 
-      .utrecht-paragraph {
+      nl-paragraph {
         color: var(--color-gray-dark-900);
       }
 
@@ -134,9 +139,9 @@
       }
     }
 
-    .utrecht-paragraph--oip-small {
-      margin-top: var(--spacing-small);
-      margin-bottom: var(--spacing-small);
+    .nl-paragraph--oip-small {
+      margin-block-start: var(--spacing-small);
+      margin-block-end: var(--spacing-small);
 
       &.error {
         [class*='icons'] {

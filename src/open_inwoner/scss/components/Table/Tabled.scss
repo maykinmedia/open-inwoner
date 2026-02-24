@@ -57,7 +57,7 @@
       color: var(--color-gray-lighter);
       font-size: 16px;
       letter-spacing: 0;
-      line-height: var(--font-line-height-body-medium);
+      line-height: var(--font-line-height-body);
     }
   }
 
@@ -85,7 +85,7 @@
 
   .tabled__paragraph {
     margin: 0;
-    line-height: var(--font-line-height-body-medium);
+    line-height: var(--font-line-height-body);
   }
 
   .tabled__item {
@@ -136,7 +136,7 @@
     > .utrecht-heading-3 {
       margin-top: var(--spacing-giant);
     }
-    > .utrecht-paragraph strong {
+    > nl-paragraph strong {
       display: inline-block;
       margin-top: var(--spacing-giant);
     }

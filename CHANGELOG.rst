@@ -34,14 +34,9 @@ Nieuwe features
   zodat duplicaten die door OpenZaak worden aangemaakt (vermeldingen met dezelfde
   'omschrijving' als bestaande vermeldingen) automatisch worden ingevuld met de
   configuratiewaarden van bestaande vermeldingen in OIP.
-* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Alle utrecht paragrafen vervangen door 'nl' paragrafen
-  waardoor hun huisstijl overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
-* [:gh:`2203`, :gh:`2394`, :gh:`2429`, :oip-nlds:`41`, :oip-nlds:`42`]: Alle utrecht paragrafen
-  vervangen door 'nl' paragrafen, als web component, waardoor hun huisstijl overschrijfbaar wordt
-  met de nieuwe candidate NL design-tokens.
-* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
-  web-component, zodat deze hergebruikt kan worden.
-* ...
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42` :oip-nlds:`43`]: Alle 'utrecht' paragrafen
+  vervangen door 'nl' paragrafen, als herbruikbaar web component, waardoor hun huisstijl
+  overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
 
 Bugfixes
 --------

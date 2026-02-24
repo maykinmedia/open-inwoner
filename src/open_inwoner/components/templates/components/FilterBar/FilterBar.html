@@ -12,9 +12,9 @@
             </div>
         </div>
         <div class="filter-bar__mobile-button">
-            <p class="utrecht-paragraph filter-bar__heading">Filters</p>
+            <p class="filter-bar__heading">Filters</p>
             {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
-            <p class="utrecht-paragraph filter-bar__status-text">Status</p>
+            <p class="filter-bar__status-text">Status</p>
         </div>
         <form class="form filter-bar__form" method="{{ method }}"
               {% if no_action %}action="" {% else %}action="{% firstof form_action request.path %}" {% endif %}

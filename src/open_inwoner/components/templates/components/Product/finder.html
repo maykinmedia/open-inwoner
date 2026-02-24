@@ -8,7 +8,7 @@
         {% if not conditions_done %}
             <h3 class="utrecht-heading-3">{{ condition.question }}</h3>
             {% if condition.rule %}
-            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ condition.rule }}</p>
+            <nl-paragraph>{{ condition.rule }}</nl-paragraph>
             {% endif %}
 
             {% if show_previous %}
@@ -17,9 +17,9 @@
                 {% form id="product-finder" spaceless=True form_object=form method="POST" submit_text=primary_text %}
             {% endif %}
         {% else %}
-            <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-compact">
+            <nl-paragraph>
                 {% trans "Er zijn geen extra vragen meer. Bekijk de producten hiernaast." %}
-            </p>
+            </nl-paragraph>
             {% render_form id="product-finder" method="POST" form=form %}
                 {% csrf_token %}
                 <div class="form__actions">

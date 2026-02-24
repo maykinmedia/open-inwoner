@@ -13,8 +13,8 @@
   }
 }
 
-.utrecht-paragraph + .map {
-  margin-top: var(--spacing-large);
+nl-paragraph + .map {
+  margin-block-start: var(--spacing-large);
 }
 
 .leaflet-content-name {
@@ -32,7 +32,7 @@
   &.container--no-margin {
     margin-top: var(--spacing-small);
 
-    & > .utrecht-paragraph {
+    & > nl-paragraph {
       margin: 0 !important;
     }
 

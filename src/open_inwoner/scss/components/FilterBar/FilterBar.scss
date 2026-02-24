@@ -1,7 +1,7 @@
 .filter-bar {
   width: 100%;
   background-color: var(--color-gray-lightest);
-  margin-bottom: var(--spacing-extra-large);
+  margin-block-end: var(--spacing-extra-large);
   padding: 0;
   position: relative;
   display: inline-block;
@@ -165,13 +165,19 @@
       display: block;
       font-size: var(--font-size-body-larger);
       font-weight: bold;
-      margin-bottom: var(--row-height);
+      margin-block-start: 0;
+      margin-block-end: var(--row-height);
+      margin-inline-start: 0;
+      margin-inline-end: 0;
     }
 
     .filter-bar__status-text {
       color: var(--color-gray-dark);
       display: block;
-      margin-bottom: calc(-1 * (var(--row-height) - var(--spacing-large)));
+      margin-block-start: 0;
+      margin-block-end: calc(-1 * (var(--row-height) - var(--spacing-large)));
+      margin-inline-start: 0;
+      margin-inline-end: 0;
     }
   }
 
@@ -205,4 +211,10 @@
       }
     }
   }
+}
+
+// Context styles
+
+nl-paragraph + .filter-bar__backdrop {
+  margin-block-start: var(--spacing-extra-large);
 }

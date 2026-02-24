@@ -1,8 +1,12 @@
 @use '@nl-design-system-candidate/paragraph-css/paragraph.scss';
 
+:host {
+  // Custom elements are displayed inline by default, so need to be set as block for adjacent/context selectors to work
+  display: block;
+}
+
 .nl-paragraph {
   // custom values same as in legacy styles
-
   &--oip {
     // Takes style values from our own design-tokens NPM package
     margin-block-start: 0;
@@ -12,16 +16,14 @@
     &-muted {
       color: var(--oip-nl-paragraph-muted-color);
     }
+  }
+  // Remove Safari iOS phone-parsing from specific paragraphs
+  .skip-phone-parsing {
+    pointer-events: none;
+  }
 
-    &-centered {
-      text-align: var(--oip-utrecht-paragraph-centered-text-align);
-    }
-
-    &-compact {
-      margin-block-start: var(
-        --oip-utrecht-paragraph-compact-margin-block-start
-      );
-      margin-block-end: var(--oip-utrecht-paragraph-compact-margin-block-end);
-    }
+  &--lead {
+    // Override larger font-size until new design is agreed
+    font-size: var(--nl-paragraph-font-size);
   }
 }

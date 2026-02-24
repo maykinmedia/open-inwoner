@@ -466,7 +466,7 @@ class CasesPlaywrightTests(
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
+        expect(page.locator("h1#title")).to_contain_text(self.zaaktype["omschrijving"])
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
@@ -531,7 +531,9 @@ class CasesPlaywrightTests(
 
         notification = page.locator(".notification__content")
         expect(notification).to_be_visible()
-        expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
+        expect(
+            notification.locator("nl-paragraph", has_text=_("Vraag verstuurd!"))
+        ).to_be_visible()
 
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)

@@ -16,9 +16,11 @@
     {% endrender_card %}
 
     {% if field.help_text %}
-        <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--small utrecht-paragraph--oip-centered">
-            {{ field.help_text }}
-        </p>
+        <div class="file-input__help-text">
+            <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">
+                {{ field.help_text }}
+            </nl-paragraph>
+        </div>
     {% endif %}
 
     {% if field.errors %}

@@ -8,7 +8,7 @@
             <input type="radio" class="choice-list__radio" id="id_{{ name }}_{{ index }}" name="{{ name }}" value="{{ choice.0|unlocalize }}" {% if choice.0 in data or checked %}checked="checked"{% endif %}>
             <div class="choice-list__content">
                 {% if bold_label %}<h2 class="choice-list__heading">Kies {{ choice.1 }}</h2>{% endif %}
-                <p class="choice-list__p">{{ choice.1 }}</p>
+                <span class="choice-list__p">{{ choice.1 }}</span>
             </div>
             {% if icon_symbol %}
                 {% icon icon_symbol outlined=True extra_classes="icon--large" %}

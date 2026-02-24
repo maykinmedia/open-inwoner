@@ -46,13 +46,13 @@
                     {# Info on notifications that cannot be disabled #}
                     <div class="choice-list__information">
                         <p class="choice-list-multiple__heading-4">{% icon icon="check" outlined=True %} {% trans "Zaakmeldingen wanneer actie nodig is" %}</p>
-                        <p class="choice-list__p">{% trans "E-mailmeldingen wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</p>
+                        <nl-paragraph>{% trans "E-mailmeldingen wanneer er actie nodig is voor een zaak (kan niet uitgeschakeld worden)" %}</nl-paragraph>
                     </div>
                 </div>
 
                 {# Choice of zaken notification channel #}
                 {% if form.case_notification_channel %}
-                    <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze meldingen ontvangen?" %}</p>
+                    <nl-paragraph>{% trans "Hoe wilt u deze meldingen ontvangen?" %}</nl-paragraph>
                     {% with form.case_notification_channel as field %}
                         {% choice_list single=True cols=True %}
                             {% for choice in field.field.choices %}

@@ -67,7 +67,7 @@
     color: var(--notification-color-text);
   }
 
-  &:not(#{&}--contents) .utrecht-paragraph {
+  &:not(#{&}--contents) nl-paragraph {
     color: var(--notification-color-text);
   }
 

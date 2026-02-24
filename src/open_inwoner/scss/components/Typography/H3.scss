@@ -6,6 +6,6 @@
     var(--utrecht-heading-font-family), var(--utrecht-heading-3-font-family);
 }
 
-.utrecht-paragraph + .utrecht-heading-3 {
-  margin-top: var(--spacing-large);
+nl-paragraph + .utrecht-heading-3 {
+  margin-block-start: var(--spacing-large);
 }

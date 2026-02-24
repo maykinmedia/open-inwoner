@@ -26,4 +26,8 @@
   .form__grid-box {
     gap: 10px;
   }
+
+  nl-paragraph:last-child {
+    margin-block-start: var(--spacing-extra-large);
+  }
 }
