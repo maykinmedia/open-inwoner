@@ -1074,6 +1074,10 @@ OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 # ID token is required to enable OIDC logout
 OIDC_STORE_ID_TOKEN = True
 
+# Amount of elapsed time before redirecting the user back to the IdP for re-authentication
+OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = config(
+    "OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS", default=15 * 60
+)
 
 # In order to support zaaktypeconfig admin screens with many statusses/results
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
