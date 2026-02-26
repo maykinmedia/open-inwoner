@@ -62,8 +62,7 @@ Onderhoud
   test suite en configuratie (``karma.conf.js``) en configuratie bestanden (``stylelint.rc``,
   ``.babelrc`` en ``.jshintrc``).
 * [:gh:`2166`]:  ``weasyprint`` bijgewerkt naar versie ``0.68``.
-* [:gh:`2179`, :cve:`CVE-2025-13465`]: ``@utrecht/component-library-react`` bijgewerkt naar versie ``12.0.0``
-  en ``loadash-es`` override bijgewerkt naar versie ``4.17.23`` om :cve:`CVE-2025-13465` te mitigeren.
+* [:gh:`2179`, :cve:`CVE-2025-13465`]: ``@utrecht/component-library-react`` bijgewerkt naar versie ``13.0.0``.
 * [:gh:`2198`, :pr:`2197`]: Django bijgewerkt naar versie ``4.2.28``.
 * [:gh:`2206`, :pr:`2207`]: `setuptools` bijgewerkt naar versie ``<81``.
 * [:gh:`2178`, :cve:`CVE-2023-44270`]: ``autoprefixer`` bijgewerkt naar versie ``10.4.23``.
@@ -72,6 +71,7 @@ Onderhoud
 * [:gh:`2228`]: ``vite`` configuratie verbeterd.
 * [:gh:`2232`]: Bijgewerkte admin index-fixture.
 * [:gh:`2082`]: Elasticsearch-verbindingscache gewist in tests.
+* [:gh:`2251`, :cve:`CVE-2026-27606`]: ``rollup`` bijgewerkt naar versie ``^4.59.0``.
 
 2.0.3 (2026-02-20)
 ==================
