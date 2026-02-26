@@ -119,14 +119,10 @@ class TaakUrl(PydanticCamelCaseModel):
     uri: AnyUrl
 
 
-class ExternFormulierTaak(PydanticCamelCaseModel):
-    model_config = ConfigDict(extra=Extra.forbid)
+# Record data models (the actual task data from record.data)
+class ExternFormulierTaakRecord(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-    # object data
-    url: str
-    uuid: str
-
-    # record data
     titel: str
     status: TaakStatus
     soort: TaakSoort
@@ -140,14 +136,9 @@ class ExternFormulierTaak(PydanticCamelCaseModel):
     portaalformulier: Portaalformulier
 
 
-class UrlTaak(PydanticCamelCaseModel):
-    model_config = ConfigDict(extra=Extra.forbid)
+class UrlTaakRecord(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-    # object data
-    url: str
-    uuid: str
-
-    # record data
     titel: str
     status: TaakStatus
     soort: TaakSoort
@@ -158,4 +149,21 @@ class UrlTaak(PydanticCamelCaseModel):
     verloopdatum: datetime | None = None
     koppeling: KoppelingZaak | KoppelingProduct | None = None
     identificatie: Union[IdentificatieBSN, IdentificatieKVK]
-    task_url: TaakUrl
+    url: TaakUrl
+
+
+# Object wrapper models (Objects API envelope + record data)
+class ExternFormulierTaakObject(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    url: str
+    uuid: str
+    record: ExternFormulierTaakRecord
+
+
+class UrlTaakObject(PydanticCamelCaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    url: str
+    uuid: str
+    record: UrlTaakRecord
