@@ -872,12 +872,12 @@ class DigiDOIDCFlowTests(WebTest):
         session.save()
         callback_url = reverse("digid_oidc:callback")
 
-        # enter the login flow
+        # enter the login flow with an unmapped error code
         callback_response = self.client.get(
             callback_url,
             {
-                "error": "access_denied",
-                "error_description": "Some generic error",
+                "error": "server_error",
+                "error_description": "",
                 "state": "mock",
             },
         )
@@ -1765,12 +1765,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         session.save()
         callback_url = reverse("eherkenning_oidc:callback")
 
-        # enter the login flow
+        # enter the login flow with an unmapped error code
         callback_response = self.client.get(
             callback_url,
             {
-                "error": "access_denied",
-                "error_description": "Some generic error",
+                "error": "server_error",
+                "error_description": "",
                 "state": "mock",
             },
         )
@@ -3060,7 +3060,7 @@ class EIDASOIDCFlowTests(WebTest):
             callback_url,
             {
                 "error": "server_error",
-                "error_description": "Internal server error",
+                "error_description": "",
                 "state": "mock",
             },
         )

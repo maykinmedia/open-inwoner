@@ -95,9 +95,8 @@ class CallbackView(OIDCAuthenticationCallbackView):
         if not (error := request.GET.get("error")):
             return ""
 
+        # Look up the error using both error code and description.
         error_description = request.GET.get("error_description", "")
-
-        # Look up the combination of error code and description in the mapping.
         mapped_error = self.error_message_mapping.get((error, error_description))
         return mapped_error or str(self.generic_error_msg)
 
@@ -183,9 +182,14 @@ generic_oidc_logout = GenericOIDCLogoutView.as_view()
 class DigiDOIDCAuthenticationCallbackView(CallbackView):
     generic_error_msg = GENERIC_DIGID_ERROR_MSG
     error_message_mapping = {
-        ("access_denied", "The user cancelled"): (
-            "U heeft het inloggen met DigiD geannuleerd."
-        )
+        (
+            "access_denied",
+            "The user cancelled",
+        ): "U heeft het inloggen met DigiD geannuleerd.",
+        (
+            "login_required",
+            "",
+        ): "Uw DigiD-sessie is verlopen. Log alstublieft opnieuw in.",
     }
 
 
@@ -195,9 +199,14 @@ class EHerkenningOIDCAuthenticationCallbackView(
 ):
     generic_error_msg = GENERIC_EHERKENNING_ERROR_MSG
     error_message_mapping = {
-        ("access_denied", "The user cancelled"): (
-            "U heeft het inloggen met eHerkenning geannuleerd."
-        )
+        (
+            "access_denied",
+            "The user cancelled",
+        ): "U heeft het inloggen met eHerkenning geannuleerd.",
+        (
+            "login_required",
+            "",
+        ): "Uw eHerkenning-sessie is verlopen. Log alstublieft opnieuw in.",
     }
 
     def get_failure_url(self):
@@ -216,9 +225,10 @@ eherkenning_logout = OIDCLogoutView.as_view(config_class=OpenIDEHerkenningConfig
 class EIDASOIDCAuthenticationCallbackView(AdminCallbackView):
     failure_url = reverse_lazy("oidc-error")
     error_message_mapping = {
-        ("access_denied", "The user cancelled"): (
-            "U heeft het inloggen met eIDAS geannuleerd."
-        )
+        (
+            "access_denied",
+            "The user cancelled",
+        ): "U heeft het inloggen met eIDAS geannuleerd.",
     }
 
     def get(self, request):
@@ -240,6 +250,7 @@ class EIDASOIDCAuthenticationCallbackView(AdminCallbackView):
         if not (error := request.GET.get("error")):
             return ""
 
+        # Look up the error using both error code and description.
         error_description = request.GET.get("error_description", "")
         mapped_error = self.error_message_mapping.get((error, error_description))
         return mapped_error or str(GENERIC_EIDAS_ERROR_MSG)
