@@ -828,7 +828,6 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise PermissionDenied()
 
         # retrieve and stream content
-        content_stream = None
         content_stream = api_group.documenten_client.download_document(
             info_object.inhoud
         )
@@ -836,13 +835,59 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         if not content_stream:
             raise Http404
 
+        # Validate the actual content length matches the expected size. Note that this
+        # is best-effort: if somehow content-length is malformed or bestandsomvang is
+        # missing, we revert to just streaming the file and hoping for the best (the
+        # behavior prior to introducing this check).
+        actual_content_length = content_stream.headers.get("Content-Length")
+        try:
+            parsed_content_length = (
+                int(actual_content_length) if actual_content_length else None
+            )
+        except (ValueError, TypeError):
+            logger.warning(
+                "Document content-length header is malformed",
+                info_object_uuid=info_object_uuid,
+                actual_content_length=actual_content_length,
+            )
+            parsed_content_length = None
+
+        if (
+            parsed_content_length is not None
+            and info_object.bestandsomvang is not None
+            and parsed_content_length != info_object.bestandsomvang
+        ):
+            logger.warning(
+                "Document size mismatch",
+                info_object_uuid=info_object_uuid,
+                expected_size=info_object.bestandsomvang,
+                actual_size=parsed_content_length,
+            )
+            messages.error(
+                request,
+                _(
+                    "Het document kon niet worden gedownload vanwege een fout in de gegevens."
+                ),
+            )
+            return HttpResponseRedirect(
+                reverse(
+                    "cases:case_detail",
+                    kwargs={
+                        "api_group_id": self.kwargs["api_group_id"],
+                        "object_id": self.zaak.uuid,
+                    },
+                )
+            )
+
         self.log_case_document_downloaded(self.zaak, info_object.bestandsnaam)
 
         headers = {
             "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
             "Content-Type": info_object.formaat,
-            "Content-Length": info_object.bestandsomvang,
         }
+        if info_object.bestandsomvang is not None:
+            headers["Content-Length"] = str(info_object.bestandsomvang)
+
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
 
