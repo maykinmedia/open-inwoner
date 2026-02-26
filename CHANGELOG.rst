@@ -6,6 +6,11 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
+* [:gh:`2156`]: De omgevingsvariabele ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` is nu
+  beschikbaar om de sessie-vernieuwingsinterval voor OpenID Connect (DigiD/eHerkenning)
+  te configureren. De standaardwaarde is ``900`` seconden (15 minuten). Zie hoofdstuk 10
+  van de beheerhandleiding voor meer informatie.
+
 Nieuwe features
 ---------------
 
@@ -24,6 +29,10 @@ Nieuwe features
 * [:gh:`2119`, :gh:`2182`, :pr:`2151`]: API-client en configuratie voor 'Mijn Afval' aangemaakt.
 * [:gh:`2157`, :gh:`2205`]: Toon het nieuwste antwoord op OpenKlant-vragen.
 * [:gh:`2192`, :pr:`2195`, :pr:`2200`]: Filters voor 'Mijn Afval' geïmplementeerd.
+* [:gh:`2156`]: Omgevingsvariabele ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` toegevoegd om
+  de sessie-vernieuwingsinterval voor OpenID Connect (DigiD/eHerkenning) te
+  configureren. OIDC-foutmeldingen vereenvoudigd om alleen op foutcode te matchen.
+  Nederlandse foutmeldingen voor DigiD en eHerkenning verbeterd.
 
 Bugfixes
 --------
