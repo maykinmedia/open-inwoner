@@ -1,0 +1,24 @@
+// This file is an addition/overwrite on the legacy scss/**/Button.scss styling.
+.button {
+  &--icon-lg {
+    [class*='icons'],
+    [class*='Icons'] {
+      font-size: 24px;
+      max-width: 24px;
+    }
+  }
+
+  &--no-underline {
+    text-decoration: none !important;
+  }
+
+  // Overwrites scss/**/Button.scss disabled styling.
+  &:disabled,
+  &--disabled {
+    background-color: var(--color-gray) !important;
+    border-color: var(--color-gray) !important;
+    color: var(--color-white);
+    cursor: default;
+    pointer-events: none;
+  }
+}

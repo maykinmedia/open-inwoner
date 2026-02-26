@@ -85,8 +85,7 @@ export default defineConfig(({ mode }) => {
         // Bundle file name manager.
         output: {
           entryFileNames: '[name].js',
-          chunkFileNames: '[name]-[hash].bundle.js',
-          // Remove hash from asset file name.
+          chunkFileNames: '[name].bundle.js',
           assetFileNames: '[name].[ext]',
         },
       },
@@ -101,6 +100,11 @@ export default defineConfig(({ mode }) => {
         '@react': path.resolve(__dirname, 'src/open_inwoner/react'),
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./src/open_inwoner/react/test/test-setup.ts'],
     },
   };
 });

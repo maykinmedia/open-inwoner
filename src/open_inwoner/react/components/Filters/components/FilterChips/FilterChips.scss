@@ -1,0 +1,14 @@
+.oip-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--oip-filter-chips-gap);
+
+  &__clear-button {
+    font-weight: var(--oip-filter-chips-clear-button-font-weight);
+
+    @media (max-width: 767px) {
+      padding: 0;
+    }
+  }
+}

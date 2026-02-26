@@ -23,7 +23,7 @@ Nieuwe features
 * [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de 'Mijn Afval' app.
 * [:gh:`2119`, :gh:`2182`, :pr:`2151`]: API-client en configuratie voor 'Mijn Afval' aangemaakt.
 * [:gh:`2157`, :gh:`2205`]: Toon het nieuwste antwoord op OpenKlant-vragen.
-* [:gh:`2192`, :pr:`2195`]: Filters voor 'Mijn Afval' geïmplementeerd.
+* [:gh:`2192`, :pr:`2195`, :pr:`2200`]: Filters voor 'Mijn Afval' geïmplementeerd.
 
 Bugfixes
 --------

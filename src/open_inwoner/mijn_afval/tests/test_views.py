@@ -74,8 +74,7 @@ class ExtractFilterOptionsTest(TestCase):
         self.assertEqual(options["afval_types"][1]["value"], "restafval")
 
         # Verify year range calculated from ledigingen
-        self.assertEqual(options["earliest_year"], 2023)
-        self.assertEqual(options["latest_year"], 2025)
+        self.assertListEqual(options["period"], [2025, 2023])
 
     def test_extract_filter_options_no_ledigingen(self):
         profiel = AfvalProfiel(
@@ -93,9 +92,8 @@ class ExtractFilterOptionsTest(TestCase):
 
         options = _extract_filter_options(profiel)
 
-        # Verify year range is None when no ledigingen
-        self.assertIsNone(options["earliest_year"])
-        self.assertIsNone(options["latest_year"])
+        # Verify emptry period options when no ledigingen
+        self.assertListEqual(options["period"], [])
 
     def test_extract_filter_options_same_year(self):
         profiel = AfvalProfiel(
@@ -124,9 +122,8 @@ class ExtractFilterOptionsTest(TestCase):
 
         options = _extract_filter_options(profiel)
 
-        # Verify same year for both earliest and latest
-        self.assertEqual(options["earliest_year"], 2024)
-        self.assertEqual(options["latest_year"], 2024)
+        # Verify single period options
+        self.assertListEqual(options["period"], [2024])
 
 
 class ConvertPeriodToDatesTest(TestCase):
