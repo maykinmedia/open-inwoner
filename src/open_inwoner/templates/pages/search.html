@@ -3,7 +3,7 @@
 
 {% block main_inner %}
     {#  search term section #}
-    <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
+    <h1 class="nl-heading nl-heading--level-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
     <p class="search-results__title-small">{{ paginator.count }} {% trans "resultaten" %} </p>
 
     {#  facets and results section #}
@@ -27,8 +27,8 @@
                     {% for hit in page_obj %}
                     <a href="{{ hit.link }}" class="card card__description-card search-results__item">
                         <div class="card__body card__body--tabled">
-                            <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.title }}</h3>
-                            <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
+                            <h3 class="nl-heading nl-heading--level-3 search-results__item-title">{{ hit.title }}</h3>
+                            <p class="nl-paragraph search-results__item-intro">{{ hit.summary }}</p>
                             <span class="link link--icon link--primary">
                                 <span class="link__text">Bekijk resultaat</span>
                                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
@@ -45,7 +45,7 @@
                 {% render_grid %}
                     {% render_column start=1 span=7 %}
                         <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
-                            <h2 class="utrecht-heading-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
+                            <h2 class="nl-heading nl-heading--level-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
                             {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
                                 {% csrf_token %}
                                 {{ feedback_form.errors }}
@@ -73,7 +73,7 @@
                                 <div class="feedback__remark">
                                     <div class="form__control">
                                         <label class="label">
-                                            <span class="feedback__label-text utrecht-paragraph"></span>
+                                            <span class="feedback__label-text nl-paragraph"></span>
                                             {{ feedback_form.remark|addclass:"textarea" }}
                                         </label>
                                     </div>
@@ -94,13 +94,13 @@
                 <div class="search-results search-results--no-results">
                     <div class="search-results--no-results-column">{% icon icon="info" icon_position="before" extra_classes="icon--info" outlined=True %}</div>
                     <div class="search-results--no-results-column">
-                        <h2 class="utrecht-heading-2 search-results__title">
+                        <h2 class="nl-heading nl-heading--level-2 search-results__title">
                             {% trans "We konden geen zoekresultaten vinden" %}
                         </h2>
                         {% if configurable_text.search_page.search_zero_results_text.html %}
                             {{ configurable_text.search_page.search_zero_results_text.html|safe }}
                         {% else %}
-                            <p class="utrecht-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
+                            <nl-paragraph>{% trans "Probeer het nog eens met deze tips:" %}</nl-paragraph>
                             <ul class="ul">
                                 <li class="li">{% trans "Zorg ervoor dat alle woorden goed gespeld zijn." %}</li>
                                 <li class="li">{% trans "Probeer andere zoektermen." %}</li>

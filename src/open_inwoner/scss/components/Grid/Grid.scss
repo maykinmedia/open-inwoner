@@ -22,7 +22,7 @@
     .plugin {
       padding-top: var(--row-height);
 
-      .utrecht-heading-1 {
+      .nl-heading--level-1 {
         margin-bottom: var(--spacing-large);
       }
 
@@ -31,7 +31,7 @@
       }
 
       &.userfeed {
-        .utrecht-heading-2 {
+        .nl-heading--level-2 {
           margin-bottom: 0;
         }
       }

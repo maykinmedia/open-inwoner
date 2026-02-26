@@ -4,6 +4,6 @@
 {% block title %}{% with page_title=flatpage.title %}{{ block.super }}{% endwith %}{% endblock %}
 
 {% block content %}
-  <h1 class="utrecht-heading-1">{{ flatpage.title }}</h1>
-  <p class="utrecht-paragraph">{{ flatpage.content|prosemirror_content|safe }}</p>
+  <h1 class="nl-heading nl-heading--level-1">{{ flatpage.title }}</h1>
+    <nl-paragraph>{{ flatpage.content|prosemirror_content|safe }}</nl-paragraph>
 {% endblock content %}

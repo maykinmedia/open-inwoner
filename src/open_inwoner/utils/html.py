@@ -5,15 +5,15 @@ import markdown
 from bs4 import BeautifulSoup
 
 CLASS_ADDERS = [
-    ("h1", "utrecht-heading-1"),
-    ("h2", "utrecht-heading-2"),
+    ("h1", "nl-heading nl-heading--level-1"),
+    ("h2", "nl-heading--level-2"),
     ("h3", "utrecht-heading-3"),
     ("h4", "utrecht-heading-4"),
     ("h5", "utrecht-heading-5"),
     ("h6", "utrecht-heading-6"),
     ("img", "image"),
     ("li", "li"),
-    ("p", "utrecht-paragraph"),
+    ("p", "nl-paragraph"),
     ("a", "link link--secondary"),
     ("table", "table table--content"),
     ("thead", "table__heading"),

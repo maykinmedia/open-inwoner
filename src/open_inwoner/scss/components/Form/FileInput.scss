@@ -91,13 +91,13 @@
     }
   }
 
-  > .utrecht-paragraph {
+  > .nl-paragraph {
     margin: calc(0.5 * var(--gutter-width)) 0;
     display: block;
     text-align: center;
   }
 
-  .utrecht-heading-4 {
+  .nl-heading--level-4 {
     margin-top: var(--spacing-large);
     margin-bottom: calc(0.5 * var(--spacing-large));
   }
@@ -109,7 +109,7 @@
     .file__file.error {
       border-color: var(--color-red-notification);
 
-      .utrecht-paragraph {
+      .nl-paragraph {
         color: var(--color-gray-dark-900);
       }
 
@@ -134,7 +134,7 @@
       }
     }
 
-    .utrecht-paragraph--oip-small {
+    .nl-paragraph--oip-small {
       margin-top: var(--spacing-small);
       margin-bottom: var(--spacing-small);
 

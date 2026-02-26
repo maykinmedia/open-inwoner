@@ -1,13 +1,13 @@
 .file-list {
   margin-bottom: var(--row-height);
 
-  .utrecht-heading-1 {
+  .nl-heading--level-1 {
     &--bottom {
       margin-bottom: calc(var(--row-height) / 2) !important;
     }
   }
 
-  .utrecht-heading-4 {
+  .nl-heading--level-4 {
     margin-bottom: var(--spacing-large);
   }
 
@@ -34,11 +34,11 @@
 /// Contextual
 ///
 
-.file-list + .utrecht-heading-2,
-.file-list + .utrecht-paragraph {
+.file-list + .nl-heading--level-2,
+.file-list + .nl-paragraph {
   margin-top: var(--spacing-large);
 }
 
-.utrecht-heading-2 + .file-list {
+.nl-heading--level-2 + .file-list {
   margin-top: var(--spacing-extra-large);
 }

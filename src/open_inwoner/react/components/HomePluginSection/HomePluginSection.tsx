@@ -24,7 +24,9 @@ const HomePluginSection: AC<IHomePluginSectionProps> = ({
       <header class="plugin__header">
         {title && (
           <div class={showIndicator ? 'heading-2__indicator' : ''}>
-            <h2 class={`utrecht-heading-2 ${showIndicator ? 'indicator' : ''}`}>
+            <h2
+              class={`nl-heading--level-2 ${showIndicator ? 'indicator' : ''}`}
+            >
               {title}
             </h2>
             {showIndicator && (

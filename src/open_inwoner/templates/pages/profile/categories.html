@@ -2,12 +2,12 @@
 {% load i18n form_tags %}
 
 {% block content %}
-<h1 class="utrecht-heading-1" id="title">
+<h1 class="nl-heading nl-heading--level-1" id="title">
     {% trans "Mijn Interessegebieden" %}
 </h1>
-<p class="utrecht-paragraph">
+<nl-paragraph>
     {% trans "Selecteer hier welke onderwerpen u interesseren, om op maat gemaakte inhoud voorgeschoteld te krijgen en nog beter te kunnen zoeken en vinden" %}
-</p>
+</nl-paragraph>
 
 {% form form_object=form method="POST" id="change-categories" submit_text=_("Opslaan") secondary_href='profile:detail' secondary_text=_('Terug') secondary_icon='arrow_backward' secondary_icon_position="before" extra_classes="select-grid" %}
 {% endblock content %}

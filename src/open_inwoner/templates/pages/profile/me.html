@@ -12,7 +12,7 @@
 {% get_solo 'configurations.SiteConfiguration' as siteconfig %}
 
 <section class="tabled tabled--flexible">
-    <h1 class="utrecht-heading-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.display_name }}{% endif %}</h1>
+    <h1 class="nl-heading nl-heading--level-1" id="title">{% trans "Welkom" %}{% if not user.is_eherkenning_user %}, {{ user.display_name }}{% endif %}</h1>
     <p class="tabled__key">
     {% trans "Voor het laatst ingelogd op" %}: <span
     class="tabled__value">{% firstof user.previous_login|date:"j F Y" user.last_login|date:"j F Y" %} om {% firstof user.previous_login|date:"G:i" user.last_login|date:"G:i" %} uur</span>
@@ -24,7 +24,7 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__business-overview">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="business-overview">{% trans "Bedrijfsgegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% session_is_branch_restricted as is_branch_restricted %}
                     {% if not is_branch_restricted %}
@@ -77,7 +77,7 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__personal-info" id="personal-info">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2 " id="personal-overview">{% trans "Persoonlijke gegevens" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2 " id="personal-overview">{% trans "Persoonlijke gegevens" %}</h2>
                 <div class="tabled__item--mobile-big">
                     {% button href="profile:edit" text=_("Bewerk") aria_label=_("Bewerk persoonsgegevens") icon="edit" transparent=True icon_outlined=True %}
                     {% if user.is_bsn_user_with_brp and view.config.my_data %}
@@ -123,7 +123,7 @@
         <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__notifications" id="profile-notifications">
             <div class="tabled__section">
                 <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
+                    <h2 class="nl-heading nl-heading--level-2" id="notifications">{% trans "Voorkeuren voor meldingen" %}
                     </h2>
                     <div class="tabled__item--mobile-big">
                         {% button href="profile:notifications" text=_("Bewerk") aria_label=_("Bewerk meldingsvoorkeuren") icon="edit" transparent=True icon_outlined=True %}
@@ -149,10 +149,10 @@
     <section class="tabled tabled--flexible profile-section profile-section--bordered profile-section__newsletters" id="profile-newsletters">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
             </header>
         </div>
-            <p class="utrecht-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
+        <nl-paragraph>{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</nl-paragraph>
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
                 {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}
@@ -184,7 +184,7 @@
     {# Overview #}
     <section class="profile-section profile-section__overview">
         <header class="oip-header-group title">
-            <h2 class="utrecht-heading-2" id="overview">{% trans "Overzicht" %}</h2>
+            <h2 class="nl-heading nl-heading--level-2" id="overview">{% trans "Overzicht" %}</h2>
         </header>
         <div class="profile-cards card-container card-container--columns-3">
             {# Selected categories #}
@@ -354,13 +354,13 @@
     <section class="tabled profile-section profile-section--bordered profile-section__remove">
         <div class="tabled__section">
             <header class="oip-header-group title">
-                <h2 class="utrecht-heading-2" id="profile-remove">{% trans "Profiel verwijderen" %}</h2>
+                <h2 class="nl-heading nl-heading--level-2" id="profile-remove">{% trans "Profiel verwijderen" %}</h2>
             </header>
         </div>
             <div class="tabled">
-                <p class="utrecht-paragraph">
+                <nl-paragraph>
                     {% trans "Wilt u uw profiel verwijderen? Dan worden al uw persoonlijke voorkeuren verwijderd binnen deze MijnOmgeving. Uw persoonsgegevens en uw zaken worden niet verwijderd." %}
-                </p>
+                </nl-paragraph>
             </div>
             {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren binnen deze MijnOmgeving verwijderd. Uw persoonsgegevens en uw zaken worden niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
             {% csrf_token %}

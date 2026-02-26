@@ -1,13 +1,13 @@
 {% load i18n form_tags button_tags icon_tags %}
 
-<h2 class="utrecht-heading-2" id="contact">{% trans 'Stel een vraag' %}</h2>
-<p class="utrecht-paragraph">
+<h2 class="nl-heading nl-heading--level-2" id="contact">{% trans 'Stel een vraag' %}</h2>
+<nl-paragraph>
     {% blocktrans trimmed %}
     Door middel van dit formulier kunt u een vraag stellen over deze zaak.
     U dient ten minste uw telefoonnummer of uw e-mailadres in te vullen.
     Indien u uw e-mailadres invult krijgt u een bevestiging per mail.
     {% endblocktrans %}
-</p>
+</nl-paragraph>
 
 {% render_form form=contact_form method="POST" id="contact-form" hxpost=hxpost_contact_action hxtarget="#cases-contact-form" extra_classes="contact-form" %}
     {% csrf_token %}

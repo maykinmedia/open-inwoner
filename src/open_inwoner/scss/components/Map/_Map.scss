@@ -13,12 +13,12 @@
   }
 }
 
-.utrecht-paragraph + .map {
+.nl-paragraph + .map {
   margin-top: var(--spacing-large);
 }
 
 .leaflet-content-name {
-  & > .utrecht-heading-4 {
+  & > .nl-heading--level-4 {
     margin: 0;
   }
 }
@@ -32,7 +32,7 @@
   &.container--no-margin {
     margin-top: var(--spacing-small);
 
-    & > .utrecht-paragraph {
+    & > .nl-paragraph {
       margin: 0 !important;
     }
 

@@ -6,20 +6,20 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ paginator.count }})</h1>
+    <h1 class="nl-heading nl-heading--level-1" id="contactmomenten">{{ page_title }} ({{ paginator.count }})</h1>
 
     {% if contactmoment_contact_form_enabled %}
     {# title + scroll down button #}
     <section class="contactmomenten__scrolldown" data-testid="contactmomenten__contact_form_scrolldown">
         <div class="form-container">
             <div class="form-heading">
-                <h2 class="utrecht-heading-2">{% trans "Stel een vraag" %}</h2>
-                <p class="utrecht-paragraph">
+                <h2 class="nl-heading nl-heading--level-2">{% trans "Stel een vraag" %}</h2>
+                <nl-paragraph>
                 {% blocktrans trimmed %}
                     Heeft u een vraag? Dan kunt u deze hier stellen.
                     Een van onze medewerkers beantwoord uw vraag z.s.m.
                 {% endblocktrans %}
-                </p>
+                </nl-paragraph>
             </div>
             <div class="button-row">
                 {% button href="#question-form" text=_("Stel een vraag") title=_("Stel een vraag") primary=True icon="arrow_downward" icon_position="after" %}
@@ -33,7 +33,7 @@
         {% if paginator.count %}
             <h2 class="contactmomenten__title">{% trans "Eerder gestelde vragen" %}</h2>
         {% else %}
-            <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen vragen." %}</strong></p>
+            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen vragen." %}</strong></nl-paragraph>
         {% endif %}
 
         {% render_grid %}
@@ -77,13 +77,13 @@
     <section class="contactmomenten contactmomenten__contact-form" data-testid="contactmomenten__contact_form">
         <div class="form-container">
             <div class="form-heading">
-                <h2 class="utrecht-heading-2">{% trans "Stel een vraag" %}</h2>
-                <p class="utrecht-paragraph">
+                <h2 class="nl-heading nl-heading--level-2">{% trans "Stel een vraag" %}</h2>
+                <nl-paragraph>
                 {% blocktrans trimmed %}
                     Heeft u een vraag? Dan kunt u deze hier stellen.
                     Een van onze medewerkers beantwoord uw vraag z.s.m.
                 {% endblocktrans %}
-                </p>
+                </nl-paragraph>
             </div>
             <div>
                 <form action="{% url 'cases:contactmoment_list' %}" method="POST" id="question-form" class="form contact-form">

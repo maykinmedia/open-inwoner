@@ -62,12 +62,12 @@
     cursor: pointer;
   }
 
-  &:not(#{&}--contents) .utrecht-heading-2 {
+  &:not(#{&}--contents) .nl-heading--level-2 {
     line-height: var(--font-size-heading-2);
     color: var(--notification-color-text);
   }
 
-  &:not(#{&}--contents) .utrecht-paragraph {
+  &:not(#{&}--contents) .nl-paragraph {
     color: var(--notification-color-text);
   }
 

@@ -33,11 +33,11 @@
     line-height: var(--font-line-height-body);
     text-decoration: none;
 
-    .utrecht-heading-3.search-results__item-title {
+    .nl-heading--level-3.search-results__item-title {
       margin: 0 0 var(--spacing-large) 0;
     }
 
-    .utrecht-paragraph {
+    .nl-paragraph {
       margin: 0;
     }
   }
@@ -66,7 +66,7 @@
         padding-inline-start: 0;
       }
 
-      .utrecht-paragraph,
+      .nl-paragraph,
       .ul .li {
         color: var(--color-info-darker);
       }

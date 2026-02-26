@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<h1 class="utrecht-heading-1" id="title">{% trans "Mijn balie-afspraken" %}</h1>
+<h1 class="nl-heading nl-heading--level-1" id="title">{% trans "Mijn balie-afspraken" %}</h1>
 
 {% if appointments %}
     <p class="tabled__key">{% trans "Een overzicht van uw afspraken" %}</p>
@@ -43,7 +43,7 @@
     {% endrender_grid %}
     </div>
 {% else %}
-    <p class="utrecht-paragraph"><strong>{% trans "Geen afspraken beschikbaar" %}</strong></p>
+    <nl-paragraph><strong>{% trans "Geen afspraken beschikbaar" %}</strong></nl-paragraph>
 {% endif %}
 
 {% endblock %}

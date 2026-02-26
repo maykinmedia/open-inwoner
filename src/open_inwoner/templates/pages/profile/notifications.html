@@ -4,7 +4,7 @@
 {% block content %}
     {% render_grid %}
         {% render_column start=5 span=5 %}
-        <h1 class="utrecht-heading-1" id="title">
+        <h1 class="nl-heading nl-heading--level-1" id="title">
             {% trans "Meldingsvoorkeuren" %}
         </h1>
 
@@ -14,8 +14,8 @@
             {# Start of multiple checkbox fields #}
             <ul class="choice-list choice-list-multiple">
 
-            <h3 class="utrecht-heading-3">{% trans "Ontvang berichten over" %}</h3>
-                <p class="utrecht-paragraph">{% trans "Kies voor welk onderwerp u meldingen wilt ontvangen" %}</p>
+            <h3 class="nl-heading nl-heading--level-3">{% trans "Ontvang berichten over" %}</h3>
+                <nl-paragraph>{% trans "Kies voor welk onderwerp u meldingen wilt ontvangen" %}</nl-paragraph>
 
                 {% if form.cases_notifications %}
                     <li class="choice-list-multiple__item">
@@ -52,7 +52,7 @@
 
                 {# Choice of zaken notification channel #}
                 {% if form.case_notification_channel %}
-                    <p class="utrecht-paragraph choice-list__p">{% trans "Hoe wilt u deze meldingen ontvangen?" %}</p>
+                    <p class="nl-paragraph choice-list__p">{% trans "Hoe wilt u deze meldingen ontvangen?" %}</p>
                     {% with form.case_notification_channel as field %}
                         {% choice_list single=True cols=True %}
                             {% for choice in field.field.choices %}

@@ -10,7 +10,7 @@
 {% block content %}
     {% render_grid %}
         {% render_column start=1 span=12 %}
-            <h1 class="utrecht-heading-1" id="title">{{ page_heading }}</h1>
+            <h1 class="nl-heading nl-heading--level-1" id="title">{{ page_heading }}</h1>
             {% if page_description %}
                 <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
             {% endif %}
@@ -35,7 +35,7 @@
                     </oip-accordion>
                 </article>
             {% empty %}
-                <p class="utrecht-paragraph">{% trans "Geen afvalgegevens beschikbaar." %}</p>
+                <nl-paragraph>{% trans "Geen afvalgegevens beschikbaar." %}</nl-paragraph>
             {% endfor %}
         {% endrender_column %}
     {% endrender_grid %}

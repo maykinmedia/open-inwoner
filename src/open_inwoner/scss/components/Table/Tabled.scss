@@ -40,7 +40,7 @@
     }
   }
 
-  &.tabled--flexible + .utrecht-heading-2 {
+  &.tabled--flexible + .nl-heading--level-2 {
     margin: var(--row-height) 0 0 0;
   }
 
@@ -133,10 +133,10 @@
   }
 
   &__inner {
-    > .utrecht-heading-3 {
+    > .nl-heading--level-3 {
       margin-top: var(--spacing-giant);
     }
-    > .utrecht-paragraph strong {
+    > .nl-paragraph strong {
       display: inline-block;
       margin-top: var(--spacing-giant);
     }
