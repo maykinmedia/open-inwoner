@@ -79,7 +79,7 @@ class TaakMockData:
             },
             "verloopdatum": "2025-09-20T18:25:43.524Z",
             "koppeling": None,
-            "task_url": {"uri": "http://www.url-task-example.nl"},
+            "url": {"uri": "http://www.url-task-example.nl"},
             "verwerker_taak_id": "18af0b6a-967b-4f81-bb8e-a44988e0c2f0",
         }
 

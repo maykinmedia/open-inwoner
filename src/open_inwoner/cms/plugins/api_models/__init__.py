@@ -1,9 +1,19 @@
-from .taak import ExternFormulierTaak, KoppelingProduct, KoppelingZaak, Object, UrlTaak
+from .taak import (
+    ExternFormulierTaakObject,
+    ExternFormulierTaakRecord,
+    KoppelingProduct,
+    KoppelingZaak,
+    Object,
+    UrlTaakObject,
+    UrlTaakRecord,
+)
 
 __all__ = [
     "Object",
-    "ExternFormulierTaak",
+    "ExternFormulierTaakObject",
+    "ExternFormulierTaakRecord",
     "KoppelingProduct",
     "KoppelingZaak",
-    "UrlTaak",
+    "UrlTaakObject",
+    "UrlTaakRecord",
 ]
