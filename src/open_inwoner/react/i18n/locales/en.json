@@ -4,6 +4,61 @@
     "description": "The default message of the chart.",
     "originalDefault": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
   },
+  "filter.adres_filter": {
+    "defaultMessage": "Address",
+    "description": "The label for the filter adres",
+    "originalDefault": "Adres"
+  },
+  "filter.chip.remove_aria_label": {
+    "defaultMessage": "Remove filter {groupLabel}: {label}",
+    "description": "Accessible label for the button that removes a selected filter chip",
+    "originalDefault": "Verwijder filter {groupLabel}: {label}"
+  },
+  "filter.chip.remove_title": {
+    "defaultMessage": "Remove filter {label}",
+    "description": "Tooltip for the button that removes a selected filter chip",
+    "originalDefault": "Verwijder filter {label}"
+  },
+  "filter.clear_all": {
+    "defaultMessage": "Clear filters",
+    "description": "The label of the 'clear all' button.",
+    "originalDefault": "Filters wissen"
+  },
+  "filter.container_type_filter": {
+    "defaultMessage": "Type container",
+    "description": "The label for the filter container type",
+    "originalDefault": "Type container"
+  },
+  "filter.heading": {
+    "defaultMessage": "Filter:",
+    "description": "The title of the filters",
+    "originalDefault": "Filter op:"
+  },
+  "filter.mobile_heading": {
+    "defaultMessage": "Filters",
+    "description": "The title of the mobile dialog filters",
+    "originalDefault": "Filters"
+  },
+  "filter.mobile_title": {
+    "defaultMessage": "Filters",
+    "description": "The title of the mobile dialog filters",
+    "originalDefault": "Filters"
+  },
+  "filter.period_filter": {
+    "defaultMessage": "Period",
+    "description": "The label for the filter period",
+    "originalDefault": "Periode"
+  },
+  "filter.period_filter_year_prefix": {
+    "defaultMessage": "Year",
+    "description": "The prefix for the options of type period",
+    "originalDefault": "Jaar"
+  },
+  "filter.show_results": {
+    "defaultMessage": "Show results",
+    "description": "Show results text",
+    "originalDefault": "Toon resultaten"
+  },
   "kvkbranchselector.clear": {
     "defaultMessage": "Clear",
     "description": "Clear search button label",

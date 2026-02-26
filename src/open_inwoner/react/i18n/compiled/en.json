@@ -5,6 +5,88 @@
       "value": "The chart is not created. See tables below for the data."
     }
   ],
+  "filter.adres_filter": [
+    {
+      "type": 0,
+      "value": "Address"
+    }
+  ],
+  "filter.chip.remove_aria_label": [
+    {
+      "type": 0,
+      "value": "Remove filter "
+    },
+    {
+      "type": 1,
+      "value": "groupLabel"
+    },
+    {
+      "type": 0,
+      "value": ": "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "filter.chip.remove_title": [
+    {
+      "type": 0,
+      "value": "Remove filter "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "filter.clear_all": [
+    {
+      "type": 0,
+      "value": "Clear filters"
+    }
+  ],
+  "filter.container_type_filter": [
+    {
+      "type": 0,
+      "value": "Type container"
+    }
+  ],
+  "filter.heading": [
+    {
+      "type": 0,
+      "value": "Filter:"
+    }
+  ],
+  "filter.mobile_heading": [
+    {
+      "type": 0,
+      "value": "Filters"
+    }
+  ],
+  "filter.mobile_title": [
+    {
+      "type": 0,
+      "value": "Filters"
+    }
+  ],
+  "filter.period_filter": [
+    {
+      "type": 0,
+      "value": "Period"
+    }
+  ],
+  "filter.period_filter_year_prefix": [
+    {
+      "type": 0,
+      "value": "Year"
+    }
+  ],
+  "filter.show_results": [
+    {
+      "type": 0,
+      "value": "Show results"
+    }
+  ],
   "kvkbranchselector.clear": [
     {
       "type": 0,

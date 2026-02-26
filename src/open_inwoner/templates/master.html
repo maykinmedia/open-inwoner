@@ -36,6 +36,7 @@
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
 
         <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-frontend.css' %}" media="all" rel="stylesheet" />
 
         <style nonce="{{ request.csp_nonce }}">
             :root {
@@ -77,8 +78,7 @@
     </head>
 
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
-
-    {% get_solo 'configurations.SiteConfiguration' as config %}
+        {% get_solo 'configurations.SiteConfiguration' as config %}
 
         {% if cookiebanner_enabled %}
         {# render cookiebanner first #}

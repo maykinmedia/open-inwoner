@@ -5,6 +5,88 @@
       "value": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
     }
   ],
+  "filter.adres_filter": [
+    {
+      "type": 0,
+      "value": "Adres"
+    }
+  ],
+  "filter.chip.remove_aria_label": [
+    {
+      "type": 0,
+      "value": "Verwijder filter "
+    },
+    {
+      "type": 1,
+      "value": "groupLabel"
+    },
+    {
+      "type": 0,
+      "value": ": "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "filter.chip.remove_title": [
+    {
+      "type": 0,
+      "value": "Verwijder filter "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "filter.clear_all": [
+    {
+      "type": 0,
+      "value": "Filters wissen"
+    }
+  ],
+  "filter.container_type_filter": [
+    {
+      "type": 0,
+      "value": "Type container"
+    }
+  ],
+  "filter.heading": [
+    {
+      "type": 0,
+      "value": "Filter op:"
+    }
+  ],
+  "filter.mobile_heading": [
+    {
+      "type": 0,
+      "value": "Filters"
+    }
+  ],
+  "filter.mobile_title": [
+    {
+      "type": 0,
+      "value": "Filters"
+    }
+  ],
+  "filter.period_filter": [
+    {
+      "type": 0,
+      "value": "Periode"
+    }
+  ],
+  "filter.period_filter_year_prefix": [
+    {
+      "type": 0,
+      "value": "Jaar"
+    }
+  ],
+  "filter.show_results": [
+    {
+      "type": 0,
+      "value": "Toon resultaten"
+    }
+  ],
   "kvkbranchselector.clear": [
     {
       "type": 0,

@@ -128,8 +128,7 @@ class AfvalProfielView(
             filter_options = {
                 "addresses": [],
                 "afval_types": [],
-                "earliest_year": None,
-                "latest_year": None,
+                "periode": [],
             }
 
         context["afval_data"] = afval_data
@@ -331,18 +330,12 @@ def _extract_filter_options(profiel: AfvalProfiel) -> dict:
     ]
 
     # Calculate year range from ledigingen
-    earliest_year = None
-    latest_year = None
-    if profiel.ledigingen:
-        dates = [lediging.geleegd_op for lediging in profiel.ledigingen]
-        earliest_year = min(dates).year
-        latest_year = max(dates).year
+    dates = {lediging.geleegd_op.year for lediging in profiel.ledigingen}
 
     return {
         "addresses": formatted_addresses,
         "afval_types": afval_types,
-        "earliest_year": earliest_year,
-        "latest_year": latest_year,
+        "periode": list(dates),
     }
 
 
