@@ -23,7 +23,7 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
     "type-check": "tsc --noEmit",
-    "watch": "vite build --watch --mode development --debug"
+    "watch": "vite build --watch --mode development"
   },
   "repository": {
     "type": "git",
