@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import AnyUrl, BaseModel, ConfigDict, Extra, Field
+from pydantic import AnyUrl, BaseModel, ConfigDict, Field
 
 
 def to_camel(string: str) -> str:
@@ -18,7 +18,7 @@ class PydanticCamelCaseModel(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,  # Accept both field name and alias
         alias_generator=to_camel,
-        extra=Extra.ignore,
+        extra="ignore",
     )
 
 
@@ -55,11 +55,26 @@ TaakSoort = Literal[
     "externformulier",
     "vrij",
 ]
-TaakStatus = Literal["open", "afgerond", "verwerkt", "gesloten"]
+# Status for UrlTaak (Dimpact schema)
+TaakStatus = Literal[
+    "open",
+    "afgerond",
+    "verwerkt",
+    "gesloten",
+]
+
+# Status for ExternFormulierTaak (OIP Klanttaak schema)
+ExternFormulierTaakStatus = Literal[
+    "open",
+    "uitgevoerd",
+    "afgebroken",
+    "verwerkt",
+    "ingetrokken",
+]
 
 
 class Url(PydanticCamelCaseModel):
-    model_config = ConfigDict(extra=Extra.forbid)
+    model_config = ConfigDict(extra="forbid")
 
     uri: AnyUrl
 
@@ -91,17 +106,17 @@ class IdentificatieKVK(PydanticCamelCaseModel):
 
 
 class KoppelingZaak(PydanticCamelCaseModel):
-    model_config = ConfigDict(extra=Extra.forbid)
+    model_config = ConfigDict(extra="forbid")
 
     registratie: Literal["zaak"]
-    value: Optional[UUID] = None
+    value: UUID
 
 
 class KoppelingProduct(PydanticCamelCaseModel):
-    model_config = ConfigDict(extra=Extra.forbid)
+    model_config = ConfigDict(extra="forbid")
 
     registratie: Literal["product"]
-    value: Optional[UUID] = None
+    value: UUID
 
 
 class Formulier(PydanticCamelCaseModel):
@@ -110,9 +125,9 @@ class Formulier(PydanticCamelCaseModel):
 
 
 class Portaalformulier(PydanticCamelCaseModel):
-    data: object
     formulier: Formulier
-    verzonden_data: object
+    data: object | None = None
+    verzonden_data: object | None = None
 
 
 class TaakUrl(PydanticCamelCaseModel):
@@ -124,16 +139,17 @@ class ExternFormulierTaakRecord(PydanticCamelCaseModel):
     model_config = ConfigDict(extra="forbid")
 
     titel: str
-    status: TaakStatus
+    status: ExternFormulierTaakStatus
     soort: TaakSoort
     verwerker_taak_id: UUID
     eigenaar: str
-    toelichting: str | None = None
-    doorlooptijd: str | None = None
-    verloopdatum: datetime | None = None
-    koppeling: KoppelingZaak | KoppelingProduct | None = None
     betrokkene: Betrokkene
     portaalformulier: Portaalformulier
+    toelichting: str | None = None
+    doorlooptijd: str | None = Field(None, pattern=r"^P\d+D$")
+    verloopdatum: datetime | None = None
+    koppeling: KoppelingZaak | KoppelingProduct | None = None
+    deadline_verlengbaar: bool | None = None
 
 
 class UrlTaakRecord(PydanticCamelCaseModel):
