@@ -160,12 +160,10 @@ class TasksPlugin(CMSPluginBase):
 
         factory_map: dict[str, Type[ExternFormulierTaakObject | UrlTaakObject]] = {}
         if instance.object_type_generieke_dienstverlening:
-            factory_map[instance.object_type_generieke_dienstverlening] = (
-                ExternFormulierTaakObject
-            )
-        # legacy type `UrlTaakObject`
+            factory_map[instance.object_type_generieke_dienstverlening] = UrlTaakObject
+        # legacy type `ExternFormulierTaakObject`
         if instance.object_type_dimpact:
-            factory_map[instance.object_type_dimpact] = UrlTaakObject
+            factory_map[instance.object_type_dimpact] = ExternFormulierTaakObject
 
         for object_type_uuid, obj_factory in factory_map.items():
             for obj in service.get_objects(object_type_uuid=object_type_uuid):

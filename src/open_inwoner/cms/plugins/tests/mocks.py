@@ -1,4 +1,8 @@
+import json
+from pathlib import Path
 from urllib.parse import quote
+
+from jsonschema import validate
 
 from .factories import ObjectsAPIServiceConfigFactory
 
@@ -22,7 +26,7 @@ class TaakMockData:
                 "authorizee": {
                     "legalSubject": {
                         "identifier": "123456789",
-                        "identifierType": "digid",
+                        "identifierType": "bsn",
                     }
                 },
                 "levelOfAssurance": "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract",
@@ -36,7 +40,7 @@ class TaakMockData:
                     "soort": "url",
                     "value": "http://portaalformulier-url/formulier/startpagina",
                 },
-                "verzonden_data": {},
+                "verzonden_data": {"volledige_naam": "Jan de Vries"},
             },
             "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
         }
@@ -50,7 +54,7 @@ class TaakMockData:
                 "authorizee": {
                     "legalSubject": {
                         "identifier": "987654321",
-                        "identifierType": "digid",
+                        "identifierType": "bsn",
                     }
                 },
                 "levelOfAssurance": "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract",
@@ -64,7 +68,7 @@ class TaakMockData:
                     "soort": "url",
                     "value": "http://portaalformulier-url/formulier-2/startpagina",
                 },
-                "verzonden_data": {},
+                "verzonden_data": {"volledige_naam": "Thomas de Vries"},
             },
             "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
         }
@@ -78,15 +82,17 @@ class TaakMockData:
                 "value": "123456789",
             },
             "verloopdatum": "2025-09-20T18:25:43.524Z",
-            "koppeling": None,
             "url": {"uri": "http://www.url-task-example.nl"},
             "verwerker_taak_id": "18af0b6a-967b-4f81-bb8e-a44988e0c2f0",
         }
 
+        # Sanity check: validate all mock data against JSON schemas
+        self._validate_mock_data_against_schemas()
+
         self.mock_task_externformulier_1 = {
             "url": f"{OBJECTS_API_ROOT}/objects/f58d9f41-78de-4d59-89ef-c439c5c24510",
             "uuid": "f58d9f41-78de-4d59-89ef-c439c5c24510",
-            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIENSVERLENING_1}/",
+            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIMPACT}/",
             "record": {
                 "index": 1,
                 "typeVersion": 1,
@@ -118,7 +124,7 @@ class TaakMockData:
         self.mock_task_url = {
             "url": f"{OBJECTS_API_ROOT}/objects/4db3491d-6ae1-4674-ba82-622f963b51d8",
             "uuid": "4db3491d-6ae1-4674-ba82-622f963b51d8",
-            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIMPACT}/",
+            "type": f"{OBJECT_TYPE_API_ROOT}/objecttypes/{UUID_OBJECT_TYPE_DIENSVERLENING_1}/",
             "record": {
                 "index": 1,
                 "typeVersion": 1,
@@ -155,7 +161,7 @@ class TaakMockData:
                 "next": None,
                 "previous": None,
                 "results": [
-                    self.mock_task_url,
+                    self.mock_task_externformulier_1,
                 ],
             },
         )
@@ -168,7 +174,7 @@ class TaakMockData:
                 "next": None,
                 "previous": None,
                 "results": [
-                    self.mock_task_externformulier_1,
+                    self.mock_task_url,
                 ],
             },
         )
@@ -196,3 +202,37 @@ class TaakMockData:
         )
 
         return self
+
+    def _validate_mock_data_against_schemas(self):
+        """
+        Sanity check to ensure all mock task data validates against the JSON schemas.
+        """
+        # Load JSON schemas
+        externe_formulier_schema_path = (
+            Path(__file__).parent.parent / "api_models" / "externe_formulier_taak.json"
+        )
+        url_taak_schema_path = (
+            Path(__file__).parent.parent / "api_models" / "url_taak_schema.json"
+        )
+
+        with open(externe_formulier_schema_path) as f:
+            externe_formulier_schema = json.load(f)
+
+        with open(url_taak_schema_path) as f:
+            url_taak_schema = json.load(f)
+
+        # Validate external form tasks against externe_formulier_taak.json
+        validate(
+            instance=self.mock_task_data_externformulier_1,
+            schema=externe_formulier_schema,
+        )
+        validate(
+            instance=self.mock_task_data_externformulier_2,
+            schema=externe_formulier_schema,
+        )
+
+        # Validate URL task against url_taak_schema.json
+        validate(
+            instance=self.mock_task_data_url,
+            schema=url_taak_schema,
+        )

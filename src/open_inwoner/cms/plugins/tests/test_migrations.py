@@ -5,6 +5,170 @@ from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
 @tag("migrations")
+class SwapTasksObjectTypeFieldsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test the data migration that swaps object_type_dimpact and
+    object_type_generieke_dienstverlening field values.
+    """
+
+    migrate_from = "0012_remove_djangocms_text_ckeditor"
+    migrate_to = "0013_swap_tasks_object_type_fields"
+    app = "plugins"
+
+    def setUpBeforeMigration(self, apps):
+        """
+        Create TasksConfig instances with object type values before migration.
+        """
+        CMSPlugin = apps.get_model("cms", "CMSPlugin")
+        Placeholder = apps.get_model("cms", "Placeholder")
+
+        # Create placeholder for the plugins
+        self.placeholder = Placeholder.objects.create(slot="content")
+
+        # Scenario 1: Config with both fields set
+        self.config_both = CMSPlugin.objects.create(
+            placeholder=self.placeholder,
+            language="nl",
+            plugin_type="TasksPlugin",
+            position=0,
+            path="0001",
+            depth=1,
+            numchild=0,
+        )
+
+        # Scenario 2: Config with only dimpact set
+        self.config_dimpact_only = CMSPlugin.objects.create(
+            placeholder=self.placeholder,
+            language="nl",
+            plugin_type="TasksPlugin",
+            position=1,
+            path="0002",
+            depth=1,
+            numchild=0,
+        )
+
+        # Scenario 3: Config with only generieke_dienstverlening set
+        self.config_generieke_only = CMSPlugin.objects.create(
+            placeholder=self.placeholder,
+            language="nl",
+            plugin_type="TasksPlugin",
+            position=2,
+            path="0003",
+            depth=1,
+            numchild=0,
+        )
+
+        # Scenario 4: Config with neither field set
+        self.config_neither = CMSPlugin.objects.create(
+            placeholder=self.placeholder,
+            language="nl",
+            plugin_type="TasksPlugin",
+            position=3,
+            path="0004",
+            depth=1,
+            numchild=0,
+        )
+
+        # Insert TasksConfig data using raw SQL to avoid multi-table inheritance issues
+        with connection.cursor() as cursor:
+            test_data = [
+                (
+                    self.config_both.id,
+                    "Both Fields Set",
+                    "uuid-for-dimpact-before",
+                    "uuid-for-generieke-before",
+                ),
+                (
+                    self.config_dimpact_only.id,
+                    "Dimpact Only",
+                    "uuid-dimpact-only-before",
+                    None,
+                ),
+                (
+                    self.config_generieke_only.id,
+                    "Generieke Only",
+                    None,
+                    "uuid-generieke-only-before",
+                ),
+                (
+                    self.config_neither.id,
+                    "Neither Field Set",
+                    None,
+                    None,
+                ),
+            ]
+
+            for (
+                plugin_id,
+                title,
+                object_type_dimpact,
+                object_type_generieke,
+            ) in test_data:
+                cursor.execute(
+                    """
+                    INSERT INTO plugins_tasksconfig
+                    (cmsplugin_ptr_id, title, object_type_dimpact, object_type_generieke_dienstverlening)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (plugin_id, title, object_type_dimpact, object_type_generieke),
+                )
+
+    def test_swap_tasks_object_type_fields_migration(self):
+        """
+        Test that object type fields are correctly swapped for all scenarios.
+
+        This test validates:
+        - Both fields are swapped when both have values
+        - Dimpact value moves to generieke when only dimpact is set
+        - Generieke value moves to dimpact when only generieke is set
+        - Configs with no values remain unchanged
+        - No configs are deleted during migration
+        - Other fields like title are preserved
+        """
+        TasksConfig = self.apps.get_model("plugins", "TasksConfig")
+
+        # Verify all configs still exist
+        self.assertEqual(TasksConfig.objects.count(), 4)
+
+        # Scenario 1: Both fields swapped
+        config_both = TasksConfig.objects.get(cmsplugin_ptr_id=self.config_both.id)
+        self.assertEqual(config_both.object_type_dimpact, "uuid-for-generieke-before")
+        self.assertEqual(
+            config_both.object_type_generieke_dienstverlening, "uuid-for-dimpact-before"
+        )
+        self.assertEqual(config_both.title, "Both Fields Set")
+
+        # Scenario 2: Dimpact only - moved to generieke
+        config_dimpact = TasksConfig.objects.get(
+            cmsplugin_ptr_id=self.config_dimpact_only.id
+        )
+        self.assertIsNone(config_dimpact.object_type_dimpact)
+        self.assertEqual(
+            config_dimpact.object_type_generieke_dienstverlening,
+            "uuid-dimpact-only-before",
+        )
+        self.assertEqual(config_dimpact.title, "Dimpact Only")
+
+        # Scenario 3: Generieke only - moved to dimpact
+        config_generieke = TasksConfig.objects.get(
+            cmsplugin_ptr_id=self.config_generieke_only.id
+        )
+        self.assertEqual(
+            config_generieke.object_type_dimpact, "uuid-generieke-only-before"
+        )
+        self.assertIsNone(config_generieke.object_type_generieke_dienstverlening)
+        self.assertEqual(config_generieke.title, "Generieke Only")
+
+        # Scenario 4: Neither field - unchanged
+        config_neither = TasksConfig.objects.get(
+            cmsplugin_ptr_id=self.config_neither.id
+        )
+        self.assertIsNone(config_neither.object_type_dimpact)
+        self.assertIsNone(config_neither.object_type_generieke_dienstverlening)
+        self.assertEqual(config_neither.title, "Neither Field Set")
+
+
+@tag("migrations")
 class CKEditorToTextPluginMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0011_alter_tasksconfig_object_type_dimpact_and_more"
     migrate_to = "0012_remove_djangocms_text_ckeditor"
