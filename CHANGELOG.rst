@@ -141,6 +141,8 @@ Bugfixes
 * [:gh:`2256`]: Probleem opgelost waarbij externe link-iconen bij product-veelgestelde vragen ontbraken.
 * [:gh:`2263`]: Het woord 'E-mailmeldingen' is onterecht met een hoofdletter is geschreven in de
   zaakmeldingen optie.
+* [:gh:`2257`]: Probleem opgelost waarbij de eerste rij van een productteksttabel altijd een header-rij is,
+  ook wanneer dit was uitgeschakeld.
 
 Onderhoud
 ---------
