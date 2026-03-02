@@ -1,7 +1,7 @@
-2.1.0 (2026-XX-XX) [UNRELEASED]
-===============================
+2.1.0 (2026-03-04)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.0`.
 
 Deployment aandachtspunten
 --------------------------
@@ -10,6 +10,9 @@ Deployment aandachtspunten
   beschikbaar om de sessie-vernieuwingsinterval voor OpenID Connect (DigiD/eHerkenning)
   te configureren. De standaardwaarde is ``900`` seconden (15 minuten). Zie hoofdstuk 10
   van de beheerhandleiding voor meer informatie.
+* [:gh:`2130`]: Er zijn nu gestandardiseerde HTTP healthchecks beschikbaar voor gebruik
+  in Docker/Kubernetes. Zie de `documentatie over health checks
+  <https://docs.openinwoner.nl/en/v2.1.0/installation/health_checks.html>`_.
 
 Nieuwe features
 ---------------
