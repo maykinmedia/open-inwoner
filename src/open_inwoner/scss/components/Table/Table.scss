@@ -209,19 +209,14 @@
 
   &--content {
     .table__row:first-child .table__item {
-      font-family: var(--font-family-heading);
-      font-weight: bold;
-      border-top: 1px solid var(--color-gray-dark-900);
-      border-bottom: 1px solid var(--color-gray-dark-900);
+      border-top: 1px solid var(--color-gray-light);
     }
 
     .table__row:first-of-type .table__item:first-of-type {
-      border-left: 1px solid var(--color-gray-dark-900);
       border-top-left-radius: var(--border-radius);
     }
 
     .table__row:first-of-type .table__item:last-of-type {
-      border-right: 1px solid var(--color-gray-dark-900);
       border-top-right-radius: var(--border-radius);
     }
   }
