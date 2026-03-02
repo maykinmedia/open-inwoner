@@ -69,6 +69,8 @@ Bugfixes
   exceptions naar strings voordat Sentry de volledige stack traces kon vastleggen.
   ``LoggingIntegration`` toegevoegd om exceptions te onderscheppen voordat structlog
   ze formatteert, waardoor Sentry nu volledige exception informatie ontvangt.
+* [:gh:`2263`]: Het woord 'E-mailmeldingen' is onterecht met een hoofdletter is geschreven in de
+  zaakmeldingen optie.
 
 Onderhoud
 ---------
