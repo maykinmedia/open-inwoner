@@ -89,3 +89,48 @@ Wanneer er wijzigingen aan de OpenID Connect configuratie hebben plaatsgevonden,
 Open Inwoner ondersteunt de eHerkenning login voor ondernemers via het OpenID Connect protocol (OIDC). Via de Open ID Connect configuratie kan deze manier van inloggen worden ingesteld. OpenID Connect staat standaard uitgeschakeld, maar kan door de technisch beheerder worden ingeschakeld. eHerkenning is een Nederlandse standaard voor het veilig en betrouwbaar inloggen bij overheidsdiensten en bedrijven. Door OIDC te gebruiken met eHerkenning, kunnen organisaties profiteren van de gestandaardiseerde en veilige authenticatiediensten die eHerkenning biedt, terwijl ze gebruik maken van de moderne functionaliteiten van OIDC. De technische details voor het configureren van OpenID Connect voor eHerkenning kunt u raadplegen in `de documentatie van Open Formulieren <https://open-forms.readthedocs.io/en/latest/configuration/authentication/oidc_eherkenning.html>`_.
 
 **Let op! Enkel de technisch beheerder dient de OpenID Connect Configuratie te wijzigen.**
+
+10.7. OpenID Connect sessie management
+=======================================
+
+Bij gebruik van OpenID Connect (OIDC) voor DigiD en eHerkenning is het belangrijk om
+rekening te houden met sessie-management. Open Inwoner vernieuwt periodiek de
+authenticatiesessie om te controleren of de gebruiker nog steeds ingelogd is bij de
+Identity Provider (IdP).
+
+10.7.1. Automatische sessievernieuwing
+--------------------------------------
+
+De omgevingsvariabele ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` bepaalt hoe vaak
+de sessie wordt ververst. De standaardwaarde is **15 minuten**. Na deze periode wordt de
+gebruiker automatisch en onzichtbaar doorgestuurd naar de IdP:
+
+- **Als de IdP-sessie nog actief is**: De gebruiker wordt automatisch teruggestuurd naar
+  Open Inwoner en kan ongestoord doorwerken. Dit gebeurt op de achtergrond zonder dat de
+  gebruiker het merkt.
+
+- **Als de IdP-sessie verlopen is**: De gebruiker wordt uitgelogd en krijgt een
+  foutmelding te zien:
+
+  - DigiD: *"Uw DigiD-sessie is verlopen. Log alstublieft opnieuw in."*
+  - eHerkenning: *"Uw eHerkenning-sessie is verlopen. Log alstublieft opnieuw in."*
+
+.. important::
+
+   Stel de sessieduur bij uw Identity Provider (DigiD/eHerkenning) in op **minimaal de
+   duur van één vernieuwingsinterval langer** dan ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS``.
+   Bij voorkeur zelfs aanzienlijk langer om te voorkomen dat gebruikers onverwacht worden
+   uitgelogd tijdens het werken. Houd hierbij rekening met de eisen en aanbevelingen van
+   Logius en uw identity broker (bijvoorbeeld Signicat).
+
+   Bijvoorbeeld:
+
+   - Als ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` is ingesteld op 10 minuten (600 seconden)
+   - Stel de IdP-sessieduur in op minimaal 21 minuten of langer, zodat de gebruiker tot
+     tweemaal toe de sessie kan laten vernieuwen.
+
+   Als de IdP-sessieduur korter is dan het vernieuwingsinterval, kunnen gebruikers
+   onverwacht worden uitgelogd. Let ook op dat een korter vernieuwingsinterval betekent
+   dat er vaker een redirect plaatsvindt naar de IdP. Hierdoor is de kans groter dat
+   een redirect gebeurt tijdens het versturen van een formulier (POST-verzoek), wat kan
+   leiden tot verlies van ingevulde gegevens.
