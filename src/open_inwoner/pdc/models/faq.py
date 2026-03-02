@@ -28,7 +28,16 @@ class Question(OrderedModel):
     question = models.CharField(verbose_name=_("Vraag"), max_length=250)
     answer = ProsemirrorModelField(
         _("Antwoord"),
-        allowed_node_types=[NodeType.PARAGRAPH, NodeType.BLOCKQUOTE],
+        allowed_node_types=[
+            NodeType.HARD_BREAK,
+            NodeType.PARAGRAPH,
+            NodeType.HEADING,
+            NodeType.BLOCKQUOTE,
+            NodeType.TABLE,
+            NodeType.TABLE_CELL,
+            NodeType.TABLE_HEADER,
+            NodeType.TABLE_ROW,
+        ],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
