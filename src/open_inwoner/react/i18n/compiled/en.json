@@ -5,6 +5,24 @@
       "value": "The chart is not created. See tables below for the data."
     }
   ],
+  "file.confirmDelete": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to delete this file?"
+    }
+  ],
+  "file.delete": [
+    {
+      "type": 0,
+      "value": "Delete"
+    }
+  ],
+  "file.download": [
+    {
+      "type": 0,
+      "value": "Download"
+    }
+  ],
   "filter.adres_filter": [
     {
       "type": 0,

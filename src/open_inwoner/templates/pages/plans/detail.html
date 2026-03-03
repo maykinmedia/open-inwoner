@@ -78,12 +78,11 @@
         <div class="plan__file">
             {% if object.get_latest_file %}
                 {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
-
-                <file-denhaag
+                <file-nlds
                     name="{{ object.get_latest_file.file.name }}"
-                    href="{{ download_url }}"
+                    download-url="{{ download_url }}"
                     size="{{ object.get_latest_file.file.size }}"
-                ></file-denhaag>
+                ></file-nlds>
 
                 {% if object.get_other_files %}
                     {% file_table files=object.get_other_files download_view="profile:documents_download" %}

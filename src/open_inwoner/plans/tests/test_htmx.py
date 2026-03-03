@@ -103,7 +103,7 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
         # Ensure uploaded document appears
         plan_file_container = page.locator(".plan__file")
         # web component tag
-        files = plan_file_container.locator("file-denhaag")
+        files = plan_file_container.locator("file-nlds")
         expect(files).to_have_count(1)
 
         # Download the uploaded file

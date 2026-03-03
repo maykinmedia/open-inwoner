@@ -1,0 +1,51 @@
+.denhaag-file {
+  // Adding values that are not in denhaag-file design tokens
+  border-radius: var(--border-radius);
+
+  &__link {
+    text-decoration: none;
+
+    &.denhaag-link--remove {
+      background-color: var(--color-white);
+      border: none;
+      font-family: var(--oip-typography-sans-serif-font-family);
+      font-size: inherit;
+      padding-block-start: 0;
+      padding-block-end: 0;
+      padding-inline-start: 0;
+      padding-inline-end: 0;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      cursor: pointer;
+    }
+  }
+
+  // OIP modifier extra class
+  &--oip__extension {
+    text-transform: uppercase;
+  }
+
+  &__label {
+    hyphens: auto;
+  }
+
+  /**
+ * Overwriting existing denhaag-file token values below
+ *
+ * In the Den Haag version, the entire .denhaag-file bar is an anchor element.
+ * In OIP we use a div instead, because wrapping the whole bar in an anchor causes
+ * screen readers to read all content (filename, size, action) as a single link —
+ * which is not accessible.
+ *
+ * Additionally, OIP uses a dedicated anchor or button inside .denhaag-file__right:
+ * - download action: <a download> link
+ * - delete action: <button> with a confirmation handler
+ *
+ * A button is used for delete (not an anchor) because delete is an action, not navigation.
+ * Anchors are for navigation/download only, so should not execute javascript.
+ */
+  cursor: default;
+  font-family: var(--oip-typography-sans-serif-font-family);
+}
