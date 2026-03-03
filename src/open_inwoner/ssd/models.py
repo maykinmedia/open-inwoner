@@ -83,7 +83,7 @@ class SSDConfig(SingletonModel):
     )
     jaaropgave_display_text = ProsemirrorModelField(
         _("Display text"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -96,7 +96,7 @@ class SSDConfig(SingletonModel):
     )
     jaaropgave_pdf_comments = ProsemirrorModelField(
         _("PDF help text"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[],
         null=True,
         blank=True,
@@ -122,7 +122,7 @@ class SSDConfig(SingletonModel):
     )
     maandspecificatie_display_text = ProsemirrorModelField(
         _("Display text"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -135,7 +135,7 @@ class SSDConfig(SingletonModel):
     )
     maandspecificatie_pdf_comments = ProsemirrorModelField(
         _("PDF help text"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[],
         null=True,
         blank=True,

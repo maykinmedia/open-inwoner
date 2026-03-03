@@ -14,7 +14,7 @@ from open_inwoner.openklant.forms import ContactForm
 def text_to_prosemirror_doc(text: str) -> dict:
     """Convert plain text to a ProseMirror document."""
     config = ProsemirrorConfig(
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

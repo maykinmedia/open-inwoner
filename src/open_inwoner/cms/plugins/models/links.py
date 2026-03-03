@@ -25,7 +25,7 @@ class ExtendedCMSLink(AbstractLink):
 
     name = ProsemirrorModelField(
         verbose_name=_("Name"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

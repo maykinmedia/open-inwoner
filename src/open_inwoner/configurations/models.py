@@ -78,7 +78,7 @@ class SiteConfiguration(SingletonModel):
     )
     warning_banner_text = ProsemirrorModelField(
         verbose_name=_("Warning banner text"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -137,7 +137,7 @@ class SiteConfiguration(SingletonModel):
     )
     login_text = ProsemirrorModelField(
         verbose_name=_("Login tekst"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -386,7 +386,7 @@ class SiteConfiguration(SingletonModel):
     )
     search_zero_results_text = ProsemirrorModelField(
         verbose_name=_("Text for zero search results"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

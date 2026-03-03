@@ -138,7 +138,7 @@ def migrate_to_prosemirror_field(
         ...     app_label="pdc",
         ...     model_name="Product",
         ...     field_name="content",
-        ...     allowed_node_types=[NodeType.PARAGRAPH, NodeType.HEADING, NodeType.FILER_IMAGE],
+        ...     allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH, NodeType.HEADING, NodeType.FILER_IMAGE],
         ...     use_singleton=False,
         ...     convert_markdown=True,
         ...     process_images=True,
@@ -153,7 +153,7 @@ def migrate_to_prosemirror_field(
 
     # Set defaults
     if allowed_node_types is None:
-        allowed_node_types = [NodeType.PARAGRAPH]
+        allowed_node_types = [NodeType.HARD_BREAK, NodeType.PARAGRAPH]
 
     if allowed_mark_types is None:
         allowed_mark_types = [

@@ -2117,7 +2117,7 @@ class TestCaseDetailView(
 
         # Create config matching the field definition
         config = ProsemirrorConfig(
-            allowed_node_types=[NodeType.PARAGRAPH],
+            allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
             allowed_mark_types=[
                 MarkType.STRONG,
                 MarkType.ITALIC,
