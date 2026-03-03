@@ -33,6 +33,11 @@ Nieuwe features
   de sessie-vernieuwingsinterval voor OpenID Connect (DigiD/eHerkenning) te
   configureren. OIDC-foutmeldingen vereenvoudigd om alleen op foutcode te matchen.
   Nederlandse foutmeldingen voor DigiD en eHerkenning verbeterd.
+* [:gh:`2247`]: Documentatie toegevoegd voor het configureren van de Takenlijst CMS
+  plugin in de beheerhandleiding. Pydantic modellen voor externe taken herzien om
+  field conflicts op te lossen: record data (``ExternFormulierTaakRecord``,
+  ``UrlTaakRecord``) gescheiden van Objects API envelope models
+  (``ExternFormulierTaakObject``, ``UrlTaakObject``).
 
 Bugfixes
 --------
