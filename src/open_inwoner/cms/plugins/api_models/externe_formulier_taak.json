@@ -1,0 +1,199 @@
+{
+  "$id": "oip-klanttaak.schema.json",
+  "type": "object",
+  "title": "OIP Klanttaak",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "required": [
+    "titel",
+    "status",
+    "soort",
+    "betrokkene",
+    "portaalformulier",
+    "verwerker_taak_id",
+    "eigenaar"
+  ],
+  "properties": {
+    "soort": {
+      "const": "externformulier"
+    },
+    "titel": {
+      "type": "string",
+      "description": "Titel van de taak (max. 1 zin)"
+    },
+    "status": {
+      "enum": ["open", "uitgevoerd", "afgebroken", "verwerkt", "ingetrokken"],
+      "type": "string",
+      "description": "Status van de taak"
+    },
+    "eigenaar": {
+      "type": "string"
+    },
+    "koppeling": {
+      "type": "object",
+      "required": ["registratie", "value"],
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "registratie": {
+          "enum": ["zaak", "product"],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "betrokkene": {
+      "type": "object",
+      "title": "DigiD zonder machtiging",
+      "required": ["source", "levelOfAssurance", "authorizee"],
+      "properties": {
+        "source": {
+          "const": "digid"
+        },
+        "authorizee": {
+          "type": "object",
+          "required": ["legalSubject"],
+          "properties": {
+            "legalSubject": {
+              "type": "object",
+              "required": ["identifierType", "identifier"],
+              "properties": {
+                "identifier": {
+                  "type": "string",
+                  "pattern": "^[0-9]{9}$"
+                },
+                "identifierType": {
+                  "const": "bsn"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "levelOfAssurance": {
+          "enum": [
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract",
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard",
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:SmartcardPKI"
+          ],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "toelichting": {
+      "type": "string"
+    },
+    "doorlooptijd": {
+      "type": "string",
+      "pattern": "^P(?!$)(\\d+D)?$",
+      "description": "ISO 8601 doorlooptijd, bijv. P14D"
+    },
+    "verloopdatum": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "portaalformulier": {
+      "type": "object",
+      "required": ["formulier"],
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "upload_documenten": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/informatieobject"
+              },
+              "description": "Ge\u00fcploade documenten"
+            }
+          },
+          "description": "Prefill data voor het externe formulier",
+          "additionalProperties": true
+        },
+        "formulier": {
+          "type": "object",
+          "required": ["soort", "value"],
+          "properties": {
+            "soort": {
+              "const": "url"
+            },
+            "value": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "additionalProperties": false
+        },
+        "verzonden_data": {
+          "type": "object",
+          "required": ["volledige_naam"],
+          "properties": {
+            "volledige_naam": {
+              "type": "string",
+              "description": "Volledige naam van de persoon"
+            },
+            "upload_documenten": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/informatieobject"
+              },
+              "description": "Ge\u00fcploade documenten"
+            }
+          },
+          "description": "Gegevens ingevuld door de gebruiker",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "verwerker_taak_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "deadline_verlengbaar": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "informatieobject": {
+      "type": "object",
+      "required": [
+        "informatieobjecttype",
+        "titel",
+        "omschrijving",
+        "vertrouwelijkheidaanduiding",
+        "auteur",
+        "formaat"
+      ],
+      "properties": {
+        "titel": {
+          "type": "string"
+        },
+        "auteur": {
+          "type": "string"
+        },
+        "formaat": {
+          "type": "string"
+        },
+        "omschrijving": {
+          "type": "string"
+        },
+        "informatieobjecttype": {
+          "type": "string",
+          "format": "uri"
+        },
+        "vertrouwelijkheidaanduiding": {
+          "enum": ["openbaar", "intern", "vertrouwelijk", "zeer geheim"],
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "description": "Schema voor externformulier taak met link naar extern formulier met twee velden (volledige naam en bestandsupload), inclusief schema voor Betrokkene",
+  "additionalProperties": false
+}

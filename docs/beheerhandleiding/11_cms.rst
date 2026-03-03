@@ -509,3 +509,177 @@ Wanneer u op het potloodicoontje klikt, verschijnt er een pop-up waarmee u de be
    :width: 700px
 
 Het contactformulier dat publiekelijk zichtbaar is voor alle gebruikers kunt u hier een andere beschrijvende tekst mee geven dan het contact formulier dat alleen zichtbaar is voor ingelogde gebruikers.
+
+
+11.2.12. Takenlijst plugin configureren via CMS
+-----------------------------------------------
+
+De Takenlijst plugin toont een gepersonaliseerde lijst met openstaande taken voor
+ingelogde gebruikers. Deze taken kunnen afkomstig zijn uit twee verschillende bronnen:
+
+1. **ZGW API taken** - Openstaande taken uit zaakgericht werken systemen
+2. **Objects API taken** - Externe taken opgeslagen in de Objects API volgens
+   gestandaardiseerde JSON schemas
+
+**Vereisten**
+
+Voordat u de Takenlijst plugin kunt configureren, moeten de volgende koppelingen zijn
+ingesteld:
+
+1. **Objects API configuratie** - Zie :ref:`hoofdstuk 9.8 <objects-api-configuratie>`
+   voor het configureren van de Objects API service. Deze koppeling is nodig om externe
+   taken op te halen.
+
+2. **Object Types configuratie** - In de Objects API moeten twee object types zijn
+   geconfigureerd met de juiste JSON schemas. Deze object types worden automatisch
+   opgehaald en zijn beschikbaar als keuze in de plugin configuratie via hun titel:
+
+   * **Object Type (Generieke Dienstverlening)** - Voor URL-taken volgens het volgende
+     JSON schema:
+
+     .. code-block:: json
+
+        {
+          "type": "object",
+          "title": "ObjectType Taak",
+          "description": "Externe klant taak schema V1.1.1",
+          "required": ["titel", "status", "soort", "identificatie", "verwerker_taak_id", "eigenaar"],
+          "properties": {
+            "titel": {"type": "string", "description": "Weergave naam van de taak"},
+            "status": {
+              "enum": ["open", "afgerond", "verwerkt", "gesloten"],
+              "type": "string"
+            },
+            "soort": {
+              "enum": ["url", "portaalformulier", "ogonebetaling"],
+              "type": "string"
+            },
+            "identificatie": {
+              "type": "object",
+              "description": "KVK of BSN waaraan de taak gericht is"
+            },
+            "url": {
+              "type": "object",
+              "properties": {
+                "uri": {"type": "string", "format": "uri"}
+              }
+            },
+            "verwerker_taak_id": {"type": "string", "format": "uuid"},
+            "eigenaar": {"type": "string"}
+          }
+        }
+
+     Het volledige schema is beschreven in de `Gitbook documentatie voor generieke
+     dienstverlening
+     <https://dienstverleningsplatform.gitbook.io/platform-generieke-dienstverlening-public/patronen/taken/externe-klanttaak#jsonschema-taak-object-type>`_.
+
+   * **Object Type (Extern Formulier Taak - Legacy)** - Voor taken met externe
+     formulieren volgens het volgende JSON schema:
+
+     .. code-block:: json
+
+        {
+          "$id": "oip-klanttaak.schema.json",
+          "type": "object",
+          "title": "OIP Klanttaak",
+          "required": ["titel", "status", "soort", "betrokkene", "portaalformulier",
+                       "verwerker_taak_id", "eigenaar"],
+          "properties": {
+            "soort": {"const": "externformulier"},
+            "titel": {"type": "string"},
+            "status": {
+              "enum": ["open", "uitgevoerd", "afgebroken", "verwerkt", "ingetrokken"],
+              "type": "string"
+            },
+            "betrokkene": {
+              "type": "object",
+              "required": ["source", "levelOfAssurance", "authorizee"],
+              "properties": {
+                "source": {"const": "digid"},
+                "authorizee": {
+                  "type": "object",
+                  "properties": {
+                    "legalSubject": {
+                      "type": "object",
+                      "properties": {
+                        "identifier": {"type": "string", "pattern": "^[0-9]{9}$"},
+                        "identifierType": {"const": "bsn"}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "portaalformulier": {
+              "type": "object",
+              "required": ["formulier"],
+              "properties": {
+                "formulier": {
+                  "type": "object",
+                  "properties": {
+                    "soort": {"const": "url"},
+                    "value": {"type": "string", "format": "uri"}
+                  }
+                }
+              }
+            },
+            "verwerker_taak_id": {"type": "string", "format": "uuid"},
+            "eigenaar": {"type": "string"}
+          }
+        }
+
+3. **ZGW API configuratie** (optioneel) - Indien u ook openstaande taken uit
+   zaaksystemen wilt tonen, configureer dan de ZGW API koppelingen. Zie :ref:`hoofdstuk
+   9.7 <zgw-api-configuratie>`.
+
+**Plugin toevoegen aan een pagina**
+
+De Takenlijst plugin wordt meestal toegevoegd aan de homepage of aan een persoonlijke
+'Mijn Omgeving' pagina:
+
+1. Navigeer naar de gewenste pagina via CMS > Pagina's
+2. Klik op [Bewerken] om de pagina te bewerken
+3. Open het plugin menu (de knop met rechts uitgelijnde regels en bullets)
+4. Klik op [+] om een nieuwe plugin toe te voegen
+5. Selecteer "Takenlijst Plugin" uit de lijst met beschikbare plugins
+6. Configureer de plugin met de volgende velden:
+
+**Plugin configuratie**
+
+In het configuratiescherm van de Takenlijst plugin kunt u de volgende instellingen aanpassen:
+
+| **Titel**
+| De titel die boven de takenlijst wordt weergegeven (standaard: "Mijn Taken")
+
+| **Object Type (Generieke Dienstverlening)**
+| Selecteer hier het object type voor URL-taken uit de dropdown lijst. Wanneer de Objects API correct is geconfigureerd, verschijnen de beschikbare object types automatisch in de lijst op basis van hun titel. Dit object type wordt gebruikt voor externe taken met een directe URL - deze taken leiden de gebruiker direct naar een externe website of formulier.
+
+| **Object Type (Extern Formulier Taak - Legacy)**
+| Selecteer hier het object type voor taken met externe formulieren uit de dropdown lijst. Wanneer de Objects API correct is geconfigureerd, verschijnen de beschikbare object types automatisch in de lijst op basis van hun titel. Dit object type wordt gebruikt voor de legacy implementatie van externe formuliertaken waarbij het formulier binnen het platform wordt getoond.
+
+**Belangrijk**: De twee object type velden zijn verwisseld ten opzichte van eerdere versies. Het veld "Object Type (Generieke Dienstverlening)" is nu bedoeld voor URL-taken, terwijl "Object Type (Extern Formulier Taak - Legacy)" bedoeld is voor de legacy externe formulier taken.
+
+7. Klik op [Opslaan] om de configuratie op te slaan
+8. Sleep de plugin naar de gewenste positie in de pagina structuur
+9. Klik op [Publiceer veranderingen in de pagina] om de wijzigingen live te zetten
+
+**Resultaat**
+
+Na het publiceren van de pagina zien ingelogde gebruikers met een BSN een gepersonaliseerde lijst met hun openstaande taken. Elke taak toont:
+
+- Type taak (soort)
+- Titel van de taak
+- Status
+- Verloopdatum
+- Eigenaar (waar van toepassing)
+- Link naar de taak voor verdere afhandeling
+
+Niet-ingelogde gebruikers of gebruikers zonder BSN zien een lege lijst of een bericht dat zij moeten inloggen om hun taken te kunnen bekijken.
+
+**Troubleshooting**
+
+Als de takenlijst leeg blijft terwijl er wel taken zouden moeten zijn:
+
+1. Controleer of de Objects en Objecttypes API service correct is geconfigureerd
+2. Controleer of de object types correct zijn ingevuld in de plugin configuratie
+3. Controleer of er daadwerkelijk taken in de Objects API staan met het juiste BSN

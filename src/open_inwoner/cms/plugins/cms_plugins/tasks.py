@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Generator, Type, TypedDict, assert_never, cast
+from typing import Generator, Type, TypedDict, assert_never
 from urllib.parse import urlencode
 
 from django.core.exceptions import ImproperlyConfigured
@@ -15,10 +15,10 @@ from pydantic import ValidationError
 from requests import RequestException
 
 from open_inwoner.cms.plugins.api_models import (
-    ExternFormulierTaak,
+    ExternFormulierTaakObject,
     KoppelingProduct,
     KoppelingZaak,
-    UrlTaak,
+    UrlTaakObject,
 )
 from open_inwoner.cms.plugins.models import TasksConfig
 from open_inwoner.openzaak.api_models import OpenstaandeTaak
@@ -96,28 +96,30 @@ class TasksPlugin(CMSPluginBase):
         for task in task_objects:
             # determine task_url based on type
             match task:
-                case ExternFormulierTaak():
-                    base_url = task.portaalformulier.formulier.value
+                case ExternFormulierTaakObject():
+                    base_url = task.record.portaalformulier.formulier.value
                     param = {"initial_data_reference": task.uuid}
                     task_url = f"{base_url}?{urlencode(param)}"
-                case UrlTaak():
-                    task_url = str(task.task_url.uri)
+                case UrlTaakObject():
+                    task_url = str(task.record.url.uri)
                 case _:
                     assert_never(task)
 
             task_data = TaskData(
                 api_source=TaskAPISource.OBJECTS_API.value,
-                soort=task.soort,
-                titel=task.titel,
-                status=task.status,
+                soort=task.record.soort,
+                titel=task.record.titel,
+                status=task.record.status,
                 verloopdatum=formats.date_format(
-                    task.verloopdatum if task.verloopdatum is not None else "",
+                    task.record.verloopdatum
+                    if task.record.verloopdatum is not None
+                    else "",
                     format="DATETIME_FORMAT",
                     use_l10n=True,
                 ),
-                koppeling=task.koppeling,
-                verwerker_taak_id=str(task.verwerker_taak_id),
-                eigenaar=task.eigenaar,
+                koppeling=task.record.koppeling,
+                verwerker_taak_id=str(task.record.verwerker_taak_id),
+                eigenaar=task.record.eigenaar,
                 task_url=task_url,
             )
 
@@ -146,7 +148,7 @@ class TasksPlugin(CMSPluginBase):
 
     def get_tasks(
         self, instance
-    ) -> Generator[ExternFormulierTaak | UrlTaak, None, None]:
+    ) -> Generator[ExternFormulierTaakObject | UrlTaakObject, None, None]:
         """
         Fetch `externe taken` from Objects API
         """
@@ -156,14 +158,12 @@ class TasksPlugin(CMSPluginBase):
             logger.debug("Objects API service not configured, skipping external tasks")
             return
 
-        factory_map: dict[str, Type[ExternFormulierTaak | UrlTaak]] = {}
+        factory_map: dict[str, Type[ExternFormulierTaakObject | UrlTaakObject]] = {}
         if instance.object_type_generieke_dienstverlening:
-            factory_map[instance.object_type_generieke_dienstverlening] = (
-                ExternFormulierTaak
-            )
-        # legacy type `UrlTaak`
+            factory_map[instance.object_type_generieke_dienstverlening] = UrlTaakObject
+        # legacy type `ExternFormulierTaakObject`
         if instance.object_type_dimpact:
-            factory_map[instance.object_type_dimpact] = UrlTaak
+            factory_map[instance.object_type_dimpact] = ExternFormulierTaakObject
 
         for object_type_uuid, obj_factory in factory_map.items():
             for obj in service.get_objects(object_type_uuid=object_type_uuid):
@@ -176,7 +176,7 @@ class TasksPlugin(CMSPluginBase):
                     )
                     continue
 
-                taak_data = cast(dict, record_data) | {"url": obj.url, "uuid": obj.uuid}
+                taak_data = {"url": obj.url, "uuid": obj.uuid, "record": record_data}
                 try:
                     yield obj_factory.validate(taak_data)
                 except ValidationError:
@@ -187,22 +187,22 @@ class TasksPlugin(CMSPluginBase):
 
     def get_tasks_by_bsn(
         self, instance, user_bsn
-    ) -> Generator[ExternFormulierTaak | UrlTaak, None, None]:
+    ) -> Generator[ExternFormulierTaakObject | UrlTaakObject, None, None]:
         tasks = self.get_tasks(instance)
 
         for task in tasks:
             match task:
-                case ExternFormulierTaak():
+                case ExternFormulierTaakObject():
                     if (
-                        task.betrokkene.source == "digid"
-                        and task.betrokkene.authorizee.legal_subject.identifier
+                        task.record.betrokkene.source == "digid"
+                        and task.record.betrokkene.authorizee.legal_subject.identifier
                         == user_bsn
                     ):
                         yield task
-                case UrlTaak():
+                case UrlTaakObject():
                     if (
-                        task.identificatie.type == "bsn"
-                        and task.identificatie.value == user_bsn
+                        task.record.identificatie.type == "bsn"
+                        and task.record.identificatie.value == user_bsn
                     ):
                         yield task
                 case _:

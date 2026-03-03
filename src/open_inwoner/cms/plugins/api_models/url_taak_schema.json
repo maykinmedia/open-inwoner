@@ -1,0 +1,276 @@
+{
+  "type": "object",
+  "title": "ObjectType Taak",
+  "description": "Externe klant taak schema V1.1.1",
+  "examples": [
+    {
+      "titel": "Check loan",
+      "status": "open",
+      "soort": "portaalformulier",
+      "verloopdatum": "2023-09-20T18:25:43.524Z",
+      "identificatie": {
+        "type": "bsn",
+        "value": "82395551"
+      },
+      "koppeling": {
+        "registratie": "zaak",
+        "value": "5551a7c5-4e92-43e6-8d23-80359b7e22b7"
+      },
+      "url": {
+        "uri": "https://google.com"
+      },
+      "portaalformulier": {
+        "formulier": {
+          "soort": "url",
+          "value": "http://localhost:8010/api/v2/objects/4e40fb4c-a29a-4e48-944b-c34a1ff6c8f4"
+        },
+        "data": {
+          "voornaam": "Jan",
+          "achternaam": "Smit",
+          "toestemming": true,
+          "geboortedatum": "01-01-1970"
+        },
+        "verzonden_data": {
+          "voornaam": "Jan",
+          "achternaam": "Smit",
+          "toestemming": false,
+          "geboortedatum": "01-01-1971"
+        }
+      },
+      "ogonebetaling": {
+        "bedrag": 147.43,
+        "betaalkenmerk": "abcdef1234",
+        "pspid": "MyID"
+      },
+      "verwerker_taak_id": "18af0b6a-967b-4f81-bb8e-a44988e0c2f0",
+      "eigenaar": "gzac-sd"
+    }
+  ],
+  "required": [
+    "titel",
+    "status",
+    "soort",
+    "identificatie",
+    "verwerker_taak_id",
+    "eigenaar"
+  ],
+  "properties": {
+    "titel": {
+      "type": "string",
+      "description": "Weergave naam van de taak. Max 1 zin"
+    },
+    "status": {
+      "enum": ["open", "afgerond", "verwerkt", "gesloten"],
+      "type": "string",
+      "description": "Status van de taak. Open: Taak kan worden gestart. Afgerond: Taak is uitgevoerd door gebruiker maar nog niet verwerkt. Verwerkt: Taak is verwerkt door ZAC. Gesloten: Taak is gearchiveerd."
+    },
+    "verloopdatum": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optioneel: Verloopdatum van de taak"
+    },
+    "identificatie": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "bsn"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "kvk"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "not": {
+                "anyOf": [
+                  {
+                    "const": "bsn"
+                  },
+                  {
+                    "const": "kvk"
+                  }
+                ]
+              },
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "description": "KVK of BSN waaraan de taak gericht is. Kan uitgebreid worden met andere types"
+    },
+    "verwerker_taak_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Een UUID waarmee een ZAC een link kan leggen tussen de taak en zijn eigen administratie"
+    },
+    "koppeling": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "registratie": {
+              "const": "zaak"
+            },
+            "value": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "registratie": {
+              "const": "product"
+            },
+            "value": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "registratie": {
+              "not": {
+                "anyOf": [
+                  {
+                    "const": "zaak"
+                  },
+                  {
+                    "const": "product"
+                  }
+                ]
+              },
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Optioneel: Zaak of Product UUID waaraan de taak verbonden is"
+    },
+    "eigenaar": {
+      "type": "string",
+      "description": "Een identificatie van de eigenaar / aanmaker van de taak. Gebruikt voor filtering ed."
+    },
+    "soort": {
+      "$ref": "#/$defs/soort"
+    },
+    "url": {
+      "$ref": "#/$defs/url"
+    },
+    "portaalformulier": {
+      "$ref": "#/$defs/portaalformulier"
+    },
+    "ogonebetaling": {
+      "$ref": "#/$defs/ogonebetaling"
+    }
+  },
+  "$defs": {
+    "soort": {
+      "enum": ["url", "portaalformulier", "ogonebetaling"],
+      "type": "string",
+      "description": "Soort taak. Bijhorende taak specifieke informatie staat in een object met dezelfde naam in deze json"
+    },
+    "url": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["uri"],
+      "additionalProperties": false,
+      "description": "Een link naar een externe resource. Als hier op deze taak geklikt word, word de gebruiker doorgestuurd naar deze link"
+    },
+    "portaalformulier": {
+      "type": "object",
+      "properties": {
+        "formulier": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "soort": {
+                  "const": "url"
+                },
+                "value": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "soort": {
+                  "const": "id"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          ],
+          "description": "Identificatie van bijhorend (formIO) formulier. Kan URL zijn voor externe opslag of ID voor locale opslag."
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "verzonden_data": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["formulier"],
+      "additionalProperties": false,
+      "description": "Een taak die uitgevoerd kan worden binnen het desbetreffende portaal"
+    },
+    "ogonebetaling": {
+      "type": "object",
+      "properties": {
+        "bedrag": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.01
+        },
+        "betaalkenmerk": {
+          "type": "string"
+        },
+        "pspid": {
+          "type": "string"
+        }
+      },
+      "required": ["bedrag", "betaalkenmerk", "pspid"],
+      "additionalProperties": false,
+      "description": "Een betaling die via het portaal met Ogone / Ingenico wordt voldaan"
+    }
+  },
+  "additionalProperties": false
+}

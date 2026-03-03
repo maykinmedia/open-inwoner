@@ -55,17 +55,6 @@ class TasksPluginTest(TestCase):
             [
                 {
                     "api_source": "Objects API",
-                    "soort": "externformulier",
-                    "titel": "Externe Taak 1",
-                    "status": "open",
-                    "verloopdatum": "15 september 2025 23:59",
-                    "koppeling": None,
-                    "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
-                    "eigenaar": "OIP",
-                    "task_url": "http://portaalformulier-url/formulier/startpagina?initial_data_reference=f58d9f41-78de-4d59-89ef-c439c5c24510",
-                },
-                {
-                    "api_source": "Objects API",
                     "soort": "url",
                     "titel": "Url taak",
                     "status": "open",
@@ -75,6 +64,17 @@ class TasksPluginTest(TestCase):
                     "eigenaar": "OIP",
                     "task_url": "http://www.url-task-example.nl/",
                 },
+                {
+                    "api_source": "Objects API",
+                    "soort": "externformulier",
+                    "titel": "Externe Taak 1",
+                    "status": "open",
+                    "verloopdatum": "15 september 2025 23:59",
+                    "koppeling": None,
+                    "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
+                    "eigenaar": "OIP",
+                    "task_url": "http://portaalformulier-url/formulier/startpagina?initial_data_reference=f58d9f41-78de-4d59-89ef-c439c5c24510",
+                },
             ],
         )
 
@@ -83,7 +83,9 @@ class TasksPluginTest(TestCase):
         mock_data = TaakMockData().install_mocks(m)
 
         user = DigidUserFactory(
-            bsn=mock_data.mock_task_data_url["identificatie"]["value"]
+            bsn=mock_data.mock_task_data_externformulier_1["betrokkene"]["authorizee"][
+                "legalSubject"
+            ]["identifier"]
         )
         # should be filtered out (BSN) - using a different BSN
         DigidUserFactory(
@@ -105,14 +107,14 @@ class TasksPluginTest(TestCase):
             [
                 {
                     "api_source": "Objects API",
-                    "soort": "url",
-                    "titel": "Url taak",
+                    "soort": "externformulier",
+                    "titel": "Externe Taak 1",
                     "status": "open",
-                    "verloopdatum": "20 september 2025 18:25",
+                    "verloopdatum": "15 september 2025 23:59",
                     "koppeling": None,
-                    "verwerker_taak_id": "18af0b6a-967b-4f81-bb8e-a44988e0c2f0",
+                    "verwerker_taak_id": "0d59ada7-eacb-4129-8b7e-9907cd82c6d0",
                     "eigenaar": "OIP",
-                    "task_url": "http://www.url-task-example.nl/",
+                    "task_url": "http://portaalformulier-url/formulier/startpagina?initial_data_reference=f58d9f41-78de-4d59-89ef-c439c5c24510",
                 }
             ],
         )
@@ -204,10 +206,10 @@ class TasksPluginTest(TestCase):
 
         # Verify we have 2 Objects API tasks
         self.assertEqual(len(objects_api_tasks), 2)
-        self.assertEqual(objects_api_tasks[0]["titel"], "Externe Taak 1")
-        self.assertEqual(objects_api_tasks[0]["soort"], "externformulier")
-        self.assertEqual(objects_api_tasks[1]["titel"], "Url taak")
-        self.assertEqual(objects_api_tasks[1]["soort"], "url")
+        self.assertEqual(objects_api_tasks[0]["titel"], "Url taak")
+        self.assertEqual(objects_api_tasks[0]["soort"], "url")
+        self.assertEqual(objects_api_tasks[1]["titel"], "Externe Taak 1")
+        self.assertEqual(objects_api_tasks[1]["soort"], "externformulier")
 
         # Verify we have 2 ZGW tasks
         self.assertEqual(len(zgw_tasks), 2)
