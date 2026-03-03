@@ -1,4 +1,3 @@
-import logging  # noqa: S001, TID251 (needed for Sentry LoggingIntegration level constants)
 import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
@@ -8,12 +7,7 @@ from django.conf import settings
 
 import structlog
 from decouple import Csv, config as _config, undefined
-from sentry_sdk.integrations import (
-    DidNotEnable,
-    django,
-    logging as sentry_logging,
-    redis,
-)
+from sentry_sdk.integrations import DidNotEnable, django, redis
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -46,11 +40,10 @@ def get_sentry_integrations() -> list:
     default = [
         django.DjangoIntegration(),
         redis.RedisIntegration(),
-        # Capture exceptions from stdlib logging before structlog formats them
-        sentry_logging.LoggingIntegration(
-            level=logging.INFO,  # Capture INFO+ as breadcrumbs for context
-            event_level=logging.ERROR,  # Send ERROR+ as events to Sentry
-        ),
+        # NOTE: We use a custom SentryStructlogProcessor in structlog to capture
+        # exceptions directly from the event dict before any formatting happens. This
+        # ensures Sentry receives proper exception objects instead of formatted strings
+        # or JSON blobs. The LoggingIntegration is disabled to prevent interference.
     ]
     extra = []
 
