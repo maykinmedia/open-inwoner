@@ -63,6 +63,7 @@ Bugfixes
   ZGW catalogus gechecked worden op valide waarden voor de prosemirror velden.
 * [:gh:`2212`]: ``referrerpolicy="strict-origin-when-cross-origin"`` toegevoegd aan de video
   iframe om het site-brede referrerbeleid te overschrijven voor dit specifieke element.
+* [:gh:`2256`]: Probleem opgelost waarbij externe link-iconen bij product-veelgestelde vragen ontbraken.
 
 Onderhoud
 ---------
