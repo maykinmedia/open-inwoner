@@ -540,6 +540,9 @@ structlog.configure(
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
+        # NOTE: format_exc_info must come AFTER we've potentially sent to Sentry.
+        # The stdlib logging integration will handle sending exceptions to Sentry
+        # before they get formatted to strings here.
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
