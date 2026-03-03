@@ -898,7 +898,7 @@ msgstr "Zaakmeldingen"
 msgid ""
 "Indicates if the user wants to receive notifications for updates concerning "
 "cases."
-msgstr "Krijg E-mailmeldingen naar aanleiding van zaakwijzigingen."
+msgstr "Krijg e-mailmeldingen naar aanleiding van zaakwijzigingen."
 
 #: open_inwoner/accounts/models.py:435
 msgid "Case notifications channel"
