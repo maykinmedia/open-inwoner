@@ -48,10 +48,8 @@ def get_sentry_integrations() -> list:
         redis.RedisIntegration(),
         # Capture exceptions from stdlib logging before structlog formats them
         sentry_logging.LoggingIntegration(
-            level=logging.INFO,  # breadcrumbs
-            # do not send any logs as event to Sentry at all - these must be scraped by
-            # the (container) infrastructure instead.
-            event_level=None,
+            level=logging.INFO,  # Capture INFO+ as breadcrumbs for context
+            event_level=logging.ERROR,  # Send ERROR+ as events to Sentry
         ),
     ]
     extra = []
