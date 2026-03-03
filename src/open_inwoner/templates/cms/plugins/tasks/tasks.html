@@ -2,7 +2,7 @@
 
 {% if instance and tasks %}
 <section class="plugin userfeed">
-    <header class="userfeed__header">
+    <header class="userfeed__header userfeed__header--tasks">
         <div class="heading-2__indicator">
             <h2 class="utrecht-heading-2">
                 {{ instance.title }}
@@ -12,11 +12,11 @@
 
     <div class="card-container card-container--columns-2 plugin-card">
         {% for task in tasks %}
-            <a href="{{ task.task_url }}" class="card card--status card--status--info {% if task.status != "open" %}card--completed{% endif %}">
+            <a href="{{ task.task_url }}" class="card card--status card--status--info {% if task.status != "open" %}card--completed{% endif %}" target="_blank">
                 <div class="userfeed__marker userfeed__marker--info"></div>
 
                 <div class="card__body card__body--tabled">
-                <h3 class="utrecht-heading-3 userfeed__title">Status: {{ task.status }} {% if task.soort %}- Soort: {{ task.soort }}{% endif %}</h3>
+                <h3 class="utrecht-heading-3 userfeed__title">Status: {{ task.status }}</h3>
                   {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=info status_indicator_text="Let op!" %}
                     <p class="userfeed-card__description">
                         <span class="status">{{ task.titel }}</span>
