@@ -8,6 +8,10 @@
       display: flex;
       justify-content: space-between;
     }
+
+    &--tasks {
+      margin-bottom: var(--spacing-extra-large);
+    }
   }
 
   &__summary {

@@ -39,6 +39,8 @@ Nieuwe features
   ``UrlTaakRecord``) gescheiden van Objects API envelope models
   (``ExternFormulierTaakObject``, ``UrlTaakObject``).
 * [:gh:`2255`]: Titels en tabellen toegevoegd aan de product-veelgestelde-vragen tekstopties.
+* [:gh:`2280`]: Verbeteringen doorgevoerd aan de Mijn Taken-plugin op de homepagina. De titel heeft extra spacing
+  gekregen, kaartjes openen nu in een nieuw tabblad en de aanduiding ‘Soort:’ is verwijderd.
 
 Bugfixes
 --------
