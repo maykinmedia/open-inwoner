@@ -1057,7 +1057,7 @@ prosemirror==0.5.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-django-prosemirror
-protobuf==6.32.1
+protobuf==6.33.5
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1371,7 +1371,7 @@ sphinxcontrib-serializinghtml==1.1.10
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
-sqlparse==0.5.3
+sqlparse==0.5.5
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1450,7 +1450,7 @@ uritemplate==4.1.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   drf-spectacular
-urllib3==2.6.2
+urllib3==2.6.3
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
