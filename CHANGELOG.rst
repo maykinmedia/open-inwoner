@@ -64,6 +64,10 @@ Bugfixes
 * [:gh:`2212`]: ``referrerpolicy="strict-origin-when-cross-origin"`` toegevoegd aan de video
   iframe om het site-brede referrerbeleid te overschrijven voor dit specifieke element.
 * [:gh:`2256`]: Probleem opgelost waarbij externe link-iconen bij product-veelgestelde vragen ontbraken.
+* [:gh:`2108`]: Sentry exception truncatie opgelost: structlog's JSON serialisatie converteerde
+  exceptions naar strings voordat Sentry de volledige stack traces kon vastleggen.
+  ``LoggingIntegration`` toegevoegd om exceptions te onderscheppen voordat structlog
+  ze formatteert, waardoor Sentry nu volledige exception informatie ontvangt.
 
 Onderhoud
 ---------
