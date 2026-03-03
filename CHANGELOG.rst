@@ -12,6 +12,9 @@ Bugfixes
   (gebruik van 'x-request-*' in plaats van 'x-requests-*').
 * [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
   Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
+* [:gh:`2280`]: Verbeteringen doorgevoerd aan de Mijn Taken-plugin op de homepagina. De
+  titel heeft extra spacing gekregen, kaartjes openen nu in een nieuw tabblad en de
+  aanduiding ‘Soort:’ is verwijderd.
 
 2.0.3 (2026-02-20)
 ==================
