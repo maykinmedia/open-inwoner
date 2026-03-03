@@ -317,8 +317,13 @@ class CaseListService:
                 )
 
         # Filter and sort zaken
-        resolved_zaken.sort(key=lambda case: case.zaak.startdatum, reverse=True)
-        resolved_zaken.sort(key=lambda c: all_api_groups.index(c.api_group))
+        # Sort by startdatum (newest first), using api_group index as tiebreaker
+        resolved_zaken.sort(
+            key=lambda c: (
+                -c.zaak.startdatum.toordinal(),
+                all_api_groups.index(c.api_group),
+            )
+        )
         return resolved_zaken
 
     def _replace_catalogus_api_with_model_refs(
