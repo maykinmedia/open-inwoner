@@ -947,7 +947,7 @@ prosemirror==0.5.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-django-prosemirror
-protobuf==6.32.1
+protobuf==6.33.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

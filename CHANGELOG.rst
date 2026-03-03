@@ -87,6 +87,7 @@ Onderhoud
 * [:gh:`2082`]: Elasticsearch-verbindingscache gewist in tests.
 * [:gh:`2251`, :cve:`CVE-2026-27606`]: ``rollup`` bijgewerkt naar versie ``^4.59.0``.
 * ``urllib3`` bijgewerkt naar versie ``2.6.3``.
+* ``protobuf`` bijgewerkt naar versie ``6.33.5``.
 
 2.0.3 (2026-02-20)
 ==================
