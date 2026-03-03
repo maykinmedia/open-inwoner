@@ -38,6 +38,7 @@ Nieuwe features
   field conflicts op te lossen: record data (``ExternFormulierTaakRecord``,
   ``UrlTaakRecord``) gescheiden van Objects API envelope models
   (``ExternFormulierTaakObject``, ``UrlTaakObject``).
+* [:gh:`2255`]: Titels en tabellen toegevoegd aan de product-veelgestelde-vragen tekstopties.
 
 Bugfixes
 --------
