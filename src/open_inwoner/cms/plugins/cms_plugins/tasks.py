@@ -94,36 +94,44 @@ class TasksPlugin(CMSPluginBase):
         # fetch externe taken from Objects API
         task_objects = self.get_tasks_by_bsn(instance, user_bsn=bsn)
         for task in task_objects:
-            # determine task_url based on type
-            match task:
-                case ExternFormulierTaakObject():
-                    base_url = task.record.portaalformulier.formulier.value
-                    param = {"initial_data_reference": task.uuid}
-                    task_url = f"{base_url}?{urlencode(param)}"
-                case UrlTaakObject():
-                    task_url = str(task.record.url.uri)
-                case _:
-                    assert_never(task)
+            try:
+                # determine task_url based on type
+                match task:
+                    case ExternFormulierTaakObject():
+                        base_url = task.record.portaalformulier.formulier.value
+                        param = {"initial_data_reference": task.uuid}
+                        task_url = f"{base_url}?{urlencode(param)}"
+                    case UrlTaakObject():
+                        task_url = str(task.record.url.uri)
+                    case _:
+                        assert_never(task)
 
-            task_data = TaskData(
-                api_source=TaskAPISource.OBJECTS_API.value,
-                soort=task.record.soort,
-                titel=task.record.titel,
-                status=task.record.status,
-                verloopdatum=formats.date_format(
-                    task.record.verloopdatum
+                task_data = TaskData(
+                    api_source=TaskAPISource.OBJECTS_API.value,
+                    soort=task.record.soort,
+                    titel=task.record.titel,
+                    status=task.record.status,
+                    verloopdatum=formats.date_format(
+                        task.record.verloopdatum,
+                        format="DATETIME_FORMAT",
+                        use_l10n=True,
+                    )
                     if task.record.verloopdatum is not None
-                    else "",
-                    format="DATETIME_FORMAT",
-                    use_l10n=True,
-                ),
-                koppeling=task.record.koppeling,
-                verwerker_taak_id=str(task.record.verwerker_taak_id),
-                eigenaar=task.record.eigenaar,
-                task_url=task_url,
-            )
+                    else None,
+                    koppeling=task.record.koppeling,
+                    verwerker_taak_id=str(task.record.verwerker_taak_id),
+                    eigenaar=task.record.eigenaar,
+                    task_url=task_url,
+                )
 
-            task_dicts.append(task_data)
+                task_dicts.append(task_data)
+            except Exception:
+                logger.exception(
+                    "Error processing externe taak for display",
+                    task_uuid=task.uuid,
+                    task_type=type(task).__name__,
+                    task=task,
+                )
 
         context["tasks"] = task_dicts
 
