@@ -111,12 +111,12 @@ class TasksPlugin(CMSPluginBase):
                 titel=task.record.titel,
                 status=task.record.status,
                 verloopdatum=formats.date_format(
-                    task.record.verloopdatum
-                    if task.record.verloopdatum is not None
-                    else "",
+                    task.record.verloopdatum,
                     format="DATETIME_FORMAT",
                     use_l10n=True,
-                ),
+                )
+                if task.record.verloopdatum is not None
+                else None,
                 koppeling=task.record.koppeling,
                 verwerker_taak_id=str(task.record.verwerker_taak_id),
                 eigenaar=task.record.eigenaar,
