@@ -14,12 +14,16 @@
             {% if page_description %}
                 <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
             {% endif %}
-            {# Filter Component #}
-            {{ filter_options|json_script:"filter_options" }}
-            <oip-afval-filters data-id="filter_options"></oip-afval-filters>
-            {# chart #}
-            {{afval_data|json_script:"afval_data"}}
-            <oip-chart data-id="afval_data"></oip-chart>
+            {% if filter_options %}
+                {# Filter Component #}
+                {{ filter_options|json_script:"filter_options" }}
+                <oip-afval-filters data-id="filter_options"></oip-afval-filters>
+            {% endif %}
+            {% if afval_data %}
+                {# chart #}
+                {{afval_data|json_script:"afval_data"}}
+                <oip-chart data-id="afval_data"></oip-chart>
+            {% endif %}
             {# Afval Data Display #}
             {% for afval_obj in afval_data %}
                 <article class="afval-object">

@@ -23,7 +23,7 @@ Bugfixes
 Onderhoud
 ---------
 
-* ...
+* [:gh:`2283`]: De grafiek en filters op de Mijn Afval pagina zijn niet meer zichtbaar wanneer er geen data beschikbaar is.
 
 2.1.0 (2026-03-04)
 ==================

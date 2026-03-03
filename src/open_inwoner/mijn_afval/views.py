@@ -125,11 +125,7 @@ class AfvalProfielView(
                 ),
             )
             afval_data = []
-            filter_options = {
-                "addresses": [],
-                "afval_types": [],
-                "periode": [],
-            }
+            filter_options = None
 
         context["afval_data"] = afval_data
         context["filter_options"] = filter_options
