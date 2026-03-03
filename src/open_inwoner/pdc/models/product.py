@@ -112,6 +112,7 @@ class Product(models.Model):
     content = ProsemirrorModelField(
         _("Content"),
         allowed_node_types=[
+            NodeType.HARD_BREAK,
             NodeType.PARAGRAPH,
             NodeType.HEADING,
             NodeType.FILER_IMAGE,

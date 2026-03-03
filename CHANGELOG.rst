@@ -41,6 +41,7 @@ Nieuwe features
 * [:gh:`2255`]: Titels en tabellen toegevoegd aan de product-veelgestelde-vragen tekstopties.
 * [:gh:`2280`]: Verbeteringen doorgevoerd aan de Mijn Taken-plugin op de homepagina. De titel heeft extra spacing
   gekregen, kaartjes openen nu in een nieuw tabblad en de aanduiding ‘Soort:’ is verwijderd.
+* [:gh:`2254`] Shift+Enter voegt nu een hard break (br) toe in alle ProseMirror-velden.
 
 Bugfixes
 --------

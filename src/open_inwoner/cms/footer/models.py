@@ -15,7 +15,7 @@ class CMSFlatPageModel(CMSPlugin):
     )
     content = ProsemirrorModelField(
         _("Content"),
-        allowed_node_types=[NodeType.PARAGRAPH, NodeType.HEADING],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH, NodeType.HEADING],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

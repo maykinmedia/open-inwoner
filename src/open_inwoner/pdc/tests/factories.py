@@ -40,6 +40,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
         if content and isinstance(content, str):
             config = ProsemirrorConfig(
                 allowed_node_types=[
+                    NodeType.HARD_BREAK,
                     NodeType.PARAGRAPH,
                     NodeType.HEADING,
                     NodeType.FILER_IMAGE,
@@ -118,7 +119,11 @@ class CategoryFactory(factory.django.DjangoModelFactory):
         # If description is provided as string, convert it to a ProseMirror document
         if description and isinstance(description, str):
             config = ProsemirrorConfig(
-                allowed_node_types=[NodeType.PARAGRAPH, NodeType.FILER_IMAGE],
+                allowed_node_types=[
+                    NodeType.HARD_BREAK,
+                    NodeType.PARAGRAPH,
+                    NodeType.FILER_IMAGE,
+                ],
                 allowed_mark_types=[
                     MarkType.STRONG,
                     MarkType.ITALIC,
@@ -218,7 +223,11 @@ class QuestionFactory(factory.django.DjangoModelFactory):
         # If answer was provided and is a string, convert it to a ProseMirror document
         if answer and isinstance(answer, str):
             config = ProsemirrorConfig(
-                allowed_node_types=[NodeType.PARAGRAPH, NodeType.FILER_IMAGE],
+                allowed_node_types=[
+                    NodeType.HARD_BREAK,
+                    NodeType.PARAGRAPH,
+                    NodeType.FILER_IMAGE,
+                ],
                 allowed_mark_types=[
                     MarkType.STRONG,
                     MarkType.ITALIC,

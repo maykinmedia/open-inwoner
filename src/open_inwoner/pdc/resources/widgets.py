@@ -50,6 +50,7 @@ class ProsemirrorWidget(Widget):
         # Use a basic config that matches what most fields use
         config = ProsemirrorConfig(
             allowed_node_types=[
+                NodeType.HARD_BREAK,
                 NodeType.PARAGRAPH,
                 NodeType.HEADING,
                 NodeType.FILER_IMAGE,

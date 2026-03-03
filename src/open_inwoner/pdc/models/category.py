@@ -73,7 +73,11 @@ class Category(MP_Node):
     )
     description = ProsemirrorModelField(
         _("Description"),
-        allowed_node_types=[NodeType.PARAGRAPH, NodeType.FILER_IMAGE],
+        allowed_node_types=[
+            NodeType.HARD_BREAK,
+            NodeType.PARAGRAPH,
+            NodeType.FILER_IMAGE,
+        ],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

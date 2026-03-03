@@ -743,7 +743,7 @@ class ZaakTypeStatusTypeConfig(models.Model):
     )
     document_upload_description = ProsemirrorModelField(
         _("Document upload description"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -758,7 +758,7 @@ class ZaakTypeStatusTypeConfig(models.Model):
     )
     description = ProsemirrorModelField(
         _("Frontend description"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,

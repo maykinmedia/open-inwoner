@@ -10,7 +10,7 @@ from django_prosemirror.schema import MarkType, NodeType
 class ContactFormConfig(CMSPlugin):
     description_authenticated_user = ProsemirrorModelField(
         _("Description authenticated users"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
@@ -23,7 +23,7 @@ class ContactFormConfig(CMSPlugin):
     )
     description_anonymous_user = ProsemirrorModelField(
         _("Description anonymous users"),
-        allowed_node_types=[NodeType.PARAGRAPH],
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
