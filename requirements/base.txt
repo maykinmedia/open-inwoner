@@ -653,7 +653,7 @@ six==1.16.0
     #   qrcode
 soupsieve==2.5
     # via beautifulsoup4
-sqlparse==0.5.3
+sqlparse==0.5.5
     # via django
 structlog==25.4.0
     # via django-structlog
