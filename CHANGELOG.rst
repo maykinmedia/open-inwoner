@@ -77,7 +77,7 @@ Onderhoud
 
 * [:taiga-us:`3615`]: zgw-klassen, methoden en variabelen hernoemd om Nederlandse termen
   te gebruiken
-* [:gh:`2126`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.2.0``.
+* [:gh:`2126`, :cve:`CVE-2026-27148`]: ``storybook`` en storybook plugins bijgewerkt naar versie ``10.2.14``.
 * [:gh:`2112`] ``README.rst`` bijgewerkt met Storybook link en correctie in badges en
   copyright.
 * [:gh:`2104`]: Verwijderen in ongebruik geraakte NPM dependencies, ``jest`` en ``karma``
