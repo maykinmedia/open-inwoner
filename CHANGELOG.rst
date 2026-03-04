@@ -1,3 +1,28 @@
+2.2.0-dev (2026-XX-XX)
+======================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Nieuwe features
+---------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
 2.1.0 (2026-03-04)
 ==================
 
