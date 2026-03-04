@@ -366,7 +366,7 @@ class ZakenClient(ZgwAPIClient):
         return status
 
     @cache_result(
-        "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}",
+        "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}:{betrokkene_type}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
     def fetch_zaak_roles(
