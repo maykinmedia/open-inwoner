@@ -1,3 +1,30 @@
+2.2.0-dev (2026-XX-XX)
+======================
+
+Voor een volledig overzicht van alle commits, zie ...
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Nieuwe features
+---------------
+
+* ...
+
+Bugfixes
+--------
+
+* [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
+  ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
+  voorkomen.
+
+Onderhoud
+---------
+
+* ...
+
 2.1.0 (2026-03-04)
 ==================
 
