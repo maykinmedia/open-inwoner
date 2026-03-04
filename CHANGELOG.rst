@@ -91,6 +91,7 @@ Onderhoud
 * [:gh:`2166`]:  ``weasyprint`` bijgewerkt naar versie ``0.68``.
 * [:gh:`2179`, :cve:`CVE-2025-13465`]: ``@utrecht/component-library-react`` bijgewerkt naar versie ``13.0.0``.
 * [:gh:`2198`, :pr:`2197`]: Django bijgewerkt naar versie ``4.2.28``.
+* Django bijgewerkt naar versie ``4.2.29``.
 * [:gh:`2206`, :pr:`2207`]: `setuptools` bijgewerkt naar versie ``<81``.
 * [:gh:`2178`, :cve:`CVE-2023-44270`]: ``autoprefixer`` bijgewerkt naar versie ``10.4.23``.
 * [:gh:`2181`]: Alle (huidige) postcss waarschuwingen opgelost.
