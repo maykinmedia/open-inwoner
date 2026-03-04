@@ -16,7 +16,9 @@ Nieuwe features
 Bugfixes
 --------
 
-* ...
+* [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
+  ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
+  voorkomen.
 
 Onderhoud
 ---------
