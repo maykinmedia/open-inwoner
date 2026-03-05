@@ -68,12 +68,6 @@ Bugfixes
 * [:gh:`2212`]: ``referrerpolicy="strict-origin-when-cross-origin"`` toegevoegd aan de video
   iframe om het site-brede referrerbeleid te overschrijven voor dit specifieke element.
 * [:gh:`2256`]: Probleem opgelost waarbij externe link-iconen bij product-veelgestelde vragen ontbraken.
-* [:gh:`2108`]: Sentry exception truncatie opgelost: structlog's JSON serialisatie converteerde
-  exceptions naar strings voordat Sentry de volledige stack traces kon vastleggen.
-  Custom ``SentryStructlogProcessor`` geïmplementeerd om exceptions direct vanuit structlog te
-  onderscheppen voordat ``format_exc_info`` ze formatteert. Dit zorgt ervoor dat Sentry
-  volledige exception objecten met stack traces ontvangt, inclusief alle structlog context
-  als "Additional Data". De ``before_send`` hook filtert duplicate message events.
 * [:gh:`2263`]: Het woord 'E-mailmeldingen' is onterecht met een hoofdletter is geschreven in de
   zaakmeldingen optie.
 
