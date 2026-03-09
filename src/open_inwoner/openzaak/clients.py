@@ -418,7 +418,12 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        betrokkene_type = (
+            RolTypes.natuurlijk_persoon
+            if self.fetch_rollen_with_betrokkene_type
+            else None
+        )
+        zaak_roles = self.fetch_zaak_roles(zaak_url, betrokkene_type=betrokkene_type)
         if not zaak_roles:
             return []
 
@@ -441,7 +446,12 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        betrokkene_type = (
+            RolTypes.niet_natuurlijk_persoon
+            if self.fetch_rollen_with_betrokkene_type
+            else None
+        )
+        zaak_roles = self.fetch_zaak_roles(zaak_url, betrokkene_type=betrokkene_type)
         if not zaak_roles:
             return []
 
@@ -464,7 +474,10 @@ class ZakenClient(ZgwAPIClient):
 
         see Taiga #948
         """
-        zaak_roles = self.fetch_zaak_roles(zaak_url)
+        betrokkene_type = (
+            RolTypes.vestiging if self.fetch_rollen_with_betrokkene_type else None
+        )
+        zaak_roles = self.fetch_zaak_roles(zaak_url, betrokkene_type=betrokkene_type)
         if not zaak_roles:
             return []
 

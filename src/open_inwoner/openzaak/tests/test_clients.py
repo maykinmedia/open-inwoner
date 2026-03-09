@@ -318,6 +318,113 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 request = m.request_history[-1]
                 self.assertIn(f"betrokkeneType={betrokkene_type.value}", request.url)
 
+    @requests_mock.Mocker()
+    def test_role_fetching_methods_use_betrokkene_type_flag(self, m):
+        """
+        Test that fetch_roles_for_zaak_and_bsn, fetch_roles_for_zaak_and_kvk_or_rsin,
+        and fetch_roles_for_zaak_and_vestigingsnummer respect the
+        fetch_rollen_with_betrokkene_type flag.
+        """
+        api_group = self.api_groups[0]
+        api_group.fetch_rollen_with_betrokkene_type = True
+        api_group.save()
+
+        zaken_client = build_zgw_client_from_service(
+            api_group.zrc_service,
+            use_openzaak_120_params=False,
+            fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
+        )
+
+        case_url = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
+
+        # Mock role for BSN
+        bsn_role = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/bsn-role-uuid",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "inpBsn": "900222086",
+            },
+        )
+
+        # Mock role for KVK/RSIN
+        kvk_role = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/kvk-role-uuid",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+            betrokkeneIdentificatie={
+                "innNnpId": "000000000",
+            },
+        )
+
+        # Mock role for vestiging
+        vestiging_role = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/vestiging-role-uuid",
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.vestiging,
+            betrokkeneIdentificatie={
+                "vestigingsNummer": "123456789012",
+            },
+        )
+
+        # Mock the API endpoints
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url}&betrokkeneType=natuurlijk_persoon",
+            json={"count": 1, "next": None, "previous": None, "results": [bsn_role]},
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url}&betrokkeneType=niet_natuurlijk_persoon",
+            json={"count": 1, "next": None, "previous": None, "results": [kvk_role]},
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={case_url}&betrokkeneType=vestiging",
+            json={
+                "count": 1,
+                "next": None,
+                "previous": None,
+                "results": [vestiging_role],
+            },
+        )
+
+        # Test fetch_roles_for_zaak_and_bsn
+        roles = zaken_client.fetch_roles_for_zaak_and_bsn(case_url, "900222086")
+        self.assertEqual(len(roles), 1)
+        self.assertEqual(roles[0].betrokkene_type, RolTypes.natuurlijk_persoon)
+
+        # Verify the betrokkeneType parameter was used
+        bsn_request = [r for r in m.request_history if "natuurlijk_persoon" in r.url][
+            -1
+        ]
+        self.assertIn("betrokkeneType=natuurlijk_persoon", bsn_request.url)
+
+        # Test fetch_roles_for_zaak_and_kvk_or_rsin
+        roles = zaken_client.fetch_roles_for_zaak_and_kvk_or_rsin(case_url, "000000000")
+        self.assertEqual(len(roles), 1)
+        self.assertEqual(roles[0].betrokkene_type, RolTypes.niet_natuurlijk_persoon)
+
+        # Verify the betrokkeneType parameter was used
+        kvk_request = [
+            r for r in m.request_history if "niet_natuurlijk_persoon" in r.url
+        ][-1]
+        self.assertIn("betrokkeneType=niet_natuurlijk_persoon", kvk_request.url)
+
+        # Test fetch_roles_for_zaak_and_vestigingsnummer
+        roles = zaken_client.fetch_roles_for_zaak_and_vestigingsnummer(
+            case_url, "123456789012"
+        )
+        self.assertEqual(len(roles), 1)
+        self.assertEqual(roles[0].betrokkene_type, RolTypes.vestiging)
+
+        # Verify the betrokkeneType parameter was used
+        vestiging_request = [r for r in m.request_history if "vestiging" in r.url][-1]
+        self.assertIn("betrokkeneType=vestiging", vestiging_request.url)
+
 
 @requests_mock.Mocker()
 class MultiZgwClientProxyTests(PlainTestCase):
