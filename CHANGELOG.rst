@@ -4,6 +4,9 @@
 Bugfixes
 --------
 
+* [:gh:`2301`]: De ``fetch_rollen_with_betrokkene_type`` instelling wordt nu ook
+  toegepast bij het ophalen van zaakrollen via ``fetch_case_roles``,
+  ``fetch_case_roles_for_eherkenning_user`` en ``fetch_case_roles_for_vestiging``.
 * [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
   ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
   voorkomen.
