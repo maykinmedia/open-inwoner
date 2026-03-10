@@ -169,7 +169,9 @@ class SentryStructlogProcessor:
         # 2. Tags show prominently in the Sentry UI tags section
         # 3. Extras are for detailed context, tags are for filtering/grouping
         if event_message := event_dict.get("event"):
-            scope.set_tag("log_message", str(event_message))
+            # Only add string messages as tags to avoid serialization issues
+            if isinstance(event_message, str):
+                scope.set_tag("log_message", event_message)
 
     def _capture_to_sentry(self, event_dict: EventDict, exc_tuple: tuple) -> str | None:
         """
