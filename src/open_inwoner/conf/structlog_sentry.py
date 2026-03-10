@@ -16,6 +16,8 @@ from structlog.types import EventDict, WrappedLogger
 IGNORED_LOGGERS: set[str] = _IGNORED_LOGGERS | {
     "log_outgoing_requests",
     "save_outgoing_requests",
+    "django_structlog.middlewares.request",
+    "open_inwoner.utils.logentry",
 }
 
 
@@ -31,6 +33,7 @@ class SentryStructlogProcessor:
         self,
         level: int = logging.INFO,
         event_level: int = logging.ERROR,
+        active: bool = True,
     ):
         """
         Initialize the Sentry processor.
@@ -38,9 +41,139 @@ class SentryStructlogProcessor:
         Args:
             level: Minimum level for breadcrumbs (default: INFO)
             event_level: Minimum level for Sentry events (default: ERROR)
+            active: Whether the processor is active (default: True)
         """
         self.level = level
         self.event_level = event_level
+        self.active = active
+
+    def _can_record(self, logger_name: str | None) -> bool:
+        """
+        Check if this logger should be recorded to Sentry.
+
+        Args:
+            logger_name: The name of the logger
+
+        Returns:
+            True if the logger should be recorded, False otherwise
+        """
+        if not logger_name:
+            return True
+        return not any(logger_name.startswith(ignored) for ignored in IGNORED_LOGGERS)
+
+    def _get_log_level(self, event_dict: EventDict) -> int:
+        """
+        Extract and convert log level from event dict.
+
+        Args:
+            event_dict: The structlog event dictionary
+
+        Returns:
+            The numeric log level (defaults to INFO if not found)
+        """
+        level_name = event_dict.get("level", "").upper()
+        try:
+            return getattr(logging, level_name, logging.INFO)
+        except AttributeError:
+            return logging.INFO
+
+    def _extract_exc_info(self, event_dict: EventDict) -> tuple | None:
+        """
+        Extract exception info and normalize to tuple format.
+
+        Args:
+            event_dict: The structlog event dictionary
+
+        Returns:
+            Exception info as a tuple (type, value, traceback) or None if no valid exception
+        """
+        exc_info = event_dict.get("exc_info")
+        match exc_info:
+            case None:
+                return None
+            case tuple():
+                exc_tuple = exc_info
+            case BaseException():
+                exc_tuple = (type(exc_info), exc_info, exc_info.__traceback__)
+            case True:
+                exc_tuple = sys.exc_info()
+            case _:
+                return None
+
+        # Validate we have a real exception
+        if not exc_tuple or exc_tuple == (None, None, None) or exc_tuple[1] is None:
+            return None
+
+        return exc_tuple
+
+    def _add_context_to_scope(self, scope, event_dict: EventDict) -> None:
+        """
+        Add structlog event context to Sentry scope.
+
+        Args:
+            scope: The Sentry scope to add context to
+            event_dict: The structlog event dictionary
+        """
+        # Add all event_dict fields as extra context
+        # Make sure we serialize complex objects to strings
+        for key, value in event_dict.items():
+            if key not in (
+                "exc_info",
+                "event",
+                "logger",
+                "level",
+                "timestamp",
+            ):
+                # Sentry's set_extra should handle serialization
+                # IMPORTANT: We let database errors propagate from str()/repr()
+                # so they break the transaction properly if they occur
+                try:
+                    scope.set_extra(key, value)
+                except (TypeError, ValueError, AttributeError):
+                    # Serialization failed, try as string (may raise DB errors)
+                    try:
+                        scope.set_extra(key, str(value))
+                    except (TypeError, ValueError, AttributeError):
+                        # str() failed (not DB errors), try repr
+                        scope.set_extra(key, repr(value))
+
+        # Add log message as context if present
+        # Note: str() calls may trigger __str__ with DB queries - we let those propagate
+        if event_message := event_dict.get("event"):
+            scope.set_tag("log_message", str(event_message))
+
+    def _capture_to_sentry(self, event_dict: EventDict, exc_tuple: tuple) -> str | None:
+        """
+        Capture exception to Sentry with event context.
+
+        Args:
+            event_dict: The structlog event dictionary
+            exc_tuple: The exception info tuple (type, value, traceback)
+
+        Returns:
+            The Sentry event ID if successful, None otherwise
+        """
+        # Only catch Sentry SDK errors, not database/transaction errors
+        # Common Sentry errors: connection issues, rate limiting, client not configured
+        try:
+            with sentry_sdk.push_scope() as scope:
+                self._add_context_to_scope(scope, event_dict)
+                # Capture the exception - Sentry will use the exception message as the title
+                event_id = sentry_sdk.capture_exception(exc_tuple[1])
+                return event_id
+        except (
+            # Only catch Sentry SDK-specific errors, not database/transaction errors
+            TypeError,  # Invalid Sentry SDK arguments
+            ValueError,  # Invalid Sentry SDK configuration
+            KeyError,  # Missing Sentry event fields
+            AttributeError,  # Sentry client not initialized
+            RuntimeError,  # Sentry SDK internal errors
+            OSError,  # Network errors to Sentry
+        ):
+            # Silently fail - Sentry errors shouldn't break logging
+            # IMPORTANT: We do NOT catch Exception, so database errors will propagate
+            # and break the transaction properly if they occur
+            return None
 
     @staticmethod
     def before_send(event, hint):
@@ -118,92 +251,27 @@ class SentryStructlogProcessor:
         Returns:
             The unmodified event_dict (this processor doesn't modify events)
         """
-        # Check if logger is in ignored list
-        logger_name = event_dict.get("logger")
-        if logger_name and any(
-            logger_name.startswith(ignored) for ignored in IGNORED_LOGGERS
-        ):
+        # Early exit if processor is disabled
+        if not self.active:
             return event_dict
 
-        # Get the log level
-        level_name = event_dict.get("level", "").upper()
-        try:
-            level_value = getattr(logging, level_name, logging.INFO)
-        except AttributeError:
-            level_value = logging.INFO
+        # Check if logger should be ignored
+        logger_name = event_dict.get("logger")
+        if not self._can_record(logger_name):
+            return event_dict
 
-        # Only process if level is high enough
+        # Check log level threshold
+        level_value = self._get_log_level(event_dict)
         if level_value < self.event_level:
             return event_dict
 
-        # Extract exception info and convert to standard tuple format
-        exc_info = event_dict.get("exc_info")
-        match exc_info:
-            case None:
-                return event_dict
-            case tuple():
-                exc_tuple = exc_info
-            case BaseException():
-                exc_tuple = (type(exc_info), exc_info, exc_info.__traceback__)
-            case True:
-                exc_tuple = sys.exc_info()
-            case _:
-                return event_dict
-
-        # Return early if we don't have a valid exception
-        if not exc_tuple or exc_tuple == (None, None, None) or exc_tuple[1] is None:
+        # Extract and validate exception info
+        exc_tuple = self._extract_exc_info(event_dict)
+        if not exc_tuple:
             return event_dict
 
-        # Only catch Sentry SDK errors, not database/transaction errors
-        # Common Sentry errors: connection issues, rate limiting, client not configured
-        try:
-            with sentry_sdk.push_scope() as scope:
-                # Add all event_dict fields as extra context
-                # Make sure we serialize complex objects to strings
-                for key, value in event_dict.items():
-                    if key not in (
-                        "exc_info",
-                        "event",
-                        "logger",
-                        "level",
-                        "timestamp",
-                    ):
-                        # Sentry's set_extra should handle serialization
-                        # IMPORTANT: We let database errors propagate from str()/repr()
-                        # so they break the transaction properly if they occur
-                        try:
-                            scope.set_extra(key, value)
-                        except (TypeError, ValueError, AttributeError):
-                            # Serialization failed, try as string (may raise DB errors)
-                            try:
-                                scope.set_extra(key, str(value))
-                            except (TypeError, ValueError, AttributeError):
-                                # str() failed (not DB errors), try repr
-                                scope.set_extra(key, repr(value))
-
-                # Add log message as context if present
-                # Note: str() calls may trigger __str__ with DB queries - we let those propagate
-                if event_message := event_dict.get("event"):
-                    scope.set_tag("log_message", str(event_message))
-
-                # Capture the exception - Sentry will use the exception message as the title
-                event_id = sentry_sdk.capture_exception(exc_tuple[1])
-
-                # Add a marker to the event dict for the before_send hook to detect duplicates
-                if event_id:
-                    event_dict["sentry_event_id"] = event_id
-        except (
-            # Only catch Sentry SDK-specific errors, not database/transaction errors
-            TypeError,  # Invalid Sentry SDK arguments
-            ValueError,  # Invalid Sentry SDK configuration
-            KeyError,  # Missing Sentry event fields
-            AttributeError,  # Sentry client not initialized
-            RuntimeError,  # Sentry SDK internal errors
-            OSError,  # Network errors to Sentry
-        ):
-            # Silently fail - Sentry errors shouldn't break logging
-            # IMPORTANT: We do NOT catch Exception, so database errors will propagate
-            # and break the transaction properly if they occur
-            pass
+        # Capture to Sentry and add event ID marker
+        if event_id := self._capture_to_sentry(event_dict, exc_tuple):
+            event_dict["sentry_event_id"] = event_id
 
         return event_dict
