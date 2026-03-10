@@ -23,7 +23,17 @@ IGNORED_LOGGERS: set[str] = _IGNORED_LOGGERS | {
 
 class SentryStructlogProcessor:
     """
-    Structlog processor that sends exceptions to Sentry.
+    Structlog processor that checks events for exception info and sends these to Senry.
+
+    This processor allows logging calls that include exc_info to be sent to Sentry.
+    It intercepts log events containing exceptions and captures them with full context
+    before they're formatted into strings. This ensures Sentry receives rich exception
+    objects with proper stack traces, type information, and metadata rather than
+    formatted text representations.
+
+    The processor only captures events at or above the configured level threshold
+    (default: ERROR) and can be disabled entirely via the active flag for testing or
+    troubleshooting purposes.
 
     This processor should be placed BEFORE format_exc_info in the processor chain
     to ensure it captures raw exception objects.
@@ -31,20 +41,24 @@ class SentryStructlogProcessor:
 
     def __init__(
         self,
-        level: int = logging.INFO,
-        event_level: int = logging.ERROR,
+        breadcrumb_level: int = logging.INFO,
+        level: int = logging.ERROR,
         active: bool = True,
     ):
         """
         Initialize the Sentry processor.
 
         Args:
-            level: Minimum level for breadcrumbs (default: INFO)
-            event_level: Minimum level for Sentry events (default: ERROR)
+            breadcrumb_level: Minimum level for breadcrumbs to attach to Sentry events.
+                Breadcrumbs are log entries that provide context leading up to an exception.
+                For example, with INFO level, all INFO+ logs before an ERROR will be
+                attached as breadcrumbs to help understand what led to the error.
+                (default: INFO, currently reserved for future use)
+            level: Minimum level for capturing exceptions to Sentry (default: ERROR)
             active: Whether the processor is active (default: True)
         """
+        self.breadcrumb_level = breadcrumb_level
         self.level = level
-        self.event_level = event_level
         self.active = active
 
     def _can_record(self, logger_name: str | None) -> bool:
@@ -153,27 +167,11 @@ class SentryStructlogProcessor:
         Returns:
             The Sentry event ID if successful, None otherwise
         """
-        # Only catch Sentry SDK errors, not database/transaction errors
-        # Common Sentry errors: connection issues, rate limiting, client not configured
-        try:
-            with sentry_sdk.push_scope() as scope:
-                self._add_context_to_scope(scope, event_dict)
-                # Capture the exception - Sentry will use the exception message as the title
-                event_id = sentry_sdk.capture_exception(exc_tuple[1])
-                return event_id
-        except (
-            # Only catch Sentry SDK-specific errors, not database/transaction errors
-            TypeError,  # Invalid Sentry SDK arguments
-            ValueError,  # Invalid Sentry SDK configuration
-            KeyError,  # Missing Sentry event fields
-            AttributeError,  # Sentry client not initialized
-            RuntimeError,  # Sentry SDK internal errors
-            OSError,  # Network errors to Sentry
-        ):
-            # Silently fail - Sentry errors shouldn't break logging
-            # IMPORTANT: We do NOT catch Exception, so database errors will propagate
-            # and break the transaction properly if they occur
-            return None
+        with sentry_sdk.push_scope() as scope:
+            self._add_context_to_scope(scope, event_dict)
+            # Capture the exception - Sentry will use the exception message as the title
+            event_id = sentry_sdk.capture_exception(exc_tuple[1])
+            return event_id
 
     @staticmethod
     def before_send(event, hint):
@@ -198,10 +196,6 @@ class SentryStructlogProcessor:
             ):
                 return None
 
-        # If this event has an exception, let it through (it's from our SentryStructlogProcessor)
-        if event.get("exception"):
-            return event
-
         # Check if this is a duplicate message event
         # Our SentryProcessor adds 'sentry_event_id' to the log, so if the message
         # contains that, it's a duplicate of an already-sent exception
@@ -209,6 +203,10 @@ class SentryStructlogProcessor:
         if "sentry_event_id" in str(message):
             # This is a duplicate - the real exception was already sent
             return None
+
+        # If this event has an exception, let it through (it's from our SentryStructlogProcessor)
+        if event.get("exception"):
+            return event
 
         # Also check the log record's message directly
         if log_record := hint.get("log_record"):
@@ -262,7 +260,7 @@ class SentryStructlogProcessor:
 
         # Check log level threshold
         level_value = self._get_log_level(event_dict)
-        if level_value < self.event_level:
+        if level_value < self.level:
             return event_dict
 
         # Extract and validate exception info
