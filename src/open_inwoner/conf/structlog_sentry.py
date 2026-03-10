@@ -133,8 +133,7 @@ class SentryStructlogProcessor:
         for key, value in event_dict.items():
             if key not in (
                 "exc_info",
-                "event",
-                "logger",
+                # "logger",
                 "level",
                 "timestamp",
             ):
