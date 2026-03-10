@@ -40,6 +40,10 @@ def get_sentry_integrations() -> list:
     default = [
         django.DjangoIntegration(),
         redis.RedisIntegration(),
+        # NOTE: We use a custom SentryStructlogProcessor in structlog to capture
+        # exceptions directly from the event dict before any formatting happens. This
+        # ensures Sentry receives proper exception objects instead of formatted strings
+        # or JSON blobs. The LoggingIntegration is disabled to prevent interference.
     ]
     extra = []
 
