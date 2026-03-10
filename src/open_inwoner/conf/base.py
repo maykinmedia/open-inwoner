@@ -12,6 +12,7 @@ from maykin_common.health_checks import (
     default_health_check_subsets,
 )
 
+from .structlog_sentry import SentryStructlogProcessor
 from .utils import config, get_sentry_integrations
 
 # Build paths inside the project, so further paths can be defined relative to
@@ -416,6 +417,7 @@ LOGGING = {
                 structlog.stdlib.add_logger_name,
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.format_exc_info,
             ],
         },
         "plain_console": {
@@ -427,6 +429,7 @@ LOGGING = {
                 structlog.stdlib.add_logger_name,
                 structlog.stdlib.add_log_level,
                 structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.format_exc_info,
             ],
         },
         "outgoing_requests": {"()": HttpFormatter},
@@ -540,6 +543,13 @@ structlog.configure(
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
+        # Capture exceptions for Sentry BEFORE any formatting happens.
+        # This ensures Sentry receives raw exception objects with full stack traces
+        # and all the context from the event dict.
+        SentryStructlogProcessor(),
+        # Format exceptions for display in logs. This happens AFTER Sentry has
+        # captured the raw exception, so both Sentry (proper exception) and logs
+        # (formatted traceback) work correctly.
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
         structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
@@ -955,6 +965,7 @@ if SENTRY_DSN:
         traces_sample_rate=0,
         integrations=get_sentry_integrations(),
         send_default_pii=True,
+        before_send=SentryStructlogProcessor.before_send,
     )
 
 # Elastic APM
