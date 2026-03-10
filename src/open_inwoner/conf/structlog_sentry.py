@@ -17,7 +17,6 @@ IGNORED_LOGGERS: set[str] = _IGNORED_LOGGERS | {
     "log_outgoing_requests",
     "save_outgoing_requests",
     "django_structlog.middlewares.request",
-    "open_inwoner.utils.logentry",
 }
 
 
@@ -39,9 +38,11 @@ class SentryStructlogProcessor:
     to ensure it captures raw exception objects.
     """
 
+    level: int
+    active: bool
+
     def __init__(
         self,
-        breadcrumb_level: int = logging.INFO,
         level: int = logging.ERROR,
         active: bool = True,
     ):
@@ -49,15 +50,9 @@ class SentryStructlogProcessor:
         Initialize the Sentry processor.
 
         Args:
-            breadcrumb_level: Minimum level for breadcrumbs to attach to Sentry events.
-                Breadcrumbs are log entries that provide context leading up to an exception.
-                For example, with INFO level, all INFO+ logs before an ERROR will be
-                attached as breadcrumbs to help understand what led to the error.
-                (default: INFO, currently reserved for future use)
             level: Minimum level for capturing exceptions to Sentry (default: ERROR)
             active: Whether the processor is active (default: True)
         """
-        self.breadcrumb_level = breadcrumb_level
         self.level = level
         self.active = active
 
@@ -73,6 +68,7 @@ class SentryStructlogProcessor:
         """
         if not logger_name:
             return True
+
         return not any(logger_name.startswith(ignored) for ignored in IGNORED_LOGGERS)
 
     def _get_log_level(self, event_dict: EventDict) -> int:
@@ -86,10 +82,7 @@ class SentryStructlogProcessor:
             The numeric log level (defaults to INFO if not found)
         """
         level_name = event_dict.get("level", "").upper()
-        try:
-            return getattr(logging, level_name, logging.INFO)
-        except AttributeError:
-            return logging.INFO
+        return getattr(logging, level_name, logging.INFO)
 
     def _extract_exc_info(self, event_dict: EventDict) -> tuple | None:
         """
@@ -140,15 +133,7 @@ class SentryStructlogProcessor:
             # Sentry's set_extra should handle serialization
             # IMPORTANT: We let database errors propagate from str()/repr()
             # so they break the transaction properly if they occur
-            try:
-                scope.set_extra(key, value)
-            except (TypeError, ValueError, AttributeError):
-                # Serialization failed, try as string (may raise DB errors)
-                try:
-                    scope.set_extra(key, str(value))
-                except (TypeError, ValueError, AttributeError):
-                    # str() failed (not DB errors), try repr
-                    scope.set_extra(key, repr(value))
+            scope.set_extra(key, value)
 
         # Add log message as a tag for searchability and visibility Note: The 'event'
         # field is also added to extras above, but we add it as a tag too because:
