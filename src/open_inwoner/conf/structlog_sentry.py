@@ -84,6 +84,33 @@ class SentryStructlogProcessor:
         level_name = event_dict.get("level", "").upper()
         return getattr(logging, level_name, logging.INFO)
 
+    def _make_safe_for_sentry(self, value):
+        """
+        Convert a value to a safe type for Sentry that won't trigger database queries.
+
+        Non-primitive types are replaced with a placeholder to avoid any potential
+        database access or serialization issues.
+
+        Args:
+            value: The value to convert
+
+        Returns:
+            The value if it's a safe primitive, otherwise a placeholder string
+        """
+        # Handle primitives that are already safe
+        if value is None or isinstance(value, (bool, int, float, str)):
+            return value
+
+        # Handle collections recursively
+        if isinstance(value, dict):
+            return {k: self._make_safe_for_sentry(v) for k, v in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [self._make_safe_for_sentry(item) for item in value]
+
+        # For anything else (Django models, querysets, lazy objects, etc.),
+        # use a placeholder to avoid database access or serialization issues
+        return f"<{type(value).__name__}>"
+
     def _extract_exc_info(self, event_dict: EventDict) -> tuple | None:
         """
         Extract exception info and normalize to tuple format.
@@ -122,7 +149,7 @@ class SentryStructlogProcessor:
             event_dict: The structlog event dictionary
         """
         # Add all event_dict fields as extra context
-        # Make sure we serialize complex objects to strings
+        # Eagerly serialize values to prevent database access during Sentry processing
         for key, value in event_dict.items():
             if key in (
                 "exc_info",
@@ -130,10 +157,10 @@ class SentryStructlogProcessor:
             ):
                 continue
 
-            # Sentry's set_extra should handle serialization
-            # IMPORTANT: We let database errors propagate from str()/repr()
-            # so they break the transaction properly if they occur
-            scope.set_extra(key, value)
+            # Eagerly convert to safe types to avoid database queries during
+            # Sentry processing. This prevents interference with ongoing transactions.
+            safe_value = self._make_safe_for_sentry(value)
+            scope.set_extra(key, safe_value)
 
         # Add log message as a tag for searchability and visibility Note: The 'event'
         # field is also added to extras above, but we add it as a tag too because:
