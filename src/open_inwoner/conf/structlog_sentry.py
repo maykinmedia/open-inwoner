@@ -131,27 +131,31 @@ class SentryStructlogProcessor:
         # Add all event_dict fields as extra context
         # Make sure we serialize complex objects to strings
         for key, value in event_dict.items():
-            if key not in (
+            if key in (
                 "exc_info",
-                # "logger",
-                "level",
                 "timestamp",
             ):
-                # Sentry's set_extra should handle serialization
-                # IMPORTANT: We let database errors propagate from str()/repr()
-                # so they break the transaction properly if they occur
-                try:
-                    scope.set_extra(key, value)
-                except (TypeError, ValueError, AttributeError):
-                    # Serialization failed, try as string (may raise DB errors)
-                    try:
-                        scope.set_extra(key, str(value))
-                    except (TypeError, ValueError, AttributeError):
-                        # str() failed (not DB errors), try repr
-                        scope.set_extra(key, repr(value))
+                continue
 
-        # Add log message as context if present
-        # Note: str() calls may trigger __str__ with DB queries - we let those propagate
+            # Sentry's set_extra should handle serialization
+            # IMPORTANT: We let database errors propagate from str()/repr()
+            # so they break the transaction properly if they occur
+            try:
+                scope.set_extra(key, value)
+            except (TypeError, ValueError, AttributeError):
+                # Serialization failed, try as string (may raise DB errors)
+                try:
+                    scope.set_extra(key, str(value))
+                except (TypeError, ValueError, AttributeError):
+                    # str() failed (not DB errors), try repr
+                    scope.set_extra(key, repr(value))
+
+        # Add log message as a tag for searchability and visibility Note: The 'event'
+        # field is also added to extras above, but we add it as a tag too because:
+        # 1. Tags are indexed and searchable in Sentry UI (can filter by
+        #    log_message:"error text")
+        # 2. Tags show prominently in the Sentry UI tags section
+        # 3. Extras are for detailed context, tags are for filtering/grouping
         if event_message := event_dict.get("event"):
             scope.set_tag("log_message", str(event_message))
 
