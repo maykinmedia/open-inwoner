@@ -1556,6 +1556,78 @@ class TestCaseDetailView(
 
         self.assertEqual(result, end_status_type)
 
+    def test_status_description_prosemirror_html_rendering(self, m):
+        """
+        Regression test: status.description ProseMirror fields should render HTML
+        correctly using |prosemirror_content|safe filter in statuses.html template
+        """
+        # Test using .html assignment pattern
+        config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_new["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+        config.description.html = (
+            "<p><strong>Bold text</strong> and <em>italic text</em></p>"
+        )
+        config.save()
+
+        self._setUpMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        # Assert HTML is rendered, not escaped
+        self.assertContains(response, "<strong>Bold text</strong>")
+        self.assertContains(response, "<em>italic text</em>")
+        self.assertNotContains(response, "&lt;strong&gt;")
+        self.assertNotContains(response, "&lt;em&gt;")
+
+    def test_status_description_prosemirror_with_links(self, m):
+        """
+        Regression test: status.description should render links correctly
+        """
+        config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_new["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+        config.description.html = (
+            '<p>Visit <a href="https://example.com">our website</a> for more info</p>'
+        )
+        config.save()
+
+        self._setUpMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        # Assert link is rendered with correct classes (get_rendered_content adds them)
+        self.assertContains(response, '<p class="utrecht-paragraph">')
+        self.assertContains(
+            response, '<a class="link link--secondary" href="https://example.com">'
+        )
+        self.assertContains(response, "our website")
+        # Verify HTML is NOT escaped
+        self.assertNotContains(response, "&lt;a href=")
+        self.assertNotContains(response, "&lt;p&gt;")
+
+    def test_status_description_empty_prosemirror_field(self, m):
+        """
+        Regression test: empty ProseMirror fields should handle gracefully
+        """
+        self._setUpMocks(m)
+
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.zaaktype_config,
+            statustype_url=self.status_type_new["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            description=None,
+        )
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        # Should render without errors
+        self.assertEqual(response.status_code, 200)
+
     def test_document_ordering_by_date(self, m):
         """
         Assert that case documents are sorted by date
@@ -2154,6 +2226,68 @@ class TestCaseDetailView(
         # BeautifulSoup's .text property only preserves newlines that exist in the source HTML.
         # For compact HTML without newlines, adjacent block elements are concatenated without separators.
         self.assertEqual(info_card.text.strip(), "info\nFoobar")
+
+        # Regression test: verify HTML tags are rendered with classes, not escaped
+        # get_rendered_content adds "utrecht-paragraph" class to <p> tags
+        self.assertContains(response, '<p class="utrecht-paragraph">Foo</p>')
+        self.assertContains(response, '<p class="utrecht-paragraph">bar</p>')
+        self.assertNotContains(response, "&lt;p&gt;")
+
+    def test_document_upload_description_prosemirror_html_assignment(self, m):
+        """
+        Regression test: document_upload_description should render HTML correctly
+        when using the .html assignment pattern (field.html = "<p>content</p>")
+        """
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
+            identificatie=self.zaaktype["identificatie"],
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+
+        # Use .html assignment pattern to set ProseMirror content
+        config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            statustype_url=self.status_type_finish["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+        )
+        config.document_upload_description.html = (
+            "<p><strong>Important:</strong> Please upload <em>all required documents</em> "
+            'before submitting. <a href="https://help.example.com">Need help?</a></p>'
+        )
+        config.save()
+
+        response = self.app.get(
+            reverse(
+                "cases:case_detail_content",
+                kwargs={
+                    "object_id": self.zaak["uuid"],
+                    "api_group_id": self.api_group.id,
+                },
+            ),
+            user=self.user,
+        )
+
+        # Verify HTML is rendered with classes, not escaped
+        # get_rendered_content adds "utrecht-paragraph" class to <p> tags
+        self.assertContains(response, '<p class="utrecht-paragraph">')
+        self.assertContains(response, "<strong>Important:</strong>")
+        self.assertContains(response, "<em>all required documents</em>")
+        # get_rendered_content adds "link link--secondary" class to external links
+        self.assertContains(
+            response, '<a class="link link--secondary" href="https://help.example.com">'
+        )
+
+        # Verify HTML is NOT escaped
+        self.assertNotContains(response, "&lt;strong&gt;")
+        self.assertNotContains(response, "&lt;em&gt;")
+        self.assertNotContains(response, "&lt;a href=")
 
     @patch(
         "open_inwoner.cms.cases.views.status.InnerCaseDetailView.is_file_upload_enabled_for_statustype",

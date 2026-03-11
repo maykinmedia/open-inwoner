@@ -4,7 +4,10 @@
 Bugfixes
 --------
 
-* ...
+* [:gh:`2307`] Correctie van ProseMirror velden in zaakstatus templates om HTML correct
+  weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
+  het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
+  zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
 
 2.0.3 (2026-02-20)
 ==================
