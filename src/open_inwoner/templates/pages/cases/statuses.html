@@ -1,4 +1,4 @@
-{% load i18n button_tags icon_tags %}
+{% load i18n button_tags icon_tags render_tags %}
 
 {% if zaak.statuses %}
 <h2 class="utrecht-heading-2" id="statuses">{% trans 'Status' %}</h2>
@@ -65,7 +65,7 @@
                         <div class="status-list__notification-content" id="{{ completed_id }}">
                             <p class="utrecht-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                                 {# Configurable texts #}
-                                <span>{{ status.description|default:"" }}</span>
+                                <span>{{ status.description|default:""|prosemirror_content|safe }}</span>
                             </p>
                             <p class="utrecht-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
                         </div>
