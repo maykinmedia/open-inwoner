@@ -146,6 +146,12 @@ Hier kiest u welke statussen een document moet hebben om zichtbaar te zijn voor 
 **Standaard actie deadline termijn in dagen**
 Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie te ondernemen.
 
+**Notification frequency limit (seconds)**
+Minimale tijd in seconden tussen twee opeenvolgende notificatie-e-mails aan dezelfde
+gebruiker voor dezelfde zaak. Voorkomt dat gebruikers worden overspoeld met e-mails
+wanneer er meerdere statuswijzigingen kort na elkaar plaatsvinden. De standaardwaarde
+is 900 seconden (15 minuten).
+
 **Maximale upload grootte (in MB)**
 Hier kiest u de maximaal toegestane grootte van te uploaden documenten.
 
@@ -535,7 +541,9 @@ Bij kanalen vult u de kanalen in waarop u zich wilt abonneren. U kunt meerdere k
 
 Wanneer alle velden zijn ingevuld klikt u op [Opslaan]. Hierna dient u de Webhook te registreren explciet door het in de lijst te selecteren en te klikken op [Webhook registreren]. De NRC-API zal worden gebruikt om de Webhook te registreren.
 
-U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webhook correct is geregistreerd. Indien dit het geval is, veschijnen er voor elke ontvangen notificatie een taak met de naam: ``open_inwoner.openzaak.tasks.process_zaken_notification``. Ziet u deze taak (vaak) verschijnen? Dan is de webhook succesvol geregistreerd.
+Wanneer de webhook correct is geregistreerd en berichten ontvangt, worden deze opgeslagen als
+notificatieberichten en asynchroon verwerkt via een Celery-taak. U kunt de ontvangen berichten
+inzien en beheren via §9.17.3.
 
 .. warning::
    Zodra de webhook met succes is geregistreerd zal hij in het bovenstaande overzicht een URL set krijgen waarmee men zich kan abonneren. Blijft het veld onder nc-abonnement leeg, dan is de registratie niet gelukt.
@@ -544,6 +552,79 @@ U kunt Onder het menu item Overige/diverse onder 'tasks' controleren of de webho
 --------------------------------------
 
 Indien u een webhook-abonnement wilt verwijderen is het belangrijk tijdens het verwijderproces de juiste volgorde aan te houden. U dient allereerst de webhook te deregistreren via de "Acties"-optie. Vervolgens kunt u de webhook verwijderen door in het overzicht van webhooks op de knop [verwijderen] te klikken. Als de webhook succesvol is gederegistreerd zal in het overzicht de URL bij de betreffende webhook verdwenen zijn. Is het deregistreren niet gelukt, dan zult u een foutmelding in beeld krijgen.
+
+9.17.3. Notificatieberichten
+-----------------------------
+
+Elk binnenkomend webhookbericht wordt direct opgeslagen als een notificatiebericht onder
+*Data koppelingen > Notificatieberichten*, ongeacht of de verdere verwerking slaagt. Dit biedt
+een auditspoor van alle ontvangen berichten en maakt het mogelijk om mislukte berichten opnieuw
+te verwerken.
+
+Statusoverzicht
+^^^^^^^^^^^^^^^
+
+Elk notificatiebericht doorloopt een verwerkingsstatus:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Status
+     - Betekenis
+   * - **In behandeling** (pending)
+     - Het bericht is ontvangen en wacht op verwerking door de achtergrondtaak.
+   * - **Wordt verwerkt** (processing)
+     - De achtergrondtaak is bezig met verwerken. Deze status fungeert tevens als vergrendeling
+       om gelijktijdige verwerking te voorkomen.
+   * - **Geslaagd** (success)
+     - Het bericht is succesvol verwerkt.
+   * - **Mislukt** (failed)
+     - Er is een fout opgetreden tijdens de verwerking. Het veld *Verwerkingsfout* bevat de
+       foutmelding. Het bericht kan opnieuw worden aangeboden (zie hieronder).
+   * - **Overgeslagen** (skipped)
+     - Het bericht is bewust niet verwerkt, bijvoorbeeld omdat zaaknotificaties uitgeschakeld
+       zijn in de siteconfiguratie.
+
+Berichten opnieuw verwerken
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Mislukte, overgeslagen of eerder geslaagde berichten kunnen opnieuw worden aangeboden via de
+bulkactie **"Geselecteerde notificaties opnieuw proberen"**:
+
+#. Selecteer een of meer berichten in de lijst.
+#. Kies "Geselecteerde notificaties opnieuw proberen" in het actiemenu.
+#. Klik op [Uitvoeren].
+
+De geselecteerde berichten worden teruggezet naar de status *In behandeling* en opnieuw
+ingepland voor verwerking. Berichten die al de status *Wordt verwerkt* hebben, worden
+overgeslagen.
+
+9.17.4. Notificatieverwerking configuratie
+------------------------------------------
+
+Via *Data koppelingen > Notificatieverwerking configuratie* kunt u twee instellingen beheren:
+
+**Maximale payload-grootte**
+De maximaal toegestane berichtgrootte in bytes voor inkomende webhooks. Berichten die deze
+grens overschrijden worden direct geweigerd met een foutmelding aan de verzender. De
+standaardwaarde is 1 MB (1.048.576 bytes).
+
+**Bewaartermijn (dagen)**
+Het aantal dagen dat notificatieberichten worden bewaard. Berichten in een eindstatus
+(geslaagd, mislukt of overgeslagen) die ouder zijn dan deze termijn worden automatisch
+verwijderd door de dagelijkse achtergrondtaak *"Opschonen notificatieberichten"*. Laat dit
+veld leeg om berichten onbeperkt te bewaren.
+
+**Bewaartermijn vastgelopen berichten (dagen)**
+Het aantal dagen waarna notificatieberichten met de status *Wordt verwerkt* worden beschouwd als
+vastgelopen - dit treedt op wanneer een achtergrondtaak is gestopt vóór het afronden van
+de verwerking. Zulke berichten worden automatisch verwijderd door dezelfde dagelijkse
+achtergrondtaak. Laat dit veld leeg om vastgelopen berichten niet automatisch op te schonen.
+
+.. note::
+   Berichten met de status *In behandeling* worden nooit automatisch verwijderd; deze kunnen
+   nog worden opgepakt door een achtergrondwerker.
 
 9.18. Zaaktype configuraties
 ============================

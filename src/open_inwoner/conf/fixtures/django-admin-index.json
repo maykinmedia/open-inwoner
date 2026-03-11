@@ -139,6 +139,8 @@
       "models": [
         ["laposta", "lapostaconfig"],
         ["mijn_afval", "mijnafvalconfig"],
+        ["notifications", "notificationprocessingconfig"],
+        ["notifications", "notificationrecord"],
         ["notifications", "notificationsapiconfig"],
         ["notifications", "subscription"],
         ["objectsapiclient", "objectsapiserviceconfiguration"],
