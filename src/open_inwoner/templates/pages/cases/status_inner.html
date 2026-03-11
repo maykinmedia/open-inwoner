@@ -1,4 +1,4 @@
-{% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags solo_tags link_tags button_tags icon_tags notification_tags %}
+{% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags solo_tags link_tags button_tags icon_tags notification_tags render_tags %}
 
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
@@ -36,7 +36,7 @@
                     <div class="card__body document-upload-description">
                         {% icon icon="info" icon_position="after" extra_classes="icon--info" outlined=True %}
 
-                        <div class="document-upload-description__text wysiwyg">{{ zaak.case_type_document_upload_description.html|safe }}</div>
+                        <div class="document-upload-description__text wysiwyg">{{ zaak.case_type_document_upload_description|prosemirror_content|safe }}</div>
                     </div>
                 </div>
                 {% endif %}
