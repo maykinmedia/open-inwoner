@@ -1,7 +1,6 @@
 import logging  # noqa: TID251 - only used for log levels
 from datetime import date, timedelta
 
-from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -310,7 +309,7 @@ def _handle_zaakinformatieobject_update(
         return
 
     # let's not spam the users
-    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    period = timedelta(seconds=OpenZaakConfig.get_solo().notification_frequency_limit)
     if note.has_received_similar_notes_within(period, template_name):
         _log_helper.log_notification_email_rate_limited(
             notification, user, zaak_info_object.url, zaak.url
@@ -321,7 +320,7 @@ def _handle_zaakinformatieobject_update(
     note.mark_sent()
 
     _log_helper.log_notification_email_sent(
-        notification, user, zaak_info_object.url, zaak.url
+        notification, user, zaak_info_object.url, zaak.url, template_name=template_name
     )
 
 
@@ -612,7 +611,7 @@ def _handle_status_update(
         return
 
     # let's not spam the users
-    period = timedelta(seconds=settings.ZGW_LIMIT_NOTIFICATIONS_FREQUENCY)
+    period = timedelta(seconds=OpenZaakConfig.get_solo().notification_frequency_limit)
     if note.has_received_similar_notes_within(period, template_name):
         _log_helper.log_notification_email_rate_limited(
             notification, user, status.url, zaak.url
@@ -624,7 +623,9 @@ def _handle_status_update(
     )
     note.mark_sent()
 
-    _log_helper.log_notification_email_sent(notification, user, status.url, zaak.url)
+    _log_helper.log_notification_email_sent(
+        notification, user, status.url, zaak.url, template_name=template_name
+    )
 
 
 # - - - - -

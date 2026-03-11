@@ -1,7 +1,7 @@
 import logging  # noqa: TID251 - only used for log levels
 from unittest.mock import Mock, patch
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 import requests_mock
 from freezegun import freeze_time
@@ -423,7 +423,6 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         )
 
 
-@override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
 class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     """
@@ -434,6 +433,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         MockAPIData.setUpServices()
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.notification_frequency_limit = 3600
+        oz_config.save()
 
     @patch(
         "open_inwoner.userfeed.hooks.case_document_added_notification_received",

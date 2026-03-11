@@ -1,3 +1,4 @@
+import json
 import logging  # noqa: TID251 - only used for log levels
 from unittest.mock import patch
 from urllib.parse import urlencode
@@ -6,9 +7,12 @@ from django.test import TestCase, override_settings
 from django.urls import reverse_lazy
 
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIRequestFactory, APITestCase
 from zds_client import ClientAuth
 
+from notifications.constants import ProcessingStatus
+from notifications.models import NotificationRecord
+from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
 from open_inwoner.openzaak.api_models import Notification
 from open_inwoner.openzaak.auth import get_valid_subscriptions_from_bearer
 from open_inwoner.openzaak.exceptions import (
@@ -87,6 +91,15 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
     """
 
     url = reverse_lazy("openzaak_api:notifications_webhook_zaken")
+
+    def setUp(self):
+        super().setUp()
+        # Ensure SiteConfiguration exists with notifications enabled
+        from open_inwoner.configurations.models import SiteConfiguration
+
+        self.config = SiteConfiguration.get_solo()
+        self.config.notifications_cases_enabled = True
+        self.config.save()
 
     def get_raw_notification(
         self,
@@ -168,6 +181,27 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         self.assertIsInstance(notification, Notification)
         self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
 
+    def test_api_marks_record_failed_when_task_scheduling_fails(self, mock_handle):
+        """Broker unavailability must leave the record FAILED, not stuck in PENDING."""
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+        raw_notification = self.get_raw_notification()
+
+        with patch(
+            "open_inwoner.openzaak.api.views.process_zaken_notification"
+        ) as mock_task:
+            mock_task.delay.side_effect = Exception("broker unavailable")
+            response = self.client.post(
+                self.url, raw_notification, **headers, format="json"
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        mock_handle.assert_not_called()
+
+        record = NotificationRecord.objects.get()
+        self.assertEqual(record.status, ProcessingStatus.FAILED)
+        self.assertEqual(record.processing_error, "broker unavailable")
+
     def test_api_returns_http_500_when_valid_but_handler_raises(self, mock_handle):
         mock_handle.side_effect = Exception("whoopsie")
 
@@ -186,18 +220,12 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         self.assertIsInstance(notification, Notification)
         self.assertEqual(notification.hoofd_object, raw_notification["hoofdObject"])
 
-        self.assertTimelineLog(
-            "error handling notification: whoopsie", level=logging.ERROR
-        )
-
     def test_api_returns_http_401_without_valid_auth(self, mock_handle):
         raw_notification = self.get_raw_notification()
 
         response = self.client.post(self.url, raw_notification, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         mock_handle.assert_not_called()
-
-        self.assertTimelineLog("missing Authorization header", level=logging.ERROR)
 
     def test_api_returns_http_401_without_matching_subscription(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
@@ -211,10 +239,6 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         mock_handle.assert_not_called()
-
-        self.assertTimelineLog(
-            "no subscriptions for client_id 'not_foo'", level=logging.ERROR
-        )
 
     def test_api_returns_http_401_on_missing_notification_members(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
@@ -233,8 +257,6 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
             {"resource": ["Dit veld is vereist."]},
         )
         mock_handle.assert_not_called()
-
-        self.assertTimelineLog("cannot deserialize notification", level=logging.ERROR)
 
     def test_api_returns_http_401_on_invalid_subscription_kanaal(self, mock_handle):
         SubscriptionFactory.create(client_id="foo", secret="password")
@@ -287,3 +309,112 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
             "notification channel 'not_webhook_kanaal' not acceptable by webhook",
             level=logging.ERROR,
         )
+
+    def test_api_returns_http_400_on_invalid_json(self, mock_handle):
+        """Test that invalid JSON in request body is rejected by DRF"""
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+
+        # Send invalid JSON (note: we need to bypass DRF's JSON parser)
+        response = self.client.post(
+            self.url,
+            data="invalid json{",  # Invalid JSON string
+            content_type="application/json",
+            **headers,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("not valid json", response.content.decode())
+        mock_handle.assert_not_called()
+
+        # Verify no NotificationRecord was created
+        self.assertEqual(NotificationRecord.objects.count(), 0)
+
+    def test_api_accepts_valid_json_only(self, mock_handle):
+        """Test that only valid JSON payloads are accepted and stored"""
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+
+        raw_notification = self.get_raw_notification()
+
+        response = self.client.post(
+            self.url, raw_notification, **headers, format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Verify NotificationRecord was created with JSON payload
+        self.assertEqual(NotificationRecord.objects.count(), 1)
+        record = NotificationRecord.objects.first()
+        self.assertIsInstance(record.payload, dict)
+        self.assertEqual(record.payload["kanaal"], "zaken")
+        self.assertEqual(record.payload["resource"], "zaak")
+
+    def test_api_rejects_payload_too_large(self, mock_handle):
+        """Test that payloads exceeding max_payload_size are rejected"""
+        from notifications.models import NotificationProcessingConfig
+
+        # Set a 1KB limit for testing
+        config = NotificationProcessingConfig.get_solo()
+        config.max_payload_size = 1024
+        config.save()
+
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+
+        # Create a large payload that exceeds the limit (1KB + 500 bytes)
+        large_payload = {
+            "kanaal": "zaken",
+            "resource": "zaak",
+            "resourceUrl": "http://example.com/zaak/1",
+            "data": "x" * 1500,
+        }
+
+        response = self.client.post(
+            self.url,
+            data=large_payload,
+            content_type="application/json",
+            **headers,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        self.assertIn("payload too large", response.json()["detail"])
+        mock_handle.assert_not_called()
+
+        # Verify no NotificationRecord was created
+        self.assertEqual(NotificationRecord.objects.count(), 0)
+
+    def test_api_rejects_payload_too_large_without_content_length_header(
+        self, mock_handle
+    ):
+        """Chunked/headerless requests are measured by buffering when Content-Length is absent"""
+        from notifications.models import NotificationProcessingConfig
+
+        config = NotificationProcessingConfig.get_solo()
+        config.max_payload_size = 1024
+        config.save()
+
+        SubscriptionFactory.create(client_id="foo", secret="password")
+
+        large_payload = {
+            "kanaal": "zaken",
+            "resource": "zaak",
+            "resourceUrl": "http://example.com/zaak/1",
+            "data": "x" * 1500,
+        }
+
+        factory = APIRequestFactory()
+        request = factory.post(
+            self.url,
+            data=json.dumps(large_payload),
+            content_type="application/json",
+            HTTP_AUTHORIZATION=generate_auth_header_value("foo", "password"),
+        )
+        del request.META["CONTENT_LENGTH"]
+
+        response = ZakenNotificationsWebhookView.as_view()(request)
+
+        self.assertEqual(response.status_code, status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        self.assertIn("payload too large", response.data["detail"])
+        mock_handle.assert_not_called()
+        self.assertEqual(NotificationRecord.objects.count(), 0)

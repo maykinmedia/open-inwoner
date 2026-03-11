@@ -523,6 +523,15 @@ class OpenZaakConfig(SingletonModel):
         default=15,
         help_text=_("Aantal dagen voor gebruiker om actie te ondernemen."),
     )
+    notification_frequency_limit = models.PositiveIntegerField(
+        verbose_name=_("Notification frequency limit (seconds)"),
+        default=60 * 15,
+        help_text=_(
+            "Minimum time in seconds between notification emails sent to a user for "
+            "the same case. Prevents email spam when multiple status changes occur in "
+            "quick succession. Default is 900 seconds (15 minutes)."
+        ),
+    )
     zaken_filter_enabled = models.BooleanField(
         verbose_name=_("Enable zaken filter"),
         default=False,

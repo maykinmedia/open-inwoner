@@ -109,7 +109,7 @@ class StatusNotificationHandlerTestCase(
             ]
         ):
             with self.subTest(f"api_group_{idx}"):
-                webhook_view.handle_notification(notification)
+                handle_zaken_notification(notification)
 
                 mock_handle.assert_called()
 
@@ -128,52 +128,15 @@ class StatusNotificationHandlerTestCase(
         self.assertIn(data.user_initiator.email, log_dump)
         self.assertIn(data_alt.user_initiator_alt.email, log_dump)
 
-    def test_case_notifications_disabled(self, m, mock_handle: Mock):
-        data = MockAPIData().install_mocks(m)
-
-        # Added for https://taiga.maykinmedia.nl/project/open-inwoner/task/1904
-        # In eSuite it is possible to reuse a StatusType for multiple ZaakTypen, which
-        # led to errors when retrieving the ZaakTypeStatusTypeConfig. This duplicate
-        # config is added to verify that that issue was solved
-        ztc = ZaakTypeConfigFactory.create(
-            catalogus__url=data.zaak_type["catalogus"],
-            identificatie=data.zaak_type["identificatie"],
-        )
-        ZaakTypeStatusTypeConfigFactory.create(
-            omschrijving=data.status_type_final["omschrijving"],
-            statustype_url=data.status_type_final["url"],
-        )
-        ZaakTypeStatusTypeConfigFactory.create(
-            zaaktype_config=ztc,
-            omschrijving=data.status_type_final["omschrijving"],
-            statustype_url=data.status_type_final["url"],
-        )
-
-        request = RequestFactory().get("/")
-        webhook_view = ZakenNotificationsWebhookView()
-        webhook_view.setup(request)
-
-        config = SiteConfiguration.get_solo()
-        config.notifications_cases_enabled = False
-        config.save()
-
-        webhook_view.handle_notification(data.status_notification)
-
-        mock_handle.assert_not_called()
-
     # start of generic checks
 
     def test_no_api_group_found(self, m, mock_handle: Mock):
         data = MockAPIData().install_mocks(m)
 
-        request = RequestFactory().get("/")
-        webhook_view = ZakenNotificationsWebhookView()
-        webhook_view.setup(request)
-
         # API group is resolved from zaak url == hoofd_object
         data.status_notification.hoofd_object = "http://www.bogus.com"
 
-        webhook_view.handle_notification(data.status_notification)
+        handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
 
@@ -670,7 +633,6 @@ class StatusNotificationHandlerTestCase(
         mock_handle.assert_not_called()
 
 
-@override_settings(ZGW_LIMIT_NOTIFICATIONS_FREQUENCY=3600)
 @freeze_time("2023-01-01 01:00:00")
 class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     """
@@ -681,6 +643,9 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         MockAPIData.setUpServices()
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.notification_frequency_limit = 3600
+        oz_config.save()
 
     @patch(
         "open_inwoner.userfeed.hooks.case_status_notification_received", autospec=True

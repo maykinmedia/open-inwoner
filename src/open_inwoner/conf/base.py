@@ -868,6 +868,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "log_outgoing_requests.tasks.prune_logs",
         "schedule": crontab(hour=0, minute=0),
     },
+    "Opschonen notificatieberichten": {
+        "task": "notifications.tasks.prune_notification_records",
+        "schedule": crontab(hour=3, minute=0),
+    },
 }
 
 # Only ACK when the task has been executed. This prevents tasks from getting lost, with
@@ -1059,10 +1063,6 @@ ZGW_CACHE_WARMUP_TIMEOUT = config("ZGW_CACHE_WARMUP_TIMEOUT", default=120)
 # needed out of the box.
 CACHE_SEEDING_QUEUE = config("CACHE_SEEDING_QUEUE", default="celery")
 
-# notifications
-ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
-    "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
-)
 
 # recent documents: created/added no longer than n days in the past
 DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)

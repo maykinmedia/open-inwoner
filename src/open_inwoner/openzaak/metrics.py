@@ -28,3 +28,21 @@ webhook_notification_emails_sent = meter.create_counter(
         "Attributes: notification_type (str), template_name (str)"
     ),
 )
+
+webhook_processing_failures = meter.create_counter(
+    "oip.webhooks.processing_failures",
+    unit="{failure}",
+    description=(
+        "Number of webhook notification processing failures. "
+        "Attributes: channel (str), reason (str)"
+    ),
+)
+
+webhook_processing_skipped = meter.create_counter(
+    "oip.webhooks.processing_skipped",
+    unit="{notification}",
+    description=(
+        "Number of webhook notifications skipped during processing. "
+        "Attributes: channel (str), reason (str)"
+    ),
+)

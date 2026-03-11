@@ -89,6 +89,7 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "document_max_confidentiality",
                     "document_visible_statuses",
                     "action_required_deadline_days",
+                    "notification_frequency_limit",
                     "max_upload_size",
                     "allowed_file_extensions",
                     "title_text",

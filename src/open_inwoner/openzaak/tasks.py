@@ -9,14 +9,25 @@ from celery_once import QueueOnce
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.concurrent import parallel
 
+from notifications.exceptions import (
+    NotificationAlreadyProcessedError,
+    NotificationRecordLockError,
+    NotificationSkippedException,
+)
+from notifications.models import NotificationRecord
 from open_inwoner.accounts.user_identification import (
     BSNIdentification,
     KVKIdentification,
     UserIdentification,
 )
 from open_inwoner.celery import app
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Notification, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
+from open_inwoner.openzaak.metrics import (
+    webhook_processing_failures,
+    webhook_processing_skipped,
+)
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.notifications import handle_zaken_notification
 from open_inwoner.openzaak.services import ZGWService
@@ -38,10 +49,58 @@ def import_zgw_data():
 
 
 @app.task
-def process_zaken_notification(notification_data: dict):
-    logger.info("Started process_zaken_notification() task")
-    notification = factory(Notification, notification_data)
-    handle_zaken_notification(notification)
+def process_zaken_notification(record_pk: int):
+    logger.info("Started process_zaken_notification() task", record_pk=record_pk)
+
+    try:
+        with NotificationRecord.objects.lock_for_processing(record_pk) as record:
+            config = SiteConfiguration.get_solo()
+            if not config.notifications_cases_enabled:
+                logger.info(
+                    "Skipping notification processing - case notifications disabled",
+                    record_pk=record_pk,
+                )
+                record.processing_output = (
+                    "Case notifications are disabled in configuration"
+                )
+                record.save(update_fields=["processing_output"])
+                raise NotificationSkippedException("Case notifications disabled")
+
+            notification = factory(Notification, record.payload)
+            try:
+                handle_zaken_notification(notification)
+            except Exception as e:
+                webhook_processing_failures.add(
+                    1,
+                    attributes={
+                        "channel": record.kanaal or "unknown",
+                        "reason": type(e).__name__,
+                    },
+                )
+                logger.exception(
+                    "Unknown error while processing notification", record_pk=record_pk
+                )
+                raise
+    except NotificationRecord.DoesNotExist:
+        logger.error(
+            "Attempted to process unknown Notification Record",
+            record_pk=record_pk,
+        )
+        raise
+    except (NotificationRecordLockError, NotificationAlreadyProcessedError) as e:
+        # Already locked or processed - don't count as failure (idempotent/concurrent access)
+        logger.info(str(e), record_pk=record_pk)
+        raise
+    except NotificationSkippedException as e:
+        # Skipped - not a failure, just disabled
+        webhook_processing_skipped.add(
+            1,
+            attributes={
+                "channel": record.kanaal or "unknown",
+                "reason": str(e),
+            },
+        )
+        raise
 
 
 @app.task(
