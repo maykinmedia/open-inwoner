@@ -23,6 +23,7 @@ Bugfixes
   efficiënter te loggen. De processor voorkomt database-toegang en serialisatie-fouten tijdens
   foutafhandeling door niet-primitieve types om te zetten naar veilige placeholders. Bevat
   recursie-bescherming en uitgebreide tests.
+* [:gh:`2278`]: Correctie in de sortering zaken. Alle zaken worden nu gesorteerd op startdatum.
 
 Onderhoud
 ---------

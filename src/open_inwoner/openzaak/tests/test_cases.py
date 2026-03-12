@@ -37,7 +37,6 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import (
     AssertRedirectsMixin,
     AssertTimelineLogMixin,
-    Lookups,
 )
 
 from .factories import (
@@ -562,73 +561,75 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.client.force_login(user=self.user)
         response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
+        # The sort order is: startdatum desc, then api_group index as tiebreaker.
+        # Zaken with the same date are interleaved across api groups.
+        # Dates: zaak2=2022-01-12, zaak1=2022-01-02, zaak3=2021-07-26, zaak_result=2020-01-01
         expected_zaken = []
         for i, mock in enumerate(self.mocks):
-            expected_zaken.extend(
-                [
-                    {
-                        "uuid": mock.zaak2["uuid"],
-                        "start_date": datetime.date.fromisoformat(
-                            mock.zaak2["startdatum"]
-                        ),
-                        "end_date": None,
-                        "identification": mock.zaak2["identificatie"],
-                        "description": mock.zaaktype["omschrijving"],
-                        "current_status": mock.status_type_initial["omschrijving"],
-                        "result": "",
-                        "zaaktype_config": mock.zaaktype_config1,
-                        "statustype_config": mock.zt_statustype_config1,
-                        "type_aanvraag": TypeAanvraag.ZAAK.value,
-                        "api_group": self.api_groups[i],
-                    },
-                    {
-                        "uuid": mock.zaak1["uuid"],
-                        "start_date": datetime.date.fromisoformat(
-                            mock.zaak1["startdatum"]
-                        ),
-                        "end_date": None,
-                        "identification": mock.zaak1["identificatie"],
-                        "description": mock.zaaktype["omschrijving"],
-                        "current_status": mock.status_type_initial["omschrijving"],
-                        "result": "",
-                        "zaaktype_config": mock.zaaktype_config1,
-                        "statustype_config": mock.zt_statustype_config1,
-                        "type_aanvraag": TypeAanvraag.ZAAK.value,
-                        "api_group": self.api_groups[i],
-                    },
-                    {
-                        "uuid": mock.zaak3["uuid"],
-                        "start_date": datetime.date.fromisoformat(
-                            mock.zaak3["startdatum"]
-                        ),
-                        "end_date": datetime.date.fromisoformat(
-                            mock.zaak3["einddatum"]
-                        ),
-                        "identification": mock.zaak3["identificatie"],
-                        "description": mock.zaaktype["omschrijving"],
-                        "current_status": mock.status_type_finish["statustekst"],
-                        "result": mock.resultaat_type["omschrijving"],
-                        "zaaktype_config": mock.zaaktype_config1,
-                        "statustype_config": None,
-                        "type_aanvraag": TypeAanvraag.ZAAK.value,
-                        "api_group": self.api_groups[i],
-                    },
-                    {
-                        "uuid": mock.zaak_result["uuid"],
-                        "start_date": datetime.date.fromisoformat(
-                            mock.zaak_result["startdatum"]
-                        ),
-                        "end_date": datetime.date(2022, 1, 13),
-                        "identification": mock.zaak_result["identificatie"],
-                        "description": mock.zaaktype["omschrijving"],
-                        "current_status": mock.status_type_initial["omschrijving"],
-                        "result": mock.resultaat_type["omschrijving"],
-                        "zaaktype_config": mock.zaaktype_config1,
-                        "statustype_config": mock.zt_statustype_config1,
-                        "type_aanvraag": TypeAanvraag.ZAAK.value,
-                        "api_group": self.api_groups[i],
-                    },
-                ]
+            expected_zaken.append(
+                {
+                    "uuid": mock.zaak2["uuid"],
+                    "start_date": datetime.date.fromisoformat(mock.zaak2["startdatum"]),
+                    "end_date": None,
+                    "identification": mock.zaak2["identificatie"],
+                    "description": mock.zaaktype["omschrijving"],
+                    "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
+                    "zaaktype_config": mock.zaaktype_config1,
+                    "statustype_config": mock.zt_statustype_config1,
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
+                    "api_group": self.api_groups[i],
+                }
+            )
+        for i, mock in enumerate(self.mocks):
+            expected_zaken.append(
+                {
+                    "uuid": mock.zaak1["uuid"],
+                    "start_date": datetime.date.fromisoformat(mock.zaak1["startdatum"]),
+                    "end_date": None,
+                    "identification": mock.zaak1["identificatie"],
+                    "description": mock.zaaktype["omschrijving"],
+                    "current_status": mock.status_type_initial["omschrijving"],
+                    "result": "",
+                    "zaaktype_config": mock.zaaktype_config1,
+                    "statustype_config": mock.zt_statustype_config1,
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
+                    "api_group": self.api_groups[i],
+                }
+            )
+        for i, mock in enumerate(self.mocks):
+            expected_zaken.append(
+                {
+                    "uuid": mock.zaak3["uuid"],
+                    "start_date": datetime.date.fromisoformat(mock.zaak3["startdatum"]),
+                    "end_date": datetime.date.fromisoformat(mock.zaak3["einddatum"]),
+                    "identification": mock.zaak3["identificatie"],
+                    "description": mock.zaaktype["omschrijving"],
+                    "current_status": mock.status_type_finish["statustekst"],
+                    "result": mock.resultaat_type["omschrijving"],
+                    "zaaktype_config": mock.zaaktype_config1,
+                    "statustype_config": None,
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
+                    "api_group": self.api_groups[i],
+                }
+            )
+        for i, mock in enumerate(self.mocks):
+            expected_zaken.append(
+                {
+                    "uuid": mock.zaak_result["uuid"],
+                    "start_date": datetime.date.fromisoformat(
+                        mock.zaak_result["startdatum"]
+                    ),
+                    "end_date": datetime.date(2022, 1, 13),
+                    "identification": mock.zaak_result["identificatie"],
+                    "description": mock.zaaktype["omschrijving"],
+                    "current_status": mock.status_type_initial["omschrijving"],
+                    "result": mock.resultaat_type["omschrijving"],
+                    "zaaktype_config": mock.zaaktype_config1,
+                    "statustype_config": mock.zt_statustype_config1,
+                    "type_aanvraag": TypeAanvraag.ZAAK.value,
+                    "api_group": self.api_groups[i],
+                }
             )
 
         zaken = response.context["zaken"]
@@ -778,49 +779,44 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 self.client.force_login(user=self.eherkenning_user)
                 response = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
+                # The sort order is: startdatum desc, then api_group index as tiebreaker.
+                # Dates: zaak_eherkenning2=2022-02-02, zaak_eherkenning1=2022-01-02
                 expected_zaken = []
                 for i, mock in enumerate(self.mocks):
-                    expected_zaken.extend(
-                        [
-                            {
-                                "uuid": mock.zaak_eherkenning2["uuid"],
-                                "start_date": datetime.date.fromisoformat(
-                                    mock.zaak_eherkenning2["startdatum"]
-                                ),
-                                "end_date": None,
-                                "identification": mock.zaak_eherkenning2[
-                                    "identificatie"
-                                ],
-                                "description": mock.zaaktype["omschrijving"],
-                                "current_status": mock.status_type_initial[
-                                    "omschrijving"
-                                ],
-                                "result": "",
-                                "zaaktype_config": mock.zaaktype_config1,
-                                "statustype_config": mock.zt_statustype_config1,
-                                "type_aanvraag": TypeAanvraag.ZAAK.value,
-                                "api_group": self.api_groups[i],
-                            },
-                            {
-                                "uuid": mock.zaak_eherkenning1["uuid"],
-                                "start_date": datetime.date.fromisoformat(
-                                    mock.zaak_eherkenning1["startdatum"]
-                                ),
-                                "end_date": None,
-                                "identification": mock.zaak_eherkenning1[
-                                    "identificatie"
-                                ],
-                                "description": mock.zaaktype["omschrijving"],
-                                "current_status": mock.status_type_initial[
-                                    "omschrijving"
-                                ],
-                                "result": "",
-                                "zaaktype_config": mock.zaaktype_config1,
-                                "statustype_config": mock.zt_statustype_config1,
-                                "type_aanvraag": TypeAanvraag.ZAAK.value,
-                                "api_group": self.api_groups[i],
-                            },
-                        ]
+                    expected_zaken.append(
+                        {
+                            "uuid": mock.zaak_eherkenning2["uuid"],
+                            "start_date": datetime.date.fromisoformat(
+                                mock.zaak_eherkenning2["startdatum"]
+                            ),
+                            "end_date": None,
+                            "identification": mock.zaak_eherkenning2["identificatie"],
+                            "description": mock.zaaktype["omschrijving"],
+                            "current_status": mock.status_type_initial["omschrijving"],
+                            "result": "",
+                            "zaaktype_config": mock.zaaktype_config1,
+                            "statustype_config": mock.zt_statustype_config1,
+                            "type_aanvraag": TypeAanvraag.ZAAK.value,
+                            "api_group": self.api_groups[i],
+                        }
+                    )
+                for i, mock in enumerate(self.mocks):
+                    expected_zaken.append(
+                        {
+                            "uuid": mock.zaak_eherkenning1["uuid"],
+                            "start_date": datetime.date.fromisoformat(
+                                mock.zaak_eherkenning1["startdatum"]
+                            ),
+                            "end_date": None,
+                            "identification": mock.zaak_eherkenning1["identificatie"],
+                            "description": mock.zaaktype["omschrijving"],
+                            "current_status": mock.status_type_initial["omschrijving"],
+                            "result": "",
+                            "zaaktype_config": mock.zaaktype_config1,
+                            "statustype_config": mock.zt_statustype_config1,
+                            "type_aanvraag": TypeAanvraag.ZAAK.value,
+                            "api_group": self.api_groups[i],
+                        }
                     )
 
                 self.assertListEqual(response.context["zaken"], expected_zaken)
@@ -1243,85 +1239,145 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
     @patch.object(InnerCaseListView, "paginate_by", 4)
     def test_list_zaken_paginated(self, m):
         """
-        show only zaken from the first backend and url to the next page
+        With paginate_by=4 and 8 total zaken (4 per api group), zaken from both
+        groups are interleaved globally by startdatum (desc), with api_group index
+        as tiebreaker. Page 1 gets the 4 newest, page 2 gets the 4 oldest.
         """
         for mock in self.mocks:
             mock._setUpMocks(m)
 
-        # 1. test first page
         self.client.force_login(user=self.user)
         response_1 = self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-        expected_zaken = [
-            [
-                {
-                    "uuid": mock.zaak2["uuid"],
-                    "start_date": datetime.date.fromisoformat(mock.zaak2["startdatum"]),
-                    "end_date": None,
-                    "identification": mock.zaak2["identificatie"],
-                    "description": mock.zaaktype["omschrijving"],
-                    "current_status": mock.status_type_initial["omschrijving"],
-                    "result": "",
-                    "zaaktype_config": mock.zaaktype_config1,
-                    "statustype_config": mock.zt_statustype_config1,
-                    "type_aanvraag": TypeAanvraag.ZAAK.value,
-                    "api_group": self.api_groups[i],
-                },
-                {
-                    "uuid": mock.zaak1["uuid"],
-                    "start_date": datetime.date.fromisoformat(mock.zaak1["startdatum"]),
-                    "end_date": None,
-                    "identification": mock.zaak1["identificatie"],
-                    "description": mock.zaaktype["omschrijving"],
-                    "current_status": mock.status_type_initial["omschrijving"],
-                    "result": "",
-                    "zaaktype_config": mock.zaaktype_config1,
-                    "statustype_config": mock.zt_statustype_config1,
-                    "type_aanvraag": TypeAanvraag.ZAAK.value,
-                    "api_group": self.api_groups[i],
-                },
-                {
-                    "uuid": mock.zaak3["uuid"],
-                    "start_date": datetime.date.fromisoformat(mock.zaak3["startdatum"]),
-                    "end_date": datetime.date.fromisoformat(mock.zaak3["einddatum"]),
-                    "identification": mock.zaak3["identificatie"],
-                    "description": mock.zaaktype["omschrijving"],
-                    "current_status": mock.status_type_finish["statustekst"],
-                    "result": mock.resultaat_type["omschrijving"],
-                    "zaaktype_config": mock.zaaktype_config1,
-                    "statustype_config": None,
-                    "type_aanvraag": TypeAanvraag.ZAAK.value,
-                    "api_group": self.api_groups[i],
-                },
-                {
-                    "uuid": mock.zaak_result["uuid"],
-                    "start_date": datetime.date.fromisoformat(
-                        mock.zaak_result["startdatum"]
-                    ),
-                    "end_date": datetime.date(2022, 1, 13),
-                    "identification": mock.zaak_result["identificatie"],
-                    "description": mock.zaaktype["omschrijving"],
-                    "current_status": mock.status_type_initial["omschrijving"],
-                    "result": mock.resultaat_type["omschrijving"],
-                    "zaaktype_config": mock.zaaktype_config1,
-                    "statustype_config": mock.zt_statustype_config1,
-                    "type_aanvraag": TypeAanvraag.ZAAK.value,
-                    "api_group": self.api_groups[i],
-                },
-            ]
-            for i, mock in enumerate(self.mocks)
+        mock0, mock1 = self.mocks
+
+        # Page 1: zaak2 (2022-01-12) and zaak1 (2022-01-02) from both groups
+        expected_page1 = [
+            {
+                "uuid": self.mocks[0].zaak2["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    self.mocks[0].zaak2["startdatum"]
+                ),
+                "end_date": None,
+                "identification": self.mocks[0].zaak2["identificatie"],
+                "description": self.mocks[0].zaaktype["omschrijving"],
+                "current_status": self.mocks[0].status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": self.mocks[0].zaaktype_config1,
+                "statustype_config": self.mocks[0].zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[0],
+            },
+            {
+                "uuid": mock1.zaak2["uuid"],
+                "start_date": datetime.date.fromisoformat(mock1.zaak2["startdatum"]),
+                "end_date": None,
+                "identification": mock1.zaak2["identificatie"],
+                "description": mock1.zaaktype["omschrijving"],
+                "current_status": mock1.status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": mock1.zaaktype_config1,
+                "statustype_config": mock1.zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[1],
+            },
+            {
+                "uuid": self.mocks[0].zaak1["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    self.mocks[0].zaak1["startdatum"]
+                ),
+                "end_date": None,
+                "identification": self.mocks[0].zaak1["identificatie"],
+                "description": self.mocks[0].zaaktype["omschrijving"],
+                "current_status": self.mocks[0].status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": self.mocks[0].zaaktype_config1,
+                "statustype_config": self.mocks[0].zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[0],
+            },
+            {
+                "uuid": mock1.zaak1["uuid"],
+                "start_date": datetime.date.fromisoformat(mock1.zaak1["startdatum"]),
+                "end_date": None,
+                "identification": mock1.zaak1["identificatie"],
+                "description": mock1.zaaktype["omschrijving"],
+                "current_status": mock1.status_type_initial["omschrijving"],
+                "result": "",
+                "zaaktype_config": mock1.zaaktype_config1,
+                "statustype_config": mock1.zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[1],
+            },
         ]
 
-        self.assertListEqual(response_1.context.get("zaken"), expected_zaken[0])
-        self.assertNotContains(response_1, self.mocks[0].zaak2["url"])
+        self.assertListEqual(response_1.context.get("zaken"), expected_page1)
         self.assertContains(response_1, "?page=2")
 
-        # 2. test page 2, where the responses from the second backend begin
+        # Page 2: zaak3 (2021-07-26) and zaak_result (2020-01-01) from both groups
         next_page = f"{self.inner_url}?page=2"
         response_2 = self.client.get(next_page, HTTP_HX_REQUEST="true")
 
-        self.assertListEqual(response_2.context.get("zaken"), expected_zaken[1])
-        self.assertNotContains(response_2, self.mocks[1].zaak2["url"])
+        expected_page2 = [
+            {
+                "uuid": mock0.zaak3["uuid"],
+                "start_date": datetime.date.fromisoformat(mock0.zaak3["startdatum"]),
+                "end_date": datetime.date.fromisoformat(mock0.zaak3["einddatum"]),
+                "identification": mock0.zaak3["identificatie"],
+                "description": mock0.zaaktype["omschrijving"],
+                "current_status": mock0.status_type_finish["statustekst"],
+                "result": mock0.resultaat_type["omschrijving"],
+                "zaaktype_config": mock0.zaaktype_config1,
+                "statustype_config": None,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[0],
+            },
+            {
+                "uuid": mock1.zaak3["uuid"],
+                "start_date": datetime.date.fromisoformat(mock1.zaak3["startdatum"]),
+                "end_date": datetime.date.fromisoformat(mock1.zaak3["einddatum"]),
+                "identification": mock1.zaak3["identificatie"],
+                "description": mock1.zaaktype["omschrijving"],
+                "current_status": mock1.status_type_finish["statustekst"],
+                "result": mock1.resultaat_type["omschrijving"],
+                "zaaktype_config": mock1.zaaktype_config1,
+                "statustype_config": None,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[1],
+            },
+            {
+                "uuid": mock0.zaak_result["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    mock0.zaak_result["startdatum"]
+                ),
+                "end_date": datetime.date(2022, 1, 13),
+                "identification": mock0.zaak_result["identificatie"],
+                "description": mock0.zaaktype["omschrijving"],
+                "current_status": mock0.status_type_initial["omschrijving"],
+                "result": mock0.resultaat_type["omschrijving"],
+                "zaaktype_config": mock0.zaaktype_config1,
+                "statustype_config": mock0.zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[0],
+            },
+            {
+                "uuid": mock1.zaak_result["uuid"],
+                "start_date": datetime.date.fromisoformat(
+                    mock1.zaak_result["startdatum"]
+                ),
+                "end_date": datetime.date(2022, 1, 13),
+                "identification": mock1.zaak_result["identificatie"],
+                "description": mock1.zaaktype["omschrijving"],
+                "current_status": mock1.status_type_initial["omschrijving"],
+                "result": mock1.resultaat_type["omschrijving"],
+                "zaaktype_config": mock1.zaaktype_config1,
+                "statustype_config": mock1.zt_statustype_config1,
+                "type_aanvraag": TypeAanvraag.ZAAK.value,
+                "api_group": self.api_groups[1],
+            },
+        ]
+
+        self.assertListEqual(response_2.context.get("zaken"), expected_page2)
         self.assertContains(response_2, "?page=1")
 
     @patch.object(InnerCaseListView, "paginate_by", 4)
@@ -1331,42 +1387,58 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
 
         self.client.force_login(user=self.user)
 
-        for page, mock in enumerate(self.mocks):
-            with self.subTest(f"page {page + 1}"):
-                url = self.inner_url + f"?page={page + 1}"
-                response = self.client.get(url, HTTP_HX_REQUEST="true")
+        with self.subTest("page 1"):
+            url = self.inner_url + "?page=1"
+            response = self.client.get(url, HTTP_HX_REQUEST="true")
 
-                expected_uuids = [
-                    mock.zaak2["uuid"],
-                    mock.zaak1["uuid"],
-                    mock.zaak3["uuid"],
-                    mock.zaak_result["uuid"],
-                ]
-                self.assertListEqual(
-                    [c["uuid"] for c in response.context.get("zaken")], expected_uuids
-                )
+            expected_uuids = [
+                self.mocks[0].zaak2["uuid"],
+                self.mocks[1].zaak2["uuid"],
+                self.mocks[0].zaak1["uuid"],
+                self.mocks[1].zaak1["uuid"],
+            ]
+            self.assertListEqual(
+                [c["uuid"] for c in response.context.get("zaken")], expected_uuids
+            )
 
-                expected_identifications = [
-                    mock.zaak2["identificatie"],
-                    mock.zaak1["identificatie"],
-                    mock.zaak3["identificatie"],
-                    mock.zaak_result["identificatie"],
-                ]
-                self.assertTimelineLog(
-                    f"Zaken bekeken: {', '.join(expected_identifications)}"
-                )
+            expected_identifications = [
+                self.mocks[0].zaak2["identificatie"],
+                self.mocks[1].zaak2["identificatie"],
+                self.mocks[0].zaak1["identificatie"],
+                self.mocks[1].zaak1["identificatie"],
+            ]
+            self.assertTimelineLog(
+                f"Zaken bekeken: {', '.join(expected_identifications)}"
+            )
 
-                other_mock = self.mocks[0 if page == 1 else 1]
-                with self.assertRaises(AssertionError):
-                    self.assertTimelineLog(
-                        message=other_mock.zaak1["identificatie"],
-                        lookup=Lookups.icontains,
-                    )
-                    self.assertTimelineLog(
-                        other_mock.zaak3["identificatie"], lookup=Lookups.icontains
-                    )
+            TimelineLog.objects.all().delete()
 
-                TimelineLog.objects.all().delete()
+        # Page 2: zaak3 (2021-07-26) and zaak_result (2020-01-01) from both groups, interleaved
+        with self.subTest("page 2"):
+            url = self.inner_url + "?page=2"
+            response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+            expected_uuids = [
+                self.mocks[0].zaak3["uuid"],
+                self.mocks[1].zaak3["uuid"],
+                self.mocks[0].zaak_result["uuid"],
+                self.mocks[1].zaak_result["uuid"],
+            ]
+            self.assertListEqual(
+                [c["uuid"] for c in response.context.get("zaken")], expected_uuids
+            )
+
+            expected_identifications = [
+                self.mocks[0].zaak3["identificatie"],
+                self.mocks[1].zaak3["identificatie"],
+                self.mocks[0].zaak_result["identificatie"],
+                self.mocks[1].zaak_result["identificatie"],
+            ]
+            self.assertTimelineLog(
+                f"Zaken bekeken: {', '.join(expected_identifications)}"
+            )
+
+            TimelineLog.objects.all().delete()
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
