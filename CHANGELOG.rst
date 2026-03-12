@@ -19,6 +19,10 @@ Bugfixes
 * [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
   ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
   voorkomen.
+* [:gh:`2294`]: Aangepaste Sentry processor voor structlog geïmplementeerd om uitzonderingen
+  efficiënter te loggen. De processor voorkomt database-toegang en serialisatie-fouten tijdens
+  foutafhandeling door niet-primitieve types om te zetten naar veilige placeholders. Bevat
+  recursie-bescherming en uitgebreide tests.
 
 Onderhoud
 ---------
