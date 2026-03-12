@@ -6,7 +6,7 @@
     }
   }
   &---pages-root {
-    &:has(.notifications .notification) {
+    &:has(.banner ~ div > .notifications .notification) {
       .notifications {
         margin-top: calc(-1 * var(--spacing-giant));
       }
