@@ -24,6 +24,7 @@ Bugfixes
   foutafhandeling door niet-primitieve types om te zetten naar veilige placeholders. Bevat
   recursie-bescherming en uitgebreide tests.
 * [:gh:`2278`]: Correctie in de sortering zaken. Alle zaken worden nu gesorteerd op startdatum.
+* [:gh:`2309`]: Uitlijning melding "Registratie voltooid" zonder banner afbeelding opgelost.
 
 Onderhoud
 ---------
