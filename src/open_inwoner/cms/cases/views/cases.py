@@ -74,16 +74,17 @@ class InnerCaseListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
-        case_service = CaseListService(self.request)
+        case_service = CaseListService.from_request(self.request)
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
         # update ctx with formulieren and cases (possibly filtered)
         formulieren: Sequence[UniformCase] = case_service.get_formulieren()
-        preprocessed_zaken: Sequence[UniformCase] = case_service.get_zaken()
+        zaken_result = case_service.get_zaken()
+        preprocessed_zaken: Sequence[UniformCase] = zaken_result.zaken
 
         if config.zaken_filter_enabled:
             case_status_frequencies = case_service.get_zaak_status_frequencies(
-                zaken=preprocessed_zaken,
+                zaken=zaken_result.zaken,
                 formulieren=formulieren,
             )
             # Separate frequency data from statusname

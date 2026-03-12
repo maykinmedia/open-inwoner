@@ -1,7 +1,7 @@
 import concurrent.futures
 import enum
 import threading
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from typing import Iterable, TypedDict, cast
 
@@ -33,6 +33,14 @@ class ResolveCaseException(Exception):
     """Exception indicating we were unable to resolve a cases type/status/result."""
 
     pass
+
+
+class SkipReason(enum.Enum):
+    """Reasons why a case was skipped/filtered out."""
+
+    RESOLUTION_FAILED = "resolution_failed"
+    NOT_VISIBLE = "not_visible"
+    TIMEOUT = "timeout"
 
 
 class CaseFilterFormOption(enum.Enum):
@@ -83,6 +91,36 @@ class FormulierWithApiGroup:
         return hash((self.identification, self.api_group.pk))
 
 
+@dataclass
+class SkippedZaak:
+    """Information about a zaak that was skipped."""
+
+    zaak: ZaakWithApiGroup
+    reason: SkipReason
+    details: str | None = None
+
+
+@dataclass
+class ZakenResult:
+    """Result from fetching and processing zaken."""
+
+    zaken: list[ZaakWithApiGroup]
+    skipped: list[SkippedZaak]
+
+    @property
+    def total_fetched(self) -> int:
+        """Total number of zaken fetched (visible + skipped)."""
+        return len(self.zaken) + len(self.skipped)
+
+    def get_skip_statistics(self) -> dict[SkipReason, int]:
+        """Return statistics about why zaken were skipped."""
+        stats = dict(Counter(skipped.reason for skipped in self.skipped))
+        # Ensure all SkipReason values are present with 0 as default
+        for reason in SkipReason:
+            stats.setdefault(reason, 0)
+        return stats
+
+
 class Timeouts(TypedDict):
     fetch_raw_zaken: int | float
     resolve_zaken: int | float
@@ -90,12 +128,67 @@ class Timeouts(TypedDict):
 
 
 class CaseListService:
-    request: HttpRequest
     _max_workers: int
     _timeouts: Timeouts
 
-    def __init__(self, request: HttpRequest):
-        self.request = request
+    @classmethod
+    def from_request(cls, request: HttpRequest) -> "CaseListService":
+        """
+        Factory method to create a CaseListService from a Django request.
+
+        Raises:
+            ValueError: If the user is not authenticated or has no identity fields.
+        """
+        user = request.user
+        if not user.is_authenticated:
+            raise ValueError("User must be authenticated to use CaseListService")
+
+        # Get identity parameters from the request
+        params = get_user_fetch_parameters(request, use_rsin=False)
+        if not params:
+            raise ValueError("User must have either BSN or KVK to use CaseListService")
+
+        # For eHerkenning users, also get RSIN (which isn't in params by default)
+        if "user_kvk" in params:
+            params["user_rsin"] = getattr(user, "rsin", None)
+
+        return cls(identity_params=params)
+
+    def __init__(self, identity_params: dict[str, str]):
+        """
+        Initialize CaseListService with identity parameters.
+
+        Args:
+            identity_params: Dictionary with identity fields matching the format
+                returned by get_user_fetch_parameters. Must contain either:
+                - user_bsn: BSN for natural persons
+                - user_kvk: KVK number for companies (optionally with user_rsin
+                  and/or vestigingsnummer)
+
+        Raises:
+            ValueError: If params don't contain valid identity information.
+        """
+        # Validate that we have exactly one identity type
+        has_bsn = "user_bsn" in identity_params
+        has_kvk = "user_kvk" in identity_params
+
+        if has_bsn and has_kvk:
+            raise ValueError("Cannot have both user_bsn and user_kvk")
+
+        if not has_bsn and not has_kvk:
+            raise ValueError("Must have either user_bsn or user_kvk")
+
+        # RSIN and vestiging are only valid with KVK
+        if has_bsn and (
+            "user_rsin" in identity_params or "vestigingsnummer" in identity_params
+        ):
+            raise ValueError(
+                "user_rsin and vestigingsnummer are only valid with user_kvk"
+            )
+
+        # Store the base parameters
+        self._identity_params = identity_params
+
         self._timeouts = {
             "fetch_raw_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
             "resolve_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
@@ -107,11 +200,38 @@ class CaseListService:
             "Configured CaseListService",
             timeouts=self._timeouts,
             max_workers=self._max_workers,
+            identity_params={k: bool(v) for k, v in identity_params.items()},
         )
 
         # Our resolver functions modify the case list in-place, the lock is used to
         # ensure there are no concurrent writes
         self._zaak_update_lock = threading.RLock()
+
+    def _get_fetch_parameters(self, use_rsin: bool = True) -> dict:
+        """
+        Build fetch parameters dict for API calls.
+
+        Args:
+            use_rsin: If True and user_rsin is available, use it instead of user_kvk
+                for eHerkenning users (some APIs require this).
+
+        Returns:
+            Dictionary with identity parameters suitable for passing to API clients.
+        """
+        if "user_bsn" in self._identity_params:
+            return {"user_bsn": self._identity_params["user_bsn"]}
+
+        # KVK case - potentially swap kvk for rsin
+        params = dict(self._identity_params)
+
+        if use_rsin and "user_rsin" in params:
+            # Replace user_kvk with user_rsin
+            params.pop("user_kvk", None)
+        else:
+            # Keep user_kvk, remove user_rsin
+            params.pop("user_rsin", None)
+
+        return params
 
     @staticmethod
     def _zaken_client_factory(group: ZGWApiGroupConfig):
@@ -134,17 +254,17 @@ class CaseListService:
         if not group.forms_client:
             raise ValueError(f"{group} has no `forms_client`")
 
+        # Note: fetch_formulieren doesn't support user_rsin, only user_bsn/user_kvk
+        params = self._get_fetch_parameters(use_rsin=False)
+        formulieren = group.forms_client.fetch_formulieren(**params)
+
         return [
             FormulierWithApiGroup(
                 formulier=formulier,
                 api_group=group,
                 type_aanvraag=TypeAanvraag.FORMULIER,
             )
-            for formulier in group.forms_client.fetch_formulieren(
-                **get_user_fetch_parameters(
-                    self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
-                )
-            )
+            for formulier in formulieren
         ]
 
     def get_formulieren(self) -> list[FormulierWithApiGroup]:
@@ -161,17 +281,17 @@ class CaseListService:
                 for group in all_api_groups
             ]
 
-        try:
-            for task in concurrent.futures.as_completed(
-                futures,
-                timeout=self._timeouts["fetch_formulieren"],
-            ):
-                try:
-                    subs_with_api_group.extend(task.result())
-                except BaseException:
-                    logger.exception("Error fetching and pre-processing zaken")
-        except concurrent.futures.TimeoutError:
-            logger.warning("Timeout while fetching formulieren")
+            try:
+                for task in concurrent.futures.as_completed(
+                    futures,
+                    timeout=self._timeouts["fetch_formulieren"],
+                ):
+                    try:
+                        subs_with_api_group.extend(task.result())
+                    except BaseException:
+                        logger.exception("Error fetching and pre-processing zaken")
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timeout while fetching formulieren")
 
         # Sort formulieren by date modified
         subs_with_api_group.sort(
@@ -204,11 +324,10 @@ class CaseListService:
     def _get_raw_zaken_for_api_group(
         self, group: ZGWApiGroupConfig
     ) -> list[ZaakWithApiGroup]:
-        raw_zaken = group.zaken_client.fetch_zaken(
-            **get_user_fetch_parameters(
-                self.request, use_rsin=group.fetch_eherkenning_zaken_with_rsin
-            )
-        )
+        # Use user_rsin if the API group is configured to use it for eHerkenning
+        use_rsin = group.fetch_eherkenning_zaken_with_rsin
+        params = self._get_fetch_parameters(use_rsin=use_rsin)
+        raw_zaken = group.zaken_client.fetch_zaken(**params)
 
         return [
             ZaakWithApiGroup(
@@ -217,7 +336,7 @@ class CaseListService:
             for raw_zaak in raw_zaken
         ]
 
-    def get_zaken(self) -> list[ZaakWithApiGroup]:
+    def get_zaken(self) -> ZakenResult:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related(
                 "zrc_service",
@@ -238,19 +357,19 @@ class CaseListService:
                 for group in all_api_groups
             )
 
-        try:
-            for task in concurrent.futures.as_completed(
-                fetch_raw_zaken_futures,
-                timeout=self._timeouts["fetch_raw_zaken"],
-            ):
-                raw_zaken_for_group = task.result()
-                fetched_zaken.extend(raw_zaken_for_group)
-        except concurrent.futures.TimeoutError:
-            # This happens, but it is not an error as such. We also want to continue
-            # execution with the zaken we _did_ manage to resolve.
-            logger.warning("Timed out fetching raw zaken for group", exc_info=True)
-        except BaseException:
-            logger.exception("Unhandled error fetching raw zaken")
+            try:
+                for task in concurrent.futures.as_completed(
+                    fetch_raw_zaken_futures,
+                    timeout=self._timeouts["fetch_raw_zaken"],
+                ):
+                    raw_zaken_for_group = task.result()
+                    fetched_zaken.extend(raw_zaken_for_group)
+            except concurrent.futures.TimeoutError:
+                # This happens, but it is not an error as such. We also want to continue
+                # execution with the zaken we _did_ manage to resolve.
+                logger.warning("Timed out fetching raw zaken for group", exc_info=True)
+            except BaseException:
+                logger.exception("Unhandled error fetching raw zaken")
 
         # Resolve zaken
         # Submit all futures and track which futures belong to which case
@@ -277,29 +396,49 @@ class CaseListService:
                     all_futures.append(future)
                     zaak_futures[zaak_with_group].append(future)
 
-        # Wait for futures to complete or timeout
-        try:
-            concurrent.futures.wait(
-                all_futures,
-                timeout=self._timeouts["resolve_zaken"],
-            )
-        except concurrent.futures.TimeoutError:
-            # This happens, but it is not an error as such. We also want to
-            # continue execution with the zaken we _did_ manage to resolve.
-            logger.warning("Timed out resolving zaken", exc_info=True)
-        except BaseException:
-            logger.exception("Unhandled error during zaak resolution")
+            # Wait for futures to complete or timeout
+            try:
+                concurrent.futures.wait(
+                    all_futures,
+                    timeout=self._timeouts["resolve_zaken"],
+                )
+            except concurrent.futures.TimeoutError:
+                # This happens, but it is not an error as such. We also want to
+                # continue execution with the zaken we _did_ manage to resolve.
+                logger.warning("Timed out resolving zaken", exc_info=True)
+            except BaseException:
+                logger.exception("Unhandled error during zaak resolution")
 
         # Now check which zaken had all 3 futures complete successfully. If we did not
         # manage to complete the resolutions for zaak, status and resultaat type, we
         # exclude the case from the final list.
         resolved_zaken: list[ZaakWithApiGroup] = []
+        skipped_zaken: list[SkippedZaak] = []
+
         for zaak, futures in zaak_futures.items():
             # Check if all 3 futures completed without exceptions...
             if not all(f.done() and not f.exception() for f in futures):
+                # Collect exception details
+                exceptions = [f.exception() for f in futures if f.exception()]
+                details = (
+                    "; ".join(str(e) for e in exceptions)
+                    if exceptions
+                    else "incomplete"
+                )
+
                 logger.warning(
                     "Culling zaak %s because not all resolutions completed successfully",
                     zaak.identification,
+                    details=details,
+                )
+
+                # Track this as a skipped zaak
+                skipped_zaken.append(
+                    SkippedZaak(
+                        zaak=zaak,
+                        reason=SkipReason.RESOLUTION_FAILED,
+                        details=details,
+                    )
                 )
                 # ... unable to fully resolve, leave it out of the list
                 continue
@@ -316,7 +455,15 @@ class CaseListService:
                     zaak_with_resolved_zgw_refs.identification,
                 )
 
-        # Filter and sort zaken
+                # Track this as a skipped zaak
+                skipped_zaken.append(
+                    SkippedZaak(
+                        zaak=zaak_with_resolved_zgw_refs,
+                        reason=SkipReason.NOT_VISIBLE,
+                        details=f"Confidentiality: {zaak_with_resolved_zgw_refs.zaak.vertrouwelijkheidaanduiding}",
+                    )
+                )
+
         # Sort by startdatum (newest first), using api_group index as tiebreaker
         resolved_zaken.sort(
             key=lambda c: (
@@ -324,7 +471,8 @@ class CaseListService:
                 all_api_groups.index(c.api_group),
             )
         )
-        return resolved_zaken
+
+        return ZakenResult(zaken=resolved_zaken, skipped=skipped_zaken)
 
     def _replace_catalogus_api_with_model_refs(
         self,

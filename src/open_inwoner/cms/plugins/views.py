@@ -40,7 +40,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         return _("Zaaknummer: %(identification)s") % {"identification": identification}
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
-        case_service = CaseListService(request)
+        case_service = CaseListService.from_request(request)
 
         # Get plugin instance for title
         try:
@@ -81,7 +81,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             formulieren = None
             msg = partial_error_msg
         try:
-            preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken()
+            zaken_result = case_service.get_zaken()
+            preprocessed_zaken: Sequence[UniformCase] | None = zaken_result.zaken
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
             preprocessed_zaken = None

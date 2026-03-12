@@ -8,6 +8,7 @@ from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.cases.views.services import ZakenResult
 from open_inwoner.cms.plugins.cms_plugins import CMSZakenPlugin
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT
 from open_inwoner.cms.tests import cms_tools
@@ -137,7 +138,7 @@ class CMSZakenPluginTest(TestCase):
 
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_zaken",
-        return_value=[],
+        return_value=ZakenResult(zaken=[], skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
@@ -179,7 +180,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -243,7 +244,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -287,7 +288,7 @@ class CMSZakenPluginTest(TestCase):
             }
             mock_cases_list.append(mock_zaak)
 
-        mock_zaken.return_value = mock_cases_list
+        mock_zaken.return_value = ZakenResult(zaken=mock_cases_list, skipped=[])
 
         plugin_model = cms_tools._init_plugin(
             CMSZakenPlugin, {"title": "Mijn Zaken", "num_zaken": 3}
@@ -349,7 +350,7 @@ class CMSZakenPluginTest(TestCase):
             mock_zaken_list.append(mock_zaak)
 
         mock_formulieren.return_value = mock_formulieren_list
-        mock_zaken.return_value = mock_zaken_list
+        mock_zaken.return_value = ZakenResult(zaken=mock_zaken_list, skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -402,7 +403,7 @@ class CMSZakenPluginTest(TestCase):
             }
             mock_zaken_list.append(mock_zaak)
 
-        mock_zaken.return_value = mock_zaken_list
+        mock_zaken.return_value = ZakenResult(zaken=mock_zaken_list, skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -442,7 +443,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -480,7 +481,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -533,7 +534,7 @@ class CMSZakenPluginTest(TestCase):
         }
 
         mock_formulieren.return_value = [mock_submission]
-        mock_zaken.return_value = [mock_zaak]
+        mock_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
