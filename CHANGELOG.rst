@@ -16,6 +16,12 @@ Bugfixes
   titel heeft extra spacing gekregen, kaartjes openen nu in een nieuw tabblad en de
   aanduiding ‘Soort:’ is verwijderd.
 
+Onderhoud
+---------
+
+* [:gh:`2314`, :cve:`CVE-2026-32597`]: ``PyJWT`` bijgewerkt naar versie ``2.10.1`` om
+  kwetsbaarheid in ``crit`` header te mitigeren.
+
 2.0.3 (2026-02-20)
 ==================
 

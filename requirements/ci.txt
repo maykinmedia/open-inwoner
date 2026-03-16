@@ -970,7 +970,7 @@ pygments==2.18.0
     # via
     #   sphinx
     #   sphinx-tabs
-pyjwt==2.8.0
+pyjwt==2.12.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
