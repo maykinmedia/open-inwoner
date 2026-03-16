@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -62,6 +63,13 @@ class InnerCaseListView(
 
     def page_title(self):
         return _("Mijn zaken")
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception:
+            logger.exception("Failed to fetch cases")
+            return render(request, self.template_name, {"fetch_error": True})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

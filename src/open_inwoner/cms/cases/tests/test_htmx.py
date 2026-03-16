@@ -2,6 +2,7 @@ import json
 from unittest.mock import patch
 from uuid import UUID
 
+from django.http import HttpResponse
 from django.test import override_settings, tag
 from django.utils.translation import gettext as _
 
@@ -664,3 +665,37 @@ class CasesPlaywrightTests(
         expect(file_list_items.first).to_contain_text("(txt, 9 bytes)")
         expect(file_list_items.last).to_contain_text("document_two")
         expect(file_list_items.last).to_contain_text("(pdf, 9 bytes)")
+
+    def test_cases_spinner_hides_on_fetch_error(self, m, contactmoment_mock):
+        """When the ZGW API fails, the view returns an error template and the spinner is hidden."""
+        with patch("open_inwoner.cms.cases.views.cases.CaseListService") as MockService:
+            MockService.return_value.get_zaken.side_effect = RuntimeError("API error")
+            MockService.return_value.get_formulieren.return_value = []
+
+            context = self.browser.new_context(storage_state=self.user_login_state)
+            page = context.new_page()
+            page.goto(self.live_reverse("cases:index"))
+
+            error_message = page.get_by_text(
+                _(
+                    "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw."
+                )
+            )
+            expect(error_message).to_be_visible()
+            expect(page.locator("#spinner-container")).not_to_be_visible()
+
+    def test_cases_spinner_hides_on_http_error(self, m, contactmoment_mock):
+        """When the cases content request returns a non-2xx, the spinner hides and error message is shown."""
+        with patch(
+            "open_inwoner.cms.cases.views.cases.InnerCaseListView.get"
+        ) as mock_get:
+            mock_get.return_value = HttpResponse(status=503)
+
+            context = self.browser.new_context(storage_state=self.user_login_state)
+            page = context.new_page()
+            page.goto(self.live_reverse("cases:index"))
+
+            expect(page.locator("#any-error")).to_have_text(
+                _("We konden geen zaken ophalen. Probeer het later opnieuw.")
+            )
+            expect(page.locator("#spinner-container")).not_to_be_visible()

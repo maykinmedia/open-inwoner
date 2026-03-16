@@ -1,4 +1,5 @@
 import * as htmxModule from 'htmx.org';
+import 'htmx-ext-response-targets';
 
 // Ensure we get the correct export
 const htmx = htmxModule.default || htmxModule;
