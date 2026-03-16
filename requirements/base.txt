@@ -556,7 +556,7 @@ pyee==12.0.0
     # via playwright
 pygments==2.19.2
     # via rich
-pyjwt==2.8.0
+pyjwt==2.12.1
     # via
     #   gemma-zds-client
     #   messagebird
