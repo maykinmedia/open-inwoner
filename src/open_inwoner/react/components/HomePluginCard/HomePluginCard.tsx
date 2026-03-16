@@ -45,7 +45,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
           </p>
         </div>
 
-        <MaterialIcon name="east" />
+        <MaterialIcon name="arrow_forward" />
       </div>
     </a>
   );
