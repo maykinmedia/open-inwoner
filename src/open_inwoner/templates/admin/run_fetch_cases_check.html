@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>
+    <a href="{% url 'admin:openzaak_openzaakconfig_changelist' %}" class="button">
+        ← Back to configuration
+    </a>
+</p>
+
+  <h1>Fetch cases check for {{ api_group.name }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label for="{{ form.api_group.id_for_label }}"><strong>API group</strong></label><br>
+        {{ form.api_group }}
+        <div class="help">{{ form.api_group.help_text }}</div>
+    </p>
+
+    <p>
+        <label for="{{ form.bsn.id_for_label }}"><strong>BSN</strong></label><br>
+        {{ form.bsn }}
+    <div class="help">{{ form.bsn.help_text }}</div>
+</p>
+
+    <button type="submit" class="button">Run check</button>
+</form>
+
+{% if result %}
+<hr>
+
+<h2>Result</h2>
+
+<p>
+<strong>Status:</strong>
+{% if result.success %}
+✅ Success
+{% else %}
+🛑 Failed
+{% endif %}
+</p>
+
+<p>
+<strong>Message:</strong>
+{{ result.message }}
+</p>
+
+<pre>{{ result.extra|pprint }}</pre>
+
+{% endif %}
+
+{% endblock %}

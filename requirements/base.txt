@@ -152,6 +152,7 @@ django==4.2.29
     #   mail-editor
     #   maykin-2fa
     #   maykin-common
+    #   maykin-config-checks
     #   maykin-django-prosemirror
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
@@ -428,6 +429,8 @@ markupsafe==3.0.3
 maykin-2fa==1.0.2
     # via -r requirements/base.in
 maykin-common[cli, health-checks, otel]==0.14.0
+    # via -r requirements/base.in
+maykin-config-checks==0.1.0
     # via -r requirements/base.in
 maykin-django-prosemirror[images]==0.4.0
     # via -r requirements/base.in

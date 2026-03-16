@@ -258,6 +258,7 @@ INSTALLED_APPS = [
     # Docker; this needs to be fixed this in the library eventually;
     # for now we load it after all our apps.
     "notifications_api_common",
+    "maykin_config_checks",
 ]
 
 _log_requests_via_middleware = config("LOG_REQUESTS", default=True)

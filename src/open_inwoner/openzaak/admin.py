@@ -38,7 +38,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class ZGWApiGroupConfig(admin.StackedInline):
     model = ZGWApiGroupConfig
     extra = 0
-
+    readonly_fields = ("run_fetch_cases_check",)
     fieldsets = (
         (
             _("Basic configuration"),
@@ -49,6 +49,7 @@ class ZGWApiGroupConfig(admin.StackedInline):
                     "drc_service",
                     "ztc_service",
                     "form_service",
+                    "run_fetch_cases_check",
                 ]
             },
         ),
@@ -64,6 +65,16 @@ class ZGWApiGroupConfig(admin.StackedInline):
             },
         ),
     )
+
+    @admin.display(description="Configuration check")
+    def run_fetch_cases_check(self, obj):
+        if not obj.pk:
+            return "-"
+        url = reverse("run_fetch_cases_check", args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}">Run check</a>',
+            url,
+        )
 
 
 @admin.register(OpenZaakConfig)

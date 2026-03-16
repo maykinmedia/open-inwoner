@@ -267,6 +267,7 @@ django==4.2.29
     #   mail-editor
     #   maykin-2fa
     #   maykin-common
+    #   maykin-config-checks
     #   maykin-django-prosemirror
     #   mozilla-django-oidc
     #   mozilla-django-oidc-db
@@ -839,6 +840,10 @@ maykin-2fa==1.0.2
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 maykin-common[cli, health-checks, otel]==0.14.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+maykin-config-checks==0.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -27,6 +27,7 @@ maykin-2fa
 phonenumbers
 maykin-django-prosemirror[images]
 maykin-common[otel,cli,health-checks]
+maykin-config-checks
 django-localflavor
 django-privates
 django-cors-headers
