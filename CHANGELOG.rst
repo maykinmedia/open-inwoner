@@ -25,6 +25,10 @@ Bugfixes
   recursie-bescherming en uitgebreide tests.
 * [:gh:`2278`]: Correctie in de sortering zaken. Alle zaken worden nu gesorteerd op startdatum.
 * [:gh:`2309`]: Uitlijning melding "Registratie voltooid" zonder banner afbeelding opgelost.
+* [:gh:`2307`] Correctie van ProseMirror velden in zaakstatus templates om HTML correct
+  weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
+  het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
+  zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
 
 Onderhoud
 ---------
