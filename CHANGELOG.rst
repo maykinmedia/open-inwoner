@@ -39,6 +39,7 @@ Onderhoud
 * [:gh:`2314`, :cve:`CVE-2026-32597`]: ``PyJWT`` bijgewerkt naar versie ``2.10.1`` om
   kwetsbaarheid in ``crit`` header te mitigeren.
 * [:gh:`2295`]: Zaken-kaartjes op de homepage gebruiken nu het ``arrow_forward`` icoon en hebben een gelijke hoogte.
+* [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
 
 2.1.0 (2026-03-04)
 ==================
