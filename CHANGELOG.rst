@@ -18,7 +18,8 @@ Bugfixes
 Onderhoud
 ---------
 
-* ...
+* [:gh:`2314`, :cve:`CVE-2026-32597`]: ``PyJWT`` bijgewerkt naar versie ``2.10.1`` om
+  kwetsbaarheid in ``crit`` header te mitigeren.
 
 2.1.0 (2026-03-04)
 ==================
