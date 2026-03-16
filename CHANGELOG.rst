@@ -42,6 +42,7 @@ Bugfixes
 * [:gh:`2298`]: Verbeterde foutafhandeling voor vragen en antwoorden in OpenKlant2,
   zodat één foutief geformuleerde vraag of antwoord niet verhindert dat de overige vragen
   en antwoorden worden weergegeven.
+* [:gh:`2305`]: Mijn Zaken overzicht blijft niet meer hangen op een spinner wanneer er een fout optreedt.
 
 Onderhoud
 ---------

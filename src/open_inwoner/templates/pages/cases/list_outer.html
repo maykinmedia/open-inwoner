@@ -6,10 +6,11 @@
 {% endblock %}
 
 {% block content %}
+    <div class="cases" id="any-error" data-error-message="{% trans 'We konden geen zaken ophalen. Probeer het later opnieuw.' %}"></div>
     <div class="cases" id="cases-content"></div>
 
     <div class="loader-container" id="spinner-container">
-        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
+        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content" hx-target-error="#any-error">
             {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
             <div class="spinner__content" role="status">{% trans "Gegevens laden..." %}</div>
         </div>

@@ -1,5 +1,9 @@
 {% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
 
+{% if fetch_error %}
+    <p class="utrecht-paragraph">{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</p>
+{% else %}
+
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-title-text">{{ title_text }}</p>
 
@@ -101,4 +105,6 @@
 
 {% if zaken %}
     {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
+{% endif %}
+
 {% endif %}
