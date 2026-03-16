@@ -130,6 +130,7 @@ urlpatterns = [
     path("", include("open_inwoner.search.urls", namespace="search")),
     path("cms-plugins/", include("open_inwoner.cms.plugins.urls")),
     path("", include("maykin_common.health_checks.urls")),
+    path("config-checks/", include("open_inwoner.config_checks.urls")),
     re_path(r"^", include("cms.urls")),
 ]
 
