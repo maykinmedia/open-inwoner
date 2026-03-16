@@ -996,7 +996,7 @@ pygments==2.19.2
     #   rich
     #   sphinx
     #   sphinx-tabs
-pyjwt==2.8.0
+pyjwt==2.12.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
