@@ -4,6 +4,8 @@
 Bugfixes
 --------
 
+* [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
+  (gebruik van 'x-request-*' in plaats van 'x-requests-*').
 * [:gh:`2301`]: De ``fetch_rollen_with_betrokkene_type`` instelling wordt nu ook
   toegepast bij het ophalen van zaakrollen via ``fetch_case_roles``,
   ``fetch_case_roles_for_eherkenning_user`` en ``fetch_case_roles_for_vestiging``.
