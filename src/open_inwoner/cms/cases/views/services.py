@@ -322,11 +322,16 @@ class CaseListService:
         }
 
     def _get_raw_zaken_for_api_group(
-        self, group: ZGWApiGroupConfig
+        self, group: ZGWApiGroupConfig, identificatie: str | None = None
     ) -> list[ZaakWithApiGroup]:
         # Use user_rsin if the API group is configured to use it for eHerkenning
         use_rsin = group.fetch_eherkenning_zaken_with_rsin
         params = self._get_fetch_parameters(use_rsin=use_rsin)
+
+        # Add identificatie filter if provided
+        if identificatie:
+            params["identificatie"] = identificatie
+
         raw_zaken = group.zaken_client.fetch_zaken(**params)
 
         return [
@@ -336,7 +341,7 @@ class CaseListService:
             for raw_zaak in raw_zaken
         ]
 
-    def get_zaken(self) -> ZakenResult:
+    def get_zaken(self, identificatie: str | None = None) -> ZakenResult:
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related(
                 "zrc_service",
@@ -353,7 +358,7 @@ class CaseListService:
         ] = []
         with parallel(max_workers=self._max_workers) as executor:
             fetch_raw_zaken_futures.extend(
-                executor.submit(self._get_raw_zaken_for_api_group, group)
+                executor.submit(self._get_raw_zaken_for_api_group, group, identificatie)
                 for group in all_api_groups
             )
 

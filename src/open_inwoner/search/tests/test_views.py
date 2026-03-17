@@ -76,6 +76,15 @@ class TestSearchView(ESMixin, TransactionTestCase):
             volgnummer=2,
             isEindstatus=True,
         )
+        self.status1 = generate_oas_component_cached(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            zaak=f"{ZAKEN_ROOT}zaken/d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
+            statustype=self.status_type1["url"],
+            datumStatusGezet="2021-01-12",
+            statustoelichting="",
+        )
         self.zaak1 = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
@@ -85,16 +94,16 @@ class TestSearchView(ESMixin, TransactionTestCase):
             omschrijving="Coffee zaak1",
             startdatum="2022-01-02",
             einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            status=self.status1["url"],
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
         )
-        self.status1 = generate_oas_component_cached(
+        self.status2 = generate_oas_component_cached(
             "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
-            zaak=self.zaak1["url"],
-            statustype=self.status_type1["url"],
-            datumStatusGezet="2021-01-12",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
+            zaak=f"{ZAKEN_ROOT}zaken/e4d469b9-6666-4bdd-bf42-b53445298102",
+            statustype=self.status_type2["url"],
+            datumStatusGezet="2021-03-12",
             statustoelichting="",
         )
         self.zaak2 = generate_oas_component_cached(
@@ -106,17 +115,8 @@ class TestSearchView(ESMixin, TransactionTestCase):
             omschrijving="Coffee zaak2",
             startdatum="2022-01-12",
             einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-beu760sle929",
+            status=self.status2["url"],
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.zeer_geheim,
-        )
-        self.status2 = generate_oas_component_cached(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da89990-c7fc-476a-ad13-c9023450083c",
-            zaak=self.zaak2["url"],
-            statustype=self.status_type2["url"],
-            datumStatusGezet="2021-03-12",
-            statustoelichting="",
         )
 
         # objects needed to test how the cache is updated
@@ -138,6 +138,15 @@ class TestSearchView(ESMixin, TransactionTestCase):
             volgnummer=1,
             isEindstatus=False,
         )
+        self.new_status = generate_oas_component_cached(
+            "zrc",
+            "schemas/Status",
+            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+            zaak=f"{ZAKEN_ROOT}zaken/a25b2dce-1cae-4fc9-b9e9-141b0ad5189f",
+            statustype=self.new_status_type["url"],
+            datumStatusGezet="2021-01-12",
+            statustoelichting="",
+        )
         self.new_zaak = generate_oas_component_cached(
             "zrc",
             "schemas/Zaak",
@@ -147,20 +156,12 @@ class TestSearchView(ESMixin, TransactionTestCase):
             omschrijving="Tea zaak",
             startdatum="2022-01-02",
             einddatum=None,
-            status=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
+            status=self.new_status["url"],
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-        )
-        self.new_status = generate_oas_component_cached(
-            "zrc",
-            "schemas/Zaak",
-            url=f"{ZAKEN_ROOT}statussen/3da81560-c7fc-476a-ad13-oie8u899923g",
-            zaak=self.new_zaak["url"],
-            statustype=self.new_status_type["url"],
-            datumStatusGezet="2021-01-12",
-            statustoelichting="",
         )
 
     def _setUpMocks(self, m):
+        # Mock zaken fetches with identificatie filter
         m.get(
             furl(f"{ZAKEN_ROOT}zaken")
             .add(
@@ -209,6 +210,8 @@ class TestSearchView(ESMixin, TransactionTestCase):
             .url,
             json=paginated_response([self.zaak2]),
         )
+
+        # Mock individual resource fetches (needed by CaseListService for resolution)
         for resource in [
             self.zaaktype,
             self.status_type1,
@@ -217,6 +220,12 @@ class TestSearchView(ESMixin, TransactionTestCase):
             self.status2,
         ]:
             m.get(resource["url"], json=resource)
+
+        # Mock rollen and resultaten endpoints for CaseListService resolution
+        m.get(f"{ZAKEN_ROOT}zaken/{self.zaak1['uuid']}/rollen", json=[])
+        m.get(f"{ZAKEN_ROOT}resultaten?zaak={self.zaak1['url']}", json=[])
+        m.get(f"{ZAKEN_ROOT}zaken/{self.zaak2['uuid']}/rollen", json=[])
+        m.get(f"{ZAKEN_ROOT}resultaten?zaak={self.zaak2['url']}", json=[])
 
     def test_search_hidden_from_anonymous_users(self, m):
         config = SiteConfiguration.get_solo()
