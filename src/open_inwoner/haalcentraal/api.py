@@ -135,13 +135,13 @@ class BRP_2_1(BRPAPI):
 
         # Centric headers
         if self.config.x_request_organization:
-            headers["x-requests-organization"] = self.config.x_request_organization
+            headers["x-request-organization"] = self.config.x_request_organization
         if self.config.x_request_application:
-            headers["x-requests-application"] = self.config.x_request_application
+            headers["x-request-application"] = self.config.x_request_application
         if self.config.x_request_afnemerscode:
-            headers["x-requests-afnemerscode"] = self.config.x_request_afnemerscode
+            headers["x-request-afnemerscode"] = self.config.x_request_afnemerscode
         if self.config.x_request_user:
-            headers["x-requests-user"] = self.config.x_request_user
+            headers["x-request-user"] = self.config.x_request_user
 
         response = self.client.post(
             url=url,
