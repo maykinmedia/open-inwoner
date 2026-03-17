@@ -18,8 +18,8 @@ const key = (k: string, extra?: KeyboardEventInit) =>
   });
 
 describe('useSelect', () => {
-  let toggleValue: ReturnType<typeof vi.fn>;
-  let toggleValueRadio: ReturnType<typeof vi.fn>;
+  let toggleValue: ReturnType<typeof vi.fn<VoidFunction>>;
+  let toggleValueRadio: ReturnType<typeof vi.fn<VoidFunction>>;
 
   beforeEach(() => {
     toggleValue = vi.fn();
@@ -32,8 +32,8 @@ describe('useSelect', () => {
         choices,
         multiple,
         name: 'fruit',
-        toggleValue,
-        toggleValueRadio,
+        toggleValue: toggleValue,
+        toggleValueRadio: toggleValueRadio,
       })
     );
 
