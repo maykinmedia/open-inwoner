@@ -16,6 +16,10 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
+  Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
+* [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
+  (gebruik van 'x-request-*' in plaats van 'x-requests-*').
 * [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
   ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
   voorkomen.
