@@ -5232,12 +5232,12 @@ msgstr ""
 
 #: open_inwoner/haalcentraal/models.py:59
 msgid "API 'verwerking' header"
-msgstr "API 'doelbinding' header"
+msgstr "API 'verwerking' header"
 
 #: open_inwoner/haalcentraal/models.py:64
 msgid "Value of the 'x-verwerking' header for Haalcentraal BRP API requests"
 msgstr ""
-"Waarde van de 'x-doelbinding' header voor Haalcentraal BRP API requests."
+"Waarde van de 'x-verwerking' header voor Haalcentraal BRP API requests."
 
 #: open_inwoner/haalcentraal/models.py:70
 msgid "API 'organization' header"

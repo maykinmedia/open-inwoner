@@ -10,6 +10,8 @@ Bugfixes
   zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
 * [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
   (gebruik van 'x-request-*' in plaats van 'x-requests-*').
+* [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
+  Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
 
 2.0.3 (2026-02-20)
 ==================
