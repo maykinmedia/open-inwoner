@@ -8,6 +8,8 @@ Bugfixes
   weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
   het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
   zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
+* [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
+  (gebruik van 'x-request-*' in plaats van 'x-requests-*').
 
 2.0.3 (2026-02-20)
 ==================
