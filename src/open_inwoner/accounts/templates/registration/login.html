@@ -160,9 +160,10 @@
                                         {% endwith %}
                                     {% endrender_card %}
                                 {% else %}
+                                    {% get_solo 'digid_eherkenning.eherkenningconfiguration' as eherkenning_saml_config %}
                                     {% render_card direction='horizontal' tinted=True compact=True %}
                                         {% url 'eherkenning:login' as href %}
-                                        {% with href|addnexturl:next as href_with_next %}
+                                        {% with href|addnexturl:next|add_attr_consuming_service_index:eherkenning_saml_config.eh_attribute_consuming_service_index as href_with_next %}
                                             <a href="{{ href_with_next }}" class="link eherkenning-logo">
                                                 <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=40 alt="eHerkenning inlogpagina">
                                             </a>
