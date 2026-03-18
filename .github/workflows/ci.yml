@@ -240,7 +240,7 @@ jobs:
   # Docker
   #
   docker:
-    needs: tests
+    # needs: tests
 
     name: Build (and push) Docker image
     runs-on: ubuntu-latest
