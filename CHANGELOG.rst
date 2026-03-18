@@ -4,6 +4,9 @@
 Bugfixes
 --------
 
+* [:gh:`2329`]: ``attr_consuming_service_index`` wordt nu correct doorgegeven als
+  queryparameter aan de eHerkenning SAML loginpagina, op basis van de waarde in de
+  eHerkenning configuratie. Het ontbreken hiervan kon leiden tot authenticatiefouten.
 * [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
   Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
 * [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie

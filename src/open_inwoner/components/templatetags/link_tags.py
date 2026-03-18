@@ -127,3 +127,15 @@ def addnexturl(href, next_url):
     f = furl(href)
     f.args["next"] = next_url
     return f.url
+
+
+@register.filter
+def add_attr_consuming_service_index(href, index):
+    """
+    Appends attr_consuming_service_index query parameter to href if set.
+    """
+    if not index:
+        return href
+    f = furl(href)
+    f.args["attr_consuming_service_index"] = index
+    return f.url
