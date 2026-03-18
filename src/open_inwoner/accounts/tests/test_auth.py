@@ -10,6 +10,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 import requests_mock
+from digid_eherkenning.models import EherkenningConfiguration
 from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery
@@ -2117,7 +2118,39 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
                     f"[title='{eherkenning_login_title}']"
                 )
 
-                self.assertEqual(eherkenning_login_link.attr("href"), login_url)
+                self.assertTrue(
+                    eherkenning_login_link.attr("href").startswith(login_url)
+                )
+
+    def test_login_page_eherkenning_saml_url_includes_attr_consuming_service_index(
+        self,
+    ):
+        site_config = SiteConfiguration.get_solo()
+        site_config.eherkenning_enabled = True
+        site_config.save()
+
+        oidc_config = OpenIDEHerkenningConfig.get_solo()
+        oidc_config.enabled = False
+        oidc_config.save()
+
+        saml_config = EherkenningConfiguration.get_solo()
+
+        for index in ["9052", ""]:
+            with self.subTest(eh_attribute_consuming_service_index=index):
+                saml_config.eh_attribute_consuming_service_index = index
+                saml_config.save()
+
+                response = self.app.get(reverse("login"))
+
+                eherkenning_login_link = response.pyquery(
+                    f"[title='{_('Inloggen met eHerkenning')}']"
+                )
+                actual_args = furl(eherkenning_login_link.attr("href")).args
+
+                if index:
+                    self.assertEqual(actual_args["attr_consuming_service_index"], index)
+                else:
+                    self.assertNotIn("attr_consuming_service_index", actual_args)
 
     def test_login_for_inactive_user_shows_appropriate_message(self):
         # Change user to inactive
