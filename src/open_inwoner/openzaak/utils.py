@@ -42,13 +42,14 @@ def is_info_object_visible(
     We check on its definitive or archived status, and a maximum confidentiality
     level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
     """
-    if info_object.status not in ["definitief", "gearchiveerd"]:
-        logger.info(
-            "Ignoring informatieobject as not visible for user: status is neither definitief nor gearchiveerd",
-            info_object_url=info_object.url,
-            info_object_status=info_object.status,
-        )
-        return False
+    # FIXME: status is currentlly not passed or set
+    # if info_object.status not in ["definitief", "gearchiveerd"]:
+    #     logger.info(
+    #         "Ignoring informatieobject as not visible for user: status is neither definitief nor gearchiveerd",
+    #         info_object_url=info_object.url,
+    #         info_object_status=info_object.status,
+    #     )
+    #     return False
 
     return is_object_visible(info_object, max_confidentiality_level)
 
