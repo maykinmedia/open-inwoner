@@ -117,6 +117,7 @@ linkcheck_ignore = [
     r"https://www\.jccsoftware\.nl/.*",  # looks like the requests user agent is blocked...
     r"https://hub\.docker\.com/r/.*",  # HTTP 429, presumably docker hub is blocking/limiting Github CI runners
     r"http://es6-features\.org.*",  # old link
+    r"https://gitlab\.gnome\.org/GNOME/libxml2/-/wikis/home",
     # 403s when running on github actions:
     r"https?://stackoverflow\.com/.*",
     r"https?://www\.npmjs\.com/.*",
