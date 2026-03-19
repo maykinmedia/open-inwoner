@@ -81,6 +81,9 @@ Nieuwe features
 * [:gh:`2113`]: Diagram (chart.js) toegevoegd ten behoeve van de 'Mijn Afval' app.
 * [:gh:`2119`, :gh:`2182`, :pr:`2151`]: API-client en configuratie voor 'Mijn Afval' aangemaakt.
 * [:gh:`2157`, :gh:`2205`]: Toon het nieuwste antwoord op OpenKlant-vragen.
+* [:gh:`2220`, :oip-nlds:`40`]: De Community versie van het NL design-system File component, waarmee een bestand
+  getoond kan worden, is toegevoegd aan de Samenwerkingen detailpagina, de Samenwerkingen preview plan
+  pop-up, de Profiel Acties bewerk-pagina en aan de Acties overzichtslijst.
 * [:gh:`2192`, :pr:`2195`, :pr:`2200`]: Filters voor 'Mijn Afval' geïmplementeerd.
 * [:gh:`2156`]: Omgevingsvariabele ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` toegevoegd om
   de sessie-vernieuwingsinterval voor OpenID Connect (DigiD/eHerkenning) te

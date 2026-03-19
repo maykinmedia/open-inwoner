@@ -11,7 +11,11 @@
 
     {% if plan_template.file %}
         <div class='plan-preview__key'>{% trans 'Bestand' %}</div>
-        <div>{% file file=plan_template.file extension=plan_template.file.extension size=plan_template.file.size show_download=False %}</div>
+        <file-nlds
+            name="{{ plan_template.file }}"
+            extension="{{ plan_template.file.extension }}"
+            size="{{ plan_template.file.size }}"
+        ></file-nlds>
     {% endif %}
 
     {% if plan_template.actiontemplates.exists %}

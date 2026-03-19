@@ -28,7 +28,12 @@
                     {% endif %}
                     {% if action.file %}
                         {% url "profile:action_download" uuid=action.uuid as download_url %}
-                        {% file file=action.file created=action.file.created_on extension=action.file.extension size=action.file.size show_download=True download_url=download_url %}
+                        <file-nlds
+                            name="{{ action.file }}"
+                            download-url="{{ download_url }}"
+                            last-updated = "{{ action.file.created_on }}"
+                            size="{{ action.file.size }}"
+                        ></file-nlds>
                     {% endif %}
                 </div>
 

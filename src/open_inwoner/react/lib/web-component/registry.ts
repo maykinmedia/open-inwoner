@@ -9,6 +9,7 @@ import { ACCORDION_DEFINITION } from '@react/components/Accordion/constants';
 import { TABLE_DEFINITION } from '@react/components/Table/constants';
 import { CHART_DEFINITION } from '@react/components/Chart/constants';
 import { AFVAL_FILTERS_DEFINITION } from '@react/components/AfvalFilter/constants';
+import { FILE_ITEM_DEFINITION } from '@react/components/File/constants';
 
 /**
  * Web component registry
@@ -33,4 +34,5 @@ export const WEB_COMPONENT_REGISTRY = {
   [TABLE_DEFINITION.tagName]: TABLE_DEFINITION,
   [CHART_DEFINITION.tagName]: CHART_DEFINITION,
   [AFVAL_FILTERS_DEFINITION.tagName]: AFVAL_FILTERS_DEFINITION,
+  [FILE_ITEM_DEFINITION.tagName]: FILE_ITEM_DEFINITION,
 } as const;
