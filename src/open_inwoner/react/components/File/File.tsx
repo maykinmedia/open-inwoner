@@ -89,16 +89,16 @@ const File: AC<IFileProps> = ({
   };
 
   return (
-    <div class={clsx('denhaag-file', className)}>
-      <div class="denhaag-file__left">
+    <div class={clsx('denhaag-file', 'oip-denhaag-file', className)}>
+      <div class="denhaag-file__left oip-denhaag-file__left">
         <MaterialIcon name={loading ? 'rotate_right' : iconName} />
       </div>
 
       <div class="denhaag-file__right">
-        <div class="denhaag-file__label">
+        <div class="denhaag-file__label oip-denhaag-file__label">
           <span>{name}</span>
           {(displayExtension || size) && (
-            <span class="denhaag-file--oip__extension">
+            <span class="oip-denhaag-file--oip-extension">
               {' '}
               ({displayExtension}
               {displayExtension && size && ', '}
@@ -111,7 +111,7 @@ const File: AC<IFileProps> = ({
 
         {showDelete && deleteUrl ? (
           <button
-            class="denhaag-file__link denhaag-link--remove"
+            class="denhaag-file__link denhaag-file__link--remove oip-denhaag-file__link--remove"
             onClick={handleDelete}
             type="button"
           >
@@ -121,7 +121,11 @@ const File: AC<IFileProps> = ({
             )}
           </button>
         ) : downloadUrl ? (
-          <a href={downloadUrl} download={name} class="denhaag-file__link">
+          <a
+            href={downloadUrl}
+            download={name}
+            class="denhaag-file__link oip-denhaag-file__link"
+          >
             <MaterialIcon name="download" />
             <span>{downloadLabel}</span>
           </a>
