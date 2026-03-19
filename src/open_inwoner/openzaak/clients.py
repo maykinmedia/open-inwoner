@@ -189,11 +189,6 @@ class ZakenClient(ZgwAPIClient):
         :param vestigingsnummer: - used to filter the zaken by a vestigingsnummer
         """
 
-        if not (kvk_or_rsin or vestigingsnummer):
-            raise ValueError(
-                "You must set either a `kvk_or_rsin` or `vestigingsnummer`"
-            )
-
         config = OpenZaakConfig.get_solo()
 
         params = {
@@ -215,9 +210,10 @@ class ZakenClient(ZgwAPIClient):
 
         if vestigingsnummer:
             params.update({vestigingsnummer_param: vestigingsnummer})
-
-        if kvk_or_rsin:
+        elif kvk_or_rsin:
             params.update({kvk_rsin_param: kvk_or_rsin})
+        else:
+            return []
 
         if zaak_identificatie:
             params.update({"identificatie": zaak_identificatie})
