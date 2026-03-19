@@ -101,13 +101,10 @@ class ZakenClient(ZgwAPIClient):
             max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
             zaak_identificatie=identificatie,
         )
-        if vestigingsnummer:
-            return fetch_cases_for_company(
-                vestigingsnummer=vestigingsnummer,
-            )
-        if user_kvk or user_rsin:
+        if vestigingsnummer or user_kvk or user_rsin:
             user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
             return fetch_cases_for_company(
+                vestigingsnummer=vestigingsnummer,
                 kvk_or_rsin=user_kvk_or_rsin,
             )
 
@@ -189,6 +186,11 @@ class ZakenClient(ZgwAPIClient):
         :param vestigingsnummer: - used to filter the cases by a vestigingsnummer
         """
 
+        if not (kvk_or_rsin or vestigingsnummer):
+            raise ValueError(
+                "You must set either a `kvk_or_rsin` or `vestigingsnummer`"
+            )
+
         config = OpenZaakConfig.get_solo()
 
         params = {
@@ -210,10 +212,9 @@ class ZakenClient(ZgwAPIClient):
 
         if vestigingsnummer:
             params.update({vestigingsnummer_param: vestigingsnummer})
-        elif kvk_or_rsin:
+
+        if kvk_or_rsin:
             params.update({kvk_rsin_param: kvk_or_rsin})
-        else:
-            return []
 
         if zaak_identificatie:
             params.update({"identificatie": zaak_identificatie})

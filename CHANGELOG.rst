@@ -15,6 +15,9 @@ Bugfixes
 * [:gh:`2280`]: Verbeteringen doorgevoerd aan de Mijn Taken-plugin op de homepagina. De
   titel heeft extra spacing gekregen, kaartjes openen nu in een nieuw tabblad en de
   aanduiding ‘Soort:’ is verwijderd.
+* [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
+  ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
+  in plaats van alleen het vestigingsnummer.
 
 Onderhoud
 ---------

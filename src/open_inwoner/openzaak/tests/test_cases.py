@@ -454,6 +454,7 @@ class CaseListMocks:
                     {
                         "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
                         "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": self.eherkenning_user_vestiging.vestiging,
+                        "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": identifier,
                     }
                 )
                 .url,
@@ -882,15 +883,29 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     # Register additional mocks for OpenZaak 1.20+ parameters
                     if use_openzaak_120_params:
                         for group in self.api_groups:
-                            zrc_root = group.zrc_service.api_root.rstrip("/")
                             if user.vestiging:
                                 m.get(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}",
+                                    furl(group.zrc_service.api_root + "zaken")
+                                    .add(
+                                        {
+                                            "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer": user.vestiging,
+                                            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer": user.kvk,
+                                        }
+                                    )
+                                    .url,
                                     json={"results": []},
                                 )
                             else:
                                 m.get(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}",
+                                    furl(group.zrc_service.api_root + "zaken")
+                                    .add(
+                                        {
+                                            "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                            "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer": user.kvk,
+                                        }
+                                    )
+                                    .url,
                                     json={"results": []},
                                 )
 
@@ -902,41 +917,42 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     self.client.force_login(user=user)
                     self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
 
-                    used_urls = {
-                        req.url
+                    used_qs = [
+                        dict(furl(req.url).args)
                         for req in m.request_history
                         if req.path == "/api/v1/zaken" and req.method == "GET"
-                    }
+                    ]
 
-                    # Build expected URLs based on user type and flag
-                    expected_urls = set()
-                    for group in self.api_groups:
-                        zrc_root = group.zrc_service.api_root.rstrip("/")
-
-                        if use_openzaak_120_params:
-                            if user.vestiging:
-                                # OpenZaak 1.20+ vestiging parameter
-                                expected_urls.add(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer={user.vestiging}"
-                                )
-                            else:
-                                # OpenZaak 1.20+ KvK parameter
-                                expected_urls.add(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer={user.kvk}"
-                                )
+                    # Build expected QS based on user type and flag
+                    if use_openzaak_120_params:
+                        if user.vestiging:
+                            expected_qs = {
+                                "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__vestigingsNummer": user.vestiging,
+                                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer": user.kvk,
+                            }
                         else:
-                            if user.vestiging:
-                                # Legacy vestiging parameter
-                                expected_urls.add(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__vestiging__vestigingsNummer={user.vestiging}"
-                                )
-                            else:
-                                # Legacy KvK/RSIN parameter
-                                expected_urls.add(
-                                    f"{zrc_root}/zaken?maximaleVertrouwelijkheidaanduiding=beperkt_openbaar&rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId={user.kvk}"
-                                )
+                            expected_qs = {
+                                "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__kvkNummer": user.kvk,
+                            }
+                    else:
+                        if user.vestiging:
+                            expected_qs = {
+                                "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                "rol__betrokkeneIdentificatie__vestiging__vestigingsNummer": user.vestiging,
+                                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": user.kvk,
+                            }
+                        else:
+                            expected_qs = {
+                                "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                                "rol__betrokkeneIdentificatie__nietNatuurlijkPersoon__innNnpId": user.kvk,
+                            }
 
-                    self.assertEqual(used_urls, expected_urls)
+                    # One request per API group, all with same params
+                    self.assertEqual(len(used_qs), len(self.api_groups))
+                    for qs in used_qs:
+                        self.assertEqual(qs, expected_qs)
 
     def test_list_cases_for_kvk_user_with_vestigingsnummer(self, m):
         for mock in self.mocks:
@@ -982,7 +998,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 if req.hostname == zaken_root and req.path == "/api/v1/zaken"
             ][0]
 
-            self.assertEqual(len(list_zaken_req.qs), 2)
+            self.assertEqual(len(list_zaken_req.qs), 3)
             self.assertEqual(
                 list_zaken_req.qs,
                 {
@@ -992,12 +1008,19 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
                         self.eherkenning_user_vestiging.vestiging
                     ],
+                    "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                        self.eherkenning_user_vestiging.kvk
+                    ],
                 },
             )
 
     def test_list_cases_for_rsin_user_with_vestigingsnummer(self, m):
         for mock in self.mocks:
             mock._setUpMocks(m)
+
+        for group in self.api_groups:
+            group.fetch_eherkenning_zaken_with_rsin = True
+            group.save()
 
         self.client.force_login(user=self.eherkenning_user_vestiging)
 
@@ -1040,7 +1063,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                 if req.hostname == zaken_root and req.path == "/api/v1/zaken"
             ][0]
 
-            self.assertEqual(len(list_zaken_req.qs), 2)
+            self.assertEqual(len(list_zaken_req.qs), 3)
             self.assertEqual(
                 list_zaken_req.qs,
                 {
@@ -1049,6 +1072,9 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
                     ],
                     "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
                         self.eherkenning_user_vestiging.vestiging
+                    ],
+                    "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                        self.eherkenning_user_vestiging.rsin
                     ],
                 },
             )
