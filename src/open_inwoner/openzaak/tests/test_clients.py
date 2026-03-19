@@ -5,7 +5,11 @@ from django.test import TestCase
 
 import requests
 import requests_mock
-from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
+from zgw_consumers.api_models.constants import (
+    RolOmschrijving,
+    RolTypes,
+    VertrouwelijkheidsAanduidingen,
+)
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.openzaak.clients import (
@@ -19,7 +23,7 @@ from open_inwoner.openzaak.clients import (
     build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
@@ -584,3 +588,97 @@ class MultiZgwClientProxyTests(PlainTestCase):
         result = proxy.fetch_rows()
 
         self.assertEqual([row.exception is None for row in result], [True, False])
+
+
+@requests_mock.Mocker()
+class FetchZakenForCompanyTests(TestCase):
+    def setUp(self):
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+        )
+        self.zaken_client = build_zgw_client_from_service(
+            self.api_group.zrc_service,
+            use_openzaak_120_params=False,
+            fetch_rollen_with_betrokkene_type=False,
+        )
+        config = OpenZaakConfig.get_solo()
+        config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
+        config.save()
+
+    def test_raises_value_error_when_neither_kvk_nor_vestigingsnummer_given(self, m):
+        with self.assertRaises(ValueError):
+            self.zaken_client.fetch_zaken_for_company()
+
+    def test_sends_both_kvk_and_vestigingsnummer_when_both_provided(self, m):
+        m.get(
+            f"{ZAKEN_ROOT}zaken",
+            json={"count": 0, "next": None, "previous": None, "results": []},
+        )
+
+        self.zaken_client.fetch_zaken_for_company(
+            kvk_or_rsin="12345678",
+            vestigingsnummer="987654321",
+        )
+
+        self.assertEqual(len(m.request_history), 1)
+        req = m.request_history[0]
+        self.assertEqual(
+            req.qs,
+            {
+                "maximalevertrouwelijkheidaanduiding": [
+                    VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                ],
+                "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                    "12345678"
+                ],
+                "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
+                    "987654321"
+                ],
+            },
+        )
+
+    def test_sends_only_vestigingsnummer_when_only_vestigingsnummer_provided(self, m):
+        m.get(
+            f"{ZAKEN_ROOT}zaken",
+            json={"count": 0, "next": None, "previous": None, "results": []},
+        )
+
+        self.zaken_client.fetch_zaken_for_company(vestigingsnummer="987654321")
+
+        self.assertEqual(len(m.request_history), 1)
+        req = m.request_history[0]
+        self.assertEqual(
+            req.qs,
+            {
+                "maximalevertrouwelijkheidaanduiding": [
+                    VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                ],
+                "rol__betrokkeneidentificatie__vestiging__vestigingsnummer": [
+                    "987654321"
+                ],
+            },
+        )
+
+    def test_sends_only_kvk_when_only_kvk_provided(self, m):
+        m.get(
+            f"{ZAKEN_ROOT}zaken",
+            json={"count": 0, "next": None, "previous": None, "results": []},
+        )
+
+        self.zaken_client.fetch_zaken_for_company(kvk_or_rsin="12345678")
+
+        self.assertEqual(len(m.request_history), 1)
+        req = m.request_history[0]
+        self.assertEqual(
+            req.qs,
+            {
+                "maximalevertrouwelijkheidaanduiding": [
+                    VertrouwelijkheidsAanduidingen.beperkt_openbaar
+                ],
+                "rol__betrokkeneidentificatie__nietnatuurlijkpersoon__innnnpid": [
+                    "12345678"
+                ],
+            },
+        )
