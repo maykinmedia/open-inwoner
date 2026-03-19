@@ -1,6 +1,10 @@
 from django.urls import path
 
-from .admin_views import run_fetch_brp_check, run_fetch_cases_check
+from .admin_views import (
+    run_fetch_brp_check,
+    run_fetch_cases_check,
+    run_fetch_userfeed_check,
+)
 
 urlpatterns = [
     path(
@@ -12,5 +16,10 @@ urlpatterns = [
         "fetch-brp-check/",
         run_fetch_brp_check,
         name="run_fetch_brp_check",
+    ),
+    path(
+        "fetch-userfeed-check/",
+        run_fetch_userfeed_check,
+        name="run_fetch_userfeed_check",
     ),
 ]

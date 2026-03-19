@@ -6,7 +6,12 @@ from open_inwoner.openzaak.models import ZGWApiGroupConfig
 
 from .fetch_brp import FetchBRPConfigCheck
 from .fetch_cases import FetchCasesConfigCheck
-from .forms import FetchBRPConfigCheckParams, FetchCasesConfigCheckParams
+from .fetch_userfeed import FetchUserfeedConfigCheck
+from .forms import (
+    FetchBRPConfigCheckParams,
+    FetchCasesConfigCheckParams,
+    FetchUserfeedConfigCheckParams,
+)
 
 
 @staff_member_required
@@ -63,5 +68,34 @@ def run_fetch_brp_check(request):
             "result": result,
             "title": "Fetch BRP check",
             "back_url": reverse("admin:haalcentraal_haalcentraalconfig_change"),
+        },
+    )
+
+
+@staff_member_required
+def run_fetch_userfeed_check(request):
+    result = None
+
+    initial = {}
+    if request.GET.get("user"):
+        initial["user"] = request.GET["user"]
+
+    if request.method == "POST":
+        form = FetchUserfeedConfigCheckParams(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data["user"]
+            check = FetchUserfeedConfigCheck(user)
+            result = check()
+    else:
+        form = FetchUserfeedConfigCheckParams(initial=initial)
+
+    return render(
+        request,
+        "admin/run_config_check.html",
+        {
+            "form": form,
+            "result": result,
+            "title": "Fetch userfeed check",
+            "back_url": reverse("admin:accounts_user_changelist"),
         },
     )

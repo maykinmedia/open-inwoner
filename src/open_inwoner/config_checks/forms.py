@@ -1,5 +1,6 @@
 from django import forms
 
+from open_inwoner.accounts.models import User
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 
 
@@ -22,4 +23,13 @@ class FetchBRPConfigCheckParams(forms.Form):
         label="BSN",
         max_length=9,
         help_text="BSN to fetch BRP data for",
+    )
+
+
+class FetchUserfeedConfigCheckParams(forms.Form):
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="User",
+        help_text="User to fetch feed for",
+        empty_label=None,
     )
