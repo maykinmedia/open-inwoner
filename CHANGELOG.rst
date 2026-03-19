@@ -1,6 +1,8 @@
 2.1.1 (2026-03-19)
 ==================
 
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.1`.
+
 Bugfixes
 --------
 
