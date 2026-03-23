@@ -12,9 +12,10 @@ from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 import structlog
-from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.client import build_client as build_zgw_client
+
+from open_inwoner.cms.utils.apphooks import AppConfigMixin
 
 from .api_models import AfvalProfiel
 from .clients import OpenAfvalAPIClient

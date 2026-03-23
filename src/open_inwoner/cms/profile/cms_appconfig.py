@@ -1,10 +1,14 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from aldryn_apphooks_config.models import AppHookConfig
 
-
-class ProfileConfig(AppHookConfig):
+class ProfileConfig(models.Model):
+    namespace = models.CharField(
+        _("Instance namespace"),
+        max_length=100,
+        unique=True,
+        default=None,
+    )
     my_data = models.BooleanField(
         verbose_name=_("Mijn gegevens"),
         default=True,

@@ -12,16 +12,76 @@ from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.models import Page, Placeholder
+from cms.models import Page, PageContent, Placeholder
 from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
 from cms.utils.plugins import get_plugins
+from djangocms_versioning.constants import DRAFT, PUBLISHED
+from djangocms_versioning.models import Version
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+def _get_or_create_publish_user():
+    from open_inwoner.accounts.models import User
+
+    user = User.objects.filter(is_superuser=True).first()
+    if user is None:
+        user = User.objects.create_superuser(
+            email="cms_publish@example.com",
+            password="cms_publish",
+        )
+    return user
+
+
+def publish_page(page, language="nl"):
+    """
+    Publish all draft versions for a page in the given language.
+
+    In CMS 4 with djangocms-versioning, page.publish() no longer exists.
+    We find (or create) a draft Version for each PageContent in the given
+    language, then publish it.
+    """
+    from cms.models import PageContent
+
+    user = _get_or_create_publish_user()
+
+    # Find PageContent objects for this page+language
+    page_contents = PageContent._original_manager.filter(page=page, language=language)
+    for page_content in page_contents:
+        try:
+            version = Version.objects.get_for_content(page_content)
+        except Version.DoesNotExist:
+            # api.create_page() didn't create a Version — create a draft now
+            version = Version.objects.create(
+                content=page_content,
+                state=DRAFT,
+                created_by=user,
+            )
+        if version.state == DRAFT:
+            version.publish(user)
+
+
+def unpublish_page(page, language="nl"):
+    """
+    Unpublish all published versions for a page in the given language.
+
+    In CMS 4 with djangocms-versioning, page.unpublish() no longer exists.
+    """
+
+    user = _get_or_create_publish_user()
+    page_contents = PageContent._original_manager.filter(page=page, language=language)
+    for page_content in page_contents:
+        try:
+            version = Version.objects.get_for_content(page_content)
+        except Version.DoesNotExist:
+            continue
+        if version.state == PUBLISHED:
+            version.unpublish(user)
 
 
 def create_homepage():
@@ -32,10 +92,7 @@ def create_homepage():
         "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
     )
     p.set_as_homepage()
-
-    if not p.publish("nl"):
-        raise Exception("failed to publish page")
-
+    publish_page(p, "nl")
     return p
 
 
@@ -120,7 +177,7 @@ def render_all_placeholders(
     request = get_request(page=page, user=as_user)
     renderer = ContentRenderer(request=request)
 
-    placeholders = page.placeholders.all()
+    placeholders = page.get_placeholders(language)
 
     if not placeholders.exists():
         logger.info("CMS page has no placeholders to render")
@@ -217,8 +274,8 @@ def create_apphook_page(
         config_args["namespace"] = hook_class.app_name
         p.app_config = app_config.objects.get_or_create(**config_args)
 
-    if publish and not p.publish("nl"):
-        raise Exception("failed to publish page")
+    if publish:
+        publish_page(p, "nl")
 
     return p
 
@@ -227,16 +284,20 @@ def create_cms_page_with_content(
     *, title: str, content: str, language: str = "nl"
 ) -> Page:
     """Create a CMS page with `content` text in the content slot."""
-    page = api.create_page(title, "cms/fullwidth.html", language, in_navigation=True)
-    if not page.publish(language):
-        raise Exception("failed to publish page")
+    from cms.models import PageContent
 
-    content_placeholder = page.placeholders.get(slot="content")
+    page = api.create_page(title, "cms/fullwidth.html", language, in_navigation=True)
+
+    # In CMS 4, placeholders are on PageContent, not Page
+    page_content = PageContent._original_manager.get(page=page, language=language)
+    content_placeholder = page_content.placeholders.get(slot="content")
     add_plugin(
         placeholder=content_placeholder,
         plugin_type="TextPlugin",
         language="nl",
         body=content,
     )
+
+    publish_page(page, language)
 
     return page

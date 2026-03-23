@@ -1,10 +1,9 @@
 from django.conf import settings
-from django.contrib.sites.models import Site
 
 from cms.models import Page
-from cms.utils.page import get_page_queryset
 from django_elasticsearch_dsl import Document, fields
 from django_elasticsearch_dsl.registries import registry
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.cms.tests.cms_tools import (
     render_all_placeholders,
@@ -129,15 +128,16 @@ class CMSPageDocument(Document):
         return str(instance)
 
     def prepare_url(self, instance: Page):
-        return instance.get_public_url() or ""
+        return instance.get_absolute_url() or ""
 
     def get_queryset(self):
         site_config = SiteConfiguration.get_solo()
         if not site_config.include_cms_pages_in_search_index:
             return Page.objects.none()
 
-        site = Site.objects.get_current()
-        return get_page_queryset(site, draft=False, published=True)
+        return Page.objects.filter(
+            pagecontent_set__versions__state=PUBLISHED
+        ).distinct()
 
     class Index:
         name = settings.ES_INDEX_CMS_PAGES

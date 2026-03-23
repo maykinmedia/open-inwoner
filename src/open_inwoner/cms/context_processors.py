@@ -1,6 +1,7 @@
 from django.db.models import Q
 
 from cms.models import Page
+from djangocms_versioning.constants import PUBLISHED
 
 
 def active_apphooks(request):
@@ -13,7 +14,7 @@ def active_apphooks(request):
     }
     """
     active_app_hooks = (
-        Page.objects.published()
+        Page.objects.filter(pagecontent_set__versions__state=PUBLISHED)
         .exclude(Q(application_urls="") | Q(application_urls__isnull=True))
         .values_list("application_urls", "application_namespace")
     )

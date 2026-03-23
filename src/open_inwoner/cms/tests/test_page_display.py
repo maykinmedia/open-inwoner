@@ -5,7 +5,7 @@ from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests.cms_tools import create_apphook_page
+from open_inwoner.cms.tests.cms_tools import create_apphook_page, unpublish_page
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,
@@ -55,7 +55,7 @@ class CMSPageDisplayTests(WebTest):
         )
 
         # check unpublishing
-        inbox.unpublish("nl")
+        unpublish_page(inbox)
         self.assertFalse(inbox_page_is_published())
         self.assertEqual(
             set(get_active_app_names()),

@@ -30,6 +30,7 @@ from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
+from open_inwoner.cms.tests.cms_tools import publish_page
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
@@ -318,7 +319,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Stuur een bericht"))
 
         # case 3: published message page
-        page.publish("nl")
+        publish_page(page)
         page.save()
 
         response = self.app.get(self.url, user=self.user)
@@ -1326,7 +1327,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("messages_notifications", form.fields)
 
         # inbox page published
-        page.publish("nl")
+        publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1349,7 +1350,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("cases_notifications", form.fields)
 
         # cases page published
-        page.publish("nl")
+        publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1371,7 +1372,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("plans_notifications", form.fields)
 
         # collaborate page published
-        page.publish("nl")
+        publish_page(page)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 

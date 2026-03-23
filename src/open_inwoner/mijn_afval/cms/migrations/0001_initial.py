@@ -2,8 +2,6 @@
 
 from django.db import migrations, models
 
-import app_data.fields
-
 
 class Migration(migrations.Migration):
     initial = True
@@ -35,7 +33,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "app_data",
-                    app_data.fields.AppDataField(default="{}", editable=False),
+                    models.TextField(default="{}", editable=False),
                 ),
                 (
                     "page_heading",

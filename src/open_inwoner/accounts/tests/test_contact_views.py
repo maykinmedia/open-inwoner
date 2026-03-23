@@ -13,6 +13,7 @@ from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.tests import cms_tools
+from open_inwoner.cms.tests.cms_tools import publish_page
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
 from .factories import DigidUserFactory, UserFactory
@@ -106,7 +107,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, _("Stuur bericht"))
 
         # case 3: published message page
-        page.publish("nl")
+        publish_page(page)
         page.save()
 
         response = self.app.get(self.list_url, user=self.user)

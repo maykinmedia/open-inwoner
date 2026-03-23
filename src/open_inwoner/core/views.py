@@ -5,7 +5,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 import structlog
-from cms.models import Page, Title
+from cms.models import Page, PageContent
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
@@ -151,7 +152,8 @@ def _get_footer_pages(is_authenticated: bool) -> list:
 
     # Add contact form page at the beginning if enabled
     contact_form_pages = Page.objects.filter(
-        template="cms/contactform/form_outer.html", publisher_is_draft=False
+        pagecontent_set__template="cms/contactform/form_outer.html",
+        pagecontent_set__versions__state=PUBLISHED,
     )
     if contact_form_pages.exists() and klant_config.contact_registration_enabled:
         cms_footer_pages.insert(0, contact_form_pages.first())
@@ -167,7 +169,7 @@ def _get_footer_pages(is_authenticated: bool) -> list:
 
     pages = []
     for page in cms_footer_pages:
-        title = Title.objects.get(page=page, language=page.languages)
+        title = PageContent.objects.get(page=page, language=page.languages)
         pages.append({"url": page.get_absolute_url(), "link_text": title.title})
 
     return pages

@@ -51,7 +51,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertFalse(config.appointments)
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -98,7 +98,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(config.appointments)
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)
@@ -140,7 +140,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(benefits_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -161,7 +161,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(benefits_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)
@@ -191,7 +191,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(case_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -212,7 +212,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(case_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)
@@ -242,7 +242,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(collaborate_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -263,7 +263,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(collaborate_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)
@@ -293,7 +293,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(inbox_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -314,7 +314,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(inbox_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)
@@ -344,7 +344,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(products_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         self.assertIsNone(getattr(page, "commonextension", None))
 
     @override_settings(
@@ -365,7 +365,7 @@ class CMSSetupConfigurationTest(TestCase):
         self.assertTrue(products_page_is_published())
 
         # check common extension
-        page = Page.objects.get(publisher_is_draft=False)
+        page = Page.objects.get()
         extension = page.commonextension
 
         self.assertTrue(extension.requires_auth)

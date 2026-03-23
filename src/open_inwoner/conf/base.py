@@ -151,6 +151,7 @@ INSTALLED_APPS = [
     "menus",
     "treebeard",
     "sekizai",
+    "djangocms_versioning",
     # "djangocms_admin_style",
     "djangocms_link",
     "djangocms_file",
@@ -653,6 +654,8 @@ SHOW_ALERT = True
 #
 # Django CMS
 #
+
+CMS_CONFIRM_VERSION4 = True
 
 CMS_PAGE_CACHE = False
 CMS_PLACEHOLDER_CACHE = False

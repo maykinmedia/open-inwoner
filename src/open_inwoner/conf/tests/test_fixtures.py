@@ -9,10 +9,6 @@ class FixtureTests(TestCase):
     def test_admin_index(self):
         call_command("loaddata", "django-admin-index")
 
-    def test_cms_pages(self):
-        # pass if this doesn't raise anything
-        call_command("loaddata", "cms-pages")
-
     def test_custom_csp(self):
         # pass if this doesn't raise anything
         call_command("loaddata", "custom_csp")

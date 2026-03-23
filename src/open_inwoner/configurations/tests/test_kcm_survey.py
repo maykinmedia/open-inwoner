@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.urls import reverse
 
 from pyquery import PyQuery
 
@@ -13,6 +14,7 @@ class KCMSurveyTestCase(TestCase):
     css_selector = ".kcm-survey"
 
     def setUp(self):
+        cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
 
     @patch(
@@ -23,7 +25,7 @@ class KCMSurveyTestCase(TestCase):
         ),
     )
     def test_kcm_survey_configured(self, mock_config):
-        response = self.client.get("/")
+        response = self.client.get(reverse("pages-root"))
 
         doc = PyQuery(response.content)
 
@@ -43,7 +45,7 @@ class KCMSurveyTestCase(TestCase):
                         kcm_survey_link_text=text, kcm_survey_link_url=url
                     ),
                 ):
-                    response = self.client.get("/")
+                    response = self.client.get(reverse("pages-root"))
 
                     doc = PyQuery(response.content)
 

@@ -5,6 +5,7 @@ import structlog
 from cms.models import Page
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.models import KlantenSysteemConfig
@@ -35,7 +36,8 @@ class FooterPagesPlugin(CMSPluginBase):
                     cms_pages.remove(page)
 
         contact_form_pages = Page.objects.filter(
-            template="cms/contactform/form_outer.html", publisher_is_draft=False
+            pagecontent_set__template="cms/contactform/form_outer.html",
+            pagecontent_set__versions__state=PUBLISHED,
         )
 
         # Use the first page if it exists

@@ -63,7 +63,10 @@ class MenuModifier(Modifier):
                 # check if we got indicator lookups
                 indicator_lookup = menu_indicator_lookups.get(ext.menu_indicator)
                 if indicator_lookup:
-                    node.indicator = indicator_lookup(request, namespace)
+                    try:
+                        node.indicator = int(indicator_lookup(request, namespace))
+                    except (ValueError, TypeError):
+                        node.indicator = 0
                 else:
                     node.indicator = 0
 

@@ -12,7 +12,6 @@ from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
 
 import structlog
-from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.choices import (
@@ -27,6 +26,7 @@ from open_inwoner.accounts.forms import (
     UserNotificationsForm,
 )
 from open_inwoner.accounts.models import Action, User
+from open_inwoner.cms.utils.apphooks import AppConfigMixin
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,

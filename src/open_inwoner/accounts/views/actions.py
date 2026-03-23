@@ -12,15 +12,15 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeletionMixin, UpdateView
 
-from aldryn_apphooks_config.mixins import AppConfigMixin
-from aldryn_apphooks_config.utils import get_app_instance
 from cms.models import Page
+from djangocms_versioning.constants import PUBLISHED
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ActionForm, ActionListForm
 from open_inwoner.accounts.models import Action
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.utils.apphooks import get_app_instance
 from open_inwoner.components.utils import RenderableTag
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_verbose_change_message
@@ -28,7 +28,7 @@ from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
 
-class ActionsEnabledMixin(AppConfigMixin):
+class ActionsEnabledMixin:
     def dispatch(self, request, *args, **kwargs):
         self.namespace, self.config = get_app_instance(request)
         request.current_app = self.namespace
@@ -94,11 +94,10 @@ class ActionListView(
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
         context["actions"] = queryset
-        context["show_plans"] = (
-            Page.objects.published()
-            .filter(application_namespace=CollaborateApphook.app_name)
-            .exists()
-        )
+        context["show_plans"] = Page.objects.filter(
+            pagecontent_set__versions__state=PUBLISHED,
+            application_namespace=CollaborateApphook.app_name,
+        ).exists()
 
         return context
 

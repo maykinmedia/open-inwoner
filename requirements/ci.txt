@@ -2,10 +2,6 @@
 #    uv pip compile --no-strip-extras --python 3.12 --no-emit-index-url --output-file requirements/ci.txt requirements/base.txt requirements/test-tools.in requirements/docs.in
 alabaster==0.7.16
     # via sphinx
-aldryn-apphooks-config==0.7.0
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 amqp==5.1.1
     # via
     #   -c requirements/base.txt
@@ -184,7 +180,6 @@ django==4.2.29
     #   -r requirements/base.txt
     #   django-admin-index
     #   django-appconf
-    #   django-appdata
     #   django-axes
     #   django-celery-beat
     #   django-celery-monitor
@@ -201,6 +196,7 @@ django==4.2.29
     #   django-filer
     #   django-filter
     #   django-formtools
+    #   django-fsm-2
     #   django-health-check
     #   django-htmx
     #   django-import-export
@@ -223,6 +219,7 @@ django==4.2.29
     #   django-sniplates
     #   django-solo
     #   django-structlog
+    #   django-stubs-ext
     #   django-timeline-logger
     #   django-timezone-field
     #   django-treebeard
@@ -253,11 +250,6 @@ django-appconf==1.0.5
     #   django-image-cropping
     #   django-log-outgoing-requests
     #   django-timeline-logger
-django-appdata==0.4.0
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   aldryn-apphooks-config
 django-autoslug==1.9.8
     # via
     #   -c requirements/base.txt
@@ -290,15 +282,15 @@ django-classy-tags==4.0.0
     #   -r requirements/base.txt
     #   django-cms
     #   django-sekizai
-django-cms==3.11.1
+django-cms==4.1.10
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   aldryn-apphooks-config
     #   djangocms-attributes-field
     #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
+    #   djangocms-versioning
 django-colorfield==0.4.5
     # via
     #   -c requirements/base.txt
@@ -347,6 +339,11 @@ django-formtools==2.3
     #   -r requirements/base.txt
     #   django-cms
     #   django-two-factor-auth
+django-fsm-2==4.2.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   djangocms-versioning
 django-health-check==3.20.8
     # via
     #   -c requirements/base.txt
@@ -475,6 +472,11 @@ django-structlog==6.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-stubs-ext==6.0.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-fsm-2
 django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
@@ -526,6 +528,10 @@ djangocms-link==3.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 djangocms-picture==4.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+djangocms-versioning==2.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -907,6 +913,8 @@ packaging==23.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-cms
+    #   djangocms-versioning
     #   kombu
     #   opentelemetry-instrumentation
     #   pytest
@@ -1138,6 +1146,7 @@ setuptools==80.10.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-cms
     #   josepy
 shellingham==1.5.4
     # via
@@ -1238,6 +1247,7 @@ typing-extensions==4.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-stubs-ext
     #   elasticsearch
     #   mozilla-django-oidc-db
     #   opentelemetry-api
