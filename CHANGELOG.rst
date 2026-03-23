@@ -16,6 +16,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
+  ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
+  in plaats van alleen het vestigingsnummer.
 * [:gh:`2329`]: ``attr_consuming_service_index`` wordt nu correct doorgegeven als
   queryparameter aan de eHerkenning SAML loginpagina, op basis van de waarde in de
   eHerkenning configuratie. Het ontbreken hiervan kon leiden tot authenticatiefouten.
