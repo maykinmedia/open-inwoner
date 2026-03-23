@@ -1802,11 +1802,29 @@ class OpenKlant2Service(
             answer_objs = []
             for answer_uuid in answer_uuids:
                 answer = klantcontact_uuid_to_klantcontact_object[answer_uuid]
-                answer_objs.append(OpenKlant2Answer.from_klantcontact(answer))
+                try:
+                    answer_objs.append(OpenKlant2Answer.from_klantcontact(answer))
+                except ValueError:
+                    logger.warning("OpenKlant2Answer without content (inhoud)")
+                except (KeyError, TypeError):
+                    logger.exception(
+                        "Unexpected error creating OpenKlant2Answer for klantcontact",
+                        answer_uuid=answer["uuid"],
+                    )
 
-            question_objs.append(
-                OpenKlant2Question.from_klantcontact_and_answers(question, answer_objs)
-            )
+            try:
+                question_objs.append(
+                    OpenKlant2Question.from_klantcontact_and_answers(
+                        question, answer_objs
+                    )
+                )
+            except ValueError:
+                logger.warning("OpenKlant2Question without content (inhoud)")
+            except (KeyError, TypeError):
+                logger.exception(
+                    "Unexpected error creating OpenKlant2Question for klantcontact",
+                    question_uuid=question["uuid"],
+                )
 
         question_objs.sort(key=lambda o: o.plaatsgevonden_op)
         return question_objs
