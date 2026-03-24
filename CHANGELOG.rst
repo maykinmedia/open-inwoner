@@ -45,6 +45,9 @@ Bugfixes
   contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
   aanvraag in plaats van alle records tegelijk in te laden.
 * [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
+* [:gh:`2320`]: Verbeterde controles op de rol van betrokkenen: gebruikers hebben alleen toegang
+  tot een zaak en worden alleen op de hoogte gebracht van wijzigingen in een zaak als ze de juiste
+  rol hebben.
 
 Onderhoud
 ---------
