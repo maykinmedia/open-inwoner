@@ -132,38 +132,60 @@ class CaseAccessMixin(AccessMixin):
             client = api_group.zaken_client
             self.zaak = client.fetch_single_zaak(object_id)
             if self.zaak:
-                # check if we have a role in this case
+                # check if we have the correct role in this case
+                config = OpenZaakConfig.get_solo()
+                limit_access_to_role = config.limit_user_visible_cases_to_role
                 if request.user.bsn:
-                    if not client.fetch_roles_for_zaak_and_bsn(
+                    rollen = client.fetch_roles_for_zaak_and_bsn(
                         self.zaak.url, request.user.bsn
+                    )
+                    if not rollen or (
+                        limit_access_to_role
+                        and not any(
+                            rol.omschrijving_generiek == limit_access_to_role
+                            for rol in rollen
+                        )
                     ):
                         logger.info(
-                            "CaseAccessMixin - permission denied via bsn: no role for the case",
+                            "CaseAccessMixin - permission denied via bsn: no or incorrect role for the case",
                             zaak_url=self.zaak.url,
                         )
                         return self.handle_no_permission()
                 elif request.user.kvk:
                     identifier = self.request.user.kvk
-                    config = OpenZaakConfig.get_solo()
                     if api_group.fetch_eherkenning_zaken_with_rsin:
                         identifier = self.request.user.rsin
 
                     vestigingsnummer = request.user.vestiging
                     if vestigingsnummer:
-                        if not client.fetch_roles_for_zaak_and_vestigingsnummer(
+                        rollen = client.fetch_roles_for_zaak_and_vestigingsnummer(
                             self.zaak.url, vestigingsnummer
+                        )
+                        if not rollen or (
+                            limit_access_to_role
+                            and not any(
+                                rol.omschrijving_generiek == limit_access_to_role
+                                for rol in rollen
+                            )
                         ):
                             logger.info(
-                                "CaseAccessMixin - permission denied via vestigingsnummer: no role for the case",
+                                "CaseAccessMixin - permission denied via vestigingsnummer: no or incorrect role for the case",
                                 zaak_url=self.zaak.url,
                             )
                             return self.handle_no_permission()
                     else:
-                        if not client.fetch_roles_for_zaak_and_kvk_or_rsin(
+                        rollen = client.fetch_roles_for_zaak_and_kvk_or_rsin(
                             self.zaak.url, identifier
+                        )
+                        if not rollen or (
+                            limit_access_to_role
+                            and not any(
+                                rol.omschrijving_generiek == limit_access_to_role
+                                for rol in rollen
+                            )
                         ):
                             logger.info(
-                                "CaseAccessMixin - permission denied via kvk/rsin: no role for the case",
+                                "CaseAccessMixin - permission denied via kvk/rsin: no or incorrect role for the case",
                                 zaak_url=self.zaak.url,
                             )
                             return self.handle_no_permission()
