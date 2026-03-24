@@ -9,7 +9,7 @@ ape-pie==0.2.0
     #   objects-api-client-django
     #   open-klant-client
     #   zgw-consumers
-asgiref==3.7.2
+asgiref==3.11.1
     # via
     #   django
     #   django-htmx
@@ -96,7 +96,7 @@ defusedxml==0.7.1
     # via odfpy
 diff-match-patch==20200713
     # via django-import-export
-django==4.2.29
+django==5.2.12
     # via
     #   -r requirements/base.in
     #   django-admin-index
@@ -170,7 +170,7 @@ django-autoslug==1.9.8
     # via -r requirements/base.in
 django-axes==5.25.0
     # via -r requirements/base.in
-django-celery-beat==2.6.0
+django-celery-beat==2.9.0
     # via -r requirements/base.in
 django-celery-monitor @ git+https://github.com/maykinmedia/django-celery-monitor@74b12529dcdd6923a4deed4c4b6fd3c9fc56eecd#egg=django_celery_monitor
     # via -r requirements/base.in
@@ -196,7 +196,7 @@ django-cors-headers==3.10.0
     # via -r requirements/base.in
 django-csp==3.7
     # via -r requirements/base.in
-django-csp-reports==1.9.1
+django-csp-reports==1.10.0
     # via -r requirements/base.in
 django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning
     # via -r requirements/base.in
@@ -204,7 +204,7 @@ django-elasticsearch-dsl==8.2
     # via -r requirements/base.in
 django-extra-fields==3.0.2
     # via -r requirements/base.in
-django-filer==3.1.1
+django-filer==3.4.4
     # via
     #   -r requirements/base.in
     #   djangocms-file
@@ -664,7 +664,9 @@ sqlparse==0.5.5
 structlog==25.4.0
     # via django-structlog
 svglib==1.5.1
-    # via easy-thumbnails
+    # via
+    #   django-filer
+    #   easy-thumbnails
 tablib[html, ods, xls, xlsx, yaml]==3.1.0
     # via django-import-export
 tinycss2==1.5.1
