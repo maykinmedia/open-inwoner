@@ -11,8 +11,10 @@ from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
+from open_inwoner.openzaak.constants import ZaakBetrokkeneRol
 from open_inwoner.openzaak.notifications import (
     _get_initiator_users_from_roles,
+    _get_nnp_initiator_nnp_id_from_roles,
     _get_np_initiator_bsns_from_roles,
     send_case_update_email,
 )
@@ -107,7 +109,49 @@ class NotificationHandlerUtilsTestCase(TestCase):
         self.assertIn(zaak_url, body_html)
         self.assertIn(config.name, body_html)
 
-    # TODO we're missing a similar test for get_nnp_initiator_nnp_id_from_roles()
+    def test_get_nnp_initiator_nnp_id_from_roles(self):
+        find_rol_1 = generate_rol(
+            RolTypes.niet_natuurlijk_persoon,
+            {"innNnpId": "100000001"},
+            RolOmschrijving.initiator,
+        )
+        find_rol_2 = generate_rol(
+            RolTypes.niet_natuurlijk_persoon,
+            {"innNnpId": "100000002"},
+            RolOmschrijving.medeinitiator,
+        )
+        roles = [
+            find_rol_1,
+            find_rol_2,
+            # duplicate NNP ID
+            generate_rol(
+                RolTypes.niet_natuurlijk_persoon,
+                {"innNnpId": "100000001"},
+                RolOmschrijving.medeinitiator,
+            ),
+            # bad type
+            generate_rol(
+                RolTypes.natuurlijk_persoon,
+                {"innNnpId": "404000001"},
+                RolOmschrijving.initiator,
+            ),
+            # bad description
+            generate_rol(
+                RolTypes.niet_natuurlijk_persoon,
+                {"innNnpId": "404000002"},
+                RolOmschrijving.behandelaar,
+            ),
+            # bad identification
+            generate_rol(
+                RolTypes.niet_natuurlijk_persoon,
+                {"not_the_expected_field": 123},
+                RolOmschrijving.initiator,
+            ),
+        ]
+        expected = {"100000001", "100000002"}
+        actual = _get_nnp_initiator_nnp_id_from_roles(roles)
+        self.assertEqual(set(actual), expected)
+
     def test_get_np_initiator_bsns_from_roles(self):
         # roles we're interested in
         find_rol_1 = generate_rol(
@@ -239,3 +283,69 @@ class NotificationHandlerUtilsTestCase(TestCase):
         actual = _get_initiator_users_from_roles(roles, api_group=self.api_group)
 
         self.assertEqual(set(actual), expected)
+
+    def test_get_np_initiator_bsns_from_roles__limit_access_to_role(self):
+        """When limit_access_to_role is set, only roles with that omschrijving are included."""
+        initiator_rol = generate_rol(
+            RolTypes.natuurlijk_persoon,
+            {"inpBsn": "100000001"},
+            RolOmschrijving.initiator,
+        )
+        medeinitiator_rol = generate_rol(
+            RolTypes.natuurlijk_persoon,
+            {"inpBsn": "100000002"},
+            RolOmschrijving.medeinitiator,
+        )
+        roles = [initiator_rol, medeinitiator_rol]
+
+        actual = _get_np_initiator_bsns_from_roles(
+            roles, limit_access_to_role=ZaakBetrokkeneRol.initiator
+        )
+
+        self.assertEqual(actual, ["100000001"])
+
+    def test_get_nnp_initiator_nnp_id_from_roles__limit_access_to_role(self):
+        """When limit_access_to_role is set, only roles with that omschrijving are included."""
+        initiator_rol = generate_rol(
+            RolTypes.niet_natuurlijk_persoon,
+            {"innNnpId": "100000001"},
+            RolOmschrijving.initiator,
+        )
+        medeinitiator_rol = generate_rol(
+            RolTypes.niet_natuurlijk_persoon,
+            {"innNnpId": "100000002"},
+            RolOmschrijving.medeinitiator,
+        )
+        roles = [initiator_rol, medeinitiator_rol]
+
+        actual = _get_nnp_initiator_nnp_id_from_roles(
+            roles, limit_access_to_role=ZaakBetrokkeneRol.initiator
+        )
+
+        self.assertEqual(actual, ["100000001"])
+
+    def test_get_initiator_users_from_roles__limit_access_to_role(self):
+        """When limit_access_to_role is set, medeinitiator users are excluded."""
+        user_initiator = DigidUserFactory(bsn="100000001")
+        user_medeinitiator = DigidUserFactory(bsn="100000002")
+
+        roles = [
+            generate_rol(
+                RolTypes.natuurlijk_persoon,
+                {"inpBsn": user_initiator.bsn},
+                RolOmschrijving.initiator,
+            ),
+            generate_rol(
+                RolTypes.natuurlijk_persoon,
+                {"inpBsn": user_medeinitiator.bsn},
+                RolOmschrijving.medeinitiator,
+            ),
+        ]
+
+        actual = _get_initiator_users_from_roles(
+            roles,
+            api_group=self.api_group,
+            limit_access_to_role=ZaakBetrokkeneRol.initiator,
+        )
+
+        self.assertEqual(actual, [user_initiator])

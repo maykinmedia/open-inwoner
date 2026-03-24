@@ -90,7 +90,12 @@ def handle_zaken_notification(notification: Notification):
         )
         return
 
-    inform_users = _get_initiator_users_from_roles(roles, api_group=api_group)
+    config = OpenZaakConfig.get_solo()
+    inform_users = _get_initiator_users_from_roles(
+        roles,
+        api_group=api_group,
+        limit_access_to_role=config.limit_user_visible_cases_to_role,
+    )
     if not inform_users:
         log_system_action(
             f"ignored {r} notification: no users with bsn/nnp_id as (mede)initiators in zaak {zaak_url}",
@@ -597,17 +602,24 @@ def _handle_status_update(
 # - - - - -
 
 
-def _get_np_initiator_bsns_from_roles(roles: list[Rol]) -> list[str]:
+def _get_np_initiator_bsns_from_roles(
+    roles: list[Rol], limit_access_to_role: str = ""
+) -> list[str]:
     """
     iterate over Rollen and for all natural-person initiators return their BSN
+
+    If `limit_access_to_role` is set, only roles with that specific omschrijving_generiek
+    are included; otherwise both initiator and medeinitiator are included.
     """
     ret = set()
+    allowed_rollen = (
+        (limit_access_to_role,)
+        if limit_access_to_role
+        else (RolOmschrijving.initiator, RolOmschrijving.medeinitiator)
+    )
 
     for role in roles:
-        if role.omschrijving_generiek not in (
-            RolOmschrijving.initiator,
-            RolOmschrijving.medeinitiator,
-        ):
+        if role.omschrijving_generiek not in allowed_rollen:
             continue
         if role.betrokkene_type != RolTypes.natuurlijk_persoon:
             continue
@@ -621,17 +633,24 @@ def _get_np_initiator_bsns_from_roles(roles: list[Rol]) -> list[str]:
     return list(ret)
 
 
-def _get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
+def _get_nnp_initiator_nnp_id_from_roles(
+    roles: list[Rol], limit_access_to_role: str = ""
+) -> list[str]:
     """
     iterate over Rollen and for all non-natural-person initiators return their nnpId
+
+    If `limit_access_to_role` is set, only roles with that specific omschrijving_generiek
+    are included; otherwise both initiator and medeinitiator are included.
     """
     ret = set()
+    allowed_rollen = (
+        (limit_access_to_role,)
+        if limit_access_to_role
+        else (RolOmschrijving.initiator, RolOmschrijving.medeinitiator)
+    )
 
     for role in roles:
-        if role.omschrijving_generiek not in (
-            RolOmschrijving.initiator,
-            RolOmschrijving.medeinitiator,
-        ):
+        if role.omschrijving_generiek not in allowed_rollen:
             continue
         if role.betrokkene_type != RolTypes.niet_natuurlijk_persoon:
             continue
@@ -646,18 +665,26 @@ def _get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
 
 
 def _get_initiator_users_from_roles(
-    roles: list[Rol], api_group: ZGWApiGroupConfig
+    roles: list[Rol],
+    api_group: ZGWApiGroupConfig,
+    limit_access_to_role: str = "",
 ) -> list[User]:
     """
     iterate over Rollen and return User objects for initiators
+
+    If `limit_access_to_role` is set, only users with that specific role are returned.
     """
     users = []
 
-    bsn_list = _get_np_initiator_bsns_from_roles(roles)
+    bsn_list = _get_np_initiator_bsns_from_roles(
+        roles, limit_access_to_role=limit_access_to_role
+    )
     if bsn_list:
         users += list(User.objects.filter(bsn__in=bsn_list, is_active=True))
 
-    nnp_id_list = _get_nnp_initiator_nnp_id_from_roles(roles)
+    nnp_id_list = _get_nnp_initiator_nnp_id_from_roles(
+        roles, limit_access_to_role=limit_access_to_role
+    )
     if nnp_id_list:
         if api_group.fetch_eherkenning_zaken_with_rsin:
             id_filter = {"rsin__in": nnp_id_list}
