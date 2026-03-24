@@ -131,6 +131,12 @@ ElasticSearch
 
         bin/start_elasticsearch.sh
 
+   By default the script starts Elasticsearch with security enabled and the
+   password ``elastic`` for the built-in ``elastic`` user (overridable via the
+   ``ES_PASSWORD`` environment variable). The development settings default
+   ``ES_USERNAME`` and ``ES_PASSWORD`` to ``elastic`` to match, so no extra
+   configuration is needed for a standard local setup.
+
 2. Then build the indices:
 
    .. code-block:: bash
@@ -206,3 +212,9 @@ file or as part of the ``(post)activate`` of your virtualenv.
   Defaults to ``True``.
 * ``TWO_FACTOR_PATCH_ADMIN``: Whether to use the 2 Factor Authentication login flow for
   the admin or not. Defaults to ``True``.
+
+* ``ES_HOST``: Elasticsearch host URL. Defaults to ``http://localhost:9200``.
+* ``ES_USERNAME``: Elasticsearch username for basic authentication. When both
+  ``ES_USERNAME`` and ``ES_PASSWORD`` are set, the client will authenticate using
+  HTTP basic auth. Leave unset to connect without authentication.
+* ``ES_PASSWORD``: Elasticsearch password for basic authentication. See ``ES_USERNAME``.

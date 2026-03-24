@@ -54,7 +54,8 @@ jobs:
         env:
           discovery.type: single-node
           ES_JAVA_OPTS: '-Xms512m -Xmx512m'
-          xpack.security.enabled: false
+          xpack.security.enabled: true
+          ELASTIC_PASSWORD: elastic
         ports:
           - 9200:9200
           - 9300:9300
@@ -104,6 +105,8 @@ jobs:
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
+          ES_USERNAME: elastic
+          ES_PASSWORD: elastic
           OTEL_SDK_DISABLED: true
 
       - name: Persist coverage data files
@@ -174,7 +177,8 @@ jobs:
         env:
           discovery.type: single-node
           ES_JAVA_OPTS: '-Xms512m -Xmx512m'
-          xpack.security.enabled: false
+          xpack.security.enabled: true
+          ELASTIC_PASSWORD: elastic
         ports:
           - 9200:9200
           - 9300:9300
@@ -206,6 +210,8 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
+          ES_USERNAME: elastic
+          ES_PASSWORD: elastic
           OTEL_SDK_DISABLED: true
 
   #

@@ -1,5 +1,6 @@
 import os
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
 import sentry_sdk
@@ -988,7 +989,17 @@ GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG
-ELASTICSEARCH_DSL = {"default": {"hosts": config("ES_HOST", "http://localhost:9200")}}
+_es_username = config("ES_USERNAME", "")
+_es_password = config("ES_PASSWORD", "")
+if bool(_es_username) ^ bool(_es_password):
+    raise ImproperlyConfigured(
+        "Both ES_USERNAME and ES_PASSWORD must be set to enable Elasticsearch "
+        "authentication. Only one of the two is currently configured."
+    )
+_es_connection: dict = {"hosts": config("ES_HOST", "http://localhost:9200")}
+if _es_username and _es_password:
+    _es_connection["basic_auth"] = (_es_username, _es_password)
+ELASTICSEARCH_DSL = {"default": _es_connection}
 ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
 ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", "cms_pages")
 ES_MAX_SIZE = 10000

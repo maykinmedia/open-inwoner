@@ -11,6 +11,11 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
+* [:gh:`2211`]: Elasticsearch ondersteunt nu HTTP basic authenticatie via de
+  omgevingsvariabelen ``ES_USERNAME`` en ``ES_PASSWORD``. Wanneer beide zijn ingesteld,
+  wordt de verbinding met Elasticsearch beveiligd met een gebruikersnaam en wachtwoord.
+  De Docker Compose- en CI-configuratie zijn bijgewerkt om ``xpack.security.enabled``
+  in te schakelen.
 * ...
 
 Bugfixes

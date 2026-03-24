@@ -28,6 +28,8 @@ x-app-env: &x-app-env
   - CELERY_RESULT_BACKEND=redis://redis:6379/0
   - CELERY_LOGLEVEL=DEBUG
   - ES_HOST=http://elasticsearch:9200
+  - ES_USERNAME=${ES_USERNAME:-elastic}
+  - ES_PASSWORD=${ES_PASSWORD:-elastic}
   - OIDC_FRONTEND_LOGOUT_WITH_HINTS=true
   # Needed for Celery Flower to match the TIME_ZONE configured in the
   # settings used by workers and beat containers.
@@ -82,6 +84,11 @@ services:
       - discovery.type=single-node
       - cluster.routing.allocation.disk.threshold_enabled=false
       - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      # The built-in superuser is always named 'elastic'; only the password is
+      # configurable here. If you set ES_USERNAME to a custom user on the app
+      # side, you must create that user in Elasticsearch manually.
+      - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
+      - xpack.security.enabled=true
     networks:
       - openinwoner-dev
     volumes:
