@@ -752,3 +752,119 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
         self.assertEqual(q3.answers[1].answer, "First answer to Q3")
         self.assertEqual(q3.answer.answer, "Second answer to Q3")
+
+    def test_questions_for_partij_missing_inhoud(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        # Question 1: question misses inhoud
+        q1_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": None,
+            "onderwerp": "Topic 1",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-01T10:00:00Z",
+            "url": "http://example.com/q1",
+            "gingOverOnderwerpobjecten": [],
+        }
+
+        # Question 2: one answer with missing inhoud
+        q2_kc = {
+            "uuid": "q-uuid-2",
+            "inhoud": "Question 2?",
+            "onderwerp": "Topic 2",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0002",
+            "plaatsgevondenOp": "2024-10-02T10:00:00Z",
+            "url": "http://example.com/q2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q2"}],
+        }
+        a2_kc = {
+            "uuid": "a-uuid-2",
+            "inhoud": None,
+            "onderwerp": "Topic 2",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0003",
+            "plaatsgevondenOp": "2024-10-02T11:00:00Z",
+            "url": "http://example.com/a2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a2"}],
+        }
+
+        # Question 3: two answers, one with and one without inhoud
+        q3_kc = {
+            "uuid": "q-uuid-3",
+            "inhoud": "Question 3?",
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0004",
+            "plaatsgevondenOp": "2024-10-03T10:00:00Z",
+            "url": "http://example.com/q3",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-q3"}],
+        }
+        a3_1_kc = {
+            "uuid": "a-uuid-3-1",
+            "inhoud": None,
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0005",
+            "plaatsgevondenOp": "2024-10-03T11:00:00Z",
+            "url": "http://example.com/a3-1",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a3-1"}],
+        }
+        a3_2_kc = {
+            "uuid": "a-uuid-3-2",
+            "inhoud": "Second answer to Q3",
+            "onderwerp": "Topic 3",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0006",
+            "plaatsgevondenOp": "2024-10-03T12:00:00Z",
+            "url": "http://example.com/a3-2",
+            "gingOverOnderwerpobjecten": [{"uuid": "oo-a3-2"}],
+        }
+
+        # Onderwerp_objecten representing answers
+        q2_oo = {"uuid": "oo-q2", "wasKlantcontact": None}
+        a2_oo = {"uuid": "oo-a2", "wasKlantcontact": {"uuid": "q-uuid-2"}}
+        q3_oo = {"uuid": "oo-q3", "wasKlantcontact": None}
+        a3_1_oo = {"uuid": "oo-a3-1", "wasKlantcontact": {"uuid": "q-uuid-3"}}
+        a3_2_oo = {"uuid": "oo-a3-2", "wasKlantcontact": {"uuid": "q-uuid-3"}}
+
+        mock_client.onderwerp_object.retrieve.side_effect = [
+            q2_oo,
+            a2_oo,
+            q3_oo,
+            a3_1_oo,
+            a3_2_oo,
+        ]
+
+        with patch.object(
+            service,
+            "klantcontacten_for_partij",
+            return_value=[q1_kc, q2_kc, a2_kc, q3_kc, a3_1_kc, a3_2_kc],
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 2)
+
+        # q1 (inhoud=None) is skipped entirely
+        self.assertFalse(any(q.question_kcm_uuid == "q-uuid-1" for q in questions))
+
+        # q2 is present but its answer (inhoud=None) is skipped
+        q2 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-2")
+        self.assertEqual(q2.question, "Question 2?")
+        self.assertEqual(len(q2.answers), 0)
+
+        # q3 is present; a3_1 (inhoud=None) is skipped, a3_2 survives
+        q3 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-3")
+        self.assertEqual(q3.question, "Question 3?")
+        self.assertEqual(len(q3.answers), 1)
+        self.assertEqual(q3.answers[0].answer, "Second answer to Q3")

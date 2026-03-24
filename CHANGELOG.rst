@@ -39,6 +39,9 @@ Bugfixes
   weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
   het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
   zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
+* [:gh:`2298`]: Verbeterde foutafhandeling voor vragen en antwoorden in OpenKlant2,
+  zodat één foutief geformuleerde vraag of antwoord niet verhindert dat de overige vragen
+  en antwoorden worden weergegeven.
 
 Onderhoud
 ---------
