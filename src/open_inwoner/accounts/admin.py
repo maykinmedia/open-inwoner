@@ -143,6 +143,12 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             _("Important dates"),
             {"fields": ("last_login", "previous_login", "date_joined")},
         ),
+        (
+            _("Checks"),
+            {
+                "fields": ("run_userfeed_check",),
+            },
+        ),
     )
     add_fieldsets = (
         (
@@ -162,6 +168,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "previous_login",
         "last_login",
         "date_joined",
+        "run_userfeed_check",
     )
     list_display = (
         "email",
@@ -190,6 +197,18 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "groups",
         "user_permissions",
     )
+
+    @admin.display(description=_("Run userfeed check"))
+    def run_userfeed_check(self, obj):
+        if not obj or not obj.pk:
+            return "-"
+
+        url = reverse("run_fetch_userfeed_check")
+        return format_html(
+            '<a class="button" href="{}?user={}">Run userfeed check</a>',
+            url,
+            obj.pk,
+        )
 
 
 admin.site.unregister(Group)
