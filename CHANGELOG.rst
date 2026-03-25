@@ -21,6 +21,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2355`]: De importeer-views voor catalogus- en zaaktype-configuraties
+  controleren nu of de gebruiker wijzigingsrechten heeft op het betreffende model,
+  in plaats van enkel te vereisen dat de gebruiker een beheerdersaccount heeft.
 * [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
   ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
   in plaats van alleen het vestigingsnummer.

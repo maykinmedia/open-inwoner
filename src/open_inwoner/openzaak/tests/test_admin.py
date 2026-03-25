@@ -387,3 +387,28 @@ class TestCatalogusConfigExportAdmin(WebTest):
             "Het was niet mogelijk om de volgene items te importeren:<div><p> - ZaakTypeConfig not found in target environment: Identificatie = 'ztc-id-a-0', Catalogus domein = 'DM-0', Catalogus rsin = '123456789'</p></div>",
             messages[1],
         )
+
+    def test_import_view_requires_change_permission(self):
+        user_without_permission = UserFactory(is_staff=True)
+
+        response = self.app.get(
+            reverse("admin:upload_catalogus_import_file"),
+            user=user_without_permission,
+            expect_errors=True,
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+
+@disable_admin_mfa()
+class TestZaakTypeConfigImportAdmin(WebTest):
+    def test_import_view_requires_change_permission(self):
+        user_without_permission = UserFactory(is_staff=True)
+
+        response = self.app.get(
+            reverse("admin:upload_zaaktype_import_file"),
+            user=user_without_permission,
+            expect_errors=True,
+        )
+
+        self.assertEqual(response.status_code, 403)
