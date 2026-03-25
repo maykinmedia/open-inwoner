@@ -16,6 +16,13 @@ Nieuwe features
   wordt de verbinding met Elasticsearch beveiligd met een gebruikersnaam en wachtwoord.
   De Docker Compose- en CI-configuratie zijn bijgewerkt om ``xpack.security.enabled``
   in te schakelen.
+* [:gh:`2353`]: Bij het uploaden van een document naar een zaak wordt de bestandsextensie
+  nu verwijderd uit de documenttitel (bijv. ``rapport.pdf`` krijgt als titel ``rapport``).
+  De bestandsextensie in de documentenlijst wordt nu afgeleid van het ``formaat``-veld
+  (en als fallback ``bestandsnaam``) in plaats van de titel, zodat de extensie correct wordt
+  weergegeven ook wanneer eSuite het document heeft omgezet naar PDF/A.
+  Daarnaast is de interne weergave van bestanden in templates gerefactored om de
+  conversielogica te centraliseren en de templatetags eenvoudiger te maken.
 * ...
 * [:gh:`2268`]: WCAG toegankelijkheidsverbeteringen uit rapport gemeente Enschede toegepast.
 

@@ -46,9 +46,9 @@
                     {{ form.instance.content|safe }}
                 {% endif %}
 
-                {% if form.instance.questionnairestepfile_set.exists %}
+                {% if questionnaire_files %}
                     <hr class="divider">
-                    {% file_list files=form.instance.questionnairestepfile_set.all title=_("Bestanden") %}
+                    {% file_list files=questionnaire_files title=_("Bestanden") %}
                 {% endif %}
 
                 {% if form.instance.related_products.published.exists %}

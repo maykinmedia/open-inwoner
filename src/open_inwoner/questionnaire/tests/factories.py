@@ -3,6 +3,7 @@ from django.utils.text import slugify
 import factory
 
 from open_inwoner.questionnaire.models import QuestionnaireStep, QuestionnaireStepFile
+from open_inwoner.utils.tests.factories import FilerFileFactory
 
 
 class QuestionnaireStepFactory(factory.django.DjangoModelFactory):
@@ -28,6 +29,7 @@ class QuestionnaireStepFactory(factory.django.DjangoModelFactory):
 
 class QuestionnaireStepFileFactory(factory.django.DjangoModelFactory):
     questionnaire_step = factory.SubFactory(QuestionnaireStepFactory)
+    file = factory.SubFactory(FilerFileFactory)
 
     class Meta:
         model = QuestionnaireStepFile

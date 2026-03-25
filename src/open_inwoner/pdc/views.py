@@ -8,6 +8,7 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from view_breadcrumbs import BaseBreadcrumbMixin, ListBreadcrumbMixin
 
+from open_inwoner.components.file_item import FileItem
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -221,6 +222,9 @@ class ProductDetailView(
         context["related_products_start"] = 6 if product.links.exists() else 1
         context["product_links"] = product.links.order_by("pk")
         context["display_social"] = config.display_social
+        context["product_files"] = [
+            FileItem.from_filer_file(pf.file) for pf in product.files.all() if pf.file
+        ]
         return context
 
 

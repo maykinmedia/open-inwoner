@@ -251,7 +251,7 @@ class CasesPlaywrightTests(
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
-            titel="uploaded_document_title.txt",
+            titel="uploaded_document_title",
             bestandsomvang=123,
         )
 
@@ -275,7 +275,7 @@ class CasesPlaywrightTests(
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_test_file.txt",
-            titel="uploaded_test_file.txt",
+            titel="uploaded_test_file",
             bestandsomvang=len(self.uploaded_zaak_informatie_object_content),
         )
         self.klant = generate_oas_component_cached(
@@ -575,11 +575,12 @@ class CasesPlaywrightTests(
             appends created item to `uploads`.
             """
             request_body = json.loads(request.body)
-            file_name = request_body["titel"]
+            titel = request_body["titel"]
+            bestandsnaam = request_body["bestandsnaam"]
 
-            # Create a UUID based on a seed derived from the file name.
+            # Create a UUID based on a seed derived from the titel.
             # This makes sure the two test cases have unique entries.
-            seed = file_name.ljust(16, "0").encode("utf-8")
+            seed = titel.ljust(16, "0").encode("utf-8")
             uuid = UUID(bytes=seed)
 
             uploaded_informatie_object = generate_oas_component_cached(
@@ -591,8 +592,8 @@ class CasesPlaywrightTests(
                 informatieobjecttype=self.informatie_object_type["url"],
                 status="definitief",
                 vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-                bestandsnaam=file_name,
-                titel=file_name,
+                bestandsnaam=bestandsnaam,
+                titel=titel,
                 bestandsomvang=request_body["bestandsomvang"],
             )
             m.get(uploaded_informatie_object["url"], json=uploaded_informatie_object)
@@ -658,8 +659,8 @@ class CasesPlaywrightTests(
 
         # Check that the case does now have two uploaded documents.
         expect(notification_list_items).to_have_count(2)
-        expect(notification_list_items.last).to_contain_text("document_two.pdf")
-        expect(notification_list_items.first).to_contain_text("document_1.txt")
+        expect(notification_list_items.last).to_contain_text("document_two")
+        expect(notification_list_items.first).to_contain_text("document_1")
         expect(file_list_items).to_have_count(2)
         expect(file_list_items.first).to_contain_text("document_1")
         expect(file_list_items.first).to_contain_text("(txt, 9 bytes)")

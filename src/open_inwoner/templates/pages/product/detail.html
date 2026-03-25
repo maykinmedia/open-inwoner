@@ -65,8 +65,8 @@
             {% include "components/Faq/Faq.html" with questions=object.question_set.all only %}
         {% endif %}
 
-        {% if object.files.exists %}
-            {% file_list files=object.files.all title=_("Bestanden") %}
+        {% if product_files %}
+            {% file_list files=product_files title=_("Bestanden") %}
         {% endif %}
 
         {# Conditions #}

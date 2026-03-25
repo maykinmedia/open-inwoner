@@ -135,5 +135,5 @@ class QuestionnaireStepFileTestCase(TestCase):
         QuestionnaireStepFileFactory.create()
 
     def test_str(self):
-        questionnaire_step_file = QuestionnaireStepFileFactory.create()
+        questionnaire_step_file = QuestionnaireStepFileFactory.create(file=None)
         self.assertEqual(_("Geen bestand geselecteerd."), str(questionnaire_step_file))
