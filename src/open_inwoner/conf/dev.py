@@ -15,6 +15,9 @@ os.environ.setdefault("DB_NAME", "open_inwoner")
 os.environ.setdefault("DB_USER", "open_inwoner")
 os.environ.setdefault("DB_PASSWORD", "open_inwoner")
 
+os.environ.setdefault("ES_USERNAME", "elastic")
+os.environ.setdefault("ES_PASSWORD", "elastic")
+
 os.environ.setdefault("ENVIRONMENT", "development")
 
 from .base import *  # noqa isort:skip
