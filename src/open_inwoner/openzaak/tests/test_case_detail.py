@@ -50,7 +50,7 @@ from open_inwoner.openklant.tests.validators import (
     PartijValidator,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.constants import StatusIndicators
+from open_inwoner.openzaak.constants import StatusIndicators, ZaakBetrokkeneRol
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.tests.factories import (
     ZaakTypeConfigFactory,
@@ -2073,6 +2073,212 @@ class TestCaseDetailView(
                 self.assertContains(
                     response, _("Sorry, you don't have access to this page (403)")
                 )
+
+    def test_no_access_when_incorrect_role_for_user_bsn(self, m):
+        """
+        Even if the user has a role for the case, access is denied when
+        `limit_user_visible_cases_to_role` is set and the role doesn't match.
+        """
+        self.zaak_config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
+        self.zaak_config.save()
+
+        non_initiator_rollen = [
+            rol
+            for rol in RolOmschrijving.values
+            if rol != RolOmschrijving.initiator.value
+        ] + [""]
+
+        for rol_omschrijving in non_initiator_rollen:
+            with self.subTest(rol_omschrijving=rol_omschrijving):
+                non_initiator_rol = generate_oas_component_cached(
+                    "zrc",
+                    "schemas/Rol",
+                    url=f"{ZAKEN_ROOT}rollen/bb353aa-ad2c-4a07-ae75-15add5823",
+                    omschrijvingGeneriek=rol_omschrijving,
+                    betrokkeneType=RolTypes.natuurlijk_persoon,
+                    betrokkeneIdentificatie={
+                        "inpBsn": self.user.bsn,
+                    },
+                )
+
+                m.get(self.zaak["url"], json=self.zaak)
+                m.get(self.zaaktype["url"], json=self.zaaktype)
+                m.get(
+                    f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                    json=paginated_response([non_initiator_rol]),
+                )
+
+                response = self.app.get(self.case_detail_url, user=self.user)
+
+                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertContains(
+                    response, _("Sorry, you don't have access to this page (403)")
+                )
+
+        with self.subTest(no_role=True):
+            m.get(self.zaak["url"], json=self.zaak)
+            m.get(self.zaaktype["url"], json=self.zaaktype)
+            m.get(
+                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                json=paginated_response([]),
+            )
+
+            response = self.app.get(self.case_detail_url, user=self.user)
+
+            self.assertTemplateUsed("pages/cases/403.html")
+            self.assertContains(
+                response, _("Sorry, you don't have access to this page (403)")
+            )
+
+    def test_no_access_when_incorrect_role_for_user_kvk_or_rsin(self, m):
+        """
+        Even if the eherkenning user has a role for the case, access is denied when
+        `limit_user_visible_cases_to_role` is set and the role doesn't match.
+        """
+        self.zaak_config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
+        self.zaak_config.save()
+
+        non_initiator_rollen = [
+            rol
+            for rol in RolOmschrijving.values
+            if rol != RolOmschrijving.initiator.value
+        ] + [""]
+
+        for rol_omschrijving in non_initiator_rollen:
+            with self.subTest(rol_omschrijving=rol_omschrijving):
+                non_initiator_role_kvk = generate_oas_component_cached(
+                    "zrc",
+                    "schemas/Rol",
+                    url=f"{ZAKEN_ROOT}rollen/cc353aa-ad2c-4a07-ae75-15add5824",
+                    omschrijvingGeneriek=rol_omschrijving,
+                    betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+                    betrokkeneIdentificatie={
+                        "innNnpId": self.eherkenning_user.kvk,
+                    },
+                )
+                non_initiator_role_rsin = generate_oas_component_cached(
+                    "zrc",
+                    "schemas/Rol",
+                    url=f"{ZAKEN_ROOT}rollen/cc353aa-ad2c-4a07-ae75-15add5825",
+                    omschrijvingGeneriek=rol_omschrijving,
+                    betrokkeneType=RolTypes.niet_natuurlijk_persoon,
+                    betrokkeneIdentificatie={
+                        "innNnpId": self.eherkenning_user.rsin,
+                    },
+                )
+
+                m.get(self.zaak["url"], json=self.zaak)
+                m.get(self.zaaktype["url"], json=self.zaaktype)
+                m.get(
+                    f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                    json=paginated_response(
+                        [non_initiator_role_kvk, non_initiator_role_rsin]
+                    ),
+                )
+
+                for fetch_eherkenning_zaken_with_rsin in [True, False]:
+                    with self.subTest(
+                        fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                    ):
+                        self.zaak_config.fetch_eherkenning_zaken_with_rsin = (
+                            fetch_eherkenning_zaken_with_rsin
+                        )
+                        self.zaak_config.save()
+
+                        response = self.app.get(
+                            self.case_detail_url, user=self.eherkenning_user
+                        )
+
+                        self.assertTemplateUsed("pages/cases/403.html")
+                        self.assertContains(
+                            response,
+                            _("Sorry, you don't have access to this page (403)"),
+                        )
+
+        with self.subTest(no_role=True):
+            m.get(self.zaak["url"], json=self.zaak)
+            m.get(self.zaaktype["url"], json=self.zaaktype)
+            m.get(
+                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                json=paginated_response([]),
+            )
+
+            for fetch_eherkenning_zaken_with_rsin in [True, False]:
+                with self.subTest(
+                    fetch_eherkenning_zaken_with_rsin=fetch_eherkenning_zaken_with_rsin
+                ):
+                    self.zaak_config.fetch_eherkenning_zaken_with_rsin = (
+                        fetch_eherkenning_zaken_with_rsin
+                    )
+                    self.zaak_config.save()
+
+                    response = self.app.get(
+                        self.case_detail_url, user=self.eherkenning_user
+                    )
+
+                    self.assertTemplateUsed("pages/cases/403.html")
+                    self.assertContains(
+                        response,
+                        _("Sorry, you don't have access to this page (403)"),
+                    )
+
+    def test_no_access_when_incorrect_role_for_vestigingsnummer(self, m):
+        """
+        Even if the vestiging user has a role for the case, access is denied when
+        `limit_user_visible_cases_to_role` is set and the role doesn't match.
+        """
+        self.client.force_login(user=self.vestiging_user)
+
+        self.zaak_config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
+        self.zaak_config.save()
+
+        non_initiator_rollen = [
+            rol
+            for rol in RolOmschrijving.values
+            if rol != RolOmschrijving.initiator.value
+        ] + [""]
+
+        for rol_omschrijving in non_initiator_rollen:
+            with self.subTest(rol_omschrijving=rol_omschrijving):
+                non_initiator_role_vestiging = generate_oas_component_cached(
+                    "zrc",
+                    "schemas/Rol",
+                    url=f"{ZAKEN_ROOT}rollen/dd353aa-ad2c-4a07-ae75-15add5826",
+                    omschrijvingGeneriek=rol_omschrijving,
+                    betrokkeneType=RolTypes.vestiging,
+                    betrokkeneIdentificatie={
+                        "vestigingsNummer": self.vestiging_user.vestiging,
+                    },
+                )
+
+                m.get(self.zaak["url"], json=self.zaak)
+                m.get(self.zaaktype["url"], json=self.zaaktype)
+                m.get(
+                    f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                    json=paginated_response([non_initiator_role_vestiging]),
+                )
+
+                response = self.client.get(self.case_detail_url)
+
+                self.assertTemplateUsed("pages/cases/403.html")
+                self.assertContains(
+                    response, _("Sorry, you don't have access to this page (403)")
+                )
+
+        with self.subTest(no_role=True):
+            m.get(self.zaak["url"], json=self.zaak)
+            m.get(self.zaaktype["url"], json=self.zaaktype)
+            m.get(
+                f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+                json=paginated_response([]),
+            )
+
+            response = self.client.get(self.case_detail_url)
+
+            self.assertTemplateUsed("pages/cases/403.html")
+            self.assertContains(
+                response, _("Sorry, you don't have access to this page (403)")
+            )
 
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m

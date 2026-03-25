@@ -43,6 +43,9 @@ Bugfixes
   zodat één foutief geformuleerde vraag of antwoord niet verhindert dat de overige vragen
   en antwoorden worden weergegeven.
 * [:gh:`2305`]: Mijn Zaken overzicht blijft niet meer hangen op een spinner wanneer er een fout optreedt.
+* [:gh:`2320`]: Verbeterde controles op de rol van betrokkenen: gebruikers hebben alleen toegang
+  tot een zaak en worden alleen op de hoogte gebracht van wijzigingen in een zaak als ze de juiste
+  rol hebben.
 
 Onderhoud
 ---------
