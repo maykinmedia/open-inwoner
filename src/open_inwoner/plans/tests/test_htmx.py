@@ -35,13 +35,12 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
         self.config.cookie_info_text = ""
         self.config.save()
 
-        self.context = self.browser.new_context(
+        self.context = self.get_context(
             base_url=self.live_server_url,
             storage_state=self.user_login_state,
         )
 
     def tearDown(self) -> None:
-        self.context.close()
         return super().tearDown()
 
     def test_plan_file_upload_e2e(self):

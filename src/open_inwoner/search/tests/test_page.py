@@ -235,7 +235,7 @@ class SearchPagePlaywrightTests(
         config.save()
 
     def test_basic_search(self):
-        context = self.browser.new_context()
+        context = self.get_context()
         page = context.new_page()
 
         # search to find both products
@@ -244,7 +244,7 @@ class SearchPagePlaywrightTests(
         expect(page.locator(".card")).to_have_count(2)
 
     def test_search_form_delegates_copy_query_value(self):
-        context = self.browser.new_context()
+        context = self.get_context()
         page = context.new_page()
         page.goto(self.live_reverse("search:search", params={"query": "summary"}))
 
@@ -273,7 +273,7 @@ class SearchPagePlaywrightTests(
 
         for form_id, view_size, open_menu in self.form_delegates:
             with self.subTest(form_id):
-                context = self.browser.new_context(
+                context = self.get_context(
                     viewport={"width": view_size, "height": 1024},
                 )
                 page = context.new_page()
@@ -288,10 +288,9 @@ class SearchPagePlaywrightTests(
                 expect(page.locator(".card")).to_have_count(1)
 
                 page.close()
-                context.close()
 
     def test_search_with_filters(self):
-        context = self.browser.new_context()
+        context = self.get_context()
         page = context.new_page()
 
         # search to find both products
@@ -369,7 +368,7 @@ class SearchPagePlaywrightTests(
         _test_search("Category 2", self.product2.name)
 
     def test_search_mobile_dialog(self):
-        context = self.browser.new_context()
+        context = self.get_context()
         page = context.new_page()
         page.set_viewport_size(
             {
@@ -402,7 +401,7 @@ class SearchPagePlaywrightTests(
 
     def test_search_with_filter_combinations(self):
         # NOTE it isn't great to generate query-strings outside the form but we test the form above
-        context = self.browser.new_context()
+        context = self.get_context()
         page = context.new_page()
 
         tests = [

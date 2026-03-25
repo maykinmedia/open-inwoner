@@ -443,7 +443,7 @@ class CasesPlaywrightTests(
     def test_cases(self, m, contactmoment_mock):
         self._setUpMocks(m)
 
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.get_context(storage_state=self.user_login_state)
 
         page = context.new_page()
         page.goto(self.live_reverse("cases:index"))
@@ -606,7 +606,7 @@ class CasesPlaywrightTests(
         )
 
         # Setup.
-        context = self.browser.new_context(storage_state=self.user_login_state)
+        context = self.get_context(storage_state=self.user_login_state)
         page = context.new_page()
         page.goto(
             self.live_reverse(
@@ -672,7 +672,7 @@ class CasesPlaywrightTests(
             MockService.return_value.get_zaken.side_effect = RuntimeError("API error")
             MockService.return_value.get_formulieren.return_value = []
 
-            context = self.browser.new_context(storage_state=self.user_login_state)
+            context = self.get_context(storage_state=self.user_login_state)
             page = context.new_page()
             page.goto(self.live_reverse("cases:index"))
 
@@ -691,7 +691,7 @@ class CasesPlaywrightTests(
         ) as mock_get:
             mock_get.return_value = HttpResponse(status=503)
 
-            context = self.browser.new_context(storage_state=self.user_login_state)
+            context = self.get_context(storage_state=self.user_login_state)
             page = context.new_page()
             page.goto(self.live_reverse("cases:index"))
 

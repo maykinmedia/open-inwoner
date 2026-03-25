@@ -1,17 +1,23 @@
 import os
 from collections.abc import Callable
+from pathlib import Path
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.files.base import ContentFile
 from django.urls import reverse
 
 from furl import furl
-from playwright.sync_api import Browser, Playwright, sync_playwright
+from playwright.sync_api import Browser, BrowserContext, Playwright, sync_playwright
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.choices import CustomFontName
 from open_inwoner.utils.files import OverwriteStorage
 from open_inwoner.utils.test import temp_media_root
+
+_REPO_ROOT = Path(__file__).parents[4]
+PLAYWRIGHT_TRACE_DIR = os.environ.get(
+    "PLAYWRIGHT_TRACE_DIR", str(_REPO_ROOT / "test-results")
+)
 
 BROWSER_DRIVERS = {
     # keys for the E2E_DRIVER environment variable (likely from test matrix)
@@ -37,6 +43,9 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
     to set the browser define E2E_DRIVER environment variable, with a value from the BROWSER_DRIVERS dictionary above.
 
+    traces are saved automatically for every test to PLAYWRIGHT_TRACE_DIR (default: /tmp/playwright-traces/).
+    view them with: playwright show-trace <path-to-trace.zip>
+
     usage:
 
     from playwright.sync_api import expect
@@ -44,7 +53,8 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     class MyPageTest(PlaywrightSyncLiveServerTestCase):
         def test_my_page():
             # get a new context for test isolation
-            context = self.browser.new_context()
+            # tracing starts automatically and is saved on tearDown
+            context = self.get_context()
 
             # open a page
             page = context.new_page()
@@ -65,8 +75,8 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
             user_state = self.get_user_bsn_login_state(user)
 
-            # user_state now has the cookies (etc) for the logged-in user and can be (re)used to get new context's
-            context = self.browser.new_context(storage_state=user_state)
+            # user_state now has the cookies (etc) for the logged-in user and can be (re)used to get new contexts
+            context = self.get_context(storage_state=user_state)
             ...
     """
 
@@ -74,6 +84,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     browser: Browser
 
     _old_async_unsafe: str
+    _traced_contexts: list[BrowserContext]
 
     @classmethod
     def launch_browser(cls, playwright: Playwright) -> Browser:
@@ -118,6 +129,34 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
         cls.browser.close()
         cls.playwright.stop()
+
+    def setUp(self):
+        super().setUp()
+        self._traced_contexts = []
+        os.makedirs(PLAYWRIGHT_TRACE_DIR, exist_ok=True)
+
+    def get_context(self, **kwargs) -> BrowserContext:
+        """
+        Create a new browser context with tracing and video recording enabled.
+
+        Use this instead of self.browser.new_context() so that a trace and
+        video are automatically saved to PLAYWRIGHT_TRACE_DIR on tearDown.
+        """
+        kwargs.setdefault("record_video_dir", PLAYWRIGHT_TRACE_DIR)
+        context = self.browser.new_context(**kwargs)
+        context.tracing.start(screenshots=True, snapshots=True, sources=True)
+        self._traced_contexts.append(context)
+        return context
+
+    def tearDown(self):
+        test_id = f"{self.__class__.__name__}.{self._testMethodName}"
+
+        for i, context in enumerate(self._traced_contexts):
+            suffix = f"_{i}" if i > 0 else ""
+            trace_path = os.path.join(PLAYWRIGHT_TRACE_DIR, f"{test_id}{suffix}.zip")
+            context.tracing.stop(path=trace_path)
+
+        super().tearDown()
 
     @classmethod
     def live_url(cls, path="/", star=False):
