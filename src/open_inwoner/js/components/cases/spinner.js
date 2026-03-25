@@ -36,4 +36,25 @@ document.addEventListener('DOMContentLoaded', function () {
         .classList.remove('cases__spinner--hide');
     }
   });
+
+  // Hide the spinner if there was a responseError.
+  htmx.on('htmx:responseError', function (e) {
+    if (
+      e.detail &&
+      (e.detail.target.id === 'cases-content' ||
+        e.detail.target.id === 'submissions-content')
+    ) {
+      // Hide the spinner
+      document
+        .getElementById('spinner-container')
+        .classList.add('loader-container--hide');
+      // Show the error message (replicates hx-target-error without the extension)
+      const anyError = document.getElementById('any-error');
+      if (anyError) {
+        anyError.textContent =
+          anyError.dataset.errorMessage ||
+          'Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw.';
+      }
+    }
+  });
 });
