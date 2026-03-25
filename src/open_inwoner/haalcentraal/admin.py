@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from solo.admin import SingletonModelAdmin
@@ -8,6 +10,7 @@ from .models import HaalCentraalConfig
 
 @admin.register(HaalCentraalConfig)
 class HaalCentraalConfigAdmin(SingletonModelAdmin):
+    readonly_fields = ("run_fetch_brp_check",)
     fieldsets = (
         (
             "Service",
@@ -37,4 +40,18 @@ class HaalCentraalConfigAdmin(SingletonModelAdmin):
                 )
             },
         ),
+        (
+            _("Checks"),
+            {
+                "fields": ("run_fetch_brp_check",),
+            },
+        ),
     )
+
+    @admin.display(description="Run BRP check")
+    def run_fetch_brp_check(self, obj):
+        url = reverse("run_fetch_brp_check")
+        return format_html(
+            '<a class="button" href="{}">Run BRP check</a>',
+            url,
+        )

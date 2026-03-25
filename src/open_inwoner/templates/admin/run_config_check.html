@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+{% if back_url %}
+<p>
+    <a href="{{ back_url }}" class="button">
+        ← Back to configuration
+    </a>
+</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+        <p>
+            <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label><br>
+            {{ field }}
+            {% if field.help_text %}
+                <div class="help">{{ field.help_text }}</div>
+            {% endif %}
+        </p>
+    {% endfor %}
+
+    <button type="submit" class="button">Run check</button>
+</form>
+
+{% if result %}
+<hr>
+
+<h2>Result</h2>
+
+<p>
+<strong>Status:</strong>
+{% if result.success %}
+✅ Success
+{% else %}
+🛑 Failed
+{% endif %}
+</p>
+
+<p>
+<strong>Message:</strong>
+{{ result.message }}
+</p>
+
+<pre>{{ result.extra|pprint }}</pre>
+
+{% endif %}
+
+{% endblock %}
