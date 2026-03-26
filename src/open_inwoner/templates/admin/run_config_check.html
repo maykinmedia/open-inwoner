@@ -1,52 +1,53 @@
 {% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
 
 {% block content %}
+    <p>
+      <a href="{% url opts|admin_urlname:'change' obj.pk|admin_urlquote %}" class="button">← {% translate 'Back' %}</a>
+    </p>
+<div id="content-main">
 
-{% if back_url %}
-<p>
-    <a href="{{ back_url }}" class="button">
-        ← Back to configuration
-    </a>
-</p>
-{% endif %}
+    <div class="module">
+        <form method="post" id="config_check_form">
+            {% csrf_token %}
+            <fieldset class="module aligned">
+                {% for field in form %}
+                    <div class="form-row">
+                        {{ field.errors }}
+                        <div>
+                            <label class="required" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="help">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
 
-<form method="post">
-    {% csrf_token %}
+            <div class="submit-row">
+                <input type="submit" value="{% translate 'Run Check' %}" class="button" name="_save">
+            </div>
+        </form>
+    </div>
 
-    {% for field in form %}
-        <p>
-            <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label><br>
-            {{ field }}
-            {% if field.help_text %}
-                <div class="help">{{ field.help_text }}</div>
+    {% if result %}
+        <div class="results" style="margin-top: 20px;">
+            <hr>
+            <h2>{% translate 'Result' %}</h2>
+
+            <div class="messagelist">
+                <div class="{% if result.success %}success{% else %}error{% endif %}">
+                    <strong>{% if result.success %}✅ Success{% else %}🛑 Failed{% endif %}</strong>:
+                    {{ result.message }}
+                </div>
+            </div>
+
+            {% if result.extra %}
+                <h3>{% translate 'Technical Details' %}</h3>
+                <pre>{{ result.extra|pprint }}</pre>
             {% endif %}
-        </p>
-    {% endfor %}
-
-    <button type="submit" class="button">Run check</button>
-</form>
-
-{% if result %}
-<hr>
-
-<h2>Result</h2>
-
-<p>
-<strong>Status:</strong>
-{% if result.success %}
-✅ Success
-{% else %}
-🛑 Failed
-{% endif %}
-</p>
-
-<p>
-<strong>Message:</strong>
-{{ result.message }}
-</p>
-
-<pre>{{ result.extra|pprint }}</pre>
-
-{% endif %}
-
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

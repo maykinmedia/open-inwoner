@@ -5,17 +5,22 @@ from open_inwoner.userfeed.adapters import get_types_for_unpublished_cms_apps
 from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.models import FeedItemData
 
+from .forms import FetchUserfeedConfigCheckParams
 
-class FetchUserfeedConfigCheck:
-    identifier = "fetch_userfeed_for_user"
-    verbose_name = "Fetch userfeed for user"
 
-    def __init__(self, user):
-        self.user = user
+class FetchUserfeedCheck:
+    identifier = "fetch_userfeed"
+    label = "Fetch userfeed for user"
+    form_class = FetchUserfeedConfigCheckParams
 
-    def __call__(self):
+    def __init__(self, form: FetchUserfeedConfigCheckParams):
+        self.form = form
+
+    def run(self, obj) -> GenericHealthCheckResult:
+        user = obj
+
         try:
-            feed = get_feed(self.user)
+            feed = get_feed(user)
 
             items = feed.items
             total = feed.total_items
@@ -28,7 +33,7 @@ class FetchUserfeedConfigCheck:
                 for item in items
             ]
 
-            raw_items = FeedItemData.objects.filter(user=self.user)
+            raw_items = FeedItemData.objects.filter(user=user)
             inactive_types = get_types_for_unpublished_cms_apps(get_active_app_names())
 
             filtered_out_types = list(
@@ -37,14 +42,15 @@ class FetchUserfeedConfigCheck:
                 .distinct()
                 .order_by("type")
             )
+
             return GenericHealthCheckResult(
                 success=True,
                 identifier=self.identifier,
-                verbose_name=self.verbose_name,
+                verbose_name=self.label,
                 message=f"Userfeed OK - {total} items found",
                 extra={
                     "total_items": total,
-                    "raw_items_count": len(raw_items),
+                    "raw_items_count": raw_items.count(),
                     "items": item_summary,
                     "filtered_out_types": filtered_out_types,
                 },
@@ -54,7 +60,7 @@ class FetchUserfeedConfigCheck:
             return GenericHealthCheckResult(
                 success=False,
                 identifier=self.identifier,
-                verbose_name=self.verbose_name,
-                message=f"Userfeed check failed: {exc}",
+                verbose_name=self.label,
+                message=str(exc),
                 extra={"exception": repr(exc)},
             )

@@ -11,6 +11,8 @@ from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 from solo.admin import SingletonModelAdmin
 
+from open_inwoner.config_checks.api import with_config_checks
+from open_inwoner.config_checks.fetch_userfeed import FetchUserfeedCheck
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
@@ -80,6 +82,7 @@ class _UserCreationForm(UserCreationForm):
 
 
 @admin.register(User)
+@with_config_checks(FetchUserfeedCheck)
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
@@ -146,7 +149,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         (
             _("Checks"),
             {
-                "fields": ("run_userfeed_check",),
+                "fields": ("config_check_links",),
             },
         ),
     )
@@ -168,7 +171,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "previous_login",
         "last_login",
         "date_joined",
-        "run_userfeed_check",
+        "config_check_links",
     )
     list_display = (
         "email",
@@ -197,18 +200,6 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "groups",
         "user_permissions",
     )
-
-    @admin.display(description=_("Run userfeed check"))
-    def run_userfeed_check(self, obj):
-        if not obj or not obj.pk:
-            return "-"
-
-        url = reverse("run_fetch_userfeed_check")
-        return format_html(
-            '<a class="button" href="{}?user={}">Run userfeed check</a>',
-            url,
-            obj.pk,
-        )
 
 
 admin.site.unregister(Group)
