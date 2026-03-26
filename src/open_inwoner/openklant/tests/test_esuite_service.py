@@ -241,3 +241,46 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             )
 
             self.assertEqual(klant.telefoonnummer_alternatief, "0687654321")
+
+    def _make_klant(self, telefoonnummer="", telefoonnummer_alternatief=""):
+        return Klant(
+            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            bronorganisatie="123456789",
+            klantnummer="12345678",
+            telefoonnummer=telefoonnummer,
+            telefoonnummer_alternatief=telefoonnummer_alternatief,
+        )
+
+    def test_update_user_from_klant_clears_alternative_when_same_as_primary_in_klant(
+        self,
+    ):
+        """If klant sends the same number for both fields, alternative is dropped."""
+        user = DigidUserFactory(phonenumber="0100000000", phonenumber_alternative="")
+        klant = self._make_klant(
+            telefoonnummer="0611111111",
+            telefoonnummer_alternatief="0611111111",
+        )
+
+        self.service.update_user_from_klant(klant, user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.phonenumber, "0611111111")
+        self.assertEqual(user.phonenumber_alternative, "")
+
+    def test_update_user_from_klant_clears_alternative_when_primary_updated_to_match_it(
+        self,
+    ):
+        """If klant's primary number matches the user's existing alternative, alternative is dropped."""
+        user = DigidUserFactory(
+            phonenumber="0100000000", phonenumber_alternative="0611111111"
+        )
+        klant = self._make_klant(
+            telefoonnummer="0611111111",
+            telefoonnummer_alternatief="0611111111",
+        )
+
+        self.service.update_user_from_klant(klant, user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.phonenumber, "0611111111")
+        self.assertEqual(user.phonenumber_alternative, "")

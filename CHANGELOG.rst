@@ -53,6 +53,12 @@ Bugfixes
   rol hebben.
 * [:gh:`2257`]: Probleem opgelost waarbij de eerste rij van een productteksttabel altijd een header-rij is,
   ook wanneer dit was uitgeschakeld.
+* [:gh:`2358`]: Probleem opgelost waarbij identieke telefoonnummers gesynchroniseerd
+  vanuit eSuite een databasefout veroorzaakten, hetgeen tot een situatie kon leiden
+  waarbij gebruikers bij het inloggen onterecht een melding kregen dat ze niet goed
+  waren ingelogd (terwijl dit wel het geval is, en de fout met de synchronisatie te
+  maken had, niet het inloggen). Het alternatieve nummer wordt nu geleegd als het gelijk
+  is aan het primaire nummer.
 
 Onderhoud
 ---------
