@@ -108,53 +108,85 @@
   &--content {
     display: table;
     border-collapse: separate;
+    border-spacing: 0;
     margin-top: var(--spacing-giant);
     margin-bottom: var(--spacing-giant);
 
-    .table__item {
-      border-right: 1px solid var(--color-gray-light);
-      word-wrap: break-word;
-      text-wrap: initial;
-    }
-
-    .table__item:first-of-type {
-      border-left: 1px solid var(--color-gray-light);
-      font-weight: bold;
-    }
-
-    .table__item:not(:first-of-type) {
-      text-align: right;
-      padding-right: var(--spacing-giant);
-    }
-
-    .table__row:first-child .table__header {
-      font-family: var(--font-family-heading);
-      font-weight: bold;
-      border-top: 1px solid var(--color-gray-dark-900);
-      border-bottom: 1px solid var(--color-gray-dark-900);
-    }
-
-    .table__header:first-of-type {
-      border-left: 1px solid var(--color-gray-dark-900);
+    // Border radiuses
+    .table__row:first-child :first-child {
       border-top-left-radius: var(--border-radius);
     }
-
-    .table__header:last-of-type {
-      border-right: 1px solid var(--color-gray-dark-900);
+    .table__row:first-child :last-child {
       border-top-right-radius: var(--border-radius);
     }
-
-    .table__header:not(:first-of-type) {
-      text-align: right;
-      padding-right: var(--spacing-giant);
-    }
-
-    .table__row:last-of-type .table__item:first-of-type {
+    .table__row:last-child :first-child {
       border-bottom-left-radius: var(--border-radius);
     }
-
-    .table__row:last-of-type .table__item:last-of-type {
+    .table__row:last-child :last-child {
       border-bottom-right-radius: var(--border-radius);
+    }
+
+    // Borders — default
+    .table__row .table__item {
+      border: 1px solid var(--color-gray-light);
+      word-wrap: break-word;
+      text-wrap: initial;
+
+      &:not(:first-child) {
+        text-align: right;
+        padding-right: var(--spacing-giant);
+      }
+
+      // Item + Item: avoid double border
+      & + .table__item {
+        border-left: none;
+      }
+
+      // Item + Header: item yields, header's dark border shows
+      &:has(+ .table__header) {
+        border-right: none;
+      }
+    }
+
+    .table__row .table__header {
+      border: 1px solid var(--color-gray-dark-900);
+
+      &:not(:first-child) {
+        text-align: right;
+        padding-right: var(--spacing-giant);
+      }
+
+      //- Header + (Header): no border between adjacent headers
+      &:has(+ .table__header) {
+        border-right: none;
+      }
+      & + .table__header {
+        border-left: none;
+      }
+
+      //- Header + (Item): item takes the header's border visually
+      & + .table__item {
+        border-left: none;
+      }
+    }
+
+    // Avoid double borders between rows
+    .table__row + .table__row {
+      .table__header,
+      .table__item {
+        border-top: none;
+      }
+    }
+
+    // (Item) above Header.
+    // This does not work in combination with merged cells.
+    // There are max 8 initial columns created with ProseMirror, more can be added.
+    // This CSS supports 12 columns.
+    @for $i from 1 through 12 {
+      .table__row:has(+ .table__row > .table__header:nth-child(#{$i}))
+        > .table__item:nth-child(#{$i}) {
+        border-bottom: 1px solid var(--color-gray-dark-900);
+      }
     }
   }
 
@@ -202,27 +234,6 @@
     *[class*='Icons'] {
       color: var(--color-gray-lighter);
       font-size: var(--font-size-body);
-    }
-  }
-
-  // TH styling for tables without THEAD elements
-
-  &--content {
-    .table__row:first-child .table__item {
-      font-family: var(--font-family-heading);
-      font-weight: bold;
-      border-top: 1px solid var(--color-gray-dark-900);
-      border-bottom: 1px solid var(--color-gray-dark-900);
-    }
-
-    .table__row:first-of-type .table__item:first-of-type {
-      border-left: 1px solid var(--color-gray-dark-900);
-      border-top-left-radius: var(--border-radius);
-    }
-
-    .table__row:first-of-type .table__item:last-of-type {
-      border-right: 1px solid var(--color-gray-dark-900);
-      border-top-right-radius: var(--border-radius);
     }
   }
 }
