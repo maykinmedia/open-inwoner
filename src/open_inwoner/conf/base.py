@@ -654,6 +654,11 @@ SHOW_ALERT = True
 # Django CMS
 #
 
+# temporary - remove after upgrade to Django CMS 4 is complete
+CMS_CONFIRM_VERSION4 = True
+
+DJANGOCMS_VERSIONING_USERNAME_FIELD = "email"
+
 CMS_PAGE_CACHE = False
 CMS_PLACEHOLDER_CACHE = False
 CMS_PLUGIN_CACHE = False
