@@ -154,7 +154,6 @@ INSTALLED_APPS = [
     "sekizai",
     # "djangocms_admin_style",
     "djangocms_link",
-    "djangocms_file",
     "djangocms_picture",
     # 'djangocms_video',
     # 'djangocms_googlemap',
