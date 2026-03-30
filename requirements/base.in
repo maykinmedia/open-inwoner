@@ -59,7 +59,6 @@ jinja2
 # django cms
 django-cms
 djangocms-link
-djangocms-file
 djangocms-picture
 # djangocms-video
 # djangocms-googlemap
