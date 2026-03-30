@@ -332,7 +332,6 @@ django-filer==3.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   djangocms-link
     #   djangocms-picture
     #   maykin-django-prosemirror
 django-filter==21.1
@@ -514,7 +513,7 @@ djangocms-attributes-field==2.1.0
     #   -r requirements/base.txt
     #   djangocms-link
     #   djangocms-picture
-djangocms-link==3.1.1
+djangocms-link==5.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
