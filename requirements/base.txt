@@ -211,7 +211,6 @@ django-extra-fields==3.0.2
 django-filer==3.1.1
     # via
     #   -r requirements/base.in
-    #   djangocms-link
     #   djangocms-picture
     #   maykin-django-prosemirror
 django-filter==21.1
@@ -315,7 +314,7 @@ djangocms-attributes-field==2.1.0
     # via
     #   djangocms-link
     #   djangocms-picture
-djangocms-link==3.1.1
+djangocms-link==5.1.1
     # via -r requirements/base.in
 djangocms-picture==4.1.1
     # via -r requirements/base.in
