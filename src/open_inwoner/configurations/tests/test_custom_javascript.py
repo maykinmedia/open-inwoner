@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 
 from cms import api
 
-from open_inwoner.cms.tests.cms_tools import render_full_page
+from open_inwoner.cms.tests.cms_tools import publish_page, render_full_page
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.test import temp_media_root
 
@@ -24,7 +24,7 @@ class CustomJavaScriptInclusionTests(TestCase):
             language="nl",
             in_navigation=True,
         )
-        self.page.publish("nl")
+        publish_page(self.page, "nl")
         self.js_content = 'console.log("Custom JS loaded");'
         self.js_file = SimpleUploadedFile(
             "test.js",

@@ -18,6 +18,7 @@ from timeline_logger.models import TimelineLog
 from open_inwoner.accounts.choices import LoginTypeChoices, StatusChoices
 from open_inwoner.accounts.forms import ActionForm
 from open_inwoner.accounts.models import Action, Invite, Message, User
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.utils.logentry import LOG_ACTIONS
@@ -38,6 +39,9 @@ class TestProfile(WebTest):
     csrf_checks = False
 
     def setUp(self):
+        cms_tools.create_static_aliases(
+            ["footer_left", "footer_center", "footer_right"]
+        )
         self.user = UserFactory()
 
         self.config = SiteConfiguration.get_solo()

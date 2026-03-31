@@ -35,7 +35,7 @@ class FooterPagesPlugin(CMSPluginBase):
                     cms_pages.remove(page)
 
         contact_form_pages = Page.objects.filter(
-            template="cms/contactform/form_outer.html", publisher_is_draft=False
+            template="cms/contactform/form_outer.html"
         )
 
         # Use the first page if it exists

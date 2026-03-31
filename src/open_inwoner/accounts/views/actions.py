@@ -14,7 +14,8 @@ from django.views.generic.edit import DeletionMixin, UpdateView
 
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from aldryn_apphooks_config.utils import get_app_instance
-from cms.models import Page
+from cms.models import Page, PageContent
+from djangocms_versioning.constants import PUBLISHED
 from privates.views import PrivateMediaView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
@@ -94,11 +95,13 @@ class ActionListView(
         context["page_obj"] = page
         context["is_paginated"] = is_paginated
         context["actions"] = queryset
-        context["show_plans"] = (
-            Page.objects.published()
-            .filter(application_namespace=CollaborateApphook.app_name)
-            .exists()
-        )
+        published_page_ids = PageContent._original_manager.filter(
+            versions__state=PUBLISHED
+        ).values_list("page_id", flat=True)
+        context["show_plans"] = Page.objects.filter(
+            id__in=published_page_ids,
+            application_namespace=CollaborateApphook.app_name,
+        ).exists()
 
         return context
 

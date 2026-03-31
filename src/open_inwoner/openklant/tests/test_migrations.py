@@ -1,3 +1,4 @@
+from django.db import connection
 from django.test import tag
 
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
@@ -35,38 +36,57 @@ class ContactFormSubjectConfigMigrationTest(TestSuccessfulMigrations):
 
 
 @tag("migrations")
-class ContactFormtConfigMigrationTest(TestSuccessfulMigrations):
+class ContactFormConfigMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0027_alter_klantensysteemconfig_primary_backend"
     migrate_to = "0028_change_contactformconfig_descriptions"
     app = "openklant"
 
     def setUpBeforeMigration(self, apps):
-        ContactFormConfig = apps.get_model("openklant", "ContactFormConfig")
         Placeholder = apps.get_model("cms", "Placeholder")
 
         # Create a placeholder for the CMS plugin
         placeholder = Placeholder.objects.create(slot="test")
 
-        # Create the ContactFormConfig plugin instance with required MPTT fields
-        self.config = ContactFormConfig.objects.create(
-            placeholder=placeholder,
-            position=0,
-            language="nl",
-            plugin_type="ContactFormPlugin",
-            description="Old contactform description",
-            # required by CMSPlugin for tree traversal
-            depth=1,
-            path="0001",
-            numchild=0,
-        )
+        # Use raw SQL to insert plugin records, bypassing the historical model
+        # that expects treebeard fields (depth, path, numchild) which don't exist in CMS 4.x
+        with connection.cursor() as cursor:
+            # Insert base CMSPlugin record
+            cursor.execute(
+                """
+                INSERT INTO cms_cmsplugin
+                (id, placeholder_id, language, plugin_type, position, creation_date, changed_date, parent_id)
+                VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), NULL)
+                """,
+                (1, placeholder.id, "nl", "ContactFormPlugin", 0),
+            )
+
+            # Insert ContactFormConfig data
+            cursor.execute(
+                """
+                INSERT INTO openklant_contactformconfig
+                (cmsplugin_ptr_id, description)
+                VALUES (%s, %s)
+                """,
+                (1, "Old contactform description"),
+            )
+
+            self.config_id = 1
 
     def test_migrate_contactform_description(self):
-        ContactFormConfig = self.apps.get_model("openklant", "ContactFormConfig")
+        # Use raw SQL to query the migrated data, bypassing the ORM which
+        # uses the historical model with treebeard fields that don't exist in CMS 4.x
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT description_authenticated_user, description_anonymous_user
+                FROM openklant_contactformconfig
+                WHERE cmsplugin_ptr_id = %s
+                """,
+                (self.config_id,),
+            )
+            row = cursor.fetchone()
+            self.assertIsNotNone(row, "ContactFormConfig should exist after migration")
 
-        for config in ContactFormConfig.objects.all():
-            self.assertEqual(
-                config.description_authenticated_user, "Old contactform description"
-            )
-            self.assertEqual(
-                config.description_anonymous_user, "Old contactform description"
-            )
+            description_authenticated, description_anonymous = row
+            self.assertEqual(description_authenticated, "Old contactform description")
+            self.assertEqual(description_anonymous, "Old contactform description")

@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
+from django.utils.translation import get_language
 
+from cms.models import PageContent
 from cms.toolbar.utils import get_toolbar_from_request
 
 from open_inwoner.configurations.models import SiteConfiguration
@@ -47,6 +49,21 @@ class DropToolbarMiddleware:
 
             toolbar = get_toolbar_from_request(request)
             toolbar.show_toolbar = False
+        else:
+            request.session.pop("cms_toolbar_disabled", None)
+
+        # VersionContentRenderer.render_obj_placeholder (djangocms_versioning) needs
+        # toolbar.get_object() to return a PageContent for any view that uses
+        # {% placeholder %} tags — including apphook views where cms/views.py never
+        # runs and therefore never calls toolbar.set_object().
+        page = getattr(request, "current_page", None)
+        if page:
+            language = get_language()
+            page_content = PageContent._original_manager.filter(
+                page=page, language=language
+            ).first()
+            if page_content:
+                get_toolbar_from_request(request).set_object(page_content)
 
         response = self.get_response(request)
         return response

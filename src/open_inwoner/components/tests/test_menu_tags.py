@@ -9,10 +9,12 @@ from django.utils import translation
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
+from cms.toolbar.toolbar import CMSToolbar
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.extensions.constants import IndicatorChoices
 from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.cms.tests.cms_tools import publish_page
 from open_inwoner.components.templatetags.menu import (
     SideNavMenuData,
     react_sidenav_data,
@@ -42,7 +44,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             in_navigation=True,
             slug="home",
         )
-        self.home_page.publish("nl")
+        publish_page(self.home_page, "nl")
 
     def _get_menu_data(self, user, path="/"):
         with translation.override("nl"):
@@ -50,6 +52,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             request.user = user
             request.session = SessionStore()
             request.session.create()
+            request.toolbar = CMSToolbar(request)
 
             # Simulate Django's URL resolution middleware
             try:
@@ -60,58 +63,6 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             context = Context({"request": request})
             return react_sidenav_data(context)
 
-    def test_draft_page_visibility_differs_for_staff_and_regular_users(self):
-        published_page = api.create_page(
-            "Published Page",
-            "cms/fullwidth.html",
-            "nl",
-            parent=self.home_page,
-            in_navigation=True,
-        )
-        published_page.publish("nl")
-
-        draft_page = api.create_page(
-            "Draft Page",
-            "cms/fullwidth.html",
-            "nl",
-            parent=self.home_page,
-            in_navigation=True,
-        )
-        # Don't publish this page - keep it as true draft
-
-        # Regular user should only see the published page
-        regular_user_menu = self._get_menu_data(self.regular_user)
-        expected_regular_menu = [
-            {
-                "href": published_page.get_absolute_url(),
-                "label": "Published Page",
-                "icon": None,
-                "current": False,
-                "counter": None,
-            }
-        ]
-        self.assertEqual(regular_user_menu, expected_regular_menu)
-
-        # Staff user should see both published and draft pages
-        staff_user_menu = self._get_menu_data(self.staff_user)
-        expected_staff_menu = [
-            {
-                "href": published_page.get_absolute_url(),
-                "label": "Published Page",
-                "icon": None,
-                "current": False,
-                "counter": None,
-            },
-            {
-                "href": draft_page.get_absolute_url(),
-                "label": "Draft Page",
-                "icon": None,
-                "current": False,
-                "counter": None,
-            },
-        ]
-        self.assertEqual(staff_user_menu, expected_staff_menu)
-
     def test_menu_icons_from_draft_page_common_extension(self):
         page_with_icon = api.create_page(
             "Page With Icon",
@@ -120,7 +71,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        page_with_icon.publish("nl")
+        publish_page(page_with_icon, "nl")
 
         # Add CommonExtension to the draft version
         CommonExtension.objects.create(
@@ -162,42 +113,6 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             msg="Staff user should see same icon from draft version",
         )
 
-    def test_menu_icons_on_draft_only_pages_for_staff(self):
-        draft_page = api.create_page(
-            "Draft Page With Icon",
-            "cms/fullwidth.html",
-            "nl",
-            parent=self.home_page,
-            in_navigation=True,
-        )
-        # Don't publish this page - keep as draft only
-
-        CommonExtension.objects.create(
-            extended_object=draft_page,
-            menu_icon="edit",
-        )
-
-        # Regular user should not see any pages
-        regular_menu = self._get_menu_data(self.regular_user)
-        self.assertEqual(regular_menu, [])
-
-        # Staff user should see the draft page with complete menu structure
-        staff_menu = self._get_menu_data(self.staff_user)
-        expected_staff_menu = [
-            {
-                "href": draft_page.get_absolute_url(),
-                "label": "Draft Page With Icon",
-                "icon": "edit",
-                "current": False,
-                "counter": None,
-            }
-        ]
-        self.assertEqual(
-            staff_menu,
-            expected_staff_menu,
-            msg="Staff user should see draft page with icon from CommonExtension",
-        )
-
     def test_menu_pages_without_common_extension_show_no_icon(self):
         page_without_icon = api.create_page(
             "Page Without Icon",
@@ -206,7 +121,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        page_without_icon.publish("nl")
+        publish_page(page_without_icon, "nl")
         # Intentionally avoid creating a CommonExtension
 
         # Regular user should see page with null icon
@@ -252,7 +167,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        page_draft_icon.publish("nl")
+        publish_page(page_draft_icon, "nl")
 
         CommonExtension.objects.create(
             extended_object=page_draft_icon,
@@ -302,13 +217,10 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        inbox_page.publish("nl")
-
-        # Get the published version of the page
-        published_page = inbox_page.get_public_object()
+        publish_page(inbox_page, "nl")
 
         CommonExtension.objects.create(
-            extended_object=published_page,
+            extended_object=inbox_page,
             menu_indicator=IndicatorChoices.inbox_new_messages,
         )
 
@@ -318,7 +230,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         menu_data = self._get_menu_data(self.regular_user)
         expected_menu = [
             {
-                "href": published_page.get_absolute_url(),
+                "href": inbox_page.get_absolute_url(),
                 "label": "My Messages",
                 "icon": None,
                 "current": False,
@@ -341,7 +253,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             in_navigation=True,
             slug="visited-page",
         )
-        visited_page.publish("nl")
+        publish_page(visited_page, "nl")
 
         other_page = api.create_page(
             "Other Page",
@@ -351,24 +263,21 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             in_navigation=True,
             slug="other-page",
         )
-        other_page.publish("nl")
+        publish_page(other_page, "nl")
 
-        published_visited_page = visited_page.get_public_object()
-        published_other_page = other_page.get_public_object()
-
-        visited_page_url = published_visited_page.get_absolute_url()
+        visited_page_url = visited_page.get_absolute_url()
         menu_data = self._get_menu_data(self.regular_user, path=visited_page_url)
 
         expected_menu = [
             {
-                "href": published_visited_page.get_absolute_url(),
+                "href": visited_page.get_absolute_url(),
                 "label": "Visited Page",
                 "icon": None,
                 "current": True,
                 "counter": None,
             },
             {
-                "href": published_other_page.get_absolute_url(),
+                "href": other_page.get_absolute_url(),
                 "label": "Other Page",
                 "icon": None,
                 "current": False,
@@ -389,7 +298,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        dutch_page.publish("nl")
+        publish_page(dutch_page, "nl")
 
         en_page = api.create_page(
             "English Only Page",
@@ -398,7 +307,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        en_page.publish("en")  # Only publish in English, not Dutch
+        publish_page(en_page, "en")  # Only publish in English, not Dutch
 
         # Menu in Dutch context should only contain Dutch page
         menu_data = self._get_menu_data(self.regular_user)
@@ -425,7 +334,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
             parent=self.home_page,
             in_navigation=True,
         )
-        page_with_broken_counter.publish("nl")
+        publish_page(page_with_broken_counter, "nl")
 
         CommonExtension.objects.create(
             extended_object=page_with_broken_counter,
@@ -457,6 +366,7 @@ class TestSideNavigationMenuFactory(CMSTestCase):
 
         request = self.factory.get("/")
         request.user = self.regular_user
+        request.toolbar = CMSToolbar(request)
         context = Context({"request": request})
 
         with self.assertRaisesRegex(

@@ -10,17 +10,18 @@ class MenuIconsSuccessfulMigrations(TestSuccessfulMigrations):
     app = "extensions"
 
     def setUpBeforeMigration(self, apps):
-        Site = apps.get_model("sites", "Site")
+        from django.contrib.sites.models import Site
+
+        from cms.models import Page, TreeNode
+
         CommonExtension = apps.get_model("extensions", "CommonExtension")
-        Page = apps.get_model("cms", "Page")
-        TreeNode = apps.get_model("cms", "TreeNode")
 
         site = Site.objects.create(domain="foo", name="foo")
         node = TreeNode.objects.create(site=site, path="0001", depth=1, numchild=0)
         page = Page.objects.create(node=node)
 
         self.ce_euro_outline = CommonExtension.objects.create(
-            extended_object=page, menu_icon="euro_outline"
+            extended_object_id=page.pk, menu_icon="euro_outline"
         )
 
     def test_menu_icons_upgrade_0007_to_0008(self):
