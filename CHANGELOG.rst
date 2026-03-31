@@ -12,6 +12,9 @@ Deployment aandachtspunten
   aangezet. Host, poort en time-out zijn instelbaar via de beheeromgeving
   (standaardwaarden: host ``clamav``, poort ``3310``, time-out ``30``
   seconden).
+* [:gh:`2363`]: ``manage.py add_missing_templates`` is toegevoegd aan het
+  opstartsscript (``bin/docker_start.sh``) en wordt voortaan automatisch
+  uitgevoerd bij elke deploy.
 
 Nieuwe features
 ---------------
@@ -21,6 +24,10 @@ Nieuwe features
   siteconfiguratie en is van toepassing op alle bestandsuploads binnen de
   applicatie (zaken en plannen). Wanneer een geïnfecteerd bestand wordt
   gedetecteerd, wordt de upload geweigerd.
+* [:gh:`2363`]: Gebruikers ontvangen nu automatisch een e-mailnotificatie wanneer
+  een uitnodiging voor contact is geaccepteerd en de koppeling tot stand is gekomen.
+  Zowel de uitnodiger als de uitgenodigde ontvangen een bericht zodra ze aan elkaar
+  zijn gekoppeld als contactpersoon.
 
 Bugfixes
 --------

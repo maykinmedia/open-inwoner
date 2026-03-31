@@ -1,10 +1,13 @@
 from datetime import timedelta
 
+from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from django_webtest import WebTest
+
+from open_inwoner.configurations.models import SiteConfiguration
 
 from .factories import InviteFactory, UserFactory
 
@@ -92,3 +95,58 @@ class InvitePageTests(WebTest):
             self.app.session["invite_url"],
             f"{reverse('django_registration_register')}?invite={invite.key}",
         )
+
+    def test_accepted_emails_sent_to_both_users_when_logged_in(self):
+        inviter = UserFactory()
+        invitee = UserFactory()
+        invite = InviteFactory.create(inviter=inviter, invitee=invitee)
+        url = invite.get_absolute_url()
+
+        self.app.get(url, user=invitee)
+
+        recipients = {m.to[0] for m in mail.outbox}
+        self.assertIn(inviter.email, recipients)
+        self.assertIn(invitee.email, recipients)
+
+    def test_accepted_emails_sent_to_both_users_via_registration(self):
+        config = SiteConfiguration.get_solo()
+        config.login_allow_registration = True
+        config.save()
+
+        inviter = UserFactory()
+        invite = InviteFactory.create(inviter=inviter)
+        url = f"{reverse('django_registration_register')}?invite={invite.key}"
+
+        page = self.app.get(url)
+        form = page.forms["registration-form"]
+        form["email"] = invite.invitee_email
+        form["first_name"] = invite.invitee_first_name
+        form["last_name"] = invite.invitee_last_name
+        form["password1"] = "SomePassword1!"
+        form["password2"] = "SomePassword1!"
+        form.submit()
+
+        recipients = {m.to[0] for m in mail.outbox}
+        self.assertIn(inviter.email, recipients)
+        self.assertIn(invite.invitee_email, recipients)
+
+    def test_accepted_emails_sent_to_both_users_via_necessary_fields(self):
+        inviter = UserFactory()
+        invitee = UserFactory()
+        invite = InviteFactory.create(
+            inviter=inviter,
+            invitee=invitee,
+            invitee_email=invitee.email,
+        )
+        url = f"{reverse('profile:registration_necessary')}?invite={invite.key}"
+
+        page = self.app.get(url, user=invitee)
+        form = page.forms["necessary-form"]
+        form["first_name"] = invitee.first_name
+        form["last_name"] = invitee.last_name
+        form["email"] = invitee.email
+        form.submit()
+
+        recipients = {m.to[0] for m in mail.outbox}
+        self.assertIn(inviter.email, recipients)
+        self.assertIn(invitee.email, recipients)
