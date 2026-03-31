@@ -372,6 +372,11 @@ class eSuiteKlantenService(
         if update_data:
             for attr, value in update_data.items():
                 setattr(user, attr, value)
+
+            if user.phonenumber and user.phonenumber == user.phonenumber_alternative:
+                user.phonenumber_alternative = ""
+                update_data["phonenumber_alternative"] = ""
+
             user.save(update_fields=update_data.keys())
 
             system_action(
