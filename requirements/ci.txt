@@ -1234,7 +1234,7 @@ typer==0.21.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-common
-typing-extensions==4.10.0
+typing-extensions==4.15.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

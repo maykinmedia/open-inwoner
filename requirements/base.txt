@@ -671,7 +671,7 @@ tinyhtml5==2.0.0
     # via weasyprint
 typer==0.21.1
     # via maykin-common
-typing-extensions==4.10.0
+typing-extensions==4.15.0
     # via
     #   -r requirements/base.in
     #   elasticsearch
