@@ -1,4 +1,4 @@
-{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags %}<!DOCTYPE html>
+{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
 <html
     lang="nl"
     class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
@@ -169,9 +169,9 @@
                 {% endif %}
             </div>
             {% endif %}
-            <div class="footer__left wysiwyg">{% static_placeholder "footer_left" %}</div>
-            <div class="footer__center wysiwyg">{% static_placeholder "footer_center" %}</div>
-            <div class="footer__right wysiwyg">{% static_placeholder "footer_right" %}</div>
+            <div class="footer__left wysiwyg">{% static_alias "footer_left" %}</div>
+            <div class="footer__center wysiwyg">{% static_alias "footer_center" %}</div>
+            <div class="footer__right wysiwyg">{% static_alias "footer_right" %}</div>
 
             {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
                 <div class="kcm-survey">

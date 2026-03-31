@@ -8,7 +8,8 @@ from django.urls import NoReverseMatch, Resolver404, ResolverMatch, resolve, rev
 from django.utils.translation import get_language, gettext_lazy as _
 
 import structlog
-from cms.models import Page
+from cms.models import Page, PageContent
+from djangocms_versioning.constants import DRAFT, PUBLISHED
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 
@@ -103,29 +104,9 @@ class SideNavMenuData:
                     pass
                 return None
 
-            # Try current page first
+            # In CMS 4 there is one Page object per logical page; look up icon directly
             if icon := try_get_icon(page):
                 return icon
-
-            # If not found and this is a public page, try the draft version
-            if not page.publisher_is_draft and hasattr(page, "publisher_public"):
-                try:
-                    draft_page = page.publisher_public
-                    if icon := try_get_icon(draft_page, " on draft"):
-                        return icon
-                except AttributeError:
-                    pass
-
-            # If not found and this is a draft page, try the public version
-            if page.publisher_is_draft and getattr(page, "publisher_public_id", None):
-                try:
-                    public_page = Page.objects.get(
-                        pk=getattr(page, "publisher_public_id")
-                    )
-                    if icon := try_get_icon(public_page, " on public"):
-                        return icon
-                except Page.DoesNotExist:
-                    pass
 
         except Exception:
             logger.exception("Error extracting icon")
@@ -265,39 +246,25 @@ class SideNavMenuData:
 
     def _is_visible_to_user(self, node: NavigationNode) -> bool:
         try:
-            # Note how draft status works: there are typically two physical Page objects
-            # for the same logical page: one draft, one published. Which one is returned
-            # depends on the request context, and is handled by Django CMS, by selecting
-            # the appropriate node for that context. Thus, we can assume `node` will
-            # contain the relevant ID for the current context.
             page = Page.objects.get(pk=node.id)
             current_language = get_language()
-            is_published_for_language = page.is_published(current_language)
-            is_draft = page.publisher_is_draft
             is_staff = self.request.user.is_staff
 
-            # Staff users can see all pages (including drafts) if published for language
-            # OR if it's a draft page with content in the current language
+            has_published = PageContent._original_manager.filter(
+                page=page, language=current_language, versions__state=PUBLISHED
+            ).exists()
+
             if is_staff:
-                if is_published_for_language:
+                if has_published:
                     return True
 
-                # For unpublished draft pages, check if they have content in current
-                # language as a hack to answer the question "Does the unpublished draft
-                # version have any content?". This allows staff users to still see the
-                # menu when they are in edit mode.
-                if is_draft:
-                    try:
-                        title = page.get_title_obj(
-                            language=current_language, fallback=False
-                        )
-                        if title:
-                            return True
-                    except Exception:
-                        logger.warning(
-                            "unable to get page title for the current node",
-                            page=page,
-                        )
+                # Allow staff to see pages that have draft content in the current
+                # language (e.g. when browsing in edit mode).
+                has_draft = PageContent._original_manager.filter(
+                    page=page, language=current_language, versions__state=DRAFT
+                ).exists()
+                if has_draft:
+                    return True
 
                 logger.debug(
                     "Skipping node for staff user: not published and no content for language",
@@ -306,15 +273,7 @@ class SideNavMenuData:
                 )
                 return False
 
-            # Regular users only see published (non-draft) pages
-            if is_draft:
-                logger.debug(
-                    "Skipping node for regular user: page is draft",
-                    node_title=node.title,
-                )
-                return False
-
-            if not is_published_for_language:
+            if not has_published:
                 logger.debug(
                     "Skipping node for regular user: not published for language",
                     node_title=node.title,

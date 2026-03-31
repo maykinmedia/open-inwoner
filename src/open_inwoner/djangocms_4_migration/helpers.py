@@ -36,6 +36,9 @@ def get_or_create_migration_user(user_model=get_user_model()):
 
 
 def get_default_site():
-    if settings.MIGRATION_DEFAULT_SITE_ID:
-        return Site.objects.get(id=settings.MIGRATION_DEFAULT_SITE_ID)
-    return Site.objects.get(id=1)
+    site_id = getattr(settings, "MIGRATION_DEFAULT_SITE_ID", None) or getattr(
+        settings, "SITE_ID", 1
+    )
+    return (
+        Site.objects.filter(id=site_id).first() or Site.objects.order_by("id").first()
+    )

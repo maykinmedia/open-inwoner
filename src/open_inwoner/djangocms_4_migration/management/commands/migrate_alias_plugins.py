@@ -223,10 +223,20 @@ def process_old_alias_sources(site, language, site_plugin_queryset):
         if is_versioning_enabled():
             from djangocms_versioning.models import Version
 
-            # Create version
-            changed_by = User.objects.get(
-                **{User.USERNAME_FIELD: old_plugin.placeholder.source.changed_by}
+            from open_inwoner.djangocms_4_migration.helpers import (
+                get_or_create_migration_user,
             )
+
+            try:
+                changed_by = User.objects.get(
+                    **{User.USERNAME_FIELD: old_plugin.placeholder.source.changed_by}
+                )
+            except User.DoesNotExist:
+                logger.warning(
+                    "User not found for alias plugin, falling back to migration user",
+                    changed_by=old_plugin.placeholder.source.changed_by,
+                )
+                changed_by, _ = get_or_create_migration_user()
             version = Version.objects.create(
                 content=alias_content, created_by=changed_by
             )

@@ -2,9 +2,10 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
 import structlog
-from cms.models import Page
+from cms.models import Page, PageContent
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.models import KlantenSysteemConfig
@@ -27,16 +28,20 @@ class FooterPagesPlugin(CMSPluginBase):
         cms_pages = config.get_ordered_cms_pages()
         user = context["request"].user
         if not user.is_authenticated:
-            for page in cms_pages:
-                if (
+            cms_pages = [
+                page
+                for page in cms_pages
+                if not (
                     hasattr(page, "commonextension")
                     and page.commonextension.requires_auth
-                ):
-                    cms_pages.remove(page)
+                )
+            ]
 
-        contact_form_pages = Page.objects.filter(
-            template="cms/contactform/form_outer.html", publisher_is_draft=False
-        )
+        contact_form_page_ids = PageContent._original_manager.filter(
+            template="cms/contactform/form_outer.html",
+            versions__state=PUBLISHED,
+        ).values_list("page_id", flat=True)
+        contact_form_pages = Page.objects.filter(id__in=contact_form_page_ids)
 
         # Use the first page if it exists
         if contact_form_pages.exists() and klant_config.contact_registration_enabled:
@@ -54,12 +59,16 @@ class CMSFlatPagePlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         cms_plugin_placeholder = instance.placeholder
-        cms_pages = Page.objects.filter(placeholders=cms_plugin_placeholder)
+        # Page.placeholders M2M was removed in CMS 4 (migration 0028_remove_page_placeholders).
+        # Placeholders now belong to PageContent objects, so look up via PageContent instead.
+        page_contents = PageContent._original_manager.filter(
+            placeholders=cms_plugin_placeholder
+        )
 
-        if cms_pages.count() > 1:
+        if page_contents.count() > 1:
             logger.warning("Multiple CMS pages found for CMSFlatPagePlugin")
 
-        cms_page = cms_pages.first()
+        cms_page = page_contents.first().page if page_contents.exists() else None
 
         if not hasattr(context, "user") or not context["user"].is_authenticated:
             if (
