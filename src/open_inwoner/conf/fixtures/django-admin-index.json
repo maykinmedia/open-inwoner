@@ -165,20 +165,18 @@
     "model": "admin_index.appgroup",
     "fields": {
       "order": 7,
-      "translations": {},
+      "translations": {
+        "nl": "CMS"
+      },
       "name": "CMS",
       "slug": "cms",
       "models": [
-        ["cms", "aliaspluginmodel"],
-        ["cms", "cmsplugin"],
         ["cms", "globalpagepermission"],
         ["cms", "page"],
-        ["cms", "pagepermission"],
-        ["cms", "pagetype"],
+        ["cms", "pagecontent"],
         ["cms", "pageuser"],
         ["cms", "pageusergroup"],
-        ["cms", "placeholder"],
-        ["cms", "placeholderreference"]
+        ["cms", "placeholder"]
       ]
     }
   },
@@ -192,11 +190,11 @@
       "name": "Inlog koppelingen",
       "slug": "auth-koppelingen",
       "models": [
+        ["accounts", "openideidasconfig"],
         ["digid_eherkenning", "digidconfiguration"],
         ["digid_eherkenning", "eherkenningconfiguration"],
         ["digid_eherkenning_oidc_generics", "digidconfig"],
         ["digid_eherkenning_oidc_generics", "eherkenningconfig"],
-        ["accounts", "openideidasconfig"],
         ["haalcentraal", "haalcentraalconfig"],
         ["kvk", "kvkconfig"],
         ["mozilla_django_oidc_db", "openidconnectconfig"]
