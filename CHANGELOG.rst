@@ -70,6 +70,7 @@ Onderhoud
   kwetsbaarheid in ``crit`` header te mitigeren.
 * [:gh:`2295`]: Zaken-kaartjes op de homepage gebruiken nu het ``arrow_forward`` icoon en hebben een gelijke hoogte.
 * [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
+* [:gh:`2372`]: ``typing-extensions`` bijgewerkt naar versie ``4.15.0``.
 
 2.1.0 (2026-03-04)
 ==================
