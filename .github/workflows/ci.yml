@@ -214,6 +214,13 @@ jobs:
           ES_PASSWORD: elastic
           OTEL_SDK_DISABLED: true
 
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results-${{ matrix.browser }}
+          path: test-results/
+
   #
   # Docs
   #

@@ -55,3 +55,6 @@ src/open_inwoner/static/fonts/material-icons/
 *storybook.log
 storybook-static/
 coverage/
+
+# Playwright traces
+test-results/
