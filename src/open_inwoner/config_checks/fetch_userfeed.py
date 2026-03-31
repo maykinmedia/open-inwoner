@@ -17,7 +17,10 @@ class FetchUserfeedCheck:
         self.form = form
 
     def run(self, obj) -> GenericHealthCheckResult:
-        user = obj
+        user = obj or self.form.cleaned_data.get("api_group")
+
+        if not user:
+            raise ValueError("User not provided")
 
         try:
             feed = get_feed(user)

@@ -17,12 +17,30 @@ class FetchCasesCheck:
     def run(self, obj) -> GenericHealthCheckResult:
         bsn = self.form.cleaned_data["bsn"]
 
+        from zgw_consumers.models import Service
+
         from open_inwoner.openzaak.models import ZGWApiGroupConfig
 
-        api_group = ZGWApiGroupConfig.objects.filter(zrc_service=obj).first()
+        if isinstance(obj, ZGWApiGroupConfig):
+            api_group = obj
+            service = obj.zrc_service
+        elif isinstance(obj, Service):
+            service = obj
+            api_group = ZGWApiGroupConfig.objects.filter(zrc_service=service).first()
+        else:
+            return GenericHealthCheckResult(
+                success=False,
+                message=f"Invalid object type: {type(obj).__name__}",
+            )
+
+        if not service:
+            return GenericHealthCheckResult(
+                success=False,
+                message="No ZRC Service is configured for this API group.",
+            )
 
         client = build_zgw_client_from_service(
-            obj,
+            service,
             use_openzaak_120_params=(
                 api_group.fetch_eherkenning_zaken_with_openzaak_120_params
                 if api_group

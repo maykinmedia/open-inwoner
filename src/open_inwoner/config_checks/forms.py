@@ -1,7 +1,15 @@
 from django import forms
 
+from open_inwoner.accounts.models import User
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
+
 
 class FetchCasesConfigCheckParams(forms.Form):
+    api_group = forms.ModelChoiceField(
+        queryset=ZGWApiGroupConfig.objects.all(),
+        required=False,
+        help_text="API group to fetch data for",
+    )
     bsn = forms.CharField(
         label="BSN",
         max_length=9,
@@ -18,4 +26,8 @@ class FetchBRPConfigCheckParams(forms.Form):
 
 
 class FetchUserfeedConfigCheckParams(forms.Form):
-    pass
+    api_group = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        help_text="User to fetch data for",
+    )

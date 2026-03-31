@@ -40,7 +40,9 @@ from .models import (
 logger = structlog.stdlib.get_logger(__name__)
 
 
+@with_config_checks(FetchCasesCheck)
 class ZGWApiGroupConfig(admin.StackedInline):
+    readonly_fields = ("config_check_links",)
     model = ZGWApiGroupConfig
     extra = 0
     fieldsets = (
@@ -65,6 +67,12 @@ class ZGWApiGroupConfig(admin.StackedInline):
                     "fetch_rollen_with_betrokkene_type",
                     "klant_backend",
                 ]
+            },
+        ),
+        (
+            _("Checks"),
+            {
+                "fields": ("config_check_links",),
             },
         ),
     )

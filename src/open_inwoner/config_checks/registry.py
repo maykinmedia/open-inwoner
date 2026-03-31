@@ -6,7 +6,8 @@ class ConfigCheckRegistry:
         self._registry = defaultdict(list)
 
     def register(self, model, check):
-        self._registry[model].append(check)
+        if check not in self._registry[model]:
+            self._registry[model].append(check)
 
     def get_checks(self, model):
         return self._registry.get(model, [])

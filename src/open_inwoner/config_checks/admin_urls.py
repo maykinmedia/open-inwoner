@@ -8,4 +8,9 @@ urlpatterns = [
         run_config_check,
         name="run_config_check",
     ),
+    # path(
+    #     "admin/config-check/<str:check_id>/",
+    #     run_config_check_standalone,
+    #     name="run_config_check_standalone",
+    # ),
 ]
