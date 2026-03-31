@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib import admin, messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import BooleanField, Count, ExpressionWrapper, Q
 from django.forms import Form, ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
@@ -127,62 +127,30 @@ class ImportZGWExportFileForm(Form):
     )
 
 
-@admin.register(CatalogusConfig)
-class CatalogusConfigAdmin(admin.ModelAdmin):
-    change_list_template = "admin/catalogusconfig_change_list.html"
+class ZGWImportExportMixin:
+    """Mixin for admin classes that provide a ZGW config import view."""
 
-    list_display = [
-        "domein",
-        "rsin",
-        "url",
-        "service",
-        "found_in_api",
-    ]
-    fields = [
-        "url",
-        "domein",
-        "rsin",
-        "service",
-        "found_in_api",
-    ]
-    readonly_fields = fields
-    search_fields = [
-        "domein",
-        "rsin",
-        "url",
-    ]
-    ordering = ("domein", "rsin")
-    list_filter = (
-        "service",
-        "found_in_api",
+    zgw_import_redirect_url_name: (
+        str  # e.g. "admin:openzaak_catalogusconfig_changelist"
     )
-
-    actions = ["export_catalogus_configs"]
+    zgw_import_path: str  # e.g. "import-catalogus-dump/"
+    zgw_import_name: str  # e.g. "upload_catalogus_import_file"
 
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path(
-                "import-catalogus-dump/",
+                self.zgw_import_path,
                 self.admin_site.admin_view(self.process_file_view),
-                name="upload_catalogus_import_file",
+                name=self.zgw_import_name,
             ),
         ]
         return custom_urls + urls
 
-    @admin.action(description=_("Export to file"))
-    def export_catalogus_configs(self, request, queryset):
-        export = ZGWConfigExport.from_catalogus_configs(queryset)
-        response = StreamingHttpResponse(
-            export.as_jsonl_iter(),
-            content_type="application/json",
-        )
-        response["Content-Disposition"] = (
-            'attachment; filename="zgw-catalogi-export.json"'
-        )
-        return response
-
     def process_file_view(self, request):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
         form = ImportZGWExportFileForm()
 
         if request.method == "POST":
@@ -229,9 +197,7 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
                         self.message_user(request, error_msg_html, messages.ERROR)
 
                     return HttpResponseRedirect(
-                        reverse(
-                            "admin:openzaak_catalogusconfig_changelist",
-                        )
+                        reverse(self.zgw_import_redirect_url_name)
                     )
                 except Exception:
                     logger.exception("Unable to process ZGW import")
@@ -248,6 +214,54 @@ class CatalogusConfigAdmin(admin.ModelAdmin):
         return TemplateResponse(
             request, "admin/import_zgw_export_form.html", {"form": form}
         )
+
+
+@admin.register(CatalogusConfig)
+class CatalogusConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
+    change_list_template = "admin/catalogusconfig_change_list.html"
+    zgw_import_redirect_url_name = "admin:openzaak_catalogusconfig_changelist"
+    zgw_import_path = "import-catalogus-dump/"
+    zgw_import_name = "upload_catalogus_import_file"
+
+    list_display = [
+        "domein",
+        "rsin",
+        "url",
+        "service",
+        "found_in_api",
+    ]
+    fields = [
+        "url",
+        "domein",
+        "rsin",
+        "service",
+        "found_in_api",
+    ]
+    readonly_fields = fields
+    search_fields = [
+        "domein",
+        "rsin",
+        "url",
+    ]
+    ordering = ("domein", "rsin")
+    list_filter = (
+        "service",
+        "found_in_api",
+    )
+
+    actions = ["export_catalogus_configs"]
+
+    @admin.action(description=_("Export to file"))
+    def export_catalogus_configs(self, request, queryset):
+        export = ZGWConfigExport.from_catalogus_configs(queryset)
+        response = StreamingHttpResponse(
+            export.as_jsonl_iter(),
+            content_type="application/json",
+        )
+        response["Content-Disposition"] = (
+            'attachment; filename="zgw-catalogi-export.json"'
+        )
+        return response
 
 
 class HasDocNotifyListFilter(admin.SimpleListFilter):
@@ -424,8 +438,11 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
 
 
 @admin.register(ZaakTypeConfig)
-class ZaakTypeConfigAdmin(admin.ModelAdmin):
+class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
     change_list_template = "admin/zaaktypeconfig_change_list.html"
+    zgw_import_redirect_url_name = "admin:openzaak_zaaktypeconfig_changelist"
+    zgw_import_path = "import-zaaktype-dump/"
+    zgw_import_name = "upload_zaaktype_import_file"
     inlines = [
         ZaakTypeInformatieObjectTypeConfigInline,
         ZaakTypeStatusTypeConfigInline,
@@ -493,17 +510,6 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
     ]
     ordering = ("identificatie", "catalogus__domein")
 
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                "import-zaaktype-dump/",
-                self.admin_site.admin_view(self.process_file_view),
-                name="upload_zaaktype_import_file",
-            ),
-        ]
-        return custom_urls + urls
-
     @admin.action(description=_("Export to file"))
     def export_zaaktype_configs(self, request, queryset):
         export = ZGWConfigExport.from_zaaktype_configs(queryset)
@@ -515,73 +521,6 @@ class ZaakTypeConfigAdmin(admin.ModelAdmin):
             'attachment; filename="zgw-zaaktype-export.json"'
         )
         return response
-
-    def process_file_view(self, request):
-        form = ImportZGWExportFileForm()
-
-        if request.method == "POST":
-            form = ImportZGWExportFileForm(request.POST, request.FILES)
-            if form.is_valid():
-                storage = PrivateMediaFileSystemStorage()
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-                target_file_name = f"zgw_import_dump_{timestamp}.json"
-                storage.save(target_file_name, request.FILES["zgw_export_file"])
-
-                try:
-                    import_result = (
-                        ZGWConfigImport.import_from_jsonl_file_in_django_storage(
-                            target_file_name,
-                            storage,
-                        )
-                    )
-                    self.message_user(
-                        request,
-                        _(
-                            "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
-                            % {
-                                "num_rows": import_result.total_rows_processed,
-                                "error_rows": len(import_result.import_errors),
-                            }
-                        ),
-                        (
-                            messages.SUCCESS
-                            if not import_result.import_errors
-                            else messages.WARNING
-                        ),
-                    )
-                    if errors := import_result.import_errors:
-                        msgs_deduped = set(error.__str__() for error in errors)
-                        error_msg_iterator = ([msg] for msg in msgs_deduped)
-
-                        error_msg_html = format_html_join(
-                            "\n", "<p> - {}</p>", error_msg_iterator
-                        )
-                        error_msg_html = format_html(
-                            _("It was not possible to import the following items:")
-                            + f"<div>{error_msg_html}</div>"
-                        )
-                        self.message_user(request, error_msg_html, messages.ERROR)
-
-                    return HttpResponseRedirect(
-                        reverse(
-                            "admin:openzaak_zaaktypeconfig_changelist",
-                        )
-                    )
-                except Exception:
-                    logger.exception("Unable to process ZGW import")
-                    self.message_user(
-                        request,
-                        _(
-                            "We were unable to process your upload. Please regenerate the file and try again."
-                        ),
-                        messages.ERROR,
-                    )
-                finally:
-                    storage.delete(target_file_name)
-
-        return TemplateResponse(
-            request, "admin/import_zgw_export_form.html", {"form": form}
-        )
 
     def has_add_permission(self, request):
         return False
