@@ -62,6 +62,7 @@ Bugfixes
   waren ingelogd (terwijl dit wel het geval is, en de fout met de synchronisatie te
   maken had, niet het inloggen). Het alternatieve nummer wordt nu geleegd als het gelijk
   is aan het primaire nummer.
+* [:gh:`2378`]: Probleem opgelost waar markdown in ssd uitkering pdf niet correct wordt gerenderd.
 
 Onderhoud
 ---------

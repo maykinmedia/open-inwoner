@@ -161,7 +161,7 @@
         {# Optional comments/help text #}
         {% if comments %}
             <section class="section monthly-report__p">
-                {{ comments|safe }}
+                {{ comments|prosemirror_html_to_markdown|safe }}
             </section>
         {% endif %}
 	</div>

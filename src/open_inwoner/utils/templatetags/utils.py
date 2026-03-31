@@ -1,3 +1,5 @@
+import re
+
 from django import template
 from django.conf import settings
 from django.http import HttpRequest
@@ -5,6 +7,7 @@ from django.template.defaultfilters import stringfilter
 from django.utils.html import format_html
 
 import markdown as md
+from bs4 import BeautifulSoup
 from humanfriendly import format_size
 
 register = template.Library()
@@ -106,3 +109,25 @@ def cookies_accepted(request: HttpRequest) -> bool:
 @stringfilter
 def markdown(value):
     return md.markdown(value, extensions=["markdown.extensions.fenced_code"])
+
+
+@register.filter()
+@stringfilter
+def prosemirror_html_to_markdown(value):
+    # ProseMirror wraps every line in <p> tags; use "\n\n" as separator so that
+    # adjacent <p> elements become blank-line-separated text, which markdown
+    # needs to correctly close block elements (e.g. blockquotes) before the next.
+    text = BeautifulSoup(value, "html.parser").get_text("\n\n")
+
+    # Markdown tables require rows on consecutive lines — collapse any number of
+    # blank lines that get_text("\n\n") inserted between adjacent table rows.
+    text = re.sub(r"(\|[^\n]+)\n{2,}(?=\|)", r"\1\n", text)
+
+    return md.markdown(
+        text,
+        extensions=[
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.sane_lists",
+            "markdown.extensions.extra",
+        ],
+    )
