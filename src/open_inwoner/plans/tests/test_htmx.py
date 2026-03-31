@@ -4,7 +4,7 @@ from django.test import override_settings, tag
 from django.utils.translation import gettext
 
 import clamd
-from cms.models.static_placeholder import StaticPlaceholder
+from djangocms_alias.models import Alias
 from playwright.sync_api import expect
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
@@ -27,11 +27,11 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
 
         self.plan_factory = PlanFactory
 
-        # Ensure only one StaticPlaceholder exists per slot/code to avoid MultipleObjectsReturned in CI
+        # Ensure only one Alias exists per static_code to avoid MultipleObjectsReturned in CI
         for code in ["footer_left", "footer_center", "footer_right"]:
-            placeholders = StaticPlaceholder.objects.filter(code=code)
-            if placeholders.count() > 1:
-                placeholders.exclude(pk=placeholders.first().pk).delete()
+            aliases = Alias.objects.filter(static_code=code)
+            if aliases.count() > 1:
+                aliases.exclude(pk=aliases.first().pk).delete()
 
         # Disable cookie banner
         self.config = SiteConfiguration.get_solo()

@@ -5,7 +5,10 @@ from django.test import TestCase, tag
 from elasticsearch.dsl import Search
 
 from open_inwoner.accounts.models import SiteConfiguration
-from open_inwoner.cms.tests.cms_tools import create_cms_page_with_content
+from open_inwoner.cms.tests.cms_tools import (
+    create_cms_page_with_content,
+    unpublish_page,
+)
 from open_inwoner.search.results import GenericHit
 from open_inwoner.search.views import multi_search
 
@@ -50,7 +53,7 @@ class CMSPageSearchTest(ESMixin, TestCase):
                 self.assertNotIn(page_without_title, pages_result.results)
 
     def test_unpublished_pages_are_not_indexed(self):
-        self.assertTrue(self.foo_page.unpublish(language="nl"))
+        unpublish_page(self.foo_page, language="nl")
         self.update_index()
 
         response = Search(index=settings.ES_INDEX_CMS_PAGES).execute()

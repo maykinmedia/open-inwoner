@@ -106,8 +106,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, _("Stuur bericht"))
 
         # case 3: published message page
-        page.publish("nl")
-        page.save()
+        cms_tools.publish_page(page, "nl")
 
         response = self.app.get(self.list_url, user=self.user)
 

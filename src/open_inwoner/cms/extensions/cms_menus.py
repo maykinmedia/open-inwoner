@@ -67,7 +67,10 @@ class MenuModifier(Modifier):
                 else:
                     node.indicator = 0
 
-                num_indicators += node.indicator
+                try:
+                    num_indicators += int(node.indicator)
+                except (ValueError, TypeError):
+                    num_indicators = None
 
             # store total on something we can access from outside the template tags
             request.user.num_indicators = num_indicators

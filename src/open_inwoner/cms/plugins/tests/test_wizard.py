@@ -1,6 +1,7 @@
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 
 from cms.forms.wizards import CreateCMSPageForm
+from cms.utils import get_current_site
 from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -22,6 +23,9 @@ class CMSPageWizardTextPluginTest(TestCase):
 
     def setUp(self):
         self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        request = RequestFactory().get("/")
+        request.user = self.superuser
+        self.request = request
 
     def _make_form(self, content="some content"):
         return CreateCMSPageForm(
@@ -32,7 +36,8 @@ class CMSPageWizardTextPluginTest(TestCase):
                 "content": content,
             },
             wizard_page=None,
-            wizard_user=self.superuser,
+            wizard_site=get_current_site(),
+            wizard_request=self.request,
             wizard_language="nl",
         )
 
