@@ -1,4 +1,5 @@
 import datetime
+from contextlib import suppress
 
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
@@ -15,7 +16,11 @@ from django.utils.translation import gettext_lazy as _, ngettext
 import structlog
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
+from zgw_consumers.admin import ServiceAdmin as BaseServiceAdmin
+from zgw_consumers.models import Service
 
+from open_inwoner.config_checks.api import with_config_checks
+from open_inwoner.config_checks.fetch_cases import FetchCasesCheck
 from open_inwoner.openzaak.clients import build_zgw_client_from_service
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.utils.forms import LimitedUploadFileField
@@ -38,7 +43,6 @@ logger = structlog.stdlib.get_logger(__name__)
 class ZGWApiGroupConfig(admin.StackedInline):
     model = ZGWApiGroupConfig
     extra = 0
-    readonly_fields = ("run_fetch_cases_check",)
     fieldsets = (
         (
             _("Basic configuration"),
@@ -49,7 +53,6 @@ class ZGWApiGroupConfig(admin.StackedInline):
                     "drc_service",
                     "ztc_service",
                     "form_service",
-                    "run_fetch_cases_check",
                 ]
             },
         ),
@@ -65,16 +68,6 @@ class ZGWApiGroupConfig(admin.StackedInline):
             },
         ),
     )
-
-    @admin.display(description="Configuration check")
-    def run_fetch_cases_check(self, obj):
-        if not obj.pk:
-            return "-"
-        url = reverse("run_fetch_cases_check", args=[obj.pk])
-        return format_html(
-            '<a class="button" href="{}">Run check</a>',
-            url,
-        )
 
 
 @admin.register(OpenZaakConfig)
@@ -732,3 +725,15 @@ class UserCaseInfoObjectNotificationAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+with suppress(admin.sites.NotRegistered):
+    admin.site.unregister(Service)
+
+
+@admin.register(Service)
+@with_config_checks(FetchCasesCheck)
+class ServiceAdmin(BaseServiceAdmin):
+    readonly_fields = getattr(BaseServiceAdmin, "readonly_fields", ()) + (
+        "config_check_links",
+    )
