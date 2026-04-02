@@ -76,6 +76,41 @@ Onderhoud
 * [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
 * [:gh:`2372`]: ``typing-extensions`` bijgewerkt naar versie ``4.15.0``.
 
+2.1.1 (2026-03-19)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.1`.
+
+Bugfixes
+--------
+
+* [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
+  ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
+  in plaats van alleen het vestigingsnummer.
+* [:gh:`2329`]: ``attr_consuming_service_index`` wordt nu correct doorgegeven als
+  queryparameter aan de eHerkenning SAML loginpagina, op basis van de waarde in de
+  eHerkenning configuratie. Het ontbreken hiervan kon leiden tot authenticatiefouten.
+* [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
+  Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
+* [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
+  (gebruik van 'x-request-*' in plaats van 'x-requests-*').
+* [:gh:`2301`]: De ``fetch_rollen_with_betrokkene_type`` instelling wordt nu ook
+  toegepast bij het ophalen van zaakrollen via ``fetch_case_roles``,
+  ``fetch_case_roles_for_eherkenning_user`` en ``fetch_case_roles_for_vestiging``.
+* [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
+  ``betrokkene_type`` parameter op te nemen, waardoor verkeerde cache hits worden
+  voorkomen.
+* [:gh:`2307`] Correctie van ProseMirror velden in zaakstatus templates om HTML correct
+  weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
+  het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
+  zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
+
+Onderhoud
+---------
+
+* [:gh:`2314`, :cve:`CVE-2026-32597`]: ``PyJWT`` bijgewerkt naar versie ``2.10.1`` om
+  kwetsbaarheid in ``crit`` header te mitigeren.
+
 2.1.0 (2026-03-04)
 ==================
 
@@ -181,6 +216,36 @@ Onderhoud
 * ``urllib3`` bijgewerkt naar versie ``2.6.3``.
 * ``protobuf`` bijgewerkt naar versie ``6.33.5``.
 * ``sqlparse`` bijgewerkt naar versie ``0.5.5``.
+
+2.0.4 (2026-03-19)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.0.4`.
+
+Bugfixes
+--------
+
+* [:gh:`2307`] Correctie van ProseMirror velden in zaakstatus templates om HTML correct
+  weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
+  het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
+  zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
+* [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
+  (gebruik van 'x-request-*' in plaats van 'x-requests-*').
+* [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
+  Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
+* [:gh:`2280`]: Verbeteringen doorgevoerd aan de Mijn Taken-plugin op de homepagina. De
+  titel heeft extra spacing gekregen, kaartjes openen nu in een nieuw tabblad en de
+  aanduiding ‘Soort:’ is verwijderd.
+* [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
+  ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
+  in plaats van alleen het vestigingsnummer.
+
+Onderhoud
+---------
+
+* [:gh:`2314`, :cve:`CVE-2026-32597`]: ``PyJWT`` bijgewerkt naar versie ``2.10.1`` om
+  kwetsbaarheid in ``crit`` header te mitigeren.
+* ``Django`` bijgewerkt naar ``4.2.29``.
 
 2.0.3 (2026-02-20)
 ==================
