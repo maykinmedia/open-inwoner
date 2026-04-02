@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import NoReverseMatch, reverse
 
 from .registry import registry
+from .signals import interactive_config_check_triggered
 
 
 @staff_member_required
@@ -12,15 +13,10 @@ def run_config_check(request, app_label, model_name, pk, check_id):
     model = apps.get_model(app_label, model_name)
     obj = get_object_or_404(model, pk=pk)
 
-    checks = registry.get_checks(model)
-
-    check_class = next(
-        (c for c in checks if c.identifier == check_id),
-        None,
-    )
-
+    check_class = registry.get_check_by_identifier(model, check_id)
     if not check_class:
         raise Http404()
+
     initial = {}
     if obj:
         initial["api_group"] = obj
@@ -30,7 +26,19 @@ def run_config_check(request, app_label, model_name, pk, check_id):
     if request.method == "POST" and form.is_valid():
         checker = check_class(form)
         selected = form.cleaned_data.get("api_group")
-        result = checker.run(selected or obj)
+        target_obj = selected or obj
+
+        result = checker.run(target_obj)
+
+        interactive_config_check_triggered.send(
+            sender=check_class,
+            request=request,
+            check_class=check_class,
+            obj=target_obj,
+            form=form,
+            result=result,
+        )
+
     opts = obj._meta
     # TODO: doublecheck this
     try:

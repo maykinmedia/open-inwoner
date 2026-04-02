@@ -249,6 +249,7 @@ INSTALLED_APPS = [
     "open_inwoner.cms.footer",
     "open_inwoner.cms.plugins",
     "open_inwoner.cms.benefits",
+    "open_inwoner.config_checks",
     "djchoices",
     "django_celery_beat",
     "django_celery_monitor",
