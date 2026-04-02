@@ -9,8 +9,8 @@
 
             {% if forloop.last %}
                 {# Current active status class #}
-                <li class="status-list__list-item {% if zaak.end_statustype_data %}status--current status-list__list-item--{{ status.status_indicator }} status--open{% endif %} {# Final status class #}{% if not case.end_statustype_data %}status--final status-list__list-item--info status--open{% endif %}">
-                {% firstof case.id|slugify as id %}
+                <li class="status-list__list-item {% if zaak.end_statustype_data %}status--current status-list__list-item--{{ status.status_indicator }} status--open{% endif %} {# Final status class #}{% if not zaak.end_statustype_data %}status--final status-list__list-item--info status--open{% endif %}">
+                {% firstof zaak.id|slugify as id %}
                 {% firstof 'content-'|add:id|add:'-id' as content_id %}
                     {% icon icon="circle" extra_classes="status-step" %}
                     <span class="sr-only">{% trans "Niet voltooid" %}</span>
@@ -24,25 +24,25 @@
                                 </button>{% endif %}
 
                             {# Non-interactive element when case is finalized #}
-                            {% if not case.end_statustype_data %}
+                            {% if not zaak.end_statustype_data %}
                                 <p class="utrecht-paragraph utrecht-accordion__paragraph status-list__open-paragraph" id="{{ id }}">
                                     {{ status.label }}
                                 </p>
                             {% endif %}
                         </h3>
 
-                        <div class="status-list__notification-content {% if zaak.end_statustype_data %}status-content--open{% endif %} {% if not case.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
+                        <div class="status-list__notification-content {% if zaak.end_statustype_data %}status-content--open{% endif %} {% if not zaak.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
                             <p class="utrecht-paragraph status-list__text utrecht-paragraph--oip utrecht-paragraph--oip-compact">
                                 {# Configurable texts #}
                                 {% if zaak.end_statustype_data %}<span>{{ status.description|default:""|prosemirror_content|safe }}</span>{% endif %}
-                                {% if not case.end_statustype_data %}<span class="status--result">{{ zaak.result_description|default:"" }}</span>{% endif %}
+                                {% if not zaak.end_statustype_data %}<span class="status--result">{{ zaak.result_description|default:"" }}</span>{% endif %}
                             </p>
                             <p class="utrecht-paragraph status-list__date utrecht-paragraph--oip utrecht-paragraph--oip-compact">{{ status.date|date }}</p>
 			    {% if status.call_to_action_url %}
                                 {% button href=status.call_to_action_url text=status.call_to_action_text title=status.call_to_action_text primary=True icon="arrow_forward" icon_position="after" %}
                             {% else %}
                                 <p class="utrecht-paragraph status-list__upload {% if zaak.end_statustype_data %}status-list__upload--enabled{% endif %}">
-                                {% if zaak.internal_upload_enabled or case.external_upload_enabled %}
+                                {% if zaak.internal_upload_enabled or zaak.external_upload_enabled %}
                                     {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
                                 {% endif %}
 				</p>
@@ -54,7 +54,7 @@
             {% else %}
                 {# Completed past statuses #}
                 <li class="status--completed status-list__list-item">
-                {% firstof case.id|slugify as id %}
+                {% firstof zaak.id|slugify as id %}
                 {% firstof 'completed-'|add:id|add:'-id' as completed_id %}
                     {% icon icon="task_alt" %}
                     <span class="sr-only">{% trans "Voltooid" %}</span>

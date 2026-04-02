@@ -11,7 +11,9 @@ Deployment aandachtspunten
 Bugfixes
 --------
 
-* ...
+* [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
+  zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
+  afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
 
 Onderhoud
 ---------
