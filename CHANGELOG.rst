@@ -16,6 +16,20 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
+  zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
+  afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
+* [:gh:`2355`]: De importeer-views voor catalogus- en zaaktype-configuraties
+  controleren nu of de gebruiker wijzigingsrechten heeft op het betreffende model,
+  in plaats van enkel te vereisen dat de gebruiker een beheerdersaccount heeft.
+* [:gh:`2332`]: KVK-nummer en vestigingsnummer worden nu beide meegestuurd naar het
+  ZGW-backend bij het ophalen van zaken voor een eHerkenning-gebruiker met een vestiging,
+  in plaats van alleen het vestigingsnummer.
+* [:gh:`2329`]: ``attr_consuming_service_index`` wordt nu correct doorgegeven als
+  queryparameter aan de eHerkenning SAML loginpagina, op basis van de waarde in de
+  eHerkenning configuratie. Het ontbreken hiervan kon leiden tot authenticatiefouten.
+* [:gh:`2326`]: Correctie van Nederlandse vertalingen voor 'verwerking' header in
+  Haalcentraal BRP configuratie (was onjuist vertaald als 'doelbinding').
 * [:gh:`2323`]: Correctie van Centric BRP HTTP header namen voor iConnect integratie
   (gebruik van 'x-request-*' in plaats van 'x-requests-*').
 * [:gh:`2290`]: Correctie van cache key voor ``fetch_zaak_roles`` om
