@@ -1,21 +1,18 @@
 from django.dispatch import receiver
 
-import structlog
-
-from .signals import interactive_config_check_triggered
-
-logger = structlog.get_logger(__name__)
+from open_inwoner.config_checks.signals import interactive_config_check_post_run
+from open_inwoner.utils.logentry import user_action
 
 
-@receiver(interactive_config_check_triggered)
+@receiver(interactive_config_check_post_run)
 def log_interactive_check(sender, request, check_class, obj, result, **kwargs):
-    user = request.user
+    if obj is None:
+        return
     status = "success" if result.success else "failure"
 
-    logger.info(
-        "interactive_config_check_run",
-        user=str(user),
-        check_id=check_class.identifier,
-        target_object=str(obj),
-        status=status,
+    user_action(
+        request,
+        obj,
+        f"Configuration check '{check_class.identifier}' executed "
+        f"for object '{obj}' with result: {status}",
     )

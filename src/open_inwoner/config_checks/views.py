@@ -1,36 +1,87 @@
 from django.apps import apps
-from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import NoReverseMatch, reverse
 
+from .api import resolve_permissions
 from .registry import registry
-from .signals import interactive_config_check_triggered
+from .signals import interactive_config_check_post_run, interactive_config_check_pre_run
 
 
-@staff_member_required
-def run_config_check(request, app_label, model_name, pk, check_id):
+def run_config_check(request, app_label, model_name, check_id, pk=None):
     model = apps.get_model(app_label, model_name)
-    obj = get_object_or_404(model, pk=pk)
+
+    obj = None
+    if pk is not None:
+        obj = get_object_or_404(model, pk=pk)
 
     check_class = registry.get_check_by_identifier(model, check_id)
     if not check_class:
         raise Http404()
 
-    initial = {}
+    permissions = resolve_permissions(check_class)
+
+    failed_reasons = []
+
+    for perm in permissions:
+        if not perm.has_permission(request):
+            failed_reasons.append(perm.get_error_message(None))
+            continue
+
+        if obj is not None and not perm.has_object_permission(request, obj):
+            failed_reasons.append(perm.get_error_message(obj))
+
+    opts = model._meta
+
     if obj:
-        initial["api_group"] = obj
-    form = check_class.form_class(request.POST or None, initial=initial)
+        try:
+            back_url = reverse(
+                f"admin:{opts.app_label}_{opts.model_name}_change",
+                args=[obj.pk],
+            )
+        except NoReverseMatch:
+            back_url = reverse("admin:index")
+    else:
+        back_url = reverse("admin:index")
+
+    if failed_reasons:
+        return render(
+            request,
+            "admin/permission_denied.html",
+            {
+                "opts": opts,
+                "obj": obj,
+                "title": "Permission Denied",
+                "failed_reasons": failed_reasons,
+                "back_url": back_url,
+            },
+            status=403,
+        )
+
+    form_kwargs = getattr(check_class, "get_form_kwargs", lambda obj: {})(obj)
+    form = check_class.form_class(request.POST or None, **form_kwargs)
+
     result = None
 
     if request.method == "POST" and form.is_valid():
-        checker = check_class(form)
-        selected = form.cleaned_data.get("api_group")
-        target_obj = selected or obj
+        checker = check_class()
+        target_obj = getattr(
+            checker,
+            "get_target_object",
+            lambda form, obj: obj,
+        )(form, obj)
 
-        result = checker.run(target_obj)
+        interactive_config_check_pre_run.send(
+            sender=check_class,
+            request=request,
+            check_class=check_class,
+            obj=target_obj,
+            form=form,
+        )
 
-        interactive_config_check_triggered.send(
+        result = checker.run(form, target_obj)
+
+        interactive_config_check_post_run.send(
             sender=check_class,
             request=request,
             check_class=check_class,
@@ -39,24 +90,7 @@ def run_config_check(request, app_label, model_name, pk, check_id):
             result=result,
         )
 
-    opts = obj._meta
-    # TODO: doublecheck this
-    try:
-        back_url = reverse(
-            f"admin:{opts.app_label}_{opts.model_name}_change", args=[obj.pk]
-        )
-    except NoReverseMatch:
-        parent_field = next(
-            (f for f in opts.get_fields() if f.one_to_many and f.concrete), None
-        )
-        if parent_field and hasattr(obj, parent_field.name):
-            parent_obj = getattr(obj, parent_field.name)
-            back_url = reverse(
-                f"admin:{parent_obj._meta.app_label}_{parent_obj._meta.model_name}_change",
-                args=[parent_obj.pk],
-            )
-        else:
-            back_url = reverse("admin:index")
+    title = check_class.label if not obj else f"{check_class.label} for {obj}"
 
     return render(
         request,
@@ -64,34 +98,10 @@ def run_config_check(request, app_label, model_name, pk, check_id):
         {
             "opts": opts,
             "back_url": back_url,
-            "title": f"{check_class.label} for {obj}",
+            "title": title,
             "obj": obj,
             "original": obj,
             "form": form,
             "result": result,
         },
     )
-
-
-#
-# def run_config_check_standalone(request, check_id):
-#     check_class = registry.get_check_by_identifier(check_id)
-#
-#     if not check_class:
-#         raise Http404()
-#
-#     form = check_class.form_class(request.POST or None)
-#     result = None
-#     if request.method == "POST" and form.is_valid():
-#         checker = check_class(form)
-#         result = checker.run(None)
-#
-#     return render(
-#         request,
-#         "admin/run_config_check.html",
-#         {
-#             "title": f"{check_class.label}",
-#             "form": form,
-#             "result": result,
-#         },
-#     )

@@ -238,5 +238,25 @@
       "name": "Link naar Maykin",
       "link": "https://www.maykinmedia.nl/nl/"
     }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 9,
+      "translations": {},
+      "name": "Configuratie checks",
+      "slug": "config-checks",
+      "models": []
+    }
+  },
+  {
+    "model": "admin_index.applink",
+    "fields": {
+      "order": 0,
+      "translations": {},
+      "app_group": ["config-checks"],
+      "name": "Fetch cases for BSN",
+      "link": "/admin/config-check/openzaak/zgwapigroupconfig/fetch_cases/"
+    }
   }
 ]

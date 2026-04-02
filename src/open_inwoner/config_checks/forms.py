@@ -26,7 +26,7 @@ class FetchBRPConfigCheckParams(forms.Form):
 
 
 class FetchUserfeedConfigCheckParams(forms.Form):
-    api_group = forms.ModelChoiceField(
+    user = forms.ModelChoiceField(
         queryset=User.objects.all(),
         required=False,
         help_text="User to fetch data for",

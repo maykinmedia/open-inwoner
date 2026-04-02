@@ -1,4 +1,6 @@
-from typing import ClassVar, Protocol, TypeVar
+from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from typing import ClassVar, TypeVar
 
 from django import forms
 from django.contrib.admin.options import InlineModelAdmin
@@ -7,28 +9,34 @@ from django.utils.html import format_html, format_html_join
 
 from maykin_config_checks import GenericHealthCheckResult
 
+from open_inwoner.config_checks.permissions import BasePermission
 from open_inwoner.config_checks.registry import registry
-from open_inwoner.openzaak.clients import build_zgw_client_from_service
 
 TParamsForm = TypeVar("TParamsForm", bound=forms.Form)
 TModel = TypeVar("TModel")
 
 
-class InteractiveConfigCheck(Protocol[TParamsForm, TModel]):
+class InteractiveConfigCheck(ABC):
     identifier: ClassVar[str]
     label: ClassVar[str]
     form_class: ClassVar[type[TParamsForm]]
 
-    def __init__(self, form: TParamsForm): ...
-    def run(self, obj: TModel | None) -> GenericHealthCheckResult:
-        bsn = self.form.cleaned_data["bsn"]
-        api_group = obj or self.form.cleaned_data["api_group"]
-        if not api_group:
-            raise ValueError("api_group is required")
-        client = build_zgw_client_from_service(api_group.zrc_service)
+    @classmethod
+    def get_form_kwargs(cls, obj):
+        return {}
+
+    @abstractmethod
+    def run(
+        self,
+        form: TParamsForm,
+        obj: TModel | None = None,
+    ) -> GenericHealthCheckResult:
+        raise NotImplementedError
 
 
-def with_config_checks(*checks: InteractiveConfigCheck):
+def with_config_checks(
+    *checks: type[InteractiveConfigCheck], target_field="config_check_links"
+):
     def decorator(admin_class):
         original_init = admin_class.__init__
 
@@ -43,8 +51,8 @@ def with_config_checks(*checks: InteractiveConfigCheck):
                 registry.register(model_to_register, check)
 
         admin_class.__init__ = wrapped_init
-        admin_class.config_check_links = config_check_links
-        admin_class.config_check_links.short_description = "Interactive Checks"
+        setattr(admin_class, target_field, config_check_links)
+        getattr(admin_class, target_field).short_description = "Interactive Checks"
         return admin_class
 
     return decorator
@@ -78,3 +86,30 @@ def config_check_links(self, obj):
             ],
         ),
     )
+
+
+def resolve_permissions(check_class) -> tuple[BasePermission, ...]:
+    if not hasattr(check_class, "required_permissions"):
+        raise ValueError(
+            f"{check_class.__name__}: You must define 'required_permissions'"
+        )
+
+    permissions = check_class.required_permissions
+
+    if not permissions:
+        raise ValueError(
+            f"{check_class.__name__}: You must define at least one permission class"
+        )
+
+    if not isinstance(permissions, Iterable):
+        raise TypeError(
+            f"{check_class.__name__}: permissions must be an iterable of BasePermission instances"
+        )
+
+    for perm in permissions:
+        if not isinstance(perm, BasePermission):
+            raise TypeError(
+                f"{check_class.__name__}: All permission classes must inherit from BasePermission"
+            )
+
+    return tuple(permissions)
