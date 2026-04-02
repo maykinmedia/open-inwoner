@@ -88,3 +88,16 @@ PASSWORD_HASHERS = [
 # Sip the auto-loading of the django-admin-index fixture on startup.
 # It doesn't add anything in CI, and just adds time to the run.
 SKIP_ADMIN_INDEX_FIXTURE = True
+
+
+class InvalidVarException(str):
+    """Raise when a template references an undefined variable, to catch typos in CI."""
+
+    def __mod__(self, missing):
+        raise AssertionError(f"Template used undefined variable: {missing!r}")
+
+    def __contains__(self, search):
+        return True  # Django checks `if "%s" in string_if_invalid` before substituting
+
+
+TEMPLATES[0]["OPTIONS"]["string_if_invalid"] = InvalidVarException()
