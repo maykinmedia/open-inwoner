@@ -1,6 +1,10 @@
 {% extends 'master.html' %}
 {% load i18n icon_tags static %}
 
+{% block notifications %}
+    <div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+{% endblock notifications %}
+
 {% block sidebar_content %}
     {% include "components/Sidenav/Sidenav.html" %}
 {% endblock %}
@@ -9,9 +13,9 @@
     <div class="cases" id="cases-content"></div>
 
     <div class="loader-container" id="spinner-container">
-        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content">
+        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content" data-spinner-live-region="spinner-live-region">
             {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
-            <div class="spinner__content" role="status">{% trans "Gegevens laden..." %}</div>
+            <div class="spinner__content" aria-hidden="true">{% trans "Gegevens laden..." %}</div>
         </div>
     </div>
 {% endblock content %}

@@ -17,7 +17,7 @@ const LoadingSpinner: AC<ILoadingSpinnerProps> = ({
           name={iconName}
           extraClassName={['spinner-icon', 'rotate']}
         />
-        <div class="spinner__content" role="status">
+        <div class="spinner__content" aria-hidden="true">
           {loadingText}
         </div>
       </div>

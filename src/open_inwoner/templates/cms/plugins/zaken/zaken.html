@@ -21,10 +21,13 @@
             {% endfor %}
         </oip-home-plugin-section>
     {% else %}
+        <div id="zaken-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
         <div
+            id="zaken-htmx-container"
             hx-get="{{ hx_get_url }}"
             hx-trigger="load"
-            hx-swap="outerHTML">
+            hx-swap="outerHTML"
+            data-spinner-live-region="zaken-live-region">
             <oip-home-plugin-section
                 title="{{ plugin_title }}"
                 next-url="{{ mijn_zaken_url }}"

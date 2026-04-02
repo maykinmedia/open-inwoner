@@ -1,5 +1,8 @@
 {% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags solo_tags link_tags button_tags icon_tags notification_tags render_tags %}
 
+{# Screenreader live region - responds to Spinner js - maybe not necessary #}
+{#<div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>#}
+
 {# Messages #}
 <div class="container container--no-margin" id="cases-status-messages-oob" hx-swap-oob="true">
     {% notifications messages closable=True %}
