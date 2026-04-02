@@ -21,6 +21,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
+  zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
+  afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
 * [:gh:`2355`]: De importeer-views voor catalogus- en zaaktype-configuraties
   controleren nu of de gebruiker wijzigingsrechten heeft op het betreffende model,
   in plaats van enkel te vereisen dat de gebruiker een beheerdersaccount heeft.
