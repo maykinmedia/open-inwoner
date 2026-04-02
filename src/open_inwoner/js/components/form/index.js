@@ -1,7 +1,7 @@
 import './FileInput';
 import './ChoiceListMultiple';
 import './ChoiceListSingle';
-import './DisableContactFormButton';
+import './DisableContactFormButton.ts';
 import './DisableSubmitButton';
 import './LoginForm';
 import './submitOnce';

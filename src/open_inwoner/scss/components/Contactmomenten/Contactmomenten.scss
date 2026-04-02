@@ -14,11 +14,12 @@
   }
 
   &__contact-form {
-    text-align: center;
-
     .form-container {
       margin: auto;
-      width: 50%;
+
+      @media (min-width: 768px) {
+        width: 50%;
+      }
     }
 
     .form-heading {
@@ -39,6 +40,12 @@
         .input {
           max-width: 100% !important;
         }
+      }
+
+      // Make required asterisk visible for this component
+      .label__label--required {
+        // asterisks is invisible by default, only make them visible if component has the caption
+        display: inline;
       }
     }
   }
