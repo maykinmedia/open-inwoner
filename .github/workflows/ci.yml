@@ -18,8 +18,8 @@ jobs:
     name: Extract messages, compile i18n, and bundle React
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
@@ -65,7 +65,7 @@ jobs:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1.3
         with:
@@ -123,11 +123,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version-file: 'pyproject.toml'
       - name: Install coverage.py
         # We only need coverage, but we need to match the version that was used
         # to generate the coverage files. Grab it from the dependencies.
@@ -142,7 +142,7 @@ jobs:
           mv coverages/migrations/.coverage* .
           coverage combine
       - name: Publish coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -184,7 +184,7 @@ jobs:
           - 9300:9300
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Set up backend environment
         uses: maykinmedia/setup-django-backend@v1.3
         with:
@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           submodules: 'true'
       - name: Set up backend environment
@@ -259,7 +259,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Set tag
         id: vars
         run: |
