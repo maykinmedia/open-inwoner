@@ -15,7 +15,7 @@ class PrimaryNavigation extends Component {
     super(node, initialState);
     /** Handler to bypass Safari bug */
     this.navigationToggle = this.node.querySelectorAll(
-      '.primary-navigation--desktop .primary-navigation--toggle'
+      '.primary-navigation--toggle'
     );
   }
 
@@ -35,13 +35,13 @@ class PrimaryNavigation extends Component {
    * Clears the dismissed state, (prevents overriding focus/hover).
    * Focusin and Focusout are used instead of Focus for Safari
    */
-  onFocusOut() {
-    if (this.node) {
+  onFocusOut(event) {
+    if (this.node && !this.node.contains(event.relatedTarget)) {
       BEM.removeModifier(this.node, 'open');
+      this.navigationToggle.forEach((toggle) => {
+        toggle.setAttribute('aria-expanded', 'false');
+      });
     }
-    this.navigationToggle.forEach((toggle) => {
-      toggle.setAttribute('aria-expanded', 'false');
-    });
   }
 
   /**

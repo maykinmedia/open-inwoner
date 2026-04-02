@@ -7,9 +7,9 @@
         {% if cms_apps.products and menu_categories %}
             {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
                 <li class="primary-navigation__list-item">
-                    {% button text=_('Onderwerpen') type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+                    {% button text=_('Onderwerpen') type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="onderwerpen-submenu" %}
 
-                    <ul class="primary-navigation__list subpage-list">
+                    <ul id="onderwerpen-submenu" class="primary-navigation__list subpage-list">
                         {% for category in menu_categories %}
                             <li class="primary-navigation__list-item">
                                 {% url 'products:category_detail' slug=category.slug as category_href %}
