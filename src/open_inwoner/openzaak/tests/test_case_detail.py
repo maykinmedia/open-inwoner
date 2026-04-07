@@ -1623,7 +1623,7 @@ class TestCaseDetailView(
         response = self.app.get(self.case_detail_url, user=self.user)
 
         # Assert link is rendered with correct classes (get_rendered_content adds them)
-        self.assertContains(response, '<p class="utrecht-paragraph">')
+        self.assertContains(response, '<p class="nl-paragraph">')
         self.assertContains(
             response, '<a class="link link--secondary" href="https://example.com">'
         )
@@ -2456,9 +2456,9 @@ class TestCaseDetailView(
         self.assertEqual(info_card.text.strip(), "info\nFoobar")
 
         # Regression test: verify HTML tags are rendered with classes, not escaped
-        # get_rendered_content adds "utrecht-paragraph" class to <p> tags
-        self.assertContains(response, '<p class="utrecht-paragraph">Foo</p>')
-        self.assertContains(response, '<p class="utrecht-paragraph">bar</p>')
+        # get_rendered_content adds "nl-paragraph" class to <p> tags
+        self.assertContains(response, '<p class="nl-paragraph">Foo</p>')
+        self.assertContains(response, '<p class="nl-paragraph">bar</p>')
         self.assertNotContains(response, "&lt;p&gt;")
 
     def test_document_upload_description_prosemirror_html_assignment(self, m):
@@ -2503,8 +2503,8 @@ class TestCaseDetailView(
         )
 
         # Verify HTML is rendered with classes, not escaped
-        # get_rendered_content adds "utrecht-paragraph" class to <p> tags
-        self.assertContains(response, '<p class="utrecht-paragraph">')
+        # get_rendered_content adds "nl-paragraph" class to <p> tags
+        self.assertContains(response, '<p class="nl-paragraph">')
         self.assertContains(response, "<strong>Important:</strong>")
         self.assertContains(response, "<em>all required documents</em>")
         # get_rendered_content adds "link link--secondary" class to external links
