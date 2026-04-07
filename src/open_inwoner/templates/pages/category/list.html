@@ -8,7 +8,7 @@
 {% block content %}
 <div class="categories__content">
     <h1 class="utrecht-heading-1">{{configurable_text.theme_page.theme_title}}</h1>
-    <p class="utrecht-paragraph">{{configurable_text.theme_page.theme_intro|linebreaksbr}}</p>
+    <nl-paragraph>{{configurable_text.theme_page.theme_intro|linebreaksbr}}</nl-paragraph>
 
     {% include "components/Card/CardContainer.html" with categories=object_list only %}
 </div>

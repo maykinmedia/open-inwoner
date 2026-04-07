@@ -6,9 +6,9 @@
 <h1 class="utrecht-heading-1">
     {% trans "Accept an invitation" %}
 </h1>
-<p class="utrecht-paragraph">
+<nl-paragraph>
     {% blocktranslate with inviter_name=object.inviter.get_full_name %}Accept invitation from {{ inviter_name }} and join Open Inwoner Platform {% endblocktranslate %}
-</p>
+</nl-paragraph>
 
 {% render_form id="invite-form" method="POST" form=form extra_classes="form--flex" %}
     {% csrf_token %}

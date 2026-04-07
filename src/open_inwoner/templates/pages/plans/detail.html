@@ -60,11 +60,11 @@
         </div>
         <div class="tabled__inner">
             <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
-            <p class="utrecht-paragraph">{{ object.goal|linebreaksbr }}</p>
+            <nl-paragraph>{{ object.goal|linebreaksbr }}</nl-paragraph>
 
             {% if object.description %}
                 <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
-                <p class="utrecht-paragraph">{{ object.description|linebreaksbr }}</p>
+                <nl-paragraph>{{ object.description|linebreaksbr }}</nl-paragraph>
             {% endif %}
         </div>
     </section>
@@ -123,13 +123,13 @@
         <div class="tabled__inner">
         {% if object.note %}
             <div class="wysiwyg">
-                <p class="utrecht-paragraph">{{ object.note|linebreaksbr }}</p>
+                <nl-paragraph>{{ object.note|linebreaksbr }}</nl-paragraph>
             </div>
         {% else %}
-            <p class="utrecht-paragraph"><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></p>
-            <p class="utrecht-paragraph--oip">
+            <nl-paragraph><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></nl-paragraph>
+            <nl-paragraph>
                 {% trans "Klik op 'Bewerk' om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld." %}
-            </p>
+            </nl-paragraph>
         {% endif %}
         </div>
     </section>

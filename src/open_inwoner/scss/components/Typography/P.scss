@@ -69,10 +69,24 @@ body [class^='utrecht-heading'] + .utrecht-paragraph,
   }
 }
 
+/// Web components
+
 // Context styles for elements that directly follow the web component paragraph
 
 // Home page plug-ins
 nl-paragraph + .card-container,
 nl-paragraph + .map {
   margin-block-start: var(--spacing-large);
+}
+
+/// HTML only
+
+// Product pages
+
+.nl-paragraph + .card-container {
+  margin-block-start: var(--spacing-large);
+}
+
+.nl-paragraph + .nl-paragraph {
+  margin-block-start: var(--font-line-height-body);
 }

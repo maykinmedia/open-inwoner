@@ -8,9 +8,9 @@
             {% for step in steps %}
             <li>
                 <h4>{% trans "Question:" %}</h4>
-                <p class="utrecht-paragraph">{{ step.question }}</p>
+                <nl-paragraph>{{ step.question }}</nl-paragraph>
                 <h4>{% trans "Answer:" %}</h4>
-                <p class="utrecht-paragraph">{{ step.answer }}</p>
+                <nl-paragraph>{{ step.answer }}</nl-paragraph>
             </li>
             {% endfor %}
         </ol>
@@ -18,14 +18,14 @@
 
     <div class="qa_results">
         <h4 class="utrecht-heading-4">{{ last_step.question }}</h4>
-        <p class="utrecht-paragraph">{{ last_step.content.html|safe}}</p>
+        <nl-paragraph>{{ last_step.content.html|safe}}</p>
         {% if related_products.exists %}
             <h4>{% trans "Related products:" %}</h4>
             <ol>
                 {% for product in related_products %}
                 <li>
                     <h4>{{ product.name }}</h4>
-                    <p class="utrecht-paragraph">{{ product.summary }}</p>
+                    <nl-paragraph>{{ product.summary }}</p>
                 </li>
                 {% endfor %}
             </ol>

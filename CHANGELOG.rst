@@ -10,6 +10,8 @@ Deployment aandachtspunten
 
 Nieuwe features
 ---------------
+* [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Alle utrecht paragrafen vervangen door 'nl' paragrafen
+  waardoor hun huisstijl overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
 * [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42`]: Nieuwe --nl NLDS prefix paragraph toegevoegd als
   web-component, zodat deze hergebruikt kan worden.
 * [:gh:`2211`]: Elasticsearch ondersteunt nu HTTP basic authenticatie via de
