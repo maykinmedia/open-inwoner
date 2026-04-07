@@ -11,8 +11,10 @@
     {% render_grid %}
         {% render_column start=1 span=12 %}
             <h1 class="utrecht-heading-1" id="title">{{ page_heading }}</h1>
+            foo bar
             {% if page_description %}
                 <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
+                <nl-paragraph purpose="lead">{{ page_description }}</nl-paragraph>
             {% endif %}
             {% if filter_options %}
                 {# Filter Component #}
@@ -49,7 +51,7 @@
                     </oip-accordion>
                 </article>
             {% empty %}
-                <p class="utrecht-paragraph">{% trans "Geen afvalgegevens beschikbaar." %}</p>
+                <nl-paragraph>{% trans "Geen afvalgegevens beschikbaar." %}</nl-paragraph>
             {% endfor %}
         {% endrender_column %}
     {% endrender_grid %}

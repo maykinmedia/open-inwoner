@@ -152,7 +152,7 @@
                 <h2 class="utrecht-heading-2" id="newsletters">{% trans "Nieuwsbrieven" %}</h2>
             </header>
         </div>
-            <p class="utrecht-paragraph">{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</p>
+            <nl-paragraph>{% trans "Vink de nieuwsbrieven aan die u wilt ontvangen. Wilt u een nieuwsbrief niet meer ontvangen? Haal het vinkje dan weg. Sla daarna uw keuze op." %}</nl-paragraph>
             <form method="POST" id="newsletter-form" class="form" novalidate>
                 {% csrf_token %}
                 {% with form.fields.newsletters.remarks_mapping as remarks_mapping %}
@@ -358,9 +358,9 @@
             </header>
         </div>
             <div class="tabled">
-                <p class="utrecht-paragraph">
+                <nl-paragraph>
                     {% trans "Wilt u uw profiel verwijderen? Dan worden al uw persoonlijke voorkeuren verwijderd binnen deze MijnOmgeving. Uw persoonsgegevens en uw zaken worden niet verwijderd." %}
-                </p>
+                </nl-paragraph>
             </div>
             {% render_form form=form method="POST" id="delete-form" extra_classes="confirm" spaceless=True data_confirm_title=_("Weet u zeker dat u uw profiel wilt verwijderen?") data_confirm_text=_("Hiermee worden alleen uw persoonlijke voorkeuren binnen deze MijnOmgeving verwijderd. Uw persoonsgegevens en uw zaken worden niet verwijderd.") data_confirm_cancel=_("Nee, annuleren") data_confirm_default=_("Ja, verwijderen") %}
             {% csrf_token %}

@@ -10,6 +10,7 @@ import {
 } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { useIntl } from 'react-intl';
+import { Paragraph } from '../Paragraph';
 
 export interface ComboBoxItem {
   id: string;
@@ -321,13 +322,10 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
         className="utrecht-form-field utrecht-form-field--text"
         ref={containerRef}
       >
-        <p
-          className="utrecht-paragraph"
-          style={{ color: 'var(--color-red-notification)' }}
-        >
+        <Paragraph style={{ color: 'var(--color-red-notification)' }}>
           Er is een probleem opgetreden bij het laden van de vestigingen.
           Probeer de pagina te vernieuwen.
-        </p>
+        </Paragraph>
       </div>
     );
   }

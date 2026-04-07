@@ -7,7 +7,7 @@
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
         <div class="actions__filter-container filter__container">
-            <p class="utrecht-paragraph">{% trans "Filter op:" %}</p>
+            <nl-paragraph>{% trans "Filter op:" %}</nl-paragraph>
             {% date_field action_form.end_date no_label=True no_help=True icon="today" %}
             {% input action_form.is_for no_label=True no_help=True icon="person" %}
             {% input action_form.status no_label=True no_help=True icon="expand_more" %}
@@ -24,7 +24,7 @@
                         </h3>
                     </section>
                     {% if action.description %}
-                        <p class="utrecht-paragraph">{{ action.description }}</p>
+                        <nl-paragraph>{{ action.description }}</nl-paragraph>
                     {% endif %}
                     {% if action.file %}
                         {% url "profile:action_download" uuid=action.uuid as download_url %}
@@ -94,7 +94,7 @@
                 {% endif %}
             </div>
         {% empty %}
-            <div class="table__item"><p class="utrecht-paragraph"><strong>{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</strong></p></div>
+            <div class="table__item"><nl-paragraph><strong>{% trans "er zijn geen acties gevonden met de huidige filters of er zijn geen acties" %}</strong></nl-paragraph></div>
         {% endfor %}
     </div>
     {% if actions|length > 3 %}

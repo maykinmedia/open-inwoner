@@ -26,9 +26,9 @@
                 {% if form_object.captcha %}
                     <div class="form__control ">
                         <div class="captcha">
-                            <p class="utrecht-paragraph">
+                            <nl-paragraph>
                                 {{ form_object.captcha.label }}<span class="label__label--required"> * </span>
-                            </p>
+                            </nl-paragraph>
                             <label class="label captcha__label">
                                 <span class="captcha__check">
                                     {{ form_object.request_session.captcha_question }}

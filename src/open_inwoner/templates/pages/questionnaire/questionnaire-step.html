@@ -14,7 +14,7 @@
             </header>
 
             {% if form.instance.get_description %}
-                <p class="utrecht-paragraph">{{ form.instance.get_description }}</p>
+                <nl-paragraph>{{ form.instance.get_description }}</nl-paragraph>
             {% endif %}
 
             {% step_indicator form.instance.depth form.instance.depth object_list=form.instance.get_tree_path object_list_str='question_subject' %}

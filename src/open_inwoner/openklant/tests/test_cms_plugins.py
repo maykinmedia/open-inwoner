@@ -58,10 +58,12 @@ class ContactFormPluginRenderTest(TestCase):
         )
 
         self.assertIn(
-            f'<p class="utrecht-paragraph">{description_authenticated_user}</p>', html
+            f'<nl-paragraph><p class="nl-paragraph">{description_authenticated_user}</p></nl-paragraph>',
+            html,
         )
         self.assertNotIn(
-            f'<p class="utrecht-paragraph">{description_anonymous_user}</p>', html
+            f'<nl-paragraph><p class="nl-paragraph">{description_anonymous_user}</p></nl-paragraph>',
+            html,
         )
 
     def test_contact_form_plugin_anonymous_user(self):
@@ -93,8 +95,10 @@ class ContactFormPluginRenderTest(TestCase):
         )
 
         self.assertNotIn(
-            f'<p class="utrecht-paragraph">{description_authenticated_user}</p>', html
+            f'<nl-paragraph><p class="nl-paragraph">{description_authenticated_user}</p></nl-paragraph>',
+            html,
         )
         self.assertIn(
-            f'<p class="utrecht-paragraph">{description_anonymous_user}</p>', html
+            f'<nl-paragraph><p class="nl-paragraph">{description_anonymous_user}</p></nl-paragraph>',
+            html,
         )

@@ -5,7 +5,7 @@
         {{ field.label }}
         {{ field|addclass:"image-ratio" }}
         {% if field.help_text and not no_help %}
-            <p class="utrecht-paragraph">{{ field.help_text }}</p>
+            <nl-paragraph>{{ field.help_text }}</nl-paragraph>
         {% endif %}
 
         {% if field.errors %}
