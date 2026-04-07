@@ -111,7 +111,8 @@ class ProfileViewTests(WebTest):
                 logout_url = (
                     reverse("digid_oidc:logout")
                     if oidc_enabled
-                    else reverse("digid:logout")
+                    # DigiD no longer supports rp-initiated logout
+                    else reverse("logout")
                 )
 
                 response = self.app.get(self.url, user=self.digid_user)

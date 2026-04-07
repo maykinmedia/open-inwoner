@@ -183,9 +183,9 @@ class UserTests(TestCase):
         mock_digid_config.get_solo.return_value.enabled = True
         self.assertEqual(user.get_logout_url(), reverse("digid_oidc:logout"))
 
-        # Test with OIDC disabled
+        # Test with OIDC disabled (DigiD no longer supports rp-initiated logout)
         mock_digid_config.get_solo.return_value.enabled = False
-        self.assertEqual(user.get_logout_url(), reverse("digid:logout"))
+        self.assertEqual(user.get_logout_url(), reverse("logout"))
 
     def test_get_logout_url_returns_correct_option_for_login_type(self):
         test_cases = [

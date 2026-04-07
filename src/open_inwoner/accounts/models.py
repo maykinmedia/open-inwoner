@@ -684,7 +684,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return (
                     reverse("digid_oidc:logout")
                     if OpenIDDigiDConfig.get_solo().enabled
-                    else reverse("digid:logout")
+                    # Digid no longer supports rp-initiated logout
+                    else reverse("logout")
                 )
             case LoginTypeChoices.eherkenning:
                 return reverse("eherkenning_oidc:logout")
@@ -1094,7 +1095,7 @@ class Invite(models.Model):
         verbose_name_plural = _("Invitations")
 
     def __str__(self):
-        return f"For: {self.invitee if self.invitee else _('new user')} ({self.created_on.date()})"
+        return f"For: {self.invitee or _('new user')} ({self.created_on.date()})"
 
     def get_full_name(self):
         """
