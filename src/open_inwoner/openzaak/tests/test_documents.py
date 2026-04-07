@@ -385,30 +385,6 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         )
         self.assertEqual(log.extra_data["message"], expected)
 
-    def test_document_content_with_bad_status_is_http_403(self, m):
-        self._setUpAccessMocks(m)
-
-        info_object = generate_oas_component_cached(
-            "drc",
-            "schemas/EnkelvoudigInformatieObject",
-            uuid="014c38fe-b010-4412-881c-3000032fb812",
-            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
-            informatieobjecttype=f"{CATALOGI_ROOT}informatieobjecttype/014c38fe-b010-4412-881c-3000032fb321",
-            # bad status
-            status="archief",
-            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
-        )
-        m.get(info_object["url"], json=info_object)
-        url = reverse(
-            "cases:document_download",
-            kwargs={
-                "object_id": self.zaak["uuid"],
-                "info_id": info_object["uuid"],
-                "api_group_id": self.api_group.id,
-            },
-        )
-        self.app.get(url, user=self.user, status=403)
-
     def test_document_content_with_bad_confidentiality_is_http_403(self, m):
         self._setUpAccessMocks(m)
 

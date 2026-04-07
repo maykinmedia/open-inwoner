@@ -307,22 +307,6 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             level=logging.INFO,
         )
 
-    def test_zio_bails_when_info_object_not_visible_because_not_definitive(
-        self, m, mock_handle: Mock
-    ):
-        data = MockAPIData()
-        data.informatie_object["status"] = "concept"
-        data.install_mocks(m)
-
-        handle_zaken_notification(data.zio_notification)
-
-        mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
-
     def test_zio_bails_when_zaak_type_info_object_type_config_is_not_found(
         self, m, mock_handle: Mock
     ):

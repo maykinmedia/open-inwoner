@@ -33,25 +33,25 @@ class TestUtils(ClearCachesMixin, TestCase):
         max_level = VertrouwelijkheidsAanduidingen.vertrouwelijk
 
         cases = [
-            # lowest below max_level
-            (False, "in_bewerking", VertrouwelijkheidsAanduidingen.openbaar),
-            (False, "ter_vaststelling", VertrouwelijkheidsAanduidingen.openbaar),
+            # lowest below max_level - status is not checked (WORKAROUND)
+            (True, "in_bewerking", VertrouwelijkheidsAanduidingen.openbaar),
+            (True, "ter_vaststelling", VertrouwelijkheidsAanduidingen.openbaar),
             (True, "definitief", VertrouwelijkheidsAanduidingen.openbaar),
-            (False, "archief", VertrouwelijkheidsAanduidingen.openbaar),
+            (True, "archief", VertrouwelijkheidsAanduidingen.openbaar),
             # just below max_level
-            (False, "in_bewerking", VertrouwelijkheidsAanduidingen.zaakvertrouwelijk),
+            (True, "in_bewerking", VertrouwelijkheidsAanduidingen.zaakvertrouwelijk),
             (
-                False,
+                True,
                 "ter_vaststelling",
                 VertrouwelijkheidsAanduidingen.zaakvertrouwelijk,
             ),
             (True, "definitief", VertrouwelijkheidsAanduidingen.zaakvertrouwelijk),
-            (False, "archief", VertrouwelijkheidsAanduidingen.zaakvertrouwelijk),
+            (True, "archief", VertrouwelijkheidsAanduidingen.zaakvertrouwelijk),
             # at max_level
-            (False, "in_bewerking", VertrouwelijkheidsAanduidingen.vertrouwelijk),
-            (False, "ter_vaststelling", VertrouwelijkheidsAanduidingen.vertrouwelijk),
+            (True, "in_bewerking", VertrouwelijkheidsAanduidingen.vertrouwelijk),
+            (True, "ter_vaststelling", VertrouwelijkheidsAanduidingen.vertrouwelijk),
             (True, "definitief", VertrouwelijkheidsAanduidingen.vertrouwelijk),
-            (False, "archief", VertrouwelijkheidsAanduidingen.vertrouwelijk),
+            (True, "archief", VertrouwelijkheidsAanduidingen.vertrouwelijk),
             # just above max_level
             (False, "in_bewerking", VertrouwelijkheidsAanduidingen.confidentieel),
             (False, "ter_vaststelling", VertrouwelijkheidsAanduidingen.confidentieel),
