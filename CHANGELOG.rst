@@ -91,6 +91,8 @@ Onderhoud
 * [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
 * [:gh:`2372`]: ``typing-extensions`` bijgewerkt naar versie ``4.15.0``.
 * [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+* [:gh:`2370`]: ``djangocms-linnk`` bijgewerkt naar versie ``5.1.1``.
+* [:gh:`2370`]: ``djangocms-file`` verwijderd.
 
 2.1.1 (2026-03-19)
 ==================
