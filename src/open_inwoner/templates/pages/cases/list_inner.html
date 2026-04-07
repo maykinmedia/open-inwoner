@@ -1,7 +1,7 @@
 {% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
 
 {% if fetch_error %}
-    <p class="utrecht-paragraph">{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</p>
+    <nl-paragraph>{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</nl-paragraph>
 {% else %}
 
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
@@ -38,7 +38,7 @@
 <div class="card__grid">
 {% render_grid %}
     {% if not zaken %}
-        <p class="utrecht-paragraph"><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></p>
+        <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
     {% endif %}
 
     {% for zaak in zaken %}
