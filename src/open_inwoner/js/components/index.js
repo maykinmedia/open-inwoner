@@ -20,6 +20,7 @@ import './autocomplete-search';
 import './autocomplete';
 import './autosumbit';
 import './cases';
+import './spinner';
 import { DisableContactFormButton } from './form/DisableContactFormButton';
 import { DisableSubmitButton } from './form/DisableSubmitButton';
 import './confirmation';

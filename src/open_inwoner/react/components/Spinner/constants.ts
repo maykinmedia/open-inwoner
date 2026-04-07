@@ -6,7 +6,7 @@ export const LOADING_SPINNER_DEFINITION: WebComponentDefinition<
   ILoadingSpinnerProps
 > = {
   tagName: 'oip-loading-spinner',
-  propNames: ['iconName', 'loadingText'],
+  propNames: ['iconName', 'loadingText', 'compact'],
   options: { shadow: false, i18n: false },
   importer: () => import('./Spinner'),
 };

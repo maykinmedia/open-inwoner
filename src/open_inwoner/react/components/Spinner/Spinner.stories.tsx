@@ -19,6 +19,7 @@ A simple loading spinner preact and web component using Material Icons.
 **Props:**
 - \`loadingText\`: Accessible text shown next to the spinner.
 - \`iconName\`: Name of the Material Icon to rotate.
+- \`compact\`: Reduces the height for use in inline/partial contexts (e.g. inside a form section). Defaults to \`false\` (full-page height).
         `,
       },
     },
@@ -40,6 +41,14 @@ export const CustomIcon: Story = {
   args: {
     loadingText: 'Custom icon spinner...',
     iconName: 'home',
+  },
+};
+
+export const Compact: Story = {
+  args: {
+    loadingText: 'Laden...',
+    iconName: 'rotate_right',
+    compact: true,
   },
 };
 

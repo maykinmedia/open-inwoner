@@ -21,10 +21,8 @@
             {% endfor %}
         </oip-home-plugin-section>
     {% else %}
-        <div
-            hx-get="{{ hx_get_url }}"
-            hx-trigger="load"
-            hx-swap="outerHTML">
+        <div id="zaken-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+        <div id="zaken-htmx-container">
             <oip-home-plugin-section
                 title="{{ plugin_title }}"
                 next-url="{{ mijn_zaken_url }}"
@@ -32,7 +30,17 @@
                 next-url-label="{% trans 'Bekijk alle zaken' %}"
                 columns="1"
             >
-                <oip-loading-spinner loading-text="{% trans 'Zaken laden...' %}"></oip-loading-spinner>
+                <oip-loading-spinner
+                    loading-text="{% trans 'Zaken laden...' %}"
+                    loaded-text="{% trans 'Zaken zijn geladen.' %}"
+                    hx-get="{{ hx_get_url }}"
+                    hx-trigger="load"
+                    hx-target="#zaken-htmx-container"
+                    hx-swap="outerHTML"
+                    compact="true"
+                    data-spinner-for="zaken-htmx-container"
+                    data-spinner-live-region="zaken-live-region">
+                </oip-loading-spinner>
             </oip-home-plugin-section>
         </div>
     {% endif %}

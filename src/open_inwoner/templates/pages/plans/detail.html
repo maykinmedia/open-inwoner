@@ -1,6 +1,11 @@
 {% extends 'master.html' %}
 {% load i18n button_tags card_tags map_tags utils icon_tags file_tags action_tags dropdown_tags anchor_menu_tags notification_tags %}
 
+{% block notifications %}
+    {{ block.super }}
+    <div id="plan-spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+{% endblock notifications %}
+
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True export_button=True %}
 {% endblock sidebar_content %}
@@ -95,18 +100,18 @@
             <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
 
             <div id="form_upload_wrapper">
-                <div id="form_upload"
-                     hx-get="{% url 'collaborate:plan_add_file' uuid=object.uuid %}"
-                     hx-target="#form_upload"
-                     hx-swap="outerHTML"
-                     hx-trigger="revealed">
-                    <div class="loader-container" id="spinner-container">
-                        <div class="spinner" id="spinner-id">
-                            {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
-                            <div class="spinner__content" role="status"><p class="utrecht-paragraph--small">{% trans "Gegevens laden..." %}</p></div>
-                        </div>
-                    </div>
-                </div>
+                <oip-loading-spinner
+                    id="form_upload"
+                    compact
+                    loading-text="{% trans 'Gegevens laden...' %}"
+                    loaded-text="{% trans 'Gegevens zijn geladen.' %}"
+                    hx-get="{% url 'collaborate:plan_add_file' uuid=object.uuid %}"
+                    hx-target="#form_upload"
+                    hx-swap="outerHTML"
+                    hx-trigger="revealed"
+                    data-spinner-for="form_upload"
+                    data-spinner-live-region="plan-spinner-live-region">
+                </oip-loading-spinner>
             </div>
         </div>
     </section>
