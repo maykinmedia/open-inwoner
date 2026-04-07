@@ -187,6 +187,7 @@ Onderhoud
 * [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
 * [:gh:`2372`]: ``typing-extensions`` bijgewerkt naar versie ``4.15.0``.
 * [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+<<<<<<< HEAD
 * [:gh:`2409`]: De web component-architectuur is gerefactored om shadow DOM te ondersteunen. Componenten (``Accordion``,
   ``Action``, ``ActionList``, ``Chart``) beschikken nu over factory-functies die een web component registreren. De
   testopzet is herschreven: gedeelde test-utilities zijn ondergebracht in ``react/lib/testing/``, Storybook-decorators
@@ -197,6 +198,8 @@ Onderhoud
 * ``lodash`` bijgewerkt naar versie ``4.18.1``.
 * ``lodash-es`` override bijgewerkt om :cve:`CVE-2026-4800` te mitigeren.
 * ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
+* [:gh:`2370`]: ``djangocms-link`` bijgewerkt naar versie ``5.1.1``.
+* [:gh:`2370`]: ``djangocms-file`` verwijderd.
 
 2.1.1 (2026-03-19)
 ==================
