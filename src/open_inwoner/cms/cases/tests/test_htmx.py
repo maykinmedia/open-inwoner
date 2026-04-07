@@ -677,10 +677,11 @@ class CasesPlaywrightTests(
             page = context.new_page()
             page.goto(self.live_reverse("cases:index"))
 
-            error_message = page.get_by_text(
-                _(
+            error_message = page.locator(
+                "nl-paragraph",
+                has_text=_(
                     "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw."
-                )
+                ),
             )
             expect(error_message).to_be_visible()
             expect(page.locator("#spinner-container")).not_to_be_visible()
