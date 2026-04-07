@@ -8,11 +8,7 @@ import './Paragraph.scss';
 export type IParagraphProps = ParagraphProps;
 
 const Paragraph: AC<IParagraphProps> = ({ children, ...props }) => {
-  return (
-    <NLDSParagraph {...props}>
-      <slot />
-    </NLDSParagraph>
-  );
+  return <NLDSParagraph {...props}>{children}</NLDSParagraph>;
 };
 
 export default Paragraph;
