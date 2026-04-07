@@ -45,6 +45,7 @@ Bugfixes
   crashen op productie wanneer er veel gebruikers in het systeem staan. De keuzelijsten voor
   contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
   aanvraag in plaats van alle records tegelijk in te laden.
+* [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
 
 Onderhoud
 ---------
