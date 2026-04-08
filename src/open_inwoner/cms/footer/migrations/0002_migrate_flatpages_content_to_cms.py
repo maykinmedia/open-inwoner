@@ -8,6 +8,25 @@ from cms.api import add_plugin, create_page
 from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
 
 
+def _get_page_placeholder(page, language, slot, apps):
+    """
+    Get a placeholder from a page, compatible with both CMS 3.x and 4.x.
+
+    CMS 3.x: page.placeholders.get(slot="content")
+    CMS 4.x: Placeholder.objects.get_for_obj(page_content).get(slot="content")
+    """
+    try:
+        # Try CMS 3.x API first (has direct placeholders relation)
+        return page.placeholders.get(slot=slot)
+    except AttributeError:
+        # Fall back to CMS 4.x API
+        PageContent = apps.get_model("cms", "PageContent")
+        Placeholder = apps.get_model("cms", "Placeholder")
+
+        page_content = PageContent._original_manager.get(page=page, language=language)
+        return Placeholder.objects.get_for_obj(page_content).get(slot=slot)
+
+
 def create_cms_pages(apps, schema_editor):
     FlatPage = apps.get_model("flatpages", "FlatPage")
 
@@ -28,7 +47,7 @@ def create_cms_pages(apps, schema_editor):
             in_navigation=True,
         )
 
-        placeholder = page.placeholders.get(slot="content")
+        placeholder = _get_page_placeholder(page, language, "content", apps)
 
         add_plugin(
             placeholder=placeholder,
@@ -39,11 +58,41 @@ def create_cms_pages(apps, schema_editor):
         )
 
 
+def _get_page_from_placeholder(placeholder, apps):
+    """
+    Get a Page from a Placeholder, compatible with both CMS 3.x and 4.x.
+
+    CMS 3.x: Page.objects.filter(placeholders=placeholder).first()
+    CMS 4.x: Navigate through Placeholder -> PageContent -> Page
+    """
+    Page = apps.get_model("cms", "Page")
+
+    try:
+        # Try CMS 3.x API first
+        return Page.objects.filter(placeholders=placeholder).first()
+    except Exception:
+        # Fall back to CMS 4.x API
+        # In CMS 4.x, placeholders are linked to PageContent via content_type/object_id
+        PageContent = apps.get_model("cms", "PageContent")
+        from django.contrib.contenttypes.models import ContentType
+
+        page_content_ct = ContentType.objects.get_for_model(PageContent)
+
+        # Check if this placeholder belongs to a PageContent
+        if placeholder.content_type == page_content_ct:
+            page_content = PageContent._original_manager.filter(
+                pk=placeholder.source_id
+            ).first()
+            if page_content:
+                return page_content.page
+
+        return None
+
+
 def link_cms_pages_with_siteconfig(apps, schema_editor):
     SiteConfiguration = apps.get_model("configurations", "SiteConfiguration")
     SiteConfigurationPage = apps.get_model("configurations", "SiteConfigurationPage")
 
-    Page = apps.get_model("cms", "Page")
     CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
 
     # remove existing pages for clean slate
@@ -53,13 +102,14 @@ def link_cms_pages_with_siteconfig(apps, schema_editor):
 
     for order, cms_model in enumerate(CMSFlatPageModel.objects.all()):
         placeholder = cms_model.placeholder
-        cms_page = Page.objects.filter(placeholders=placeholder).first()
+        cms_page = _get_page_from_placeholder(placeholder, apps)
 
-        SiteConfigurationPage.objects.create(
-            configuration=site_config,
-            cms_page=cms_page,
-            order=order,
-        )
+        if cms_page:
+            SiteConfigurationPage.objects.create(
+                configuration=site_config,
+                cms_page=cms_page,
+                order=order,
+            )
 
 
 def delete_flatpages(apps, schema_editor):
