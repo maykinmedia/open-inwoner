@@ -182,11 +182,21 @@ class NecessaryFieldsUserView(
         updated_openklant = False
 
         if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
-            self.update_klant_via_esuite(form)
-            updated_esuite = True
+            try:
+                self.update_klant_via_esuite(form)
+                updated_esuite = True
+            except Exception:
+                logger.exception(
+                    "Failed to update klant via eSuite during registration"
+                )
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
-            self.update_klant_via_openklant(form)
-            updated_openklant = True
+            try:
+                self.update_klant_via_openklant(form)
+                updated_openklant = True
+            except Exception:
+                logger.exception(
+                    "Failed to update klant via OpenKlant2 during registration"
+                )
 
         invite = form.cleaned_data["invite"]
         if invite:

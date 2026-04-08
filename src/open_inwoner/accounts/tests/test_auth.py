@@ -2040,6 +2040,68 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
             user=user,
         )
 
+    @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
+    def test_openklant_service_exception_does_not_block_registration(
+        self, mock_service_class
+    ):
+        """An unexpected exception from the OpenKlant2 service must not block registration."""
+        OpenKlant2ConfigFactory()
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        mock_service_class.return_value.get_or_create_partij_for_user.side_effect = (
+            Exception("unexpected error")
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+    @patch("open_inwoner.accounts.views.registration.eSuiteKlantenService")
+    def test_esuite_service_exception_does_not_block_registration(
+        self, mock_service_class
+    ):
+        """An unexpected exception from the eSuite service must not block registration."""
+        ESuiteConfigFactory()
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = KlantenServiceType.ESUITE.value
+        config.save()
+
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="old@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        mock_service_class.return_value.get_or_create_klant.side_effect = Exception(
+            "unexpected error"
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "new@example.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Doe"
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
