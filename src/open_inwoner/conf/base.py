@@ -155,7 +155,7 @@ INSTALLED_APPS = [
     # "djangocms_admin_style",
     "djangocms_versioning",
     "djangocms_alias",
-    "djangocms_4_migration",
+    "open_inwoner.djangocms_4_migration",
     "djangocms_link",
     "djangocms_picture",
     # 'djangocms_video',
