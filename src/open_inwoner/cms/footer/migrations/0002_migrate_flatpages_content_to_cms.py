@@ -8,29 +8,23 @@ from cms.api import add_plugin, create_page
 from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
 
 
-def _get_page_placeholder(page, language, slot, apps):
-    """
-    Get a placeholder from a page, compatible with both CMS 3.x and 4.x.
+def _get_page_placeholder(page, language, slot):
+    # Use real CMS 4 models directly — acceptable since we don't migrate cms schema here.
+    # admin_manager bypasses the versioning published-only filter, so draft pages are included.
+    from cms.models import PageContent, Placeholder
 
-    CMS 3.x: page.placeholders.get(slot="content")
-    CMS 4.x: Placeholder.objects.get_for_obj(page_content).get(slot="content")
-    """
-    try:
-        # Try CMS 3.x API first (has direct placeholders relation)
-        return page.placeholders.get(slot=slot)
-    except AttributeError:
-        # Fall back to CMS 4.x API
-        PageContent = apps.get_model("cms", "PageContent")
-        Placeholder = apps.get_model("cms", "Placeholder")
-
-        page_content = PageContent._original_manager.get(page=page, language=language)
-        return Placeholder.objects.get_for_obj(page_content).get(slot=slot)
+    page_content = PageContent.admin_manager.filter(
+        page_id=page.pk, language=language
+    ).get()
+    return Placeholder.objects.get_for_obj(page_content).get(slot=slot)
 
 
 def create_cms_pages(apps, schema_editor):
     FlatPage = apps.get_model("flatpages", "FlatPage")
+    User = apps.get_model("accounts", "User")
 
     language = "nl"
+    user = User.objects.filter(is_superuser=True).order_by("pk").first()
 
     for flatpage in FlatPage.objects.all():
         title = flatpage.title
@@ -43,11 +37,11 @@ def create_cms_pages(apps, schema_editor):
             template="cms/cms_flatpage_template.html",
             language=language,
             slug=slug,
-            published=True,
             in_navigation=True,
+            created_by=user,
         )
 
-        placeholder = _get_page_placeholder(page, language, "content", apps)
+        placeholder = _get_page_placeholder(page, language, "content")
 
         add_plugin(
             placeholder=placeholder,
@@ -80,9 +74,7 @@ def _get_page_from_placeholder(placeholder, apps):
 
         # Check if this placeholder belongs to a PageContent
         if placeholder.content_type == page_content_ct:
-            page_content = PageContent._original_manager.filter(
-                pk=placeholder.source_id
-            ).first()
+            page_content = PageContent.objects.filter(pk=placeholder.source_id).first()
             if page_content:
                 return page_content.page
 
