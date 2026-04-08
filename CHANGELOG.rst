@@ -69,6 +69,7 @@ Bugfixes
   maken had, niet het inloggen). Het alternatieve nummer wordt nu geleegd als het gelijk
   is aan het primaire nummer.
 * [:gh:`2378`]: Probleem opgelost waar markdown in ssd uitkering pdf niet correct wordt gerenderd.
+* [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
 
 Onderhoud
 ---------

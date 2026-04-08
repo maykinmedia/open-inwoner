@@ -17,6 +17,10 @@
 
     .warning-header__text {
       padding: var(--spacing-tiny) 0 0 0;
+
+      p {
+        margin: 0;
+      }
     }
 
     *[class*='icons'],
