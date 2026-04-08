@@ -523,10 +523,6 @@ django-yubin==2.0.4
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangocms-4-migration @ git+https://github.com/django-cms/djangocms-4-migration@a018e77bdf6ba3d8b12aae6f08ba3842fe69cce3
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
 djangocms-admin-style==3.2.3
     # via
     #   -c requirements/base.txt

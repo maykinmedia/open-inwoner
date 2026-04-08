@@ -318,8 +318,6 @@ django-view-breadcrumbs==2.5.1
     # via -r requirements/base.in
 django-yubin==2.0.4
     # via -r requirements/base.in
-djangocms-4-migration @ git+https://github.com/django-cms/djangocms-4-migration@a018e77bdf6ba3d8b12aae6f08ba3842fe69cce3
-    # via -r requirements/base.in
 djangocms-admin-style==3.2.3
     # via django-cms
 djangocms-alias==2.0.5
