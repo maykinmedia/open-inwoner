@@ -28,10 +28,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version-file: 'pyproject.toml'
       - name: Install system packages
         run: |
           sudo apt-get update \
@@ -58,17 +58,19 @@ jobs:
     name: Run pre-commit checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: 'pyproject.toml'
       - name: npm install
         run: npm install
-      - uses: pre-commit/action@v3.0.1
+      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   ruff-version-check:
     name: Check ruff version consistency
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Check ruff versions match
         run: |
           # Extract ruff version from ci.txt
