@@ -9,7 +9,7 @@ from requests import RequestException
 from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
-from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.haalcentraal.models import BrpVersionChoices, HaalCentraalConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -17,15 +17,31 @@ logger = structlog.stdlib.get_logger(__name__)
 
 class BRPClient(ABC):
     version: str = NotImplemented
-    _is_ready = False
 
-    def __init__(self):
-        self.config = HaalCentraalConfig.get_solo()
-        if not self.config.service:
+    def __init__(self, client, config):
+        self.client = client
+        self.config = config
+
+    @classmethod
+    def from_config(cls) -> "BRPClient":
+        config = HaalCentraalConfig.get_solo()
+        if not config.service:
             logger.warning("no service defined for Haal Centraal")
+            client = None
         else:
-            self.client = build_client(self.config.service)
-            self._is_ready = True
+            client = build_client(config.service)
+
+        mapping = {
+            BrpVersionChoices.V1_3: BRPClient_1_3,
+            BrpVersionChoices.V2_0: BRPClient_2_0,
+            BrpVersionChoices.V2_1: BRPClient_2_1,
+        }
+        klass = mapping.get(config.brp_version)
+        if klass is None:
+            raise NotImplementedError(
+                f"no implementation for BRP version '{config.brp_version}'"
+            )
+        return klass(client=client, config=config)
 
     @abc.abstractmethod
     def fetch_data(self, user_bsn: str) -> dict | None:
@@ -36,7 +52,7 @@ class BRPClient(ABC):
         raise NotImplementedError()
 
     def fetch_brp(self, user_bsn: str) -> BRPData | None:
-        if not self._is_ready:
+        if not self.client:
             return None
 
         data = self.fetch_data(user_bsn)

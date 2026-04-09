@@ -8,6 +8,12 @@ from zgw_consumers.constants import APITypes
 from .validators import validate_verwerking_header
 
 
+class BrpVersionChoices(models.TextChoices):
+    V1_3 = "1.3", _("BRP 1.3")
+    V2_0 = "2.0", _("BRP 2.0")
+    V2_1 = "2.1", _("BRP 2.1")
+
+
 class HaalCentraalConfigManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related("service")
@@ -17,6 +23,17 @@ class HaalCentraalConfig(SingletonModel):
     """
     global configuration and defaults
     """
+
+    brp_version = models.CharField(
+        verbose_name=_("BRP version"),
+        max_length=3,
+        choices=BrpVersionChoices.choices,
+        default=BrpVersionChoices.V2_0,
+        help_text=_(
+            "Version of the Haal Centraal BRP API to use. "
+            "See {url} for the API specification."
+        ).format(url="https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/redoc"),
+    )
 
     service = models.OneToOneField(
         "zgw_consumers.Service",

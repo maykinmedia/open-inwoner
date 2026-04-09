@@ -1,6 +1,6 @@
 import logging  # noqa: TID251 - only used for log levels
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils.translation import gettext as _
 
 import requests_mock
@@ -39,10 +39,10 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.city, "'s-Gravenhage")
         self.assertTrue(user.is_prepopulated)
 
-    @override_settings(BRP_VERSION="1.3")
     def test_signal_updates_users_data_when_logged_in_via_digid_v_1_3(self, m):
         self._setUpMocks_v_1_3(m)
         self._setUpService()
+        self._setUpVersion("1.3")
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -60,7 +60,6 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.city, "'s-Gravenhage")
         self.assertTrue(user.is_prepopulated)
 
-    @override_settings(BRP_VERSION="1.3")
     def test_request_adds_configured_headers_when_calling_via_digid_v_1_3(self, m):
         config = HaalCentraalConfig.get_solo()
         config.api_origin_oin = "00000001234567890000"
@@ -69,6 +68,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
 
         self._setUpMocks_v_1_3(m)
         self._setUpService()
+        self._setUpVersion("1.3")
 
         user = UserFactory(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
@@ -148,9 +148,9 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self.assertEqual(user.city, "")
         self.assertFalse(user.is_prepopulated)
 
-    @override_settings(BRP_VERSION="1.3")
     def test_wrong_date_format_saves_birthday_none_brp_v_1_3(self, m):
         self._setUpService()
+        self._setUpVersion("1.3")
 
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",

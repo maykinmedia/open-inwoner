@@ -12,7 +12,10 @@ class HaalCentraalConfigAdmin(SingletonModelAdmin):
         (
             "Service",
             {
-                "fields": ("service",),
+                "fields": (
+                    "service",
+                    "brp_version",
+                ),
             },
         ),
         (

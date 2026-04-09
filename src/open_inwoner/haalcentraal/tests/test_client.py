@@ -4,7 +4,7 @@ from django.test import TestCase
 
 import requests_mock
 
-from open_inwoner.haalcentraal.clients import BRPClient_2_1
+from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
 
 from .mixins import HaalCentraalMixin
@@ -16,7 +16,7 @@ class BRPClientTest(HaalCentraalMixin, TestCase):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
-        api_client = BRPClient_2_1()
+        api_client = BRPClient.from_config()
         response = api_client.make_request("999993847")
 
         data = {
@@ -51,7 +51,7 @@ class BRPClientTest(HaalCentraalMixin, TestCase):
         config.api_verwerking = "test_x-verwerking_header"
         config.save()
 
-        api_client = BRPClient_2_1()
+        api_client = BRPClient.from_config()
         api_client.make_request("999993847")
 
         self.assertEqual(
@@ -71,7 +71,7 @@ class BRPClientTest(HaalCentraalMixin, TestCase):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
-        api_client = BRPClient_2_1()
+        api_client = BRPClient.from_config()
         api_client.make_request("999993847")
 
         self.assertEqual(
