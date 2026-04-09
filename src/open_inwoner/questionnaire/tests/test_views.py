@@ -20,7 +20,7 @@ from open_inwoner.questionnaire.views import (
     QUESTIONNAIRE_SESSION_KEY,
     QuestionnaireStepView,
 )
-from open_inwoner.utils.test import SessionMiddleware
+from open_inwoner.utils.test import SessionMiddleware, temp_media_root
 
 from .factories import QuestionnaireStepFactory, QuestionnaireStepFileFactory
 
@@ -138,6 +138,7 @@ class QuestionnaireStepViewTestCase(TestCase):
         response = self.client.get(path)
         self.assertContains(response, "foo")
 
+    @temp_media_root()
     def test_render_file(self):
         root = QuestionnaireStepFactory.create(code="foo", slug="foo")
         QuestionnaireStepFileFactory.create(questionnaire_step=root)

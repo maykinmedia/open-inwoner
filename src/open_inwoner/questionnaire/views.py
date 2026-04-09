@@ -11,6 +11,7 @@ from django.views.generic import FormView, ListView, RedirectView, TemplateView
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import Document
+from open_inwoner.components.file_item import FileItem
 from open_inwoner.utils.mixins import ExportMixin
 from open_inwoner.utils.views import CommonPageMixin, LogMixin
 
@@ -88,6 +89,16 @@ class QuestionnaireStepView(CommonPageMixin, BaseBreadcrumbMixin, FormView):
         instance = self.get_object()
 
         return {**super().get_form_kwargs(), "instance": instance}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        instance = self.get_object()
+        context["questionnaire_files"] = [
+            FileItem.from_filer_file(step_file.file)
+            for step_file in instance.questionnairestepfile_set.all()
+            if step_file.file
+        ]
+        return context
 
     def form_valid(self, form: QuestionnaireStepForm):
         questionnaire_step = form.cleaned_data["answer"]

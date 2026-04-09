@@ -1,7 +1,6 @@
-import dataclasses
 import datetime as dt
+import os
 from collections import defaultdict
-from datetime import datetime
 from typing import Iterable, Protocol, cast
 
 from django.conf import settings
@@ -32,6 +31,7 @@ from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
+from open_inwoner.components.file_item import FileItem
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
@@ -68,14 +68,6 @@ from open_inwoner.utils.views import CommonPageMixin
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 logger = structlog.stdlib.get_logger(__name__)
-
-
-@dataclasses.dataclass
-class SimpleFile:
-    name: str
-    size: int
-    url: str
-    created: datetime | None = None
 
 
 class VragenService(Protocol):
@@ -737,7 +729,7 @@ class InnerCaseDetailView(
     @staticmethod
     def get_case_document_files(
         zaak: Zaak, api_group: ZGWApiGroupConfig
-    ) -> list[SimpleFile]:
+    ) -> list[FileItem]:
         client = api_group.zaken_client
         case_info_objects = client.fetch_zaak_information_objects(zaak.url)
 
@@ -765,21 +757,17 @@ class InnerCaseDetailView(
                 info_obj, config.document_max_confidentiality
             ):
                 continue
-            # restructure into something understood by the FileList template tag
+
+            url = reverse(
+                "cases:document_download",
+                kwargs={
+                    "object_id": zaak.uuid,
+                    "info_id": info_obj.uuid,
+                    "api_group_id": api_group.id,
+                },
+            )
             documents.append(
-                SimpleFile(
-                    name=getattr(info_obj, "titel", None),
-                    size=info_obj.bestandsomvang,
-                    url=reverse(
-                        "cases:document_download",
-                        kwargs={
-                            "object_id": zaak.uuid,
-                            "info_id": info_obj.uuid,
-                            "api_group_id": api_group.id,
-                        },
-                    ),
-                    created=getattr(case_info_obj, "registratiedatum", None),
-                )
+                FileItem.from_informatieobject(info_obj, case_info_obj, url)
             )
 
         # `registratiedatum` and `titel` should be present, but not guaranteed by schema
@@ -907,7 +895,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
         created_documents = []
 
         for file in files:
-            title = file.name
+            title = os.path.splitext(file.name)[0] or file.name
             document_type = cleaned_data["type"]
             source_organization = self.zaak.bronorganisatie
 

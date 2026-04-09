@@ -20,7 +20,7 @@ from zgw_consumers.constants import AuthTypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
-from open_inwoner.cms.cases.views.status import SimpleFile
+from open_inwoner.components.file_item import FileItem
 from open_inwoner.openzaak.clients import build_documenten_clients, build_zaken_clients
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
@@ -164,8 +164,9 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             titel="",
             auteur="Open Inwoner Platform",
         )
-        self.informatie_object_file = SimpleFile(
-            name="my_document.txt",
+        self.informatie_object_file = FileItem(
+            name="",
+            extension="txt",
             size=len(self.informatie_object_content),
             url=reverse(
                 "cases:document_download",
@@ -175,6 +176,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
                     "api_group_id": self.api_group.id,
                 },
             ),
+            is_image=False,
         )
 
         #
@@ -248,8 +250,9 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             titel="",
             auteur="Open Inwoner Platform",
         )
-        self.informatie_object_file_alt = SimpleFile(
-            name="my_alt_document.txt",
+        self.informatie_object_file_alt = FileItem(
+            name="",
+            extension="txt",
             size=len(self.informatie_object_content_alt),
             url=reverse(
                 "cases:document_download",
@@ -259,6 +262,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
                     "api_group_id": self.api_group_alt.id,
                 },
             ),
+            is_image=False,
         )
         self.zaak_informatie_object_alt = generate_oas_component_cached(
             "zrc",
@@ -381,7 +385,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         self.assertEqual(log.content_object, self.user)
         expected = _("Document van zaak gedownload {case}: {filename}").format(
             case=self.zaak["identificatie"],
-            filename=self.informatie_object_file.name,
+            filename=self.informatie_object["bestandsnaam"],
         )
         self.assertEqual(log.extra_data["message"], expected)
 

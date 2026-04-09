@@ -30,7 +30,8 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
-from open_inwoner.cms.cases.views.status import InnerCaseDetailView, SimpleFile
+from open_inwoner.cms.cases.views.status import InnerCaseDetailView
+from open_inwoner.components.file_item import FileItem
 from open_inwoner.openklant.api_models import ObjectContactMoment
 from open_inwoner.openklant.constants import (
     KlantenServiceType,
@@ -302,6 +303,7 @@ class TestCaseDetailView(
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
+            formaat="text/plain",
             titel="uploaded_document_title.txt",
             bestandsomvang=123,
         )
@@ -315,6 +317,7 @@ class TestCaseDetailView(
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
+            formaat="text/plain",
             titel="another_document_title.txt",
             bestandsomvang=123,
         )
@@ -328,6 +331,7 @@ class TestCaseDetailView(
             status="definitief",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
+            formaat="text/plain",
             titel="yet_another_document_title.txt",
             bestandsomvang=123,
         )
@@ -366,6 +370,7 @@ class TestCaseDetailView(
             status="gearchiveerd",
             vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
             bestandsnaam="uploaded_document.txt",
+            formaat="text/plain",
             titel="uploaded_document_title.txt",
             bestandsomvang=123,
         )
@@ -730,8 +735,9 @@ class TestCaseDetailView(
         #
         # documents
         #
-        self.informatie_object_file = SimpleFile(
-            name="uploaded_document_title.txt",
+        self.informatie_object_file = FileItem(
+            name="uploaded_document_title",
+            extension="txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -741,12 +747,14 @@ class TestCaseDetailView(
                     "api_group_id": self.api_group.id,
                 },
             ),
+            is_image=False,
             created=dateutil.parser.parse(
                 self.zaak_informatie_object_old["registratiedatum"]
             ),
         )
-        self.informatie_object_file_2 = SimpleFile(
-            name="another_document_title.txt",
+        self.informatie_object_file_2 = FileItem(
+            name="another_document_title",
+            extension="txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -756,12 +764,14 @@ class TestCaseDetailView(
                     "api_group_id": self.api_group.id,
                 },
             ),
+            is_image=False,
             created=dateutil.parser.parse(
                 self.zaak_informatie_object_new["registratiedatum"]
             ),
         )
-        self.informatie_object_file_no_date = SimpleFile(
-            name="yet_another_document_title.txt",
+        self.informatie_object_file_no_date = FileItem(
+            name="yet_another_document_title",
+            extension="txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -771,9 +781,11 @@ class TestCaseDetailView(
                     "api_group_id": self.api_group.id,
                 },
             ),
+            is_image=False,
         )
-        self.informatie_object_file_archived = SimpleFile(
-            name="document_archived.txt",
+        self.informatie_object_file_archived = FileItem(
+            name="uploaded_document_title",
+            extension="txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -783,6 +795,7 @@ class TestCaseDetailView(
                     "api_group_id": self.api_group.id,
                 },
             ),
+            is_image=False,
             created=dateutil.parser.parse(
                 self.zaak_informatie_object_new["registratiedatum"]
             ),
@@ -1027,8 +1040,9 @@ class TestCaseDetailView(
             titel="uploaded_document_title.txt",
             bestandsomvang=123,
         )
-        self.informatie_object_file_alt = SimpleFile(
-            name="uploaded_document_title.txt",
+        self.informatie_object_file_alt = FileItem(
+            name="uploaded_document_title",
+            extension="txt",
             size=123,
             url=reverse(
                 "cases:document_download",
@@ -1038,6 +1052,7 @@ class TestCaseDetailView(
                     "api_group_id": self.api_group_alt.id,
                 },
             ),
+            is_image=False,
             created=dateutil.parser.parse(
                 self.zaak_informatie_object_new["registratiedatum"]
             ),
@@ -1689,9 +1704,9 @@ class TestCaseDetailView(
         self.assertEqual(len(documents), 3)
 
         # order should be reverse of list order from response
-        self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
-        self.assertEqual(documents[1].name, self.informatie_object["titel"])
-        self.assertEqual(documents[1].name, self.informatie_object_archived["titel"])
+        self.assertEqual(documents[0].name, "another_document_title")
+        self.assertEqual(documents[1].name, "uploaded_document_title")
+        self.assertEqual(documents[1].name, "uploaded_document_title")
 
     def test_document_ordering_by_name(self, m):
         """
@@ -1749,9 +1764,9 @@ class TestCaseDetailView(
         documents = response.context.get("zaak")["documents"]
 
         # order of #1 and #2 should be reversed
-        self.assertEqual(documents[0].name, self.informatie_object_2["titel"])
-        self.assertEqual(documents[1].name, self.informatie_object["titel"])
-        self.assertEqual(documents[2].name, self.informatie_object_no_date["titel"])
+        self.assertEqual(documents[0].name, "another_document_title")
+        self.assertEqual(documents[1].name, "uploaded_document_title")
+        self.assertEqual(documents[2].name, "yet_another_document_title")
 
     @freeze_time("2021-01-12 17:00:00")
     def test_new_docs(self, m):
