@@ -185,7 +185,7 @@ class UserTests(TestCase):
 
         # Test with OIDC disabled
         mock_digid_config.get_solo.return_value.enabled = False
-        self.assertEqual(user.get_logout_url(), reverse("digid:logout"))
+        self.assertEqual(user.get_logout_url(), reverse("logout"))
 
     def test_get_logout_url_returns_correct_option_for_login_type(self):
         test_cases = [

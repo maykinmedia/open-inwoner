@@ -78,6 +78,11 @@ Bugfixes
   is aan het primaire nummer.
 * [:gh:`2378`]: Probleem opgelost waar markdown in ssd uitkering pdf niet correct wordt gerenderd.
 * [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
+* [:gh:`3298`]: Probleem opgelost waarbij DigiD-gebruikers na uitloggen werden
+  doorgestuurd naar een niet-bestaande URL wanneer OIDC niet was ingeschakeld. Omdat de
+  single logout-functie van DigiD SAML is komen te vervallen, wordt de DigiD-sessie niet
+  langer actief beëindigd en worden gebruikers nu correct doorgestuurd naar de standaard
+  uitlogpagina.
 
 Onderhoud
 ---------
