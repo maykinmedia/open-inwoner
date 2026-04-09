@@ -15,7 +15,7 @@ from open_inwoner.utils.api import ClientError, get_json_response
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class BRPAPI(ABC):
+class BRPClient(ABC):
     version: str = NotImplemented
     _is_ready = False
 
@@ -57,7 +57,7 @@ class BRPAPI(ABC):
         return f"{self.__class__.__name__}({self.version})"
 
 
-class BRP_1_3(BRPAPI):
+class BRPClient_1_3(BRPClient):
     version = "1.3"
 
     def fetch_data(self, user_bsn: str) -> dict | None:
@@ -112,8 +112,8 @@ class BRP_1_3(BRPAPI):
         return brp
 
 
-class BRP_2_1(BRPAPI):
-    version = "2.1"
+class _BRPClient_2_x(BRPClient):
+    """Shared implementation base for BRP 2.x API versions."""
 
     def make_request(self, user_bsn: str) -> requests.Response:
         url = "personen"
@@ -209,3 +209,11 @@ class BRP_2_1(BRPAPI):
             # country=glom(data, "verblijfplaats.land.omschrijving", default=""),
         )
         return brp
+
+
+class BRPClient_2_0(_BRPClient_2_x):
+    version = "2.0"
+
+
+class BRPClient_2_1(_BRPClient_2_x):
+    version = "2.1"
