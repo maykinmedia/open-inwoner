@@ -18,9 +18,9 @@ logger = structlog.stdlib.get_logger(__name__)
 class BRPClient(ABC):
     version: str = NotImplemented
 
-    def __init__(self, client, config):
+    def __init__(self, client, extra_headers: dict | None = None):
         self.client = client
-        self.config = config
+        self.extra_headers = extra_headers or {}
 
     @classmethod
     def from_config(cls) -> "BRPClient":
@@ -41,7 +41,10 @@ class BRPClient(ABC):
             raise NotImplementedError(
                 f"no implementation for BRP version '{config.brp_version}'"
             )
-        return klass(client=client, config=config)
+        extra_headers = {
+            item["key"]: item["value"] for item in config.headers if item.get("key")
+        }
+        return klass(client=client, extra_headers=extra_headers)
 
     @abc.abstractmethod
     def fetch_data(self, user_bsn: str) -> dict | None:
@@ -81,10 +84,7 @@ class BRPClient_1_3(BRPClient):
         headers = {
             "Accept": "application/hal+json",
         }
-        if self.config.api_origin_oin:  # See Taiga #755
-            headers["x-origin-oin"] = self.config.api_origin_oin
-        if self.config.api_doelbinding:  # See Taiga #755
-            headers["x-doelbinding"] = self.config.api_doelbinding
+        headers.update(self.extra_headers)
 
         try:
             response = self.client.get(
@@ -136,28 +136,8 @@ class _BRPClient_2_x(BRPClient):
 
         headers = {
             "Accept": "application/json",
-            "x-gebruiker": "BurgerZelf",
         }
-
-        # I connect headers
-        if self.config.api_origin_oin:  # See Taiga #755
-            headers["x-origin-oin"] = self.config.api_origin_oin
-        if self.config.api_doelbinding:  # See Taiga #755
-            headers["x-doelbinding"] = self.config.api_doelbinding
-        if self.config.api_verwerking:
-            headers["x-verwerking"] = self.config.api_verwerking
-        if self.config.api_afnemer_oin:  # See Taiga #2860 / Yenlo
-            headers["x-afnemer-oin"] = self.config.api_afnemer_oin
-
-        # Centric headers
-        if self.config.x_request_organization:
-            headers["x-request-organization"] = self.config.x_request_organization
-        if self.config.x_request_application:
-            headers["x-request-application"] = self.config.x_request_application
-        if self.config.x_request_afnemerscode:
-            headers["x-request-afnemerscode"] = self.config.x_request_afnemerscode
-        if self.config.x_request_user:
-            headers["x-request-user"] = self.config.x_request_user
+        headers.update(self.extra_headers)
 
         response = self.client.post(
             url=url,

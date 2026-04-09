@@ -46,9 +46,11 @@ class BRPClientTest(HaalCentraalMixin, TestCase):
         self._setUpService()
 
         config = HaalCentraalConfig.get_solo()
-        config.api_origin_oin = "test_x-origin-oin_header"
-        config.api_doelbinding = "test_x-doelbinding_header"
-        config.api_verwerking = "test_x-verwerking_header"
+        config.headers = [
+            {"key": "x-origin-oin", "value": "test_x-origin-oin_header"},
+            {"key": "x-doelbinding", "value": "test_x-doelbinding_header"},
+            {"key": "x-verwerking", "value": "test_x-verwerking_header"},
+        ]
         config.save()
 
         api_client = BRPClient.from_config()

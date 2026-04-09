@@ -62,8 +62,10 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
 
     def test_request_adds_configured_headers_when_calling_via_digid_v_1_3(self, m):
         config = HaalCentraalConfig.get_solo()
-        config.api_origin_oin = "00000001234567890000"
-        config.api_doelbinding = "Huisvesting"
+        config.headers = [
+            {"key": "x-origin-oin", "value": "00000001234567890000"},
+            {"key": "x-doelbinding", "value": "Huisvesting"},
+        ]
         config.save()
 
         self._setUpMocks_v_1_3(m)
