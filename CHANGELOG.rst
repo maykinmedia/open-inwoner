@@ -17,6 +17,7 @@ Nieuwe features
   De Docker Compose- en CI-configuratie zijn bijgewerkt om ``xpack.security.enabled``
   in te schakelen.
 * ...
+* [:gh:`2268`]: WCAG toegankelijkheidsverbeteringen uit rapport gemeente Enschede toegepast.
 
 Bugfixes
 --------

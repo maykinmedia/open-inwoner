@@ -9,11 +9,11 @@
             <li class="primary-navigation__list-item">
                 <span class="nav-login__icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
                 {% if user.is_eherkenning_user and user.vestiging %}
-                    {% button text=user.branch_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+                    {% button text=user.branch_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% elif user.is_eherkenning_user %}
-                    {% button text=user.company_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+                    {% button text=user.company_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% else %}
-                    {% button text=user.display_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" %}
+                    {% button text=user.display_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% endif %}
 
                 {% if request.user.num_indicators %}
@@ -21,7 +21,7 @@
                     <span class="indicator"><span class="indicator__dot"></span></span>
                 {% endif %}
 
-                <ul class="primary-navigation__list subpage-list">
+                <ul id="authenticated-navigation-submenu" class="primary-navigation__list subpage-list">
                     {{ rendered_cms_menu__home }}
                     {% if user.is_eherkenning_user %}
                         {% session_is_branch_restricted as is_branch_restricted %}

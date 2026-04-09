@@ -86,7 +86,8 @@
                 </p>
             </div>
             <div>
-                <form action="{% url 'cases:contactmoment_list' %}" method="POST" id="question-form" class="form contact-form">
+                {% url 'cases:contactmoment_list' as from_action %}
+                {% render_form form=form from_action=form_action method="POST" id="question-form" extra_classes="form contact-form" show_required=True %}
                     {% csrf_token %}
 
                     {% input form.subject no_help=True icon="expand_more" %}
@@ -100,7 +101,7 @@
                             {% button text=_("Vraag versturen") icon="east" icon_position="after" icon_outlined=True id="submit_question" type="submit" disabled=True primary=True name="question_form_submit" %}
                         {% endbutton_row %}
                     </div>
-                </form>
+                {% endrender_form %}
             </div>
         </div>
     </section>

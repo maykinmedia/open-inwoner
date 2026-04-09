@@ -253,6 +253,7 @@
       list-style: none;
       background-color: var(--color-white);
       transform: scaleY(0);
+      visibility: hidden;
       right: 0;
       top: var(--row-height-big);
       position: absolute;
@@ -306,6 +307,7 @@
   &:not(#{&}--dismissed) &__list-item &__list:focus-within,
   &:not(#{&}--dismissed)[class*='--open'] &__list-item &__list {
     transform: scaleY(1);
+    visibility: visible;
   }
 
   &:not(#{&}--dismissed)[class*='--open'] &__list-item {
