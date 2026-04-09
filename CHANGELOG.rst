@@ -64,6 +64,28 @@ Bugfixes
   weer te geven. ``status.description`` en ``document_upload_description`` gebruiken nu
   het ``prosemirror_content`` filter in plaats van direct de ``.html`` property of
   zonder filter, zodat opmaak (vet, cursief, links) correct wordt gerenderd.
+* [:gh:`2298`]: Verbeterde foutafhandeling voor vragen en antwoorden in OpenKlant2,
+  zodat één foutief geformuleerde vraag of antwoord niet verhindert dat de overige vragen
+  en antwoorden worden weergegeven.
+* [:gh:`2305`]: Mijn Zaken overzicht blijft niet meer hangen op een spinner wanneer er een fout optreedt.
+* [:gh:`2320`]: Verbeterde controles op de rol van betrokkenen: gebruikers hebben alleen toegang
+  tot een zaak en worden alleen op de hoogte gebracht van wijzigingen in een zaak als ze de juiste
+  rol hebben.
+* [:gh:`2257`]: Probleem opgelost waarbij de eerste rij van een productteksttabel altijd een header-rij is,
+  ook wanneer dit was uitgeschakeld.
+* [:gh:`2358`]: Probleem opgelost waarbij identieke telefoonnummers gesynchroniseerd
+  vanuit eSuite een databasefout veroorzaakten, hetgeen tot een situatie kon leiden
+  waarbij gebruikers bij het inloggen onterecht een melding kregen dat ze niet goed
+  waren ingelogd (terwijl dit wel het geval is, en de fout met de synchronisatie te
+  maken had, niet het inloggen). Het alternatieve nummer wordt nu geleegd als het gelijk
+  is aan het primaire nummer.
+* [:gh:`2378`]: Probleem opgelost waar markdown in ssd uitkering pdf niet correct wordt gerenderd.
+* [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
+* [:gh:`2398`]: Probleem opgelost waarbij DigiD-gebruikers na uitloggen werden
+  doorgestuurd naar een niet-bestaande URL wanneer OIDC niet was ingeschakeld. Omdat de
+  single logout-functie van DigiD SAML is komen te vervallen, wordt de DigiD-sessie niet
+  langer actief beëindigd en worden gebruikers nu correct doorgestuurd naar de standaard
+  uitlogpagina.
 
 Onderhoud
 ---------
