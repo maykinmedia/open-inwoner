@@ -78,6 +78,73 @@ Er zijn diverse OpenID Connect methodes (bijvoorbeeld Azure AD). Afhankelijk van
    :width: 620px
    :height: 333px
 
+Signicat (eID Hub, nieuwe stijl)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`Signicat <https://www.signicat.com/>`_ is een veelgebruikte identity broker voor
+DigiD en eHerkenning via OIDC. Onderstaande instellingen zijn de aanbevolen configuratie
+voor gebruik met Open Inwoner. Deze instructies gaan uit van de **eID and Wallet Hub**
+(nieuwe stijl), niet de legacy-omgeving.
+
+- Log in op https://dashboard.signicat.com/
+- Ga naar de **eID and Wallet Hub**
+- Klik op **Add Client**:
+
+  - **Client name**: een beschrijvende naam, bij voorkeur:
+    ``{gemeente}-open-inwoner-{acceptatie,productie}``
+  - **Redirect URI**: de basis-URL van de deploy, zonder verdere paden, bijvoorbeeld
+    ``https://open-inwoner-test.maykin.nl``
+
+- Tabblad **URIs**:
+
+  - **Redirect URIs** — voeg de volgende drie toe (pas de basis-URL aan):
+
+    - ``https://open-inwoner-test.maykin.nl/digid-oidc/callback/``
+    - ``https://open-inwoner-test.maykin.nl/eherkenning-oidc/callback/``
+    - ``https://open-inwoner-test.maykin.nl/eidas-oidc/callback/``
+
+  - **Post logout Redirect URIs**:
+
+    - ``https://open-inwoner-test.maykin.nl/accounts/login/``
+
+  - **Front Channel Logout URI**:
+
+    - ``https://open-inwoner-test.maykin.nl/accounts/login/``
+
+  - **Required Front Channel Logout Session**: uitgevinkt
+  - **Automatic Redirect to Logout URL**: aangevinkt
+
+- Tabblad **Secrets**:
+
+  - Maak één secret aan met een beschrijvende naam (gebruik bijvoorbeeld de URL van de doelomgeving)
+  - Kopieer de client secret naar het daartoe bestemde veld in Open Inwoner
+
+- Tabblad **Access**:
+
+  - **Allowed scopes**:
+    - ``openid``
+    - ``eherkenning-extra``
+    - ``idp-id``
+    - ``profile``
+  - **Identity provider restrictions**: leeg laten
+  - **ACR values**: leeg laten
+  - **Force use ACR values**: leeg laten
+
+- Tabblad **Advanced**:
+
+  - Sectie **Security**:
+
+    - **ID Token User data**: ``Minimal``
+
+      .. note::
+
+         Dit vereist de optie "Gebruik userinfo als source" in Open Inwoner.
+
+    - **User Info Response Type**: ``JSON``
+    - **Content encryption algorithm**: ``A128CBC-HS256``
+    - **Allowed CORS Origins**: leeg laten
+    - **Requires Secret**: aanvinken; alle overige checkboxes uitvinken
+
 10.5.1. Geschiedenis
 --------------------
 
