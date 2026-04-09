@@ -16,10 +16,22 @@ Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. H
 
 Dit is de configuratie voor de koppeling van het Open Inwoner platform met DigiD van Logius. Bij de onboarding van Open Inwoner wordt bij deze configuratie hulp geboden.
 
+.. note::
+
+   Wanneer de OpenID Connect-koppeling voor DigiD is ingeschakeld (zie sectie 10.5),
+   vervangt deze de SAML-koppeling op de loginpagina. Beide kunnen niet tegelijkertijd
+   actief zijn.
+
 10.3. eHerkenning/eIDAS configuratie
 ====================================
 
 Dit is de configuratie voor de koppeling van het Open Inwoner platform met eHerkenning bij een eHerkenningsmakelaar. Bij de onboarding van Open Inwoner wordt bij deze configuratie hulp geboden.
+
+.. note::
+
+   Wanneer de OpenID Connect-koppeling voor eHerkenning is ingeschakeld (zie sectie 10.6),
+   vervangt deze de SAML-koppeling op de loginpagina. Beide kunnen niet tegelijkertijd
+   actief zijn.
 
 10.4. KVK configuratie
 ======================
@@ -68,15 +80,110 @@ tot één bestand:
 10.5. OpenID Connect configuratie voor DigiD
 ============================================
 
-Open Inwoner ondersteunt de DigiD login voor burgers via het OpenID Connect protocol (OIDC). Via de Open ID Connect configuratie kan deze manier van inloggen worden ingesteld. OpenID Connect staat standaard uitgeschakeld, maar kan door de technisch beheerder worden ingeschakeld. OpenID Connect maakt het mogelijk dat medewerkers niet met hun privé DigiD voor werkdoeleinden te hoeven inloggen. Het gebruik van OpenID Connect is met name bedoeld voor medewerkers die veel met inwoners of cliënten in samenwerkingsomgevingen werken.
-
-Er zijn diverse OpenID Connect methodes (bijvoorbeeld Azure AD). Afhankelijk van de gewenste OpenID Connect methode dienen de betreffende technische gegevens te worden ingevuld alvorens het ingeschakeld kan worden. Wanneer OpenID Connect is ingeschakeld wordt dit op de loginpagina duidelijk door middel van het logo en de knoptekst. De technische details voor het configureren van OpenID Connect voor DigiD kunt u raadplegen in `de documentatie van Open Formulieren <https://open-forms.readthedocs.io/en/latest/configuration/authentication/oidc_eherkenning.html>`_.
+Open Inwoner ondersteunt DigiD-login voor burgers via het OpenID Connect protocol (OIDC).
+Dit is een alternatief voor de SAML-gebaseerde DigiD-koppeling. OIDC staat standaard
+uitgeschakeld en vereist technische configuratie voordat het in gebruik genomen kan worden.
 
 **Let op! Enkel de technisch beheerder dient de OpenID Connect Configuratie te wijzigen.**
 
 .. image:: images/image77.png
    :width: 620px
    :height: 333px
+
+*Activatie*
+
+**Inschakelen**
+Schakelt DigiD-login via OIDC in of uit. Staat standaard uitgeschakeld.
+
+.. note::
+
+   Wanneer ingeschakeld, vervangt de OIDC-koppeling de SAML-gebaseerde DigiD-koppeling
+   op de loginpagina. Beide kunnen niet tegelijkertijd actief zijn.
+
+*Algemene instellingen*
+
+**OpenID Connect client ID**
+Het client-ID verstrekt door de OIDC-provider (identity broker).
+
+**OpenID Connect secret**
+Het bijbehorende client-secret van de OIDC-provider.
+
+**OpenID Connect scopes**
+De scopes die worden aangevraagd bij de identity provider. Standaard: ``openid``, ``bsn``.
+
+**Ondertekeningsalgoritme**
+Algoritme waarmee de provider ID-tokens ondertekent. Standaard ``HS256``; gebruik ``RS256`` bij een asymmetrisch sleutelpaar.
+
+**Ondertekeningssleutel**
+Openbare sleutel van de provider in PEM- of DER-formaat. Alleen vereist bij RSA-algoritmen zoals ``RS256``.
+
+*Attributen uit claims*
+
+**BSN claim**
+Naam van de claim die het BSN van de gebruiker bevat. Standaard: ``bsn``.
+
+**LoA claim**
+Naam van de claim met het betrouwbaarheidsniveau (Level of Assurance). Laat leeg als de provider geen LoA levert; de standaardwaarde hieronder wordt dan gebruikt.
+
+**Standaard LoA**
+Het betrouwbaarheidsniveau dat wordt toegepast als de identity provider geen LoA-claim
+meestuurt in het token. Het betrouwbaarheidsniveau bepaalt welke acties een ingelogde
+gebruiker mag uitvoeren - een hoger niveau vereist een sterkere vorm van authenticatie.
+
+**LoA-mapping**
+Vertaaltabel voor LoA-claimwaarden van de provider naar Nederlandse standaardniveaus. Gebruik dit als de provider eigen waarden hanteert.
+
+*Eindpunten*
+
+**Discovery endpoint**
+URL van het discovery-endpoint van de provider. Het pad ``.well-known/openid-configuration``
+wordt automatisch toegevoegd. Als dit is ingevuld, kunnen de overige eindpunten worden
+weggelaten - ze worden automatisch afgeleid bij het opslaan van de configuratie.
+
+.. note::
+
+   Als er geen discovery-endpoint beschikbaar is, kunnen de onderstaande velden handmatig
+   worden ingevuld.
+
+**JSON Web Key Set endpoint**
+URL van het JWKS-endpoint. Verplicht bij gebruik van het ``RS256``-algoritme.
+
+**Authorization endpoint**
+URL van het autorisatie-endpoint van de provider.
+
+**Token endpoint**
+URL van het token-endpoint van de provider.
+
+**Gebruik Basic auth voor token endpoint**
+Indien ingeschakeld worden client-ID en secret via HTTP Basic auth meegestuurd bij het
+ophalen van het access token. Standaard worden ze in de request body geplaatst.
+
+**User endpoint**
+URL van het userinfo-endpoint van de provider.
+
+**Logout endpoint**
+URL van het logout-endpoint van de provider. Optioneel.
+
+*Keycloak-specifieke instellingen*
+
+**Keycloak Identity Provider hint**
+Alleen van toepassing bij Keycloak: geeft aan welke identity provider gebruikt moet worden,
+zodat het Keycloak-loginscherm wordt overgeslagen. Laat leeg bij andere providers.
+
+*Geavanceerde instellingen*
+
+.. _digid-oidc-userinfo-bron:
+
+**Gebruikersinformatie claims afkomstig van**
+Bepaalt vanwaar de gebruikersclaims worden opgehaald: het *Userinfo endpoint* (standaard)
+of het *ID-token*. Kies *Userinfo endpoint* wanneer de identity provider de claims niet
+in het ID-token zelf meelevert.
+
+**Nonce verificatie**
+Schakelt nonce-verificatie in of uit (standaard ingeschakeld).
+
+**Nonce-grootte** / **State-grootte**
+Lengte van de willekeurige nonce- en state-strings (standaard: 32 tekens).
 
 Signicat (eID Hub, nieuwe stijl)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,7 +204,7 @@ voor gebruik met Open Inwoner. Deze instructies gaan uit van de **eID and Wallet
 
 - Tabblad **URIs**:
 
-  - **Redirect URIs** — voeg de volgende drie toe (pas de basis-URL aan):
+  - **Redirect URIs** - voeg de volgende drie toe (pas de basis-URL aan):
 
     - ``https://open-inwoner-test.maykin.nl/digid-oidc/callback/``
     - ``https://open-inwoner-test.maykin.nl/eherkenning-oidc/callback/``
@@ -138,7 +245,11 @@ voor gebruik met Open Inwoner. Deze instructies gaan uit van de **eID and Wallet
 
       .. note::
 
-         Dit vereist de optie "Gebruik userinfo als source" in Open Inwoner.
+         Omdat Signicat met deze instelling de claims niet in het ID-token meelevert,
+         moet in Open Inwoner onder *Geavanceerde instellingen* de optie
+         **Gebruikersinformatie claims afkomstig van** worden ingesteld op
+         *Userinfo endpoint*. Dit veld is te vinden in de DigiD- en
+         eHerkenning OIDC-configuratiepagina's in de beheeromgeving.
 
     - **User Info Response Type**: ``JSON``
     - **Content encryption algorithm**: ``A128CBC-HS256``
@@ -153,9 +264,113 @@ Wanneer er wijzigingen aan de OpenID Connect configuratie hebben plaatsgevonden,
 10.6. OpenID Connect configuratie voor eHerkenning
 ==================================================
 
-Open Inwoner ondersteunt de eHerkenning login voor ondernemers via het OpenID Connect protocol (OIDC). Via de Open ID Connect configuratie kan deze manier van inloggen worden ingesteld. OpenID Connect staat standaard uitgeschakeld, maar kan door de technisch beheerder worden ingeschakeld. eHerkenning is een Nederlandse standaard voor het veilig en betrouwbaar inloggen bij overheidsdiensten en bedrijven. Door OIDC te gebruiken met eHerkenning, kunnen organisaties profiteren van de gestandaardiseerde en veilige authenticatiediensten die eHerkenning biedt, terwijl ze gebruik maken van de moderne functionaliteiten van OIDC. De technische details voor het configureren van OpenID Connect voor eHerkenning kunt u raadplegen in `de documentatie van Open Formulieren <https://open-forms.readthedocs.io/en/latest/configuration/authentication/oidc_eherkenning.html>`_.
+Open Inwoner ondersteunt eHerkenning-login voor ondernemers via het OpenID Connect protocol
+(OIDC). Dit is een alternatief voor de SAML-gebaseerde eHerkenning-koppeling. OIDC staat
+standaard uitgeschakeld en vereist technische configuratie voordat het in gebruik genomen
+kan worden.
 
 **Let op! Enkel de technisch beheerder dient de OpenID Connect Configuratie te wijzigen.**
+
+*Activatie*
+
+**Inschakelen**
+Schakelt eHerkenning-login via OIDC in of uit. Staat standaard uitgeschakeld.
+
+.. note::
+
+   Wanneer ingeschakeld, vervangt de OIDC-koppeling de SAML-gebaseerde
+   eHerkenning-koppeling op de loginpagina. Beide kunnen niet tegelijkertijd actief zijn.
+
+*Algemene instellingen*
+
+**OpenID Connect client ID**
+Het client-ID verstrekt door de OIDC-provider (identity broker).
+
+**OpenID Connect secret**
+Het bijbehorende client-secret van de OIDC-provider.
+
+**OpenID Connect scopes**
+De scopes die worden aangevraagd bij de identity provider. Standaard: ``openid``, ``kvk``.
+
+**Ondertekeningsalgoritme**
+Algoritme waarmee de provider ID-tokens ondertekent. Standaard ``HS256``; gebruik ``RS256`` bij een asymmetrisch sleutelpaar.
+
+**Ondertekeningssleutel**
+Openbare sleutel van de provider in PEM- of DER-formaat. Alleen vereist bij RSA-algoritmen zoals ``RS256``.
+
+*Attributen uit claims*
+
+**Identifier type claim**
+Naam van de claim die aangeeft hoe de bedrijfsidentifier geïnterpreteerd moet worden.
+Verwachte waarden: ``urn:etoegang:1.9:EntityConcernedID:KvKnr`` (KVK-nummer) of
+``urn:etoegang:1.9:EntityConcernedID:RSIN``. Standaard: ``namequalifier``.
+
+**Bedrijfsidentifier claim**
+Naam van de claim met het KVK-nummer of RSIN van het ingelogde bedrijf.
+Standaard: ``urn:etoegang:core:LegalSubjectID``.
+
+**Vestigingsnummer claim**
+Naam van de claim met het vestigingsnummer, indien van toepassing.
+Standaard: ``urn:etoegang:1.9:ServiceRestriction:Vestigingsnr``.
+
+**Vertegenwoordiger claim**
+Naam van de claim met de (pseudonieme) identifier van de gebruiker die namens het
+bedrijf handelt. Standaard: ``urn:etoegang:core:ActingSubjectID``.
+
+**LoA claim**
+Naam van de claim met het betrouwbaarheidsniveau (Level of Assurance). Laat leeg als de provider geen LoA levert; de standaardwaarde hieronder wordt dan gebruikt.
+
+**Standaard LoA**
+Het betrouwbaarheidsniveau dat wordt toegepast als de identity provider geen LoA-claim meestuurt in het token. Het betrouwbaarheidsniveau bepaalt welke acties een ingelogde gebruiker mag uitvoeren - een hoger niveau vereist een sterkere vorm van authenticatie.
+
+**LoA-mapping**
+Vertaaltabel voor LoA-claimwaarden van de provider naar Nederlandse standaardniveaus. Gebruik dit als de provider eigen waarden hanteert.
+
+*Eindpunten*
+
+**Discovery endpoint**
+URL van het discovery-endpoint van de provider. Het pad ``.well-known/openid-configuration``
+wordt automatisch toegevoegd. Als dit is ingevuld, kunnen de overige eindpunten worden
+weggelaten - ze worden automatisch afgeleid bij het opslaan van de configuratie. Als er
+geen discovery-endpoint beschikbaar is, kunnen de onderstaande velden handmatig worden
+ingevuld.
+
+**JSON Web Key Set endpoint**
+URL van het JWKS-endpoint. Verplicht bij gebruik van het ``RS256``-algoritme.
+
+**Authorization endpoint**
+URL van het autorisatie-endpoint van de provider.
+
+**Token endpoint**
+URL van het token-endpoint van de provider.
+
+**Gebruik Basic auth voor token endpoint**
+Indien ingeschakeld worden client-ID en secret via HTTP Basic auth meegestuurd bij het
+ophalen van het access token. Standaard worden ze in de request body geplaatst.
+
+**User endpoint**
+URL van het userinfo-endpoint van de provider.
+
+**Logout endpoint**
+URL van het logout-endpoint van de provider. Optioneel.
+
+*Keycloak-specifieke instellingen*
+
+**Keycloak Identity Provider hint**
+Alleen van toepassing bij Keycloak: geeft aan welke identity provider gebruikt moet worden,
+zodat het Keycloak-loginscherm wordt overgeslagen. Laat leeg bij andere providers.
+
+*Geavanceerde instellingen*
+
+**Gebruikersinformatie claims afkomstig van**
+Bepaalt vanwaar de gebruikersclaims worden opgehaald: het *Userinfo endpoint* (standaard)
+of het *ID-token*. Zie sectie 10.5 voor een toelichting.
+
+**Nonce verificatie**
+Schakelt nonce-verificatie in of uit (standaard ingeschakeld).
+
+**Nonce-grootte** / **State-grootte**
+Lengte van de willekeurige nonce- en state-strings (standaard: 32 tekens).
 
 10.7. OpenID Connect sessie management
 =======================================
