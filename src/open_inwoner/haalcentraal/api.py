@@ -82,7 +82,6 @@ class BRP_1_3(BRPAPI):
                     "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
                     "geboorte.datum.datum,geboorte.plaats.omschrijving"
                 },
-                verify=False,
             )
             return get_json_response(response)
         except (RequestException, ClientError):
@@ -165,7 +164,6 @@ class BRP_2_1(BRPAPI):
                 "burgerservicenummer": [user_bsn],
             },
             headers=headers,
-            verify=False,
         )
         return response
 

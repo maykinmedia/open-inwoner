@@ -30,6 +30,9 @@ Deployment aandachtspunten
 Bugfixes
 --------
 
+* [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
+  verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
+  valideren nu standaard het servercertificaat.
 * [:gh:`2465`]: CKEDITOR_CONFIGS aan de configuratie is toegevoegd om te voorkomen dat de
   opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het beheeropdracht
   'find_modified_mail_templates' is toegevoegd om e-mailsjablonen op te sporen en te melden
