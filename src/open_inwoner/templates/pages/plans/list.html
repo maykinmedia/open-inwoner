@@ -74,7 +74,7 @@
         {% if plans.plan_list %}
             {% include "components/Card/CardContainer.html" with plans=plans.plan_list columns=2 only %}
         {% else %}
-            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen samenwerkingsplannen." %}</strong></p>
+            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen samenwerkingsplannen." %}</strong></nl-paragraph>
         {% endif %}
     {% endif %}
 
