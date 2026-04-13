@@ -1,13 +1,19 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
     "skipLibCheck": true,
+    "module": "esnext",
+    "target": "ES2021",
+    "declaration": false,
     "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "noErrorTruncation": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -32,6 +38,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [".storybook", "vite-env.d.ts", "src/open_inwoner/react"],
+  "include": [".storybook/**/*", "vite-env.d.ts", "src/open_inwoner/react"],
   "exclude": ["node_modules"]
 }

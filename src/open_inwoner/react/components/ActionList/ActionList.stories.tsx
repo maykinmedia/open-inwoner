@@ -1,31 +1,31 @@
 import { withLoader } from '@react/lib/decorators/storybook';
 import type { Meta, StoryObj } from '@storybook/preact-vite';
-import {
-  ACTION_LIST_DEFINITION,
-  ActionList,
-  IActionListProps,
-  IActionProps,
-} from '.';
+import { ActionList, IActionListProps } from '.';
+import { factoryActions } from '../Action';
 
 const meta: Meta<typeof ActionList> = {
-  title: 'Components/ActionList',
+  title: 'Components/ActionList (Web Component Only)',
   component: ActionList,
+  decorators: [withLoader('oip-action-list', 'oip-action')],
+  tags: ['Shadow DOM'],
   parameters: {
     layout: 'padded',
     docs: {
       description: {
         component: `
-The ActionList component displays a list of user feed items with actions.
+A slot-only wrapper for \`oip-action\` items. Use this web component to group actions into a list.
 
-This component integrates with the Den Haag Action component and provides a consistent way to display feed items.
+**Slots:**
 
-**Props:**
-- \`actions\`: Array of feed items with type, title, message, status info, and action details
+- \`default\`: The slot where the \`oip-action\` components are placed.
 
-**Item Structure:**
-- \`title\`: Item title
-- \`message\`: Item description/message
-- \`action_url\`: URL for the action link
+**Usage:**
+\`\`\`html
+<oip-action-list>
+  <oip-action title="Mijn Zaken" message="Er is een nieuwe zaak" action-url="/cases"></oip-action>
+  <oip-action title="Mijn Vragen" message="Er is een antwoord op de vraag" action-url="/mijn-vragen"></oip-action>
+</oip-action-list>
+\`\`\`
 `,
       },
     },
@@ -35,71 +35,30 @@ export default meta;
 
 type Story = StoryObj<IActionListProps>;
 
-const mockDataWithItems: IActionProps[] = [
-  {
-    title: 'Complete your profile',
-    message: 'Please fill in your personal information to continue.',
-    action_url: '/profile',
-  },
-  {
-    title: 'Document uploaded successfully',
-    message: 'Your document has been received and is being processed.',
-    action_url: '/documents',
-  },
-  {
-    title: 'Payment failed',
-    message:
-      'Your recent payment could not be processed. Please update your payment method.',
-    action_url: '/payment',
-  },
-  {
-    title: 'New message received',
-    message: 'You have a new message from the municipality.',
-    action_url: '/messages',
-  },
-];
+const mockActions = factoryActions();
 
+/**
+ * Default list of actions rendered as web components.
+ */
 export const Default: Story = {
-  name: 'Default with Items',
-  args: {
-    actions: mockDataWithItems,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Default ActionList with various feed items showing different statuses and completion states.',
-      },
-    },
-  },
-};
-
-export const Empty: Story = {
-  name: 'Empty List',
-  args: {
-    actions: [],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'ActionList with no actions - so nothing is rendered.',
-      },
-    },
-  },
+  name: 'Default',
+  render: () => (
+    <oip-action-list>
+      {mockActions.map((x) => (
+        <oip-action
+          action-url={x.actionUrl}
+          message={x.message}
+          title={x.title}
+        />
+      ))}
+    </oip-action-list>
+  ),
 };
 
 /**
- * Rendered as webcomponent
+ * ActionList with no children — renders an empty slot.
  */
-export const AsWebComponent: Story = {
-  args: { actionsId: 'test-id' },
-  decorators: withLoader(ACTION_LIST_DEFINITION.tagName),
-  render: ({ actionsId }) => (
-    <>
-      <script type="application/json" id={actionsId}>
-        {JSON.stringify(mockDataWithItems)}
-      </script>
-      <action-list actions-id={actionsId} />
-    </>
-  ),
+export const Empty: Story = {
+  name: 'Empty',
+  render: () => <oip-action-list />,
 };

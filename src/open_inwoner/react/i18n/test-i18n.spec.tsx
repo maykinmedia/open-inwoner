@@ -1,20 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { loadI18nConfig } from './i18n';
-
-// Mock the locale imports
-vi.mock('@react/i18n/compiled/nl.json', () => ({
-  default: {
-    'test.key': 'Test waarde',
-    'another.key': 'Nog een waarde',
-  },
-}));
-
-vi.mock('@react/i18n/compiled/en.json', () => ({
-  default: {
-    'test.key': 'Test value',
-    'another.key': 'Another value',
-  },
-}));
 
 describe('Test react/lib/i18n folder', () => {
   describe('Test i18n.tsx file', () => {
@@ -25,7 +10,7 @@ describe('Test react/lib/i18n folder', () => {
         expect(config).toBeDefined();
         expect(config?.locale).toBe('nl');
         expect(config?.defaultLocale).toBe('nl');
-        expect(config?.messages).toHaveProperty('test.key');
+        expect(config?.messages).toHaveProperty('chart.default');
       });
 
       it('should load the i18n config for English', async () => {
@@ -34,7 +19,7 @@ describe('Test react/lib/i18n folder', () => {
         expect(config).toBeDefined();
         expect(config?.locale).toBe('en');
         expect(config?.defaultLocale).toBe('nl');
-        expect(config?.messages).toHaveProperty('test.key');
+        expect(config?.messages).toHaveProperty('chart.default');
       });
 
       it('should shorten locale from en-GB to en', async () => {
@@ -56,7 +41,7 @@ describe('Test react/lib/i18n folder', () => {
 
         expect(config).toBeDefined();
         expect(config?.locale).toBe('fr');
-        expect(config?.messages).toHaveProperty('test.key');
+        expect(config?.messages).toHaveProperty('chart.default');
       });
 
       it('should cache loaded configs', async () => {

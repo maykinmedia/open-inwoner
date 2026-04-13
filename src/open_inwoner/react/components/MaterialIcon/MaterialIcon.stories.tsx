@@ -129,6 +129,6 @@ export const CommonIcons: Story = {
  */
 export const AsWebComponent: Story = {
   args: { name: 'home' },
-  decorators: withLoader(MATERIAL_ICON_DEFINITION.tagName),
+  decorators: [withLoader(MATERIAL_ICON_DEFINITION.tagName)],
   render: ({ name }) => <material-icon name={name} />,
 };

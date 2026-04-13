@@ -1,43 +1,6 @@
-import { vi } from 'vitest';
-
-/**
- * The @utrecht/component-library-react library is React-only, web component
- * wrappers seem incompatible with Preact + JSDOM test environment. This causes
- * low-level DOM errors when rendering Utrecht components in unit tests.
- *
- * Solution: Mock Utrecht components with semantic HTML equivalents.
- * This allows table logic tests to run without browser API dependencies, while actual
- * rendering can be tested in Django integration tests and Storybook.
- */
-
-vi.mock('@utrecht/component-library-react/dist', () => {
-  const Mock = (tag: string) => {
-    return ({ children, ...props }: any) => {
-      // Render semantic HTML tags directly
-      const Tag = tag as any;
-      return <Tag {...props}>{children}</Tag>;
-    };
-  };
-
-  return {
-    TableContainer: Mock('div'),
-    Table: Mock('table'),
-    TableCaption: Mock('caption'),
-    TableHeader: Mock('thead'),
-    TableHeaderCell: Mock('th'),
-    TableBody: Mock('tbody'),
-    TableRow: Mock('tr'),
-    TableCell: Mock('td'),
-    TableFooter: Mock('tfoot'),
-  };
-});
-
-// Preact
-
 import { render, screen } from '@testing-library/preact';
 import { describe, it, expect } from 'vitest';
 import Table, { ITableProps } from './Table';
-import '@testing-library/jest-dom';
 
 // Helper: Mount table data in script tag
 function mountTableData(id: string, data: ITableProps): () => void {

@@ -13,6 +13,7 @@ const meta: Meta<IChartProps> = {
   parameters: {
     layout: 'padded',
   },
+  tags: ['Shadow DOM'],
   argTypes: {
     period: {
       control: 'select',

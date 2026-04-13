@@ -3,9 +3,6 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { SideNav, SIDE_NAV_DEFINITION } from '.';
 import { WebComponentLoader } from '@react/lib/web-component';
 
-// Import jest-dom matchers for extended assertions like toBeInTheDocument
-import '@testing-library/jest-dom';
-
 describe('SideNav', () => {
   it('renders without crashing', () => {
     render(<SideNav items={[]} />);

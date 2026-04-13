@@ -1,18 +1,8 @@
-import '@testing-library/jest-dom';
 import { render } from '@testing-library/preact';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { page } from 'vitest/browser';
 import { type IFiltersConfig, Filters } from '.';
-
-// Mock react-intl
-vi.mock('react-intl', () => ({
-  FormattedMessage: ({ children, defaultMessage }: any) => {
-    if (typeof children === 'function') {
-      return children(defaultMessage[0].value);
-    }
-    return defaultMessage[0].value || '';
-  },
-  IntlProvider: ({ children }: any) => children,
-}));
+import { IntlWrapperNL } from '@react/lib/decorators/web-component';
 
 const mockConfig: IFiltersConfig = {
   filterGroups: [
@@ -37,8 +27,14 @@ const mockConfig: IFiltersConfig = {
 };
 
 describe('FiltersBar', () => {
+  // Set desktop breakpoint
+  beforeEach(async () => {
+    await page.viewport(1375, 768);
+  });
   it('renders without crashing', () => {
-    const { container } = render(<Filters data={mockConfig} />);
+    const { container } = render(<Filters data={mockConfig} />, {
+      wrapper: IntlWrapperNL,
+    });
 
     expect(
       container.querySelector('.oip-filter-bar--desktop')
@@ -46,7 +42,9 @@ describe('FiltersBar', () => {
   });
 
   it('renders desktop and mobile layouts', () => {
-    const { container } = render(<Filters data={mockConfig} />);
+    const { container } = render(<Filters data={mockConfig} />, {
+      wrapper: IntlWrapperNL,
+    });
 
     const desktopBar = container.querySelector('.oip-filter-bar--desktop');
     const filterBarLabel = container.querySelector('.oip-filter-bar__label');
@@ -58,9 +56,11 @@ describe('FiltersBar', () => {
   });
 
   it('renders desktop filter bar in desktop mode', () => {
-    const { container } = render(<Filters data={mockConfig} />);
+    const { container } = render(<Filters data={mockConfig} />, {
+      wrapper: IntlWrapperNL,
+    });
 
-    // matchMedia mock returns false, so we're in desktop mode
+    // Playwright default viewport (1280x720) is wider than 767px, so desktop mode
     const desktopBar = container.querySelector('.oip-filter-bar--desktop');
     expect(desktopBar).toBeInTheDocument();
 
@@ -69,26 +69,18 @@ describe('FiltersBar', () => {
     expect(mobileBar).not.toBeInTheDocument();
   });
 
-  it('applies correct CSS classes for layout', () => {
-    const { container } = render(<Filters data={mockConfig} />);
-
-    const desktopBar = container.querySelector('.oip-filter-bar--desktop');
-    const filterBarLabel = container.querySelector('.oip-filter-bar__label');
-    const filters = container.querySelector('.oip-filter-bar__filters');
-
-    expect(desktopBar).toHaveClass('oip-filter-bar--desktop');
-    expect(filterBarLabel).toHaveClass('oip-filter-bar__label');
-    expect(filters).toHaveClass('oip-filter-bar__filters');
-  });
-
   it('renders filter label text', () => {
-    const { container } = render(<Filters data={mockConfig} />);
+    const { container } = render(<Filters data={mockConfig} />, {
+      wrapper: IntlWrapperNL,
+    });
     const label = container.querySelector('.oip-filter-bar__label');
     expect(label).toHaveTextContent('Filter op:');
   });
 
   it('renders filters from config', () => {
-    const { container } = render(<Filters data={mockConfig} />);
+    const { container } = render(<Filters data={mockConfig} />, {
+      wrapper: IntlWrapperNL,
+    });
 
     // Component should render successfully with config data
     expect(

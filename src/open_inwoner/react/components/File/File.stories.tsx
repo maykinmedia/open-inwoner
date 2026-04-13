@@ -57,7 +57,7 @@ Files download should:
   },
   decorators: [
     (Story) => (
-      <div style={{ width: '800px' }}>
+      <div style={{ maxWidth: '800px' }}>
         <Story />
       </div>
     ),

@@ -5,9 +5,10 @@
  * These types are foundational and have no dependencies on the registry.
  */
 
-import { AnyComponent as AC } from 'preact';
+import { AnyComponent as AC, ComponentChildren } from 'preact';
 import { WEB_COMPONENT_REGISTRY } from './registry';
 import { KebabCasedProperties } from 'type-fest';
+import { RegisterOptions } from '@maykinmedia/preact-custom-element';
 
 /**
  * Context object passed to plugin hooks
@@ -52,7 +53,7 @@ export interface WebComponentPlugin {
 /**
  * Extra options for web component registration
  */
-export type WebComponentRegisterExtraOptions = {
+export type ExtraWebComponentRegisterOptions = {
   /**
    * Whether to automatically wrap the component with IntlProvider for i18n support
    * @default false
@@ -64,16 +65,8 @@ export type WebComponentRegisterExtraOptions = {
  * Extended options for web component registration
  * Supports both shadow DOM and light DOM configurations
  */
-export type WebComponentRegisterOptions = WebComponentRegisterExtraOptions &
-  (
-    | { shadow: false }
-    | {
-        shadow: true;
-        mode?: 'open' | 'closed';
-        adoptedStyleSheets?: CSSStyleSheet[];
-        serializable?: boolean;
-      }
-  );
+export type WebComponentRegisterOptions = ExtraWebComponentRegisterOptions &
+  RegisterOptions;
 
 /**
  * Web component definition with full configuration
@@ -100,6 +93,11 @@ export interface WebComponentDefinition<T extends string, P = {}> {
   importer: () => Promise<{
     default: AC<P>;
   }>;
+  /**
+   * Sub-components are used when a web-component renders other web-components.
+   * This allows the loader to register these sub-components.
+   */
+  subComponents?: WebComponentTagName[];
 }
 
 /**
@@ -118,7 +116,7 @@ export type WebComponentJSXRegistry = {
       infer _S,
       infer P
     >
-      ? P
+      ? P & { slot?: string; children?: ComponentChildren }
       : never
   >;
 };

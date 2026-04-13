@@ -11,6 +11,7 @@ export const silentErrorPlugin: WebComponentPlugin = {
     if (!error) return;
     element.style.display = 'none';
     element.setAttribute('data-wc-error', error.message);
+    console.error(error, element);
 
     // TODO: implement sentry integration.
   },

@@ -96,6 +96,11 @@ Onderhoud
 * [:gh:`2318`]: ``vitest`` en ``@vitest/ui`` bijgewerkt naar versie ``4.1.0``.
 * [:gh:`2372`]: ``typing-extensions`` bijgewerkt naar versie ``4.15.0``.
 * [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+* [:gh:`2409`]: De web component-architectuur is gerefactored om shadow DOM te ondersteunen. Componenten (``Accordion``,
+  ``Action``, ``ActionList``, ``Chart``) beschikken nu over factory-functies die een web component registreren. De
+  testopzet is herschreven: gedeelde test-utilities zijn ondergebracht in ``react/lib/testing/``, Storybook-decorators
+  en web component-decorators zijn gesplitst in afzonderlijke modules, en de Vitest-configuratie is bijgewerkt. Daarnaast
+  zijn de CI-workflow en Storybook-configuratie samengevoegd en gemoderniseerd.
 
 2.1.1 (2026-03-19)
 ==================

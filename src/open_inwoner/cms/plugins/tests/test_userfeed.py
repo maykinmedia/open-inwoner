@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase
 
 from pyquery import PyQuery
@@ -29,21 +27,18 @@ class TestUserFeedPlugin(TestCase):
 
         pyquery = PyQuery(html)
 
-        # make sure the action-list web component is present
-        action_list = pyquery.find("action-list")
+        # make sure the oip-action-list web component is present
+        action_list = pyquery.find("oip-action-list")
         self.assertEqual(len(action_list), 1)
-        self.assertEqual(action_list.attr("actions-id"), "userfeed_data")
 
-        # check the script tag contains the correct JSON data
-        script = pyquery.find("script#userfeed_data")
-        self.assertEqual(len(script), 1)
-        self.assertEqual(script.attr("type"), "application/json")
+        # validate actions length
+        actions = pyquery.find("oip-action")
+        self.assertEqual(len(actions), 1)
 
-        script_content = json.loads(script.text())
-        self.assertEqual(len(script_content), 1)
-        self.assertEqual(script_content[0]["title"], "Test message")
-        self.assertEqual(script_content[0]["message"], "Hello")
-        self.assertEqual(script_content[0]["action_url"], "http://foo.bar")
+        # validate actions attrs
+        self.assertEqual(actions.attr("title"), "Test message")
+        self.assertEqual(actions.attr("message"), "Hello")
+        self.assertEqual(actions.attr("action-url"), "http://foo.bar")
 
     def test_multiple_plugin(self):
         simple_message(self.user, "Hi", title="My message", url="http://test.com")
@@ -67,21 +62,21 @@ class TestUserFeedPlugin(TestCase):
 
         pyquery = PyQuery(html)
 
-        # make sure the action-list web component is present
-        action_list = pyquery.find("action-list")
+        # make sure the oip-action-list web component is present
+        action_list = pyquery.find("oip-action-list")
         self.assertEqual(len(action_list), 1)
-        self.assertEqual(action_list.attr("actions-id"), "userfeed_data")
 
-        # check the script tag contains the correct JSON data for both items
-        script = pyquery.find("script#userfeed_data")
-        self.assertEqual(len(script), 1)
-        self.assertEqual(script.attr("type"), "application/json")
+        # validate actions length
+        actions = pyquery.find("oip-action")
+        self.assertEqual(len(actions), 2)
 
-        script_content = json.loads(script.text())
-        self.assertEqual(len(script_content), 2)
-        self.assertEqual(script_content[0]["title"], "My message")
-        self.assertEqual(script_content[0]["message"], "Hi")
-        self.assertEqual(script_content[0]["action_url"], "http://test.com")
-        self.assertEqual(script_content[1]["title"], "TEST MESSAGE 2")
-        self.assertEqual(script_content[1]["message"], "TEST")
-        self.assertEqual(script_content[1]["action_url"], "http://example.com")
+        # validate actions attrs
+        first_action = actions.eq(0)
+        self.assertEqual(first_action.attr("title"), "My message")
+        self.assertEqual(first_action.attr("message"), "Hi")
+        self.assertEqual(first_action.attr("action-url"), "http://test.com")
+
+        last_action = actions.eq(1)
+        self.assertEqual(last_action.attr("title"), "TEST MESSAGE 2")
+        self.assertEqual(last_action.attr("message"), "TEST")
+        self.assertEqual(last_action.attr("action-url"), "http://example.com")

@@ -4,7 +4,6 @@ import { MaterialIcon, MATERIAL_ICON_DEFINITION } from '.';
 import { WebComponentLoader } from '@react/lib/web-component';
 
 // Import jest-dom matchers for extended assertions like toBeInTheDocument
-import '@testing-library/jest-dom';
 
 describe('MaterialIcon', () => {
   it('renders without crashing', () => {

@@ -28,7 +28,13 @@
             {% for afval_obj in afval_data %}
                 <article class="afval-object">
                     {# Accordion wrapping address and all containers #}
-                    <oip-accordion title="{{ afval_obj.object_address }}" subtitle="{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}" initial-open="{{ forloop.first|lower }}">
+                    <oip-accordion initial-open="{{ forloop.first|lower }}">
+                        {# hidden is added to avoid a flash of unstyled content (value resetted inside the web component) #}
+                        <div class="accordion__heading" slot="summary" hidden>
+                            <h3 class="utrecht-heading-3">{{ afval_obj.object_address }}</h3>
+                            <p class="utrecht-paragraph">{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}</p>
+                        </div>
+                        <material-icon name="keyboard_arrow_down" extra-class-name='accordion__icon' slot="icon"></material-icon>
                         {# Container Sections - Same rendering for all types #}
                         {% for container in afval_obj.containers %}
                             <section class="afval-container">

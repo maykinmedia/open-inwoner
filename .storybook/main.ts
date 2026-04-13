@@ -10,7 +10,12 @@ const config: StorybookConfig = {
     disableTelemetry: true,
   },
   stories: ['../src/**/*.stories.@(ts|tsx|mdx)'],
-  addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  addons: [
+    '@storybook/addon-vitest',
+    '@storybook/addon-docs',
+    '@storybook/addon-a11y',
+    'storybook-react-intl',
+  ],
   staticDirs: [{ from: '../src/open_inwoner/static', to: '/static' }],
   viteFinal: async (config) => {
     // Set base path for GitHub Pages deployment at /open-inwoner/

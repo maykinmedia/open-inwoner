@@ -1,0 +1,42 @@
+@use '@gemeente-denhaag/action/index.css';
+
+oip-action:first-of-type {
+  border-top: var(--denhaag-action-border-width)
+    var(--denhaag-action-border-style) var(--denhaag-action-border-color);
+}
+
+.denhaag-action {
+  border-left: none !important;
+  border-right: none !important;
+  font-size: 14px;
+  font-family: var(--oip-typography-sans-serif-font-family);
+  text-decoration: none;
+
+  // Use browser default focus-state until there is a design for it.
+  &:focus {
+    outline: revert !important;
+  }
+
+  &__content span {
+    color: var(--color-black);
+  }
+  &__actions .button {
+    height: fit-content;
+  }
+
+  // Make sure the icon is 16px/16px (only the width has a design token).
+  &__link-icon {
+    height: var(--denhaag-action-link-icon-width);
+  }
+
+  /// Open Inwoner modifiers
+
+  &__content--oip-message {
+    font-weight: bold;
+    color: var(--oip-color-fg-heading);
+  }
+
+  &__content--oip-title {
+    color: var(--utrecht-document-color);
+  }
+}

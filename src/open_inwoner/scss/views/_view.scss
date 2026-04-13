@@ -69,16 +69,6 @@
     }
   }
 
-  &--mijn_afval-index {
-    oip-accordion {
-      display: none;
-
-      &:defined {
-        display: block;
-      }
-    }
-  }
-
   &--style-demo {
     line-height: 24px;
 

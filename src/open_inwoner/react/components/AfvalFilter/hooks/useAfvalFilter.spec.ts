@@ -1,15 +1,9 @@
 import { renderHook } from '@testing-library/preact';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { type AfvalFilterConfig, AfvalFilterTypes, useAfvalFilter } from '..';
+import { IntlWrapperNL } from '@react/lib/decorators/web-component';
 
-// Mock react-intl – formatMessage returns the defaultMessage as a plain string
-vi.mock('react-intl', () => ({
-  useIntl: () => ({
-    formatMessage: (descriptor: { defaultMessage: string }) =>
-      // @ts-expect-error this is valid
-      descriptor.defaultMessage[0].value,
-  }),
-}));
+const wrapper = IntlWrapperNL;
 
 const fullConfig: AfvalFilterConfig = {
   periode: [2024, 2025],
@@ -21,27 +15,15 @@ const fullConfig: AfvalFilterConfig = {
 };
 
 describe('useAfvalFilter', () => {
-  let originalLocation: Location;
-
-  beforeEach(() => {
-    // Save and mock window.location.search
-    originalLocation = window.location;
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: { ...originalLocation, search: '' },
-    });
-  });
-
   afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: originalLocation,
-    });
+    history.pushState({}, '', window.location.pathname);
   });
 
   describe('filterGroups', () => {
     it('creates a period group from config.period', () => {
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
       const periodGroup = result.current.filterGroups.find(
         (g) => g.name === 'periode'
       );
@@ -55,7 +37,9 @@ describe('useAfvalFilter', () => {
     });
 
     it('creates an afval-type group from config.afval_types', () => {
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
       const typeGroup = result.current.filterGroups.find(
         (g) => g.name === 'afval-type'
       );
@@ -69,7 +53,9 @@ describe('useAfvalFilter', () => {
     });
 
     it('creates an adres group from config.addresses', () => {
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
       const adresGroup = result.current.filterGroups.find(
         (g) => g.name === 'adres'
       );
@@ -87,7 +73,9 @@ describe('useAfvalFilter', () => {
         ...fullConfig,
         periode: undefined as any,
       };
-      const { result } = renderHook(() => useAfvalFilter(config));
+      const { result } = renderHook(() => useAfvalFilter(config), {
+        wrapper,
+      });
 
       expect(
         result.current.filterGroups.find((g) => g.name === 'periode')
@@ -99,7 +87,9 @@ describe('useAfvalFilter', () => {
         ...fullConfig,
         afval_types: undefined as any,
       };
-      const { result } = renderHook(() => useAfvalFilter(config));
+      const { result } = renderHook(() => useAfvalFilter(config), {
+        wrapper,
+      });
 
       expect(
         result.current.filterGroups.find((g) => g.name === 'afval-type')
@@ -111,7 +101,9 @@ describe('useAfvalFilter', () => {
         ...fullConfig,
         addresses: undefined as any,
       };
-      const { result } = renderHook(() => useAfvalFilter(config));
+      const { result } = renderHook(() => useAfvalFilter(config), {
+        wrapper,
+      });
 
       expect(
         result.current.filterGroups.find((g) => g.name === 'adres')
@@ -120,7 +112,9 @@ describe('useAfvalFilter', () => {
 
     it('returns empty filterGroups when all config fields are undefined', () => {
       const config = {} as AfvalFilterConfig;
-      const { result } = renderHook(() => useAfvalFilter(config));
+      const { result } = renderHook(() => useAfvalFilter(config), {
+        wrapper,
+      });
 
       expect(result.current.filterGroups).toEqual(
         [] satisfies typeof result.current.filterGroups
@@ -128,7 +122,9 @@ describe('useAfvalFilter', () => {
     });
 
     it('preserves group order: period, afval-type, adres', () => {
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
       const names = result.current.filterGroups.map((g) => g.name);
 
       expect(names).toEqual([
@@ -141,7 +137,9 @@ describe('useAfvalFilter', () => {
 
   describe('initialFilterState', () => {
     it('returns empty arrays when no URL params are present', () => {
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
 
       expect(result.current.initialFilterState).toEqual({
         periode: [],
@@ -151,9 +149,11 @@ describe('useAfvalFilter', () => {
     });
 
     it('reads period values from URL search params', () => {
-      window.location.search = '?periode=2024';
+      history.pushState({}, '', '?periode=2024');
 
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
 
       expect(result.current.initialFilterState.periode).toEqual([
         '2024',
@@ -161,9 +161,11 @@ describe('useAfvalFilter', () => {
     });
 
     it('reads adres values from URL search params', () => {
-      window.location.search = '?adres=Kerkstraat+12';
+      history.pushState({}, '', '?adres=Kerkstraat+12');
 
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
 
       expect(result.current.initialFilterState.adres).toEqual([
         'Kerkstraat 12',
@@ -171,9 +173,11 @@ describe('useAfvalFilter', () => {
     });
 
     it('reads afval-type values from URL search params', () => {
-      window.location.search = '?afval-type=rest&afval-type=gft';
+      history.pushState({}, '', '?afval-type=rest&afval-type=gft');
 
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
 
       expect(result.current.initialFilterState['afval-type']).toEqual([
         'rest',
@@ -182,9 +186,15 @@ describe('useAfvalFilter', () => {
     });
 
     it('reads multiple filter types from URL simultaneously', () => {
-      window.location.search = '?periode=2025&adres=Dorpslaan+5&afval-type=gft';
+      history.pushState(
+        {},
+        '',
+        '?periode=2025&adres=Dorpslaan+5&afval-type=gft'
+      );
 
-      const { result } = renderHook(() => useAfvalFilter(fullConfig));
+      const { result } = renderHook(() => useAfvalFilter(fullConfig), {
+        wrapper,
+      });
 
       expect(result.current.initialFilterState).toEqual({
         periode: ['2025'],
