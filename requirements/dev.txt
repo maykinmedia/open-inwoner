@@ -44,8 +44,6 @@ attrs==21.2.0
     #   -r requirements/ci.txt
     #   glom
     #   jsonschema
-autopep8==1.5.7
-    # via django-silk
 babel==2.15.0
     # via
     #   -c requirements/ci.txt
@@ -504,7 +502,7 @@ django-setup-configuration==0.9.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   mozilla-django-oidc-db
-django-silk==5.1.0
+django-silk==5.5.0
     # via -r requirements/dev.in
 django-simple-certmanager==2.5.0
     # via
@@ -1096,8 +1094,6 @@ psycopg2==2.9.9
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-pycodestyle==2.11.1
-    # via autopep8
 pycparser==2.20
     # via
     #   -c requirements/ci.txt
@@ -1438,8 +1434,6 @@ tinyhtml5==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   weasyprint
-toml==0.10.2
-    # via autopep8
 tomli==1.2.1
     # via pep517
 typer==0.21.1
