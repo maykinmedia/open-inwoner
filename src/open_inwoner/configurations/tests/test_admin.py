@@ -170,6 +170,21 @@ class TestAdminForm(WebTest):
         config.refresh_from_db()
         self.assertFalse(config.email_verification_required)
 
+    def test_virus_scan_requires_clamav_host(self):
+        config = SiteConfiguration.get_solo()
+
+        self.form["enable_virus_scan"] = True
+        self.form["clamav_host"] = ""
+        response = self.form.submit()
+
+        self.assertIn(
+            "ClamAV host cannot be empty when virus scanning is enabled.",
+            response.text,
+        )
+
+        config.refresh_from_db()
+        self.assertFalse(config.enable_virus_scan)
+
 
 class CustomJavaScriptValidatorTests(TestCase):
     """Test the JavaScript file validator"""
