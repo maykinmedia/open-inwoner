@@ -977,9 +977,9 @@ class ProfileDeleteTest(WebTest):
         response = response.forms["delete-form"].submit()
         self.assertIsNone(self.regular_users.first())
 
-        # check redirect
+        # check redirect directly to login (no longer via logout)
         self.assertRedirects(
-            self.app.get(response.url),
+            response,
             reverse("login"),
             status_code=302,
             target_status_code=200,
@@ -996,9 +996,9 @@ class ProfileDeleteTest(WebTest):
         response = response.forms["delete-form"].submit()
         self.assertIsNone(self.regular_users.first())
 
-        # check redirect
+        # check redirect directly to login (no longer via logout)
         self.assertRedirects(
-            self.app.get(response.url),
+            response,
             reverse("login"),
             status_code=302,
             target_status_code=200,
