@@ -40,7 +40,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/first",
+            link="https://example.com/first",
             icon="arrow_forward",
         )
         add_plugin(
@@ -58,7 +58,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/second",
+            link="https://example.com/second",
             icon="check",
         )
 
@@ -108,7 +108,7 @@ class CMSLinkPluginTest(TestCase):
                     }
                 ],
             },
-            external_link="https://example.com/first",
+            link="https://example.com/first",
             icon="arrow_forward",
         )
 

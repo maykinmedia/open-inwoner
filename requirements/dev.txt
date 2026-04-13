@@ -329,7 +329,6 @@ django-cms==3.11.1
     #   -r requirements/ci.txt
     #   aldryn-apphooks-config
     #   djangocms-attributes-field
-    #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
 django-colorfield==0.4.5
@@ -370,8 +369,6 @@ django-filer==3.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   djangocms-file
-    #   djangocms-link
     #   djangocms-picture
     #   maykin-django-prosemirror
 django-filter==21.1
@@ -555,14 +552,9 @@ djangocms-attributes-field==2.1.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-    #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-djangocms-file==3.0.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-djangocms-link==3.1.1
+djangocms-link==5.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
