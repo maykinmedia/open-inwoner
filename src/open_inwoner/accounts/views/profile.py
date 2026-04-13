@@ -4,6 +4,7 @@ from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -34,7 +35,7 @@ from open_inwoner.cms.utils.page_display import (
     products_page_is_published,
 )
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.haalcentraal.utils import fetch_brp
+from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.openklant.constants import KlantenServiceType
@@ -437,8 +438,20 @@ class MyDataView(
 
     def get_brp_data(self):
         self.log_brp_data_requested()
-        data = fetch_brp(self.request.user.bsn)
-        return data
+        bsn = self.request.user.bsn
+        if not bsn:
+            return None
+        try:
+            client = BRPClient.from_config()
+        except ImproperlyConfigured:
+            logger.warning("no service configured for Haal Centraal")
+            return None
+
+        try:
+            return client.fetch_brp(bsn)
+        except Exception:
+            logger.exception("Failed to fetch BRP data for user")
+            return None
 
 
 class MyNotificationsView(

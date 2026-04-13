@@ -766,6 +766,30 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.is_bsn_user and self.is_prepopulated
 
+    def populate_from_brp(self, persoon: BRPPersoon13 | BRPPersoon2x) -> None:
+        brp = BRPData.from_persoon(persoon)
+        self.first_name = brp.first_name
+        self.infix = brp.infix
+        self.last_name = brp.last_name
+        self.birthday = brp.birthday
+        self.street = brp.street
+        self.housenumber = brp.get_housenumber()
+        self.city = brp.city
+        self.is_prepopulated = True
+        self.save(
+            update_fields=[
+                "first_name",
+                "infix",
+                "last_name",
+                "birthday",
+                "street",
+                "housenumber",
+                "city",
+                "is_prepopulated",
+            ]
+        )
+
+
     @property
     def is_eherkenning_user(self) -> bool:
         return self.login_type == LoginTypeChoices.eherkenning

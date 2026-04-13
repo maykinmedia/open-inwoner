@@ -67,7 +67,7 @@ class AccountsConfig(AppConfig):
 
     def ready(self):
         # Register the signals upon app init
-        from .signals import log_user_login, log_user_logout  # noqa:F401
+        from .signals import log_user_login, log_user_logout, on_bsn_change  # noqa:F401
 
         if self._has_run:
             return

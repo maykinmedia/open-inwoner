@@ -10,11 +10,10 @@ from timeline_logger.models import TimelineLog
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.haalcentraal.tests.factories import ServiceFactory
+from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
-
-from .factories import ServiceFactory
-from .mixins import HaalCentraalMixin
 
 
 @requests_mock.Mocker()

@@ -2,15 +2,16 @@ import abc
 from abc import ABC
 from datetime import datetime
 
+from django.core.exceptions import ImproperlyConfigured
+
 import requests
 import structlog
 from glom import GlomError, glom
-from requests import RequestException
 from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import BrpVersionChoices, HaalCentraalConfig
-from open_inwoner.utils.api import ClientError, get_json_response
+from open_inwoner.utils.api import get_json_response
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -26,10 +27,8 @@ class BRPClient(ABC):
     def from_config(cls) -> "BRPClient":
         config = HaalCentraalConfig.get_solo()
         if not config.service:
-            logger.warning("no service defined for Haal Centraal")
-            client = None
-        else:
-            client = build_client(config.service)
+            raise ImproperlyConfigured("No service configured for Haal Centraal")
+        client = build_client(config.service)
 
         mapping = {
             BrpVersionChoices.V1_3: BRPClient_1_3,
@@ -55,9 +54,6 @@ class BRPClient(ABC):
         raise NotImplementedError()
 
     def fetch_brp(self, user_bsn: str) -> BRPData | None:
-        if not self.client:
-            return None
-
         data = self.fetch_data(user_bsn)
         if not data:
             logger.warning("no data retrieved from Haal Centraal")
@@ -86,24 +82,20 @@ class BRPClient_1_3(BRPClient):
         }
         headers.update(self.extra_headers)
 
-        try:
-            response = self.client.get(
-                url=url,
-                headers=headers,
-                params={
-                    "fields": "geslachtsaanduiding,"
-                    "naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,"
-                    "verblijfplaats.straat,verblijfplaats.huisletter,"
-                    "verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,"
-                    "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
-                    "geboorte.datum.datum,geboorte.plaats.omschrijving"
-                },
-                verify=False,
-            )
-            return get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("unexpected error connecting to Haal Centraal")
-            return None
+        response = self.client.get(
+            url=url,
+            headers=headers,
+            params={
+                "fields": "geslachtsaanduiding,"
+                "naam.voornamen,naam.geslachtsnaam,naam.voorletters,naam.voorvoegsel,"
+                "verblijfplaats.straat,verblijfplaats.huisletter,"
+                "verblijfplaats.huisnummertoevoeging,verblijfplaats.woonplaats,"
+                "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
+                "geboorte.datum.datum,geboorte.plaats.omschrijving"
+            },
+            verify=False,
+        )
+        return get_json_response(response)
 
     def parse_data(self, data: dict) -> BRPData | None:
         brp = BRPData(
@@ -166,12 +158,8 @@ class _BRPClient_2_x(BRPClient):
         return response
 
     def fetch_data(self, user_bsn) -> dict | None:
-        try:
-            response = self.make_request(user_bsn)
-            return get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("unexpected error connecting to Haal Centraal")
-            return None
+        response = self.make_request(user_bsn)
+        return get_json_response(response)
 
     def parse_data(self, data: dict) -> BRPData | None:
         # use first record
