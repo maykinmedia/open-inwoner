@@ -2,7 +2,7 @@
 export { default as ActionList } from './ActionList';
 
 // Types
-export type { IActionListProps, IActionProps } from './ActionList';
+export type { IActionListProps } from './ActionList';
 
 // Constants
 export * from './constants';

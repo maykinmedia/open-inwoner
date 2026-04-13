@@ -1,2 +1,6 @@
-export { withIntl, withThemeClass } from './storybook';
-export { withIntl as withIntlWebComponent } from './web-component';
+export {
+  withIntlStory,
+  withThemeClass,
+  withLoader as withLoader,
+} from './storybook';
+export { withIntl, IntlWrapperNL, IntlWrapperEN } from './web-component';

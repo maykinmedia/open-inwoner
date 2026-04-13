@@ -1,4 +1,4 @@
-import { withIntl, withLoader } from '@react/lib/decorators/storybook';
+import { withLoader } from '@react/lib/decorators/storybook';
 import type { Meta, StoryObj } from '@storybook/preact-vite';
 import {
   AFVAL_FILTERS_DEFINITION,
@@ -31,7 +31,6 @@ const sampleConfig: AfvalFilterConfig = {
 const meta: Meta<typeof AfvalFilter> = {
   title: 'Components/AfvalFilter',
   component: AfvalFilter,
-  decorators: [withIntl],
   parameters: {
     layout: 'padded',
     docs: {

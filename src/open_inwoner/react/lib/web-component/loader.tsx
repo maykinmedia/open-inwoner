@@ -1,19 +1,19 @@
 import { AnyComponent as AC } from 'preact';
-import register from 'preact-custom-element';
-import { withIntlWebComponent } from '../decorators';
-import {
-  performancePlugin,
-  silentErrorPlugin,
-  skeletonPlugin,
-} from './plugins';
-import { WEB_COMPONENT_REGISTRY } from './registry';
 import type {
   WebComponentContext,
   WebComponentPlugin,
   WebComponentRegisterOptions,
   WebComponentTagName,
 } from '.';
+import { withIntl } from '../decorators';
 import { ExtractGeneric } from '../types';
+import {
+  performancePlugin,
+  silentErrorPlugin,
+  skeletonPlugin,
+} from './plugins';
+import { register } from '@maykinmedia/preact-custom-element';
+import { WEB_COMPONENT_REGISTRY } from './registry';
 
 export class WebComponentLoader {
   constructor() {}
@@ -28,8 +28,10 @@ export class WebComponentLoader {
   private static pluginRegistry: WebComponentPlugin[] = [
     silentErrorPlugin,
     skeletonPlugin,
-    // @ts-expect-error
-    ...(window.IS_DEV ? [performancePlugin] : []),
+    // @ts-expect-error window.IS_DEV is a custom window variable which we set in the master template.
+    ...(window.IS_DEV || import.meta.env.DEV || import.meta.env.STORYBOOK
+      ? [performancePlugin]
+      : []),
   ];
 
   /**
@@ -115,16 +117,22 @@ export class WebComponentLoader {
     tagName: string,
     propNames?: (keyof P)[],
     options: WebComponentRegisterOptions = { shadow: false, i18n: false }
-  ): HTMLElement {
+  ) {
     // Remove i18n from options before passing to preact-custom-element
     const { i18n, ...registerOptions } = options;
 
-    // If i18n option is enabled, wrap the component with IntlProvider
-    const ComponentToRegister = i18n
-      ? withIntlWebComponent(Component)
-      : Component;
+    // Every custom element gets its own Preact render root, so the story/app-level
+    // IntlProvider context is not accessible. Wrap with IntlProvider inside the
+    // component itself whenever i18n is enabled.
+    const ComponentToRegister = i18n ? withIntl(Component) : Component;
 
-    return register(ComponentToRegister, tagName, propNames, registerOptions);
+    // Fail silently if component is already defined.
+    // The component continue rendering like nothing happened.
+    try {
+      return register(ComponentToRegister, tagName, propNames, registerOptions);
+    } catch {
+      return;
+    }
   }
 
   public static async importWebComponent(
@@ -150,6 +158,7 @@ export class WebComponentLoader {
       // Import and load the web component
       const { default: Component } = await importer();
       if (!Component) throw new Error(`"${name}" has no default export`);
+
       const config = WebComponentLoader.registry[name];
 
       WebComponentLoader.registerWebComponent<ExtractGeneric<typeof Component>>(
@@ -159,6 +168,13 @@ export class WebComponentLoader {
         config.options
       );
 
+      // Register sub-components immediatly.
+      // The sub-components mount later when the loading is already done.
+      if (config.subComponents) {
+        await Promise.all(
+          config.subComponents.map(WebComponentLoader.importWebComponent)
+        );
+      }
       // Run plugins `afterLoad` hooks
       await Promise.all(contexts.map(WebComponentLoader.runAfterLoadHooks));
     } catch (err) {
@@ -185,6 +201,8 @@ export class WebComponentLoader {
       await Promise.all(
         foundComponents.map(WebComponentLoader.importWebComponent)
       );
+
+      // WebComponentLoader.registerWebComponents();
     } catch (err) {
       console.error('[web-component:error]:', err);
     }

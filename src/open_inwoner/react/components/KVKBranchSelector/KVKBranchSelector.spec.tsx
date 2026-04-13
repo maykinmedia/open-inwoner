@@ -1,26 +1,8 @@
-import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/preact';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { KVKBranchSelector, KVK_BRANCH_SELECTOR_DEFINITION } from '.';
 import { WebComponentLoader } from '@react/lib/web-component';
-
-// Mock useIntl hook to avoid IntlProvider compatibility issues with Preact
-vi.mock('react-intl', () => ({
-  useIntl: () => ({
-    formatMessage: ({ id }: { id: string }) => {
-      const messages: Record<string, string> = {
-        'kvkbranchselector.placeholder':
-          'Vul naam, adres of vestigingsnummer in...',
-        'kvkbranchselector.clear': 'Wissen',
-        'kvkbranchselector.toggle': 'Toggle dropdown',
-      };
-      return messages[id] || id;
-    },
-  }),
-}));
-
-// Mock scrollIntoView since jsdom doesn't support it
-Element.prototype.scrollIntoView = vi.fn();
+import { IntlWrapperNL } from '@react/lib/decorators/web-component';
 
 const mockBranches = [
   {
@@ -56,7 +38,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
     expect(screen.getByRole('combobox')).toBeInTheDocument();
     expect(screen.getByText('Select Branch')).toBeInTheDocument();
@@ -69,7 +52,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     // Clear the auto-selected rechtspersoon to open dropdown
@@ -90,7 +74,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     // Component auto-selects rechtspersoon, so clear button is shown initially
@@ -101,7 +86,7 @@ describe('KVKBranchSelector', () => {
     fireEvent.click(clearButton);
 
     // Now toggle button should appear
-    const toggleButton = screen.getByLabelText(/toggle dropdown/i);
+    const toggleButton = screen.getByLabelText(/opties tonen/i);
     expect(toggleButton).toHaveAttribute('aria-expanded', 'true');
 
     // Close dropdown
@@ -120,7 +105,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     const input = screen.getByRole('combobox');
@@ -145,7 +131,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     const input = screen.getByRole('combobox') as HTMLInputElement;
@@ -165,7 +152,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     const input = screen.getByRole('combobox') as HTMLInputElement;
@@ -185,7 +173,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     const input = screen.getByRole('combobox') as HTMLInputElement;
@@ -204,7 +193,8 @@ describe('KVKBranchSelector', () => {
         label="Select Branch"
         name="branch"
         branches={mockBranches}
-      />
+      />,
+      { wrapper: IntlWrapperNL }
     );
 
     const input = screen.getByRole('combobox');
@@ -226,7 +216,8 @@ describe('KVKBranchSelector', () => {
           branches={mockBranches}
           selectedBranchId="12345"
         />
-      </form>
+      </form>,
+      { wrapper: IntlWrapperNL }
     );
 
     const hiddenInput = container.querySelector(
@@ -247,7 +238,8 @@ describe('KVKBranchSelector', () => {
           branches={mockBranches}
           selectedBranchId="rechtspersoon"
         />
-      </form>
+      </form>,
+      { wrapper: IntlWrapperNL }
     );
 
     const hiddenInput = container.querySelector(

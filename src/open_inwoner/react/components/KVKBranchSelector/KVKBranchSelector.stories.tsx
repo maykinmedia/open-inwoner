@@ -1,10 +1,10 @@
-import { withLoader } from '@react/lib/decorators/storybook';
 import type { Meta, StoryObj } from '@storybook/preact-vite';
 import {
   KVK_BRANCH_SELECTOR_DEFINITION,
   KVKBranchSelector,
   KVKBranchSelectorProps,
 } from '.';
+import { withLoader } from '@react/lib/decorators';
 
 const meta: Meta<KVKBranchSelectorProps> = {
   title: 'Components/KVKBranchSelector',
@@ -176,45 +176,49 @@ export const SearchFiltering: Story = {
   },
 };
 
-export const InsideForm: Story = {
-  args: {
-    branches: mockBranches,
-  },
-  render: (args) => (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        alert('Form submitted! Check console for form data.');
-        const formData = new FormData(e.currentTarget);
-        console.log('Form data:', Object.fromEntries(formData));
-      }}
-    >
-      <KVKBranchSelector {...args} />
-      <div style={{ marginTop: '1rem' }}>
-        <button
-          type="submit"
-          name="submit"
-          className="button button--secondary"
-          disabled
-        >
-          Ga door →
-        </button>
-      </div>
-      <p className="utrecht-paragraph">
-        💡 Note: The submit button becomes enabled after selecting a branch.
-        When selection is cleared, the button becomes disabled.
-      </p>
-    </form>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Form integration example. Select a branch to enable the submit button. On submit, the hidden input value is logged to console.',
-      },
-    },
-  },
-};
+/**
+ * This test causes connection errors when tested in `npm run test:storybook`.
+ * Besides that we should move this to a propriate `Form.stories.tsx#FormWithKVKBranchesSelectorField` storie.
+ * TODO: Create and move this story to Form.stories.tsx
+ */
+// export const InsideForm: Story = {
+//   args: {
+//     branches: mockBranches,
+//   },
+//   render: (args) => (
+//     <form
+//       onSubmit={(e) => {
+//         e.preventDefault();
+//         const formData = new FormData(e.currentTarget);
+//         console.log('Form data:', Object.fromEntries(formData));
+//       }}
+//     >
+//       <KVKBranchSelector {...args} />
+//       <div style={{ marginTop: '1rem' }}>
+//         <button
+//           type="submit"
+//           name="submit"
+//           className="button button--secondary"
+//           disabled
+//         >
+//           Ga door →
+//         </button>
+//       </div>
+//       <p className="utrecht-paragraph">
+//         💡 Note: The submit button becomes enabled after selecting a branch.
+//         When selection is cleared, the button becomes disabled.
+//       </p>
+//     </form>
+//   ),
+//   parameters: {
+//     docs: {
+//       description: {
+//         story:
+//           'Form integration example. Select a branch to enable the submit button. On submit, the form data is logged to the console.',
+//       },
+//     },
+//   },
+// };
 
 export const EmptyBranches: Story = {
   args: {
@@ -240,7 +244,7 @@ export const AsWebComponent: Story = {
     name: 'branch_number',
     branchesId: 'branches-id',
   },
-  decorators: withLoader(KVK_BRANCH_SELECTOR_DEFINITION.tagName),
+  decorators: [withLoader(KVK_BRANCH_SELECTOR_DEFINITION.tagName)],
   render: ({ id, label, name, branchesId }) => (
     <>
       <script type="application/json" id={branchesId}>

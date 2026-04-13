@@ -14,7 +14,7 @@ const meta: Meta<HomepageCardTypes> = {
 
 export default meta;
 
-type Story = StoryObj<HomepageCardTypes>;
+type Story = StoryObj<typeof HomePluginCard>;
 
 export const Default: Story = {
   args: {

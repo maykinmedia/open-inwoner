@@ -356,7 +356,7 @@ const mockMenuData = [
  */
 export const AsWebComponent: Story = {
   args: { itemsId: 'sidenav-test-data' },
-  decorators: withLoader(SIDE_NAV_DEFINITION.tagName),
+  decorators: [withLoader(SIDE_NAV_DEFINITION.tagName)],
   render: ({ itemsId }) => (
     <>
       <script type="application/json" id={itemsId}>

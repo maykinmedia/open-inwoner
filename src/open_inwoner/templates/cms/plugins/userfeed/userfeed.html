@@ -12,8 +12,11 @@
     </header>
 
     <div class="card-container card-container--columns-1 plugin-card">
-        {{userfeed_item_list_json|json_script:"userfeed_data"}}
-        <action-list actions-id="userfeed_data" />
+        <oip-action-list>
+            {% for item in userfeed_item_list_json %}
+                <oip-action title="{{item.title}}" message="{{item.message}}" action-url="{{item.action_url}}"></oip-action>
+            {% endfor %}
+        </oip-action-list>
     </div>
 </section>
 {% endif %}

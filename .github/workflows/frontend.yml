@@ -1,6 +1,5 @@
-name: Build and publish storybook
+name: Frontend
 
-# Run this workflow every time a new commit pushed to your repository
 on:
   push:
     branches:
@@ -16,15 +15,65 @@ on:
   workflow_dispatch:
 
 jobs:
+  unit-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up test environment
+        run: |
+          npx playwright install --with-deps firefox webkit chromium
+          npm run compilemessages
+
+      - name: Run tests
+        run: npm run test:vitest
+
+      - name: Type check and build
+        run: |
+          npm run type-check
+          npm run build
+
+  interaction-tests:
+    name: Run Storybook tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up test environment
+        run: |
+          npx playwright install --with-deps firefox webkit chromium
+          npm run compilemessages
+
+      - name: Run Storybook tests
+        run: npm run test:storybook
+
   storybook:
     name: Create storybook build
     runs-on: ubuntu-latest
+    needs: [unit-tests, interaction-tests]
 
     steps:
       - uses: actions/checkout@v6
       - name: Build Storybook docs
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
           npm run build-storybook
 
       - name: Upload artifact
@@ -54,7 +103,7 @@ jobs:
     steps:
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

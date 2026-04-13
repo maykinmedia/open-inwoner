@@ -14,19 +14,6 @@ env:
   IMAGE_NAME: maykinmedia/open-inwoner
 
 jobs:
-  test_frontend:
-    name: Extract messages, compile i18n, and bundle React
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-      - run: npm ci
-      - run: npm run test:ci
-      - run: npm run type-check
-      - run: npm run build
-
   #
   # Unit and integration tests
   #

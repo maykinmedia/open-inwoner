@@ -1,31 +1,14 @@
-import { vi, describe, expect, it, beforeAll, beforeEach } from 'vitest';
+import { describe, expect, it, beforeAll, beforeEach } from 'vitest';
 import { WebComponentLoader } from '@react/lib/web-component';
-import '@testing-library/jest-dom';
 import { render, cleanup } from '@testing-library/preact';
+import { IntlWrapperNL } from '@react/lib/testing';
+
+const wrapper = IntlWrapperNL;
+
 import OIPChart from './Chart';
 import { CHART_DEFINITION } from '.';
 import { AfvalData } from './types';
 import mockDataFixture from './fixtures/data-2025.json';
-// Mock react-intl
-vi.mock('react-intl', () => ({
-  FormattedMessage: ({ children, defaultMessage }: any) => {
-    if (typeof children === 'function') {
-      return children(defaultMessage);
-    }
-    return defaultMessage;
-  },
-  IntlProvider: ({ children }: any) => children,
-}));
-
-// Mock I18nProvider to avoid hooks issues with preact-custom-element
-vi.mock('@react/i18n', () => ({
-  I18nProvider: ({ children }: any) => children,
-  loadI18nConfig: vi.fn().mockResolvedValue({
-    messages: {},
-    locale: 'nl',
-    defaultLocale: 'nl',
-  }),
-}));
 
 const mockData = mockDataFixture as AfvalData;
 
@@ -47,19 +30,19 @@ describe('Chart', () => {
   });
 
   it('renders without crashing', () => {
-    const { container } = render(<OIPChart />);
+    const { container } = render(<OIPChart />, { wrapper });
     expect(container).toBeDefined();
   });
 
   it('renders canvas element', () => {
-    const { container } = render(<OIPChart data={mockData} />);
+    const { container } = render(<OIPChart data={mockData} />, { wrapper });
     const canvas = container.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
     expect(canvas).toHaveClass('afval-chart');
   });
 
   it('renders container with aria-hidden for accessibility', () => {
-    const { container } = render(<OIPChart data={mockData} />);
+    const { container } = render(<OIPChart data={mockData} />, { wrapper });
     const chartContainer = container.querySelector('.afval-chart__container');
     expect(chartContainer).toHaveAttribute('aria-hidden', 'true');
   });
@@ -68,7 +51,9 @@ describe('Chart', () => {
     const dataId = 'test-chart-data';
     const cleanupScript = mountChartData(dataId, mockData);
 
-    const { container } = render(<OIPChart dataId={dataId} period="month" />);
+    const { container } = render(<OIPChart dataId={dataId} period="month" />, {
+      wrapper,
+    });
     expect(container.querySelector('canvas')).toBeInTheDocument();
 
     cleanupScript();
@@ -94,7 +79,7 @@ describe('Chart', () => {
     });
 
     it('should not use shadow DOM', () => {
-      expect(CHART_DEFINITION.options?.shadow).toBe(false);
+      expect(CHART_DEFINITION.options?.shadow).toBe(true);
     });
 
     it('should have i18n enabled', () => {

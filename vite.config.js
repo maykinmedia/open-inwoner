@@ -1,9 +1,15 @@
+/// <reference types="vitest/config" />
+import { playwright } from '@vitest/browser-playwright';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import paths from './build/paths';
 import { collectStaticPlugin } from './build/collect-static';
+
+const _OIP_INTERNAL_dirname = dirname(fileURLToPath(import.meta.url));
 
 // Export Vite build-only config
 export default defineConfig(({ mode }) => {
@@ -91,9 +97,10 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    // This base is the relative location where the static
-    // files are sourced from (after building).
-    base: '/static/bundles/',
+    // This base is the relative location where the static files are sourced
+    // from (after building). Override to '/' in test mode so Vite's
+    // pre-bundled dep URLs resolve correctly in the browser test runner.
+    base: mode === 'test' ? '/' : '/static/bundles/',
 
     resolve: {
       alias: {
@@ -101,10 +108,52 @@ export default defineConfig(({ mode }) => {
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     },
+    optimizeDeps: {
+      include: ['react-intl'],
+    },
     test: {
       globals: true,
-      environment: 'jsdom',
-      setupFiles: ['./src/open_inwoner/react/test/test-setup.ts'],
+      setupFiles: './vitest.setup.ts',
+      browser: {
+        enabled: true,
+        headless: true,
+        provider: playwright({}),
+        instances: [
+          { browser: 'chromium' },
+          // WebKit has known issues on some Linux setups (snap library conflicts).
+          // Run it only in CI where the environment is controlled.
+          ...(process.env.CI
+            ? [{ browser: 'webkit' }, { browser: 'firefox' }]
+            : []),
+        ],
+        screenshotFailures: false,
+      },
+      projects: [
+        {
+          extends: true,
+          test: {
+            name: 'unit',
+            include: [
+              'src/**/*.spec.{js,jsx,ts,tsx}',
+              'src/**/*.test.{js,jsx,ts,tsx}',
+            ],
+          },
+        },
+        {
+          extends: true,
+          plugins: [
+            // The plugin will run tests for the stories defined in your Storybook config
+            // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+            storybookTest({
+              configDir: resolve(_OIP_INTERNAL_dirname, '.storybook'),
+            }),
+          ],
+          test: {
+            name: 'storybook',
+            // setupFiles: ['./vitest.setup.ts'],
+          },
+        },
+      ],
     },
   };
 });

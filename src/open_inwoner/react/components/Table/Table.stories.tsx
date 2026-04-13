@@ -168,7 +168,7 @@ export const WithScriptData: Story = {
  */
 export const AsWebComponent: Story = {
   args: { jsonScriptId: 'gft-table-data' },
-  decorators: withLoader(TABLE_DEFINITION.tagName),
+  decorators: [withLoader(TABLE_DEFINITION.tagName)],
   render: ({ jsonScriptId }) => {
     const data = {
       caption:

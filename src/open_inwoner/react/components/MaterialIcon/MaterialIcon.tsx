@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { AnyComponent as AC } from 'preact';
+import './MaterialIcon.scss';
 
 export interface MaterialIconProps {
   name: string;
