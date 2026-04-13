@@ -161,12 +161,16 @@ export class WebComponentLoader {
 
       const config = WebComponentLoader.registry[name];
 
-      WebComponentLoader.registerWebComponent<ExtractGeneric<typeof Component>>(
+      const a = WebComponentLoader.registerWebComponent<
+        ExtractGeneric<typeof Component>
+      >(
         Component as AC<ExtractGeneric<typeof Component>>,
         config.tagName,
         config.propNames as (keyof ExtractGeneric<typeof Component>)[],
         config.options
       );
+
+      console.log(a, config.subComponents);
 
       // Register sub-components immediatly.
       // The sub-components mount later when the loading is already done.

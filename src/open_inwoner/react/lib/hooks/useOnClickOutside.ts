@@ -21,7 +21,11 @@ export const useOnClickOutside = (
     if (disabled) return;
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      // Use composedPath() instead of contains() so clicks on slotted children
+      // (light DOM nodes projected into a shadow root via <slot>) are correctly
+      // treated as "inside" the container — contains() only walks the flat DOM
+      // tree and returns false for slotted/shadow-DOM nodes.
+      if (ref.current && !e.composedPath().includes(ref.current)) {
         onClickOutside();
       }
     };
