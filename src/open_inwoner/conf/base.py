@@ -1,5 +1,7 @@
+import datetime
 import os
 
+import django.utils.timezone
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
@@ -15,6 +17,11 @@ from maykin_common.health_checks import (
 
 from .structlog_sentry import SentryStructlogProcessor
 from .utils import config, get_sentry_integrations
+
+# django.utils.timezone.utc was removed in Django 5.0. Restore it as a
+# compatibility shim for third-party packages (e.g. zgw-consumers-oas) that
+# haven't been updated yet.
+django.utils.timezone.utc = datetime.timezone.utc
 
 # Build paths inside the project, so further paths can be defined relative to
 # the code root.
