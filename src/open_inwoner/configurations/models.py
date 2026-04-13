@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -710,6 +710,34 @@ class SiteConfiguration(SingletonModel):
         ),
     )
 
+    # Virus scan (ClamAV)
+    enable_virus_scan = models.BooleanField(
+        verbose_name=_("Enable virus scan"),
+        default=False,
+        help_text=_(
+            "When enabled, uploaded files are scanned for viruses using ClamAV. "
+            "Requires a ClamAV service reachable at the configured host and port."
+        ),
+    )
+    clamav_host = models.CharField(
+        verbose_name=_("ClamAV host"),
+        max_length=255,
+        default="clamav",
+        blank=True,
+        help_text=_("Hostname or IP address of the ClamAV daemon."),
+    )
+    clamav_port = models.PositiveIntegerField(
+        verbose_name=_("ClamAV port"),
+        default=3310,
+        validators=[MaxValueValidator(65535)],
+        help_text=_("TCP port of the ClamAV daemon (default: 3310)."),
+    )
+    clamav_timeout = models.FloatField(
+        verbose_name=_("ClamAV timeout"),
+        default=30.0,
+        help_text=_("Connection timeout in seconds for the ClamAV daemon."),
+    )
+
     class Meta:
         verbose_name = _("Site Configuration")
 
@@ -721,6 +749,15 @@ class SiteConfiguration(SingletonModel):
                 _(
                     "Email verification message cannot be empty if email verification is required"
                 )
+            )
+
+        if self.enable_virus_scan and not self.clamav_host:
+            raise ValidationError(
+                {
+                    "clamav_host": _(
+                        "ClamAV host cannot be empty when virus scanning is enabled."
+                    )
+                }
             )
 
     def __str__(self):

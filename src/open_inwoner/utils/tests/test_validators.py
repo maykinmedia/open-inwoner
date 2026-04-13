@@ -1,9 +1,16 @@
+from unittest.mock import patch
+
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
+import clamd
+
+from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.validators import (
     DutchPhoneNumberValidator,
+    NoVirusValidator,
     format_phone_number,
     validate_array_contents_non_empty,
     validate_phone_number,
@@ -145,3 +152,101 @@ class ValidatorsTestCase(TestCase):
             with self.subTest(val=val):
                 with self.assertRaises(ValidationError):
                     validate_array_contents_non_empty(val)
+
+
+@patch("open_inwoner.utils.validators.clamd.ClamdNetworkSocket")
+class NoVirusValidatorTests(TestCase):
+    def setUp(self):
+        self.config = SiteConfiguration.get_solo()
+        self.config.enable_virus_scan = True
+        self.config.clamav_host = "clamav"
+        self.config.clamav_port = 3310
+        self.config.clamav_timeout = 30.0
+        self.config.save()
+
+    def _uploaded_file(self, content=b"data"):
+        return SimpleUploadedFile(
+            "test.bin", content, content_type="application/octet-stream"
+        )
+
+    def test_scan_disabled_skips_clamd(self, mock_clamd_cls):
+        self.config.enable_virus_scan = False
+        self.config.save()
+        NoVirusValidator()(self._uploaded_file())
+        mock_clamd_cls.assert_not_called()
+
+    def test_clean_file_passes(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.return_value = {"stream": ("OK", "")}
+        NoVirusValidator()(self._uploaded_file())
+
+    def test_clean_file_seeks_to_zero_before_scan(self, mock_clamd_cls):
+        def _drain_and_return_ok(f):
+            f.read()
+            return {"stream": ("OK", "")}
+
+        mock_clamd_cls.return_value.instream.side_effect = _drain_and_return_ok
+        uploaded = self._uploaded_file()
+        uploaded.read()
+
+        NoVirusValidator()(uploaded)
+
+        mock_clamd_cls.return_value.instream.assert_called_once_with(uploaded)
+        self.assertEqual(uploaded.tell(), 0)
+
+    def test_virus_found_raises_validation_error_with_threat_name(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("FOUND", "Eicar-Test-Signature")
+        }
+        with self.assertRaises(ValidationError) as ctx:
+            NoVirusValidator()(self._uploaded_file())
+        self.assertIn("Eicar-Test-Signature", str(ctx.exception))
+
+    def test_virus_found_with_eicar_bytes(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("FOUND", "Eicar-Test-Signature")
+        }
+        eicar_file = SimpleUploadedFile(
+            "eicar.bin", clamd.EICAR, content_type="application/octet-stream"
+        )
+        with self.assertRaises(ValidationError):
+            NoVirusValidator()(eicar_file)
+
+    def test_scan_error_response_raises_validation_error(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("ERROR", "Permission denied")
+        }
+        with self.assertRaises(ValidationError) as ctx:
+            NoVirusValidator()(self._uploaded_file())
+        self.assertIn("error", str(ctx.exception).lower())
+
+    def test_clamd_connection_error_raises_retry_message(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.side_effect = clamd.ConnectionError(
+            "refused"
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            NoVirusValidator()(self._uploaded_file())
+        self.assertIn("retry", str(ctx.exception).lower())
+
+    def test_unexpected_exception_raises_validation_error(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.side_effect = OSError("broken pipe")
+        with self.assertRaises(ValidationError):
+            NoVirusValidator()(self._uploaded_file())
+
+    def test_unexpected_status_raises_validation_error(self, mock_clamd_cls):
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("UNKNOWN", "???")
+        }
+        with self.assertRaises(ValidationError) as ctx:
+            NoVirusValidator()(self._uploaded_file())
+        self.assertIn("unexpected", str(ctx.exception).lower())
+
+    def test_scanner_constructed_with_config_values(self, mock_clamd_cls):
+        self.config.clamav_host = "av.internal"
+        self.config.clamav_port = 4000
+        self.config.clamav_timeout = 10.0
+        self.config.save()
+        mock_clamd_cls.return_value.instream.return_value = {"stream": ("OK", "")}
+        NoVirusValidator()(self._uploaded_file())
+        mock_clamd_cls.assert_called_once_with(
+            host="av.internal", port=4000, timeout=10.0
+        )

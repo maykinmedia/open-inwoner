@@ -2,16 +2,21 @@ from typing import TYPE_CHECKING, Protocol
 
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
+from django.core.files.uploadedfile import UploadedFile
 from django.core.validators import RegexValidator
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
+import clamd
 import phonenumbers
+import structlog
 from filer.models import Image
 
 if TYPE_CHECKING:
     from phonenumbers.phonenumber import PhoneNumber
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ParsePhoneNumber(Protocol):
@@ -210,3 +215,70 @@ def validate_array_contents_non_empty(list_: list) -> None:
         raise ValidationError(
             _("Valid strings must include at least one non-space character")
         )
+
+
+class NoVirusValidator:
+    def __call__(self, uploaded_file: UploadedFile) -> None:
+        # Import here to avoid circular imports at module load time
+        from open_inwoner.configurations.models import SiteConfiguration
+
+        config = SiteConfiguration.get_solo()
+        if not config.enable_virus_scan:
+            logger.debug(
+                "clamav.scan_skipped",
+                filename=getattr(uploaded_file, "name", "<unknown>"),
+            )
+            return
+
+        filename = getattr(uploaded_file, "name", "<unknown>")
+        filesize = getattr(uploaded_file, "size", None)
+
+        log = logger.bind(
+            filename=filename,
+            filesize=filesize,
+            clamav_host=config.clamav_host,
+            clamav_port=config.clamav_port,
+        )
+
+        log.debug("clamav.scan_started")
+
+        scanner = clamd.ClamdNetworkSocket(
+            host=config.clamav_host,
+            port=config.clamav_port,
+            timeout=config.clamav_timeout,
+        )
+
+        uploaded_file.seek(0)
+
+        try:
+            result = scanner.instream(uploaded_file)
+        except Exception as exc:
+            log.error("clamav.connection_error", exc_info=exc)
+            raise ValidationError(
+                _(
+                    "The virus scan could not be performed at this time. Please retry later."
+                )
+            ) from exc
+
+        # Possible results: FOUND | OK | ERROR
+        match result["stream"]:
+            case ("FOUND", virus_name):
+                log.warning("clamav.virus_found", virus_name=virus_name)
+                raise ValidationError(
+                    _(
+                        "File did not pass the virus scan. It was found to contain '{virus_name}'."
+                    ).format(virus_name=virus_name)
+                )
+            case ("ERROR", error_message):
+                log.error("clamav.scan_error", error_message=error_message)
+                raise ValidationError(
+                    _("The virus scan on this file returned an error.")
+                )
+            case ("OK", _):
+                log.debug("clamav.scan_clean")
+                uploaded_file.seek(0)
+            case (status, message):
+                log.error("clamav.unexpected_status", status=status, message=message)
+                raise ValidationError(
+                    _("The virus scan returned an unexpected status.")
+                )
