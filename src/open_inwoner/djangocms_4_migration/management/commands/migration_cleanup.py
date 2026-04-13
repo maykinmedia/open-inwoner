@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
-from django.db.models import ProtectedError
+from django.db.models import Count, ProtectedError
 
 import structlog
 from cms.models import (
@@ -15,9 +15,23 @@ from packaging.version import Version as PgkVersion
 logger = structlog.stdlib.get_logger(__name__)
 
 
-def _fix_link_plugins(page):
+def _get_replacement_page(page):
+    """Return the surviving Page for the same node, or None if there is no counterpart.
+
+    In CMS 3 each logical page had two rows (draft + published). After the CMS 4
+    migration both survive on the same node_id; the empty one should be deleted and its
+    references rerouted to the surviving one. Draft-only pages that were never published
+    have no counterpart, so there is nothing to reroute to.
+    """
+    return Page.objects.filter(node_id=page.node_id).exclude(id=page.id).first()
+
+
+def _fix_link_plugins(page, replacement_page):
     """djangocms-link with version above 5.0.0 stores only "soft" references to pages in JSON fields which will not be
     updated by `_fix_page_refernces`"""
+    if replacement_page is None:
+        return
+
     if "djangocms_link" in settings.INSTALLED_APPS:
         from djangocms_link import __version__
         from djangocms_link.models import Link
@@ -29,11 +43,6 @@ def _fix_link_plugins(page):
                 ].startswith("cms.page:"):
                     _, linked_page_id = link.link["internal_link"].split(":")
                     if linked_page_id == str(page.pk):
-                        replacement_page = (
-                            Page.objects.filter(node_id=page.node_id)
-                            .exclude(id=page.id)
-                            .get()
-                        )
                         logger.info(
                             "Fixing link reference",
                             from_page_id=page.id,
@@ -43,9 +52,11 @@ def _fix_link_plugins(page):
                         link.save()
 
 
-def _fix_frontend_refernces(page):
+def _fix_frontend_refernces(page, replacement_page):
     """djangocms-frontend stores only "soft" references to pages in JSON fields which will not be
     updated by `_fix_page_refernces`"""
+    if replacement_page is None:
+        return
 
     def search(json, reference, pk):
         changed = False
@@ -58,11 +69,6 @@ def _fix_frontend_refernces(page):
                 # Update link field
                 _, linked_page_id = value.split(":")
                 if linked_page_id == str(pk):
-                    replacement_page = (
-                        Page.objects.filter(node_id=page.node_id)
-                        .exclude(id=page.id)
-                        .get()
-                    )
                     json[key] = f"{reference}:{replacement_page.pk}"
                     changed = True
             elif (
@@ -73,11 +79,6 @@ def _fix_frontend_refernces(page):
             ):
                 # Update reference
                 if value["pk"] == pk:
-                    replacement_page = (
-                        Page.objects.filter(node_id=page.node_id)
-                        .exclude(id=page.id)
-                        .get()
-                    )
                     value["pk"] = replacement_page.pk
                     changed = True
             elif isinstance(value, dict):
@@ -93,7 +94,15 @@ def _fix_frontend_refernces(page):
                 frontend_component.save()
 
 
-def _fix_page_references(page):
+def _fix_page_references(page, replacement_page):
+    if replacement_page is None:
+        logger.warning(
+            "No counterpart page found for Page — skipping reference fix and deleting directly",
+            page_id=page.id,
+            node_id=page.node_id,
+        )
+        return
+
     relations = [
         f
         for f in Page._meta.get_fields()
@@ -102,9 +111,6 @@ def _fix_page_references(page):
         and not f.concrete
     ]
 
-    replacement_page = (
-        Page.objects.filter(node_id=page.node_id).exclude(id=page.id).get()
-    )
     logger.info(
         "Fixing reference", from_page_id=page.id, to_page_id=replacement_page.id
     )
@@ -207,9 +213,10 @@ class Command(BaseCommand):
             page_content_list = _get_page_contents(page)
 
             if not page_content_list.exists():
-                _fix_page_references(page)
-                _fix_link_plugins(page)
-                _fix_frontend_refernces(page)
+                replacement_page = _get_replacement_page(page)
+                _fix_page_references(page, replacement_page)
+                _fix_link_plugins(page, replacement_page)
+                _fix_frontend_refernces(page, replacement_page)
                 _delete_page(page)
                 stats["page_deleted"] = stats["page_deleted"] + 1
                 continue
@@ -238,6 +245,23 @@ class Command(BaseCommand):
                 # Delete redundant page urls (the first is the published one - keep it)
                 for url in page.urls.filter(language=language).order_by("pk")[1:]:
                     url.delete()
+
+        # Second pass: remove duplicate PageUrls that may have been created when
+        # _fix_page_references merged URLs from deleted empty pages into surviving pages.
+        # The per-page dedup above runs before the merge happens, so it cannot catch these.
+        urls_deleted = 0
+        for page in Page.objects.all():
+            for lang_entry in (
+                page.urls.values("language").annotate(cnt=Count("id")).filter(cnt__gt=1)
+            ):
+                for url in page.urls.filter(language=lang_entry["language"]).order_by(
+                    "pk"
+                )[1:]:
+                    url.delete()
+                    urls_deleted += 1
+
+        if urls_deleted:
+            logger.info("Removed duplicate PageUrls", count=urls_deleted)
 
         _post_cleanup()
 
