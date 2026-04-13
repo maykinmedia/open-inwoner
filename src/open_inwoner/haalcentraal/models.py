@@ -12,6 +12,12 @@ class BrpVersionChoices(models.TextChoices):
     V1_3 = "1.3", _("BRP 1.3")
     V2_0 = "2.0", _("BRP 2.0")
     V2_1 = "2.1", _("BRP 2.1")
+    V2_2 = "2.2", _("BRP 2.2")
+    V2_3 = "2.3", _("BRP 2.3")
+    V2_4 = "2.4", _("BRP 2.4")
+    V2_5 = "2.5", _("BRP 2.5")
+    V2_6 = "2.6", _("BRP 2.6")
+    V2_7 = "2.7", _("BRP 2.7")
 
 
 HEADERS_SCHEMA = {

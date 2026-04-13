@@ -131,9 +131,6 @@ ignore-names = [
     # N801
     "eHerkenning*",
     "eSuite*",
-    "BRP_[0-9]_[0-9]",
-    "BRPClient_[0-9]_[0-9]",
-    "_BRPClient_[0-9]_x",
     # N802
     "*setUp*",
     "tearDown*",

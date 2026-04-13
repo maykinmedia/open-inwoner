@@ -16,8 +16,12 @@ Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. D
 Selecteer de versie van de Haal Centraal BRP API die uw leverancier ondersteunt:
 
 - ``1.3`` — BRP 1.3 (GET-gebaseerde API, endpoint ``ingeschrevenpersonen``)
-- ``2.0`` — BRP 2.0 (POST-gebaseerde API, endpoint ``personen``)
-- ``2.1`` — BRP 2.1 (POST-gebaseerde API, endpoint ``personen``)
+- ``2.0`` t/m ``2.7`` — BRP 2.x (POST-gebaseerde API, endpoint ``personen``)
+
+.. note::
+
+   Patch versies hebben geen invloed op de keuze: gebruikt uw leverancier bijvoorbeeld
+   versie 2.6.2, kies dan ``2.6``.
 
 **Request headers**
 
