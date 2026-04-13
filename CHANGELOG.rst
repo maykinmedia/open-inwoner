@@ -39,6 +39,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
+  verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
+  valideren nu standaard het servercertificaat.
 * [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
   zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
   afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.

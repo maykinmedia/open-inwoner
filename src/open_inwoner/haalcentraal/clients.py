@@ -74,7 +74,6 @@ class BRPClient13(BRPClient):
                 "verblijfplaats.postcode,verblijfplaats.land.omschrijving,"
                 "geboorte.datum.datum,geboorte.plaats.omschrijving"
             },
-            verify=False,
         )
         data = get_json_response(response)
         if not data:
@@ -139,7 +138,6 @@ class BRPClient2x(BRPClient):
                 "burgerservicenummer": [user_bsn],
             },
             headers=headers,
-            verify=False,
         )
         return response
 
