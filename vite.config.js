@@ -8,6 +8,7 @@ import preact from '@preact/preset-vite';
 import path from 'path';
 import paths from './build/paths';
 import { collectStaticPlugin } from './build/collect-static';
+import { coverageConfigDefaults } from 'vitest/config';
 
 const _OIP_INTERNAL_dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -114,6 +115,17 @@ export default defineConfig(({ mode }) => {
     test: {
       globals: true,
       setupFiles: './vitest.setup.ts',
+      coverage: {
+        provider: 'v8',
+        include: ['src/**/*.{ts,tsx,js,jsx}'],
+        exclude: [
+          'src/**/*.d.ts',
+          'src/**/*.stories.{ts,tsx}',
+          'src/**/static/bundles/*.*',
+          ...coverageConfigDefaults.exclude,
+        ],
+        reporter: ['text', 'cobertura', 'html'],
+      },
       browser: {
         enabled: true,
         headless: true,
