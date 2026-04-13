@@ -625,7 +625,7 @@ drf-spectacular==0.20.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-easy-thumbnails[svg]==2.8.5
+easy-thumbnails[svg]==2.10.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
