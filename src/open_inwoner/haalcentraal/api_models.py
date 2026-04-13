@@ -1,7 +1,7 @@
 import dataclasses
-from datetime import date
+from datetime import date, datetime
 
-from open_inwoner.accounts.models import User
+from glom import GlomError, glom
 
 
 @dataclasses.dataclass
@@ -26,17 +26,15 @@ class BRPData:
     postal_code: str = ""
     country: str = ""
 
-    def copy_to_user(self, user: User):
-        # not all BRP fields are present on our User
-        user.first_name = self.first_name
-        user.infix = self.infix
-        user.last_name = self.last_name
-
-        user.street = self.street
-        user.housenumber = self.get_housenumber()
-
-        user.city = self.city
-        user.birthday = self.birthday
+    @classmethod
+    def parse_date(
+        cls, data: dict, path: str, default: date | None = None
+    ) -> date | None:
+        try:
+            value = glom(data, path)
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except (GlomError, ValueError):
+            return default
 
     def get_full_name(self) -> str:
         parts = (self.first_name, self.infix, self.last_name)

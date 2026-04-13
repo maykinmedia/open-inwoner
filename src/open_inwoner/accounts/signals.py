@@ -46,7 +46,7 @@ def _update_user_from_brp(user: User):
         return
 
     try:
-        brp = client.fetch_brp(user.bsn)
+        brp = client.fetch_brp_data_for_bsn(user.bsn)
     except Exception:
         logger.exception("unexpected error fetching BRP data")
         return
@@ -55,9 +55,7 @@ def _update_user_from_brp(user: User):
         logger.info("no BRP data found for user", user=user)
         return
 
-    brp.copy_to_user(user)
-    user.is_prepopulated = True
-    user.save()
+    user.populate_from_brp(brp)
 
     system_action(_("data was retrieved from haal centraal"), content_object=user)
 

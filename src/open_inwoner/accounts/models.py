@@ -789,7 +789,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             ]
         )
 
-
     @property
     def is_eherkenning_user(self) -> bool:
         return self.login_type == LoginTypeChoices.eherkenning

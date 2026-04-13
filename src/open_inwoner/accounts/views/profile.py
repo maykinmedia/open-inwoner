@@ -448,7 +448,7 @@ class MyDataView(
             return None
 
         try:
-            return client.fetch_brp(bsn)
+            return client.fetch_brp_data_for_bsn(bsn)
         except Exception:
             logger.exception("Failed to fetch BRP data for user")
             return None

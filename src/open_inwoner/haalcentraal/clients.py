@@ -1,19 +1,15 @@
 import abc
 from abc import ABC
-from datetime import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 
 import requests
-import structlog
-from glom import GlomError, glom
+from glom import glom
 from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.models import BrpVersionChoices, HaalCentraalConfig
 from open_inwoner.utils.api import get_json_response
-
-logger = structlog.stdlib.get_logger(__name__)
 
 
 class BRPClient(ABC):
@@ -46,27 +42,8 @@ class BRPClient(ABC):
         return klass(client=client, extra_headers=extra_headers)
 
     @abc.abstractmethod
-    def fetch_data(self, user_bsn: str) -> dict | None:
+    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
         raise NotImplementedError()
-
-    @abc.abstractmethod
-    def parse_data(self, data: dict) -> BRPData | None:
-        raise NotImplementedError()
-
-    def fetch_brp(self, user_bsn: str) -> BRPData | None:
-        data = self.fetch_data(user_bsn)
-        if not data:
-            logger.warning("no data retrieved from Haal Centraal")
-            return None
-        obj = self.parse_data(data)
-        return obj
-
-    def glom_date(self, data, path, default=None):
-        try:
-            value = glom(data, path)
-            return datetime.strptime(value, "%Y-%m-%d").date()
-        except (GlomError, ValueError):
-            return default
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.version})"
@@ -75,7 +52,7 @@ class BRPClient(ABC):
 class BRPClient_1_3(BRPClient):
     version = "1.3"
 
-    def fetch_data(self, user_bsn: str) -> dict | None:
+    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
         url = f"ingeschrevenpersonen/{user_bsn}"
         headers = {
             "Accept": "application/hal+json",
@@ -95,10 +72,11 @@ class BRPClient_1_3(BRPClient):
             },
             verify=False,
         )
-        return get_json_response(response)
+        data = get_json_response(response)
+        if not data:
+            return None
 
-    def parse_data(self, data: dict) -> BRPData | None:
-        brp = BRPData(
+        return BRPData(
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
             initials=glom(data, "naam.voorletters", default=""),
@@ -112,12 +90,10 @@ class BRPClient_1_3(BRPClient):
             city=glom(data, "verblijfplaats.woonplaats", default=""),
             postal_code=glom(data, "verblijfplaats.postcode", default=""),
             country=glom(data, "verblijfplaats.land.omschrijving", default=""),
-            birthday=self.glom_date(data, "geboorte.datum.datum", default=None),
-            # extra fields
+            birthday=BRPData.parse_date(data, "geboorte.datum.datum", default=None),
             birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
             gender=glom(data, "geslachtsaanduiding", default=""),
         )
-        return brp
 
 
 class _BRPClient_2_x(BRPClient):
@@ -157,17 +133,13 @@ class _BRPClient_2_x(BRPClient):
         )
         return response
 
-    def fetch_data(self, user_bsn) -> dict | None:
-        response = self.make_request(user_bsn)
-        return get_json_response(response)
-
-    def parse_data(self, data: dict) -> BRPData | None:
-        # use first record
-        if not data["personen"]:
+    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
+        data = get_json_response(self.make_request(user_bsn))
+        if not data or not data["personen"]:
             return None
         data = data["personen"][0]
 
-        brp = BRPData(
+        return BRPData(
             first_name=glom(data, "naam.voornamen", default=""),
             infix=glom(data, "naam.voorvoegsel", default=""),
             last_name=glom(data, "naam.geslachtsnaam", default=""),
@@ -186,13 +158,12 @@ class _BRPClient_2_x(BRPClient):
             ),
             city=glom(data, "verblijfplaats.verblijfadres.woonplaats", default=""),
             postal_code=glom(data, "verblijfplaats.verblijfadres.postcode", default=""),
-            birthday=self.glom_date(data, "geboorte.datum.datum", default=None),
+            birthday=BRPData.parse_date(data, "geboorte.datum.datum", default=None),
             birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
             gender=glom(data, "geslacht.omschrijving", default=""),
             # we don't have country in 2.x (address defaults to Nederland)
             # country=glom(data, "verblijfplaats.land.omschrijving", default=""),
         )
-        return brp
 
 
 class BRPClient_2_0(_BRPClient_2_x):
