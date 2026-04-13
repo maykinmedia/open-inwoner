@@ -18,14 +18,14 @@
 
     <div class="qa_results">
         <h4 class="utrecht-heading-4">{{ last_step.question }}</h4>
-        <nl-paragraph>{{ last_step.content.html|safe}}</p>
+        <nl-paragraph>{{ last_step.content.html|safe}}</nl-paragraph>
         {% if related_products.exists %}
             <h4>{% trans "Related products:" %}</h4>
             <ol>
                 {% for product in related_products %}
                 <li>
                     <h4>{{ product.name }}</h4>
-                    <nl-paragraph>{{ product.summary }}</p>
+                    <nl-paragraph>{{ product.summary }}</nl-paragraph>
                 </li>
                 {% endfor %}
             </ol>

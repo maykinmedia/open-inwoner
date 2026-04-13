@@ -33,7 +33,7 @@
         {% if paginator.count %}
             <h2 class="contactmomenten__title">{% trans "Eerder gestelde vragen" %}</h2>
         {% else %}
-            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen vragen." %}</strong></p>
+            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen vragen." %}</strong></nl-paragraph>
         {% endif %}
 
         {% render_grid %}
@@ -83,7 +83,7 @@
                     Heeft u een vraag? Dan kunt u deze hier stellen.
                     Een van onze medewerkers beantwoord uw vraag z.s.m.
                 {% endblocktrans %}
-                </p>
+                </nl-paragraph>
             </div>
             <div>
                 {% url 'cases:contactmoment_list' as from_action %}
