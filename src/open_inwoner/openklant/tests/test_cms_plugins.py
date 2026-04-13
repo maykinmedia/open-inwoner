@@ -58,11 +58,11 @@ class ContactFormPluginRenderTest(TestCase):
         )
 
         self.assertIn(
-            f'<nl-paragraph><p class="nl-paragraph">{description_authenticated_user}</p></nl-paragraph>',
+            f'<p class="nl-paragraph">{description_authenticated_user}</p>',
             html,
         )
         self.assertNotIn(
-            f'<nl-paragraph><p class="nl-paragraph">{description_anonymous_user}</p></nl-paragraph>',
+            f'<p class="nl-paragraph">{description_anonymous_user}</p>',
             html,
         )
 
@@ -95,10 +95,10 @@ class ContactFormPluginRenderTest(TestCase):
         )
 
         self.assertNotIn(
-            f'<nl-paragraph><p class="nl-paragraph">{description_authenticated_user}</p></nl-paragraph>',
+            f'<p class="nl-paragraph">{description_authenticated_user}</p>',
             html,
         )
         self.assertIn(
-            f'<nl-paragraph><p class="nl-paragraph">{description_anonymous_user}</p></nl-paragraph>',
+            f'<p class="nl-paragraph">{description_anonymous_user}</p>',
             html,
         )

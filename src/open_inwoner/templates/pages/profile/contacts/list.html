@@ -25,7 +25,7 @@
                 <div class="approval__single">
                     <nl-paragraph>
                         {% blocktrans with full_name=pending_approval.get_full_name %}{{ full_name }} wil u toevoegen als contactpersoon.{% endblocktrans %}
-                    </p>
+                    </nl-paragraph>
                     {% url 'profile:contact_approval' uuid=pending_approval.uuid as approval_url %}
                     {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                         {% csrf_token %}
@@ -40,7 +40,7 @@
                 <ul class="approval__list">
                     {% for approval in pending_approvals %}
                         <li class="approval__list-item">
-                            <nl-paragraph>{{approval.get_full_name}}</p>
+                            <nl-paragraph>{{approval.get_full_name}}</nl-paragraph>
                             {% url 'profile:contact_approval' uuid=approval.uuid as approval_url %}
                             {% render_form form=None method="POST" form_action=approval_url id="approval_form" spaceless=True show_notifications=True %}
                                 {% csrf_token %}
@@ -74,7 +74,7 @@
             {% button text=_("Filter") type="button" bordered=True %}
         </div>
         <div class="contacts__filter-container filter__container">
-            <nl-paragraph>{% trans "Filter op:" %}</p>
+            <nl-paragraph>{% trans "Filter op:" %}</nl-paragraph>
             {% input form.type no_label=True no_help=True icon="expand_more" class="label input" id="id_type" %}
         </div>
     </div>
@@ -87,7 +87,9 @@
                 <td class="table__item">{% trans "Soort contact" %}</td>
                 <td class="table__item">{% trans "E-mailadres" %}</td>
                 <td class="table__item">{% trans "Telefoonnummer" %}</td>
-		<td class="table__item" {% if inbox_page_is_published %}colspan="2" {% else %}colspan="1"{% endif %}{% trans "Actief" %}&nbsp;</td>
+                <td class="table__item" {% if inbox_page_is_published %}colspan="2"{% else %}colspan="1"{% endif %}>
+                    {% trans "Actief" %}&nbsp;
+                </td>
                 <td class="table__item">&nbsp;</td>
             </tr>
         </thead>
