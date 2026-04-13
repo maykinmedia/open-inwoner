@@ -684,7 +684,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return (
                     reverse("digid_oidc:logout")
                     if OpenIDDigiDConfig.get_solo().enabled
-                    else reverse("digid:logout")
+                    # Digid no longer supports rp-initiated logout, so we don't worry
+                    # about clearing the DigiD session, and just kill our own session.
+                    else reverse("logout")
                 )
             case LoginTypeChoices.eherkenning:
                 return reverse("eherkenning_oidc:logout")
