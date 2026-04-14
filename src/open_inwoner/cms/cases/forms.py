@@ -10,6 +10,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeInformatieObjectTypeConfig,
 )
 from open_inwoner.utils.forms import MultipleFileField
+from open_inwoner.utils.validators import NoVirusValidator
 
 
 class CaseUploadForm(forms.Form):
@@ -70,6 +71,8 @@ class CaseUploadForm(forms.Form):
                 raise ValidationError(
                     f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
                 )
+
+            NoVirusValidator()(file)
 
             cleaned_files.append(file)
 

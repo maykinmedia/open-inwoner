@@ -13,6 +13,7 @@ from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.forms import (
     LimitedUploadFileField,
 )
+from open_inwoner.utils.validators import NoVirusValidator
 
 from .choices import PlanStatusChoices
 from .models import Plan, PlanTemplate
@@ -254,6 +255,13 @@ class PlanFileUploadForm(forms.ModelForm):
         # Hide name field from user
         self.fields["name"].required = False
         self.fields["name"].widget = forms.HiddenInput()
+
+    def clean_file(self):
+        file = self.cleaned_data.get("file")
+        if file:
+            NoVirusValidator()(file)
+
+        return file
 
     def save(self, user, plan=None, commit=True):
         self.instance.owner = user
