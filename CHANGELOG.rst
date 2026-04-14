@@ -39,6 +39,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* CI: ``--concurrency=multiprocessing`` toegevoegd aan de coverage-run voor
+  migratietests, zodat coverage ook de testmethoden in parallelle subprocessen
+  correct registreert.
 * [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
   verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
   valideren nu standaard het servercertificaat.

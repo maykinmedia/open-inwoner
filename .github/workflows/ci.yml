@@ -82,7 +82,8 @@ jobs:
               --exclude-tag=migrations \
               -v 2
           elif [ "${{ matrix.test-type }}" = "migrations" ]; then
-            coverage run -p src/manage.py test src --tag=migrations --parallel 2 -v 2
+            coverage run -p --concurrency=multiprocessing \
+              src/manage.py test src --tag=migrations --parallel 2 -v 2
           else
             echo "Error: Unknown test type '${{ matrix.test-type }}'"
             exit 1
