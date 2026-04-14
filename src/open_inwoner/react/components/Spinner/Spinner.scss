@@ -1,12 +1,3 @@
-@keyframes spinner {
-  0% {
-    transform: translate3d(-50%, -50%, 0) rotate(0deg);
-  }
-  100% {
-    transform: translate3d(-50%, -50%, 0) rotate(360deg);
-  }
-}
-
 .loader-container {
   display: flex;
   justify-content: center;
@@ -23,6 +14,20 @@
     margin: 100px 0 0 0;
   }
 
+  &--hide {
+    display: none;
+  }
+
+  &--compact {
+    height: auto;
+    margin: var(--spacing-extra-large) 0;
+
+    @media (min-width: 500px) {
+      height: auto;
+      margin: var(--spacing-extra-large) 0;
+    }
+  }
+
   .spinner {
     display: flex;
     flex-direction: column;
@@ -35,24 +40,21 @@
     }
   }
 
-  &--hide {
-    display: none;
-  }
-
-  .rotate {
-    animation: rotate 1.5s linear infinite;
-  }
-  @keyframes rotate {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .spinner-icon {
     display: inline-block;
     font-size: 50px;
     color: var(--color-gray-dark);
     width: 50px;
     height: 50px;
+  }
+
+  .rotate {
+    @keyframes rotate {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    animation: rotate 1.5s linear infinite;
   }
 }

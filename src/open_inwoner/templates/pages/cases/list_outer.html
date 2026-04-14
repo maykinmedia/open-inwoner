@@ -1,5 +1,9 @@
 {% extends 'master.html' %}
-{% load i18n icon_tags static %}
+{% load i18n static %}
+
+{% block notifications %}
+    <div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+{% endblock notifications %}
 
 {% block sidebar_content %}
     {% include "components/Sidenav/Sidenav.html" %}
@@ -9,10 +13,16 @@
     <div class="cases" id="any-error" data-error-message="{% trans 'We konden geen zaken ophalen. Probeer het later opnieuw.' %}"></div>
     <div class="cases" id="cases-content"></div>
 
-    <div class="loader-container" id="spinner-container">
-        <div class="spinner" id="spinner-id" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-content" hx-target-error="#any-error">
-            {% icon icon="rotate_right" extra_classes="spinner-icon rotate" %}
-            <div class="spinner__content" role="status">{% trans "Gegevens laden..." %}</div>
-        </div>
-    </div>
+    <oip-loading-spinner
+        id="spinner-container"
+        {# indicator that this spinner hides instead of unmounting #}
+        data-spinner-for="cases-content"
+        data-spinner-live-region="spinner-live-region"
+        loading-text="{% trans 'Gegevens laden...' %}"
+        loaded-text="{% trans 'Gegevens zijn geladen.' %}"
+        hx-get="{{ hxget }}"
+        hx-trigger="load"
+        hx-target="#cases-content"
+        hx-target-error="#any-error">
+    </oip-loading-spinner>
 {% endblock content %}
