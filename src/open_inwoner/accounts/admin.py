@@ -184,9 +184,12 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
     )
     search_fields = ("first_name", "infix", "last_name", "email")
     ordering = ("last_login",)
-    filter_horizontal = (
+    autocomplete_fields = (
         "user_contacts",
         "contacts_for_approval",
+        "selected_categories",
+    )
+    filter_horizontal = (
         "groups",
         "user_permissions",
     )
@@ -308,6 +311,7 @@ class InviteAdmin(admin.ModelAdmin):
     list_display = ("inviter", "invitee_email", "invitee", "accepted", "created_on")
     list_filter = ("inviter", "invitee")
     readonly_fields = ("key",)
+    autocomplete_fields = ("inviter", "invitee")
 
 
 @admin.register(OpenIDEIDASConfig)
