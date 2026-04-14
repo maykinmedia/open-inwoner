@@ -178,6 +178,13 @@ jobs:
         ports:
           - 9200:9200
           - 9300:9300
+      clamav:
+        image: clamav/clamav:stable
+        ports:
+          - 3310:3310
+        options: >-
+          --health-cmd "/usr/local/bin/clamdcheck.sh" --health-interval 60s
+          --health-timeout 30s --health-retries 5 --health-start-period 120s
 
     steps:
       - uses: actions/checkout@v3
@@ -207,6 +214,8 @@ jobs:
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
           OTEL_SDK_DISABLED: true
+          CLAMAV_HOST: localhost
+          CLAMAV_PORT: 3310
 
   #
   # Docs

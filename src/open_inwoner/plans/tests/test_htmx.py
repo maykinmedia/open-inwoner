@@ -1,6 +1,9 @@
+from unittest.mock import patch
+
 from django.test import override_settings, tag
 from django.utils.translation import gettext
 
+import clamd
 from cms.models.static_placeholder import StaticPlaceholder
 from playwright.sync_api import expect
 
@@ -115,3 +118,99 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
         download = download_info.value
         with open(download.path(), "rb") as f:
             assert f.read() == self.uploaded_bytes
+
+    def _submit_upload_form(self, page, plan, filename, mime_type, file_bytes):
+        """Helper: navigate to plan detail, wait for HTMX upload form, upload a file."""
+        page.goto(
+            self.live_reverse("collaborate:plan_detail", kwargs={"uuid": plan.uuid})
+        )
+        expect(page).to_have_url(
+            self.live_reverse("collaborate:plan_detail", kwargs={"uuid": plan.uuid})
+        )
+
+        form_upload = page.locator("#form_upload")
+        expect(form_upload).to_be_visible(timeout=10_000)
+        page.evaluate("document.querySelector('#form_upload')?.scrollIntoView()")
+        page.wait_for_load_state("networkidle")
+
+        upload_form = page.locator("#document-upload")
+        for _ in range(5):
+            if upload_form.count() > 0:
+                break
+            page.wait_for_timeout(2000)
+        else:
+            raise Exception("HTMX swap failed: #document-upload not found")
+
+        expect(upload_form).to_be_visible(timeout=10_000)
+
+        file_input = upload_form.get_by_label(
+            gettext("Sleep of selecteer bestand"), exact=True
+        )
+        file_input.set_input_files(
+            {"name": filename, "mimeType": mime_type, "buffer": file_bytes}
+        )
+
+        submit_button = upload_form.get_by_role(
+            "button", name=gettext("Upload document")
+        )
+        expect(submit_button).to_be_visible()
+        submit_button.click()
+
+    def test_plan_file_upload_virus_scan_disabled_allows_upload(self):
+        plan = self.plan_factory(created_by=self.user)
+        plan.plan_contacts.add(self.user)
+
+        # Virus scan is disabled by default.
+        assert not self.config.enable_virus_scan
+
+        page = self.context.new_page()
+        self._submit_upload_form(
+            page,
+            plan,
+            filename="eicar_test.txt",
+            mime_type="text/plain",
+            # clamd.EICAR is the official EICAR antivirus test string.
+            file_bytes=clamd.EICAR,
+        )
+
+        # The file should have been accepted and appear in the plan's file list.
+        plan_file_container = page.locator(".plan__file")
+        files = plan_file_container.locator("file-nlds")
+        expect(files).to_have_count(1)
+
+    def test_plan_file_upload_virus_found_shows_error(self):
+        plan = self.plan_factory(created_by=self.user)
+        plan.plan_contacts.add(self.user)
+
+        self.config.enable_virus_scan = True
+        self.config.clamav_host = "clamav"
+        self.config.clamav_port = 3310
+        self.config.save()
+
+        # Patch clamd at the source used by the validator so no daemon is needed.
+        with patch(
+            "open_inwoner.utils.validators.clamd.ClamdNetworkSocket"
+        ) as mock_clamd_cls:
+            mock_scanner = mock_clamd_cls.return_value
+            mock_scanner.instream.return_value = {
+                "stream": ("FOUND", "Eicar-Test-Signature")
+            }
+
+            page = self.context.new_page()
+            self._submit_upload_form(
+                page,
+                plan,
+                filename="eicar_test.txt",
+                mime_type="text/plain",
+                file_bytes=clamd.EICAR,
+            )
+
+        # The file must NOT have been saved — no plan files expected.
+        plan_file_container = page.locator(".plan__file")
+        files = plan_file_container.locator("file-nlds")
+        expect(files).to_have_count(0)
+
+        # An error message about the virus scan should be visible.
+        error = page.locator(".notification--error, .messages .error, [role='alert']")
+        expect(error).to_be_visible(timeout=5_000)
+        expect(error).to_contain_text("virus", ignore_case=True)
