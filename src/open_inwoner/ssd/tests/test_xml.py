@@ -2,10 +2,12 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
+from open_inwoner.ssd.exceptions import SSDServiceFaultException
 from open_inwoner.ssd.service.jaaropgave import JaarOpgaveInfoResponse
 from open_inwoner.ssd.service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
 )
+from open_inwoner.ssd.service.uitkering.fwi_resolved import Fwi, Melding
 from open_inwoner.ssd.templatetags.ssd_tags import (
     format_currency,
     format_date_month_name,
@@ -14,19 +16,14 @@ from open_inwoner.ssd.templatetags.ssd_tags import (
     format_string,
     get_detail_value_for_column,
 )
-from open_inwoner.ssd.xml import get_jaaropgaven, get_uitkeringen
+from open_inwoner.ssd.xml import (
+    JAAROPGAVE_INFO_RESPONSE_NODE,
+    UITKERING_INFO_RESPONSE_NODE,
+    get_jaaropgaven,
+    get_uitkeringen,
+)
 
 from .utils import get_component_value, mock_get_report_info
-
-JAAROPGAVE_INFO_RESPONSE_NODE = (
-    "//{http://www.centric.nl/GWS/Diensten/JaarOpgaveClient/v0400}"
-    "JaarOpgaveInfoResponse"
-)
-
-UITKERING_INFO_RESPONSE_NODE = (
-    "//{http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600}"
-    "UitkeringsSpecificatieInfoResponse"
-)
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
 
@@ -335,3 +332,37 @@ class SSDTagTest(TestCase):
             with self.subTest(i=i):
                 res = get_detail_value_for_column(detail, column_index)
                 self.assertEqual(res, expected)
+
+
+class SSDServiceFaultExceptionTest(TestCase):
+    def _make_response(self, meldingen: list[Melding]) -> UitkeringInfoResponse:
+        return UitkeringInfoResponse(fwi=Fwi(fout=meldingen))
+
+    def test_from_xml_response_sets_meldingen(self):
+        melding = Melding(code="01", tekst="BSN voldoet niet aan de elfproef.")
+        xml_response = self._make_response([melding])
+
+        exc = SSDServiceFaultException.from_xml_response(xml_response)
+
+        self.assertEqual(exc.meldingen, [melding])
+
+    def test_from_xml_response_builds_message_from_tekst(self):
+        xml_response = self._make_response(
+            [
+                Melding(code="01", tekst="Eerste fout."),
+                Melding(code="02", tekst="Tweede fout."),
+            ]
+        )
+
+        exc = SSDServiceFaultException.from_xml_response(xml_response)
+
+        self.assertEqual(str(exc), "Eerste fout., Tweede fout.")
+
+    def test_from_xml_response_skips_meldingen_without_tekst(self):
+        xml_response = self._make_response(
+            [Melding(code="01", tekst=None), Melding(code="02", tekst="Fout.")]
+        )
+
+        exc = SSDServiceFaultException.from_xml_response(xml_response)
+
+        self.assertEqual(str(exc), "Fout.")

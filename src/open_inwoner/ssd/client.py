@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+from django.core.exceptions import ImproperlyConfigured
 from django.template import loader
 from django.template.defaultfilters import date as django_date
 from django.utils import timezone
@@ -44,10 +45,6 @@ class SSDBaseClient(ABC):
         }
 
     def _get_auth_kwargs(self) -> dict:
-        if not self.config.service:
-            logger.error("SSD client used without SOAP service")
-            return {}
-
         cert = self.config.service.get_cert()
         verify = self.config.service.get_verify()
         return {
@@ -72,6 +69,9 @@ class SSDBaseClient(ABC):
 
     def templated_request(self, **kwargs) -> Response | None:
         """Wrap around `requests.post` with headers, auth details, request body"""
+
+        if not self.config.service:
+            raise ImproperlyConfigured("SSD config missing service")
 
         auth_kwargs = self._get_auth_kwargs()
         headers = self._get_headers()

@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
 import requests_mock
@@ -139,6 +140,13 @@ class SSDClientRequestInterfaceTest(TestCase):
 
         with self.assertRaises(SSDClientException):
             ssd_client.templated_request(**context)
+
+    def test_missing_ssd_service_returns_none(self, mock_request_body):
+        ssd_client = ConcreteSSDClient()
+        ssd_client.config = SSDConfigFactory.build(service=None)
+
+        with self.assertRaises(ImproperlyConfigured):
+            ssd_client.templated_request(bsn="dummy", period="dummy")
 
 
 class UitkeringClientTest(TestCase):

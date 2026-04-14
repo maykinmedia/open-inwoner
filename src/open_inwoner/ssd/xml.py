@@ -1,6 +1,7 @@
 from typing import Any, TypedDict, cast
 
 import requests
+import structlog
 from lxml import etree  # nosec
 from lxml.etree import LxmlError, XMLSyntaxError  # nosec
 from xsdata.exceptions import ParserError
@@ -14,7 +15,7 @@ from open_inwoner.ssd.service.jaaropgave.body_reaction_resolved import (
     SpecificatieJaarOpgave,
 )
 
-from .exceptions import SSDClientException
+from .exceptions import SSDClientException, SSDServiceFaultException
 from .service.jaaropgave import Client, JaarOpgaveInfoResponse
 from .service.uitkering import (
     UitkeringsSpecificatieInfoResponse as UitkeringInfoResponse,
@@ -30,7 +31,8 @@ UITKERING_INFO_RESPONSE_NODE = (
     "UitkeringsSpecificatieInfoResponse"
 )
 
-FAULT_NODE = "//{http://schemas.xmlsoap.org/soap/envelope/}Fault"
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def _get_report_info(
@@ -68,7 +70,7 @@ def _get_report_info(
 
     # fout, waarschuwing, informatie
     if info_response.fwi:
-        raise SSDClientException.from_xml_response(xml_response=info_response)
+        raise SSDServiceFaultException.from_xml_response(xml_response=info_response)
 
     return info_response
 

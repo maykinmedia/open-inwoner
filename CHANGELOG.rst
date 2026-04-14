@@ -134,6 +134,8 @@ Bugfixes
 * [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
   (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
 * Correctie aangebracht in de controle van 'request.path' bij het ophalen van menu-items voor de 'SideMenu'.
+* [:gh:`2421`]: verbeterde foutafhandeling voor de SSD-app: geldige XML-respons met 'fwi' (fout, waarschuwing,
+  informatie) wordt nu correct verwerkt.
 
 Onderhoud
 ---------
