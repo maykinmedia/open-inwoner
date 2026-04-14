@@ -41,6 +41,10 @@ Bugfixes
 * [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
   zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
   afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
+* [:gh:`2416`]: Beheerpagina's voor gebruikers, plannen en uitnodigingen konden vastlopen of
+  crashen op productie wanneer er veel gebruikers in het systeem staan. De keuzelijsten voor
+  contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
+  aanvraag in plaats van alle records tegelijk in te laden.
 
 Onderhoud
 ---------

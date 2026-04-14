@@ -14,6 +14,7 @@ class ActionTemplateInlineAdmin(admin.TabularInline):
 class PlanContactInlineAdmin(admin.TabularInline):
     model = PlanContact
     extra = 1
+    autocomplete_fields = ("user",)
 
 
 @admin.register(PlanTemplate)
@@ -23,7 +24,7 @@ class PlanTemplateAdmin(admin.ModelAdmin):
         "goal",
     )
     inlines = [ActionTemplateInlineAdmin]
-    filter_horizontal = ("related_categories",)
+    autocomplete_fields = ("related_categories",)
 
 
 @admin.register(Plan)
@@ -35,4 +36,3 @@ class PlanAdmin(UUIDAdminFirstInOrder, admin.ModelAdmin):
         "created_by",
     )
     inlines = [PlanContactInlineAdmin, ActionInlineAdmin]
-    filter_horizontal = ("plan_contacts",)
