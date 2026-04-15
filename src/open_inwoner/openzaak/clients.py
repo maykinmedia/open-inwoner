@@ -365,10 +365,11 @@ class ZakenClient(ZgwAPIClient):
 
         return status
 
-    @cache_result(
-        "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}:{betrokkene_type}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
-    )
+    # TODO: re-enable caching once the [] caching on transient failures is resolved
+    # @cache_result(
+    #     "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}:{betrokkene_type}",
+    #     timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    # )
     def fetch_zaak_roles(
         self,
         zaak_url: str,
