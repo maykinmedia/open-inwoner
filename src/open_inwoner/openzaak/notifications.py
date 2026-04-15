@@ -81,7 +81,24 @@ def handle_zaken_notification(notification: Notification):
     zaken_client = api_group.zaken_client
 
     # check if we have users that need to be informed about this case
-    if not (roles := zaken_client.fetch_zaak_roles(zaak_url)):
+    if zaken_client.fetch_rollen_with_betrokkene_type:
+        # Only query types that can map to a user account; medewerker and
+        # organisatorische_eenheid are internal government roles and some
+        # backends (e.g. iConnect/Decos) reject those types with a 400.
+        citizen_betrokkene_types = (
+            RolTypes.natuurlijk_persoon,
+            RolTypes.niet_natuurlijk_persoon,
+            RolTypes.vestiging,
+        )
+        roles = []
+        for betrokkene_type in citizen_betrokkene_types:
+            roles += zaken_client.fetch_zaak_roles(
+                zaak_url, betrokkene_type=betrokkene_type
+            )
+    else:
+        roles = zaken_client.fetch_zaak_roles(zaak_url)
+
+    if not roles:
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for zaak {zaak_url}",
             # NOTE this used to be logging.ERROR, but as this is also our first call
