@@ -54,10 +54,16 @@ Bugfixes
   die mogelijk beschadigd zijn.
 * [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
   te voorkomen.
-* [:gh:`2449`]: Het ‘formaat' van een bestand wordt ingesteld op het inhoudstype van de
+* [:gh:`2449`]: Het ‘formaat’ van een bestand wordt ingesteld op het inhoudstype van de
   upload wanneer het naar een zaak wordt geüpload, zodat er een voorbeeld beschikbaar komt.
 * [:gh:`2438`]: Lange bestandsnamen in notificaties worden nu correct afgebroken zodat ze niet
   buiten de notificatie vallen.
+* [:gh:`2443`]: De zaaknotificatie-handler hield geen rekening met de instelling
+  ``Rollen ophalen per betrokkene type``. Wanneer deze instelling actief is, worden
+  rollen nu ook bij het verwerken van zaaknotificaties apart opgevraagd per betrokkene
+  type (natuurlijk persoon, niet-natuurlijk persoon, vestiging), zodat backends die
+  verzoeken voor interne typen (medewerker, organisatorische eenheid) afwijzen geen
+  problemen meer veroorzaken.
 
 Onderhoud
 ---------
