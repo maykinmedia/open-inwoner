@@ -246,7 +246,20 @@ class Command(BaseCommand):
                 for url in page.urls.filter(language=language).order_by("pk")[1:]:
                     url.delete()
 
-        # Second pass: remove duplicate PageUrls that may have been created when
+        # Second pass: delete pages that became empty during the first pass.
+        # When the first pass deletes orphaned PageContent objects (no version), the
+        # page itself is not deleted in the same iteration — it already passed the
+        # "no PageContent" branch before any content was removed. This pass catches those.
+        for page in Page.objects.all():
+            if not _get_page_contents(page).exists():
+                replacement_page = _get_replacement_page(page)
+                _fix_page_references(page, replacement_page)
+                _fix_link_plugins(page, replacement_page)
+                _fix_frontend_refernces(page, replacement_page)
+                _delete_page(page)
+                stats["page_deleted"] = stats["page_deleted"] + 1
+
+        # Third pass: remove duplicate PageUrls that may have been created when
         # _fix_page_references merged URLs from deleted empty pages into surviving pages.
         # The per-page dedup above runs before the merge happens, so it cannot catch these.
         urls_deleted = 0
