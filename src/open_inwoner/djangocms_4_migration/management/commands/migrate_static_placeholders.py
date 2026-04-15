@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 
 import structlog
 from cms.models import CMSPlugin, Placeholder, StaticPlaceholder
+from cms.utils.i18n import get_language_list
 from djangocms_alias.constants import DEFAULT_STATIC_ALIAS_CATEGORY_NAME
 from djangocms_alias.models import Alias, AliasContent, Category
 from djangocms_versioning.constants import DRAFT, PUBLISHED
@@ -127,21 +128,26 @@ def _get_or_create_alias(category, static_code, site):
 
 
 def _create_alias_content(alias, name, language, user, state=PUBLISHED):
+    """Create an AliasContent with a Version at the given state.
+
+    Sets the version state directly rather than going through the FSM publish
+    transition — the same approach the original migration used, which avoids
+    side-effects (StateTracking, emit_content_change hooks) that can fail
+    outside a normal request cycle.
+    """
     alias_content = AliasContent.objects.create(
         alias=alias,
         name=name,
         language=language,
     )
-
-    Version.objects.update_or_create(
+    version = Version.objects.create(
         content_type=ContentType.objects.get_for_model(alias_content),
         object_id=alias_content.id,
         created_by=user,
         state=state,
     )
     logger.info(f"Created AliasContent {alias_content}")
-
-    return alias_content
+    return alias_content, version
 
 
 def _remap_static_placeholder_plugins_to_static_alias(
@@ -150,22 +156,27 @@ def _remap_static_placeholder_plugins_to_static_alias(
     alias,
     migration_user,
     version_state=PUBLISHED,
+    site=None,
 ):
-    published_plugins = CMSPlugin.objects.filter(placeholder_id=static_placeholder_id)
+    plugins = CMSPlugin.objects.filter(placeholder_id=static_placeholder_id)
     # Group the plugins by their language because in cms3 placeholders contain all of the contents
     # in all languages vs in cms4 each language has it's own placeholder
     plugin_language_groups = {}
-    for plugin in published_plugins:
-        if plugin.language not in plugin_language_groups:
-            plugin_language_groups[plugin.language] = []
-        plugin_language_groups[plugin.language].append(plugin)
+    for plugin in plugins:
+        plugin_language_groups.setdefault(plugin.language, []).append(plugin)
 
-    # For every language
-    for language in plugin_language_groups:
+    # Migrate all configured languages, even those with no plugins in the source
+    # placeholder. Without this, static aliases whose public placeholder was empty
+    # (e.g. content never published in CMS 3) end up with no AliasContent and the
+    # {% static_alias %} tag silently auto-creates an empty draft on first render.
+    site_id = site.id if site else 1
+    all_languages = set(get_language_list(site_id)) | set(plugin_language_groups.keys())
+
+    for language in sorted(all_languages):
         logger.info(f"Processing plugin language: {language}")
 
-        plugin_set = plugin_language_groups[language]
-        alias_content = _create_alias_content(
+        plugin_set = plugin_language_groups.get(language, [])
+        alias_content, version = _create_alias_content(
             alias, static_placeholder_code, language, migration_user, version_state
         )
         alias_placeholder_id = alias_content.placeholder.id
@@ -174,6 +185,12 @@ def _remap_static_placeholder_plugins_to_static_alias(
         for plugin in plugin_set:
             plugin.placeholder_id = alias_placeholder_id
             plugin.save()
+
+        # Create a DRAFT copy of the published version so editors can immediately
+        # work with the migrated content without having to click "New Draft" manually.
+        if version_state == PUBLISHED:
+            version.copy(migration_user)
+            logger.info(f"Created draft copy of {alias_content}")
 
 
 def _process_static_placeholders():
@@ -192,7 +209,11 @@ def _process_static_placeholders():
         )
 
         _remap_static_placeholder_plugins_to_static_alias(
-            static_placeholder.public_id, static_placeholder.code, alias, migration_user
+            static_placeholder.public_id,
+            static_placeholder.code,
+            alias,
+            migration_user,
+            site=static_placeholder.site,
         )
 
         # If new draft changes are pending "dirty" create a new draft version with those changes
@@ -203,6 +224,7 @@ def _process_static_placeholders():
                 alias,
                 migration_user,
                 version_state=DRAFT,
+                site=static_placeholder.site,
             )
 
 

@@ -17,8 +17,11 @@ def get_or_create_migration_user(user_model=get_user_model()):
     if getattr(settings, "CMS_MIGRATION_USER_ID", None):
         return user_model.objects.get(id=settings.CMS_MIGRATION_USER_ID), False
 
-    # Get the USERNAME_FIELD for the user model (e.g., 'username' or 'email')
-    username_field = getattr(user_model, "USERNAME_FIELD", "email")
+    # Get the USERNAME_FIELD from the *real* user model, not the potentially
+    # historical model passed in — historical models from apps.get_model() don't
+    # carry custom class attributes like USERNAME_FIELD and fall back to Django's
+    # default "username", causing "Cannot resolve keyword 'username'" errors.
+    username_field = get_user_model().USERNAME_FIELD
 
     # Determine appropriate value based on field type
     if username_field == "email":
