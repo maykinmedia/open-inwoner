@@ -41,11 +41,10 @@ def create_cms_pages(apps, schema_editor):
     future changes to CMS or versioning models cannot break this migration
     when it is replayed from scratch.
 
-    The only live imports are:
-    - ``ContentType`` (stable Django core model, no risk)
+    The only live import is:
     - ``get_or_create_migration_user`` (project helper, safe to call here)
     """
-    from django.contrib.contenttypes.models import ContentType
+    from django.conf import settings
 
     from open_inwoner.djangocms_4_migration.helpers import get_or_create_migration_user
 
@@ -64,15 +63,27 @@ def create_cms_pages(apps, schema_editor):
     CMSPlugin = apps.get_model("cms", "CMSPlugin")
     CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
     Version = apps.get_model("djangocms_versioning", "Version")
+    Site = apps.get_model("sites", "Site")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    User = apps.get_model("accounts", "User")
 
     # get_or_create_migration_user() uses the live User model by default, which
     # is fine: we only need the PK for the Version.created_by FK.
     migration_user, _ = get_or_create_migration_user()
+    migration_user = User.objects.get(pk=migration_user.pk)
 
-    site = apps.get_model("sites", "Site").objects.get(id=1)
+    site_id = getattr(settings, "MIGRATION_DEFAULT_SITE_ID", None) or getattr(
+        settings, "SITE_ID", 1
+    )
+    site = (
+        Site.objects.filter(id=site_id).first() or Site.objects.order_by("id").first()
+    )
+    if site is None:
+        raise RuntimeError(
+            "footer/0002: no Site object found — cannot migrate FlatPages to CMS pages"
+        )
 
-    # Look up the ContentType for PageContent by label/model string so we never
-    # need a reference to the live PageContent class.
+    # Look up the ContentType for PageContent by label/model string.
     page_content_ct = ContentType.objects.get(app_label="cms", model="pagecontent")
 
     language = "nl"
@@ -184,12 +195,14 @@ def create_cms_pages(apps, schema_editor):
 
 
 def _get_page_from_placeholder(placeholder, apps):
-    from django.contrib.contenttypes.models import ContentType
+    if placeholder is None:
+        return None
 
     PageContent = apps.get_model("cms", "PageContent")
-    page_content_ct = ContentType.objects.get_for_model(PageContent)
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    page_content_ct = ContentType.objects.get(app_label="cms", model="pagecontent")
 
-    if placeholder.content_type == page_content_ct:
+    if placeholder.content_type_id == page_content_ct.pk:
         page_content = PageContent.objects.filter(pk=placeholder.object_id).first()
         if page_content:
             return page_content.page
