@@ -33,12 +33,14 @@ class ContactForm(forms.Form):
     email = forms.EmailField(
         label=_("E-mailadres"),
         required=False,
+        help_text=_("Verplicht als telefoonnummer leeg is."),
     )
     phonenumber = forms.CharField(
         label=_("Telefoonnummer"),
         max_length=15,
         validators=[DutchPhoneNumberValidator()],
         required=False,
+        help_text=_("Verplicht als e-mailadres leeg is."),
     )
     question = forms.CharField(
         label=_("Vraag"),
