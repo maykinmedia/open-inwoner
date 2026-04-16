@@ -249,6 +249,7 @@ class Rol(ZGWModel):
     registratiedatum: Optional[datetime] = None
     betrokkene: Optional[str] = ""
     betrokkene_identificatie: Optional[dict] = None
+    _expand: Optional[dict] = None
 
     def get_betrokkene_type_display(self):
         return RolTypes[self.betrokkene_type].label

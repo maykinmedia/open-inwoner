@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 import structlog
+from glom import Coalesce, glom
 from mail_editor.helpers import find_template
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
@@ -88,7 +89,6 @@ def handle_zaken_notification(notification: Notification):
         citizen_betrokkene_types = (
             RolTypes.natuurlijk_persoon,
             RolTypes.niet_natuurlijk_persoon,
-            RolTypes.vestiging,
         )
         roles = []
         for betrokkene_type in citizen_betrokkene_types:
@@ -621,7 +621,15 @@ def _get_np_initiator_bsns_from_roles(roles: list[Rol]) -> list[str]:
     ret = set()
 
     for role in roles:
-        if role.omschrijving_generiek not in (
+        omschrijving_generiek = glom(
+            role,
+            Coalesce(
+                "omschrijving_generiek",
+                "_expand.roltype.omschrijving_generiek",
+                default="",
+            ),
+        )
+        if omschrijving_generiek not in (
             RolOmschrijving.initiator,
             RolOmschrijving.medeinitiator,
         ):
@@ -645,7 +653,15 @@ def _get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
     ret = set()
 
     for role in roles:
-        if role.omschrijving_generiek not in (
+        omschrijving_generiek = glom(
+            role,
+            Coalesce(
+                "omschrijving_generiek",
+                "_expand.roltype.omschrijving_generiek",
+                default="",
+            ),
+        )
+        if omschrijving_generiek not in (
             RolOmschrijving.initiator,
             RolOmschrijving.medeinitiator,
         ):
