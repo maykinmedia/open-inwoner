@@ -12,10 +12,13 @@ class ClientError(Exception):
     pass
 
 
-def get_json_response(response: requests.Response) -> dict | None:
+def get_json_response(response: requests.Response, strict=False) -> dict | None:
     try:
         response_json = response.json()
     except Exception:
+        if strict:
+            raise
+
         response_json = None
 
     try:
