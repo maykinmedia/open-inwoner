@@ -87,6 +87,8 @@ Bugfixes
   single logout-functie van DigiD SAML is komen te vervallen, wordt de DigiD-sessie niet
   langer actief beëindigd en worden gebruikers nu correct doorgestuurd naar de standaard
   uitlogpagina.
+* [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
+  (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
 
 Onderhoud
 ---------

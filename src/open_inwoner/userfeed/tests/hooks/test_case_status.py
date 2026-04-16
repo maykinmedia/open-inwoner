@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils.html import escape, strip_tags
+from django.utils.html import strip_tags
 from django.utils.translation import gettext as _, ngettext
 
 from zgw_consumers.api_models.base import factory
@@ -60,8 +60,10 @@ class FeedHookTest(TestCase):
         self.assertEqual(item.is_completed, False)
         self.assertEqual(item.status_indicator, StatusIndicators.info)
         self.assertEqual(
-            strip_tags(item.message),
-            escape(_("Case status has been changed to 'initial'")),
+            item.message,
+            str(_('Case status has been changed to "{status}"')).format(
+                status="initial"
+            ),
         )
         self.assertEqual(item.title, case.zaaktype.omschrijving)
         self.assertEqual(
@@ -103,11 +105,9 @@ class FeedHookTest(TestCase):
         # check item changed
         item = feed.items[0]
         self.assertEqual(
-            strip_tags(item.message),
-            escape(
-                _("Case status has been changed to '{status}'").format(
-                    status=status2.statustype.statustekst
-                )
+            item.message,
+            str(_('Case status has been changed to "{status}"')).format(
+                status=status2.statustype.statustekst
             ),
         )
         self.assertEqual(item.title, case.zaaktype.omschrijving)
@@ -175,8 +175,10 @@ class FeedHookTest(TestCase):
                 self.assertEqual(item.status_indicator, StatusIndicators.warning)
                 self.assertEqual(item.status_text, "my_status_text")
                 self.assertEqual(
-                    strip_tags(item.message),
-                    escape(_("Case status has been changed to 'initial'")),
+                    item.message,
+                    str(_('Case status has been changed to "{status}"')).format(
+                        status="initial"
+                    ),
                 )
                 self.assertEqual(item.title, expected_zaak_title)
                 self.assertEqual(
