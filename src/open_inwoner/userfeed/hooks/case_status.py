@@ -3,7 +3,6 @@ from datetime import timedelta
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.html import escape, format_html
 from django.utils.translation import gettext_lazy as _
 
 from open_inwoner.accounts.models import User
@@ -70,7 +69,7 @@ def case_status_seen(user: User, case: Zaak):
 
 class CaseStatusUpdateFeedItem(FeedItem):
     base_title = _("Case status update")
-    base_message = _("Case status has been changed to '{status}'")
+    base_message = _('Case status has been changed to "{status}"')
 
     cms_apps = ["cases"]
 
@@ -101,11 +100,7 @@ class CaseStatusUpdateFeedItem(FeedItem):
     @property
     def message(self) -> str:
         status_text = self.get_data("status_omschrijving") or _("No data available")
-        html = escape(self.base_message)
-        status = format_html('<span class="status">{}</span>', status_text)
-        html = format_html(html, status=status)
-
-        return html
+        return str(self.base_message).format(status=status_text)
 
     @property
     def action_url(self) -> str:

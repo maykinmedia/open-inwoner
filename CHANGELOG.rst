@@ -17,7 +17,8 @@ Deployment aandachtspunten
 Bugfixes
 --------
 
-* ...
+* [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
+  (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
 
 Onderhoud
 ---------
