@@ -1,52 +1,75 @@
-import dataclasses
 from datetime import date, datetime
 
-from glom import GlomError, glom
+from pydantic import BaseModel, Field, field_validator
 
 
-@dataclasses.dataclass
-class BRPData:
-    # match with user model fields
-    first_name: str = ""
-    infix: str = ""
-    last_name: str = ""
+class Waardetabel(BaseModel):
+    """Codelist entry; only omschrijving is read."""
 
-    street: str = ""
-    housenumber: str = ""
-    houseletter: str = ""
-    housenumbersuffix: str = ""
+    omschrijving: str = ""
 
-    city: str = ""
-    birthday: date | None = None
 
-    # extra fields for My Data
-    initials: str = ""
-    birth_place: str = ""
-    gender: str = ""
-    postal_code: str = ""
-    country: str = ""
+class BRPDatum(BaseModel):
+    datum: date | None = None
 
+    @field_validator("datum", mode="before")
     @classmethod
-    def parse_date(
-        cls, data: dict, path: str, default: date | None = None
-    ) -> date | None:
+    def coerce_datum(cls, v):
+        """Return None for any date string that isn't strict YYYY-MM-DD."""
+        if v is None or isinstance(v, date):
+            return v
         try:
-            value = glom(data, path)
-            return datetime.strptime(value, "%Y-%m-%d").date()
-        except (GlomError, ValueError):
-            return default
+            return datetime.strptime(str(v), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            return None
 
-    def get_full_name(self) -> str:
-        parts = (self.first_name, self.infix, self.last_name)
-        return " ".join(v for v in parts if v)
 
-    def get_housenumber(self):
-        parts = []
-        if self.housenumber:
-            parts.append(str(self.housenumber))
-        if self.houseletter:
-            parts.append(str(self.houseletter))
-        if self.housenumbersuffix:
-            parts.append(" ")
-            parts.append(str(self.housenumbersuffix))
-        return "".join(parts)
+class BRPNaam(BaseModel):
+    voornamen: str = ""
+    voorvoegsel: str = ""
+    geslachtsnaam: str = ""
+    voorletters: str = ""
+
+
+class BRPGeboorte(BaseModel):
+    datum: BRPDatum = Field(default_factory=BRPDatum)
+    plaats: Waardetabel = Field(default_factory=Waardetabel)
+
+
+class BRPAdres(BaseModel):
+    """Common house-number fields shared by both API versions."""
+
+    huisnummer: int | None = None
+    huisletter: str = ""
+    huisnummertoevoeging: str = ""
+    woonplaats: str = ""
+    postcode: str = ""
+
+
+# BRP 1.3 (flat verblijfplaats)
+class BRP13Verblijfplaats(BRPAdres):
+    straat: str = ""
+    land: Waardetabel = Field(default_factory=Waardetabel)
+
+
+class BRP13Persoon(BaseModel):
+    naam: BRPNaam = Field(default_factory=BRPNaam)
+    geslachtsaanduiding: str = ""
+    geboorte: BRPGeboorte = Field(default_factory=BRPGeboorte)
+    verblijfplaats: BRP13Verblijfplaats = Field(default_factory=BRP13Verblijfplaats)
+
+
+# BRP 2.x (nested verblijfadres)
+class BRPVerblijfadres(BRPAdres):
+    officieleStraatnaam: str = ""
+
+
+class BRPVerblijfplaats2x(BaseModel):
+    verblijfadres: BRPVerblijfadres = Field(default_factory=BRPVerblijfadres)
+
+
+class BRP2xPersoon(BaseModel):
+    naam: BRPNaam = Field(default_factory=BRPNaam)
+    geslacht: Waardetabel = Field(default_factory=Waardetabel)
+    geboorte: BRPGeboorte = Field(default_factory=BRPGeboorte)
+    verblijfplaats: BRPVerblijfplaats2x = Field(default_factory=BRPVerblijfplaats2x)

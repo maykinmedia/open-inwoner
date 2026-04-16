@@ -4,10 +4,9 @@ from abc import ABC
 from django.core.exceptions import ImproperlyConfigured
 
 import requests
-from glom import glom
 from zgw_consumers.client import build_client
 
-from open_inwoner.haalcentraal.api_models import BRPData
+from open_inwoner.haalcentraal.api_models import BRP2xPersoon, BRP13Persoon
 from open_inwoner.haalcentraal.models import BrpVersionChoices, HaalCentraalConfig
 from open_inwoner.utils.api import get_json_response
 
@@ -48,7 +47,9 @@ class BRPClient(ABC):
         return klass(client=client, version=version, extra_headers=extra_headers)
 
     @abc.abstractmethod
-    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
+    def fetch_brp_data_for_bsn(
+        self, user_bsn: str
+    ) -> BRP13Persoon | BRP2xPersoon | None:
         raise NotImplementedError()
 
     def __str__(self):
@@ -56,7 +57,7 @@ class BRPClient(ABC):
 
 
 class BRPClient13(BRPClient):
-    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
+    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRP13Persoon | None:
         url = f"ingeschrevenpersonen/{user_bsn}"
         headers = {
             "Accept": "application/hal+json",
@@ -75,28 +76,10 @@ class BRPClient13(BRPClient):
                 "geboorte.datum.datum,geboorte.plaats.omschrijving"
             },
         )
-        data = get_json_response(response)
+        data = get_json_response(response, strict=True)
         if not data:
             return None
-
-        return BRPData(
-            first_name=glom(data, "naam.voornamen", default=""),
-            infix=glom(data, "naam.voorvoegsel", default=""),
-            initials=glom(data, "naam.voorletters", default=""),
-            last_name=glom(data, "naam.geslachtsnaam", default=""),
-            street=glom(data, "verblijfplaats.straat", default=""),
-            housenumber=str(glom(data, "verblijfplaats.huisnummer", default="")),
-            houseletter=glom(data, "verblijfplaats.huisletter", default=""),
-            housenumbersuffix=glom(
-                data, "verblijfplaats.huisnummertoevoeging", default=""
-            ),
-            city=glom(data, "verblijfplaats.woonplaats", default=""),
-            postal_code=glom(data, "verblijfplaats.postcode", default=""),
-            country=glom(data, "verblijfplaats.land.omschrijving", default=""),
-            birthday=BRPData.parse_date(data, "geboorte.datum.datum", default=None),
-            birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
-            gender=glom(data, "geslachtsaanduiding", default=""),
-        )
+        return BRP13Persoon.model_validate(data)
 
 
 class BRPClient2x(BRPClient):
@@ -141,34 +124,9 @@ class BRPClient2x(BRPClient):
         )
         return response
 
-    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRPData | None:
-        data = get_json_response(self.make_request(user_bsn))
-        if not data or not data["personen"]:
+    def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRP2xPersoon | None:
+        data = get_json_response(self.make_request(user_bsn), strict=True)
+        personen = (data or {}).get("personen", [])
+        if not personen:
             return None
-        data = data["personen"][0]
-
-        return BRPData(
-            first_name=glom(data, "naam.voornamen", default=""),
-            infix=glom(data, "naam.voorvoegsel", default=""),
-            last_name=glom(data, "naam.geslachtsnaam", default=""),
-            initials=glom(data, "naam.voorletters", default=""),
-            street=glom(
-                data, "verblijfplaats.verblijfadres.officieleStraatnaam", default=""
-            ),
-            housenumber=str(
-                glom(data, "verblijfplaats.verblijfadres.huisnummer", default="")
-            ),
-            houseletter=glom(
-                data, "verblijfplaats.verblijfadres.huisletter", default=""
-            ),
-            housenumbersuffix=glom(
-                data, "verblijfplaats.verblijfadres.huisnummertoevoeging", default=""
-            ),
-            city=glom(data, "verblijfplaats.verblijfadres.woonplaats", default=""),
-            postal_code=glom(data, "verblijfplaats.verblijfadres.postcode", default=""),
-            birthday=BRPData.parse_date(data, "geboorte.datum.datum", default=None),
-            birth_place=glom(data, "geboorte.plaats.omschrijving", default=""),
-            gender=glom(data, "geslacht.omschrijving", default=""),
-            # we don't have country in 2.x (address defaults to Nederland)
-            # country=glom(data, "verblijfplaats.land.omschrijving", default=""),
-        )
+        return BRP2xPersoon.model_validate(personen[0])

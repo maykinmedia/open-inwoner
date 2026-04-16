@@ -15,6 +15,7 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 from webtest import Upload
 
+from open_inwoner.accounts.brp import BRPData
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
@@ -31,7 +32,6 @@ from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory

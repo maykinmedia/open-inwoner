@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import os
 from datetime import timedelta
-from typing import Any, assert_never, cast
+from typing import TYPE_CHECKING, Any, assert_never, cast
 from uuid import uuid4
 
 from django.conf import settings
@@ -27,6 +29,7 @@ from mozilla_django_oidc_db.fields import ClaimField, ClaimFieldDefault
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
+from open_inwoner.accounts.brp import BRPData
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.plans.models import PlanContact
 from open_inwoner.utils.hash import create_sha256_hash
@@ -46,6 +49,9 @@ from .choices import (
 )
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
+
+if TYPE_CHECKING:
+    from open_inwoner.haalcentraal.api_models import BRP2xPersoon, BRP13Persoon
 
 ###
 # Configuration
@@ -766,12 +772,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.is_bsn_user and self.is_prepopulated
 
-    def populate_from_brp(self, persoon: BRPPersoon13 | BRPPersoon2x) -> None:
+    def populate_from_brp(self, persoon: BRP13Persoon | BRP2xPersoon) -> None:
         brp = BRPData.from_persoon(persoon)
         self.first_name = brp.first_name
         self.infix = brp.infix
         self.last_name = brp.last_name
-        self.birthday = brp.birthday
         self.street = brp.street
         self.housenumber = brp.get_housenumber()
         self.city = brp.city
@@ -781,7 +786,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 "first_name",
                 "infix",
                 "last_name",
-                "birthday",
                 "street",
                 "housenumber",
                 "city",

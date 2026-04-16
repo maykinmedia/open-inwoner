@@ -16,6 +16,7 @@ import structlog
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 
+from open_inwoner.accounts.brp import BRPData
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
@@ -448,10 +449,14 @@ class MyDataView(
             return None
 
         try:
-            return client.fetch_brp_data_for_bsn(bsn)
+            persoon = client.fetch_brp_data_for_bsn(bsn)
         except Exception:
             logger.exception("Failed to fetch BRP data for user")
             return None
+
+        if persoon is None:
+            return None
+        return BRPData.from_persoon(persoon)
 
 
 class MyNotificationsView(
