@@ -77,6 +77,10 @@ Bugfixes
   maken had, niet het inloggen). Het alternatieve nummer wordt nu geleegd als het gelijk
   is aan het primaire nummer.
 * [:gh:`2378`]: Probleem opgelost waar markdown in ssd uitkering pdf niet correct wordt gerenderd.
+* [:gh:`2416`]: Beheerpagina's voor gebruikers, plannen en uitnodigingen konden vastlopen of
+  crashen op productie wanneer er veel gebruikers in het systeem staan. De keuzelijsten voor
+  contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
+  aanvraag in plaats van alle records tegelijk in te laden.
 * [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
 * [:gh:`2398`]: Probleem opgelost waarbij DigiD-gebruikers na uitloggen werden
   doorgestuurd naar een niet-bestaande URL wanneer OIDC niet was ingeschakeld. Omdat de
