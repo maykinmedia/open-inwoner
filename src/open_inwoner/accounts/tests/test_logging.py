@@ -242,7 +242,7 @@ class TestProfile(WebTest):
         )
 
     def test_password_change_is_logged(self):
-        user = UserFactory(password="test")
+        user = UserFactory(password="test", first_name="Alice", last_name="Smith")
         form = self.app.get(reverse("password_change"), user=user).forms[
             "password-change-form"
         ]
