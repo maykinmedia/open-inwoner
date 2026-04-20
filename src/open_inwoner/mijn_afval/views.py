@@ -61,7 +61,8 @@ class AfvalProfielView(
         )
         if not self.request.user.bsn:
             messages.info(
-                self.request, _("Gegevens alleen beschikbaar voor gebruikers met BSN.")
+                self.request,
+                _("Gegevens alleen beschikbaar voor gebruikers met een BSN."),
             )
             return context
 
