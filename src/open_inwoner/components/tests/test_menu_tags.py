@@ -524,6 +524,14 @@ class TestExtraMenuItemGeneration(TestCase):
         with self.assertRaises(ValueError):
             SideNavMenuData(context).get_extra_menu_items()
 
+    def test_no_extra_items_when_request_has_no_path_attribute(self):
+        request = object()  # no .path attribute
+        context = Context({"request": request, "has_general_faq_questions": True})
+
+        extra_items = SideNavMenuData(context).get_extra_menu_items()
+
+        self.assertEqual(extra_items, [])
+
     def test_url_reverse_failures_are_handled_gracefully(self):
         context = Context(
             {"request": self.factory.get("/"), "has_general_faq_questions": True}

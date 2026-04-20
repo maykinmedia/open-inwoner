@@ -389,25 +389,21 @@ class SideNavMenuData:
         return complete_menu
 
     def get_extra_menu_items(self) -> List[MenuItem]:
-        extra_items: List[MenuItem] = []
         request = self.context.get("request")
-        if not request and hasattr(request, "path"):
-            return extra_items
+        if not request or not hasattr(request, "path"):
+            return []
 
         if not self.context.get("has_general_faq_questions", False):
-            return extra_items
-
-        # FAQ item
-        is_current = False
+            return []
 
         try:
             faq_url = reverse("general_faq")
             is_current = request.path.startswith(faq_url)
         except NoReverseMatch:
             logger.warning("Could not add FAQ menu item", exc_info=True)
-            return extra_items
+            return []
 
-        extra_items.append(
+        extra_items: List[MenuItem] = [
             {
                 "href": faq_url,
                 "label": str(_("Veelgestelde vragen")),
@@ -415,7 +411,7 @@ class SideNavMenuData:
                 "current": is_current,
                 "counter": None,
             }
-        )
+        ]
 
         logger.debug("Generated extra menu items", count=len(extra_items))
         return extra_items
