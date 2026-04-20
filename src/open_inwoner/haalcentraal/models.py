@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import JSONField as JSONFormField
@@ -55,10 +56,13 @@ class HaalCentraalConfig(SingletonModel):
         max_length=3,
         choices=BrpVersionChoices.choices,
         default=BrpVersionChoices.V2_0,
-        help_text=_(
-            "Version of the Haal Centraal BRP API to use. "
-            "See {url} for the API specification."
-        ).format(url="https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/redoc"),
+        help_text=format_lazy(
+            _(
+                "Version of the Haal Centraal BRP API to use. "
+                "See {url} for the API specification."
+            ),
+            url="https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/redoc",
+        ),
     )
 
     service = models.OneToOneField(
