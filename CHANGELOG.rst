@@ -109,6 +109,10 @@ Bugfixes
 Onderhoud
 ---------
 
+* [:gh:`2364`]: Nederlandse vertalingen bijgewerkt: ontbrekende vertalingen toegevoegd,
+  verouderde (obsolete) vermeldingen verwijderd en fuzzy vertalingen gecorrigeerd.
+  ``format_lazy`` toegepast in het BRP-versieveld om te voorkomen dat de actieve taal
+  wordt ingebakken in migraties.
 * [:gh:`2283`]: De grafiek en filters op de Mijn Afval pagina zijn niet meer zichtbaar wanneer er geen data beschikbaar is.
 * [:gh:`2303`, :cve:`CVE-2026-29074`, :cve:`CVE-2026-29063`]: ``cssnano`` bijgewerkt om :cve:`CVE-2026-29074` te mitigeren en
   ``immutable`` override bijgewerkt om :cve:`CVE-2026-29063` te mitigeren.
