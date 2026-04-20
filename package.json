@@ -36,6 +36,7 @@
     "@gemeente-denhaag/action": "^4.0.1",
     "@gemeente-denhaag/file": "^2.3.0",
     "@gemeente-denhaag/side-navigation": "^4.0.2",
+    "@maykinmedia/preact-custom-element": "github:maykinmedia/preact-custom-element#5b3701126d62a7de458099f1186f66d34878766d",
     "@open-inwoner/design-tokens": "^0.0.28",
     "@tarekraafat/autocomplete.js": "^10.2.6",
     "@utrecht/button-css": "^2.3.1",
@@ -64,11 +65,10 @@
     "htmx-ext-response-targets": "^2.0.4",
     "htmx.org": "^2.0.4",
     "leaflet": "^1.7.1",
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "material-icons": "^1.13.12",
     "microscope-sass": "latest",
     "preact": "^10.27.3",
-    "@maykinmedia/preact-custom-element": "github:maykinmedia/preact-custom-element#5b3701126d62a7de458099f1186f66d34878766d",
     "proj4leaflet": "^1.0.2",
     "react-intl": "^7.1.11"
   },
@@ -76,10 +76,10 @@
     "@babel/core": "latest",
     "@formatjs/cli": "^6.7.2",
     "@preact/preset-vite": "^2.10.2",
-    "@storybook/addon-a11y": "^10.2.10",
-    "@storybook/addon-docs": "^10.2.10",
-    "@storybook/addon-vitest": "^10.2.10",
-    "@storybook/preact-vite": "^10.2.10",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-vitest": "^10.3.5",
+    "@storybook/preact-vite": "^10.3.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/preact": "^3.2.4",
@@ -101,11 +101,11 @@
     "postcss-selector-lint": "^1.0.2",
     "prettier": "^3.6.2",
     "sass-embedded": "^1.97.3",
-    "storybook": "^10.2.10",
+    "storybook": "^10.3.5",
     "storybook-react-intl": "^10.1.1",
     "type-fest": "^5.2.0",
     "typescript": "^5.8.3",
-    "vite": "^7.3.1",
+    "vite": "^7.3.2",
     "vitest": "^4.1.1"
   },
   "overrides": {
@@ -115,7 +115,8 @@
     "immutable": "^5.1.5",
     "@utrecht/component-library-react": {
       "vega": "^6.0.0"
-    }
+    },
+    "lodash-es": "^4.18.1"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "*",

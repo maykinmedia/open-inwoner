@@ -107,6 +107,10 @@ Onderhoud
   testopzet is herschreven: gedeelde test-utilities zijn ondergebracht in ``react/lib/testing/``, Storybook-decorators
   en web component-decorators zijn gesplitst in afzonderlijke modules, en de Vitest-configuratie is bijgewerkt. Daarnaast
   zijn de CI-workflow en Storybook-configuratie samengevoegd en gemoderniseerd.
+* [:gh:`2412`, :cve:`CVE-2026-39364`, :cve:`CVE-2026-4800`]: ``vite`` bijgewerkt naar versie ``7.3.2``.
+* ``storybook`` bijgewerkt naar versie ``10.3.5``.
+* ``lodash`` bijgewerkt naar versie ``4.18.1``.
+* ``lodash-es`` override bijgewerkt om :cve:`CVE-2026-4800` te mitigeren.
 
 2.1.1 (2026-03-19)
 ==================
