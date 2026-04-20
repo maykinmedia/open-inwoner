@@ -1,7 +1,7 @@
-2.2.0-dev (2026-XX-XX)
-======================
+2.2.0 (2026-04-20)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.2.0`.
 
 Deployment aandachtspunten
 --------------------------
