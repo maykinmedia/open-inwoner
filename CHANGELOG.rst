@@ -1,7 +1,7 @@
-2.2.0-dev (2026-XX-XX)
-======================
+2.2.0 (2026-04-20)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.2.0`.
 
 Deployment aandachtspunten
 --------------------------
@@ -27,7 +27,6 @@ Nieuwe features
   weergegeven ook wanneer eSuite het document heeft omgezet naar PDF/A.
   Daarnaast is de interne weergave van bestanden in templates gerefactored om de
   conversielogica te centraliseren en de templatetags eenvoudiger te maken.
-* ...
 * [:gh:`2268`]: WCAG toegankelijkheidsverbeteringen uit rapport gemeente Enschede toegepast.
 * [:gh:`2362`]: De integratie met de Haal Centraal BRP API is uitgebreid en
   flexibeler gemaakt. De API-versie is nu instelbaar via de beheeromgeving in
