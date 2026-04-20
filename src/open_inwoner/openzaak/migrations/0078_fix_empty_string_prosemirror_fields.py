@@ -40,34 +40,20 @@ def fix_empty_string_prosemirror_fields(apps, schema_editor):  # noqa: ARG001
     ]
 
     for model, field_names in models_to_fix:
-        for config in model.objects.all():
-            changed = False
-
+        for row in model.objects.values("pk", "omschrijving", *field_names):
+            updates = {}
             for field_name in field_names:
-                # Check if field exists and is not None
-                if not hasattr(config, field_name):
-                    continue
-
-                field_value = getattr(config, field_name)
-                if field_value is None:
-                    continue
-
-                # In migrations, we might not have the wrapper, just the raw value
-                raw_value = getattr(field_value, "raw_data", field_value)
-
-                if raw_value == "":
+                if row[field_name] == "":
                     logger.info(
                         "Fixing empty string literal in ProseMirror field",
                         model=model.__name__,
                         field=field_name,
-                        config_id=config.pk,
-                        omschrijving=config.omschrijving,
+                        config_id=row["pk"],
+                        omschrijving=row["omschrijving"],
                     )
-                    setattr(config, field_name, None)
-                    changed = True
-
-            if changed:
-                config.save()
+                    updates[field_name] = None
+            if updates:
+                model.objects.filter(pk=row["pk"]).update(**updates)
                 fixed_count += 1
 
     logger.info(

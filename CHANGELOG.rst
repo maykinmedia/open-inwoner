@@ -132,6 +132,7 @@ Onderhoud
 * ``storybook`` bijgewerkt naar versie ``10.3.5``.
 * ``lodash`` bijgewerkt naar versie ``4.18.1``.
 * ``lodash-es`` override bijgewerkt om :cve:`CVE-2026-4800` te mitigeren.
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
 
 2.1.1 (2026-03-19)
 ==================
