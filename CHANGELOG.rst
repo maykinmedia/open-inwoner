@@ -6,7 +6,11 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
-* ...
+* [:gh:`2362`]: De omgevingsvariabele ``BRP_VERSION`` is vervangen door een
+  instelbaar veld in de beheeromgeving. De upgrade verloopt automatisch: de
+  waarde van ``BRP_VERSION`` wordt bij de migratie overgenomen en er is geen
+  handmatige actie vereist. De omgevingsvariabele kan na de upgrade worden
+  verwijderd.
 
 Nieuwe features
 ---------------
@@ -25,10 +29,22 @@ Nieuwe features
   conversielogica te centraliseren en de templatetags eenvoudiger te maken.
 * ...
 * [:gh:`2268`]: WCAG toegankelijkheidsverbeteringen uit rapport gemeente Enschede toegepast.
+* [:gh:`2362`]: De integratie met de Haal Centraal BRP API is uitgebreid en
+  flexibeler gemaakt. De API-versie is nu instelbaar via de beheeromgeving in
+  plaats van een omgevingsvariabele; ondersteunde versies zijn 1.3 en 2.0 t/m
+  2.7. De vaste, leverancierspecifieke request-headers (I Connect en Centric)
+  zijn vervangen door een vrij configureerbaar sleutel/waarde-overzicht;
+  bestaande headerwaarden worden automatisch gemigreerd.
 
 Bugfixes
 --------
 
+* CI: ``--concurrency=multiprocessing`` toegevoegd aan de coverage-run voor
+  migratietests, zodat coverage ook de testmethoden in parallelle subprocessen
+  correct registreert.
+* [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
+  verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
+  valideren nu standaard het servercertificaat.
 * [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
   zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
   afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.

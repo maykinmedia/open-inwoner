@@ -15,6 +15,7 @@ from freezegun import freeze_time
 from pyquery import PyQuery
 from webtest import Upload
 
+from open_inwoner.accounts.brp import BRPData
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
     LoginTypeChoices,
@@ -31,7 +32,6 @@ from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.haalcentraal.api_models import BRPData
 from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
@@ -1105,10 +1105,10 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             action_flag=list(LOG_ACTIONS[4]),
         )
 
-    @override_settings(BRP_VERSION="1.3")
     def test_expected_response_is_returned_brp_v_1_3(self, m):
         self._setUpMocks_v_1_3(m)
         self._setUpService()
+        self._setUpVersion("1.3")
 
         response = self.app.get(self.url, user=self.user)
         self.assertEqual(
@@ -1122,9 +1122,9 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             action_flag=list(LOG_ACTIONS[4]),
         )
 
-    @override_settings(BRP_VERSION="1.3")
     def test_wrong_date_format_shows_birthday_none_brp_v_1_3(self, m):
         self._setUpService()
+        self._setUpVersion("1.3")
 
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",

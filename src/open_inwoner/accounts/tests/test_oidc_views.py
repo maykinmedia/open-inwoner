@@ -513,7 +513,7 @@ class DigiDOIDCFlowTests(WebTest):
         cms_tools.create_homepage()
         cms_tools.create_apphook_page(ProfileApphook)
 
-    @patch("open_inwoner.haalcentraal.signals.update_brp_data_in_db")
+    @patch("open_inwoner.accounts.signals._update_user_from_brp")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
@@ -577,7 +577,7 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertEqual(db_user.first_name, "John")
         self.assertEqual(db_user.last_name, "Doe")
 
-    @patch("open_inwoner.haalcentraal.signals.update_brp_data_in_db")
+    @patch("open_inwoner.accounts.signals._update_user_from_brp")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")

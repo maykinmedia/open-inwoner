@@ -7,6 +7,13 @@ from .factories import ServiceFactory
 
 
 class HaalCentraalMixin:
+    def _setUpVersion(self, version: str):
+        from open_inwoner.haalcentraal.models import HaalCentraalConfig
+
+        config = HaalCentraalConfig.get_solo()
+        config.brp_version = version
+        config.save()
+
     def _setUpService(self):
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(

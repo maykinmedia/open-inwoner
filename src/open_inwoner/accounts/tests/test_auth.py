@@ -411,7 +411,7 @@ class DigiDRegistrationTest(
     def test_existing_user_digid_login_updates_brp_fields(self, m):
         self._setUpService()
 
-        user = DigidUserFactory()
+        user = DigidUserFactory(is_prepopulated=False)
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
@@ -493,7 +493,7 @@ class DigiDRegistrationTest(
     def test_existing_user_digid_login_fails_brp_update_when_brp_http_404(self, m):
         self._setUpService()
 
-        user = DigidUserFactory()
+        user = DigidUserFactory(is_prepopulated=False)
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,

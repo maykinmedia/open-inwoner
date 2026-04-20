@@ -12,29 +12,16 @@ class HaalCentraalConfigAdmin(SingletonModelAdmin):
         (
             "Service",
             {
-                "fields": ("service",),
+                "fields": (
+                    "service",
+                    "brp_version",
+                ),
             },
         ),
         (
-            _("Headers for I Connect"),
+            _("Request headers"),
             {
-                "fields": (
-                    "api_origin_oin",
-                    "api_afnemer_oin",
-                    "api_doelbinding",
-                    "api_verwerking",
-                )
-            },
-        ),
-        (
-            _("Headers for Centric"),
-            {
-                "fields": (
-                    "x_request_organization",
-                    "x_request_application",
-                    "x_request_afnemerscode",
-                    "x_request_user",
-                )
+                "fields": ("headers",),
             },
         ),
     )

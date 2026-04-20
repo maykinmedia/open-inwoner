@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
@@ -7,6 +8,17 @@ from django.urls import reverse
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.models import User
+from open_inwoner.haalcentraal.api_models import (
+    BRP2xPersoon,
+    BRP13Persoon,
+    BRP13Verblijfplaats,
+    BRPDatum,
+    BRPGeboorte,
+    BRPNaam,
+    BRPVerblijfadres,
+    BRPVerblijfplaats2x,
+    Waardetabel,
+)
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.hash import generate_email_from_string
 
@@ -221,3 +233,79 @@ class UserTests(TestCase):
             with self.subTest(login_type=login_type):
                 user = UserFactory(login_type=login_type, **extra_kwargs)
                 self.assertEqual(user.get_logout_url(), expected_url)
+
+
+_PERSOON_NAAM = BRPNaam(
+    voornamen="Merel",
+    voorvoegsel="de",
+    geslachtsnaam="Kooyman",
+    voorletters="M.",
+)
+_PERSOON_GEBOORTE = BRPGeboorte(
+    datum=BRPDatum(datum=date(1982, 4, 10)),
+    plaats=Waardetabel(omschrijving="Leerdam"),
+)
+
+
+class PopulateFromBRPTests(TestCase):
+    def setUp(self):
+        self.user = UserFactory(login_type=LoginTypeChoices.digid, bsn="999993847")
+
+    def test_populate_from_brp_v1_3(self):
+        persoon = BRP13Persoon(
+            naam=_PERSOON_NAAM,
+            geslachtsaanduiding="vrouw",
+            geboorte=_PERSOON_GEBOORTE,
+            verblijfplaats=BRP13Verblijfplaats(
+                straat="King Olivereiland",
+                huisnummer=64,
+                huisletter="A",
+                huisnummertoevoeging="bis",
+                woonplaats="'s-Gravenhage",
+                postcode="2551JV",
+                land=Waardetabel(omschrijving="Nederland"),
+            ),
+        )
+
+        self.user.populate_from_brp(persoon)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Merel")
+        self.assertEqual(self.user.infix, "de")
+        self.assertEqual(self.user.last_name, "Kooyman")
+        self.assertEqual(self.user.street, "King Olivereiland")
+        self.assertEqual(self.user.housenumber, "64A bis")
+        self.assertEqual(self.user.city, "'s-Gravenhage")
+        self.assertTrue(self.user.is_prepopulated)
+
+    def test_populate_from_brp_v2x(self):
+        persoon = BRP2xPersoon(
+            naam=_PERSOON_NAAM,
+            geslacht=Waardetabel(omschrijving="vrouw"),
+            geboorte=_PERSOON_GEBOORTE,
+            verblijfplaats=BRPVerblijfplaats2x(
+                verblijfadres=BRPVerblijfadres(
+                    officieleStraatnaam="King Olivereiland",
+                    huisnummer=64,
+                    huisletter="A",
+                    huisnummertoevoeging="bis",
+                    woonplaats="'s-Gravenhage",
+                    postcode="2551JV",
+                )
+            ),
+        )
+
+        self.user.populate_from_brp(persoon)
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Merel")
+        self.assertEqual(self.user.infix, "de")
+        self.assertEqual(self.user.last_name, "Kooyman")
+        self.assertEqual(self.user.street, "King Olivereiland")
+        self.assertEqual(self.user.housenumber, "64A bis")
+        self.assertEqual(self.user.city, "'s-Gravenhage")
+        self.assertTrue(self.user.is_prepopulated)
+
+    def test_populate_from_brp_raises_on_unknown_type(self):
+        with self.assertRaises(ValueError):
+            self.user.populate_from_brp(object())

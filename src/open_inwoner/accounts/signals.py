@@ -6,7 +6,8 @@ from django.contrib.auth.signals import (
     user_logged_out,
     user_login_failed,
 )
-from django.db.models.signals import pre_save
+from django.core.exceptions import ImproperlyConfigured
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.http import HttpRequest
 from django.urls import reverse
@@ -15,8 +16,7 @@ from django.utils.translation import gettext as _
 import structlog
 from axes.signals import user_locked_out
 
-from open_inwoner.haalcentraal.models import HaalCentraalConfig
-from open_inwoner.haalcentraal.utils import update_brp_data_in_db
+from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.kvk.client import KvKClient
 from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.openklant.constants import KlantenServiceType
@@ -28,6 +28,36 @@ from .metrics import login_failures, logins, logouts, user_lockouts
 from .models import User
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+def _update_user_from_brp(user: User):
+    if not user.bsn:
+        raise ValueError("Expected User with BSN")
+
+    system_action(
+        "Retrieving data for user from haal centraal based on BSN",
+        content_object=user,
+    )
+
+    try:
+        client = BRPClient.from_config()
+    except ImproperlyConfigured:
+        logger.warning("no service configured for Haal Centraal")
+        return
+
+    try:
+        brp = client.fetch_brp_data_for_bsn(user.bsn)
+    except Exception:
+        logger.exception("unexpected error fetching BRP data")
+        return
+
+    if not brp:
+        logger.info("no BRP data found for user", user=user)
+        return
+
+    user.populate_from_brp(brp)
+
+    system_action(_("data was retrieved from haal centraal"), content_object=user)
 
 
 MESSAGE_TYPE = {
@@ -65,8 +95,11 @@ def update_user_on_login(sender, user, request, *args, **kwargs):
             )
 
     # update brp fields when login with digid and brp is configured
-    if user.is_bsn_user and HaalCentraalConfig.get_solo().service:
-        update_brp_data_in_db(user)
+    if user.is_bsn_user and not user.is_prepopulated:
+        try:
+            _update_user_from_brp(user)
+        except Exception:
+            logger.exception("unexpected error updating user from BRP on login")
 
     config = KlantenSysteemConfig.get_solo()
     if config.primary_backend == KlantenServiceType.OPENKLANT2.value:
@@ -176,6 +209,20 @@ def log_user_login(sender, user, request, *args, **kwargs):
 def log_user_logout(sender, user, request, *args, **kwargs):
     if user:
         user_action(request, user, MESSAGE_TYPE["logout"])
+
+
+@receiver(post_save, sender=User)
+def on_bsn_change(instance, **kwargs):
+    if (
+        instance.is_bsn_user
+        and not instance.is_prepopulated
+        and getattr(instance, "_process_on_bsn_change_post_save", True)
+    ):
+        # workaround to not have a post_save-signal loop if we save() again from within this handler
+        # note: this used to be a pre_save, but we need a saved user for the timeline log of the BRP access
+        instance._process_on_bsn_change_post_save = False
+
+        _update_user_from_brp(instance)
 
 
 @receiver(pre_save, sender=User)

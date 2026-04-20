@@ -9,7 +9,57 @@ Bij inlog koppelingen kunt u de authenticatiemogelijkheden voor inwoners, bedrij
 10.1. Configuratie ‘Haal centraal’
 ==================================
 
-Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. Hier kan de beheerder de Haal Centraal API die van toepassing is selecteren. In het venster zijn twee onderdelen zichtbaar: Headers voor I Connect en Headers voor Centric. Welke velden u exact dient in te vullen is afhankelijk van welke leverancier u heeft. U vult of de velden in bij I Connect óf bij Centric. Voor meer informatie over de in te vullen velden verwijzen wij u graag door naar de documentatie van de betreffende leverancier.
+Dit dient ter configuratie van de BRP-integratie met de Open Inwoner omgeving. De beheerder stelt hier de Haal Centraal API-service en BRP-versie in, en configureert de HTTP-headers die met elke aanvraag worden meegestuurd.
+
+**BRP versie**
+
+Selecteer de versie van de Haal Centraal BRP API die uw leverancier ondersteunt:
+
+- ``1.3`` — BRP 1.3 (GET-gebaseerde API, endpoint ``ingeschrevenpersonen``)
+- ``2.0`` t/m ``2.7`` — BRP 2.x (POST-gebaseerde API, endpoint ``personen``)
+
+.. note::
+
+   Patch versies hebben geen invloed op de keuze: gebruikt uw leverancier bijvoorbeeld
+   versie 2.6.2, kies dan ``2.6``.
+
+**Request headers**
+
+Voer de HTTP-headers in als sleutel/waarde-paren die bij elke BRP-aanvraag worden toegevoegd. Welke headers vereist zijn is afhankelijk van uw leverancier:
+
+*I Connect*
+
++--------------------+------------------------------------------+
+| Header             | Omschrijving                             |
++====================+==========================================+
+| x-origin-oin       | OIN van de gemeente (afzender)           |
++--------------------+------------------------------------------+
+| x-afnemer-oin      | OIN van de afnemer                       |
++--------------------+------------------------------------------+
+| x-doelbinding      | Doelbinding van de aanvraag              |
++--------------------+------------------------------------------+
+| x-verwerking       | Verwerkingsactiviteit (vrij tekstveld)   |
++--------------------+------------------------------------------+
+
+*Centric*
+
++--------------------------+------------------------------------------+
+| Header                   | Omschrijving                             |
++==========================+==========================================+
+| x-request-organization   | Organisatienaam                          |
++--------------------------+------------------------------------------+
+| x-request-application    | Applicatienaam                           |
++--------------------------+------------------------------------------+
+| x-request-afnemerscode   | Afnemerscode                             |
++--------------------------+------------------------------------------+
+| x-request-user           | Gebruikersnaam                           |
++--------------------------+------------------------------------------+
+
+Raadpleeg de documentatie van uw leverancier voor de exacte waarden.
+
+.. note::
+
+   De waarde van ``x-verwerking`` werd in eerdere versies gevalideerd op het voorkomen van maximaal één ``@``-teken. Deze validatie is vervallen omdat het veld is vervangen door een generiek sleutel/waarde-veld zonder leverancierspecifieke beperkingen.
 
 10.2. DigiD configuratie
 ========================
