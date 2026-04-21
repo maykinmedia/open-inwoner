@@ -21,6 +21,12 @@ export const useSelect = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   const typeaheadBuffer = useRef('');
   const typeaheadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const optionRefs = useRef(new Map<string, HTMLElement>());
+
+  const setOptionRef = (value: string, el: HTMLElement | null) => {
+    if (el) optionRefs.current.set(value, el);
+    else optionRefs.current.delete(value);
+  };
 
   const openDropdown = () => {
     setIsOpen(true);
@@ -102,14 +108,12 @@ export const useSelect = ({
     }
   };
 
-  // Scroll active option into view when navigating with keyboard
   useEffect(() => {
-    if (activeIndex < 0) return;
-    const id = `option-${name}-${choices[activeIndex].value}`;
-    document.getElementById(id)?.scrollIntoView({ block: 'nearest' });
+    const activeValue = choices[activeIndex]?.value;
+    if (!activeValue) return;
+    optionRefs.current.get(activeValue)?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex]);
 
-  // Cleanup typeahead timer on unmount
   useEffect(() => {
     return () => {
       if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current);
@@ -123,5 +127,6 @@ export const useSelect = ({
     handleKeyDown,
     closeDropdown,
     toggleDropdown,
+    setOptionRef,
   };
 };

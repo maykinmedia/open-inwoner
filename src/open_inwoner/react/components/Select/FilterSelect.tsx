@@ -2,19 +2,17 @@ import { normalizeBoolean } from '@react/lib/attributes/attribute';
 import { BooleanLike } from '@react/types/attributes';
 import { type AnyComponent as AC } from 'preact';
 import { SelectContext } from './context';
-import { useSelectProvider } from './useSelectProvider';
+import { useFilterSelectProvider } from './useFilterSelectProvider';
 import SelectView from './SelectView';
+import { SelectProps } from './Select';
 
-export interface SelectProps {
-  name: string;
-  label: string;
-  /** When true, always show choices without a toggle button (e.g. inside a mobile modal). */
-  alwaysOpen?: BooleanLike;
-  /** Whether options behave as checkboxes (true) or radio buttons (false). Default: true. */
-  multiple?: BooleanLike;
-}
-
-const Select: AC<SelectProps> = ({
+/**
+ * oip-filter-select
+ * Filter-aware variant of oip-select. Reads and writes selection state through
+ * SignalTestContext when nested inside oip-sig-root-test. Falls back to own
+ * signal state when used standalone (e.g. in Storybook).
+ */
+const FilterSelect: AC<SelectProps> = ({
   name,
   label,
   alwaysOpen: alwaysOpenProp = false,
@@ -25,7 +23,7 @@ const Select: AC<SelectProps> = ({
   const multiple = normalizeBoolean(multipleProp);
 
   const { containerRef, buttonRef, isOpen, toggleDropdown, ...ctx } =
-    useSelectProvider(name, multiple);
+    useFilterSelectProvider(name, multiple);
 
   return (
     <SelectContext.Provider value={ctx}>
@@ -47,4 +45,4 @@ const Select: AC<SelectProps> = ({
   );
 };
 
-export default Select;
+export default FilterSelect;

@@ -14,9 +14,9 @@ export const NEW_FILTER_ROOT_DEFINITION: WebComponentDefinition<'oip-sig-root-te
     importer: () => import('./Root'),
     subComponents: [
       'oip-sig-bar-test',
-      'oip-sig-list-test',
+      'oip-filter-select',
       'oip-sig-summary-test',
-      'oip-sig-option-test',
+      'oip-select-option',
     ],
   };
 

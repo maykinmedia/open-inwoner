@@ -1,23 +1,23 @@
 import { useSignal } from '@preact/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { useContext, useEffect, useRef } from 'preact/hooks';
+import { SignalTestContext } from '../NewFilter/context';
 import type { SelectContextValue } from './context';
+import type { UseSelectProviderResult } from './useSelectProvider';
 
-export interface UseSelectProviderResult extends SelectContextValue {
-  isOpen: boolean;
-  containerRef: ReturnType<typeof useRef<HTMLElement>>;
-  buttonRef: ReturnType<typeof useRef<HTMLButtonElement>>;
-  toggleDropdown: () => void;
-}
-
-export const useSelectProvider = (
+export const useFilterSelectProvider = (
   name: string,
   multiple: boolean
 ): UseSelectProviderResult => {
-  const selected = useSignal<string[]>([]);
+  const rootCtx = useContext(SignalTestContext);
+  const ownSelected = useSignal<string[]>([]);
   const choiceMap = useSignal<Record<string, string>>({});
   const isOpen = useSignal(false);
   const containerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const selectedValues: string[] = rootCtx
+    ? (rootCtx.selected.value[name] ?? [])
+    : ownSelected.value;
 
   const getHost = (): Element | null =>
     (containerRef.current?.getRootNode() as ShadowRoot)?.host ?? null;
@@ -31,20 +31,29 @@ export const useSelectProvider = (
     el?.shadowRoot?.querySelector<HTMLElement>('.oip-filter__option')?.focus();
 
   const toggle = (value: string) => {
+    if (rootCtx) {
+      if (multiple) rootCtx.toggle(name, value);
+      else rootCtx.toggleRadio(name, value);
+      return;
+    }
     if (multiple) {
-      selected.value = selected.value.includes(value)
-        ? selected.value.filter((v) => v !== value)
-        : [...selected.value, value];
+      ownSelected.value = ownSelected.value.includes(value)
+        ? ownSelected.value.filter((v) => v !== value)
+        : [...ownSelected.value, value];
     } else {
-      selected.value = [value];
+      ownSelected.value = [value];
     }
   };
 
   const register = (value: string, label: string, initialSelected = false) => {
     if (choiceMap.value[value] === label) return;
     choiceMap.value = { ...choiceMap.value, [value]: label };
-    if (initialSelected && !selected.value.includes(value)) {
-      selected.value = [...selected.value, value];
+    if (rootCtx) {
+      rootCtx.registerOption(name, value, label, initialSelected);
+      return;
+    }
+    if (initialSelected && !ownSelected.value.includes(value)) {
+      ownSelected.value = [...ownSelected.value, value];
     }
   };
 
@@ -70,23 +79,23 @@ export const useSelectProvider = (
 
   const toggleDropdown = () => (isOpen.value ? close() : open());
 
-  // Sync selection to ElementInternals.setFormValue when host is form-associated.
+  // Sync selection to ElementInternals.setFormValue so a wrapping <form> captures values.
   useEffect(() => {
     const host = getHost() as any;
     if (!host?.internals_) return;
-    if (selected.value.length === 0) {
+    if (selectedValues.length === 0) {
       host.internals_.setFormValue(null);
       return;
     }
     const fd = new FormData();
-    selected.value.forEach((v) => fd.append(name, v));
+    selectedValues.forEach((v) => fd.append(name, v));
     host.internals_.setFormValue(fd);
-  }, [selected.value]);
+  }, [selectedValues]);
 
   return {
     name,
     multiple,
-    selectedValues: selected.value,
+    selectedValues,
     register,
     toggle,
     moveFocus,

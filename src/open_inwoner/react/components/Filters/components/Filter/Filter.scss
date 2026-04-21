@@ -209,9 +209,9 @@
   }
 }
 
-oip-sig-option-test .oip-filter__option {
+oip-select-option .oip-filter__option {
   border-radius: 0;
 }
-oip-sig-option-test:last-of-type .oip-filter__option {
+oip-select-option:last-of-type .oip-filter__option {
   border-radius: 0 0 var(--option-radius) var(--option-radius);
 }

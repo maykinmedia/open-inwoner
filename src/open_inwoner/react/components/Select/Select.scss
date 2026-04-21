@@ -5,13 +5,11 @@
     margin: 0;
   }
 
-  // Desktop variant
   &--dropdown {
     position: relative;
     min-width: var(--oip-filter-dropdown-min-width);
   }
 
-  // Mobile variant
   &--mobile {
     display: flex;
     flex-direction: column;
@@ -94,6 +92,10 @@
     flex-direction: column;
   }
 
+  &--dropdown &__button[aria-expanded='false'] ~ &__choices {
+    display: none;
+  }
+
   &--dropdown &__choices {
     position: absolute;
     top: calc(100% - 1px);
@@ -105,6 +107,7 @@
     border-radius: 0 0 var(--oip-filter-choices-border-radius)
       var(--oip-filter-choices-border-radius);
     box-shadow: var(--oip-filter-choices-box-shadow);
+    overflow: hidden;
     z-index: 1100;
     max-height: 300px;
     max-width: calc(var(--oip-filter-button-max-width) - 2px);

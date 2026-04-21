@@ -2,14 +2,15 @@
  * NewFilter stories — rebuilds the Filters component using the signal/self-registration approach.
  *
  * Architecture:
- *   oip-sig-root-test    — creates Signal<selected>, handles isDirty + applyFilters
- *     oip-sig-bar-test   — desktop bar (groups + apply button) / mobile button + modal
- *       oip-sig-list-test  — a filter group (dropdown on desktop, fieldset on mobile)
- *         oip-sig-option-test — single option; registers its group, value and label on mount
- *     oip-sig-summary-test — renders chips for active filters + clear-all button
+ *   <form method="GET">          — native form for GET submission (optional, enables requestSubmit)
+ *     oip-sig-root-test          — creates Signal<selected>, handles isDirty + applyFilters
+ *       oip-sig-bar-test         — desktop bar / mobile button + modal
+ *         oip-filter-select      — filter group (dropdown or fieldset); formAssociated
+ *           oip-select-option    — registers value/label on mount
+ *       oip-sig-summary-test     — chips for active filters + clear-all
  *
- * No JSON config is needed — the HTML is the config.
- * Initial state (e.g. from URL params) is expressed via initial-selected on each option.
+ * applyFilters() calls form.requestSubmit() when a <form> ancestor is present,
+ * falling back to window.location.assign() otherwise.
  */
 import { withLoader } from '@react/lib/decorators';
 import type { Meta, StoryObj } from '@storybook/preact-vite';
@@ -23,59 +24,56 @@ const meta: Meta = {
 
 export default meta;
 
-/** Default — no filters pre-selected. */
+/** With native form — applyFilters calls form.requestSubmit(). */
+export const WithForm: StoryObj = {
+  render: () => (
+    <form method="GET" action="">
+      <oip-sig-root-test>
+        <oip-sig-bar-test>
+          <oip-filter-select name="status" label="Status">
+            <oip-select-option value="open" label="Open" />
+            <oip-select-option value="in-behandeling" label="In behandeling" />
+            <oip-select-option value="afgerond" label="Afgerond" />
+            <oip-select-option value="geannuleerd" label="Geannuleerd" />
+          </oip-filter-select>
+          <oip-filter-select name="categorie" label="Categorie">
+            <oip-select-option value="vraag" label="Vraag" />
+            <oip-select-option value="melding" label="Melding" />
+            <oip-select-option value="klacht" label="Klacht" />
+          </oip-filter-select>
+          <oip-filter-select name="datum" label="Datum">
+            <oip-select-option value="week" label="Afgelopen week" />
+            <oip-select-option value="maand" label="Afgelopen maand" />
+            <oip-select-option value="jaar" label="Afgelopen jaar" />
+          </oip-filter-select>
+        </oip-sig-bar-test>
+        <oip-sig-summary-test />
+      </oip-sig-root-test>
+    </form>
+  ),
+};
+
+/** Without form — applyFilters falls back to window.location.assign(). */
 export const Default: StoryObj = {
   render: () => (
     <oip-sig-root-test>
       <oip-sig-bar-test>
-        <oip-sig-list-test name="status" label="Status">
-          <oip-sig-option-test group="status" value="open" label="Open" />
-          <oip-sig-option-test
-            group="status"
-            value="in-behandeling"
-            label="In behandeling"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="afgerond"
-            label="Afgerond"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="geannuleerd"
-            label="Geannuleerd"
-          />
-        </oip-sig-list-test>
-        <oip-sig-list-test name="categorie" label="Categorie">
-          <oip-sig-option-test group="categorie" value="vraag" label="Vraag" />
-          <oip-sig-option-test
-            group="categorie"
-            value="melding"
-            label="Melding"
-          />
-          <oip-sig-option-test
-            group="categorie"
-            value="klacht"
-            label="Klacht"
-          />
-        </oip-sig-list-test>
-        <oip-sig-list-test name="datum" label="Datum">
-          <oip-sig-option-test
-            group="datum"
-            value="week"
-            label="Afgelopen week"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="maand"
-            label="Afgelopen maand"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="jaar"
-            label="Afgelopen jaar"
-          />
-        </oip-sig-list-test>
+        <oip-filter-select name="status" label="Status">
+          <oip-select-option value="open" label="Open" />
+          <oip-select-option value="in-behandeling" label="In behandeling" />
+          <oip-select-option value="afgerond" label="Afgerond" />
+          <oip-select-option value="geannuleerd" label="Geannuleerd" />
+        </oip-filter-select>
+        <oip-filter-select name="categorie" label="Categorie">
+          <oip-select-option value="vraag" label="Vraag" />
+          <oip-select-option value="melding" label="Melding" />
+          <oip-select-option value="klacht" label="Klacht" />
+        </oip-filter-select>
+        <oip-filter-select name="datum" label="Datum">
+          <oip-select-option value="week" label="Afgelopen week" />
+          <oip-select-option value="maand" label="Afgelopen maand" />
+          <oip-select-option value="jaar" label="Afgelopen jaar" />
+        </oip-filter-select>
       </oip-sig-bar-test>
       <oip-sig-summary-test />
     </oip-sig-root-test>
@@ -85,114 +83,71 @@ export const Default: StoryObj = {
 /** Pre-selected filters — simulates page load from URL params. */
 export const WithActiveFilters: StoryObj = {
   render: () => (
-    <oip-sig-root-test>
-      <oip-sig-bar-test>
-        <oip-sig-list-test name="status" label="Status">
-          <oip-sig-option-test
-            group="status"
-            value="open"
-            label="Open"
-            initial-selected="true"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="in-behandeling"
-            label="In behandeling"
-            initial-selected="true"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="afgerond"
-            label="Afgerond"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="geannuleerd"
-            label="Geannuleerd"
-          />
-        </oip-sig-list-test>
-        <oip-sig-list-test name="categorie" label="Categorie">
-          <oip-sig-option-test group="categorie" value="vraag" label="Vraag" />
-          <oip-sig-option-test
-            group="categorie"
-            value="melding"
-            label="Melding"
-            initial-selected="true"
-          />
-          <oip-sig-option-test
-            group="categorie"
-            value="klacht"
-            label="Klacht"
-          />
-        </oip-sig-list-test>
-        <oip-sig-list-test name="datum" label="Datum">
-          <oip-sig-option-test
-            group="datum"
-            value="week"
-            label="Afgelopen week"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="maand"
-            label="Afgelopen maand"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="jaar"
-            label="Afgelopen jaar"
-          />
-        </oip-sig-list-test>
-      </oip-sig-bar-test>
-      <oip-sig-summary-test />
-    </oip-sig-root-test>
+    <form method="GET" action="">
+      <oip-sig-root-test>
+        <oip-sig-bar-test>
+          <oip-filter-select name="status" label="Status">
+            <oip-select-option
+              value="open"
+              label="Open"
+              initial-selected="true"
+            />
+            <oip-select-option
+              value="in-behandeling"
+              label="In behandeling"
+              initial-selected="true"
+            />
+            <oip-select-option value="afgerond" label="Afgerond" />
+            <oip-select-option value="geannuleerd" label="Geannuleerd" />
+          </oip-filter-select>
+          <oip-filter-select name="categorie" label="Categorie">
+            <oip-select-option value="vraag" label="Vraag" />
+            <oip-select-option
+              value="melding"
+              label="Melding"
+              initial-selected="true"
+            />
+            <oip-select-option value="klacht" label="Klacht" />
+          </oip-filter-select>
+          <oip-filter-select name="datum" label="Datum">
+            <oip-select-option value="week" label="Afgelopen week" />
+            <oip-select-option value="maand" label="Afgelopen maand" />
+            <oip-select-option value="jaar" label="Afgelopen jaar" />
+          </oip-filter-select>
+        </oip-sig-bar-test>
+        <oip-sig-summary-test />
+      </oip-sig-root-test>
+    </form>
   ),
 };
 
 /** Radio (single-select) group alongside checkbox groups. */
 export const WithRadioGroup: StoryObj = {
   render: () => (
-    <oip-sig-root-test>
-      <oip-sig-bar-test>
-        <oip-sig-list-test name="status" label="Status">
-          <oip-sig-option-test
-            group="status"
-            value="open"
-            label="Open"
-            initial-selected="true"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="in-behandeling"
-            label="In behandeling"
-          />
-          <oip-sig-option-test
-            group="status"
-            value="afgerond"
-            label="Afgerond"
-          />
-        </oip-sig-list-test>
-        <oip-sig-list-test name="datum" label="Datum (kies één)">
-          <oip-sig-option-test
-            group="datum"
-            value="week"
-            label="Afgelopen week"
-            checkbox="false"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="maand"
-            label="Afgelopen maand"
-            checkbox="false"
-          />
-          <oip-sig-option-test
-            group="datum"
-            value="jaar"
-            label="Afgelopen jaar"
-            checkbox="false"
-          />
-        </oip-sig-list-test>
-      </oip-sig-bar-test>
-      <oip-sig-summary-test />
-    </oip-sig-root-test>
+    <form method="GET" action="">
+      <oip-sig-root-test>
+        <oip-sig-bar-test>
+          <oip-filter-select name="status" label="Status">
+            <oip-select-option
+              value="open"
+              label="Open"
+              initial-selected="true"
+            />
+            <oip-select-option value="in-behandeling" label="In behandeling" />
+            <oip-select-option value="afgerond" label="Afgerond" />
+          </oip-filter-select>
+          <oip-filter-select
+            name="datum"
+            label="Datum (kies één)"
+            multiple="false"
+          >
+            <oip-select-option value="week" label="Afgelopen week" />
+            <oip-select-option value="maand" label="Afgelopen maand" />
+            <oip-select-option value="jaar" label="Afgelopen jaar" />
+          </oip-filter-select>
+        </oip-sig-bar-test>
+        <oip-sig-summary-test />
+      </oip-sig-root-test>
+    </form>
   ),
 };

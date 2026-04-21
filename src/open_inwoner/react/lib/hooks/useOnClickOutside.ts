@@ -1,5 +1,4 @@
-import type { RefObject } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { MutableRef, useEffect } from 'preact/hooks';
 
 /**
  * Hook that triggers callback when clicking outside the referenced element
@@ -13,7 +12,7 @@ import { useEffect } from 'preact/hooks';
  * ```
  */
 export const useOnClickOutside = (
-  ref: RefObject<HTMLElement>,
+  ref: MutableRef<HTMLElement | undefined>,
   onClickOutside: () => void,
   disabled = false
 ) => {
