@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<p>
+  <a href="{{ back_url }}" class="button">← Back</a>
+</p>
+
+<div id="content-main">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div class="submit-row">
+      <input type="submit" value="Run Check" class="default">
+    </div>
+  </form>
+
+  {% if result %}
+    <hr>
+    <h2>Result</h2>
+    <p>
+      {% if result.success %}
+        ✅ {{ result.message }}
+      {% else %}
+        ❌ {{ result.message }}
+      {% endif %}
+    </p>
+
+    {% if result.extra %}
+     <pre>{{ result.extra|pprint }}</pre>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

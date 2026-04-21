@@ -16,6 +16,8 @@ import structlog
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
+from maykin_config_checks.api.api import with_config_checks
+from open_inwoner.openzaak.config_checks.fetch_cases import FetchCasesCheck
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.forms import LimitedUploadFileField
@@ -35,9 +37,11 @@ from .models import (
 logger = structlog.stdlib.get_logger(__name__)
 
 
+@with_config_checks(FetchCasesCheck)
 class ZGWApiGroupConfig(admin.StackedInline):
     model = ZGWApiGroupConfig
     extra = 0
+    readonly_fields = ("config_check_links",)
 
     fieldsets = (
         (
@@ -61,6 +65,12 @@ class ZGWApiGroupConfig(admin.StackedInline):
                     "fetch_rollen_with_betrokkene_type",
                     "klant_backend",
                 ]
+            },
+        ),
+        (
+            _("Checks"),
+            {
+                "fields": ("config_check_links",),
             },
         ),
     )
