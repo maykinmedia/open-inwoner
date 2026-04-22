@@ -1,0 +1,33 @@
+{% load i18n %}
+
+<div>
+    <h2>
+        {% translate 'Configuration status' %}
+        &nbsp;
+        {% if failed_checks %}
+            <img src="/static/admin/img/icon-no.svg" alt="{% translate 'Configuration incomplete' %}">
+        {% else %}
+            <img src="/static/admin/img/icon-yes.svg" alt="{% translate 'Configuration complete' %}">
+        {% endif %}
+    </h2>
+    {% if failed_checks %}
+        <p>{% translate 'The following issues have been detected:' %}</p>
+        <ul class="config-error-list">
+            {% for failed_check in failed_checks %}
+            <li>
+                {{ failed_check.verbose_name|capfirst }}: {{ failed_check.message }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if successful_checks %}
+        <p>{% translate 'The following checks ran successfully:' %}</p>
+        <ul class="config-success-list">
+            {% for successful_check in successful_checks %}
+            <li>
+                {{ successful_check.verbose_name|capfirst }}: {{ successful_check.message }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
