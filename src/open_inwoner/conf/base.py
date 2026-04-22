@@ -659,6 +659,13 @@ CMS_PAGE_CACHE = False
 CMS_PLACEHOLDER_CACHE = False
 CMS_PLUGIN_CACHE = False
 
+# The page creation wizard defaults to creating a TextPlugin pre-filled with
+# the wizard's content field. The content field is a plain textarea (we no
+# longer use djangocms_text_ckeditor), so the raw string would be stored
+# directly as the Prosemirror body field, bypassing JSON serialisation.
+# Disabling the body field prevents the wizard from creating a broken plugin.
+CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY = ""
+
 CMS_TEMPLATES = [
     ("cms/fullwidth.html", "Home page template"),
     ("cms/cms_flatpage_template.html", "CMS Flatpage Template"),
