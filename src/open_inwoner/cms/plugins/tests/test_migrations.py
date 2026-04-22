@@ -5,6 +5,107 @@ from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
 @tag("migrations")
+class FixLegacyTextPluginBodyMigrationTest(TestSuccessfulMigrations):
+    """
+    Test the data migration that fixes Text plugin body fields containing
+    legacy plain strings (stored as JSON strings in JSONB) instead of
+    Prosemirror JSON documents.
+
+    Scenarios:
+    - Empty JSON string ("") → EMPTY_DOC (body is NOT NULL)
+    - HTML string → Prosemirror JSON dict
+    - Plain text string → Prosemirror JSON dict (wrapped in paragraph)
+    - None → unchanged
+    - Valid Prosemirror dict → unchanged
+    """
+
+    migrate_from = "0014_alter_extendedcmslink_name"
+    migrate_to = "0015_fix_legacy_text_plugin_body"
+    app = "plugins"
+
+    def setUpBeforeMigration(self, apps):
+        CMSPlugin = apps.get_model("cms", "CMSPlugin")
+        Placeholder = apps.get_model("cms", "Placeholder")
+
+        placeholder = Placeholder.objects.create(slot="content")
+
+        def make_plugin(position, path):
+            return CMSPlugin.objects.create(
+                language="nl",
+                plugin_type="TextPlugin",
+                placeholder=placeholder,
+                position=position,
+                path=path,
+                depth=1,
+                numchild=0,
+            )
+
+        self.plugin_empty = make_plugin(0, "0001")
+        self.plugin_html = make_plugin(1, "0002")
+        self.plugin_plain = make_plugin(2, "0003")
+        self.plugin_none = make_plugin(3, "0004")
+        self.plugin_valid = make_plugin(4, "0005")
+
+        with connection.cursor() as cursor:
+            # Empty string stored as JSON-encoded empty string (the wizard bug)
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
+                (self.plugin_empty.id, '""'),
+            )
+            # Legacy HTML content stored as a JSON string
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
+                (self.plugin_html.id, '"<p>Hello <strong>world</strong></p>"'),
+            )
+            # Plain text stored as a JSON string
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
+                (self.plugin_plain.id, '"plain text"'),
+            )
+            # JSON null — should be left alone (NOT NULL column can still store 'null'::jsonb)
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, 'null'::jsonb)",
+                (self.plugin_none.id,),
+            )
+            # Already a valid Prosemirror JSON object — should be left alone
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
+                (
+                    self.plugin_valid.id,
+                    '{"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Valid"}]}]}',
+                ),
+            )
+
+    def test_empty_string_becomes_empty_doc(self):
+        Text = self.apps.get_model("plugins", "Text")
+        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_empty.id)
+        self.assertEqual(text.body.raw_data, {"type": "doc", "content": []})
+
+    def test_html_string_converted_to_prosemirror(self):
+        Text = self.apps.get_model("plugins", "Text")
+        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_html.id)
+        self.assertIsInstance(text.body.raw_data, dict)
+        self.assertEqual(text.body.raw_data.get("type"), "doc")
+
+    def test_plain_text_converted_to_prosemirror(self):
+        Text = self.apps.get_model("plugins", "Text")
+        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_plain.id)
+        self.assertIsInstance(text.body.raw_data, dict)
+        self.assertEqual(text.body.raw_data.get("type"), "doc")
+
+    def test_none_remains_none(self):
+        Text = self.apps.get_model("plugins", "Text")
+        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_none.id)
+        self.assertIsNone(text.body.raw_data)
+
+    def test_valid_prosemirror_dict_unchanged(self):
+        Text = self.apps.get_model("plugins", "Text")
+        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_valid.id)
+        self.assertIsInstance(text.body.raw_data, dict)
+        self.assertEqual(text.body.raw_data.get("type"), "doc")
+
+
+@tag("migrations")
 class SwapTasksObjectTypeFieldsMigrationTest(TestSuccessfulMigrations):
     """
     Test the data migration that swaps object_type_dimpact and
