@@ -217,6 +217,7 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     *default_health_check_apps,
+    "maykin_config_checks",
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
