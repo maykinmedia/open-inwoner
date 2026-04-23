@@ -87,13 +87,14 @@
     margin-bottom: var(--oip-filter-mobile-gap);
   }
 
-  &__choices {
+  &__dropdown &__choices--open {
     display: flex;
     flex-direction: column;
   }
 
-  &--dropdown &__button[aria-expanded='false'] ~ &__choices {
-    display: none;
+  &--dropdown &__choices {
+    // display: none;
+    background: red;
   }
 
   &--dropdown &__choices {

@@ -1,13 +1,11 @@
-import { normalizeBoolean } from '@react/lib/attributes/attribute';
-import { BooleanLike } from '@react/types/attributes';
 import { type AnyComponent as AC } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
+import { useRequiredFormContext } from '../Form/FormContext';
 import { useSelectContext } from './context';
 
 export interface OptionProps {
   value: string;
   label: string;
-  initialSelected?: BooleanLike;
 }
 
 /**
@@ -15,30 +13,30 @@ export interface OptionProps {
  * Renders a single option row inside its own shadow DOM.
  * The host element has role="option" via ElementInternals (set in constants).
  * The inner div is the focusable/interactive element — the input is aria-hidden
- * and exists only for CSS-driven icon state and form value submission.
+ * and exists only for CSS-driven icon state.
+ *
+ * Default selection is set on oip-select via the value prop, not here.
+ * This component only registers its display label and handles interaction.
  */
-const SelectOption: AC<OptionProps> = ({
-  value,
-  label,
-  initialSelected = false,
-}) => {
+const SelectOption: AC<OptionProps> = ({ value, label }) => {
   const ctx = useSelectContext();
-  const isSelected = ctx.selectedValues.includes(value);
-  const divRef = useRef<HTMLElement>(null);
+  const formCtx = useRequiredFormContext();
+  const isSelected = formCtx.values.value[ctx.name]?.includes(value) ?? false;
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ctx.register(value, label, normalizeBoolean(initialSelected));
+    ctx.registerLabel(value, label);
   }, []);
 
   // Keep ElementInternals.ariaSelected in sync for screen readers.
   useEffect(() => {
-    const host = (divRef.current?.getRootNode() as ShadowRoot)?.host as any;
+    const host = (ref.current?.getRootNode() as ShadowRoot)?.host as any;
     if (host?.internals_) {
       host.internals_.ariaSelected = isSelected ? 'true' : 'false';
     }
-
-    console.log(host.internals_.ariaSelected);
   }, [isSelected]);
+
+  const toggle = () => formCtx.toggle(ctx.name, value, ctx.multiple);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
@@ -53,7 +51,7 @@ const SelectOption: AC<OptionProps> = ({
       case 'Enter':
       case ' ':
         e.preventDefault();
-        ctx.toggle(value);
+        toggle();
         break;
       case 'Escape':
         e.preventDefault();
@@ -64,10 +62,10 @@ const SelectOption: AC<OptionProps> = ({
 
   return (
     <div
-      ref={divRef as any}
+      ref={ref}
       class="oip-filter__option"
       tabIndex={-1}
-      onClick={() => ctx.toggle(value)}
+      onClick={toggle}
       onKeyDown={handleKeyDown}
     >
       {/* aria-hidden: input is purely for CSS icon state, not exposed to AT */}
@@ -79,7 +77,7 @@ const SelectOption: AC<OptionProps> = ({
         value={value}
         checked={isSelected}
         class="oip-filter__option-input"
-        onChange={() => ctx.toggle(value)}
+        onChange={toggle}
       />
       <span class="oip-filter__option-label">
         <span>{label}</span>

@@ -2,11 +2,12 @@ import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
 export interface SelectContextValue {
+  /** Field name — passed to FormContext when toggling or reading selections. */
   name: string;
+  /** Whether the field is multi-select (checkbox) or single-select (radio). */
   multiple: boolean;
-  selectedValues: string[];
-  register: (value: string, label: string, initialSelected?: boolean) => void;
-  toggle: (value: string) => void;
+  /** Called by each option on mount to register its display label with the form. */
+  registerLabel: (value: string, label: string) => void;
   /** Move keyboard focus to the next or previous option. */
   moveFocus: (direction: 'next' | 'prev') => void;
   /** Close the dropdown and return focus to the toggle button. */

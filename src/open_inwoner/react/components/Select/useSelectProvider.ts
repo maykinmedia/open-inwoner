@@ -1,19 +1,32 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
+import { useRequiredFormContext } from '../Form/FormContext';
 import type { SelectContextValue } from './context';
 
 export interface UseSelectProviderResult extends SelectContextValue {
+  /** Current selected values — for the badge count in Select, not exposed via SelectContext. */
+  selectedValues: string[];
   isOpen: boolean;
   containerRef: ReturnType<typeof useRef<HTMLElement>>;
   buttonRef: ReturnType<typeof useRef<HTMLButtonElement>>;
   toggleDropdown: () => void;
 }
 
+/**
+ * Core logic for oip-select. Requires a parent oip-form (FormContext).
+ * Throws if used outside oip-form.
+ *
+ * Value state lives entirely in FormContext. This hook only manages:
+ *   - Option registration (label + default forwarded to FormContext)
+ *   - Dropdown open/close state and keyboard focus
+ */
 export const useSelectProvider = (
   name: string,
-  multiple: boolean
+  multiple: boolean,
+  defaultValue?: string[]
 ): UseSelectProviderResult => {
-  const selected = useSignal<string[]>([]);
+  const formCtx = useRequiredFormContext();
+  const binding = formCtx.register(name, defaultValue);
   const choiceMap = useSignal<Record<string, string>>({});
   const isOpen = useSignal(false);
   const containerRef = useRef<HTMLElement>(null);
@@ -30,22 +43,10 @@ export const useSelectProvider = (
   const focusOption = (el: HTMLElement | undefined) =>
     el?.shadowRoot?.querySelector<HTMLElement>('.oip-filter__option')?.focus();
 
-  const toggle = (value: string) => {
-    if (multiple) {
-      selected.value = selected.value.includes(value)
-        ? selected.value.filter((v) => v !== value)
-        : [...selected.value, value];
-    } else {
-      selected.value = [value];
-    }
-  };
-
-  const register = (value: string, label: string, initialSelected = false) => {
+  const registerLabel = (value: string, label: string) => {
     if (choiceMap.value[value] === label) return;
     choiceMap.value = { ...choiceMap.value, [value]: label };
-    if (initialSelected && !selected.value.includes(value)) {
-      selected.value = [...selected.value, value];
-    }
+    formCtx.registerLabel(name, value, label);
   };
 
   const moveFocus = (direction: 'next' | 'prev') => {
@@ -70,30 +71,31 @@ export const useSelectProvider = (
 
   const toggleDropdown = () => (isOpen.value ? close() : open());
 
-  // Sync selection to ElementInternals.setFormValue when host is form-associated.
+  const selectedValues = binding.value.value;
+
+  // Sync to ElementInternals.setFormValue so a wrapping <form> captures values.
   useEffect(() => {
     const host = getHost() as any;
     if (!host?.internals_) return;
-    if (selected.value.length === 0) {
+    if (selectedValues.length === 0) {
       host.internals_.setFormValue(null);
       return;
     }
     const fd = new FormData();
-    selected.value.forEach((v) => fd.append(name, v));
+    selectedValues.forEach((v) => fd.append(name, v));
     host.internals_.setFormValue(fd);
-  }, [selected.value]);
+  }, [selectedValues]);
 
   return {
     name,
     multiple,
-    selectedValues: selected.value,
-    register,
-    toggle,
+    selectedValues,
+    registerLabel,
     moveFocus,
     close,
     isOpen: isOpen.value,
-    containerRef,
-    buttonRef,
+    containerRef: containerRef as ReturnType<typeof useRef<HTMLElement>>,
+    buttonRef: buttonRef as ReturnType<typeof useRef<HTMLButtonElement>>,
     toggleDropdown,
   };
 };

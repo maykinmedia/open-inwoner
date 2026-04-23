@@ -16,8 +16,40 @@
             {% endif %}
             {% if filter_options %}
                 {# Filter Component #}
-                {{ filter_options|json_script:"filter_options" }}
-                <oip-afval-filters data-id="filter_options"></oip-afval-filters>
+                {# Declarative web component approach — filter data is rendered directly from the view context. #}
+                {# The view must pass filter_options (AfvalFilterConfig) and active_filters (dict of param -> list). #}
+                <oip-form>
+                    <oip-filters>
+                        <oip-filter-bar>
+                            {% if filter_options.periode %}
+                                <oip-select name="periode" label="{% trans 'Periode' %}" multiple="false"
+                                            value="{{ active_filters.periode|join:',' }}">
+                                    {% for year in filter_options.periode %}
+                                        <oip-select-option value="{{ year }}" label="{% trans 'Jaar' %} {{ year }}"></oip-select-option>
+                                    {% endfor %}
+                                </oip-select>
+                            {% endif %}
+                            {% if filter_options.afval_types %}
+                                <oip-select name="afval-type" label="{% trans 'Type container' %}"
+                                            value="{{ active_filters.afval_type|join:',' }}">
+                                    {% for type in filter_options.afval_types %}
+                                        <oip-select-option value="{{ type.value }}" label="{{ type.label }}"></oip-select-option>
+                                    {% endfor %}
+                                </oip-select>
+                            {% endif %}
+                            {% if filter_options.addresses %}
+                                <oip-select name="adres" label="{% trans 'Adres' %}"
+                                            value="{{ active_filters.adres|join:',' }}">
+                                    {% for address in filter_options.addresses %}
+                                        <oip-select-option value="{{ address }}" label="{{ address }}"></oip-select-option>
+                                    {% endfor %}
+                                </oip-select>
+                            {% endif %}
+                            <oip-form-button></oip-form-button>
+                        </oip-filter-bar>
+                        <oip-filter-chips></oip-filter-chips>
+                    </oip-filters>
+                </oip-form>
             {% endif %}
             {% if afval_data %}
                 {# chart #}

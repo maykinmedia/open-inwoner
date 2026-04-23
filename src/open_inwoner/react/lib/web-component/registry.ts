@@ -12,34 +12,24 @@ import { AFVAL_FILTERS_DEFINITION } from '@react/components/AfvalFilter/constant
 import { FILE_ITEM_DEFINITION } from '@react/components/File/constants';
 import { ACTION_DEFINITION } from '@react/components/Action/constants';
 import {
-  SIG_ROOT_DEFINITION,
-  SIG_LIST_DEFINITION,
-  SIG_SUMMARY_DEFINITION,
-} from '@react/components/SignalTest/constants';
-import {
-  NEW_FILTER_ROOT_DEFINITION,
-  NEW_FILTER_BAR_DEFINITION,
-  NEW_FILTER_SUMMARY_DEFINITION,
-} from '@react/components/NewFilter/constants';
-import { FILTERS_DEFINITION } from '@react/components/FiltersClone/constants';
-import { FILTER_DEFINITION } from '@react/components/FiltersClone/components/Filter/constants';
-import { FILTER_BAR_DEFINITION } from '@react/components/FiltersClone/components/FilterBar/constants';
-import { FILTER_CHIPS_DEFINITION } from '@react/components/FiltersClone/components/FilterChips/constants';
-import {
   SELECT_DEFINITION,
   SELECT_OPTION_DEFINITION,
-  FILTER_SELECT_DEFINITION,
 } from '@react/components/Select/constants';
+import {
+  FORM_COMPONENT_DEFINITION,
+  FORM_BUTTON_DEFINITION,
+  FORM_FILTERS_DEFINITION,
+  FORM_FILTER_BAR_DEFINITION,
+  FORM_FILTER_CHIPS_DEFINITION,
+} from '@react/components/Form/constants';
 
 /**
  * Web component registry
  * Maps tag names to their definitions
  *
- * This is the single source of truth for all web components.
- *
  * To add a new web component:
  * 1. Create a COMPONENT_DEFINITION in the component's constants.ts
- * 2. Import the definition and tag name at the top of this file
+ * 2. Import it here
  * 3. Add to WEB_COMPONENT_REGISTRY
  */
 export const WEB_COMPONENT_REGISTRY = {
@@ -56,17 +46,11 @@ export const WEB_COMPONENT_REGISTRY = {
   [AFVAL_FILTERS_DEFINITION.tagName]: AFVAL_FILTERS_DEFINITION,
   [FILE_ITEM_DEFINITION.tagName]: FILE_ITEM_DEFINITION,
   [ACTION_DEFINITION.tagName]: ACTION_DEFINITION,
-  [SIG_ROOT_DEFINITION.tagName]: SIG_ROOT_DEFINITION,
-  [SIG_LIST_DEFINITION.tagName]: SIG_LIST_DEFINITION,
-  [SIG_SUMMARY_DEFINITION.tagName]: SIG_SUMMARY_DEFINITION,
-  [FILTERS_DEFINITION.tagName]: FILTERS_DEFINITION,
-  [FILTER_DEFINITION.tagName]: FILTER_DEFINITION,
-  [FILTER_BAR_DEFINITION.tagName]: FILTER_BAR_DEFINITION,
-  [FILTER_CHIPS_DEFINITION.tagName]: FILTER_CHIPS_DEFINITION,
-  [NEW_FILTER_ROOT_DEFINITION.tagName]: NEW_FILTER_ROOT_DEFINITION,
-  [NEW_FILTER_BAR_DEFINITION.tagName]: NEW_FILTER_BAR_DEFINITION,
-  [NEW_FILTER_SUMMARY_DEFINITION.tagName]: NEW_FILTER_SUMMARY_DEFINITION,
   [SELECT_DEFINITION.tagName]: SELECT_DEFINITION,
   [SELECT_OPTION_DEFINITION.tagName]: SELECT_OPTION_DEFINITION,
-  [FILTER_SELECT_DEFINITION.tagName]: FILTER_SELECT_DEFINITION,
+  [FORM_COMPONENT_DEFINITION.tagName]: FORM_COMPONENT_DEFINITION,
+  [FORM_BUTTON_DEFINITION.tagName]: FORM_BUTTON_DEFINITION,
+  [FORM_FILTERS_DEFINITION.tagName]: FORM_FILTERS_DEFINITION,
+  [FORM_FILTER_BAR_DEFINITION.tagName]: FORM_FILTER_BAR_DEFINITION,
+  [FORM_FILTER_CHIPS_DEFINITION.tagName]: FORM_FILTER_CHIPS_DEFINITION,
 } as const;
