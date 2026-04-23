@@ -16,7 +16,11 @@ Nieuwe features
 Bugfixes
 --------
 
-* ...
+* [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
+  wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
+  het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
+  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
+  dezelfde versheid garandeert als de zaakdetailpagina.
 
 Onderhoud
 ---------
