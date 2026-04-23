@@ -16,6 +16,7 @@ export const SELECT_DEFINITION: WebComponentDefinition<
     formAssociated: true,
     adoptedStyleSheets: createStyleSheets(selectStyle),
     internals: { role: 'listbox' },
+    i18n: true,
   },
   subComponents: ['oip-select-option'],
   importer: () => import('./Select'),

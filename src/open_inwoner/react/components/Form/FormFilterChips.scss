@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.oip-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--oip-filter-chips-gap);
+
+  &__clear {
+    font-weight: var(--oip-filter-chips-clear-button-font-weight);
+
+    @media (max-width: 767px) {
+      padding: 0;
+    }
+  }
+}
+
+.oip-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--oip-filter-chip-gap);
+  padding-block-start: var(--oip-filter-chip-padding-block-start);
+  padding-block-end: var(--oip-filter-chip-padding-block-end);
+  padding-inline-start: var(--oip-filter-chip-padding-inline-start);
+  padding-inline-end: var(--oip-filter-chip-padding-inline-end);
+  background-color: var(--oip-filter-chip-background-color);
+  border: 1px solid var(--oip-filter-chip-border-color);
+  border-radius: var(--oip-filter-chip-border-radius);
+  font-size: var(--oip-filter-chip-font-size);
+  line-height: var(--oip-filter-chip-line-height);
+  color: var(--oip-filter-chip-color);
+  height: fit-content;
+
+  @media (min-width: 768px) {
+    font-size: var(--oip-filter-chip-desktop-font-size);
+    line-height: var(--oip-filter-chip-desktop-line-height);
+    padding-block-start: var(--oip-filter-chip-desktop-padding-block-start);
+    padding-block-end: var(--oip-filter-chip-desktop-padding-block-end);
+    padding-inline-start: var(--oip-filter-chip-desktop-padding-inline-start);
+    padding-inline-end: var(--oip-filter-chip-desktop-padding-inline-end);
+  }
+
+  &__label {
+    font-weight: var(--oip-filter-chip-label-font-weight);
+  }
+
+  &__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

@@ -1,13 +1,9 @@
 import { Meta, StoryObj } from '@storybook/preact-vite';
-import FormComponent from './FormComponent';
-import FormFilterBar from './FormFilterBar';
-import FormFilterChips from './FormFilterChips';
-import Select from '../Select/Select';
-import SelectOption from '../Select/SelectOption';
-import FormButton from './FormButton';
+import { withLoader } from '@react/lib/decorators';
 
 const meta: Meta = {
   title: 'Form/Form',
+  decorators: withLoader('oip-form'),
 };
 
 export default meta;
@@ -17,22 +13,25 @@ type Story = StoryObj;
 export const Default: Story = {
   render: () => {
     return (
-      <FormComponent>
-        <FormFilterBar>
-          <Select label="Status" name="status" multiple={true}>
-            <SelectOption label="Development" value="0"></SelectOption>
-            <SelectOption label="Acceptatie" value="1"></SelectOption>
-            <SelectOption label="Productie" value="2"></SelectOption>
-          </Select>
-          <Select label="Date" name="date" multiple={false}>
-            <SelectOption label="Today" value="0"></SelectOption>
-            <SelectOption label="Tommorow" value="1"></SelectOption>
-            <SelectOption label="Yesterday" value="2"></SelectOption>
-          </Select>
-          <FormButton>Toon resultaten</FormButton>
-        </FormFilterBar>
-        <FormFilterChips />
-      </FormComponent>
+      <oip-form>
+        <oip-filter-bar>
+          <oip-select label="Status" name="status" multiple={true}>
+            <oip-select-option
+              label="Development"
+              value="0"
+            ></oip-select-option>
+            <oip-select-option label="Acceptatie" value="1"></oip-select-option>
+            <oip-select-option label="Productie" value="2"></oip-select-option>
+          </oip-select>
+          <oip-select label="Date" name="date" multiple={false}>
+            <oip-select-option label="Today" value="0"></oip-select-option>
+            <oip-select-option label="Tommorow" value="1"></oip-select-option>
+            <oip-select-option label="Yesterday" value="2"></oip-select-option>
+          </oip-select>
+          <oip-form-button>Toon resultaten</oip-form-button>
+        </oip-filter-bar>
+        <oip-filter-chips />
+      </oip-form>
     );
   },
 };
