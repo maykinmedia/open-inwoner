@@ -6,12 +6,21 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
-* ...
+* [:gh:`2414`]: De virusscanner maakt gebruik van een ClamAV-daemon. Om
+  bestandsuploads te scannen dient een ClamAV-daemon bereikbaar te zijn en
+  moet het veld ``Virusscanner inschakelen`` in de siteconfiguratie worden
+  aangezet. Host, poort en time-out zijn instelbaar via de beheeromgeving
+  (standaardwaarden: host ``clamav``, poort ``3310``, time-out ``30``
+  seconden).
 
 Nieuwe features
 ---------------
 
-* ...
+* [:gh:`2414`]: Bestandsuploads worden nu optioneel gescand op virussen met
+  behulp van ClamAV. De virusscanner is in te schakelen via de
+  siteconfiguratie en is van toepassing op alle bestandsuploads binnen de
+  applicatie (zaken en plannen). Wanneer een geïnfecteerd bestand wordt
+  gedetecteerd, wordt de upload geweigerd.
 
 Bugfixes
 --------
@@ -27,7 +36,7 @@ Bugfixes
 Onderhoud
 ---------
 
-* ...
+* [:gh:`2414`]: ClamAV Python-client (``clamd``) toegevoegd.
 
 2.2.0 (2026-04-20)
 ==================
