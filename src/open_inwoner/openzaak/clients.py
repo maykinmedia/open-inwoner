@@ -349,7 +349,10 @@ class ZakenClient(ZgwAPIClient):
     def fetch_status_history(self, zaak_url: str) -> list[Status]:
         return self.fetch_status_history_no_cache(zaak_url)
 
-    @cache_result("{self.base_url}:status:{status_url}", timeout=60 * 60)
+    @cache_result(
+        "{self.base_url}:status:{status_url}",
+        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+    )
     def fetch_single_status(self, status_url: str) -> Status | None:
         try:
             response = self.get(url=status_url)
