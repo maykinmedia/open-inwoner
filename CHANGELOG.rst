@@ -32,6 +32,9 @@ Bugfixes
   dezelfde versheid garandeert als de zaakdetailpagina.
 * [:gh:`2289`] Validate content-length in ZGW document downloads to prevent broken downloads
   when the backend returns error messages instead of file content.
+* [:gh:`2445`]: Ongeldige inhoud in TextPlugin-velden (lege of platte tekst opgeslagen
+  als JSON-string) wordt nu automatisch hersteld via een datamigatie. De CMS-wizard
+  vult het tekstveld niet langer voor, zodat nieuwe corruptie wordt voorkomen.
 
 Onderhoud
 ---------
