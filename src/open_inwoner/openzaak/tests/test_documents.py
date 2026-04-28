@@ -522,6 +522,78 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
+    def test_document_download_with_size_mismatch_shows_error(self, m):
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        # Content-Length differs from informatie_object["bestandsomvang"], triggering the mismatch
+        content_wrong_length = b"wrong content"
+        m.get(
+            self.informatie_object["inhoud"],
+            content=content_wrong_length,
+            headers={"Content-Length": str(len(content_wrong_length))},
+        )
+
+        response = self.app.get(
+            self.informatie_object_file.url,
+            user=self.user,
+            status=302,
+            auto_follow=False,
+        )
+
+        expected_redirect = f"/cases/{self.api_group.id}/{self.zaak['uuid']}/status/"
+        self.assertEqual(response.location, expected_redirect)
+
+        # Follow the redirect to access messages
+        response_redirect = response.follow()
+        messages = [str(message) for message in response_redirect.context["messages"]]
+        self.assertIn(
+            "Het document kon niet worden gedownload vanwege een fout in de gegevens.",
+            messages,
+        )
+
+    def test_document_download_missing_bestandsomvang_still_returns_file(self, m):
+        informatie_object_no_size = {**self.informatie_object, "bestandsomvang": None}
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=informatie_object_no_size)
+        m.get(
+            self.informatie_object["inhoud"],
+            content=self.informatie_object_content,
+            headers={"Content-Length": str(len(self.informatie_object_content))},
+        )
+
+        response = self.app.get(self.informatie_object_file.url, user=self.user)
+
+        self.assertEqual(response.body, self.informatie_object_content)
+
+    def test_document_download_malformed_content_length_header_still_returns_file(
+        self, m
+    ):
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["inhoud"],
+            content=self.informatie_object_content,
+            headers={"Content-Length": "not-a-number"},
+        )
+
+        response = self.app.get(self.informatie_object_file.url, user=self.user)
+
+        self.assertEqual(response.body, self.informatie_object_content)
+
+    def test_document_download_missing_content_length_header_still_returns_file(
+        self, m
+    ):
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["inhoud"],
+            content=self.informatie_object_content,
+        )
+
+        response = self.app.get(self.informatie_object_file.url, user=self.user)
+
+        self.assertEqual(response.body, self.informatie_object_content)
+
     def test_document_download_request_uses_service_credentials(self, m):
         server = CertificateFactory(label="server", cert_only=True)
         client = CertificateFactory(label="client", key_pair=True)

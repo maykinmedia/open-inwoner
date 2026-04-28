@@ -21,6 +21,8 @@ Bugfixes
   het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
   aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
   dezelfde versheid garandeert als de zaakdetailpagina.
+* [:gh:`2289`] Validate content-length in ZGW document downloads to prevent broken downloads
+  when the backend returns error messages instead of file content.
 
 Onderhoud
 ---------
