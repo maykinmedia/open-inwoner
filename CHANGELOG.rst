@@ -6,7 +6,7 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
-* ...
+* [:gh:`2365`]: ...
 
 Nieuwe features
 ---------------
@@ -25,6 +25,7 @@ Nieuwe features
   conversielogica te centraliseren en de templatetags eenvoudiger te maken.
 * ...
 * [:gh:`2268`]: WCAG toegankelijkheidsverbeteringen uit rapport gemeente Enschede toegepast.
+* [:gh:`2365`]: ``django-cms`` bijgewerkt naar versie ``4.1.3``.
 
 Bugfixes
 --------
