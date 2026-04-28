@@ -3,7 +3,7 @@
 
 {% block content %}
     <p>
-      <a href="{% url opts|admin_urlname:'change' obj.pk|admin_urlquote %}" class="button">← {% translate 'Back' %}</a>
+     <a href="{{ back_url }}" class="button">← {% translate 'Back' %}</a>
     </p>
 <div id="content-main">
 

@@ -6,18 +6,23 @@ from open_inwoner.userfeed.feed import get_feed
 from open_inwoner.userfeed.models import FeedItemData
 
 from .forms import FetchUserfeedConfigCheckParams
+from .permissions import IsSuperUser
 
 
 class FetchUserfeedCheck:
     identifier = "fetch_userfeed"
     label = "Fetch userfeed for user"
     form_class = FetchUserfeedConfigCheckParams
+    required_permissions = (IsSuperUser(),)
 
-    def __init__(self, form: FetchUserfeedConfigCheckParams):
-        self.form = form
+    def get_target_object(self, form, obj):
+        return form.cleaned_data.get("user") or obj
 
-    def run(self, obj) -> GenericHealthCheckResult:
-        user = obj
+    def run(self, form, obj=None) -> GenericHealthCheckResult:
+        user = obj or form.cleaned_data.get("user")
+
+        if not user:
+            raise ValueError("User not provided")
 
         try:
             feed = get_feed(user)

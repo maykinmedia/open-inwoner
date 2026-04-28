@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .permission-error-container {
+            max-width: 800px;
+            margin: 20px 0;
+        }
+        .errornote ul {
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+        .errornote li {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .help-text {
+            color: #666;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; Permission Denied
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="permission-error-container">
+    <h1>{% trans "Insufficient Permissions" %}</h1>
+
+    <p>
+        {% blocktrans with title=title %}
+        You do not have the required permissions to run the configuration check: <strong>{{ title }}</strong>.
+        {% endblocktrans %}
+    </p>
+
+    <div class="errornote">
+        <p><strong>{% trans "The following security requirements were not met:" %}</strong></p>
+        <ul>
+            {% for reason in failed_reasons %}
+                <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <p class="help-text">
+        {% trans "If you believe you should have access, please contact your system administrator to update your user group permissions." %}
+    </p>
+
+    <div class="submit-row">
+        <a href="{{ back_url }}" class="button closelink">{% trans "Return to Record" %}</a>
+    </div>
+</div>
+{% endblock %}

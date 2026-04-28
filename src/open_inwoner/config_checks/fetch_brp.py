@@ -3,18 +3,25 @@ from maykin_config_checks import GenericHealthCheckResult
 from open_inwoner.haalcentraal.utils import get_brp_api
 
 from .forms import FetchBRPConfigCheckParams
+from .permissions import IsSuperUser
 
 
 class FetchBRPCheck:
     identifier = "fetch_brp"
-    label = "Fetch BRP data for BSN"
+    label = "Fetch BRP for BSN"
     form_class = FetchBRPConfigCheckParams
+    required_permissions = (IsSuperUser(),)
 
-    def __init__(self, form: FetchBRPConfigCheckParams):
-        self.form = form
+    @classmethod
+    def get_form_kwargs(cls, obj):
+        return {}
 
-    def run(self, obj) -> GenericHealthCheckResult:
-        bsn = self.form.cleaned_data["bsn"]
+    def run(
+        self,
+        form: FetchBRPConfigCheckParams,
+        obj=None,
+    ) -> GenericHealthCheckResult:
+        bsn = form.cleaned_data["bsn"]
 
         try:
             api = get_brp_api()

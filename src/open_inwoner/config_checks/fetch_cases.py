@@ -1,28 +1,64 @@
 from maykin_config_checks import GenericHealthCheckResult
 
 from open_inwoner.openzaak.clients import build_zgw_client_from_service
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import get_json_response
 
 from .forms import FetchCasesConfigCheckParams
+from .permissions import HasModelWrite
 
 
 class FetchCasesCheck:
     identifier = "fetch_cases"
     label = "Fetch cases for BSN"
     form_class = FetchCasesConfigCheckParams
+    required_permissions = (HasModelWrite(ZGWApiGroupConfig),)
 
-    def __init__(self, form: FetchCasesConfigCheckParams):
-        self.form = form
+    @classmethod
+    def get_form_kwargs(cls, obj):
+        initial = {}
 
-    def run(self, obj) -> GenericHealthCheckResult:
-        bsn = self.form.cleaned_data["bsn"]
+        if obj:
+            initial["api_group"] = obj
+
+        return {"initial": initial}
+
+    def get_target_object(self, form, obj):
+        return form.cleaned_data.get("api_group") or obj
+
+    def run(self, form, obj=None) -> GenericHealthCheckResult:
+        bsn = form.cleaned_data["bsn"]
+
+        from zgw_consumers.models import Service
 
         from open_inwoner.openzaak.models import ZGWApiGroupConfig
 
-        api_group = ZGWApiGroupConfig.objects.filter(zrc_service=obj).first()
+        if isinstance(obj, ZGWApiGroupConfig):
+            api_group = obj
+            service = obj.zrc_service
+
+        elif isinstance(obj, Service):
+            service = obj
+            api_group = ZGWApiGroupConfig.objects.filter(zrc_service=service).first()
+
+        else:
+            return GenericHealthCheckResult(
+                success=False,
+                identifier=self.identifier,
+                verbose_name=self.label,
+                message=f"Invalid object type: {type(obj).__name__}",
+            )
+
+        if not service:
+            return GenericHealthCheckResult(
+                success=False,
+                identifier=self.identifier,
+                verbose_name=self.label,
+                message="No ZRC Service is configured for this API group.",
+            )
 
         client = build_zgw_client_from_service(
-            obj,
+            service,
             use_openzaak_120_params=(
                 api_group.fetch_eherkenning_zaken_with_openzaak_120_params
                 if api_group
