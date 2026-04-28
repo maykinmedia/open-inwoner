@@ -3,6 +3,7 @@ from datetime import datetime
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -18,7 +19,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 from .client import JaaropgaveClient, UitkeringClient
-from .exceptions import SSDClientException
+from .exceptions import SSDClientException, SSDServiceFaultException
 from .forms import MonthlyReportsForm, YearlyReportsForm
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -56,13 +57,26 @@ class BenefitsFormView(
 
             try:
                 pdf_content = ssd_client.get_reports(bsn, report_date, request_url)
+            except (ImproperlyConfigured, SSDServiceFaultException) as exc:
+                logger.warning(
+                    "SSD service fault",
+                    meldingen=[m.tekst for m in exc.meldingen],
+                )
+                messages.error(
+                    request=request,
+                    message=_(
+                        "Your report(s) could not be retrieved due to technical problems. "
+                        "Please contact the municipality."
+                    ),
+                )
+                pdf_content = None
             except SSDClientException:
                 logger.exception("SSD client error")
                 messages.error(
                     request=request,
                     message=_(
                         "Your report(s) could not be retrieved due to technical problems. "
-                        "Please try again later"
+                        "Please try again later."
                     ),
                 )
                 pdf_content = None

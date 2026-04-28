@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:fwi="http://www.centric.nl/GWS/FWI/v0200" xmlns:gwsd="http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600" xmlns:ns3="http://www.centric.nl/GWS/Header/v0201" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wsa="http://www.w3.org/2005/08/addressing">
+ <SOAP-ENV:Header>
+  <wsa:MessageID>447B2E69-F59E-4949-B31F-F1B6A0C80CDD</wsa:MessageID>
+  <wsa:Action>http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient-v0600/UitkeringsSpecificatieInfoResponse</wsa:Action>
+ </SOAP-ENV:Header>
+ <SOAP-ENV:Body>
+  <gwsd:UitkeringsSpecificatieInfoResponse>
+   <fwi:FWI>
+    <Fout>
+     <Code>01</Code>
+     <Tekst>BSN 999972042 voldoet niet aan de elfproef.</Tekst>
+    </Fout>
+   </fwi:FWI>
+  </gwsd:UitkeringsSpecificatieInfoResponse>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

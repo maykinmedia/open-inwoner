@@ -10,6 +10,7 @@ contents is tested in `test_xml_parsing.py`
 from http import HTTPStatus
 from unittest.mock import patch
 
+from django.contrib.messages import get_messages
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -20,6 +21,8 @@ from pyquery import PyQuery
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.ssd.client import UitkeringClient
+from open_inwoner.ssd.exceptions import SSDClientException, SSDServiceFaultException
+from open_inwoner.ssd.service.uitkering.fwi_resolved import Melding
 from open_inwoner.ssd.tests.factories import SSDConfigFactory
 from open_inwoner.ssd.tests.mocks import (
     mock_jaaropgave_response,
@@ -117,6 +120,41 @@ class TestMonthlyBenefitsFormView(TestCase):
 
         with self.assertRaises(ValueError):
             self.client.post(url, data={"report_date": "bad-user-input"})
+
+    @patch(
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
+        side_effect=SSDClientException("technical failure"),
+    )
+    @freeze_time("1985-12-25")
+    def test_uitkering_post_ssd_client_exception_shows_technical_error(
+        self, mock_report
+    ):
+        url = reverse("ssd:monthly_benefits_index")
+        self.client.login(email=self.user.email, password="12345")
+
+        response = self.client.post(url, data={"report_date": "1985-12-25"})
+
+        messages = [str(m) for m in get_messages(response.wsgi_request)]
+        self.assertTrue(any("try again later" in m for m in messages))
+
+    @patch(
+        "open_inwoner.ssd.client.UitkeringClient.get_reports",
+        side_effect=SSDServiceFaultException(
+            meldingen=[Melding(code="01", tekst="BSN voldoet niet aan de elfproef.")],
+            message="BSN voldoet niet aan de elfproef.",
+        ),
+    )
+    @freeze_time("1985-12-25")
+    def test_uitkering_post_ssd_service_fault_exception_shows_contact_municipality(
+        self, mock_report
+    ):
+        url = reverse("ssd:monthly_benefits_index")
+        self.client.login(email=self.user.email, password="12345")
+
+        response = self.client.post(url, data={"report_date": "1985-12-25"})
+
+        messages = [str(m) for m in get_messages(response.wsgi_request)]
+        self.assertTrue(any("contact the municipality" in m for m in messages))
 
     @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
     def test_uitkering_get_reports_not_enabled(self, mock_solo):
