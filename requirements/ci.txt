@@ -102,6 +102,10 @@ charset-normalizer==2.0.6
     #   -r requirements/base.txt
     #   reportlab
     #   requests
+clamd==1.0.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 click==8.1.3
     # via
     #   -c requirements/base.txt

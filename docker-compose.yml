@@ -216,6 +216,18 @@ services:
     networks:
       - openinwoner-dev
 
+  clamav:
+    image: clamav/clamav:stable
+    container_name: open-inwoner-clamav
+    # ClamAV exposes its TCP socket on port 3310
+    ports:
+      - '3310:3310'
+    networks:
+      - openinwoner-dev
+    # The daemon needs a writable directory to store virus definitions
+    volumes:
+      - clamav_data:/var/lib/clamav
+
   frontend-test:
     image: mcr.microsoft.com/playwright:v1.58.2-noble
     working_dir: /work
@@ -236,6 +248,7 @@ volumes:
   data:
   es_data:
   frontend_node_modules:
+  clamav_data:
 
 networks:
   openinwoner-dev:

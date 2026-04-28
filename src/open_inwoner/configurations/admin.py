@@ -335,6 +335,17 @@ class SiteConfigurationAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
         ),
         (_("Social media"), {"fields": ("display_social",)}),
         (_("Questions"), {"fields": ("contactmoment_contact_form_enabled",)}),
+        (
+            _("Virus scan"),
+            {
+                "fields": (
+                    "enable_virus_scan",
+                    "clamav_host",
+                    "clamav_port",
+                    "clamav_timeout",
+                ),
+            },
+        ),
     )
     inlines = [SiteConfigurationPageInline, FontConfigurationInline]
     form = SiteConfigurationAdminForm
