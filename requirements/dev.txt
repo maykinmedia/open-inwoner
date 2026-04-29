@@ -279,7 +279,7 @@ django==4.2.30
     #   sentry-sdk
     #   zgw-consumers
     #   zgw-consumers-oas
-django-admin-index==3.1.0
+django-admin-index==4.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

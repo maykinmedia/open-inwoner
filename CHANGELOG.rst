@@ -40,6 +40,7 @@ Onderhoud
 ---------
 
 * [:gh:`2414`]: ClamAV Python-client (``clamd``) toegevoegd.
+* [:gh:`2455`]: ``django-admin-index`` bijgewerkt naar versie ``4.0.0``.
 
 2.2.0 (2026-04-20)
 ==================
