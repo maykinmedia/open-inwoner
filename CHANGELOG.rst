@@ -11,7 +11,21 @@ Deployment aandachtspunten
 Nieuwe features
 ---------------
 
-* ...
+* [:gh:`2414`]: Bestandsuploads worden nu optioneel gescand op virussen met
+  behulp van ClamAV. De virusscanner is in te schakelen via de
+  siteconfiguratie en is van toepassing op alle bestandsuploads binnen de
+  applicatie (zaken en plannen). Wanneer een geïnfecteerd bestand wordt
+  gedetecteerd, wordt de upload geweigerd.
+* [:gh:`2363`]: Gebruikers ontvangen nu automatisch een e-mailnotificatie wanneer
+  een uitnodiging voor contact is geaccepteerd en de koppeling tot stand is gekomen.
+  Zowel de uitnodiger als de uitgenodigde ontvangen een bericht zodra ze aan elkaar
+  zijn gekoppeld als contactpersoon.
+* [:gh:`2470`]: Support van lijsten toegevoegd aan veelgestelde vragen en vragenlijststappen.
+* [:gh:`2468`]: Support van lijsten toegevoegd aan geen resultaten tekst op zoekpagina.
+* [:gh:`2454`]: De synchronisatie van ZGW-configuratieobjecten is aangepast,
+  zodat duplicaten die door OpenZaak worden aangemaakt (vermeldingen met dezelfde
+  'omschrijving' als bestaande vermeldingen) automatisch worden ingevuld met de
+  configuratiewaarden van bestaande vermeldingen in OIP.
 
 Bugfixes
 --------

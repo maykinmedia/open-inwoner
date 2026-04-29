@@ -1252,6 +1252,98 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertIn("Database lock timeout", excluded.error_message)
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
 
+    def test_import_informatieobjecttype_configs_copies_config_from_duplicate(self, m):
+        """
+        When OpenZaak creates a new informatieobjecttype with the same omschrijving,
+        OIP config fields are copied from the existing entry to the new one.
+        """
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        # Existing config with configured OIP fields and the old informatieobjecttype URL
+        old_iot_url = f"{root}informatieobjecttypen/iot-old"
+        ZaakTypeInformatieObjectTypeConfig.objects.create(
+            zaaktype_config=zaaktype_config,
+            informatieobjecttype_url=old_iot_url,
+            omschrijving="Besluit",
+            zaaktype_uuids=[],
+            document_upload_enabled=True,
+            document_notification_enabled=True,
+        )
+
+        # OpenZaak has created a new informatieobjecttype URL for the same omschrijving
+        new_iot_url = f"{root}informatieobjecttypen/iot-new"
+        zaaktype_uuid = "7092140f-a0fe-4092-a1f8-293d03d2b053"
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            json=paginated_response(
+                [
+                    generate_oas_component_cached(
+                        "ztc",
+                        "schemas/ZaakType",
+                        uuid=zaaktype_uuid,
+                        url=f"{root}zaaktypen/{zaaktype_uuid}",
+                        identificatie="ZAAK-001",
+                        omschrijving="Test Zaaktype",
+                        catalogus=catalogus_url,
+                        indicatieInternOfExtern="extern",
+                        informatieobjecttypen=[old_iot_url, new_iot_url],
+                        statustypen=[],
+                        resultaattypen=[],
+                    )
+                ]
+            ),
+        )
+        m.get(
+            old_iot_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/InformatieObjectType",
+                url=old_iot_url,
+                omschrijving="Besluit",
+            ),
+        )
+        m.get(
+            new_iot_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/InformatieObjectType",
+                url=new_iot_url,
+                omschrijving="Besluit",
+            ),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_informatieobjecttype_configs_for_zaaktype(
+            zaaktype_config
+        )
+
+        self.assertEqual(len(result.created), 1)
+        self.assertEqual(len(result.updated), 1)
+        self.assertEqual(len(result.excluded), 0)
+
+        new_config = result.created[0]
+        self.assertEqual(new_config.informatieobjecttype_url, new_iot_url)
+        self.assertEqual(new_config.omschrijving, "Besluit")
+        # OIP config fields copied from the existing entry
+        self.assertTrue(new_config.document_upload_enabled)
+        self.assertTrue(new_config.document_notification_enabled)
+
     def test_import_statustype_configs_create_new(self, m):
         """Test importing a new statustype config for a zaaktype"""
         # Setup: create catalogus and zaaktype
@@ -1735,6 +1827,135 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertIn("Save failed", excluded.error_message)
         self.assertIn("Database lock timeout", excluded.error_message)
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
+
+    def test_import_statustype_configs_copies_config_from_duplicate(self, m):
+        """
+        When OpenZaak creates a new statustype with the same omschrijving,
+        OIP config fields are copied from the existing entry to the new one.
+        """
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        # Existing config with configured OIP fields and the old statustype URL
+        old_statustype_url = f"{root}statustypen/st-old"
+        description_doc = {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Status beschrijving"}],
+                }
+            ],
+        }
+        doc_upload_description_doc = {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{"type": "text", "text": "Upload instructies"}],
+                }
+            ],
+        }
+        ZaakTypeStatusTypeConfig.objects.create(
+            zaaktype_config=zaaktype_config,
+            statustype_url=old_statustype_url,
+            omschrijving="In behandeling",
+            statustekst="Uw zaak wordt behandeld",
+            zaaktype_uuids=[],
+            status_indicator="warning",
+            status_indicator_text="Let op",
+            notify_status_change=False,
+            action_required=True,
+            document_upload_enabled=False,
+            description=description_doc,
+            document_upload_description=doc_upload_description_doc,
+            call_to_action_url="https://example.com",
+            call_to_action_text="Actie vereist",
+            case_link_text="Bekijk zaak",
+        )
+
+        # OpenZaak has created a new statustype URL for the same omschrijving
+        new_statustype_url = f"{root}statustypen/st-new"
+        zaaktype_uuid = "7092140f-a0fe-4092-a1f8-293d03d2b053"
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            json=paginated_response(
+                [
+                    generate_oas_component_cached(
+                        "ztc",
+                        "schemas/ZaakType",
+                        uuid=zaaktype_uuid,
+                        url=f"{root}zaaktypen/{zaaktype_uuid}",
+                        identificatie="ZAAK-001",
+                        omschrijving="Test Zaaktype",
+                        catalogus=catalogus_url,
+                        indicatieInternOfExtern="extern",
+                        informatieobjecttypen=[],
+                        statustypen=[old_statustype_url, new_statustype_url],
+                        resultaattypen=[],
+                    )
+                ]
+            ),
+        )
+        m.get(
+            old_statustype_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/StatusType",
+                url=old_statustype_url,
+                omschrijving="In behandeling",
+                statustekst="Uw zaak wordt behandeld",
+            ),
+        )
+        m.get(
+            new_statustype_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/StatusType",
+                url=new_statustype_url,
+                omschrijving="In behandeling",
+                statustekst="Uw zaak wordt behandeld",
+            ),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_statustype_configs_for_zaaktype(zaaktype_config)
+
+        self.assertEqual(len(result.created), 1)
+        self.assertEqual(len(result.updated), 1)
+        self.assertEqual(len(result.excluded), 0)
+
+        new_config = result.created[0]
+        self.assertEqual(new_config.statustype_url, new_statustype_url)
+        self.assertEqual(new_config.omschrijving, "In behandeling")
+        # OIP config fields copied from the existing entry
+        self.assertEqual(new_config.status_indicator, "warning")
+        self.assertEqual(new_config.status_indicator_text, "Let op")
+        self.assertFalse(new_config.notify_status_change)
+        self.assertTrue(new_config.action_required)
+        self.assertFalse(new_config.document_upload_enabled)
+        self.assertEqual(new_config.description.raw_data, description_doc)
+        self.assertEqual(
+            new_config.document_upload_description.raw_data, doc_upload_description_doc
+        )
+        self.assertEqual(new_config.call_to_action_url, "https://example.com")
+        self.assertEqual(new_config.call_to_action_text, "Actie vereist")
+        self.assertEqual(new_config.case_link_text, "Bekijk zaak")
 
     def test_import_resultaattype_configs_create_new(self, m):
         """Test importing a new resultaattype config for a zaaktype"""
@@ -2225,6 +2446,96 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertIn("Save failed", excluded.error_message)
         self.assertIn("Database lock timeout", excluded.error_message)
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
+
+    def test_import_resultaattype_configs_copies_config_from_duplicate(self, m):
+        """
+        When OpenZaak creates a new resultaattype with the same omschrijving,
+        OIP config fields are copied from the existing entry to the new one.
+        """
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        # Existing config with a configured description and the old resultaattype URL
+        old_resultaattype_url = f"{root}resultaattypen/rt-old"
+        ZaakTypeResultaatTypeConfig.objects.create(
+            zaaktype_config=zaaktype_config,
+            resultaattype_url=old_resultaattype_url,
+            omschrijving="Toegewezen",
+            zaaktype_uuids=[],
+            description="De zaak is toegewezen aan een behandelaar.",
+        )
+
+        # OpenZaak has created a new resultaattype URL for the same omschrijving
+        new_resultaattype_url = f"{root}resultaattypen/rt-new"
+        zaaktype_uuid = "7092140f-a0fe-4092-a1f8-293d03d2b053"
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            json=paginated_response(
+                [
+                    generate_oas_component_cached(
+                        "ztc",
+                        "schemas/ZaakType",
+                        uuid=zaaktype_uuid,
+                        url=f"{root}zaaktypen/{zaaktype_uuid}",
+                        identificatie="ZAAK-001",
+                        omschrijving="Test Zaaktype",
+                        catalogus=catalogus_url,
+                        indicatieInternOfExtern="extern",
+                        informatieobjecttypen=[],
+                        statustypen=[],
+                        resultaattypen=[old_resultaattype_url, new_resultaattype_url],
+                    )
+                ]
+            ),
+        )
+        m.get(
+            old_resultaattype_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/ResultaatType",
+                url=old_resultaattype_url,
+                omschrijving="Toegewezen",
+            ),
+        )
+        m.get(
+            new_resultaattype_url,
+            json=generate_oas_component_cached(
+                "ztc",
+                "schemas/ResultaatType",
+                url=new_resultaattype_url,
+                omschrijving="Toegewezen",
+            ),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_resultaattype_configs_for_zaaktype(zaaktype_config)
+
+        self.assertEqual(len(result.created), 1)
+        self.assertEqual(len(result.updated), 1)
+        self.assertEqual(len(result.excluded), 0)
+
+        new_config = result.created[0]
+        self.assertEqual(new_config.resultaattype_url, new_resultaattype_url)
+        self.assertEqual(new_config.omschrijving, "Toegewezen")
+        # OIP config field copied from the existing entry
+        self.assertEqual(
+            new_config.description, "De zaak is toegewezen aan een behandelaar."
+        )
 
     def test_full_zaaktype_import_integration(self, m):
         """Integration test: full import with creates, updates, and exclusions"""

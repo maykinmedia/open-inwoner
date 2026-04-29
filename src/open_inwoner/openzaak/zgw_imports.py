@@ -789,10 +789,16 @@ class ZGWCatalogusImporter:
             for url in zaak_type.informatieobjecttypen:
                 info_queue[url].append(zaak_type)
 
-        # Map existing config records by url
+        # Map existing config records by url and by omschrijving (natural key).
+        # The omschrijving lookup is used to copy OIP config fields onto newly
+        # created entries when OpenZaak produces a duplicate information object type
+        # (same omschrijving, new URL) after a zaaktype edit.
+        all_existing_iots = list(ztc.zaaktypeinformatieobjecttypeconfig_set.all())
         existing_map = {
-            ztiotc.informatieobjecttype_url: ztiotc
-            for ztiotc in ztc.zaaktypeinformatieobjecttypeconfig_set.all()
+            ztiotc.informatieobjecttype_url: ztiotc for ztiotc in all_existing_iots
+        }
+        existing_iot_by_omschrijving = {
+            ztiotc.omschrijving: ztiotc for ztiotc in all_existing_iots
         }
 
         iot_urls_seen = set()
@@ -878,7 +884,12 @@ class ZGWCatalogusImporter:
                                 )
                             )
                 else:
-                    # Create new
+                    # Create new: if an existing entry with the same omschrijving
+                    # exists, copy its OIP config fields so the admin does not have
+                    # to reconfigure after OpenZaak duplicates an information object type.
+                    config_source = existing_iot_by_omschrijving.get(
+                        info_type.omschrijving
+                    )
                     ztiotc = ZaakTypeInformatieObjectTypeConfig(
                         zaaktype_config=ztc,
                         informatieobjecttype_url=info_type.url,
@@ -886,6 +897,19 @@ class ZGWCatalogusImporter:
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                         found_in_api=True,
                     )
+                    if config_source is not None:
+                        logger.info(
+                            "Copying OIP config from existing information object type with matching omschrijving",
+                            new_informatieobjecttype_url=info_type.url,
+                            source_informatieobjecttype_url=config_source.informatieobjecttype_url,
+                            omschrijving=info_type.omschrijving,
+                        )
+                        ztiotc.document_upload_enabled = (
+                            config_source.document_upload_enabled
+                        )
+                        ztiotc.document_notification_enabled = (
+                            config_source.document_notification_enabled
+                        )
                     try:
                         ztiotc.save()
                         result.created.append(ztiotc)
@@ -952,10 +976,16 @@ class ZGWCatalogusImporter:
             for url in zaak_type.statustypen:
                 status_queue[url].append(zaak_type)
 
-        # Map existing config records by url
+        # Map existing config records by url and by omschrijving (natural key).
+        # The omschrijving lookup is used to copy OIP config fields onto newly
+        # created entries when OpenZaak produces a duplicate status type (same
+        # omschrijving, new URL) after a zaaktype edit.
+        all_existing_statustypes = list(ztc.zaaktypestatustypeconfig_set.all())
         existing_map = {
-            ztstc.statustype_url: ztstc
-            for ztstc in ztc.zaaktypestatustypeconfig_set.all()
+            ztstc.statustype_url: ztstc for ztstc in all_existing_statustypes
+        }
+        existing_statustype_by_omschrijving = {
+            ztstc.omschrijving: ztstc for ztstc in all_existing_statustypes
         }
 
         statustype_urls_seen = set()
@@ -1043,7 +1073,9 @@ class ZGWCatalogusImporter:
                                 )
                             )
                 else:
-                    # Create new
+                    # Create new: if an existing entry with the same omschrijving
+                    # exists, copy its OIP config fields so the admin does not have
+                    # to reconfigure after OpenZaak duplicates a status type.
                     ztstc = ZaakTypeStatusTypeConfig(
                         zaaktype_config=ztc,
                         statustype_url=status_type.url,
@@ -1052,6 +1084,32 @@ class ZGWCatalogusImporter:
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                         found_in_api=True,
                     )
+                    config_source = existing_statustype_by_omschrijving.get(
+                        status_type.omschrijving
+                    )
+                    if config_source is not None:
+                        logger.info(
+                            "Copying OIP config from existing statustype with matching omschrijving",
+                            new_statustype_url=status_type.url,
+                            source_statustype_url=config_source.statustype_url,
+                            omschrijving=status_type.omschrijving,
+                        )
+                        ztstc.status_indicator = config_source.status_indicator
+                        ztstc.status_indicator_text = (
+                            config_source.status_indicator_text
+                        )
+                        ztstc.document_upload_description = (
+                            config_source.document_upload_description
+                        )
+                        ztstc.description = config_source.description
+                        ztstc.notify_status_change = config_source.notify_status_change
+                        ztstc.action_required = config_source.action_required
+                        ztstc.document_upload_enabled = (
+                            config_source.document_upload_enabled
+                        )
+                        ztstc.call_to_action_url = config_source.call_to_action_url
+                        ztstc.call_to_action_text = config_source.call_to_action_text
+                        ztstc.case_link_text = config_source.case_link_text
                     try:
                         ztstc.save()
                         result.created.append(ztstc)
@@ -1113,10 +1171,16 @@ class ZGWCatalogusImporter:
 
         zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
 
-        # Map existing config records by url
+        # Map existing config records by url and by omschrijving (natural key).
+        # The omschrijving lookup is used to copy OIP config fields onto newly
+        # created entries when OpenZaak produces a duplicate result type (same
+        # omschrijving, new URL) after a zaaktype edit.
+        all_existing_resultaattypes = list(ztc.zaaktyperesultaattypeconfig_set.all())
         existing_map = {
-            ztrtc.resultaattype_url: ztrtc
-            for ztrtc in ztc.zaaktyperesultaattypeconfig_set.all()
+            ztrtc.resultaattype_url: ztrtc for ztrtc in all_existing_resultaattypes
+        }
+        existing_resultaattype_by_omschrijving = {
+            ztrtc.omschrijving: ztrtc for ztrtc in all_existing_resultaattypes
         }
 
         # Collect and implicitly de-duplicate resultaattype urls
@@ -1206,7 +1270,12 @@ class ZGWCatalogusImporter:
                                 )
                             )
                 else:
-                    # Create new
+                    # Create new: if an existing entry with the same omschrijving
+                    # exists, copy its OIP config fields so the admin does not have
+                    # to reconfigure after OpenZaak duplicates a result type.
+                    config_source = existing_resultaattype_by_omschrijving.get(
+                        resultaat_type.omschrijving
+                    )
                     ztrtc = ZaakTypeResultaatTypeConfig(
                         zaaktype_config=ztc,
                         resultaattype_url=resultaat_type.url,
@@ -1214,6 +1283,14 @@ class ZGWCatalogusImporter:
                         zaaktype_uuids=[zt.uuid for zt in using_zaak_types],
                         found_in_api=True,
                     )
+                    if config_source is not None:
+                        logger.info(
+                            "Copying OIP config from existing resultaattype with matching omschrijving",
+                            new_resultaattype_url=resultaat_type.url,
+                            source_resultaattype_url=config_source.resultaattype_url,
+                            omschrijving=resultaat_type.omschrijving,
+                        )
+                        ztrtc.description = config_source.description
                     try:
                         ztrtc.save()
                         result.created.append(ztrtc)
