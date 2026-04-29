@@ -30,6 +30,10 @@ Nieuwe features
   zijn gekoppeld als contactpersoon.
 * [:gh:`2470`]: Support van lijsten toegevoegd aan veelgestelde vragen en vragenlijststappen.
 * [:gh:`2468`]: Support van lijsten toegevoegd aan geen resultaten tekst op zoekpagina.
+* [:gh:`2454`]: De synchronisatie van ZGW-configuratieobjecten is aangepast,
+  zodat duplicaten die door OpenZaak worden aangemaakt (vermeldingen met dezelfde
+  'omschrijving' als bestaande vermeldingen) automatisch worden ingevuld met de
+  configuratiewaarden van bestaande vermeldingen in OIP.
 
 Bugfixes
 --------
