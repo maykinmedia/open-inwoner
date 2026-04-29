@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import F, Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
@@ -1155,6 +1155,52 @@ class Invite(models.Model):
         }
 
         return template.send_email([self.invitee_email], context)
+
+    @transaction.atomic
+    def accept(self, user: "User") -> bool:
+        """
+        Mark the invite as accepted by user and establish the contact relationship.
+        Sends notification emails to both parties if this is a new connection.
+        Returns True if the connection was newly created, False if it already existed.
+        """
+        is_new = not self.accepted
+
+        if is_new:
+            self.accepted = True
+            self.invitee = user
+            self.save()
+
+        if not self.inviter.has_contact(user):
+            self.inviter.user_contacts.add(user)
+
+        if is_new:
+            self.send_accepted_emails()
+
+        return is_new
+
+    # Because django-yubin queues outgoing mails in the database, this ensures either
+    # all or none will be queued. The main call-site is in `accept()` which is also
+    # atomic, but it can't hurt to have an extra savepoint.
+    @transaction.atomic
+    def send_accepted_emails(self):
+        contacts_url = settings.BASE_URL + reverse("profile:contact_list")
+        template = find_template("contact_invitation_accepted")
+        template.send_email(
+            [self.inviter.email],
+            {
+                "contact_name": self.invitee.get_full_name(),
+                "email": self.inviter.email,
+                "contacts_link": contacts_url,
+            },
+        )
+        template.send_email(
+            [self.invitee.email],
+            {
+                "contact_name": self.inviter.get_full_name(),
+                "email": self.invitee.email,
+                "contacts_link": contacts_url,
+            },
+        )
 
     def get_absolute_url(self) -> str:
         return reverse("profile:invite_accept", kwargs={"key": self.key})

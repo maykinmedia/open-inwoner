@@ -60,19 +60,6 @@ class InviteMixin(CommonPageMixin):
 
         return get_object_or_404(Invite, key=invite_key)
 
-    def add_invitee(self, invite, user):
-        """update invite and related contact"""
-        if not invite.invitee:
-            invite.accepted = True
-            invite.invitee = user
-            invite.save()
-
-        #  update inviter - invitee relationship
-        inviter_contacts = invite.inviter.user_contacts.all()
-        invitee = invite.invitee
-        if invitee not in inviter_contacts:
-            invite.inviter.user_contacts.add(invitee)
-
 
 class CustomRegistrationView(RegistrationLogMixin, InviteMixin, RegistrationView):
     form_class = CustomRegistrationForm
@@ -89,7 +76,7 @@ class CustomRegistrationView(RegistrationLogMixin, InviteMixin, RegistrationView
 
         invite = form.cleaned_data["invite"]
         if invite:
-            self.add_invitee(invite, user)
+            invite.accept(user)
             self.log_invite_accepted()
 
         # Remove invite url from user's session
@@ -200,7 +187,7 @@ class NecessaryFieldsUserView(
 
         invite = form.cleaned_data["invite"]
         if invite:
-            self.add_invitee(invite, user)
+            invite.accept(user)
 
         self.log_necessary_fields_completed(
             user,

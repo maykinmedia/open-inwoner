@@ -23,6 +23,10 @@ ${SCRIPTPATH}/wait_for_db.sh
 >&2 echo "Apply database migrations"
 python src/manage.py migrate
 
+# Ensure all mail-editor templates exist in the database
+>&2 echo "Loading mail templates"
+python src/manage.py add_missing_templates
+
 ##
 # uWSGI settings
 ##

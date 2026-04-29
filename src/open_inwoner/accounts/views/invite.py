@@ -52,12 +52,7 @@ class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):
 
         # mark invitation as accepted and add inviter to the user's contacts as well
         if user.is_authenticated and invite.accepted is False:
-            invite.accepted = True
-            invite.invitee = user
-            invite.save()
-
-            inviter = invite.inviter
-            user.user_contacts.add(inviter)
+            invite.accept(user)
             self.log_system_action(_("invitation automatically accepted"), invite)
 
             messages.add_message(
@@ -65,7 +60,7 @@ class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):
                 messages.SUCCESS,
                 _(
                     "{inviter} is toegevoegd aan uw contactpersonen.".format(
-                        inviter=inviter.email
+                        inviter=invite.inviter.email
                     )
                 ),
             )

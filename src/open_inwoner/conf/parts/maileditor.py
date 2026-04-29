@@ -102,6 +102,57 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "contact_invitation_accepted": {
+        "name": _("Contact Invitation Accepted Email"),
+        "description": _(
+            "This email is sent to both users when an invitation is accepted "
+            "and a contact connection is established."
+        ),
+        "subject_default": "U bent nu als contactpersoon gekoppeld op {{ site_name }}",
+        "body_default": _readfile("contact_invitation_accepted.html"),
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+            {
+                "name": "contact_name",
+                "description": _("Full name of the newly connected contact."),
+            },
+        ],
+        "body": [
+            {
+                "name": "contact_name",
+                "description": _("Full name of the newly connected contact."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+            {
+                "name": "contacts_link",
+                "description": _("Link to the contacts list page."),
+            },
+            {"name": "email", "description": _("Email of the recipient.")},
+            {
+                "name": "contact_page",
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+                "example": "14010",
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
+        ],
+    },
     "new_messages": {
         "name": _("New Message Email"),
         "description": _(
