@@ -430,6 +430,22 @@ class ContactViewTests(WebTest):
         response = form.submit("contact_approve")
         self.assertRedirects(response, reverse("profile:contact_list"))
 
+    def test_approve_contact_sends_notifications_to_both_parties(self):
+        existing_user = UserFactory(
+            first_name="Luke", last_name="Skywalker", email="ex@example.com"
+        )
+        self.user.contacts_for_approval.add(existing_user)
+
+        mail.outbox.clear()
+
+        response = self.app.get(self.list_url, user=existing_user)
+        form = response.forms["approval_form"]
+        form.submit("contact_approve")
+
+        recipients = {m.to[0] for m in mail.outbox}
+        self.assertIn(self.user.email, recipients)
+        self.assertIn(existing_user.email, recipients)
+
     def test_user_cannot_approve_other_users_contact(self):
         other_user = UserFactory()
         contact = UserFactory()
