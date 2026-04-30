@@ -13,12 +13,17 @@ from django_prosemirror.serde import html_to_doc
 logger = logging.getLogger(__name__)
 
 
-def migrate_ssd_field(apps, _, field_name, convert_markdown=False):
+def migrate_ssd_field(apps, schema_editor, field_name, convert_markdown=False):
     SSDConfig = apps.get_model("ssd", "SSDConfig")
 
-    ssd_config = SSDConfig.objects.first()
+    row = SSDConfig.objects.values("pk", f"{field_name}_tmp").first()
 
-    if not ssd_config:
+    if not row:
+        return
+
+    content = row[f"{field_name}_tmp"]
+
+    if not content or not content.strip():
         return
 
     config = ProsemirrorConfig(
@@ -31,14 +36,6 @@ def migrate_ssd_field(apps, _, field_name, convert_markdown=False):
         ],
     )
 
-    content = getattr(ssd_config, f"{field_name}_tmp")
-
-    # Skip empty or whitespace-only content
-    if not content or not content.strip():
-        setattr(ssd_config, field_name, None)
-        ssd_config.save()
-        return
-
     if convert_markdown:
         content = markdown.markdown(content, extensions=["extra"])
 
@@ -47,15 +44,13 @@ def migrate_ssd_field(apps, _, field_name, convert_markdown=False):
     if not content.startswith("<p>"):
         content = f"<p>{content}</p>"
 
-    # Convert the HTML to a proper ProseMirror document
     try:
         doc = html_to_doc(content, schema=config.schema)
-        setattr(ssd_config, field_name, doc)
     except (IndexError, ValueError):
         logger.exception("Warning: Could not convert description for ssd_config")
-        setattr(ssd_config, field_name, None)
+        return
 
-    ssd_config.save()
+    SSDConfig.objects.filter(pk=row["pk"]).update(**{field_name: doc})
 
 
 migrate_maandspecificatie_display_text = partial(

@@ -5,6 +5,137 @@ from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
+def _make_zaaktype_status_config(
+    apps, description_tmp=None, doc_upload_description_tmp=None
+):
+    """Helper to create related objects and a ZaakTypeStatusTypeConfig at a historical state."""
+    import uuid
+
+    Service = apps.get_model("zgw_consumers", "Service")
+    CatalogusConfig = apps.get_model("openzaak", "CatalogusConfig")
+    ZaakTypeConfig = apps.get_model("openzaak", "ZaakTypeConfig")
+    ZaakTypeStatusTypeConfig = apps.get_model("openzaak", "ZaakTypeStatusTypeConfig")
+
+    service_obj = ServiceFactory(api_type="ztc")
+    service = Service.objects.get(id=service_obj.id)
+
+    uid = uuid.uuid4()
+    catalogus = CatalogusConfig.objects.create(
+        url=f"https://example.com/catalogussen/{uid}",
+        domein="TEST",
+        rsin="123456789",
+        service=service,
+    )
+    zaaktype_config = ZaakTypeConfig.objects.create(
+        urls=[f"https://example.com/zaaktypen/{uid}"],
+        catalogus=catalogus,
+        identificatie="TEST",
+        omschrijving="Test ZaakType",
+    )
+    kwargs = dict(
+        zaaktype_config=zaaktype_config,
+        omschrijving="Test status",
+        statustekst="Test",
+        statustype_url=f"https://example.com/statustypen/{uid}",
+        zaaktype_uuids=["a1591906-3368-470a-a957-4b8634c275a1"],
+    )
+    if description_tmp is not None:
+        kwargs["description_tmp"] = description_tmp
+    if doc_upload_description_tmp is not None:
+        kwargs["document_upload_description_tmp"] = doc_upload_description_tmp
+    return ZaakTypeStatusTypeConfig.objects.create(**kwargs)
+
+
+@tag("migrations")
+class DescriptionDataMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0071: description_tmp (markdown text) → description (ProseMirror).
+
+    Scenarios:
+    - Markdown content → converted to ProseMirror doc
+    - Empty string → description stays NULL
+    - Whitespace-only → description stays NULL
+    """
+
+    migrate_from = "0070_zaaktypestatustypeconfig_description_schema_1"
+    migrate_to = "0071_zaaktypestatustypeconfig_description_data"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        self.config_with_content = _make_zaaktype_status_config(
+            apps, description_tmp="**Bold** answer"
+        )
+        self.config_empty = _make_zaaktype_status_config(apps, description_tmp="")
+        self.config_whitespace = _make_zaaktype_status_config(
+            apps, description_tmp="   "
+        )
+
+    def _get(self, config):
+        ZaakTypeStatusTypeConfig = self.apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        return ZaakTypeStatusTypeConfig.objects.get(id=config.id)
+
+    def test_markdown_content_is_converted(self):
+        config = self._get(self.config_with_content)
+        self.assertIsNotNone(config.description.raw_data)
+        self.assertEqual(config.description.raw_data["type"], "doc")
+
+    def test_empty_content_is_skipped(self):
+        config = self._get(self.config_empty)
+        self.assertIsNone(config.description.raw_data)
+
+    def test_whitespace_content_is_skipped(self):
+        config = self._get(self.config_whitespace)
+        self.assertIsNone(config.description.raw_data)
+
+
+@tag("migrations")
+class DocUploadDescriptionDataMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0074: document_upload_description_tmp → document_upload_description.
+
+    Scenarios:
+    - Markdown content → converted to ProseMirror doc
+    - Empty string → field stays NULL
+    - Whitespace-only → field stays NULL
+    """
+
+    migrate_from = "0073_zaaktypestatustypeconfig_doc_upload_description_schema_1"
+    migrate_to = "0074_zaaktypestatustypeconfig_doc_upload_description_data"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        self.config_with_content = _make_zaaktype_status_config(
+            apps, doc_upload_description_tmp="**Upload** instructions"
+        )
+        self.config_empty = _make_zaaktype_status_config(
+            apps, doc_upload_description_tmp=""
+        )
+        self.config_whitespace = _make_zaaktype_status_config(
+            apps, doc_upload_description_tmp="   "
+        )
+
+    def _get(self, config):
+        ZaakTypeStatusTypeConfig = self.apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        return ZaakTypeStatusTypeConfig.objects.get(id=config.id)
+
+    def test_markdown_content_is_converted(self):
+        config = self._get(self.config_with_content)
+        self.assertIsNotNone(config.document_upload_description.raw_data)
+        self.assertEqual(config.document_upload_description.raw_data["type"], "doc")
+
+    def test_empty_content_is_skipped(self):
+        config = self._get(self.config_empty)
+        self.assertIsNone(config.document_upload_description.raw_data)
+
+    def test_whitespace_content_is_skipped(self):
+        config = self._get(self.config_whitespace)
+        self.assertIsNone(config.document_upload_description.raw_data)
+
+
 @tag("migrations")
 class FixEmptyStringProsemirrorFieldsTest(TestSuccessfulMigrations):
     migrate_from = "0077_catalogusconfig_found_in_api_and_more"

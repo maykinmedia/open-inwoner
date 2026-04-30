@@ -7,7 +7,7 @@ import structlog
 logger = structlog.stdlib.get_logger(__name__)
 
 
-def fix_empty_string_prosemirror_fields(apps, schema_editor):  # noqa: ARG001
+def fix_empty_string_prosemirror_fields(apps, schema_editor):
     """
     Fix ProseMirror fields that contain empty string literals '""'.
 
@@ -15,46 +15,35 @@ def fix_empty_string_prosemirror_fields(apps, schema_editor):  # noqa: ARG001
     functionality. The export code converts empty ProseMirror fields to the string '""'
     which then gets imported back into the database as JSON string value.
 
-    ProseMirrorModelField is a JSONField that wraps values in ProsemirrorFieldDocument.
-    When "" is stored, accessing the field gives us a wrapper with raw_data="".
-    We need to check the raw_data attribute and set the field to None if it's "".
-
     This migration fixes existing instances by:
-    1. Finding all fields where raw_data is the string "" (not dict/object/None)
-    2. Setting them to None instead
+    1. Finding all fields where the JSONB value is the JSON string "" (not a dict)
+    2. Setting them to NULL instead
     """
     ZaakTypeStatusTypeConfig = apps.get_model("openzaak", "ZaakTypeStatusTypeConfig")
 
-    # Track statistics
+    # Note: ZaakTypeResultaatTypeConfig.description is a TextField, not ProsemirrorModelField
+    # Note: ZaakTypeInformatieObjectTypeConfig has no ProsemirrorModelField fields
+    field_names = ["description", "document_upload_description"]
+
     fixed_count = 0
 
-    # Define models and their fields to fix
-    # Note: ZaakTypeResultaatTypeConfig.description is a TextField, not ProsemirrorModelField
-    # It doesn't have the "" issue from import/export, so we skip it
-    # Note: ZaakTypeInformatieObjectTypeConfig has no ProsemirrorModelField fields
-    models_to_fix = [
-        (
-            ZaakTypeStatusTypeConfig,
-            ["description", "document_upload_description"],
-        ),
-    ]
-
-    for model, field_names in models_to_fix:
-        for row in model.objects.values("pk", "omschrijving", *field_names):
-            updates = {}
-            for field_name in field_names:
-                if row[field_name] == "":
-                    logger.info(
-                        "Fixing empty string literal in ProseMirror field",
-                        model=model.__name__,
-                        field=field_name,
-                        config_id=row["pk"],
-                        omschrijving=row["omschrijving"],
-                    )
-                    updates[field_name] = None
-            if updates:
-                model.objects.filter(pk=row["pk"]).update(**updates)
-                fixed_count += 1
+    for field_name in field_names:
+        for row in ZaakTypeStatusTypeConfig.objects.values(
+            "pk", "omschrijving", field_name
+        ):
+            if row[field_name] != "":
+                continue
+            logger.info(
+                "Fixing empty string literal in ProseMirror field",
+                model="ZaakTypeStatusTypeConfig",
+                field=field_name,
+                config_id=row["pk"],
+                omschrijving=row["omschrijving"],
+            )
+            ZaakTypeStatusTypeConfig.objects.filter(pk=row["pk"]).update(
+                **{field_name: None}
+            )
+            fixed_count += 1
 
     logger.info(
         "Completed fixing empty string ProseMirror fields",
