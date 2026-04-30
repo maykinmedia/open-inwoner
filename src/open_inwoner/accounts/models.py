@@ -750,6 +750,67 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_contact(self, user):
         return self.user_contacts.filter(id=user.id).exists()
 
+    @transaction.atomic
+    def _send_contact_accepted_notifications(self, other_user: "User") -> None:
+        """
+        Send notification emails to both users about an accepted contact relationship.
+        Uses the 'contact_invitation_accepted' email template.
+        """
+        contacts_url = settings.BASE_URL + reverse("profile:contact_list")
+        template = find_template("contact_invitation_accepted")
+
+        # Send email to self
+        template.send_email(
+            [self.email],
+            {
+                "contact_name": other_user.get_full_name(),
+                "email": self.email,
+                "contacts_link": contacts_url,
+            },
+        )
+
+        # Send email to other user
+        template.send_email(
+            [other_user.email],
+            {
+                "contact_name": self.get_full_name(),
+                "email": other_user.email,
+                "contacts_link": contacts_url,
+            },
+        )
+
+    @transaction.atomic
+    def approve_contact(self, sender: "User") -> bool:
+        """
+        Approve a pending contact request from another user (the sender).
+        The sender had previously added the receiver (self) to their contacts_for_approval.
+        Establishes bidirectional contact relationship and sends notifications to both parties.
+
+        Returns True if the relationship was newly created, False if it already existed.
+        """
+        # Check if this is a new relationship
+        is_new = not self.has_contact(sender)
+
+        # Remove the receiver (self) from the sender's pending approvals list
+        sender.contacts_for_approval.remove(self)
+
+        # Add to contacts (bidirectional)
+        if is_new:
+            self.user_contacts.add(sender)
+
+        # Send notifications to both parties
+        if is_new:
+            self._send_contact_accepted_notifications(sender)
+
+        return is_new
+
+    def reject_contact_request(self, sender: "User") -> None:
+        """
+        Reject a pending contact request from another user (the sender).
+        Removes the receiver (self) from the sender's pending approvals list.
+        """
+        sender.contacts_for_approval.remove(self)
+
     def get_plan_contact_new_count(self):
         return (
             PlanContact.objects.filter(user=self, notify_new=True)
@@ -1183,24 +1244,7 @@ class Invite(models.Model):
     # atomic, but it can't hurt to have an extra savepoint.
     @transaction.atomic
     def send_accepted_emails(self):
-        contacts_url = settings.BASE_URL + reverse("profile:contact_list")
-        template = find_template("contact_invitation_accepted")
-        template.send_email(
-            [self.inviter.email],
-            {
-                "contact_name": self.invitee.get_full_name(),
-                "email": self.inviter.email,
-                "contacts_link": contacts_url,
-            },
-        )
-        template.send_email(
-            [self.invitee.email],
-            {
-                "contact_name": self.inviter.get_full_name(),
-                "email": self.invitee.email,
-                "contacts_link": contacts_url,
-            },
-        )
+        self.inviter._send_contact_accepted_notifications(self.invitee)
 
     def get_absolute_url(self) -> str:
         return reverse("profile:invite_accept", kwargs={"key": self.key})

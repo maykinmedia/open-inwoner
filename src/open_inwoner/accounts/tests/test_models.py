@@ -48,3 +48,56 @@ class InviteAcceptTests(TestCase):
         invite.accept(invitee)
 
         self.assertEqual(len(mail.outbox), count_after_first)
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class UserApproveContactTests(TestCase):
+    def test_approve_contact_establishes_relationship(self):
+        sender = UserFactory()
+        receiver = UserFactory()
+        sender.contacts_for_approval.add(receiver)
+
+        result = receiver.approve_contact(sender)
+
+        self.assertTrue(result)
+        self.assertIn(sender, receiver.user_contacts.all())
+        self.assertIn(receiver, sender.user_contacts.all())
+        self.assertNotIn(receiver, sender.contacts_for_approval.all())
+
+    def test_approve_contact_sends_notifications_to_both_parties(self):
+        sender = UserFactory()
+        receiver = UserFactory()
+        sender.contacts_for_approval.add(receiver)
+
+        mail.outbox.clear()
+
+        receiver.approve_contact(sender)
+
+        recipients = {m.to[0] for m in mail.outbox}
+        self.assertIn(sender.email, recipients)
+        self.assertIn(receiver.email, recipients)
+
+    def test_approve_contact_returns_false_when_already_approved(self):
+        sender = UserFactory()
+        receiver = UserFactory()
+        sender.contacts_for_approval.add(receiver)
+
+        receiver.approve_contact(sender)
+        mail.outbox.clear()
+
+        result = receiver.approve_contact(sender)
+
+        self.assertFalse(result)
+        # No new emails should be sent
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_reject_contact_request_removes_from_pending(self):
+        sender = UserFactory()
+        receiver = UserFactory()
+        sender.contacts_for_approval.add(receiver)
+
+        receiver.reject_contact_request(sender)
+
+        self.assertNotIn(receiver, sender.contacts_for_approval.all())
+        self.assertNotIn(sender, receiver.user_contacts.all())
+        self.assertNotIn(receiver, sender.user_contacts.all())

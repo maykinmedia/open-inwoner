@@ -183,10 +183,9 @@ class ContactApprovalView(LogMixin, LoginRequiredMixin, SingleObjectMixin, View)
 
     def update_contact(self, sender, receiver, type_of_approval):
         if type_of_approval == "approve":
-            sender.contacts_for_approval.remove(receiver)
-            sender.user_contacts.add(receiver)
+            receiver.approve_contact(sender)
             self.log_change(sender, _("contact was approved"))
 
         elif type_of_approval == "reject":
-            sender.contacts_for_approval.remove(receiver)
+            receiver.reject_contact_request(sender)
             self.log_change(sender, _("contact was rejected"))
