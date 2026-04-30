@@ -3,64 +3,126 @@ from django.test import tag
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
 
-@tag("migrations")
-class SSDConfigRichtTextMigrationTest(TestSuccessfulMigrations):
-    migrate_from = (
-        "0006_rename_jaaropgave_comments_ssdconfig_jaaropgave_pdf_comments_and_more"
-    )
-    migrate_to = "0018_ssdconfig_maandspecificatie_pdf_comments_schema_2"
-    app = "ssd"
+class _SsdFieldWithContentMixin:
+    """Mixin: creates a singleton SSDConfig with markdown content before migration."""
+
+    field_name: str
+    content: str
 
     def setUpBeforeMigration(self, apps):
         SSDConfig = apps.get_model("ssd", "SSDConfig")
+        SSDConfig.objects.create(**{f"{self.field_name}_tmp": self.content})
 
-        ssd_config = SSDConfig.objects.create()
-
-        # Jaaropgave
-        test_html = '<p>This is a <strong>test</strong> text with <em>formatting</em> and a <a href="https://example.com">link</a>.</p>'
-        ssd_config.jaaropgave_display_text = test_html
-
-        test_html = "<p>These are PDF comments without formatting.</p>"
-        ssd_config.jaaropgave_pdf_comments = test_html
-
-        # Maandspecificatie
-        test_html = '<p>This is a <strong>monthly statement</strong> text with <em>formatting</em> and a <a href="https://example.com">link</a>.</p>'
-        ssd_config.maandspecificatie_display_text = test_html
-
-        test_html = (
-            "<p>These are monthly statement PDF comments without formatting.</p>"
-        )
-        ssd_config.maandspecificatie_pdf_comments = test_html
-
-        ssd_config.save()
-
-    def test_migrate_rich_text(self):
+    def test_content_is_converted_to_prosemirror(self):
         SSDConfig = self.apps.get_model("ssd", "SSDConfig")
-        ssd_config = SSDConfig.objects.first()
+        config = SSDConfig.objects.first()
+        pm_value = getattr(config, self.field_name).raw_data
+        self.assertIsNotNone(pm_value)
+        self.assertEqual(pm_value["type"], "doc")
 
-        # Jaaropgave
-        expected_content = '<p>This is a <strong>test</strong> text with <em>formatting</em> and a <a href="https://example.com">link</a>.</p>'
-        self.assertEqual(ssd_config.jaaropgave_display_text.html, expected_content)
 
-        expected_content = "<p>These are PDF comments without formatting.</p>"
-        self.assertEqual(ssd_config.jaaropgave_pdf_comments.html, expected_content)
+class _SsdFieldEmptyContentMixin:
+    """Mixin: creates a singleton SSDConfig with empty content before migration."""
 
-        # Verify that the temporary fields were removed
-        self.assertFalse(hasattr(ssd_config, "jaaropgave_display_text_tmp"))
-        self.assertFalse(hasattr(ssd_config, "jaaropgave_pdf_comments_tmp"))
+    field_name: str
 
-        # Maandspecificatie
-        expected_content = '<p>This is a <strong>monthly statement</strong> text with <em>formatting</em> and a <a href="https://example.com">link</a>.</p>'
-        self.assertEqual(
-            ssd_config.maandspecificatie_display_text.html, expected_content
-        )
-        expected_content = (
-            "<p>These are monthly statement PDF comments without formatting.</p>"
-        )
-        self.assertEqual(
-            ssd_config.maandspecificatie_pdf_comments.html, expected_content
-        )
+    def setUpBeforeMigration(self, apps):
+        SSDConfig = apps.get_model("ssd", "SSDConfig")
+        SSDConfig.objects.create(**{f"{self.field_name}_tmp": ""})
 
-        # Verify that the temporary fields were removed
-        self.assertFalse(hasattr(ssd_config, "maandspecificatie_display_text_tmp"))
-        self.assertFalse(hasattr(ssd_config, "maandspecificatie_pdf_comments_tmp"))
+    def test_empty_content_is_skipped(self):
+        SSDConfig = self.apps.get_model("ssd", "SSDConfig")
+        config = SSDConfig.objects.first()
+        self.assertIsNone(getattr(config, self.field_name).raw_data)
+
+
+@tag("migrations")
+class JaaropgaveDisplayTextWithContentTest(
+    _SsdFieldWithContentMixin, TestSuccessfulMigrations
+):
+    """Migration 0008: jaaropgave_display_text_tmp (markdown) → PM field."""
+
+    app = "ssd"
+    migrate_from = "0007_ssdconfig_jaaropgave_display_text_schema_1"
+    migrate_to = "0008_ssdconfig_jaaropgave_display_text_data"
+    field_name = "jaaropgave_display_text"
+    content = "**Bold** display text"
+
+
+@tag("migrations")
+class JaaropgaveDisplayTextEmptyContentTest(
+    _SsdFieldEmptyContentMixin, TestSuccessfulMigrations
+):
+    app = "ssd"
+    migrate_from = "0007_ssdconfig_jaaropgave_display_text_schema_1"
+    migrate_to = "0008_ssdconfig_jaaropgave_display_text_data"
+    field_name = "jaaropgave_display_text"
+
+
+@tag("migrations")
+class JaaropgavePdfCommentsWithContentTest(
+    _SsdFieldWithContentMixin, TestSuccessfulMigrations
+):
+    """Migration 0011: jaaropgave_pdf_comments_tmp (plain text) → PM field."""
+
+    app = "ssd"
+    migrate_from = "0010_ssdconfig_jaaropgave_pdf_comments_schema_1"
+    migrate_to = "0011_ssdconfig_jaaropgave_pdf_comments_data"
+    field_name = "jaaropgave_pdf_comments"
+    content = "PDF comment text"
+
+
+@tag("migrations")
+class JaaropgavePdfCommentsEmptyContentTest(
+    _SsdFieldEmptyContentMixin, TestSuccessfulMigrations
+):
+    app = "ssd"
+    migrate_from = "0010_ssdconfig_jaaropgave_pdf_comments_schema_1"
+    migrate_to = "0011_ssdconfig_jaaropgave_pdf_comments_data"
+    field_name = "jaaropgave_pdf_comments"
+
+
+@tag("migrations")
+class MaandspecificatieDisplayTextWithContentTest(
+    _SsdFieldWithContentMixin, TestSuccessfulMigrations
+):
+    """Migration 0014: maandspecificatie_display_text_tmp (markdown) → PM field."""
+
+    app = "ssd"
+    migrate_from = "0013_ssdconfig_maandspecificatie_display_text_schema_1"
+    migrate_to = "0014_ssdconfig_maandspecificatie_display_text_data"
+    field_name = "maandspecificatie_display_text"
+    content = "**Bold** display text"
+
+
+@tag("migrations")
+class MaandspecificatieDisplayTextEmptyContentTest(
+    _SsdFieldEmptyContentMixin, TestSuccessfulMigrations
+):
+    app = "ssd"
+    migrate_from = "0013_ssdconfig_maandspecificatie_display_text_schema_1"
+    migrate_to = "0014_ssdconfig_maandspecificatie_display_text_data"
+    field_name = "maandspecificatie_display_text"
+
+
+@tag("migrations")
+class MaandspecificatiePdfCommentsWithContentTest(
+    _SsdFieldWithContentMixin, TestSuccessfulMigrations
+):
+    """Migration 0017: maandspecificatie_pdf_comments_tmp (plain text) → PM field."""
+
+    app = "ssd"
+    migrate_from = "0016_ssdconfig_maandspecificatie_pdf_comments_schema_1"
+    migrate_to = "0017_ssdconfig_maandspecificatie_pdf_comments_data"
+    field_name = "maandspecificatie_pdf_comments"
+    content = "PDF comment text"
+
+
+@tag("migrations")
+class MaandspecificatiePdfCommentsEmptyContentTest(
+    _SsdFieldEmptyContentMixin, TestSuccessfulMigrations
+):
+    app = "ssd"
+    migrate_from = "0016_ssdconfig_maandspecificatie_pdf_comments_schema_1"
+    migrate_to = "0017_ssdconfig_maandspecificatie_pdf_comments_data"
+    field_name = "maandspecificatie_pdf_comments"

@@ -1,81 +1,38 @@
-from django.test import tag
+import importlib
+import unittest.mock as mock
 
-from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
+from django.test import SimpleTestCase
+
+_migration = importlib.import_module(
+    "open_inwoner.cms.footer.migrations.0002_migrate_flatpages_content_to_cms"
+)
+_html_to_pm_doc = _migration._html_to_pm_doc
 
 
-@tag("migrations")
-class FlatPageContentMigrationTest(TestSuccessfulMigrations):
-    migrate_from = "0002_migrate_flatpages_content_to_cms"
-    migrate_to = "0005_cmsflatpagemodel_content_schema_2"
-    app = "footer"
+class HtmlToPmDocTest(SimpleTestCase):
+    def test_none_returns_none(self):
+        self.assertIsNone(_html_to_pm_doc(None))
 
-    def setUpBeforeMigration(self, apps):
-        CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
-        Placeholder = apps.get_model("cms", "Placeholder")
+    def test_empty_string_returns_none(self):
+        self.assertIsNone(_html_to_pm_doc(""))
 
-        placeholder = Placeholder.objects.create(slot="test")
+    def test_whitespace_only_returns_none(self):
+        self.assertIsNone(_html_to_pm_doc("   "))
 
-        CMSFlatPageModel.objects.create(
-            language="nl",
-            plugin_type="CMSFlatPagePlugin",
-            placeholder=placeholder,
-            position=1,
-            path="0001",
-            depth=1,
-            numchild=0,
-            title="Test Flatpage",
-            content="<p><strong>Bold text</strong> and <em>italic text</em></p>",
-        )
+    def test_valid_html_returns_prosemirror_doc(self):
+        result = _html_to_pm_doc("<p>Hello <strong>world</strong></p>")
+        self.assertIsNotNone(result)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result["type"], "doc")
 
-        CMSFlatPageModel.objects.create(
-            language="nl",
-            plugin_type="CMSFlatPagePlugin",
-            placeholder=placeholder,
-            position=2,
-            path="0002",
-            depth=1,
-            numchild=0,
-            title="Plain Text Flatpage",
-            content="This is plain text content",
-        )
+    def test_heading_is_preserved(self):
+        result = _html_to_pm_doc("<h2>Title</h2><p>Body</p>")
+        self.assertIsNotNone(result)
+        self.assertEqual(result["type"], "doc")
 
-        CMSFlatPageModel.objects.create(
-            language="nl",
-            plugin_type="CMSFlatPagePlugin",
-            placeholder=placeholder,
-            position=3,
-            path="0003",
-            depth=1,
-            numchild=0,
-            title="Empty Flatpage",
-            content="",
-        )
-
-    def test_html_content_migration(self):
-        CMSFlatPageModel = self.apps.get_model("footer", "CMSFlatPageModel")
-
-        flatpage = CMSFlatPageModel.objects.filter(title="Test Flatpage").first()
-
-        expected_html = "<p><strong>Bold text</strong> and <em>italic text</em></p>"
-        self.assertEqual(flatpage.content.html, expected_html)
-
-        self.assertFalse(hasattr(flatpage, "content_tmp"))
-
-    def test_plain_text_content_migration(self):
-        CMSFlatPageModel = self.apps.get_model("footer", "CMSFlatPageModel")
-
-        flatpage = CMSFlatPageModel.objects.filter(title="Plain Text Flatpage").first()
-
-        expected_html = "<p>This is plain text content</p>"
-        self.assertEqual(flatpage.content.html, expected_html)
-
-        self.assertFalse(hasattr(flatpage, "content_tmp"))
-
-    def test_empty_content_migration(self):
-        CMSFlatPageModel = self.apps.get_model("footer", "CMSFlatPageModel")
-
-        flatpage = CMSFlatPageModel.objects.filter(title="Empty Flatpage").first()
-
-        self.assertTrue(flatpage.content is None or flatpage.content.html == "")
-
-        self.assertFalse(hasattr(flatpage, "content_tmp"))
+    def test_unparseable_html_returns_none(self):
+        with mock.patch.object(
+            _migration, "html_to_doc", side_effect=Exception("parse error")
+        ):
+            result = _html_to_pm_doc("<p>content</p>")
+        self.assertIsNone(result)

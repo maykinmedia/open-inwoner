@@ -38,6 +38,8 @@ Bugfixes
   voorkomen dat de opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het
   beheercommando ``find_modified_mail_templates`` is toegevoegd om e-mailsjablonen
   op te sporen die mogelijk beschadigd zijn.
+* [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
+  te voorkomen.
 * [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
   zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
   afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
