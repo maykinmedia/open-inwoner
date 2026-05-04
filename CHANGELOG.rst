@@ -6,11 +6,34 @@ Voor een volledig overzicht van alle commits, zie :release:`v2.2.2-rc1`.
 Deployment aandachtspunten
 --------------------------
 
-* ...
+* [:gh:`2465`]: E-mailsjablonen die handmatig zijn bewerkt en opgeslagen via het
+  beheerscherm kunnen opmaak zijn kwijtgeraakt. Dit is een gevolg van een
+  migratieprobleem bij de Django Prosemirror-upgrade (geïntroduceerd in release 2.0.0)
+  dat nu pas aan het licht is gekomen. Installaties die zijn geüpgraded naar versie
+  2.1.0 of hoger en sindsdien e-mailsjablonen hebben bewerkt, kunnen door dit probleem
+  zijn getroffen.
+
+  Controleer na de upgrade of de opmaak van uw e-mailsjablonen intact is. Voer het
+  management command ``find_modified_mail_templates`` uit voor een overzicht van
+  mogelijk aangetaste sjablonen, of controleer alle sjablonen visueel via het
+  beheerscherm (via "Configuratie → Mail templates"). Herstel aangetaste sjablonen op
+  één van de volgende manieren:
+
+  * Open het sjabloon in de **productieomgeving** (op een versie vóór 2.1.0) via de
+    **Broncode**-knop en kopieer de broncode. Open vervolgens hetzelfde sjabloon in de
+    **acceptatieomgeving** via de **Broncode**-weergave en plak de gekopieerde inhoud
+    daar in. Dit werkt alleen als de productieomgeving nog op een versie vóór 2.1.0
+    draait; vanaf 2.1.0 is de opmaak mogelijk al verwijderd.
+  * **Of**: Herstel naar de standaardopmaak via **Actie → Reset templates** en pas
+    daarna de gewenste aanpassingen opnieuw toe.
 
 Bugfixes
 --------
 
+* [:gh:`2465`]: CKEDITOR_CONFIGS aan de configuratie is toegevoegd om te voorkomen dat de
+  opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het beheeropdracht
+  'find_modified_mail_templates' is toegevoegd om e-mailsjablonen op te sporen en te melden
+  die mogelijk beschadigd zijn.
 * [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
   zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
   afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
