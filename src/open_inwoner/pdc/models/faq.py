@@ -37,6 +37,9 @@ class Question(OrderedModel):
             NodeType.TABLE_CELL,
             NodeType.TABLE_HEADER,
             NodeType.TABLE_ROW,
+            NodeType.BULLET_LIST,
+            NodeType.ORDERED_LIST,
+            NodeType.LIST_ITEM,
         ],
         allowed_mark_types=[
             MarkType.STRONG,
