@@ -38,6 +38,7 @@ Nieuwe features
   verminderd.
 * [:gh:`2517`]: ``min-release-age=2`` toegevoegd aan ``.npmrc``, minimale npm-versie
   vastgelegd via ``engines`` in ``package.json`` en node bijgewerkt naar ``24.15`` (LTS).
+* [:gh:`2142`]: Verbeterde foutafhandeling voor Klanten API-services en clients.
 
 Bugfixes
 --------

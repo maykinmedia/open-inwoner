@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView, UpdateView
 
+import requests
 import structlog
 from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -40,6 +41,7 @@ from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.laposta.forms import NewsletterSubscriptionForm
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.types import PartijUpdateData
@@ -363,15 +365,19 @@ class EditProfileView(
             return False
 
         if fetch_params := service.get_fetch_parameters(user):
-            klant, created = service.get_or_create_klant(
-                fetch_params=fetch_params, user=user
-            )
-            if klant and not created:
-                return bool(
-                    service.update_klant_from_user(
-                        klant, user, update_fields=list(update_data.keys())
-                    )
+            try:
+                klant, created = service.get_or_create_klant(
+                    fetch_params=fetch_params, user=user
                 )
+                if klant and not created:
+                    return bool(
+                        service.update_klant_from_user(
+                            klant, user, update_fields=list(update_data.keys())
+                        )
+                    )
+            except (KlantAPIError, requests.RequestException):
+                logger.error("Error updating klant via eSuite")
+                return False
 
         return bool(klant)
 
@@ -518,15 +524,18 @@ class MyNotificationsView(
             return
 
         if fetch_params := service.get_fetch_parameters(user):
-            klant, created = service.get_or_create_klant(
-                fetch_params=fetch_params, user=user
-            )
-            if klant and not created:
-                service.update_klant_from_user(
-                    klant,
-                    user,
-                    update_fields=["toestemmingZaakNotificatiesAlleenDigitaal"],
+            try:
+                klant, created = service.get_or_create_klant(
+                    fetch_params=fetch_params, user=user
                 )
+                if klant and not created:
+                    service.update_klant_from_user(
+                        klant,
+                        user,
+                        update_fields=["toestemmingZaakNotificatiesAlleenDigitaal"],
+                    )
+            except (KlantAPIError, requests.RequestException):
+                logger.error("Error updating klant via eSuite")
 
 
 class UserAppointmentsView(

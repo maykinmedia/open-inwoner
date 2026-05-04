@@ -32,9 +32,6 @@ def fetch_klantcontactmomenten(
             user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
         )
 
-    if klanten is None:
-        return []
-
     client = build_contactmomenten_client()
     if client is None:
         return []

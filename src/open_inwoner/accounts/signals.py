@@ -13,6 +13,7 @@ from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+import requests
 import structlog
 from axes.signals import user_locked_out
 
@@ -20,6 +21,7 @@ from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.kvk.client import KvKClient
 from open_inwoner.kvk.exceptions import KVKAPIException
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.utils.logentry import system_action, user_action
@@ -136,9 +138,14 @@ def _update_user_from_esuite(
     if not (fetch_params := service.get_fetch_parameters(user)):
         return
 
-    klant, created = service.get_or_create_klant(fetch_params=fetch_params, user=user)
-    if klant and not created:
-        service.update_user_from_klant(klant, user)
+    try:
+        klant, created = service.get_or_create_klant(
+            fetch_params=fetch_params, user=user
+        )
+        if klant and not created:
+            service.update_user_from_klant(klant, user)
+    except (KlantAPIError, requests.RequestException):
+        logger.error("Error updating user from klant via eSuite")
 
 
 def _update_eherkenning_user_from_kvk_api(user: User):

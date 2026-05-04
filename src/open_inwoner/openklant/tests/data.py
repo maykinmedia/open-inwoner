@@ -1,4 +1,4 @@
-from requests.exceptions import RequestException
+from requests.exceptions import ConnectionError as RequestsConnectionError
 from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.tests.factories import (
@@ -715,11 +715,11 @@ class MockAPIReadData(MockAPIData):
         # should still show
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment2['url']}",
-            exc=RequestException,
+            exc=RequestsConnectionError,
         )
         m.get(
             f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={self.contactmoment_vestiging['url']}",
-            exc=RequestException,
+            exc=RequestsConnectionError,
         )
 
         return self

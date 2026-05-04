@@ -33,6 +33,7 @@ from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
 from open_inwoner.components.file_item import FileItem
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
     KlantenSysteemConfig,
@@ -272,13 +273,10 @@ class InnerCaseDetailView(
                             self.zaak, user=self.request.user
                         )
                         questions.extend(service_questions)
-                    except RequestException:
-                        # TODO: This can happen. Ideally, we would present the user with
-                        # warning noting that not all questions might be visible.
-                        logger.warning(
-                            "Connection error for service",
-                            service_type=service_type,
-                            exc_info=True,
+                    except (KlantAPIError, RequestException):
+                        logger.error(
+                            "Error fetching questions for service",
+                            service_type=service_type.value,
                         )
                     except BaseException:
                         logger.exception(
@@ -992,10 +990,13 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
         except (ImproperlyConfigured, RuntimeError):
             self.log_system_action("could not build client for klanten API")
         else:
-            fetch_params = service.get_fetch_parameters(user)
-            klant, created = service.get_or_create_klant(
-                fetch_params=fetch_params, user=user
-            )
+            try:
+                fetch_params = service.get_fetch_parameters(user)
+                klant, created = service.get_or_create_klant(
+                    fetch_params=fetch_params, user=user
+                )
+            except (KlantAPIError, RequestException):
+                logger.error("Error retrieving/creating klant for contactmoment")
 
         # create contact moment
         question = form.cleaned_data["question"]
@@ -1016,7 +1017,10 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             logger.error("Failed to build eSuiteVragenService")
             return
 
-        if not (contactmoment := service.create_contactmoment(data, klant=klant)):
+        try:
+            contactmoment = service.create_contactmoment(data, klant=klant)
+        except (KlantAPIError, RequestException):
+            logger.error("Error creating contactmoment")
             self.log_contactmoment_for_zaak_registered_by_api(
                 contactmoment_success=False
             )
@@ -1026,9 +1030,14 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             )
             return False
 
-        objectcontactmoment = service.create_objectcontactmoment(
-            contactmoment, self.zaak
-        )
+        try:
+            objectcontactmoment = service.create_objectcontactmoment(
+                contactmoment, self.zaak
+            )
+        except (KlantAPIError, RequestException):
+            logger.error("Error creating objectcontactmoment")
+            objectcontactmoment = None
+
         self.log_contactmoment_for_zaak_registered_by_api(
             contactmoment_success=True,
             objectcontactmoment_success=bool(objectcontactmoment),
