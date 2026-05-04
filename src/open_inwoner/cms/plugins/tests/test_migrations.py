@@ -26,85 +26,96 @@ class FixLegacyTextPluginBodyMigrationTest(TestSuccessfulMigrations):
     app = "plugins"
 
     def setUpBeforeMigration(self, apps):
-        CMSPlugin = apps.get_model("cms", "CMSPlugin")
         Placeholder = apps.get_model("cms", "Placeholder")
-
         placeholder = Placeholder.objects.create(slot="content")
 
-        def make_plugin(position, path):
-            return CMSPlugin.objects.create(
-                language="nl",
-                plugin_type="TextPlugin",
-                placeholder=placeholder,
-                position=position,
-                path=path,
-                depth=1,
-                numchild=0,
-            )
-
-        self.plugin_empty = make_plugin(0, "0001")
-        self.plugin_html = make_plugin(1, "0002")
-        self.plugin_plain = make_plugin(2, "0003")
-        self.plugin_none = make_plugin(3, "0004")
-        self.plugin_valid = make_plugin(4, "0005")
-
+        # Use raw SQL to avoid passing treebeard fields (depth, path, numchild)
+        # that were removed in CMS 4.
         with connection.cursor() as cursor:
+            for position in range(5):
+                cursor.execute(
+                    """
+                    INSERT INTO cms_cmsplugin
+                        (placeholder_id, language, plugin_type, position, creation_date, changed_date)
+                    VALUES (%s, %s, %s, %s, NOW(), NOW())
+                    RETURNING id
+                    """,
+                    (placeholder.id, "nl", "TextPlugin", position),
+                )
+                plugin_id = cursor.fetchone()[0]
+                attr = [
+                    "plugin_empty_id",
+                    "plugin_html_id",
+                    "plugin_plain_id",
+                    "plugin_none_id",
+                    "plugin_valid_id",
+                ][position]
+                setattr(self, attr, plugin_id)
+
             # Empty string stored as JSON-encoded empty string (the wizard bug)
             cursor.execute(
                 "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
-                (self.plugin_empty.id, '""'),
+                (self.plugin_empty_id, '""'),
             )
             # Legacy HTML content stored as a JSON string
             cursor.execute(
                 "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
-                (self.plugin_html.id, '"<p>Hello <strong>world</strong></p>"'),
+                (self.plugin_html_id, '"<p>Hello <strong>world</strong></p>"'),
             )
             # Plain text stored as a JSON string
             cursor.execute(
                 "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
-                (self.plugin_plain.id, '"plain text"'),
+                (self.plugin_plain_id, '"plain text"'),
             )
             # JSON null — should be left alone (NOT NULL column can still store 'null'::jsonb)
             cursor.execute(
                 "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, 'null'::jsonb)",
-                (self.plugin_none.id,),
+                (self.plugin_none_id,),
             )
             # Already a valid Prosemirror JSON object — should be left alone
             cursor.execute(
                 "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
                 (
-                    self.plugin_valid.id,
+                    self.plugin_valid_id,
                     '{"type": "doc", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Valid"}]}]}',
                 ),
             )
 
+    def _get_body(self, plugin_id):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT body::text FROM plugins_text WHERE cmsplugin_ptr_id = %s",
+                (plugin_id,),
+            )
+            row = cursor.fetchone()
+        self.assertIsNotNone(
+            row, f"No plugins_text row for cmsplugin_ptr_id={plugin_id}"
+        )
+        raw = row[0]
+        return json.loads(raw) if raw is not None else None
+
     def test_empty_string_becomes_empty_doc(self):
-        Text = self.apps.get_model("plugins", "Text")
-        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_empty.id)
-        self.assertEqual(text.body.raw_data, {"type": "doc", "content": []})
+        body = self._get_body(self.plugin_empty_id)
+        self.assertEqual(body, {"type": "doc", "content": []})
 
     def test_html_string_converted_to_prosemirror(self):
-        Text = self.apps.get_model("plugins", "Text")
-        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_html.id)
-        self.assertIsInstance(text.body.raw_data, dict)
-        self.assertEqual(text.body.raw_data.get("type"), "doc")
+        body = self._get_body(self.plugin_html_id)
+        self.assertIsInstance(body, dict)
+        self.assertEqual(body.get("type"), "doc")
 
     def test_plain_text_converted_to_prosemirror(self):
-        Text = self.apps.get_model("plugins", "Text")
-        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_plain.id)
-        self.assertIsInstance(text.body.raw_data, dict)
-        self.assertEqual(text.body.raw_data.get("type"), "doc")
+        body = self._get_body(self.plugin_plain_id)
+        self.assertIsInstance(body, dict)
+        self.assertEqual(body.get("type"), "doc")
 
     def test_none_remains_none(self):
-        Text = self.apps.get_model("plugins", "Text")
-        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_none.id)
-        self.assertIsNone(text.body.raw_data)
+        body = self._get_body(self.plugin_none_id)
+        self.assertIsNone(body)
 
     def test_valid_prosemirror_dict_unchanged(self):
-        Text = self.apps.get_model("plugins", "Text")
-        text = Text.objects.get(cmsplugin_ptr_id=self.plugin_valid.id)
-        self.assertIsInstance(text.body.raw_data, dict)
-        self.assertEqual(text.body.raw_data.get("type"), "doc")
+        body = self._get_body(self.plugin_valid_id)
+        self.assertIsInstance(body, dict)
+        self.assertEqual(body.get("type"), "doc")
 
 
 @tag("migrations")
