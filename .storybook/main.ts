@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/preact-vite';
+import remarkGfm from 'remark-gfm';
 
 const config: StorybookConfig = {
   framework: {
@@ -9,10 +10,19 @@ const config: StorybookConfig = {
     disableWhatsNewNotifications: true,
     disableTelemetry: true,
   },
-  stories: ['../src/**/*.stories.@(ts|tsx|mdx)'],
+  stories: ['../src/**/*.stories.@(ts|tsx|mdx)', '../src/**/*.mdx'],
   addons: [
     '@storybook/addon-vitest',
-    '@storybook/addon-docs',
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        },
+      },
+    },
     '@storybook/addon-a11y',
     'storybook-react-intl',
   ],

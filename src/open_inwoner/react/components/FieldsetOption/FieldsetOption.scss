@@ -2,56 +2,56 @@
   display: block;
 }
 
-.oip-filter__option {
+.oip-fieldset-option {
   color: var(--oip-filter-option-color);
   display: flex;
+  cursor: pointer;
   border-top: 1px solid var(--oip-filter-option-border-color);
   border-right: 1px solid var(--oip-filter-option-border-color);
   border-bottom: 1px solid var(--oip-filter-option-border-color);
   border-left: 4px solid var(--oip-filter-option-border-color);
 
-  &:hover,
-  &:focus {
+  &:hover {
     background-color: var(--oip-filter-option-hover-background-color);
-    outline: none;
   }
 
-  &:focus-visible {
+  &:focus-within {
     outline: 2px solid
       var(--oip-filter-option-focus-outline-color, currentColor);
     outline-offset: -2px;
   }
 
-  &-input {
+  // Visually hidden — the label wrapper and ::before icon handle all interaction/display
+  &__input {
     opacity: 0;
     width: 0;
     margin: 0;
     border: 0;
     appearance: none;
 
-    &:checked ~ .oip-filter__option-label::before {
+    &:checked ~ .oip-fieldset-option__label::before {
       color: var(--oip-filter-option-checked-icon-color);
       font-family: 'Material Icons Outlined';
     }
 
-    &:checked[type='radio'] ~ .oip-filter__option-label::before {
+    &:checked[type='radio'] ~ .oip-fieldset-option__label::before {
       content: 'radio_button_checked';
     }
 
-    &:checked[type='checkbox'] ~ .oip-filter__option-label::before {
+    &:checked[type='checkbox'] ~ .oip-fieldset-option__label::before {
       content: 'check_box';
     }
   }
 
-  &-input[type='radio'] ~ &-label::before {
+  &__input[type='radio'] ~ &__label::before {
     content: 'radio_button_unchecked';
   }
 
-  &-input[type='checkbox'] ~ &-label::before {
+  &__input[type='checkbox'] ~ &__label::before {
     content: 'check_box_outline_blank';
   }
 
-  &-label {
+  &__label {
     color: var(--oip-filter-option-label-color);
     display: flex;
     flex-direction: row;
@@ -74,7 +74,7 @@
     }
   }
 
-  &:has(&-input:checked) {
+  &:has(&__input:checked) {
     border-top: 1px solid var(--oip-filter-option-checked-border-color);
     border-right: 1px solid var(--oip-filter-option-checked-border-color);
     border-bottom: 1px solid var(--oip-filter-option-checked-border-color);

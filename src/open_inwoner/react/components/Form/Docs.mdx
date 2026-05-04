@@ -1,0 +1,130 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as FormStories from './Form.stories';
+
+<Meta title="Documentation" of={FormStories} />
+
+# Form
+
+`oip-form` is the root context provider for filter forms. It manages all
+field-value state and exposes a generic submit mechanism — it performs no
+navigation itself. Navigation is handled by `oip-filters`, which layers
+filter-specific behaviour on top.
+
+## Component tree
+
+A complete filter form combines several sub-components across desktop and
+mobile:
+
+| Component         | Tag                       | Role                                                            |
+| ----------------- | ------------------------- | --------------------------------------------------------------- |
+| Form              | `oip-form`                | Root; owns all field values via `FormContext`                   |
+| Filters           | `oip-filters`             | Connects form state to URL navigation; provides `FilterContext` |
+| FilterBar         | `oip-filter-bar`          | Desktop horizontal layout for selects and submit button         |
+| FilterChips       | `oip-filter-chips`        | Active-filter chips; hidden when no values are selected         |
+| Select            | `oip-select`              | Dropdown field; registers itself with `FormContext`             |
+| SelectOption      | `oip-select-option`       | Individual option inside `oip-select`                           |
+| Fieldset          | `oip-fieldset`            | Mobile checkbox/radio group inside `oip-filter-modal`           |
+| FieldsetOption    | `oip-fieldset-option`     | Individual option inside `oip-fieldset`                         |
+| Modal             | `oip-modal`               | Modal shell wrapping the mobile filter sheet                    |
+| FilterModal       | `oip-filter-modal`        | Full-screen bottom-sheet for mobile filter selection            |
+| FilterModalOpener | `oip-filter-modal-opener` | Button that opens `oip-filter-modal`                            |
+| FormButton        | `oip-form-button`         | Submit button; enabled only when the form is dirty              |
+| FormResetButton   | `oip-form-reset-button`   | Clears all fields back to empty                                 |
+
+## Behaviour
+
+- **Dirty tracking** — `oip-form-button` is enabled only once a field value
+  differs from the initial page-load state, preventing redundant submissions.
+- **Preselected values** — pass a comma-separated `value` attribute to
+  `oip-select` or `oip-fieldset` to set default selections on mount (e.g.
+  `value="open,closed"`).
+- **Submit** — `oip-filters` serialises the current values as repeated URL query
+  params (`?status=open&status=closed`) and navigates via
+  `window.location.assign`.
+- **Reset** — `oip-form-reset-button` clears every field to `[]`. After
+  clearing, `isDirty` becomes `true` for any field that had a non-empty default
+  value.
+- **Typeahead** — `oip-select` supports keyboard typeahead for quick option
+  lookup when the dropdown is open.
+
+## Examples
+
+### Default
+
+Two selects and a submit button on desktop; a modal sheet for mobile;
+active-filter chips below.
+
+<Canvas of={FormStories.Default} />
+
+### With preselected values
+
+Fields initialised from the `value` attribute on mount — verifies chip rendering
+and dirty-state on first load.
+
+<Canvas of={FormStories.WithPreselectedValues} />
+
+### Many options
+
+Exercises typeahead search and dropdown scroll behaviour with 20 year options
+and 10 status options.
+
+<Canvas of={FormStories.ManyOptions} />
+
+### Single filter
+
+Minimal setup — one dropdown, no mobile modal.
+
+<Canvas of={FormStories.SingleFilter} />
+
+## Usage
+
+### Minimal single-filter
+
+```html
+<oip-form>
+  <oip-filters>
+    <oip-filter-bar>
+      <oip-select label="Periode" name="periode">
+        <oip-select-option label="2025" value="2025"></oip-select-option>
+        <oip-select-option label="2024" value="2024"></oip-select-option>
+      </oip-select>
+      <oip-form-button>Toon resultaten</oip-form-button>
+    </oip-filter-bar>
+    <oip-filter-chips />
+  </oip-filters>
+</oip-form>
+```
+
+### Full desktop + mobile
+
+```html
+<oip-form>
+  <oip-filters>
+    <!-- Desktop bar -->
+    <oip-filter-bar>
+      <oip-select label="Status" name="status" multiple>
+        <oip-select-option label="Open" value="open"></oip-select-option>
+        <oip-select-option label="Gesloten" value="closed"></oip-select-option>
+      </oip-select>
+      <oip-form-button>Toon resultaten</oip-form-button>
+    </oip-filter-bar>
+    <!-- Mobile modal trigger + sheet -->
+    <oip-modal>
+      <oip-modal-opener>
+        <oip-filter-modal-opener>Filters</oip-filter-modal-opener>
+      </oip-modal-opener>
+      <oip-filter-modal>
+        <oip-fieldset label="Status" name="status" multiple>
+          <oip-fieldset-option label="Open" value="open"></oip-fieldset-option>
+          <oip-fieldset-option
+            label="Gesloten"
+            value="closed"
+          ></oip-fieldset-option>
+        </oip-fieldset>
+      </oip-filter-modal>
+    </oip-modal>
+    <!-- Active-filter chips row -->
+    <oip-filter-chips />
+  </oip-filters>
+</oip-form>
+```

@@ -1,8 +1,7 @@
 import { createStyleSheets } from '@react/lib/css';
 import { WebComponentDefinition } from '@react/lib/web-component';
-import filterBarStyle from './FormFilterBar.scss?inline';
-import filterChipsStyle from './FormFilterChips.scss?inline';
-import filtersStyle from './FormFilters.scss?inline';
+import buttonStyle from '../Button/Button.scss?inline';
+import globalButtonStyle from '../../../scss/components/Button/Button.scss?inline';
 
 export const FORM_COMPONENT_DEFINITION: WebComponentDefinition<'oip-form'> = {
   tagName: 'oip-form',
@@ -13,12 +12,13 @@ export const FORM_COMPONENT_DEFINITION: WebComponentDefinition<'oip-form'> = {
   },
   subComponents: [
     'oip-filters',
-    'oip-filter-bar',
-    'oip-filter-chips',
     'oip-form-button',
+    'oip-form-reset-button',
     'oip-select',
+    'oip-fieldset',
+    'oip-modal',
   ],
-  importer: () => import('./FormComponent'),
+  importer: () => import('./Form'),
 };
 
 export const FORM_BUTTON_DEFINITION: WebComponentDefinition<'oip-form-button'> =
@@ -28,44 +28,22 @@ export const FORM_BUTTON_DEFINITION: WebComponentDefinition<'oip-form-button'> =
     options: {
       shadow: true,
       i18n: true,
+      // Both the component-scoped and global design-system button styles are
+      // required so the Button component renders correctly inside shadow DOM.
+      adoptedStyleSheets: createStyleSheets(buttonStyle, globalButtonStyle),
     },
-    importer: () => import('./FormButton'),
+    importer: () => import('./components/FormButton'),
   };
-
-export const FORM_FILTERS_DEFINITION: WebComponentDefinition<'oip-filters'> = {
-  tagName: 'oip-filters',
-  propNames: [],
-  options: {
-    shadow: true,
-    i18n: true,
-
-    adoptedStyleSheets: createStyleSheets(filtersStyle),
-  },
-  importer: () => import('./FormFilters'),
-};
-
-export const FORM_FILTER_BAR_DEFINITION: WebComponentDefinition<'oip-filter-bar'> =
+export const FORM_RESET_BUTTON_DEFINITION: WebComponentDefinition<'oip-form-reset-button'> =
   {
-    tagName: 'oip-filter-bar',
+    tagName: 'oip-form-reset-button',
     propNames: [],
     options: {
       shadow: true,
       i18n: true,
-
-      adoptedStyleSheets: createStyleSheets(filterBarStyle),
+      // Both the component-scoped and global design-system button styles are
+      // required so the Button component renders correctly inside shadow DOM.
+      adoptedStyleSheets: createStyleSheets(buttonStyle, globalButtonStyle),
     },
-    importer: () => import('./FormFilterBar'),
-  };
-
-export const FORM_FILTER_CHIPS_DEFINITION: WebComponentDefinition<'oip-filter-chips'> =
-  {
-    tagName: 'oip-filter-chips',
-    propNames: [],
-    options: {
-      i18n: true,
-
-      shadow: true,
-      adoptedStyleSheets: createStyleSheets(filterChipsStyle),
-    },
-    importer: () => import('./FormFilterChips'),
+    importer: () => import('./components/FormResetButton'),
   };

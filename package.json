@@ -38,7 +38,7 @@
     "@gemeente-denhaag/action": "^4.0.1",
     "@gemeente-denhaag/file": "^2.3.0",
     "@gemeente-denhaag/side-navigation": "^4.0.2",
-    "@maykinmedia/preact-custom-element": "github:maykinmedia/preact-custom-element#5b3701126d62a7de458099f1186f66d34878766d",
+    "@maykinmedia/preact-custom-element": "github:maykinmedia/preact-custom-element#21cea07d7b2ac73ac10aa59822757ff160805c56",
     "@open-inwoner/design-tokens": "^0.0.28",
     "@preact/signals": "^2.9.0",
     "@tarekraafat/autocomplete.js": "^10.2.6",
@@ -73,7 +73,8 @@
     "microscope-sass": "latest",
     "preact": "^10.27.3",
     "proj4leaflet": "^1.0.2",
-    "react-intl": "^7.1.11"
+    "react-intl": "^7.1.11",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "latest",

@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.oip-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  &__legend {
+    padding: 0;
+    margin-bottom: 8px;
+    font-size: var(--oip-filter-title-font-size);
+    font-weight: var(--oip-filter-title-font-weight);
+    color: var(--oip-filter-title-color);
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}

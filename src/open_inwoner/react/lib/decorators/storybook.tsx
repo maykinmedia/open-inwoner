@@ -24,6 +24,36 @@ export const withIntlStory: Decorator = (Story, context) => {
 };
 
 /**
+ * Decorator that wraps stories with a standalone FormContext provider.
+ * Use this for stories that render components requiring FormContext
+ * (e.g. oip-filter-chips, oip-select) without a full oip-form web component.
+ */
+export const withFormContext: Decorator = (Story) => {
+  WebComponentLoader.importWebComponent('oip-form');
+
+  return (
+    <oip-form>
+      <Story />
+    </oip-form>
+  );
+};
+
+/**
+ * Decorator that wraps stories with a standalone FormContext provider.
+ * Use this for stories that render components requiring FormContext
+ * (e.g. oip-filter-chips, oip-select) without a full oip-form web component.
+ */
+export const withFilterContext: Decorator = (Story) => {
+  WebComponentLoader.importWebComponent('oip-filters');
+
+  return (
+    <oip-filters>
+      <Story />
+    </oip-filters>
+  );
+};
+
+/**
  * Decorator to make sure one or more web-components load inside the story.
  */
 export const withLoader: (

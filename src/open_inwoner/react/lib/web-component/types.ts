@@ -9,6 +9,7 @@ import { AnyComponent as AC, ComponentChildren } from 'preact';
 import { WEB_COMPONENT_REGISTRY } from './registry';
 import { KebabCasedProperties } from 'type-fest';
 import { RegisterOptions } from '@maykinmedia/preact-custom-element';
+import { JSX } from 'preact/jsx-runtime';
 
 /**
  * Context object passed to plugin hooks
@@ -116,7 +117,11 @@ export type WebComponentJSXRegistry = {
       infer _S,
       infer P
     >
-      ? P & { slot?: string; children?: ComponentChildren }
+      ? P &
+          JSX.IntrinsicAttributes & {
+            slot?: string;
+            children?: ComponentChildren;
+          }
       : never
   >;
 };

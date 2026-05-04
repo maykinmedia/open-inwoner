@@ -16,8 +16,8 @@ HTML) and also works **nested** inside a parent component that owns shared state
 ## Why signals, not `useState`
 
 React-style `useState` is local to a single Preact tree. A value held in
-`useState` inside `oip-filter-root` cannot be read by `oip-filter-option`
-because they are in different shadow roots.
+`useState` inside `oip-form` cannot be read by `oip-select` because they are in
+different shadow roots.
 
 `@preact/signals` signals are plain JavaScript objects. They can be placed in
 context and passed through the `_preact` event bus as-is. Reading a signal's
@@ -28,12 +28,12 @@ boundaries.
 ```
                   root shadow root
                  ┌──────────────────────────┐
-  selected  ──►  │  Signal<Record<...>>     │  ──► sent via _preact event bus
+  values    ──►  │  Signal<Record<...>>     │  ──► sent via _preact event bus
                  └──────────────────────────┘
                          ↓
                   child shadow root
                  ┌──────────────────────────┐
-                 │  reads selected.value    │  ──► re-renders on change ✓
+                 │  reads values.value      │  ──► re-renders on change ✓
                  └──────────────────────────┘
 ```
 
@@ -47,216 +47,176 @@ reads or the signal itself only inside provider hooks.
 
 ```
 ComponentName/
-  context.ts                    — interface + unconditional consumer hook
-  useComponentNameProvider.ts   — all state + bridge logic
-  ComponentName.tsx             — provides context, renders markup
+  context.ts                    — interface + consumer hooks (nullable + throwing)
+  ComponentName.tsx             — state, context provider, markup
   ComponentName.scss            — component-level styles
   ComponentName.stories.tsx     — Storybook stories
   constants.ts                  — web component definition (tagName, propNames)
 ```
 
+For components with substantial state, logic can be extracted to a
+`useComponentNameProvider.ts` hook to keep the component body clean and make the
+logic independently testable via `renderHook`. For simpler components, inlining
+state directly in the component body is fine.
+
 No `ComponentNameProvider.tsx` or `ComponentNameContext.tsx`. The component
-**is** the provider. The hook **is** the bridge.
+**is** the provider. The hook (when it exists) **is** the bridge.
 
 ---
 
-## The four layers
+## The layers
 
-### 1. `context.ts` — interface and dumb consumer hook
+### 1. `context.ts` — interface and consumer hooks
 
 Defines what consumers can read from context. **No knowledge of parent contexts.
 No conditional hook calls. No state.**
 
 ```ts
-import type { Signal, ReadonlySignal } from '@preact/signals';
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
-export interface SelectContextValue {
-  name: string;
-  multiple: boolean;
-  selectedValues: string[];
-  registerChoice: (
-    value: string,
-    label: string,
-    initialSelected?: boolean
-  ) => void;
-  toggle: (value: string) => void;
+export interface FilterContextValue {
+  registerLabel: (fieldName: string, value: string, label: string) => void;
+  getLabel: (fieldName: string, value: string) => string;
+  submit: () => void;
 }
 
-export const SelectContext = createContext<SelectContextValue | null>(null);
+export const FilterContext = createContext<FilterContextValue | null>(null);
 
-// This hook is the only public API for consumers.
-// It is always unconditional — no ifs, no parent context checks.
-export const useSelectContext = (): SelectContextValue => {
-  const ctx = useContext(SelectContext);
-  if (!ctx) throw new Error('useSelectContext must be used within a Select');
+/** Returns the nearest FilterContext value, or `null` if outside oip-filters. */
+export const useFilterContext = (): FilterContextValue | null =>
+  useContext(FilterContext);
+
+/**
+ * Returns the nearest FilterContext value.
+ * Throws a descriptive error if called outside an oip-filters tree.
+ */
+export const useRequiredFilterContext = (): FilterContextValue => {
+  const ctx = useContext(FilterContext);
+  if (!ctx) throw new Error('Component must be nested inside oip-filters');
   return ctx;
 };
 ```
 
 **Rules for `context.ts`:**
 
-- The consumer hook calls `useContext` once, unconditionally.
-- It throws a descriptive error when called outside the provider — this is
-  intentional: a missing provider is a programming error, not a runtime case.
+- Export two hooks: a nullable one (`useXxxContext`) for guards and a throwing
+  one (`useRequiredXxxContext`) for components that must be nested.
+- Both hooks call `useContext` once, unconditionally.
+- The throwing variant is intentional: a missing provider is a programming
+  error, not a runtime case to handle silently.
 - The interface exposes only what leaf consumers need. Rendering helpers
-  (`choices`, `isOpen`, `containerRef`) belong in the provider hook's return
-  type, not here.
-- This file never imports a parent or root context.
+  (`isOpen`, `containerRef`) stay in the component or provider hook, not here.
+- This file never imports a parent or sibling context.
 
 ---
 
-### 2. `useComponentNameProvider.ts` — state and bridge hook
+### 2. `ComponentName.tsx` — state, provider, markup
 
-All state management, signal wiring, and parent-context bridging lives here.
-**This is the only file that knows about both contexts.** Keeping it in a hook
-makes the logic independently testable without mounting a component tree.
-
-```ts
-import { useSignal } from '@preact/signals';
-import { useContext } from 'preact/hooks';
-import { SignalTestContext } from '../NewFilter/context';
-import type { SelectContextValue } from './context';
-
-export const useSelectProvider = (
-  name: string,
-  multiple: boolean
-): SelectContextValue & { choices: { value: string; label: string }[] } => {
-  // ── Step 1: read parent context unconditionally ──────────────────────────
-  // null when standalone (no root ancestor); non-null when nested.
-  const rootCtx = useContext(SignalTestContext);
-
-  // ── Step 2: own local signals for standalone mode ────────────────────────
-  // These are used only when rootCtx is null.
-  const ownSelected = useSignal<string[]>([]);
-  const choiceMap = useSignal<Record<string, string>>({});
-
-  // ── Step 3: resolve derived values ───────────────────────────────────────
-  // Root context wins when present; own state is the fallback.
-  const selectedValues = rootCtx
-    ? (rootCtx.selected.value[name] ?? [])
-    : ownSelected.value;
-
-  // ── Step 4: bridge actions ────────────────────────────────────────────────
-  // Each action delegates upward when nested; operates on local state when not.
-  const registerChoice = (
-    value: string,
-    label: string,
-    initialSelected = false
-  ) => {
-    choiceMap.value = { ...choiceMap.value, [value]: label };
-    if (rootCtx) {
-      rootCtx.registerOption(name, value, label, initialSelected);
-    } else if (initialSelected) {
-      ownSelected.value = [...ownSelected.value, value];
-    }
-  };
-
-  const toggle = (value: string) => {
-    if (rootCtx) {
-      multiple ? rootCtx.toggle(name, value) : rootCtx.toggleRadio(name, value);
-      return;
-    }
-    if (multiple) {
-      ownSelected.value = ownSelected.value.includes(value)
-        ? ownSelected.value.filter((v) => v !== value)
-        : [...ownSelected.value, value];
-    } else {
-      ownSelected.value = [value];
-    }
-  };
-
-  // ── Step 5: derived state for rendering ───────────────────────────────────
-  // choiceMap is a signal, so this array updates reactively as options mount.
-  const choices = Object.entries(choiceMap.value).map(([value, label]) => ({
-    value,
-    label,
-  }));
-
-  return { name, multiple, selectedValues, registerChoice, toggle, choices };
-};
-```
-
-**Rules for `useXxxProvider.ts`:**
-
-- All `useContext` / `useSignal` / `useComputed` calls are at the **top level**,
-  never inside conditions, loops, or callbacks.
-- Local signals exist for every piece of state the root context provides. The
-  component must function without a root context.
-- The "root context wins" pattern (step 3) means the standalone signals are
-  never written when a root context is present — there is one source of truth.
-- Signal mutations must replace the whole value
-  (`signal.value = { ...old, key: val }`) because signals use reference
-  equality. Mutating a nested object won't trigger subscribers.
-- The return type extends `SelectContextValue` with rendering extras. Anything
-  only needed by the component (e.g. `isOpen`, `containerRef`) is added here,
-  not to `SelectContextValue`.
-
----
-
-### 3. `ComponentName.tsx` — provides context, renders markup
-
-With all logic in the hook, the component does exactly two things: call the hook
-and provide the context.
+With all context definitions in `context.ts`, the component owns state and
+provides the context. For complex components, state can be extracted to a
+`useComponentNameProvider.ts` hook.
 
 ```tsx
-import { type AnyComponent as AC } from 'preact';
-import { SelectContext } from './context';
-import { useSelectProvider } from './useSelectProvider';
+const Filters = withContextGuard(useFormContext, ({ children }) => {
+  const formCtx = useRequiredFormContext();
+  const optionLabels = useRef<Record<string, Record<string, string>>>({});
 
-const Select: AC<SelectProps> = ({ name, multiple = true, children }) => {
-  const { choices, isOpen, ...ctx } = useSelectProvider(name, multiple);
+  const registerLabel = (fieldName: string, value: string, label: string) => {
+    if (!optionLabels.current[fieldName]) {
+      optionLabels.current[fieldName] = {};
+    }
+    optionLabels.current[fieldName][value] = label;
+  };
+
+  const getLabel = (fieldName: string, value: string): string =>
+    optionLabels.current[fieldName]?.[value] ?? value;
+
+  const submit = (): void => {
+    formCtx.submit((values) => {
+      const params = new URLSearchParams();
+      Object.entries(values).forEach(([key, vals]) => {
+        vals.forEach((v) => params.append(key, v));
+      });
+      window.location.assign(`${window.location.pathname}?${params}`);
+    });
+  };
 
   return (
-    <SelectContext.Provider value={ctx}>
-      {/* render using choices, isOpen, ctx.selectedValues, etc. */}
-    </SelectContext.Provider>
+    <FilterContext.Provider value={{ registerLabel, getLabel, submit }}>
+      <div class="oip-filters">{children}</div>
+    </FilterContext.Provider>
   );
-};
+});
 ```
 
 **Rules for `ComponentName.tsx`:**
 
-- No `useSignal`, `useState`, or `useContext` calls in the component body — all
-  state comes from the provider hook.
-- The component is the provider: it wraps children with `<XxxContext.Provider>`.
-- Children (including deeply nested ones across shadow roots) will receive the
-  local context via the `_preact` event bus automatically.
-- The component does not know or care whether it is nested inside a root context
-  or standing alone.
+- The component wraps children with `<XxxContext.Provider value={...}>`.
+- Children (including deeply nested ones across shadow roots) receive the
+  context via the `_preact` event bus automatically.
+- The component does not know or care whether it is nested inside a parent
+  context or standing alone — `withContextGuard` handles the null case.
 
 ---
 
-### 4. Consumers — use the local hook only
+### 3. Consumers — use the required hook only
 
 ```tsx
-import { useSelectContext } from './context';
+const SelectOption = withContextGuard(
+  useSelectContextNullable,
+  ({ value, label }: OptionProps) => {
+    const ctx = useSelectContext(); // safe — guard ensures it exists
+    const { isSelected, onChange, moveFocus, close, typeahead } =
+      ctx.registerOption(value, label);
 
-const SelectOption: AC<OptionProps> = ({ value, label, initialSelected }) => {
-  const { selectedValues, registerChoice, toggle } = useSelectContext();
-
-  useEffect(() => {
-    registerChoice(value, label, initialSelected);
-  }, []);
-
-  const checked = selectedValues.includes(value);
-
-  return (
-    <label>
-      <input type="checkbox" checked={checked} onChange={() => toggle(value)} />
-      {label}
-    </label>
-  );
-};
+    return (
+      <div
+        class="oip-select-option"
+        tabIndex={-1}
+        onClick={onChange}
+        onKeyDown={handleKeyDown}
+      >
+        <input
+          type={ctx.multiple ? 'checkbox' : 'radio'}
+          checked={isSelected}
+          onChange={onChange}
+        />
+        <span>{label}</span>
+      </div>
+    );
+  }
+);
 ```
 
 **Rules for consumers:**
 
-- Call only the local hook (`useSelectContext`, `useChipsContext`, etc.).
-- Never import or call a root/parent context hook (`useSignalTest`, etc.).
+- Call only the local required hook (`useRequiredSelectContext`, etc.).
+- Never import or call a parent context hook (`useFormContext`, etc.).
 - The consumer is unaware of whether state is owned locally or delegated upward.
   This makes it fully reusable and testable in isolation.
+
+---
+
+## withContextGuard
+
+`withContextGuard` is an HOC that guards a component behind a nullable context
+check. The wrapped component renders `null` while the context is absent, then
+renders normally once context arrives.
+
+This serves two purposes:
+
+1. **Timing**: the `_preact` event propagation is async. There is a window
+   between a web component rendering and its parent's context event firing where
+   context is `null`. The guard prevents crashes during this window.
+2. **Misuse**: renders nothing (dev warning) when the component is used outside
+   its required parent — a clear signal of incorrect composition.
+
+```tsx
+// Renders null silently while FilterContext is absent.
+// Once context arrives the full component renders.
+export default withContextGuard(useFilterContext, FormButton);
+```
 
 ---
 
@@ -267,9 +227,8 @@ const SelectOption: AC<OptionProps> = ({ value, label, initialSelected }) => {
 ```ts
 // ❌ Broken
 export const useSelectContext = () => {
-  const rootCtx = useContext(RootContext);
-  // The second useContext is conditional — React/Preact will throw in strict mode
-  // and produce unpredictable behaviour otherwise.
+  const rootCtx = useContext(FormContext);
+  // The second useContext is conditional — Preact will produce unpredictable behaviour.
   const localCtx = rootCtx ? rootCtx : useContext(SelectContext);
   return localCtx;
 };
@@ -285,18 +244,18 @@ Hooks must be called in the same order on every render. A ternary that skips
 
 ```ts
 // ❌ Wrong layer — context.ts should not know about parent contexts
-import { SignalTestContext } from '../NewFilter/context';
+import { FormContext } from '../Form/context';
 
 export const useSelectContext = () => {
-  const rootCtx = useContext(SignalTestContext); // parent concern
+  const formCtx = useContext(FormContext); // parent concern
   const localCtx = useContext(SelectContext);
-  return rootCtx ?? localCtx;
+  return formCtx ?? localCtx;
 };
 ```
 
 This couples the consumer hook to a specific parent, preventing reuse in other
-trees and making the abstraction leaky. All bridging belongs in
-`useXxxProvider.ts`.
+trees and making the abstraction leaky. All bridging belongs in the component
+body (or `useXxxProvider.ts` for complex components).
 
 ---
 
@@ -364,12 +323,12 @@ import selectStyle from './Select.scss?inline';
 import type { SelectProps } from './Select';
 
 export const SELECT_DEFINITION: WebComponentDefinition<
-  'oip-sig-list-test',
+  'oip-select',
   SelectProps
 > = {
-  tagName: 'oip-sig-list-test',
+  tagName: 'oip-select',
   // propNames drives observedAttributes — must match SelectProps exactly.
-  propNames: ['name', 'label', 'alwaysOpen', 'multiple'],
+  propNames: ['name', 'label', 'value', 'multiple'],
   options: {
     shadow: true,
     adoptedStyleSheets: createStyleSheets(selectStyle),
@@ -391,45 +350,54 @@ changes.
 
 ## Standalone usage (Storybook / tests)
 
-No mock context or wrapper is needed:
+`oip-select` and `oip-select-option` work without any parent context — Select
+registers with FormContext when present and manages its own state when not:
 
 ```tsx
-// Works without any provider — Select owns its own signal state.
+// Works without oip-form or oip-filters — Select owns its own signal state.
 <Select name="status" label="Status">
   <SelectOption value="open" label="Open" />
   <SelectOption value="closed" label="Closed" />
 </Select>
 ```
 
-When a root context is present (e.g. `oip-sig-root-test` ancestor), state is
-automatically delegated upward through the bridge.
-
-For components that render nothing when standalone (e.g. `Chips`, which hides
-when nothing is selected), provide a lightweight `SignalTestContext` mock in the
-story:
+For components that require parent context to render anything visible (e.g.
+`FilterChips` hides when no values are selected), provide a lightweight
+`FormContext` mock in the story:
 
 ```tsx
 export const WithSelection: Story = {
   render: () => {
-    const selected = useSignal({ status: ['open'] });
-    const isFiltered = useComputed(() => true);
-    const isDirty = useComputed(() => false);
+    const values = useSignal<Record<string, string[]>>({ status: ['open'] });
+    const isDirty = useComputed(() => true);
+    const isEmpty = useComputed(() => false);
     return (
-      <SignalTestContext.Provider
+      <FormContext.Provider
         value={{
-          selected,
-          isFiltered,
+          values,
           isDirty,
-          optionLabels: { status: { open: 'Open' } },
+          isEmpty,
+          register: () => ({
+            value: computed(() => []),
+            setValue: () => {},
+            onChange: () => {},
+          }),
+          removeValue: () => {},
           toggle: () => {},
-          toggleRadio: () => {},
-          registerOption: () => {},
-          clearAll: () => {},
-          applyFilters: () => {},
+          submit: () => {},
+          reset: () => {},
         }}
       >
-        <Chips />
-      </SignalTestContext.Provider>
+        <FilterContext.Provider
+          value={{
+            registerLabel: () => {},
+            getLabel: (_field, value) => value,
+            submit: () => {},
+          }}
+        >
+          <FilterChips />
+        </FilterContext.Provider>
+      </FormContext.Provider>
     );
   },
 };
@@ -439,34 +407,31 @@ export const WithSelection: Story = {
 
 ## Testing strategy
 
-| Layer                     | Test type        | What to test                                           |
-| ------------------------- | ---------------- | ------------------------------------------------------ |
-| `context.ts`              | Unit             | Hook throws when called outside provider               |
-| `useXxxProvider.ts`       | `renderHook`     | State transitions, bridge delegation, no-root fallback |
-| `ComponentName.tsx`       | Component test   | Renders correct markup, provides context               |
-| Consumer (`SelectOption`) | Component test   | Registration, checked state, toggle interaction        |
-| Full tree                 | Integration test | Root context + Select + Option end-to-end              |
+| Layer               | Test type      | What to test                                     |
+| ------------------- | -------------- | ------------------------------------------------ |
+| `context.ts`        | Unit           | Nullable hook returns null; throwing hook throws |
+| `ComponentName.tsx` | Component test | Renders correct markup, provides context         |
+| Consumer            | Component test | Registration, checked state, interaction         |
+| Full tree           | Integration    | Form + Filters + Select + Option end-to-end      |
 
-Use `renderHook` from `@testing-library/preact` to test provider hooks in
-isolation — no shadow DOM or custom element registration required:
+Use `renderHook` from `@testing-library/preact` when you extract state to a
+provider hook, or mount the component directly when state is inline:
 
 ```ts
-it('falls back to own state when standalone', () => {
-  const { result } = renderHook(() => useSelectProvider('status', true));
-  act(() => result.current.registerChoice('open', 'Open', true));
-  expect(result.current.selectedValues).toEqual(['open']);
-});
-
-it('delegates to root context when present', () => {
-  const toggle = vi.fn();
-  const wrapper = ({ children }) => (
-    <SignalTestContext.Provider value={{ ...mockRootCtx, toggle }}>
-      {children}
-    </SignalTestContext.Provider>
+it('registers a label and returns it', () => {
+  const { getByText } = render(
+    <FormContext.Provider value={mockFormCtx}>
+      <Filters>
+        <FilterChips />
+        <Select name="status" label="Status">
+          <SelectOption value="open" label="Open" />
+        </Select>
+      </Filters>
+    </FormContext.Provider>
   );
-  const { result } = renderHook(() => useSelectProvider('status', true), { wrapper });
-  act(() => result.current.toggle('open'));
-  expect(toggle).toHaveBeenCalledWith('status', 'open');
+  // After mount, SelectOption registers its label via FilterContext.
+  // FilterChips should show 'Open', not 'open'.
+  expect(getByText('Open')).toBeTruthy();
 });
 ```
 
@@ -474,13 +439,13 @@ it('delegates to root context when present', () => {
 
 ## Nesting depth
 
-The pattern composes to any depth. Each level provides a narrower, scoped
-context. Each provider hook only bridges one level up:
+The current filter tree:
 
 ```
-SignalTestContext  (Root.tsx        + useRootProvider.ts)
-  └─ SelectContext  (Select.tsx     + useSelectProvider.ts  — bridges from Root)
-       └─ OptionContext  (Option.tsx + useOptionProvider.ts — bridges from Select)
+FormContext    (Form.tsx      — owns all field values, isDirty, isEmpty)
+  └─ FilterContext  (Filters.tsx  — label registry, URL navigation, bridges to Form)
+       └─ SelectContext  (Select.tsx  — dropdown state, option registration, bridges to Form + Filter)
+            └─ (no context)  (SelectOption.tsx  — reads SelectContext only)
 ```
 
 Consumers at any level call only the hook one level up from themselves.
@@ -489,17 +454,61 @@ Consumers at any level call only the hook one level up from themselves.
 
 ## Checklist: adding a new component
 
-1. **`context.ts`** — define the interface; write the unconditional consumer
-   hook; no parent context imports.
-2. **`useComponentNameProvider.ts`** — read parent context unconditionally at
-   the top; define own signals for every piece of state; bridge each action;
-   return the complete context value plus render extras.
-3. **`ComponentName.tsx`** — call the hook; wrap output with
-   `<XxxContext.Provider value={ctx}>`; no state logic.
-4. **`constants.ts`** — define the web component; list all props in `propNames`;
+1. **`context.ts`** — define the interface; export a nullable hook and a
+   throwing hook; no parent context imports.
+2. **`ComponentName.tsx`** — read parent context unconditionally at the top;
+   provide the context via `<XxxContext.Provider>`; use `withContextGuard` if
+   the component requires a parent context to function.
+3. **`constants.ts`** — define the web component; list all props in `propNames`;
    wire `adoptedStyleSheets`.
-5. **Consumer components** — call only the local `useXxxContext()` hook; no root
-   context imports.
-6. **Stories** — one standalone story (no wrapper needed for components with
-   visible default state); one nested story (inside a root context mock) if the
-   component requires pre-populated state to be visible.
+4. **Consumer components** — call only the local `useRequiredXxxContext()` hook;
+   no parent context imports.
+5. **Stories** — one standalone story; one story with a parent context mock if
+   the component requires pre-populated state to be visible.
+
+---
+
+## HTML composition
+
+Components are composed in HTML templates. There is no domain-specific wrapper
+web component — `oip-form` and `oip-filters` are generic and reusable.
+
+Default values are set via the `value` attribute on `oip-select`. Django can
+read URL query params server-side and pass them directly:
+
+```html
+<oip-form>
+  <oip-filters>
+    <oip-filter-bar>
+      <oip-select
+        name="periode"
+        label="Periode"
+        multiple="false"
+        value="{{ request.GET.periode }}"
+      >
+        {% for year in periode_options %}
+        <oip-select-option value="{{ year }}" label="Jaar {{ year }}">
+        </oip-select-option>
+        {% endfor %}
+      </oip-select>
+
+      <oip-select
+        name="adres"
+        label="Adres"
+        value="{{ request.GET.getlist('adres')|join:',' }}"
+      >
+        {% for address in user.addresses %}
+        <oip-select-option value="{{ address }}" label="{{ address }}">
+        </oip-select-option>
+        {% endfor %}
+      </oip-select>
+
+      <oip-form-button>Toon resultaten</oip-form-button>
+    </oip-filter-bar>
+    <oip-filter-chips></oip-filter-chips>
+  </oip-filters>
+</oip-form>
+```
+
+For multi-select fields with multiple URL params (`?status=open&status=closed`),
+join the values as comma-separated for the `value` attribute.

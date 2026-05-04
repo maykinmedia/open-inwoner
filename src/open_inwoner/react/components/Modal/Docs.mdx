@@ -1,0 +1,67 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as ModalStories from './Modal.stories';
+
+<Meta of={ModalStories} />
+
+# Modal
+
+A headless dialog coordinator (`oip-modal`) that wires an opener button to a
+`<dialog>` element via context — no attributes required.
+
+## Component tree
+
+| Tag                       | Role                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| `oip-modal-opener`        | Button that calls `open()` on the registered `<dialog>`                              |
+| `oip-filter-modal`        | Content panel that owns the `<dialog>` element and registers it via `registerDialog` |
+| `oip-filter-modal-opener` | Specialised opener variant styled for filter panels                                  |
+
+## Context
+
+`ModalContext` (`ModalContextValue`) is provided by `oip-modal` and consumed by
+its descendants.
+
+| Field            | Signature                                 | Description                                                                                                                          |
+| ---------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `open`           | `() => void`                              | Calls `showModal()` on the registered `<dialog>`. Called by `oip-modal-opener` on click.                                             |
+| `close`          | `() => void`                              | Calls `close()` on the registered `<dialog>`. Called by content components when the user dismisses the modal.                        |
+| `registerDialog` | `(el: HTMLDialogElement \| null) => void` | Called by the content component (e.g. `oip-filter-modal`) to hand the `<dialog>` ref to the context so `open`/`close` can target it. |
+
+## Behaviour
+
+- `oip-modal` holds a `useRef<HTMLDialogElement>` and exposes
+  `open`/`close`/`registerDialog` via `ModalContext`.
+- No DOM is rendered by `oip-modal` itself — it is a pure context provider
+  wrapping `children`.
+- `oip-modal-opener` is guarded by `withModalGuard` — renders `null` silently
+  until `ModalContext` is available (async web-component propagation window).
+- `oip-modal-opener` renders as a transparent primary `Button` with `lg` icon
+  size and no underline.
+- Uses shadow DOM (no i18n) for `oip-modal-opener`; `oip-modal` itself also uses
+  shadow DOM.
+
+## Examples
+
+### Default
+
+A modal opener paired with a filter-modal panel — the standard usage pattern.
+
+<Canvas of={ModalStories.Default} />
+
+### CustomOpener
+
+An opener with a material icon and a text label inside.
+
+<Canvas of={ModalStories.CustomOpener} />
+
+## Usage
+
+```html
+<oip-modal>
+  <oip-modal-opener>Open filters</oip-modal-opener>
+  <oip-filter-modal>
+    <div>Heyy</div>
+    <!-- modal content -->
+  </oip-filter-modal>
+</oip-modal>
+```

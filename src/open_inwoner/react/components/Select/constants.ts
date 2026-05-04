@@ -1,16 +1,14 @@
 import { createStyleSheets } from '@react/lib/css';
 import { WebComponentDefinition } from '@react/lib/web-component';
 import selectStyle from './Select.scss?inline';
-import selectOptionStyle from './SelectOption.scss?inline';
 import { SelectProps } from './Select';
-import { OptionProps } from './SelectOption';
 
 export const SELECT_DEFINITION: WebComponentDefinition<
   'oip-select',
   SelectProps
 > = {
   tagName: 'oip-select',
-  propNames: ['name', 'label', 'value', 'alwaysOpen', 'multiple'],
+  propNames: ['name', 'label', 'value', 'multiple'],
   options: {
     shadow: true,
     formAssociated: true,
@@ -18,20 +16,6 @@ export const SELECT_DEFINITION: WebComponentDefinition<
     internals: { role: 'listbox' },
     i18n: true,
   },
-  subComponents: ['oip-select-option'],
+  subComponents: ['oip-select-option', 'material-icon'],
   importer: () => import('./Select'),
-};
-
-export const SELECT_OPTION_DEFINITION: WebComponentDefinition<
-  'oip-select-option',
-  OptionProps
-> = {
-  tagName: 'oip-select-option',
-  propNames: ['value', 'label'],
-  options: {
-    shadow: true,
-    adoptedStyleSheets: createStyleSheets(selectOptionStyle),
-    internals: { role: 'option' },
-  },
-  importer: () => import('./SelectOption'),
 };

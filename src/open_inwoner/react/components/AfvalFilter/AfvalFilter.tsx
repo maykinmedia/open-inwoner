@@ -1,10 +1,10 @@
-import FormButton from '@react/components/Form/FormButton';
-import FormComponent from '@react/components/Form/FormComponent';
-import FormFilterBar from '@react/components/Form/FormFilterBar';
-import FormFilterChips from '@react/components/Form/FormFilterChips';
-import FormFilters from '@react/components/Form/FormFilters';
+import FormButton from '@react/components/Form/components/FormButton';
+import Form from '@react/components/Form/Form';
+import FilterBar from '@react/components/FilterBar/FilterBar';
+import FilterChips from '@react/components/FilterChips/FilterChips';
+import Filters from '@react/components/Filters/Filters';
 import Select from '@react/components/Select/Select';
-import SelectOption from '@react/components/Select/SelectOption';
+import SelectOption from '@react/components/SelectOption/SelectOption';
 import { usePropsOrScriptData } from '@react/lib/json';
 import { AnyComponent as AC } from 'preact';
 import { useAfvalFilter } from './hooks/useAfvalFilters';
@@ -35,9 +35,9 @@ const AfvalFilter: AC<IAfvalFilterProps> = ({ data, dataId }) => {
   const { filterGroups, initialFilterState } = useAfvalFilter(config);
 
   return (
-    <FormComponent>
-      <FormFilters>
-        <FormFilterBar>
+    <Form>
+      <Filters>
+        <FilterBar>
           {filterGroups.map((group) => (
             <Select
               key={group.name}
@@ -56,10 +56,10 @@ const AfvalFilter: AC<IAfvalFilterProps> = ({ data, dataId }) => {
             </Select>
           ))}
           <FormButton />
-        </FormFilterBar>
-        <FormFilterChips />
-      </FormFilters>
-    </FormComponent>
+        </FilterBar>
+        <FilterChips />
+      </Filters>
+    </Form>
   );
 };
 
