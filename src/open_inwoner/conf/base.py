@@ -1141,6 +1141,32 @@ else:
 
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
+CKEDITOR_CONFIGS = {
+    "default": {
+        "allowedContent": True,
+        "toolbar": "Custom",
+        "toolbar_Custom": [
+            ["Format"],  # Headings
+            ["Bold", "Italic", "Underline"],
+            ["NumberedList", "BulletedList"],
+            ["Link", "Unlink"],
+            ["Table", "HorizontalRule"],
+            ["RemoveFormat", "Source"],
+            ["Undo", "Redo"],
+        ],
+        "removeButtons": "TextColor,BGColor",  # Remove color-styling
+        "versionCheck": False,
+        "width": 600,
+    },
+    "mail_editor": {
+        "allowedContent": True,
+        "contentsCss": [
+            "/static/mailcss/email.css"
+        ],  # Enter the css file used to style the email.
+        "height": 600,  # This is optional
+        "entities": False,  # This is added because CKEDITOR escapes the ' when you do an if statement
+    },
+}
 
 #
 # django-setup-configuration
