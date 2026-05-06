@@ -43,6 +43,10 @@ Bugfixes
 * [:gh:`2445`]: Ongeldige inhoud in TextPlugin-velden (lege of platte tekst opgeslagen
   als JSON-string) wordt nu automatisch hersteld via een datamigatie. De CMS-wizard
   vult het tekstveld niet langer voor, zodat nieuwe corruptie wordt voorkomen.
+* [:gh:`2465`]: CKEDITOR_CONFIGS aan de configuratie is toegevoegd om te voorkomen dat de
+  opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het beheeropdracht
+  'find_modified_mail_templates' is toegevoegd om e-mailsjablonen op te sporen en te melden
+  die mogelijk beschadigd zijn.
 
 Onderhoud
 ---------
