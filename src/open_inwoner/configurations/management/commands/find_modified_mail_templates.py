@@ -79,6 +79,8 @@ class Command(BaseCommand):
             if template.language:
                 label += f" ({template.language})"
 
+            path = reverse("admin:mail_editor_mailtemplate_change", args=[template.pk])
+
             self.stdout.write(self.style.SUCCESS(label))
             self.stdout.write(f"  Subject : {template.subject}")
             self.stdout.write(
@@ -86,9 +88,10 @@ class Command(BaseCommand):
                 f"by {last_save.user}"
             )
             self.stdout.write(f"  Saves since cutoff : {len(saves)}")
+            self.stdout.write(f"  Admin URL : {path}")
             self.stdout.write("")
 
-            blocks.append((label, template))
+            blocks.append((label, template, path))
 
         email_address = options["email"]
         if not email_address:
@@ -98,8 +101,7 @@ class Command(BaseCommand):
         lines = []
         list_items = []
 
-        for label, template in blocks:
-            path = reverse("admin:mail_editor_mailtemplate_change", args=[template.pk])
+        for label, template, path in blocks:
             url = f"https://{domain}{path}"
             lines.append(f"{label}: {url}")
             list_items.append(f'<li><a href="{url}">{label}</a></li>')
