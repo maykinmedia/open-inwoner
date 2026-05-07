@@ -29,6 +29,7 @@ Nieuwe features
   Zowel de uitnodiger als de uitgenodigde ontvangen een bericht zodra ze aan elkaar
   zijn gekoppeld als contactpersoon.
 * [:gh:`2470`]: Support van lijsten toegevoegd aan veelgestelde vragen en vragenlijststappen.
+* [:gh:`2468`]: Support van lijsten toegevoegd aan geen resultaten tekst op zoekpagina.
 
 Bugfixes
 --------

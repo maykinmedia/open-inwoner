@@ -386,7 +386,13 @@ class SiteConfiguration(SingletonModel):
     )
     search_zero_results_text = ProsemirrorModelField(
         verbose_name=_("Text for zero search results"),
-        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH],
+        allowed_node_types=[
+            NodeType.HARD_BREAK,
+            NodeType.PARAGRAPH,
+            NodeType.BULLET_LIST,
+            NodeType.ORDERED_LIST,
+            NodeType.LIST_ITEM,
+        ],
         allowed_mark_types=[
             MarkType.STRONG,
             MarkType.ITALIC,
