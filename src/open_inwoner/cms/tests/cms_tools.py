@@ -16,6 +16,7 @@ from cms.models import Page, Placeholder
 from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
 from cms.utils.plugins import get_plugins
+from django_prosemirror.constants import EMPTY_DOC
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
@@ -232,11 +233,14 @@ def create_cms_page_with_content(
         raise Exception("failed to publish page")
 
     content_placeholder = page.placeholders.get(slot="content")
-    add_plugin(
+    plugin = add_plugin(
         placeholder=content_placeholder,
         plugin_type="TextPlugin",
         language="nl",
-        body=content,
+        body=EMPTY_DOC,
     )
+    if content:
+        plugin.body.html = f"<p>{content}</p>"
+        plugin.save()
 
     return page
