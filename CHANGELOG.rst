@@ -1,3 +1,23 @@
+2.2.2-rc1 (2026-XX-YY)
+======================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.2.2-rc1`.
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
 2.1.1 (2026-03-19)
 ==================
 
