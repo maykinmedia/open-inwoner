@@ -4,8 +4,30 @@ from django.db import migrations
 from django.utils.text import slugify
 
 from cms.api import add_plugin, create_page
+from django_prosemirror.config import ProsemirrorConfig
+from django_prosemirror.schema import MarkType, NodeType
+from django_prosemirror.serde import html_to_doc
 
 from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
+
+
+def _html_to_pm_doc(html):
+    if not html or not html.strip():
+        return None
+
+    config = ProsemirrorConfig(
+        allowed_node_types=[NodeType.HARD_BREAK, NodeType.PARAGRAPH, NodeType.HEADING],
+        allowed_mark_types=[
+            MarkType.STRONG,
+            MarkType.ITALIC,
+            MarkType.UNDERLINE,
+            MarkType.LINK,
+        ],
+    )
+    try:
+        return html_to_doc(html, schema=config.schema)
+    except Exception:
+        return None
 
 
 def create_cms_pages(apps, schema_editor):
@@ -35,7 +57,7 @@ def create_cms_pages(apps, schema_editor):
             plugin_type=CMSFlatPagePlugin,
             language=language,
             title=flatpage.title,
-            content=flatpage.content,
+            content=_html_to_pm_doc(flatpage.content),
         )
 
 

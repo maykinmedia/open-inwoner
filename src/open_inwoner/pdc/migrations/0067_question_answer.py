@@ -14,10 +14,8 @@ from django_prosemirror.serde import html_to_doc
 logger = logging.getLogger(__name__)
 
 
-def migrate_answer_texts(apps, _):
+def migrate_answer_texts(apps, schema_editor):
     Question = apps.get_model("pdc", "Question")
-
-    questions = Question.objects.all()
 
     config = ProsemirrorConfig(
         allowed_node_types=[NodeType.PARAGRAPH],
@@ -29,34 +27,28 @@ def migrate_answer_texts(apps, _):
         ],
     )
 
-    for question in questions:
-        content = question.answer_tmp
+    for row in Question.objects.values("pk", "answer_tmp"):
+        content = row["answer_tmp"]
 
-        # Skip empty or whitespace-only content
         if not content or not content.strip():
-            question.answer = None
-            question.save()
             continue
 
         content = content.strip('"')
-
         html_content = markdown.markdown(content, extensions=["extra"])
 
         if not html_content.startswith("<p>"):
             html_content = f"<p>{html_content}</p>"
 
-        # Convert the HTML to a proper ProseMirror document
         try:
             doc = html_to_doc(html_content, schema=config.schema)
-            question.answer = doc
         except (IndexError, ValueError):
             logger.exception(
-                "Warning: Could not convert answer for question: %s",
-                question,
+                "Warning: Could not convert answer for question pk=%s",
+                row["pk"],
             )
-            question.answer = None
+            continue
 
-        question.save()
+        Question.objects.filter(pk=row["pk"]).update(answer=doc)
 
 
 class Migration(migrations.Migration):

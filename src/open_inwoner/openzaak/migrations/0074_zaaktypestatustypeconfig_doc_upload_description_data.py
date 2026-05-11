@@ -12,14 +12,8 @@ from django_prosemirror.serde import html_to_doc
 logger = logging.getLogger(__name__)
 
 
-def markdown_to_html(text):
-    return markdown.markdown(text, extensions=["extra"])
-
-
-def migrate_statustype_doc_upload_descriptions(apps, _):
+def migrate_statustype_doc_upload_descriptions(apps, schema_editor):
     ZaakTypeStatusTypeConfig = apps.get_model("openzaak", "ZaakTypeStatusTypeConfig")
-
-    statustype_configs = ZaakTypeStatusTypeConfig.objects.all()
 
     config = ProsemirrorConfig(
         allowed_node_types=[NodeType.PARAGRAPH],
@@ -31,32 +25,32 @@ def migrate_statustype_doc_upload_descriptions(apps, _):
         ],
     )
 
-    for statustype_config in statustype_configs:
-        markdown_content = statustype_config.document_upload_description_tmp
+    for row in ZaakTypeStatusTypeConfig.objects.values(
+        "pk", "document_upload_description_tmp"
+    ):
+        content = row["document_upload_description_tmp"]
 
-        if not markdown_content or not markdown_content.strip():
-            statustype_config.document_upload_description = None
-            statustype_config.save()
+        if not content or not content.strip():
             continue
 
-        markdown_content = markdown_content.strip('"')
-
-        html_content = markdown_to_html(markdown_content)
+        content = content.strip('"')
+        html_content = markdown.markdown(content, extensions=["extra"])
 
         if not html_content.startswith("<p>"):
             html_content = f"<p>{html_content}</p>"
 
         try:
             doc = html_to_doc(html_content, schema=config.schema)
-            statustype_config.document_upload_description = doc
         except (IndexError, ValueError):
             logger.exception(
-                "Warning: Could not convert description for statustype_config: %s",
-                statustype_config,
+                "Warning: Could not convert doc_upload_description for statustype_config pk=%s",
+                row["pk"],
             )
-            statustype_config.document_upload_description = None
+            continue
 
-        statustype_config.save()
+        ZaakTypeStatusTypeConfig.objects.filter(pk=row["pk"]).update(
+            document_upload_description=doc
+        )
 
 
 class Migration(migrations.Migration):

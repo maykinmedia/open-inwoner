@@ -88,15 +88,18 @@ def migrate_to_prosemirror_field(
     """
     Generic helper to migrate text/HTML fields to ProsemirrorModelField.
 
+    Uses raw SQL for reads and writes to avoid triggering the ProseMirror field
+    descriptor, which raises on non-JSON values in newer versions of django-prosemirror.
+
     Args:
         apps: Django apps registry from migration
-        schema_editor: Django schema editor (unused but required by migration signature)
+        schema_editor: Django schema editor
         app_label: App label (e.g., "configurations", "pdc")
         model_name: Model name (e.g., "SiteConfiguration", "Product")
         field_name: Name of the field being migrated
         allowed_node_types: List of NodeType enums (default: [NodeType.PARAGRAPH])
         allowed_mark_types: List of MarkType enums (default: [STRONG, ITALIC, LINK, UNDERLINE])
-        use_singleton: If True, use Model.objects.first(), else use Model.objects.all()
+        use_singleton: If True, only process the first row
         convert_markdown: If True, convert markdown to HTML before processing
         strip_quotes: If True, strip surrounding quotes from content
         process_images: If True, process filer_image nodes to add imageId attributes
@@ -151,7 +154,6 @@ def migrate_to_prosemirror_field(
 
     logger = logging.getLogger(__name__)
 
-    # Set defaults
     if allowed_node_types is None:
         allowed_node_types = [NodeType.HARD_BREAK, NodeType.PARAGRAPH]
 
@@ -163,87 +165,69 @@ def migrate_to_prosemirror_field(
             MarkType.UNDERLINE,
         ]
 
-    # Create Prosemirror config
     config = ProsemirrorConfig(
         allowed_node_types=allowed_node_types,
         allowed_mark_types=allowed_mark_types,
     )
 
-    # Get model
     Model = apps.get_model(app_label, model_name)
+    tmp_col = f"{field_name}_tmp"
 
-    # Get instances to process
-    if use_singleton:
-        instances = [Model.objects.first()] if Model.objects.exists() else []
-    else:
-        instances = Model.objects.all()
+    qs = Model.objects.values("pk", tmp_col)
+    if use_singleton and qs.exists():
+        qs = qs[:1]
 
-    # Process each instance
-    for instance in instances:
-        target_prosemirror_field = getattr(instance, field_name)
-        if not instance:
+    for row in qs:
+        pk_value = row["pk"]
+        content = row[tmp_col]
+
+        if not content:
             continue
 
-        # Get original content
-        content = getattr(instance, f"{field_name}_tmp")
-
-        # Convert markdown to HTML if needed
         if convert_markdown:
             content = markdown.markdown(content, extensions=["extra"])
 
-        # Check if content has actual text (not just empty tags)
         if not _has_text_content(content):
             logger.info(
-                "Skipping %s.%s for instance %s: no text content",
+                "Skipping %s.%s for pk=%s: no text content",
                 model_name,
                 field_name,
-                instance.pk if hasattr(instance, "pk") else instance,
+                pk_value,
             )
-            # Nothing to do here
             continue
 
-        # Clean empty tags before parsing (prevents IndexError)
         content = _clean_empty_html_tags(content)
 
-        # After cleaning, double-check again if anything is left
         if not content or not content.strip():
-            # Nothing to do here
             continue
 
         try:
-            # Strip quotes if needed
             if strip_quotes:
                 content = content.strip('"')
 
-            # Wrap in paragraph tags if needed
             if wrap_paragraph:
                 content = content.strip()
-                # Check for both <p> and <p (to handle attributes)
                 if not content.startswith("<p"):
                     content = f"<p>{content}</p>"
 
             doc = None
             try:
-                # Convert HTML to ProseMirror document
                 doc = html_to_doc(content, schema=config.schema)
             except Exception:
                 doc = create_text_fallback_prosemirror_doc(content)
             else:
-                # Process images if needed
                 if process_images:
                     doc = _add_image_ids_to_prosemirror_doc(doc, apps)
-            finally:
-                # Set the new field value
-                if doc:
-                    target_prosemirror_field.doc = doc
-                    instance.save()
+
+            if doc:
+                Model.objects.filter(pk=pk_value).update(**{field_name: doc})
 
         except Exception as exc:
             logger.warning(
-                "Could not convert %s.%s for instance %s: %s",
+                "Could not convert %s.%s for pk=%s: %s",
                 model_name,
                 field_name,
-                instance.pk if hasattr(instance, "pk") else instance,
+                pk_value,
                 exc,
             )
 

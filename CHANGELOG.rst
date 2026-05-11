@@ -52,6 +52,8 @@ Bugfixes
   opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het beheeropdracht
   'find_modified_mail_templates' is toegevoegd om e-mailsjablonen op te sporen en te melden
   die mogelijk beschadigd zijn.
+* [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
+  te voorkomen.
 
 Onderhoud
 ---------

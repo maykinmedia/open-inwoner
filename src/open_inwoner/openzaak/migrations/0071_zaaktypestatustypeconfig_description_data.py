@@ -12,10 +12,8 @@ from django_prosemirror.serde import html_to_doc
 logger = logging.getLogger(__name__)
 
 
-def migrate_statustype_descriptions(apps, _):
+def migrate_statustype_descriptions(apps, schema_editor):
     ZaakTypeStatusTypeConfig = apps.get_model("openzaak", "ZaakTypeStatusTypeConfig")
-
-    statustype_configs = ZaakTypeStatusTypeConfig.objects.all()
 
     config = ProsemirrorConfig(
         allowed_node_types=[NodeType.PARAGRAPH],
@@ -27,16 +25,13 @@ def migrate_statustype_descriptions(apps, _):
         ],
     )
 
-    for statustype_config in statustype_configs:
-        content = statustype_config.description_tmp
+    for row in ZaakTypeStatusTypeConfig.objects.values("pk", "description_tmp"):
+        content = row["description_tmp"]
 
         if not content or not content.strip():
-            statustype_config.description = None
-            statustype_config.save()
             continue
 
         content = content.strip('"')
-
         content = markdown.markdown(content, extensions=["extra"])
 
         if not content.startswith("<p>"):
@@ -44,15 +39,14 @@ def migrate_statustype_descriptions(apps, _):
 
         try:
             doc = html_to_doc(content, schema=config.schema)
-            statustype_config.description = doc
         except (IndexError, ValueError):
             logger.exception(
-                "Warning: Could not convert description for statustype_config: %s",
-                statustype_config,
+                "Warning: Could not convert description for statustype_config pk=%s",
+                row["pk"],
             )
-            statustype_config.description = None
+            continue
 
-        statustype_config.save()
+        ZaakTypeStatusTypeConfig.objects.filter(pk=row["pk"]).update(description=doc)
 
 
 class Migration(migrations.Migration):
