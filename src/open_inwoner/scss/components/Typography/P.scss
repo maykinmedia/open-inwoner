@@ -1,4 +1,4 @@
-// When shadow DOM is on, we need to import these styles for paragraphs that are not a web component:
+// When shadow DOM is on, we use these styles for paragraphs that are not a web component:
 @use '@nl-design-system-candidate/paragraph-css/paragraph.scss';
 
 body [class^='utrecht-heading'] + nl-paragraph,
