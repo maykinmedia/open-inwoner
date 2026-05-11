@@ -755,6 +755,9 @@ DJANGOCMS_LINK_TEMPLATES = [
     ("arrow", _("Arrow")),
 ]
 
+# Styling for rich text fields
+DJANGO_PROSEMIRROR = {"tag_to_classes": {"p": "nl-paragraph"}}
+
 #
 # Django-Admin-Index
 #
