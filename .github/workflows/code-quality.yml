@@ -10,10 +10,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   migrations:
     name: Check for model changes not present in the migrations
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     services:
       postgres:
@@ -28,8 +32,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version-file: 'pyproject.toml'
       - name: Install system packages
@@ -57,9 +63,13 @@ jobs:
   pre-commit:
     name: Run pre-commit checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version-file: 'pyproject.toml'
       - name: npm install
@@ -69,8 +79,12 @@ jobs:
   ruff-version-check:
     name: Check ruff version consistency
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Check ruff versions match
         run: |
           # Extract ruff version from ci.txt
