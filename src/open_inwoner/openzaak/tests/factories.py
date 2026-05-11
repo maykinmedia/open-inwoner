@@ -158,6 +158,40 @@ class ZaakTypeStatusTypeConfigFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ZaakTypeStatusTypeConfig
 
+    @classmethod
+    def _set_prosemirror_fields(cls, obj, kwargs):
+        changed = False
+        for field_name in ("description", "document_upload_description"):
+            value = kwargs.pop(field_name, None)
+            if value and isinstance(value, str):
+                getattr(obj, field_name).html = f"<p>{value}</p>"
+                changed = True
+            elif value is not None:
+                setattr(obj, field_name, value)
+                changed = True
+        return changed
+
+    @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        prosemirror_kwargs = {
+            k: kwargs.pop(k, None)
+            for k in ("description", "document_upload_description")
+        }
+        obj = model_class(*args, **kwargs)
+        cls._set_prosemirror_fields(obj, prosemirror_kwargs)
+        return obj
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        prosemirror_kwargs = {
+            k: kwargs.pop(k, None)
+            for k in ("description", "document_upload_description")
+        }
+        obj = super()._create(model_class, *args, **kwargs)
+        if cls._set_prosemirror_fields(obj, prosemirror_kwargs):
+            obj.save()
+        return obj
+
 
 class UserCaseStatusNotificationFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)

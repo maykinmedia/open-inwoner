@@ -56,6 +56,7 @@ Onderhoud
 ---------
 
 * [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
 
 2.1.1 (2026-03-19)
 ==================

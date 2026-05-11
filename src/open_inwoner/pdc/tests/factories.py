@@ -32,6 +32,16 @@ class ProductFactory(factory.django.DjangoModelFactory):
         model = Product
 
     @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        content = kwargs.pop("content", None)
+        obj = model_class(*args, **kwargs)
+        if content and isinstance(content, str):
+            obj.content.html = f"<p>{content}</p>"
+        elif content is not None:
+            obj.content = content
+        return obj
+
+    @classmethod
     def _create(cls, model_class, *args, **kwargs):
         """Convert string content to ProseMirror document if needed."""
         content = kwargs.get("content")
@@ -102,11 +112,21 @@ class ProductFactory(factory.django.DjangoModelFactory):
 class CategoryFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: f"category {n}")
     slug = factory.LazyAttribute(lambda a: slugify(a.name))
-    description = factory.Faker("sentence")
+    description = None
     published = True
 
     class Meta:
         model = Category
+
+    @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        description = kwargs.pop("description", None)
+        obj = model_class(*args, **kwargs)
+        if description and isinstance(description, str):
+            obj.description.html = f"<p>{description}</p>"
+        elif description is not None:
+            obj.description = description
+        return obj
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
