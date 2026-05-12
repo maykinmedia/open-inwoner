@@ -205,6 +205,7 @@ django==4.2.30
     #   django-filer
     #   django-filter
     #   django-formtools
+    #   django-fsm-2
     #   django-health-check
     #   django-htmx
     #   django-import-export
@@ -214,6 +215,7 @@ django==4.2.30
     #   django-log-outgoing-requests
     #   django-open-forms-client
     #   django-otp
+    #   django-parler
     #   django-phonenumber-field
     #   django-polymorphic
     #   django-privates
@@ -227,11 +229,13 @@ django==4.2.30
     #   django-sniplates
     #   django-solo
     #   django-structlog
+    #   django-stubs-ext
     #   django-timeline-logger
     #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
     #   django-view-breadcrumbs
+    #   djangocms-alias
     #   djangorestframework
     #   drf-spectacular
     #   easy-thumbnails
@@ -294,15 +298,16 @@ django-classy-tags==4.0.0
     #   -r requirements/base.txt
     #   django-cms
     #   django-sekizai
-django-cms==3.11.1
+django-cms==4.1.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   aldryn-apphooks-config
+    #   djangocms-alias
     #   djangocms-attributes-field
-    #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
+    #   djangocms-versioning
 django-colorfield==0.4.5
     # via
     #   -c requirements/base.txt
@@ -337,8 +342,6 @@ django-filer==3.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   djangocms-file
-    #   djangocms-link
     #   djangocms-picture
     #   maykin-django-prosemirror
 django-filter==21.1
@@ -351,6 +354,11 @@ django-formtools==2.3
     #   -r requirements/base.txt
     #   django-cms
     #   django-two-factor-auth
+django-fsm-2==4.2.4
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   djangocms-versioning
 django-health-check==3.20.8
     # via
     #   -c requirements/base.txt
@@ -406,6 +414,11 @@ django-otp==1.3.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
+django-parler==2.3
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   djangocms-alias
 django-phonenumber-field==5.2.0
     # via
     #   -c requirements/base.txt
@@ -479,6 +492,11 @@ django-structlog==6.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+django-stubs-ext==6.0.2
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+    #   django-fsm-2
 django-timeline-logger==4.0.0
     # via
     #   -c requirements/base.txt
@@ -514,22 +532,25 @@ djangocms-admin-style==3.2.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-cms
+djangocms-alias==2.0.5
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
 djangocms-attributes-field==2.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   djangocms-file
     #   djangocms-link
     #   djangocms-picture
-djangocms-file==3.0.1
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-djangocms-link==3.1.1
+djangocms-link==5.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
 djangocms-picture==4.1.1
+    # via
+    #   -c requirements/base.txt
+    #   -r requirements/base.txt
+djangocms-versioning==2.5.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -911,6 +932,8 @@ packaging==23.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-cms
+    #   djangocms-versioning
     #   kombu
     #   opentelemetry-instrumentation
     #   pytest
@@ -1142,6 +1165,7 @@ setuptools==80.10.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-cms
     #   josepy
 shellingham==1.5.4
     # via
@@ -1242,6 +1266,7 @@ typing-extensions==4.15.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-stubs-ext
     #   elasticsearch
     #   mozilla-django-oidc-db
     #   opentelemetry-api

@@ -1,10 +1,13 @@
 from typing import Any, Mapping
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.contenttypes.models import ContentType
 from django.template import Context
 from django.template.defaultfilters import truncatechars
 from django.test import RequestFactory
+from django.utils.functional import SimpleLazyObject
 from django.utils.module_loading import import_string
 
 import structlog
@@ -12,17 +15,101 @@ from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.models import Page, Placeholder
+from cms.models import Page, PageContent, Placeholder
 from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
+from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.plugins import get_plugins
 from django_prosemirror.constants import EMPTY_DOC
+from djangocms_versioning.constants import DRAFT, PUBLISHED
+from djangocms_versioning.models import Version
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.utils.test import SessionMiddleware
 
+
+def _get_cms_test_user():
+    """Return a superuser for CMS versioning publish/unpublish operations in tests."""
+    UserModel = get_user_model()
+    user, _ = UserModel.objects.get_or_create(
+        email="cms-test@example.com",
+        defaults={"is_staff": True, "is_superuser": True},
+    )
+    return user
+
+
+def publish_page(page, language):
+    """Publish the draft PageContent version for a CMS 4 page."""
+    user = _get_cms_test_user()
+    page_content = PageContent._original_manager.get(page=page, language=language)
+    ct = ContentType.objects.get_for_model(PageContent)
+    version, _ = Version.objects.get_or_create(
+        content_type=ct,
+        object_id=page_content.pk,
+        defaults={"created_by": user},
+    )
+    if version.state == DRAFT:
+        version.publish(user)
+
+
+def unpublish_page(page, language):
+    """Unpublish the published PageContent version for a CMS 4 page."""
+    user = _get_cms_test_user()
+    ct = ContentType.objects.get_for_model(PageContent)
+    version = Version.objects.get(
+        content_type=ct,
+        object_id__in=PageContent._original_manager.filter(
+            page=page, language=language
+        ).values("pk"),
+        state=PUBLISHED,
+    )
+    version.unpublish(user)
+
+
 logger = structlog.stdlib.get_logger(__name__)
+
+
+def create_static_aliases(slots, language="nl"):
+    """
+    Pre-create static alias records for the given slot names using the CMS test user.
+
+    The {% static_alias %} template tag auto-creates Alias + AliasContent + Version
+    records with created_by=request.user on first render. This sets the regular test
+    user as created_by, which blocks user.delete() because Version.created_by has
+    on_delete=PROTECT. Call this helper in setUp to pre-populate the aliases with the
+    CMS test user so that subsequent requests by regular test users don't create new
+    Version records.
+    """
+    from djangocms_alias.constants import DEFAULT_STATIC_ALIAS_CATEGORY_NAME
+    from djangocms_alias.models import Alias, AliasContent, Category
+    from djangocms_versioning.models import Version
+
+    user = _get_cms_test_user()
+
+    category = Category.objects.filter(
+        translations__name=DEFAULT_STATIC_ALIAS_CATEGORY_NAME
+    ).first()
+    if not category:
+        category = Category.objects.create(name=DEFAULT_STATIC_ALIAS_CATEGORY_NAME)
+
+    for slot in slots:
+        alias, _ = Alias.objects.get_or_create(
+            static_code=slot,
+            defaults={
+                "category": category,
+                "creation_method": Alias.CREATION_BY_TEMPLATE,
+            },
+        )
+        if not AliasContent._base_manager.filter(
+            alias=alias, language=language
+        ).exists():
+            alias_content = AliasContent._base_manager.create(
+                alias=alias,
+                name=slot,
+                language=language,
+            )
+            Version.objects.create(content=alias_content, created_by=user)
 
 
 def create_homepage():
@@ -33,10 +120,7 @@ def create_homepage():
         "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
     )
     p.set_as_homepage()
-
-    if not p.publish("nl"):
-        raise Exception("failed to publish page")
-
+    publish_page(p, "nl")
     return p
 
 
@@ -70,6 +154,7 @@ def get_request(
         request.current_page = page
 
     request.csp_nonce = "test-nonce"
+    request.toolbar = SimpleLazyObject(lambda: CMSToolbar(request))
 
     middleware = SessionMiddleware()
     middleware.process_request(request)
@@ -121,7 +206,13 @@ def render_all_placeholders(
     request = get_request(page=page, user=as_user)
     renderer = ContentRenderer(request=request)
 
-    placeholders = page.placeholders.all()
+    page_content = PageContent._original_manager.filter(
+        page=page, language=language
+    ).first()
+    if not page_content:
+        logger.info("CMS page has no content for language", language=language)
+        return ""
+    placeholders = Placeholder.objects.get_for_obj(page_content)
 
     if not placeholders.exists():
         logger.info("CMS page has no placeholders to render")
@@ -152,14 +243,22 @@ def render_all_placeholders(
     return ""
 
 
-def render_full_page(page: Page, *, as_user: User | None = None):
+def render_full_page(page: Page, *, as_user: User | None = None, language: str = "nl"):
     """
-    Render a full Django CMS page with container template in Django CMS 3.11
+    Render a full Django CMS page.
     """
     request = get_request(user=as_user, page=page)
 
+    # djangocms_versioning's VersionContentRenderer.render_obj_placeholder needs
+    # toolbar.get_object() to return the PageContent; mirror what cms/views.py does.
+    page_content = PageContent._original_manager.filter(
+        page=page, language=language
+    ).first()
+    if page_content:
+        request.toolbar.set_object(page_content)
+
     # Use the render_page function
-    rendered_response = render_page(request, page, current_language="nl", slug=None)
+    rendered_response = render_page(request, page, current_language=language, slug=None)
     rendered_response.render()
 
     content = rendered_response.content
@@ -218,8 +317,8 @@ def create_apphook_page(
         config_args["namespace"] = hook_class.app_name
         p.app_config = app_config.objects.get_or_create(**config_args)
 
-    if publish and not p.publish("nl"):
-        raise Exception("failed to publish page")
+    if publish:
+        publish_page(p, "nl")
 
     return p
 
@@ -229,10 +328,11 @@ def create_cms_page_with_content(
 ) -> Page:
     """Create a CMS page with `content` text in the content slot."""
     page = api.create_page(title, "cms/fullwidth.html", language, in_navigation=True)
-    if not page.publish(language):
-        raise Exception("failed to publish page")
 
-    content_placeholder = page.placeholders.get(slot="content")
+    page_content = PageContent._original_manager.get(page=page, language=language)
+    content_placeholder = Placeholder.objects.get_for_obj(page_content).get(
+        slot="content"
+    )
     plugin = add_plugin(
         placeholder=content_placeholder,
         plugin_type="TextPlugin",
@@ -243,4 +343,5 @@ def create_cms_page_with_content(
         plugin.body.html = f"<p>{content}</p>"
         plugin.save()
 
+    publish_page(page, language)
     return page

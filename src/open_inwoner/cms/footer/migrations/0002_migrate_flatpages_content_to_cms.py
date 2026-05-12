@@ -3,12 +3,36 @@
 from django.db import migrations
 from django.utils.text import slugify
 
-from cms.api import add_plugin, create_page
 from django_prosemirror.config import ProsemirrorConfig
 from django_prosemirror.schema import MarkType, NodeType
 from django_prosemirror.serde import html_to_doc
 
-from open_inwoner.cms.footer.cms_plugins import CMSFlatPagePlugin
+
+def _next_root_path(TreeNode):  # noqa
+    """
+    Return the next available treebeard path for a CMS TreeNode root (depth=1).
+
+    CMS TreeNode uses steplen=4 and the base-36 alphabet
+    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.  Root nodes at depth=1 therefore
+    have 4-character paths: "0001", "0002", …, "000Z", "0010", …
+
+    We avoid importing treebeard internals so this function stays frozen even
+    if treebeard's private API changes.  Python's built-in int(x, 36) handles
+    the decoding because the alphabet is exactly base-36.
+    """
+    last_path = (
+        TreeNode.objects.filter(depth=1)
+        .order_by("-path")
+        .values_list("path", flat=True)
+        .first()
+    )
+    n = int(last_path, 36) + 1 if last_path else 1
+    alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    digits = []
+    while n:
+        digits.append(alphabet[n % 36])
+        n //= 36
+    return "".join(reversed(digits)).zfill(4)
 
 
 def _html_to_pm_doc(html):
@@ -31,7 +55,59 @@ def _html_to_pm_doc(html):
 
 
 def create_cms_pages(apps, schema_editor):
+    """
+    Convert each Django FlatPage into a CMS 4 page with a CMSFlatPagePlugin
+    placed in its "content" placeholder.
+
+    All model access goes through the historical ``apps`` registry so that this
+    migration remains frozen: no live model classes are imported, meaning
+    future changes to CMS or versioning models cannot break this migration
+    when it is replayed from scratch.
+
+    The only live import is:
+    - ``get_or_create_migration_user`` (project helper, safe to call here)
+    """
+    from django.conf import settings
+
+    from open_inwoner.djangocms_4_migration.helpers import get_or_create_migration_user
+
     FlatPage = apps.get_model("flatpages", "FlatPage")
+
+    # Nothing to do on a fresh database (CI, new deployments) or when flatpages
+    # have already been removed by a prior run.
+    if not FlatPage.objects.exists():
+        return
+
+    TreeNode = apps.get_model("cms", "TreeNode")
+    Page = apps.get_model("cms", "Page")
+    PageUrl = apps.get_model("cms", "PageUrl")
+    PageContent = apps.get_model("cms", "PageContent")
+    Placeholder = apps.get_model("cms", "Placeholder")
+    CMSPlugin = apps.get_model("cms", "CMSPlugin")
+    CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
+    Version = apps.get_model("djangocms_versioning", "Version")
+    Site = apps.get_model("sites", "Site")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    User = apps.get_model("accounts", "User")
+
+    # get_or_create_migration_user() uses the live User model by default, which
+    # is fine: we only need the PK for the Version.created_by FK.
+    migration_user, _ = get_or_create_migration_user()
+    migration_user = User.objects.get(pk=migration_user.pk)
+
+    site_id = getattr(settings, "MIGRATION_DEFAULT_SITE_ID", None) or getattr(
+        settings, "SITE_ID", 1
+    )
+    site = (
+        Site.objects.filter(id=site_id).first() or Site.objects.order_by("id").first()
+    )
+    if site is None:
+        raise RuntimeError(
+            "footer/0002: no Site object found — cannot migrate FlatPages to CMS pages"
+        )
+
+    # Look up the ContentType for PageContent by label/model string.
+    page_content_ct = ContentType.objects.get(app_label="cms", model="pagecontent")
 
     language = "nl"
 
@@ -41,31 +117,127 @@ def create_cms_pages(apps, schema_editor):
         if not slug:
             slug = slugify(flatpage.title)
 
-        page = create_page(
-            title=title,
-            template="cms/cms_flatpage_template.html",
-            language=language,
+        # ------------------------------------------------------------------ #
+        # 1. Tree node (treebeard root)                                       #
+        # ------------------------------------------------------------------ #
+        # We cannot call TreeNode.add_root() on the historical model because
+        # the historical class does not inherit MP_Node (Django strips mixins
+        # from the historical model bases).  Instead we generate the path
+        # ourselves using _next_root_path() above.
+        tree_node = TreeNode.objects.create(
+            path=_next_root_path(TreeNode),
+            depth=1,
+            numchild=0,
+            parent=None,
+            site=site,
+        )
+
+        # ------------------------------------------------------------------ #
+        # 2. Page                                                             #
+        # ------------------------------------------------------------------ #
+        page = Page.objects.create(
+            node=tree_node,
+            created_by="cms-migration",
+            changed_by="cms-migration",
+            languages=language,
+        )
+
+        # ------------------------------------------------------------------ #
+        # 3. Page URL                                                         #
+        # ------------------------------------------------------------------ #
+        PageUrl.objects.create(
             slug=slug,
-            published=True,
-            in_navigation=True,
-        )
-
-        placeholder = page.placeholders.get(slot="content")
-
-        add_plugin(
-            placeholder=placeholder,
-            plugin_type=CMSFlatPagePlugin,
+            path=slug,
             language=language,
-            title=flatpage.title,
-            content=_html_to_pm_doc(flatpage.content),
+            page=page,
+            managed=True,
         )
+
+        # ------------------------------------------------------------------ #
+        # 4. Page content                                                     #
+        # ------------------------------------------------------------------ #
+        # Using the historical model bypasses djangocms-versioning's custom
+        # manager (which would try to create a Version via signals), so we
+        # create the Version explicitly in step 7.
+        page_content = PageContent.objects.create(
+            language=language,
+            title=title,
+            page=page,
+            template="cms/cms_flatpage_template.html",
+            in_navigation=True,
+            created_by="cms-migration",
+            changed_by="cms-migration",
+        )
+
+        # ------------------------------------------------------------------ #
+        # 5. Placeholder                                                      #
+        # ------------------------------------------------------------------ #
+        # We know the template has a single slot named "content", so we
+        # create it directly instead of calling page_content.rescan_placeholders().
+        placeholder = Placeholder.objects.create(
+            slot="content",
+            content_type=page_content_ct,
+            object_id=page_content.pk,
+        )
+
+        # ------------------------------------------------------------------ #
+        # 6. Plugin rows                                                      #
+        # ------------------------------------------------------------------ #
+        # Bypass cms.api.add_plugin() to avoid its isinstance() check against
+        # the live Placeholder class, which would fail for historical instances.
+        plugin = CMSPlugin.objects.create(
+            plugin_type="CMSFlatPagePlugin",
+            placeholder=placeholder,
+            position=1,
+            language=language,
+        )
+
+        # The historical CMSFlatPageModel still has content as a TextField
+        # (migrations 0003-0006 convert it to ProsemirrorModelField later).
+        # Store raw HTML here; migration 0004 converts it to Prosemirror JSON.
+        CMSFlatPageModel.objects.create(
+            cmsplugin_ptr=plugin,
+            title=title,
+            content=flatpage.content,
+        )
+
+        # ------------------------------------------------------------------ #
+        # 7. Version                                                          #
+        # ------------------------------------------------------------------ #
+        # Create a PUBLISHED version so the page is immediately visible —
+        # mirroring the original CMS 3 migration's create_page(published=True).
+        # Version.number is normally auto-set by the live model's save(), but
+        # the historical model bypasses that override, so we set it manually.
+        # Each newly created page content is its first version, so "1" is correct.
+        Version.objects.create(
+            content_type=page_content_ct,
+            object_id=page_content.pk,
+            created_by=migration_user,
+            state="published",
+            number="1",
+        )
+
+
+def _get_page_from_placeholder(placeholder, apps):
+    if placeholder is None:
+        return None
+
+    PageContent = apps.get_model("cms", "PageContent")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    page_content_ct = ContentType.objects.get(app_label="cms", model="pagecontent")
+
+    if placeholder.content_type_id == page_content_ct.pk:
+        page_content = PageContent.objects.filter(pk=placeholder.object_id).first()
+        if page_content:
+            return page_content.page
+
+    return None
 
 
 def link_cms_pages_with_siteconfig(apps, schema_editor):
     SiteConfiguration = apps.get_model("configurations", "SiteConfiguration")
     SiteConfigurationPage = apps.get_model("configurations", "SiteConfigurationPage")
 
-    Page = apps.get_model("cms", "Page")
     CMSFlatPageModel = apps.get_model("footer", "CMSFlatPageModel")
 
     # remove existing pages for clean slate
@@ -75,13 +247,14 @@ def link_cms_pages_with_siteconfig(apps, schema_editor):
 
     for order, cms_model in enumerate(CMSFlatPageModel.objects.all()):
         placeholder = cms_model.placeholder
-        cms_page = Page.objects.filter(placeholders=placeholder).first()
+        cms_page = _get_page_from_placeholder(placeholder, apps)
 
-        SiteConfigurationPage.objects.create(
-            configuration=site_config,
-            cms_page=cms_page,
-            order=order,
-        )
+        if cms_page:
+            SiteConfigurationPage.objects.create(
+                configuration=site_config,
+                cms_page=cms_page,
+                order=order,
+            )
 
 
 def delete_flatpages(apps, schema_editor):
@@ -93,6 +266,13 @@ def delete_flatpages(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("footer", "0001_initial"),
+        # Note: this migration also requires cms >= 0036 (for TreeNode, PageContent,
+        # PageUrl, Placeholder.content_type) and djangocms_versioning >= 0018 (for
+        # Version).  Those dependencies are NOT declared here because footer/0002 may
+        # already be applied on databases that were upgraded from CMS 3, where those
+        # migrations did not yet exist.  In practice they are always satisfied: the
+        # full CMS 4 migration chain runs before footer/0002 due to the topological
+        # ordering enforced by footer/0001 → cms/0022.
     ]
 
     operations = [

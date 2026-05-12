@@ -2,7 +2,8 @@
 
 from django.db.models import Q
 
-from cms.models import Page
+from cms.models import Page, PageContent
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
@@ -33,10 +34,12 @@ def _is_published(page_name: str) -> bool:
         return False
     # CMS uses the hook's classname as urls value
     # NOTE: the old approach of filtering on application_namespace breaks for hooks with app-configs
-    page = Page.objects.filter(
-        application_urls=hook.__name__, publisher_is_draft=False
-    ).first()
-    return bool(page and page.is_published(page.languages))
+    page = Page.objects.filter(application_urls=hook.__name__).first()
+    if not page:
+        return False
+    return PageContent._original_manager.filter(
+        page=page, versions__state=PUBLISHED
+    ).exists()
 
 
 def inbox_page_is_published() -> bool:
@@ -81,9 +84,16 @@ def profile_page_is_published() -> bool:
     return _is_published("profile")
 
 
+def get_published_page_ids():
+    """Return a queryset of Page PKs that have at least one published version."""
+    return PageContent._original_manager.filter(versions__state=PUBLISHED).values_list(
+        "page_id", flat=True
+    )
+
+
 def get_active_app_names() -> list[str]:
     qs = (
-        Page.objects.published()
+        Page.objects.filter(id__in=get_published_page_ids())
         .exclude(
             Q(application_urls="")
             | Q(application_urls__isnull=True)

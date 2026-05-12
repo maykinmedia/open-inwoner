@@ -316,8 +316,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("Stuur een bericht"))
 
         # case 3: published message page
-        page.publish("nl")
-        page.save()
+        cms_tools.publish_page(page, "nl")
 
         response = self.app.get(self.url, user=self.user)
 
@@ -954,6 +953,20 @@ class ProfileDeleteTest(WebTest):
     def setUpTestData(cls):
         cls.url = reverse("profile:detail")
 
+    def setUp(self):
+        # Pre-create footer static aliases owned by the CMS test user.
+        # Without this, {% static_alias %} in master.html creates Version records
+        # with created_by=request.user (the test user), and Version.created_by has
+        # on_delete=PROTECT, which blocks the user.delete() call under test.
+        cms_tools.create_static_aliases(
+            ["footer_left", "footer_center", "footer_right"]
+        )
+        self._infra_user_pks = set(User.objects.values_list("pk", flat=True))
+
+    @property
+    def regular_users(self):
+        return User.objects.exclude(pk__in=self._infra_user_pks)
+
     def test_delete_regular_user_success(self):
         user = UserFactory()
 
@@ -962,7 +975,7 @@ class ProfileDeleteTest(WebTest):
 
         # check delete
         response = response.forms["delete-form"].submit()
-        self.assertIsNone(User.objects.first())
+        self.assertIsNone(self.regular_users.first())
 
         # check redirect
         self.assertRedirects(
@@ -981,7 +994,7 @@ class ProfileDeleteTest(WebTest):
 
         # check user deleted
         response = response.forms["delete-form"].submit()
-        self.assertIsNone(User.objects.first())
+        self.assertIsNone(self.regular_users.first())
 
         # check redirect
         self.assertRedirects(
@@ -1001,7 +1014,7 @@ class ProfileDeleteTest(WebTest):
 
         # check user not deleted
         response = response.forms["delete-form"].submit()
-        self.assertEqual(User.objects.first(), user)
+        self.assertEqual(self.regular_users.first(), user)
 
         # check redirect
         self.assertRedirects(
@@ -1020,7 +1033,7 @@ class ProfileDeleteTest(WebTest):
 
         # check staff user not deleted
         response = response.forms["delete-form"].submit()
-        self.assertEqual(User.objects.first(), user)
+        self.assertEqual(self.regular_users.first(), user)
 
         # check redirect
         self.assertRedirects(
@@ -1324,7 +1337,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("messages_notifications", form.fields)
 
         # inbox page published
-        page.publish("nl")
+        cms_tools.publish_page(page, "nl")
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1347,7 +1360,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("cases_notifications", form.fields)
 
         # cases page published
-        page.publish("nl")
+        cms_tools.publish_page(page, "nl")
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 
@@ -1369,7 +1382,7 @@ class NotificationsDisplayTests(WebTest):
         self.assertNotIn("plans_notifications", form.fields)
 
         # collaborate page published
-        page.publish("nl")
+        cms_tools.publish_page(page, "nl")
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-notifications"]
 

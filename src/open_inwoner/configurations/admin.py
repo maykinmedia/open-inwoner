@@ -64,7 +64,7 @@ class SiteConfigurationPageInline(OrderedTabularInline):
     )
     extra = 1
     ordering = ("order",)
-    autocomplete_fields = ("cms_page",)
+    raw_id_fields = ("cms_page",)
 
 
 class FontConfigurationInline(admin.StackedInline):

@@ -88,8 +88,9 @@ def migrate_to_prosemirror_field(
     """
     Generic helper to migrate text/HTML fields to ProsemirrorModelField.
 
-    Uses raw SQL for reads and writes to avoid triggering the ProseMirror field
-    descriptor, which raises on non-JSON values in newer versions of django-prosemirror.
+    Uses ``.values()`` for reads and ``.update()`` for writes to bypass the
+    ProseMirror field descriptor, which raises on non-JSON values in newer
+    versions of django-prosemirror.
 
     Args:
         apps: Django apps registry from migration

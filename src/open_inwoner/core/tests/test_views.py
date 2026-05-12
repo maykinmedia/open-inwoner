@@ -21,7 +21,11 @@ from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
-from open_inwoner.cms.tests.cms_tools import create_apphook_page, create_homepage
+from open_inwoner.cms.tests.cms_tools import (
+    create_apphook_page,
+    create_homepage,
+    publish_page,
+)
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.core.views import _get_category_data_for_user
 from open_inwoner.pdc.tests.factories import CategoryFactory, ProductFactory
@@ -520,7 +524,7 @@ class SitemapViewTest(TestCase):
         page = api.create_page(
             "Privacy Policy", "cms/fullwidth.html", "nl", in_navigation=True
         )
-        page.publish("nl")
+        publish_page(page, "nl")
         self.config.cms_pages.add(page)
 
         response = self.client.get(reverse("sitemap"))
@@ -533,8 +537,8 @@ class SitemapViewTest(TestCase):
         page = api.create_page(
             "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
         )
-        page.publish("nl")
-        published_page = page.get_public_object()
+        publish_page(page, "nl")
+        published_page = page
         CommonExtension.objects.create(
             extended_object=published_page, requires_auth=True
         )
@@ -551,8 +555,8 @@ class SitemapViewTest(TestCase):
         page = api.create_page(
             "Members Only", "cms/fullwidth.html", "nl", in_navigation=True
         )
-        page.publish("nl")
-        published_page = page.get_public_object()
+        publish_page(page, "nl")
+        published_page = page
         CommonExtension.objects.create(
             extended_object=published_page, requires_auth=True
         )

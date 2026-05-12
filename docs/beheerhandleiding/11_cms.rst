@@ -55,7 +55,11 @@ Wanneer u dubbelklikt op het grijze icoontje met puzzelstukjes achter een menu i
 11.1.4. Status wijzigen
 -----------------------
 
-Wanneer u onder de kolom ‘NL’ op het gekleurde bolletje klikt, kunt u de status van de gekozen pagina wijzigen. Een groen bolletje betekent dat de pagina gepubliceerd is. Een blauw bolletje geeft aan dat er niet opgeslagen wijzigingen op een pagina zijn en een grijs bolletje betekent dat de pagina nog niet of niet meer gepubliceerd is en dus niet aan de voorkant van de site wordt weergegeven. Bezoekers kunnen deze pagina dus níet bereiken als het bolletje grijs is.
+Wanneer u onder de kolom ‘NL’ op het gekleurde bolletje klikt, kunt u de status van de gekozen pagina wijzigen. De kleur van het bolletje geeft de huidige versiestatus aan (zie ook hoofdstuk 11.1.11 over versiebeheer):
+
+- **Groen** — de pagina is gepubliceerd en zichtbaar voor bezoekers.
+- **Blauw** — er is een conceptversie met nog niet gepubliceerde wijzigingen.
+- **Grijs** — de pagina heeft geen gepubliceerde versie en is niet bereikbaar voor bezoekers.
 
 .. image:: images/image83.png
    :alt: CMS dashboard
@@ -170,6 +174,37 @@ Om een pagina helemaal te verwijderen klikt u op het hamburgermenu (de drie stre
 .. image:: images/image92.png
    :alt: CMS dashboard
    :width: 600px
+
+
+11.1.11. Versiebeheer
+---------------------
+
+CMS 4 introduceert een volledig versiebeheer voor pagina-inhoud (*versioning*). Dit vervangt het vroegere eenvoudige onderscheid tussen een gepubliceerde en een conceptpagina: elke pagina heeft nu één of meer expliciet beheerde versies.
+
+**Versiestatussen**
+
+Elke versie van een pagina bevindt zich altijd in één van de volgende statussen:
+
+- **Concept** — De versie is aangemaakt maar nog niet gepubliceerd. Alleen ingelogde redacteuren en beheerders kunnen deze versie bekijken via de preview.
+- **Gepubliceerd** — De versie is zichtbaar voor alle bezoekers van de website. Er kan op elk moment slechts één versie tegelijk gepubliceerd zijn.
+- **Niet-gepubliceerd** — De versie was eerder gepubliceerd, maar de publicatie is teruggedraaid. De pagina is niet meer zichtbaar voor bezoekers.
+- **Gearchiveerd** — De versie is gearchiveerd. Dit gebeurt automatisch wanneer een nieuwe versie wordt gepubliceerd; de vorige gepubliceerde versie wordt dan gearchiveerd.
+
+**Werkwijze: bewerken en publiceren**
+
+1. Ga naar de voorkant van de website terwijl u bent ingelogd als redacteur of beheerder.
+2. Navigeer naar de pagina die u wilt bewerken.
+3. Klik op [Bewerken] in de CMS-werkbalk bovenaan. Bestaat er al een conceptversie, dan opent die versie. Anders wordt er automatisch een nieuwe conceptversie aangemaakt op basis van de huidige gepubliceerde versie.
+4. Breng de gewenste wijzigingen aan.
+5. Klik op [Publiceer veranderingen in de pagina] om de conceptversie te publiceren. De vorige gepubliceerde versie wordt automatisch gearchiveerd.
+
+.. note::
+
+   In tegenstelling tot het vroegere CMS 3 worden wijzigingen **niet** automatisch zichtbaar voor bezoekers zodra u ze opslaat. U dient altijd expliciet op [Publiceer veranderingen in de pagina] te klikken om een versie live te zetten.
+
+**Versiegeschiedenis bekijken**
+
+Via de backend (CMS > Pagina's) kunt u per pagina de versiegeschiedenis bekijken en eerder gearchiveerde versies terugzetten. Klik op het hamburgermenu achter de betreffende pagina en kies [Versies beheren].
 
 
 11.2. Via de frontend wijzigingen doorvoeren
@@ -321,6 +356,10 @@ Er opent nu een nieuw scherm waarin u de titel en slug van de pagina kunt invoer
 
 U kunt eenvoudig een pagina bewerken wanneer u op de knop [Bewerken] klikt. Let op! Deze knop is alleen zichtbaar als u op de live versie (gepubliceerde pagina) bent. Bevindt u zich op een pagina waar al zaken gewijzigd zijn, dan ziet u hier de knop [Bekijk gepubliceerde pagina].
 
+**Conceptversie bekijken (preview)**
+
+Voordat u een conceptversie publiceert kunt u een voorbeeld bekijken zoals de pagina er voor bezoekers uit zal zien. Klik hiervoor in de CMS-werkbalk op [Bekijk] of [Preview]. De preview is alleen zichtbaar voor ingelogde redacteuren en beheerders; bezoekers zien de pagina pas nadat u deze heeft gepubliceerd (zie hoofdstuk 11.1.11).
+
 .. image:: images/image101.png
    :alt: CMS dashboard
    :width: 600px
@@ -379,6 +418,10 @@ Wanneer u op markeren klikt wordt de betreffende plugin op de pagina weergegeven
 
 **Creëer alias**
 Door een alias te creëren kunt u content hergebruiken op verschillende pagina’s en deze op één plek beheren. Wanneer hergebruikte content op één plek wordt gewijzigd, wordt dit door de alias ook op de andere plekken gewijzigd.
+
+.. note::
+
+   Een eenmaal aangemaakte alias kunt u **niet** bewerken via het plugin menu van de pagina waarop hij is geplaatst. Gebruik hiervoor de [Aliassen]-optie in de CMS-werkbalk. Zie hoofdstuk 11.2.13.
 
 
 11.2.9. 'Ga Naar' links op homepagina via CMS
@@ -452,7 +495,7 @@ De footer van Open Inwoner kan worden aangepast via het Django CMS. Dit doet u d
    :width: 600px
 
 **Footer plugins**
-De footer bevat diverse soorten plugins: link, paginalijst of tekst. In het bovenstaande screenshot bevat de linker kolom uit tekst en de rechter kolom uit de paginalijst. Dit zijn de platte pagina’s die in de via de backend geconfigureerd zijn.
+De footer bevat diverse soorten plugins: link, paginalijst of tekst. In het bovenstaande screenshot bevat de linker kolom uit tekst en de rechter kolom uit de paginalijst.
 
 
 **Footertekst wijzigen**
@@ -476,7 +519,7 @@ U kunt in de footer ook een link invoegen. Wanneer u kiest voor de link plugin k
    :width: 600px
 
 **Paginalijst invoegen**
-Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. Het gaat in dit geval om de platte pagina’s zoals deze in de backend onder “Configuratie” als platte pagina’s zijn gedefinieerd. Wijzigingen aan deze lijst kunt u aanbrengen via de backend. Zie hoofdstuk 12.4.
+Wanneer u de paginalijst in de footer wilt weergeven, selecteert u deze plugin. De paginalijst toont de CMS-pagina’s die zijn gekoppeld aan de siteconfiguratie. In CMS 4 worden deze pagina’s beheerd als gewone CMS-pagina’s (niet langer als platte pagina’s). U kunt de volgorde en samenstelling van de footerpaginalijst aanpassen via de backend onder **Configuratie > Siteconfiguratiepagina’s**. Zie ook hoofdstuk 12.
 
 
 11.2.11. Contactformulier aanpassen via CMS
@@ -683,3 +726,39 @@ Als de takenlijst leeg blijft terwijl er wel taken zouden moeten zijn:
 1. Controleer of de Objects en Objecttypes API service correct is geconfigureerd
 2. Controleer of de object types correct zijn ingevuld in de plugin configuratie
 3. Controleer of er daadwerkelijk taken in de Objects API staan met het juiste BSN
+
+
+11.2.13. Statische aliassen bewerken
+-------------------------------------
+
+Statische aliassen zijn inhoudsblokken die op meerdere pagina's tegelijk worden hergebruikt. Een alias wordt op al die pagina's op dezelfde manier weergegeven. Wanneer u de inhoud van een alias aanpast, is die wijziging direct zichtbaar op alle pagina's waar de alias is geplaatst.
+
+Voorbeelden van aliassen zijn de homepagina-blokken die op meerdere plekken in de site verschijnen.
+
+.. note::
+
+   In CMS 3 werden deze blokken **statische placeholders** (*static placeholders*) genoemd. In CMS 4 heten ze **statische aliassen** (*static aliases*). De functionaliteit is vergelijkbaar, maar de bewerkstroom is gewijzigd zoals hieronder beschreven.
+
+.. note::
+
+   Vanaf CMS 4 kunnen statische aliassen **niet meer** worden bewerkt door op het element op de homepagina te klikken of via het plugin menu van de pagina. Aliassen zijn een apart versiebeheerd inhoudstype en vereisen een eigen bewerkstroom.
+
+**Werkwijze: een statische alias bewerken**
+
+1. Ga naar de voorkant van de website terwijl u bent ingelogd als redacteur of beheerder.
+2. Klik in de CMS-werkbalk bovenaan op **[Aliassen]** (of *Aliases* in de Engelse interface).
+
+.. image:: images/screenshot_oip_cms_static_alias.png
+   :alt: CMS static alias bewerken
+   :width: 600px
+
+3. Er verschijnt een overzicht van alle beschikbare statische aliassen.
+4. Zoek de alias die u wilt bewerken en klik op het potloodicoontje of [Bewerken].
+5. Breng de gewenste wijzigingen aan aan de plugins binnen de alias.
+6. Klik op [Publiceer alias] om de gewijzigde versie van de alias te publiceren.
+
+
+
+.. note::
+
+   Net als bij gewone pagina's (zie hoofdstuk 11.1.11) zijn wijzigingen aan een alias pas zichtbaar voor bezoekers nadat u de alias expliciet heeft gepubliceerd. Opslaan alleen is niet voldoende.

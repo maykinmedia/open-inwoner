@@ -74,6 +74,20 @@ Deployment aandachtspunten
   waarde van ``BRP_VERSION`` wordt bij de migratie overgenomen en er is geen
   handmatige actie vereist. De omgevingsvariabele kan na de upgrade worden
   verwijderd.
+* [:gh:`2365`]: Django CMS is bijgewerkt van versie 3 naar versie 4. Na het
+  uitrollen dient het commando ``manage.py cms4_migration`` eenmalig te worden
+  uitgevoerd om de CMS 3-gegevens te migreren naar het CMS 4-datamodel. Zonder
+  dit commando is de site niet bruikbaar.
+
+  Voor redacteuren en beheerders zijn de volgende werkwijzen gewijzigd:
+
+  - **Statische aliassen** (voorheen *statische placeholders*): deze kunnen
+    niet langer worden bewerkt via het pluginmenu van een pagina. Gebruik
+    hiervoor de optie [Aliassen] in de CMS-werkbalk.
+  - **Publiceren**: wijzigingen aan een pagina worden niet langer automatisch
+    zichtbaar voor bezoekers na het opslaan. Er wordt nu altijd een
+    conceptversie aangemaakt die expliciet gepubliceerd moet worden via
+    [Publiceer veranderingen in de pagina].
 
 Nieuwe features
 ---------------
@@ -97,6 +111,7 @@ Nieuwe features
   2.7. De vaste, leverancierspecifieke request-headers (I Connect en Centric)
   zijn vervangen door een vrij configureerbaar sleutel/waarde-overzicht;
   bestaande headerwaarden worden automatisch gemigreerd.
+* [:gh:`2365`]: ``django-cms`` bijgewerkt naar versie ``4.1.3``.
 
 Bugfixes
 --------
@@ -197,6 +212,8 @@ Onderhoud
 * ``lodash`` bijgewerkt naar versie ``4.18.1``.
 * ``lodash-es`` override bijgewerkt om :cve:`CVE-2026-4800` te mitigeren.
 * ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
+* [:gh:`2370`]: ``djangocms-link`` bijgewerkt naar versie ``5.1.1``.
+* [:gh:`2370`]: ``djangocms-file`` verwijderd.
 
 2.1.1 (2026-03-19)
 ==================

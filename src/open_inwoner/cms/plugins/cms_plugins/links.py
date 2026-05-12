@@ -38,14 +38,7 @@ class CustomLinkForm(forms.ModelForm):
 
     class Meta:
         model = ExtendedCMSLink
-        fields = ["name", "external_link", "icon", "target"]
-
-    # `LinkPlugin.get_form()` from djangocms-link dynamically wraps the form class and
-    # calls `for_site()`, which filters the `linternal_link` field's queryset to only show
-    # CMS pages from the current site. We don't support internal links so the method
-    # can be empty, but must be present to avoid `AttributeError` when editing links
-    def for_site(self, site):
-        pass
+        fields = ["name", "link", "icon", "target"]
 
 
 @plugin_pool.register_plugin
@@ -61,12 +54,10 @@ class LinkPlugin(OriginalLinkPlugin):
 
     def get_render_template(self, context, instance, placeholder):
         """
-        Override to use our custom template that supports ProsemirrorModelField
-
-        Note: setting the template via the render_template attribute does not work;
-        template resolution seems to be broken by inheritance. Revisit when upgrading to
-        Django CMS 4
-        """
+        Override to use our custom template instead of the dynamic template path
+        computed by OriginalLinkPlugin.get_render_template(), which would resolve to
+        djangocms_link/{instance.template}/link.html and bypass our render_template
+        attribute entirely."""
         return self.render_template
 
     fieldsets = [
@@ -75,7 +66,7 @@ class LinkPlugin(OriginalLinkPlugin):
             {
                 "fields": (
                     "name",
-                    "external_link",
+                    "link",
                     "icon",
                 )
             },

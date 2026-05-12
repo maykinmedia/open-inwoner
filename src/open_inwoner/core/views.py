@@ -2,10 +2,11 @@ from urllib.parse import urlencode
 
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 
 import structlog
-from cms.models import Page, Title
+from cms.models import Page, PageContent
+from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
@@ -150,9 +151,11 @@ def _get_footer_pages(is_authenticated: bool) -> list:
     cms_footer_pages = list(config.get_ordered_cms_pages())
 
     # Add contact form page at the beginning if enabled
-    contact_form_pages = Page.objects.filter(
-        template="cms/contactform/form_outer.html", publisher_is_draft=False
-    )
+    contact_form_page_ids = PageContent._original_manager.filter(
+        template="cms/contactform/form_outer.html",
+        versions__state=PUBLISHED,
+    ).values_list("page_id", flat=True)
+    contact_form_pages = Page.objects.filter(id__in=contact_form_page_ids)
     if contact_form_pages.exists() and klant_config.contact_registration_enabled:
         cms_footer_pages.insert(0, contact_form_pages.first())
 
@@ -167,8 +170,13 @@ def _get_footer_pages(is_authenticated: bool) -> list:
 
     pages = []
     for page in cms_footer_pages:
-        title = Title.objects.get(page=page, language=page.languages)
-        pages.append({"url": page.get_absolute_url(), "link_text": title.title})
+        page_content = PageContent._original_manager.filter(
+            page=page, language=get_language(), versions__state=PUBLISHED
+        ).first()
+        if page_content:
+            pages.append(
+                {"url": page.get_absolute_url(), "link_text": page_content.title}
+            )
 
     return pages
 

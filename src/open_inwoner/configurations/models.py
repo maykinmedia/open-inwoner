@@ -787,10 +787,7 @@ class SiteConfiguration(SingletonModel):
         return hex_to_hsl(self.accent_color)
 
     def get_ordered_cms_pages(self):
-        return [
-            page.publisher_public
-            for page in self.cms_pages.order_by("ordered_cms_pages")
-        ]
+        return list(self.cms_pages.order_by("ordered_cms_pages"))
 
     @property
     def google_enabled(self):

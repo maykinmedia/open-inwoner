@@ -113,7 +113,9 @@ class TestAdminCategoryForm(WebTest):
         group = GroupFactory()
         group_user = UserFactory(is_staff=True)
         group_user.user_permissions.add(
-            Permission.objects.get(codename="view_category"),
+            Permission.objects.get(
+                codename="view_category", content_type__app_label="pdc"
+            ),
         )
         group_user.groups.add(group)
 
@@ -157,7 +159,9 @@ class TestAdminCategoryForm(WebTest):
         group = GroupFactory()
         group_user = UserFactory(is_staff=True)
         group_user.user_permissions.add(
-            Permission.objects.get(codename="change_category"),
+            Permission.objects.get(
+                codename="change_category", content_type__app_label="pdc"
+            ),
         )
         group_user.groups.add(group)
 
