@@ -104,7 +104,7 @@ certifi==2025.11.12
     #   geventhttpclient
     #   requests
     #   sentry-sdk
-cffi==1.15.0
+cffi==1.17.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -894,7 +894,7 @@ mozilla-django-oidc-db[setup-configuration]==0.23.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-msgpack==1.0.7
+msgpack==1.1.2
     # via locust
 multidict==6.6.4
     # via
@@ -1039,7 +1039,7 @@ phonenumberslite==8.13.29
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-two-factor-auth
-pillow==10.3.0
+pillow==10.4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1090,7 +1090,7 @@ protobuf==6.33.5
     #   opentelemetry-proto
 psutil==5.9.7
     # via locust
-psycopg2==2.9.9
+psycopg2==2.9.12
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1226,7 +1226,7 @@ pyyaml==6.0.2
     #   tablib
     #   vcrpy
     #   zgw-consumers-oas
-pyzmq==25.1.2
+pyzmq==27.1.0
     # via locust
 qrcode==6.1
     # via
@@ -1484,7 +1484,7 @@ urllib3==2.6.3
     #   requests
     #   sentry-sdk
     #   vcrpy
-uwsgi==2.0.23
+uwsgi==2.0.31
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

@@ -50,7 +50,7 @@ certifi==2025.11.12
     #   elastic-transport
     #   requests
     #   sentry-sdk
-cffi==1.15.0
+cffi==1.17.1
     # via
     #   cryptography
     #   weasyprint
@@ -534,7 +534,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==10.3.0
+pillow==10.4.0
     # via
     #   -r requirements/base.in
     #   easy-thumbnails
@@ -550,7 +550,7 @@ protobuf==6.33.5
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
-psycopg2==2.9.9
+psycopg2==2.9.12
     # via -r requirements/base.in
 pycparser==2.20
     # via cffi
@@ -720,7 +720,7 @@ urllib3==2.6.3
     #   elastic-transport
     #   requests
     #   sentry-sdk
-uwsgi==2.0.23
+uwsgi==2.0.31
     # via -r requirements/base.in
 vine==5.1.0
     # via
