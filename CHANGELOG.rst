@@ -39,6 +39,9 @@ Nieuwe features
 * [:gh:`2517`]: ``min-release-age=2`` toegevoegd aan ``.npmrc``, minimale npm-versie
   vastgelegd via ``engines`` in ``package.json`` en node bijgewerkt naar ``24.15`` (LTS).
 * [:gh:`2142`]: Verbeterde foutafhandeling voor Klanten API-services en clients.
+* [:gh:`2514`]: De ZGW-cache wordt bij het inloggen op de achtergrond voorgeladen via een
+  Celery-taak, zodat de zakenlijst en zaakdetailpagina's bij het eerste bezoek al vanuit
+  de cache worden bediend.
 
 Bugfixes
 --------
