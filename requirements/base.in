@@ -15,7 +15,7 @@ pydantic[email]
 typing-extensions
 
 # Framework libraries
-Django>=4.2,<5.0
+Django>=5.2,<6.0
 django-admin-index
 django-axes
 django-filer
@@ -57,7 +57,7 @@ django-structlog
 jinja2
 
 # django cms
-django-cms==4.1.3
+django-cms==4.1.10
 djangocms-versioning
 djangocms-alias<3
 djangocms-link

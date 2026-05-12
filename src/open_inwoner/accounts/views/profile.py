@@ -215,7 +215,7 @@ class MyProfileView(
             instance.delete()
             request.session.flush()
 
-            return redirect(reverse("logout"))
+            return redirect(reverse("login"))
         else:
             messages.warning(request, _("Uw account kon niet worden verwijderd"))
             return redirect("profile:detail")

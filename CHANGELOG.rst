@@ -60,6 +60,9 @@ Onderhoud
 
 * [:gh:`2414`]: ClamAV Python-client (``clamd``) toegevoegd.
 * [:gh:`2455`]: ``django-admin-index`` bijgewerkt naar versie ``4.0.0``.
+* [:gh:`2366`, :gh:`2371`]: ``Django`` bijgewerkt naar versie ``5.2``, samen met
+  ``easy-thumbnails`` (2.10.1), ``django-debug-toolbar`` (6.3.0),
+  ``django-silk`` (5.5.0) en ``django-cms`` (4.1.10).
 
 2.2.0 (2026-04-20)
 ==================

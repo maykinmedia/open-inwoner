@@ -32,11 +32,8 @@ class MenuModifier(Modifier):
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             page_nodes = {n.id: n for n in nodes if n.attr["is_page"]}
-            pages = (
-                Page.objects.filter(id__in=page_nodes.keys())
-                # optimise and only retrieve id and related object
-                .only("id")
-                .select_related("commonextension")
+            pages = Page.objects.filter(id__in=page_nodes.keys()).select_related(
+                "commonextension"
             )
             num_indicators = 0
 

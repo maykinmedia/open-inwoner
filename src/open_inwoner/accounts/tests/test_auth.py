@@ -2250,10 +2250,14 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
 
     def test_logout(self):
         """Test that a user is able to log out and page redirects to root endpoint."""
-        # Log out user and redirection
-        logout_response = self.app.get(reverse("logout"), user=self.user)
+        # Django 5 LogoutView requires POST and enforces @csrf_protect at the view
+        # level, bypassing django-webtest's middleware-level CSRF disable. Use
+        # Django's test client instead, which disables CSRF checks entirely.
+        self.client.force_login(self.user)
+        logout_response = self.client.post(reverse("logout"))
         self.assertRedirects(logout_response, reverse("login"))
-        self.assertFalse(logout_response.follow().context["user"].is_authenticated)
+        followed = self.client.get(reverse("login"))
+        self.assertFalse(followed.context["user"].is_authenticated)
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")

@@ -37,10 +37,10 @@ class InboxPageTests(WebTest):
         self.assertEqual(
             receiver_choices,
             [
-                [
+                (
                     str(active_contact.uuid),
                     active_contact.get_full_name(),
-                ]
+                )
             ],
         )
 
