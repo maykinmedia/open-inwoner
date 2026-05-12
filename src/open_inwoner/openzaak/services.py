@@ -510,6 +510,7 @@ class ZGWService:
 
         resolved_zaken.sort(
             key=lambda c: (
+                # negate ordinal for descending order: date has no __neg__.
                 -c.zaak.startdatum.toordinal(),
                 all_api_groups.index(c.api_group),
             )
