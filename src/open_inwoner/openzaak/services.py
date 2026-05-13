@@ -267,40 +267,43 @@ class ZGWService:
 
     def check_zaak_access(
         self,
-        object_id: str,
-        identity: UserIdentity,
+        zaak_id: str,
+        user_identity: UserIdentity,
         api_group: ZGWApiGroupConfig,
     ) -> tuple[Zaak, ZGWApiGroupConfig] | None:
         zaken_client = self._zaken_client_factory(api_group)
 
-        zaak = zaken_client.fetch_single_zaak(object_id)
+        zaak = zaken_client.fetch_single_zaak(zaak_id)
+        # TODO: temporary workaround for our practice of swalling exceptions into None
+        # at the client layer. Should be removed when the refactoring of error-handling
+        # is completed (see GH #2142)
         if not zaak:
-            raise ZaakNotFound(f"Zaak {object_id!r} not found or API unavailable")
+            raise ZaakNotFound(f"Zaak {zaak_id!r} not found or API unavailable")
 
         config = OpenZaakConfig.get_solo()
         limit_access_to_role = config.limit_user_visible_cases_to_role
 
-        match identity:
+        match user_identity:
             case BSNIdentity():
                 rollen = zaken_client.fetch_roles_for_zaak_and_bsn(
-                    zaak.url, identity.bsn
+                    zaak.url, user_identity.bsn
                 )
             case KVKIdentity():
-                if identity.vestigingsnummer:
+                if user_identity.vestigingsnummer:
                     rollen = zaken_client.fetch_roles_for_zaak_and_vestigingsnummer(
-                        zaak.url, identity.vestigingsnummer
+                        zaak.url, user_identity.vestigingsnummer
                     )
                 else:
                     kvk_or_rsin = (
-                        identity.rsin
+                        user_identity.rsin
                         if api_group.fetch_eherkenning_zaken_with_rsin
-                        else identity.kvk
+                        else user_identity.kvk
                     )
                     rollen = zaken_client.fetch_roles_for_zaak_and_kvk_or_rsin(
                         zaak.url, kvk_or_rsin
                     )
             case _:
-                raise TypeError(f"Unexpected identity type: {type(identity)}")
+                raise TypeError(f"Unexpected identity type: {type(user_identity)}")
 
         if not rollen:
             logger.info("check_zaak_access: no role for zaak", zaak_url=zaak.url)
