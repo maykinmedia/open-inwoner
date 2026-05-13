@@ -1,7 +1,7 @@
 [project]
 name = "open-inwoner"
 version = "2.0.0-dev"
-requires-python = "== 3.12"
+requires-python = "~= 3.13"
 
 [tool.uv.pip]
 # Note: setuptools is NOT excluded because it must be explicitly installed
@@ -59,8 +59,8 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.12
-target-version = "py312"
+# Assume Python 3.13
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [

@@ -68,6 +68,7 @@ Onderhoud
   ``easy-thumbnails`` (2.10.1), ``django-debug-toolbar`` (6.3.0),
   ``django-silk`` (5.5.0) en ``django-cms`` (4.1.10).
 * [:gh:`2481`]: zizmor toegevoegd aan de CI-pipeline voor automatische beveiligingsanalyse van GitHub Actions-workflows.
+* [:gh:`2499`]: Python bijgewerkt naar versie ``3.13``.
 
 2.2.0 (2026-04-20)
 ==================

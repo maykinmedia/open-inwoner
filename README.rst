@@ -7,7 +7,7 @@ Open Inwoner
 :Demo: https://openinwoner.nl
 :Source: https://github.com/maykinmedia/open-inwoner
 :Documentation: https://docs.openinwoner.nl
-:PythonVersion: 3.12
+:PythonVersion: 3.13
 
 |build-status| |docker| |ruff| |python-versions| |storybook|
 
@@ -53,7 +53,7 @@ Backend
 ==================== ===================================================
 Component            Technology
 ==================== ===================================================
-Framework            Django 4.2 (Python 3.12)
+Framework            Django 5.2 (Python 3.13)
 Database             PostgreSQL with PostGIS extension (geographic data)
 Caching              Redis with django-redis
 Task Queue           Celery with Redis backend
@@ -147,7 +147,7 @@ References
     :alt: Docker image
     :target: https://hub.docker.com/r/maykinmedia/open-inwoner
 
-.. |python-versions| image:: https://img.shields.io/badge/python-3.12-blue.svg
+.. |python-versions| image:: https://img.shields.io/badge/python-3.13-blue.svg
     :alt: Supported Python version
 
 .. |storybook| image:: https://img.shields.io/badge/storybook-live-FF4785.svg?logo=storybook
