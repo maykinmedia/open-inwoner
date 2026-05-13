@@ -9,21 +9,12 @@ Voor een volledig overzicht van alle commits, zie :release:`v2.1.2-rc2`.
    versie is niet bestemd voor productie. Feedback wordt verwerkt in een volgende RC, of
    - als er geen problemen worden gevonden - resulteert dit in een definitieve release.
 
-Deployment aandachtspunten
---------------------------
-
-* ...
-
 Bugfixes
 --------
 
 * [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
   (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
 
-Onderhoud
----------
-
-* ...
 
 2.1.2-rc1 (2026-05-12)
 =======================
