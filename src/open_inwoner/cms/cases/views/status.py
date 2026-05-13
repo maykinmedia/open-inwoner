@@ -1,6 +1,6 @@
 import datetime as dt
 import os
-from collections import defaultdict
+from dataclasses import dataclass
 from typing import Iterable, Protocol, cast
 
 from django.conf import settings
@@ -27,7 +27,6 @@ from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
 from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
-from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
@@ -46,20 +45,17 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
-from open_inwoner.openzaak.documents import (
-    fetch_single_information_object_from_url,
-    fetch_single_information_object_uuid,
-)
+from open_inwoner.openzaak.documents import fetch_single_information_object_uuid
+from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
-    ZaakTypeResultaatTypeConfig,
     ZaakTypeStatusTypeConfig,
     ZGWApiGroupConfig,
 )
-from open_inwoner.openzaak.utils import get_role_name_display, is_info_object_visible
+from open_inwoner.openzaak.services import ZaakDetailData, ZGWService
+from open_inwoner.openzaak.utils import is_info_object_visible
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
@@ -68,6 +64,74 @@ from open_inwoner.utils.views import CommonPageMixin
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+@dataclass
+class ZaakContext:
+    """Presentation-layer snapshot of a zaak for the detail template."""
+
+    id: str
+    identification: str
+    initiator: str
+    result: str
+    result_description: str
+    start_date: dt.date
+    end_date: dt.date | None
+    end_date_planned: dt.date | None
+    end_date_legal: dt.date | None
+    description: str
+    statuses: list[dict]
+    end_statustype_data: dict | None
+    second_status_preview: StatusType | None
+    documents: list
+    allowed_file_extensions: list[str]
+    new_docs: bool
+    questions: list[Question]
+    # upload / contact info (from get_upload_info_context)
+    case_type_config_description: str
+    case_type_document_upload_description: str
+    internal_upload_enabled: bool
+    external_upload_enabled: bool
+    external_upload_url: str
+    contact_form_enabled: bool
+
+    @classmethod
+    def from_zaak_detail(
+        cls,
+        zaak: "Zaak",
+        zaak_detail: "ZaakDetailData",
+        openzaak_config: "OpenZaakConfig",
+        documents: list,
+        second_status_preview: "StatusType | None",
+        end_statustype_data: "dict | None",
+        statuses: list[dict],
+        questions: list["Question"],
+        upload_info: dict,
+    ) -> "ZaakContext":
+        return cls(
+            id=str(zaak.uuid),
+            identification=zaak.identification,
+            initiator=zaak_detail.initiator,
+            result=zaak_detail.result.get("display", ""),
+            result_description=zaak_detail.result.get("description", ""),
+            start_date=zaak.startdatum,
+            end_date=getattr(zaak, "einddatum", None),
+            end_date_planned=getattr(zaak, "einddatum_gepland", None),
+            end_date_legal=getattr(zaak, "uiterlijke_einddatum_afdoening", None),
+            description=zaak.description,
+            statuses=statuses,
+            end_statustype_data=end_statustype_data,
+            second_status_preview=second_status_preview,
+            documents=documents,
+            allowed_file_extensions=sorted(openzaak_config.allowed_file_extensions),
+            new_docs=has_new_elements(
+                documents,
+                "created",
+                dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
+            ),
+            questions=questions,
+            **upload_info,
+        )
 
 
 class VragenService(Protocol):
@@ -163,16 +227,6 @@ class InnerCaseDetailView(
             )
         }
 
-    def store_resulttype_mapping(self, zaaktype_identificatie):
-        # Filter on ZaakType identificatie to avoid eSuite situation where one resulttype
-        # is linked to multiple zaaktypes
-        self.resulttype_config_mapping = {
-            zt_resulttype.resultaattype_url: zt_resulttype
-            for zt_resulttype in ZaakTypeResultaatTypeConfig.objects.filter(
-                zaaktype_config__identificatie=zaaktype_identificatie
-            )
-        }
-
     @cached_property
     def crumbs(self):
         # zaak is retrieved via CaseAccessMixin
@@ -203,15 +257,11 @@ class InnerCaseDetailView(
             self.log_case_detail_accessed(self.zaak)
 
             openzaak_config = OpenZaakConfig.get_solo()
+            api_group = self.api_group
+            identity = UserIdentity.from_request(self.request)
+            zaak_detail = ZGWService().get_zaak_detail(self.zaak, api_group, identity)
 
-            api_group = ZGWApiGroupConfig.objects.get(pk=self.kwargs["api_group_id"])
-            zaken_client = api_group.zaken_client
-
-            # fetch data associated with `self.zaak`
-            documents = self.get_case_document_files(self.zaak, api_group)
-            statuses = zaken_client.fetch_status_history(self.zaak.url)
             self.store_statustype_mapping(self.zaak.zaaktype.identificatie)
-            self.store_resulttype_mapping(self.zaak.zaaktype.identificatie)
 
             questions = []
             for service_type in KlantenServiceType:
@@ -237,76 +287,54 @@ class InnerCaseDetailView(
 
             questions.sort(key=lambda q: q["registered_date"], reverse=True)
 
-            statustypen = []
-            catalogi_client = api_group.catalogi_client
-            statustypen = catalogi_client.fetch_statustypes_no_cache(
-                self.zaak.zaaktype.url
-            )
-
-            # NOTE we cannot always sort on the Status.datum_status_gezet (datetime) because eSuite
-            # returns zeros as the time component of the datetime, so we're going with the
-            # observation that on both OpenZaak and eSuite the returned list is ordered 'oldest-last'
-            # here we want it 'oldest-first' so we reverse() it instead of sort()-ing
-            if openzaak_config.order_statuses_by_date_set:
-                statuses.sort(key=lambda s: s.datum_status_gezet)
-            else:
-                statuses.reverse()
-
-            # get preview of second status
-            if len(statuses) == 1:
-                second_status_preview = self.get_second_status_preview(statustypen)
+            if len(zaak_detail.statuses) == 1:
+                second_status_preview = self.get_second_status_preview(
+                    zaak_detail.statustypen
+                )
             else:
                 second_status_preview = None
 
-            # handle/transform data associated with `self.zaak`
-            status_types_mapping = self.sync_statuses_with_status_types(
-                statuses, zaken_client, catalogi_client=catalogi_client
-            )
             end_statustype_data = self.handle_end_statustype_data(
-                status_types_mapping=status_types_mapping,
-                end_statustype=self.handle_end_statustype(statuses, statustypen),
+                status_types_mapping=zaak_detail.status_types_mapping,
+                end_statustype=self.handle_end_statustype(
+                    zaak_detail.statuses, zaak_detail.statustypen
+                ),
             )
-            result_data = self.get_result_data(
-                self.zaak,
-                self.resulttype_config_mapping,
-                zaken_client,
-                catalogi_client,
-            )
+
+            documents = [
+                FileItem.from_informatieobject(
+                    doc_data.info_obj,
+                    doc_data.case_info_obj,
+                    reverse(
+                        "cases:document_download",
+                        kwargs={
+                            "object_id": self.zaak.uuid,
+                            "info_id": doc_data.info_obj.uuid,
+                            "api_group_id": api_group.id,
+                        },
+                    ),
+                )
+                for doc_data in zaak_detail.documents
+            ]
 
             hooks.case_status_seen(self.request.user, self.zaak)
             hooks.case_documents_seen(self.request.user, self.zaak)
 
-            context["zaak"] = {
-                "id": str(self.zaak.uuid),
-                "identification": self.zaak.identification,
-                "initiator": self.get_initiator_display(self.zaak, api_group),
-                "result": result_data.get("display", ""),
-                "result_description": result_data.get("description", ""),
-                "start_date": self.zaak.startdatum,
-                "end_date": getattr(self.zaak, "einddatum", None),
-                "end_date_planned": getattr(self.zaak, "einddatum_gepland", None),
-                "end_date_legal": getattr(
-                    self.zaak, "uiterlijke_einddatum_afdoening", None
+            zaak_context = ZaakContext.from_zaak_detail(
+                zaak=self.zaak,
+                zaak_detail=zaak_detail,
+                openzaak_config=openzaak_config,
+                documents=documents,
+                second_status_preview=second_status_preview,
+                end_statustype_data=end_statustype_data,
+                statuses=self.get_statuses_data(
+                    zaak_detail.statuses, self.statustype_config_mapping
                 ),
-                "description": self.zaak.description,
-                "statuses": self.get_statuses_data(
-                    statuses, self.statustype_config_mapping
-                ),
-                "end_statustype_data": end_statustype_data,
-                "second_status_preview": second_status_preview,
-                "documents": documents,
-                "allowed_file_extensions": sorted(
-                    openzaak_config.allowed_file_extensions
-                ),
-                "new_docs": has_new_elements(
-                    documents,
-                    "created",
-                    dt.timedelta(days=settings.DOCUMENT_RECENT_DAYS),
-                ),
-                "questions": questions,
-            }
-            context["zaak"].update(self.get_upload_info_context(self.zaak))
-            context["anchors"] = self.get_anchors(statuses, documents)
+                questions=questions,
+                upload_info=self.get_upload_info_context(self.zaak),
+            )
+            context["zaak"] = zaak_context
+            context["anchors"] = self.get_anchors(zaak_detail.statuses, documents)
             context["contact_form"] = self.contact_form_class()
             context["hxpost_contact_action"] = reverse(
                 "cases:case_detail_contact_form", kwargs=self.kwargs
@@ -315,26 +343,15 @@ class InnerCaseDetailView(
                 "cases:case_detail_document_form", kwargs=self.kwargs
             )
             context["metrics"] = [
-                {
-                    "label": _("Zaaknummer:"),
-                    "value": context["zaak"].get("identification"),
-                },
-                {
-                    "label": _("Zaak ingediend op:"),
-                    "value": context["zaak"].get("start_date"),
-                },
+                {"label": _("Zaaknummer:"), "value": zaak_context.identification},
+                {"label": _("Zaak ingediend op:"), "value": zaak_context.start_date},
             ]
-            if self.zaak.einddatum:
+            if zaak_context.end_date:
                 context["metrics"].append(
-                    {
-                        "label": _("Besluit genomen op:"),
-                        "value": self.zaak.einddatum,
-                    },
+                    {"label": _("Besluit genomen op:"), "value": zaak_context.end_date},
                 )
             else:
-                end_date = context["zaak"].get("end_date_legal") or context["zaak"].get(
-                    "end_date_planned"
-                )
+                end_date = zaak_context.end_date_legal or zaak_context.end_date_planned
                 context["metrics"].append(
                     {
                         "label": _("U ontvangt een besluit vóór:"),
@@ -381,59 +398,6 @@ class InnerCaseDetailView(
             ),
             None,
         )
-
-    def sync_statuses_with_status_types(
-        self,
-        statuses: list[Status],
-        zaken_client: ZakenClient,
-        catalogi_client: CatalogiClient,
-    ) -> dict[str, StatusType]:
-        """
-        Update `statuses` (including the status on this view) and sync with `status_types`:
-            - resolve `self.zaak.status` (a url/str) to a `Status` object
-            - resolve `status_type` url for each element in `statuses` to the corresponding
-              `StatusType` object (this also mutates `self.zaak.status`)
-            - create mapping `{status_type_url: StatusType}`
-
-        We create a preliminary mapping {status_type url: Status}, then loop over this mapping
-        replacing `Status` with the `StatusType` corresponding to the url, and resolving the
-        `status_type` url on each `Status` instance to the corresponding `StatusType` object.
-        Note that this works by mutating `statuses`.
-
-        Requires eSuite compatibility check for cases where the current status of our zaak is
-        not returned as part of the statuslist retrieval.
-        """
-        status_types_mapping = defaultdict(list)
-
-        # preliminary mapping {status_type url: status}
-        for status in statuses:
-            status_types_mapping[status.statustype].append(status)
-            if self.zaak.status == status.url:
-                self.zaak.status = status
-
-        # eSuite compatibility
-        if isinstance(self.zaak.status, str):
-            # OIP requests cases, user goes to detailview of zaak
-            # OIP requests the statusses of the zaak (the status history)
-            # OIP sees a zaak.status URL which doesn't occur in the status history, however requires this status to determine the statustype and configuration options related to this statustype (Taiga #2037, uploading documents was activated for statustype in the admin but wasn't active for users
-            # Workaround: OIP requests the current zaak.status individually and adds the retrieved information to the statustype mapping
-
-            logger.info(
-                "Issue #2037 -- Retrieving status individually for zaak because of eSuite",
-                case_identification=self.zaak.identification,
-            )
-            self.zaak.status = zaken_client.fetch_single_status(self.zaak.status)
-            status_types_mapping[self.zaak.status.statustype].append(self.zaak.status)
-
-        # final mapping {status_type url: status_type}
-        for status_type_url, _statuses in list(status_types_mapping.items()):
-            status_type = catalogi_client.fetch_single_status_type(status_type_url)
-            status_types_mapping[status_type_url] = status_type
-            # resolve statustype url to `StatusType`
-            for status in _statuses:
-                status.statustype = status_type
-
-        return status_types_mapping
 
     def handle_end_statustype(
         self, statuses: list[Status], statustypen: list[StatusType]
@@ -606,79 +570,6 @@ class InnerCaseDetailView(
         }
 
     @staticmethod
-    def get_result_data(
-        zaak: Zaak,
-        result_type_config_mapping: dict,
-        zaken_client: ZakenClient,
-        catalogi_client: CatalogiClient,
-    ) -> dict:
-        """
-        Get display and description for the result of `zaak`
-
-        Note:
-            For the description, we try the `esuite_compat_naam` attribute of the corresponding
-            resultaattype first. This is for E-suite compatibility in zaak the E-suite returns
-            a description longer than 20 chars. Alternatively, we get the description from the
-            config of the resultaattype.
-        """
-        if not zaak.resultaat:
-            return {}
-
-        result = zaken_client.fetch_single_result(zaak.resultaat)
-        result_type = catalogi_client.fetch_single_resultaat_type(result.resultaattype)
-
-        display = result.toelichting
-        description = getattr(result_type, "esuite_compat_naam", "") or getattr(
-            result_type_config_mapping.get(result.resultaattype), "description", ""
-        )
-
-        return {
-            "display": display,
-            "description": description,
-        }
-
-    def get_initiator_display(self, zaak: Zaak, api_group: ZGWApiGroupConfig) -> str:
-        """
-        Fetch zaak roles filtered by the user's betrokkene type.
-
-        Only returns roles that match the betrokkene_type of the current user:
-            - natuurlijk_persoon if user has BSN
-            - niet_natuurlijk_persoon if user has KVK/RSIN and no vestigingsnummer
-            - vestiging if user has vestigingsnummer
-        """
-        zaken_client = api_group.zaken_client
-        user = self.request.user
-
-        if api_group.fetch_rollen_with_betrokkene_type:
-            if user.bsn:
-                roles = zaken_client.fetch_zaak_roles(
-                    zaak.url,
-                    betrokkene_type=RolTypes.natuurlijk_persoon,
-                    role_desc_generic=RolOmschrijving.initiator,
-                )
-            elif user.kvk:
-                if user.vestiging:
-                    roles = zaken_client.fetch_zaak_roles(
-                        zaak.url,
-                        betrokkene_type=RolTypes.vestiging,
-                        role_desc_generic=RolOmschrijving.initiator,
-                    )
-                else:
-                    roles = zaken_client.fetch_zaak_roles(
-                        zaak.url,
-                        betrokkene_type=RolTypes.niet_natuurlijk_persoon,
-                        role_desc_generic=RolOmschrijving.initiator,
-                    )
-            else:
-                roles = []
-        else:
-            roles = zaken_client.fetch_zaak_roles(
-                zaak.url, role_desc_generic=RolOmschrijving.initiator
-            )
-
-        return ", ".join(get_role_name_display(r) for r in roles)
-
-    @staticmethod
     def get_statuses_data(
         statuses: list[Status],
         statustype_config_mapping: dict | None = None,
@@ -725,61 +616,6 @@ class InnerCaseDetailView(
             }
             for s in statuses
         ]
-
-    @staticmethod
-    def get_case_document_files(
-        zaak: Zaak, api_group: ZGWApiGroupConfig
-    ) -> list[FileItem]:
-        client = api_group.zaken_client
-        case_info_objects = client.fetch_zaak_information_objects(zaak.url)
-
-        # get the information objects for the zaak objects
-
-        # TODO we'd like to use parallel() but it is borked in tests
-        # with parallel() as executor:
-        #     info_objects = executor.map(
-        #         fetch_single_information_object,
-        #         [case_info.informatieobject for case_info in case_info_objects],
-        #     )
-        info_objects = [
-            fetch_single_information_object_from_url(
-                case_info.informatieobject, api_group=api_group
-            )
-            for case_info in case_info_objects
-        ]
-
-        config = OpenZaakConfig.get_solo()
-        documents = []
-        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
-            if not info_obj:
-                continue
-            if not is_info_object_visible(
-                info_obj, config.document_max_confidentiality
-            ):
-                continue
-
-            url = reverse(
-                "cases:document_download",
-                kwargs={
-                    "object_id": zaak.uuid,
-                    "info_id": info_obj.uuid,
-                    "api_group_id": api_group.id,
-                },
-            )
-            documents.append(
-                FileItem.from_informatieobject(info_obj, case_info_obj, url)
-            )
-
-        # `registratiedatum` and `titel` should be present, but not guaranteed by schema
-        try:
-            return sorted(documents, key=lambda doc: doc.created, reverse=True)
-        except TypeError:
-            try:
-                return sorted(
-                    documents, key=lambda doc: doc.name
-                )  # order ascending b/c alphabetical
-            except TypeError:
-                return documents
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

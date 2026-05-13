@@ -430,7 +430,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertTrue(response.context["zaak"]["contact_form_enabled"])
+        self.assertTrue(response.context["zaak"].contact_form_enabled)
         self.assertTrue(contact_form)
 
         mock_send_confirm.assert_not_called()
@@ -454,7 +454,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertTrue(response.context["zaak"]["contact_form_enabled"])
+        self.assertTrue(response.context["zaak"].contact_form_enabled)
         self.assertTrue(contact_form)
 
         mock_send_confirm.assert_not_called()
@@ -475,7 +475,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertTrue(response.context["zaak"]["contact_form_enabled"])
+        self.assertTrue(response.context["zaak"].contact_form_enabled)
         self.assertTrue(contact_form)
 
         mock_send_confirm.assert_not_called()
@@ -499,7 +499,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertFalse(response.context["zaak"]["contact_form_enabled"])
+        self.assertFalse(response.context["zaak"].contact_form_enabled)
         self.assertFalse(contact_form)
 
         mock_send_confirm.assert_not_called()
@@ -522,7 +522,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         response = self.app.get(self.case_detail_url, user=self.user)
         contact_form = response.pyquery("#contact-form")
 
-        self.assertFalse(response.context["zaak"]["contact_form_enabled"])
+        self.assertFalse(response.context["zaak"].contact_form_enabled)
         self.assertFalse(contact_form)
 
         mock_send_confirm.assert_not_called()

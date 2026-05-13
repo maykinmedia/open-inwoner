@@ -15,7 +15,7 @@ from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.constants import TypeAanvraag
-from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.openzaak.services import UserIdentity, ZGWService
 from open_inwoner.openzaak.types import UniformCase
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -40,7 +40,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         return _("Zaaknummer: %(identification)s") % {"identification": identification}
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
-        identity = ZGWService.get_identity_for_request(request)
+        identity = UserIdentity.from_request(request)
         case_service = ZGWService()
 
         # Get plugin instance for title

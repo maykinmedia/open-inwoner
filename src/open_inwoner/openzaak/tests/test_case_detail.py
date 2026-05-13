@@ -1143,7 +1143,7 @@ class TestCaseDetailView(
         case = response.context.get("zaak")
 
         self.assertEqual(
-            case,
+            vars(case),
             {
                 "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
@@ -1216,7 +1216,7 @@ class TestCaseDetailView(
 
         self.assertEqual(len(links), 3)
 
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case.questions):
             self.assertIn(
                 link.attrib["href"],
                 [
@@ -1350,7 +1350,7 @@ class TestCaseDetailView(
 
         case = response.context.get("zaak")
         self.assertEqual(
-            case,
+            vars(case),
             {
                 "id": self.zaak["uuid"],
                 "identification": "ZAAK-2022-0000000024",
@@ -1414,7 +1414,7 @@ class TestCaseDetailView(
 
         self.assertEqual(len(links), 4)
 
-        for link, question in zip(links, case["questions"]):
+        for link, question in zip(links, case.questions):
             self.assertIn(
                 link.attrib["href"],
                 [
@@ -1528,7 +1528,7 @@ class TestCaseDetailView(
         response = self.app.get(self.case_detail_url, user=self.user)
 
         case = response.context.get("zaak")
-        first_status = case["statuses"][0]
+        first_status = case.statuses[0]
 
         self.assertEqual(first_status["status_indicator_text"], "foo")
 
@@ -1700,7 +1700,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        documents = response.context.get("zaak")["documents"]
+        documents = response.context.get("zaak").documents
         self.assertEqual(len(documents), 3)
 
         # order should be reverse of list order from response
@@ -1761,7 +1761,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        documents = response.context.get("zaak")["documents"]
+        documents = response.context.get("zaak").documents
 
         # order of #1 and #2 should be reversed
         self.assertEqual(documents[0].name, "another_document_title")
@@ -1774,7 +1774,7 @@ class TestCaseDetailView(
 
         response = self.app.get(self.case_detail_url, user=self.user)
 
-        self.assertEqual(response.context.get("zaak")["new_docs"], True)
+        self.assertEqual(response.context.get("zaak").new_docs, True)
 
     def test_page_displays_expected_data(self, m):
         self._setUpMocks(m)
@@ -1896,7 +1896,7 @@ class TestCaseDetailView(
         self._setUpMocks(m)
 
         response = self.app.get(self.case_detail_url, user=self.user)
-        documents = response.context.get("zaak", {}).get("documents")
+        documents = response.context.get("zaak").documents
         self.assertEqual(len(documents), 2)
         self.assertEqual(
             documents,
@@ -3457,6 +3457,6 @@ class TestCaseDetailView(
         response = self.app.get(self.case_detail_url, user=self.user)
         case = response.context.get("zaak")
 
-        self.assertEqual(case["statuses"][0]["label"], "Registered")
-        self.assertEqual(case["statuses"][1]["label"], "Modified")
-        self.assertEqual(case["statuses"][2]["label"], "Finish")
+        self.assertEqual(case.statuses[0]["label"], "Registered")
+        self.assertEqual(case.statuses[1]["label"], "Modified")
+        self.assertEqual(case.statuses[2]["label"], "Finish")

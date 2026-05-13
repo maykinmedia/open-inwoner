@@ -48,6 +48,9 @@ class ResolveCaseException(Exception):
     pass
 
 
+# TODO: temporary workaround for our practice of swalling exceptions into None
+# at the client layer. Should be removed when the refactoring of error-handling
+# is completed (see GH #2142)
 class ZaakNotFound(Exception):
     """Raised by check_zaak_access when the zaak cannot be fetched (API error or 404)."""
 
@@ -667,32 +670,27 @@ class ZGWService:
         identity: UserIdentity,
     ) -> str:
         zaken_client = api_group.zaken_client
-        if api_group.fetch_rollen_with_betrokkene_type:
-            if isinstance(identity, BSNIdentity):
-                roles = zaken_client.fetch_zaak_roles(
-                    zaak.url,
-                    betrokkene_type=RolTypes.natuurlijk_persoon,
-                    role_desc_generic=RolOmschrijving.initiator,
-                )
-            elif isinstance(identity, KVKIdentity):
-                if identity.vestigingsnummer:
-                    roles = zaken_client.fetch_zaak_roles(
-                        zaak.url,
-                        betrokkene_type=RolTypes.vestiging,
-                        role_desc_generic=RolOmschrijving.initiator,
-                    )
-                else:
-                    roles = zaken_client.fetch_zaak_roles(
-                        zaak.url,
-                        betrokkene_type=RolTypes.niet_natuurlijk_persoon,
-                        role_desc_generic=RolOmschrijving.initiator,
-                    )
-            else:
-                roles = []
-        else:
+
+        if not api_group.fetch_rollen_with_betrokkene_type:
             roles = zaken_client.fetch_zaak_roles(
                 zaak.url, role_desc_generic=RolOmschrijving.initiator
             )
+        else:
+            match identity:
+                case BSNIdentity():
+                    betrokkene_type = RolTypes.natuurlijk_persoon
+                case KVKIdentity(vestigingsnummer=str()):
+                    betrokkene_type = RolTypes.vestiging
+                case KVKIdentity():
+                    betrokkene_type = RolTypes.niet_natuurlijk_persoon
+                case _:
+                    return ""
+            roles = zaken_client.fetch_zaak_roles(
+                zaak.url,
+                betrokkene_type=betrokkene_type,
+                role_desc_generic=RolOmschrijving.initiator,
+            )
+
         return ", ".join(get_role_name_display(r) for r in roles)
 
     def get_zaak_detail(
@@ -703,7 +701,7 @@ class ZGWService:
     ) -> ZaakDetailData:
         """Fetch and resolve all ZGW API data for the zaak detail page.
 
-        Mutates zaak.status (URL → Status) and each status.statustype (URL → StatusType).
+        Mutates zaak.status (URL → Status) and each status.statustype (URL -> StatusType).
         """
         zaken_client = self._zaken_client_factory(api_group)
         catalogi_client = self._catalogi_client_factory(api_group)

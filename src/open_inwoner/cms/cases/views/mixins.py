@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import Http404, HttpRequest
 from django.template.response import TemplateResponse
@@ -12,6 +14,7 @@ from open_inwoner.cms.cases.metrics import (
     case_document_uploads,
     case_list_views,
 )
+from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import UserIdentity, ZaakNotFound, ZGWService
 from open_inwoner.openzaak.types import UniformCase
@@ -108,6 +111,9 @@ class CaseAccessMixin(AccessMixin):
     - case confidentiality is not higher than globally configured
     """
 
+    zaak: Zaak | None = None
+    api_group: ZGWApiGroupConfig | None = None
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             logger.info("CaseAccessMixin - permission denied: user not authenticated")
@@ -133,15 +139,15 @@ class CaseAccessMixin(AccessMixin):
             try:
                 result = ZGWService().check_zaak_access(object_id, identity, api_group)
             except ZaakNotFound:
-                # API unavailable or zaak removed; let the detail view render gracefully
+                # TODO: distinguish between temporary API failures and genuine 404 when
+                # the refactoring of error-handling is complete (GH #2142)
                 pass
             else:
                 if result is None:
                     return self.handle_no_permission()
                 zaak, api_group = result
-                request.case = zaak
-                request.case_api_group = api_group
-                self.zaak = zaak  # backward compat for detail views not yet handled by ZGWService
+                self.zaak = zaak
+                self.api_group = api_group
 
         return super().dispatch(request, *args, **kwargs)
 
