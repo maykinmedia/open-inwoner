@@ -1,5 +1,31 @@
-2.1.2-rc1 (2026-05-12)
+2.1.2-rc2 (2026-05-13)
 ======================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.2-rc2`.
+
+.. note::
+
+   Dit is een release candidate, bedoeld voor beoordeling en kwaliteitsborging. Deze
+   versie is niet bestemd voor productie. Feedback wordt verwerkt in een volgende RC, of
+   - als er geen problemen worden gevonden - resulteert dit in een definitieve release.
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
+2.1.2-rc1 (2026-05-12)
+=======================
 
 Voor een volledig overzicht van alle commits, zie :release:`v2.1.2-rc1`.
 
