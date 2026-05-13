@@ -1,7 +1,7 @@
 import structlog
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, ZaakType
+from open_inwoner.openzaak.api_models import Rol, ZaakType
 
 from .models import ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
@@ -31,26 +31,6 @@ def is_object_visible(obj, max_confidentiality_level: str) -> bool:
         return False
 
     return True
-
-
-def is_info_object_visible(
-    info_object: InformatieObject, max_confidentiality_level: str
-) -> bool:
-    """
-    Test if a InformatieObject (zaak info object) should be visible to the user.
-
-    We check on its definitive or archived status, and a maximum confidentiality
-    level (compared the ordering from the VertrouwelijkheidsAanduidingen.choices)
-    """
-    if info_object.status not in ["definitief", "gearchiveerd"]:
-        logger.info(
-            "Ignoring informatieobject as not visible for user: status is neither definitief nor gearchiveerd",
-            info_object_url=info_object.url,
-            info_object_status=info_object.status,
-        )
-        return False
-
-    return is_object_visible(info_object, max_confidentiality_level)
 
 
 def get_role_name_display(rol: Rol) -> str:

@@ -54,7 +54,6 @@ from open_inwoner.openzaak.models import (
     ZGWApiGroupConfig,
 )
 from open_inwoner.openzaak.services import ZaakDetailData, ZGWService
-from open_inwoner.openzaak.utils import is_info_object_visible
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
@@ -675,7 +674,11 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         # check if this info_object should be visible
         config = OpenZaakConfig.get_solo()
-        if not is_info_object_visible(info_object, config.document_max_confidentiality):
+        if not service._is_info_object_visible(
+            info_object,
+            config.document_max_confidentiality,
+            config.document_visible_statuses,
+        ):
             raise PermissionDenied()
 
         # retrieve and stream content

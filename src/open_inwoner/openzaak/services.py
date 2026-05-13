@@ -47,7 +47,6 @@ from open_inwoner.openzaak.models import (
 )
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
-    is_info_object_visible,
     is_object_visible,
 )
 from open_inwoner.utils.decorators import cache as cache_result
@@ -247,6 +246,29 @@ class ZGWService:
             return False, SkipReason.CONFIDENTIALITY_TOO_HIGH
 
         return True, None
+
+    @staticmethod
+    def _is_info_object_visible(
+        info_object: InformatieObject,
+        max_confidentiality_level: str,
+        document_visible_statuses: list[str],
+    ) -> bool:
+        """Return True if the informatieobject should be shown to the user."""
+        if (
+            document_visible_statuses
+            and info_object.status not in document_visible_statuses
+        ):
+            logger.debug(
+                "Ignoring informatieobject as not visible for user",
+                info_object_url=info_object.url,
+                info_object_status=info_object.status,
+                document_visible_statuses=document_visible_statuses,
+                status_filtering_active=True,
+                status_visible=False,
+            )
+            return False
+
+        return is_object_visible(info_object, max_confidentiality_level)
 
     # -------------------------------------------------------------------------
     # Zaak list
@@ -997,8 +1019,10 @@ class ZGWService:
                     informatieobject_url=case_info_obj.informatieobject,
                 )
                 continue
-            if not is_info_object_visible(
-                info_obj, config.document_max_confidentiality
+            if not self._is_info_object_visible(
+                info_obj,
+                config.document_max_confidentiality,
+                config.document_visible_statuses,
             ):
                 continue
             documents.append(

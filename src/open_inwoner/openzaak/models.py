@@ -30,7 +30,12 @@ from open_inwoner.openzaak.managers import (
     ZaakTypeStatusTypeConfigQuerySet,
 )
 
-from .constants import StatusIndicators, ZaakBetrokkeneRol, ZaakTitleDisplayChoices
+from .constants import (
+    InformatieObjectStatus,
+    StatusIndicators,
+    ZaakBetrokkeneRol,
+    ZaakTitleDisplayChoices,
+)
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -57,6 +62,13 @@ def generate_default_file_extensions():
             "bmp",
         ]
     )
+
+
+def default_document_visible_statuses():
+    return [
+        InformatieObjectStatus.definitief,
+        InformatieObjectStatus.gearchiveerd,
+    ]
 
 
 class _ZgwClient(Protocol):  # Typing helper to avoid circular imports from .clients
@@ -372,6 +384,19 @@ class OpenZaakConfig(SingletonModel):
         default=VertrouwelijkheidsAanduidingen.openbaar,
         verbose_name=_("Documents confidentiality"),
         help_text=_("Select confidentiality level of documents to display for cases"),
+    )
+    document_visible_statuses = ArrayField(
+        models.CharField(
+            max_length=32,
+            choices=InformatieObjectStatus.choices,
+        ),
+        default=default_document_visible_statuses,
+        verbose_name=_("Visible document statuses"),
+        help_text=_(
+            "Select which document statuses are visible to users. "
+            "Documents with other statuses will be hidden. "
+            "Warning: selecting no statuses means documents with any status will be visible."
+        ),
     )
     max_upload_size = models.PositiveIntegerField(
         verbose_name=_("Max upload file size (in MB)"),
