@@ -1,5 +1,10 @@
 name: readthedocs/actions
 on:
+  # zizmor: ignore[dangerous-triggers]
+  # Safe because this workflow has NO checkout step — the PR's code is never
+  # fetched or run. pull_request_target is required so the action can post a
+  # comment on fork PRs (pull_request lacks write permissions for forks).
+  # WARNING: never add actions/checkout here; that would expose secrets to PR authors.
   pull_request_target:
     types:
       - opened

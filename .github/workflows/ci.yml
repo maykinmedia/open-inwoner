@@ -13,6 +13,8 @@ on:
 env:
   IMAGE_NAME: maykinmedia/open-inwoner
 
+permissions: {}
+
 jobs:
   #
   # Unit and integration tests
@@ -21,6 +23,8 @@ jobs:
     name: Run the Django test suite
     runs-on:
       ${{ matrix.test-type == 'main' && 'maykin-runner' || 'ubuntu-latest' }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         test-type: [main, elastic, migrations]
@@ -47,14 +51,16 @@ jobs:
           - 9200:9200
           - 9300:9300
       redis:
-        image: redis
+        image: redis:6
         ports:
           - 6379:6379
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@v1.3
+        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
@@ -98,7 +104,7 @@ jobs:
           OTEL_SDK_DISABLED: true
 
       - name: Persist coverage data files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ matrix.test-type }}
           path: .coverage*
@@ -109,18 +115,22 @@ jobs:
     needs: tests
     name: Upload coverage information to codecov
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Set up Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version-file: 'pyproject.toml'
       - name: Install coverage.py
         # We only need coverage, but we need to match the version that was used
         # to generate the coverage files. Grab it from the dependencies.
         run: grep "^coverage" requirements/ci.txt | xargs -r pip install
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: coverages
       - name: Combine the coverage files
@@ -139,6 +149,8 @@ jobs:
   #
   e2etests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         browser:
@@ -179,9 +191,11 @@ jobs:
           --health-timeout 30s --health-retries 5 --health-start-period 120s
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@v1.3
+        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
@@ -212,7 +226,7 @@ jobs:
           CLAMAV_PORT: 3310
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: e2e-test-results-${{ matrix.browser }}
@@ -225,13 +239,16 @@ jobs:
   docs:
     name: Build and check documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           submodules: 'true'
+          persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@v1.3
+        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev
@@ -255,17 +272,21 @@ jobs:
 
     name: Build (and push) Docker image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Set tag
         id: vars
         run: |
           # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION=$(echo "${GITHUB_REF}" | sed -e 's,.*/\(.*\),\1,')
 
           # Strip "v" prefix from tag name (if present at all)
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [[ "${GITHUB_REF}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Use Docker `latest` tag convention
           [ "$VERSION" == "develop" ] && VERSION=latest
