@@ -30,6 +30,13 @@ class ZaakBetrokkeneRol(models.TextChoices):
     initiator = "initiator", _("Initiator")
 
 
+class InformatieObjectStatus(models.TextChoices):
+    in_bewerking = "in_bewerking", _("In bewerking")
+    ter_vaststelling = "ter_vaststelling", _("Ter vaststelling")
+    definitief = "definitief", _("Definitief")
+    gearchiveerd = "gearchiveerd", _("Gearchiveerd")
+
+
 class TypeAanvraag(Enum):
     ZAAK = "Zaak"
     FORMULIER = "Formulier"  # "openstaande inzending/formulier"

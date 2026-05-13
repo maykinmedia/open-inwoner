@@ -140,6 +140,9 @@ Wanneer u de geavanceerde opties zichtbaar maakt, krijgt u extra opties om de ve
    :width: 624px
    :height: 840px
 
+**Zichtbare documentstatussen**
+Hier kiest u welke statussen een document moet hebben om zichtbaar te zijn voor de gebruiker. Standaard zijn dit *Definitief* en *Gearchiveerd*. U kunt kiezen uit: *In bewerking*, *Ter vaststelling*, *Definitief* en *Gearchiveerd*. Documenten met een andere status worden niet getoond. **Let op:** wanneer u geen enkele status selecteert, worden documenten met *alle* statussen getoond.
+
 **Standaard actie deadline termijn in dagen**
 Hier stelt u in hoeveel dagen de gebruiker standaard krijgt om actie te ondernemen.
 

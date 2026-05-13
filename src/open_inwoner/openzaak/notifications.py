@@ -33,7 +33,6 @@ from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.utils import (
     get_zaak_type_config,
     get_zaak_type_info_object_type_config,
-    is_info_object_visible,
 )
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -242,7 +241,11 @@ def _handle_zaakinformatieobject_notification(
 
     ziobj.informatieobject = info_object
 
-    if not is_info_object_visible(info_object, oz_config.document_max_confidentiality):
+    if not service._is_info_object_visible(
+        info_object,
+        oz_config.document_max_confidentiality,
+        oz_config.document_visible_statuses,
+    ):
         log_system_action(
             f"ignored {r} notification: informatieobject not visible after "
             f"applying website visibility filter for zaak {zaak.url}",
