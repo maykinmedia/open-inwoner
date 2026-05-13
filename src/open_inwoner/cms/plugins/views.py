@@ -11,11 +11,11 @@ import structlog
 from furl import furl
 
 from open_inwoner.cms.cases.views.mixins import CaseLogMixin
-from open_inwoner.cms.cases.views.services import CaseListService
 from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.constants import TypeAanvraag
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.types import UniformCase
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -40,7 +40,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         return _("Zaaknummer: %(identification)s") % {"identification": identification}
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
-        case_service = CaseListService(request)
+        identity = ZGWService.get_identity_for_request(request)
+        case_service = ZGWService()
 
         # Get plugin instance for title
         try:
@@ -75,13 +76,17 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             "We're experiencing technical difficulties. Some results may be missing from your cases."
         )
         try:
-            formulieren: Sequence[UniformCase] | None = case_service.get_formulieren()
+            formulieren: Sequence[UniformCase] | None = case_service.get_formulieren(
+                identity
+            )
         except Exception:
             logger.error("Failed to retrieve formulieren", user=request.user)
             formulieren = None
             msg = partial_error_msg
         try:
-            preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken()
+            preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken(
+                identity
+            )
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
             preprocessed_zaken = None

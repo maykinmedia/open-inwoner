@@ -136,11 +136,11 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_zaken",
+        "open_inwoner.cms.plugins.views.ZGWService.get_zaken",
         return_value=[],
     )
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_endpoint_returns_empty_state(
@@ -163,9 +163,9 @@ class CMSZakenPluginTest(TestCase):
         # Should have no zaak items
         self.assertNotIn("oip-home-plugin-card", content)
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_endpoint_returns_cases(self, mock_formulieren, mock_zaken):
@@ -205,8 +205,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_endpoint_complete_failure(self, mock_formulieren, mock_zaken):
         mock_zaken.side_effect = Exception("Cases API error")
         mock_formulieren.side_effect = Exception("formulieren API error")
@@ -226,8 +226,8 @@ class CMSZakenPluginTest(TestCase):
         # Should have no zaak items
         self.assertNotIn("oip-home-plugin-card", content)
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_endpoint_partial_failure(self, mock_formulieren, mock_zaken):
         api_group = ZGWApiGroupConfigFactory()
 
@@ -267,9 +267,9 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(len(error_slot), 1)
         self.assertIn("technisch probleem", error_slot.text().lower())
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_num_zaken_parameter_limits_results(self, mock_formulieren, mock_zaken):
@@ -315,8 +315,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("ZAAK-001", identifications)
         self.assertIn("ZAAK-002", identifications)
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_num_zaken_parameter_with_mixed_formulieren_and_cases(
         self, mock_formulieren, mock_zaken
     ):
@@ -381,9 +381,9 @@ class CMSZakenPluginTest(TestCase):
         # But not the 3rd case
         self.assertNotIn("ZAAK-002", identifications)
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_num_zaken_parameter_invalid_input(self, mock_formulieren, mock_zaken):
@@ -426,9 +426,9 @@ class CMSZakenPluginTest(TestCase):
                 # Should return MAX_CASES_DEFAULT
                 self.assertEqual(len(zaak_items), MAX_CASES_DEFAULT)
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_maps_naam_to_description(self, mock_formulieren, mock_zaken):
@@ -462,9 +462,9 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("Zaaknummer:", zaak_item.attr("description"))
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
     @patch(
-        "open_inwoner.cms.plugins.views.CaseListService.get_formulieren",
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_handles_missing_optional_fields(
@@ -500,8 +500,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(zaak_item.attr("identificatie"), "")
         self.assertEqual(zaak_item.attr("description"), "")
 
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_zaken")
-    @patch("open_inwoner.cms.plugins.views.CaseListService.get_formulieren")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_handles_both_naam_and_description_fields(
         self, mock_formulieren, mock_zaken
     ):

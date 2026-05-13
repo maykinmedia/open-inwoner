@@ -1,4 +1,5 @@
-from typing import Sequence
+import enum
+from typing import Iterable, Sequence
 
 from django.shortcuts import render
 from django.urls import reverse
@@ -11,15 +12,44 @@ from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
+from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.services import (
+    FormulierWithApiGroup,
+    UserIdentity,
+    ZaakWithApiGroup,
+    ZGWService,
+)
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
-from .services import CaseFilterFormOption, CaseListService
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class CaseFilterFormOption(enum.Enum):
+    FORMULIER = _("Openstaande formulieren")
+    ZAAK_OPEN = _("Lopende aanvragen")
+    ZAAK_AFGEROND = _("Afgeronde aanvragen")
+
+
+def _get_zaak_filter_status(zaak: Zaak) -> CaseFilterFormOption:
+    if zaak.einddatum:
+        return CaseFilterFormOption.ZAAK_AFGEROND
+    return CaseFilterFormOption.ZAAK_OPEN
+
+
+def _get_zaak_status_frequencies(
+    zaken: Iterable[ZaakWithApiGroup],
+    formulieren: Iterable[FormulierWithApiGroup],
+) -> dict[CaseFilterFormOption, int]:
+    zaak_statuses = [_get_zaak_filter_status(zaak.zaak) for zaak in zaken]
+    zaak_statuses += [CaseFilterFormOption.FORMULIER for _ in formulieren]
+    return {
+        status: zaak_statuses.count(status) for status in list(CaseFilterFormOption)
+    }
 
 
 class OuterCaseListView(
@@ -74,15 +104,16 @@ class InnerCaseListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         config = OpenZaakConfig.get_solo()
-        case_service = CaseListService(self.request)
+        identity = UserIdentity.from_request(self.request)
+        case_service = ZGWService()
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
         # update ctx with formulieren and cases (possibly filtered)
-        formulieren: Sequence[UniformCase] = case_service.get_formulieren()
-        preprocessed_zaken: Sequence[UniformCase] = case_service.get_zaken()
+        formulieren: Sequence[UniformCase] = case_service.get_formulieren(identity)
+        preprocessed_zaken: Sequence[UniformCase] = case_service.get_zaken(identity)
 
         if config.zaken_filter_enabled:
-            case_status_frequencies = case_service.get_zaak_status_frequencies(
+            case_status_frequencies = _get_zaak_status_frequencies(
                 zaken=preprocessed_zaken,
                 formulieren=formulieren,
             )
@@ -112,7 +143,7 @@ class InnerCaseListView(
                 preprocessed_zaken = [
                     zaak
                     for zaak in preprocessed_zaken
-                    if case_service.get_zaak_filter_status(zaak.zaak) in statuses
+                    if _get_zaak_filter_status(zaak.zaak) in statuses
                 ]
 
         paginator_dict = self.paginate_with_context([*formulieren, *preprocessed_zaken])
