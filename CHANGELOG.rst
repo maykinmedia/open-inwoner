@@ -54,6 +54,8 @@ Bugfixes
   die mogelijk beschadigd zijn.
 * [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
   te voorkomen.
+* [:gh:`2449`]: Het ‘formaat' van een bestand wordt ingesteld op het inhoudstype van de
+  upload wanneer het naar een zaak wordt geüpload, zodat er een voorbeeld beschikbaar komt.
 
 Onderhoud
 ---------

@@ -751,6 +751,8 @@ class DocumentenClient(ZgwAPIClient):
             "taal": "dut",
             "informatieobjecttype": informatieobjecttype_url,
         }
+        if file.content_type:
+            document_body["formaat"] = file.content_type
 
         try:
             response = self.post("enkelvoudiginformatieobjecten", json=document_body)
