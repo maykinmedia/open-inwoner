@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-11 16:05+0200\n"
+"POT-Creation-Date: 2026-05-13 10:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2512,8 +2512,8 @@ msgstr "nog onbekend"
 #: open_inwoner/openzaak/api_models.py:82
 #: open_inwoner/openzaak/notifications.py:177
 #: open_inwoner/openzaak/tests/test_api_models.py:85
-#: open_inwoner/userfeed/hooks/case_status.py:28
-#: open_inwoner/userfeed/hooks/case_status.py:103
+#: open_inwoner/userfeed/hooks/case_status.py:27
+#: open_inwoner/userfeed/hooks/case_status.py:102
 msgid "No data available"
 msgstr "Geen data beschikbaar"
 
@@ -2801,6 +2801,7 @@ msgid "The number of zaken that are displayed in the plugin"
 msgstr "Het aantal zaken dat wordt getoond binnen het plugin blok"
 
 #: open_inwoner/cms/plugins/views.py:40
+#, python-format
 msgid "Zaaknummer: %(identification)s"
 msgstr "Zaaknummer: %(identification)s"
 
@@ -9326,15 +9327,17 @@ msgstr "Document '{title}' is toegevoegd"
 msgid "onbekend"
 msgstr "onbekend"
 
-#: open_inwoner/userfeed/hooks/case_status.py:72
+#: open_inwoner/userfeed/hooks/case_status.py:71
 msgid "Case status update"
 msgstr "Zaakstatus gewijzigd"
 
-#: open_inwoner/userfeed/hooks/case_status.py:73
-#: open_inwoner/userfeed/tests/hooks/test_case_status.py:108
+#: open_inwoner/userfeed/hooks/case_status.py:72
+#: open_inwoner/userfeed/tests/hooks/test_case_status.py:64
+#: open_inwoner/userfeed/tests/hooks/test_case_status.py:109
+#: open_inwoner/userfeed/tests/hooks/test_case_status.py:179
 #, python-brace-format
-msgid "Case status has been changed to '{status}'"
-msgstr "Zaakstatus is veranderd naar '{status}'"
+msgid "Case status has been changed to \"{status}\""
+msgstr "Zaakstatus is veranderd naar \"{status}\""
 
 #: open_inwoner/userfeed/hooks/plan.py:53
 msgid "Plan expiring"
@@ -9371,7 +9374,7 @@ msgid "External object de-duplication"
 msgstr "Extern objectondubbeling"
 
 #: open_inwoner/userfeed/summarize.py:24
-#: open_inwoner/userfeed/tests/hooks/test_case_status.py:77
+#: open_inwoner/userfeed/tests/hooks/test_case_status.py:79
 #, python-brace-format
 msgid "In {count} case the status has changed"
 msgid_plural "In {count} cases the status has changed"
@@ -9392,11 +9395,6 @@ msgid "There is {count} message"
 msgid_plural "There are {count} messages"
 msgstr[0] "Er is {count} openstaande actie"
 msgstr[1] "Er zijn {count} openstaande acties"
-
-#: open_inwoner/userfeed/tests/hooks/test_case_status.py:64
-#: open_inwoner/userfeed/tests/hooks/test_case_status.py:179
-msgid "Case status has been changed to 'initial'"
-msgstr "Zaakstatus is veranderd naar 'initial'"
 
 #: open_inwoner/utils/admin.py:24 open_inwoner/utils/admin.py:138
 msgid "Actie"
@@ -9546,6 +9544,9 @@ msgstr "Het vestigingsnummer moet numeriek zijn."
 #: open_inwoner/utils/validators.py:211
 msgid "Valid strings must include at least one non-space character"
 msgstr "Een geldige invoer bevat minimaal één teken dat geen spatie is."
+
+#~ msgid "Case status has been changed to 'initial'"
+#~ msgstr "Zaakstatus is veranderd naar 'initial'"
 
 #~ msgid "Objects API client configuration"
 #~ msgstr "Objecten API client configuratie"
