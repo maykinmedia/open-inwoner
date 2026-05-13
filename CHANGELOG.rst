@@ -56,6 +56,8 @@ Bugfixes
   te voorkomen.
 * [:gh:`2449`]: Het ‘formaat' van een bestand wordt ingesteld op het inhoudstype van de
   upload wanneer het naar een zaak wordt geüpload, zodat er een voorbeeld beschikbaar komt.
+* [:gh:`2438`]: Lange bestandsnamen in notificaties worden nu correct afgebroken zodat ze niet
+  buiten de notificatie vallen.
 
 Onderhoud
 ---------
