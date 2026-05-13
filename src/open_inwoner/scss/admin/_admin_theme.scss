@@ -38,13 +38,29 @@ a:hover {
   }
 }
 
-#user-tools a {
+#user-tools a,
+#user-tools button {
   border-bottom: none;
   text-decoration: underline;
 
   &:focus,
   &:hover {
     color: $color_darkest;
+  }
+}
+
+#user-tools button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  // font: inherit;
+  color: inherit;
+
+  &:focus,
+  &:hover {
+    background: none;
+    text-decoration: none;
   }
 }
 

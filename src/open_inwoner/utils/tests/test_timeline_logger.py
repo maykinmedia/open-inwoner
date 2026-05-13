@@ -81,7 +81,7 @@ class TestAdminTimelineLogging(WebTest):
     def test_deleted_object_is_logged(self):
         plan = PlanFactory(created_by=self.user)
         url = reverse("admin:plans_plan_delete", kwargs={"object_id": plan.id})
-        delete_form = self.app.get(url, user=self.user).forms[0]
+        delete_form = self.app.get(url, user=self.user).forms[1]
         delete_form.submit()
 
         log_entry = TimelineLog.objects.last()
@@ -173,7 +173,7 @@ class TestAdminTimelineLogging(WebTest):
     def test_get_action_returns_delete_when_object_is_deleted(self):
         plan = PlanFactory()
         url = reverse("admin:plans_plan_delete", kwargs={"object_id": plan.id})
-        form = self.app.get(url, user=self.user).forms[0]
+        form = self.app.get(url, user=self.user).forms[1]
         form.submit()
 
         log_entry = TimelineLog.objects.last()
@@ -206,9 +206,9 @@ class TestTimelineLogExport(WebTest):
     @freeze_time("2021-10-18 13:00:00")
     def test_proper_data_is_exported(self):
         user = UserFactory(is_superuser=True, is_staff=True)
-        form = self.app.get(
-            reverse("admin:timeline_logger_timelinelog_export"), user=user
-        ).forms[0]
+        export_url = reverse("admin:timeline_logger_timelinelog_export")
+        response = self.app.get(export_url, user=user)
+        form = next(f for f in response.forms.values() if "file_format" in f.fields)
 
         # csv format chosen
         form["file_format"] = "0"
