@@ -65,7 +65,7 @@ jobs:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
             postgresql-client libgdal-dev gdal-bin'
-          python-version: '3.12'
+          python-version: '3.13'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
           setup-node: 'yes'
@@ -200,7 +200,7 @@ jobs:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
             postgresql-client libgdal-dev gdal-bin'
-          python-version: '3.12'
+          python-version: '3.13'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
           setup-node: 'yes'
@@ -253,7 +253,7 @@ jobs:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev
             gdal-bin graphviz'
-          python-version: '3.12'
+          python-version: '3.13'
           setup-node: 'no'
 
       - name: Build and test docs
