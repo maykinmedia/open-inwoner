@@ -229,18 +229,20 @@ class ZGWService:
                 )
                 for group in all_api_groups
             ]
-
-        try:
-            for task in concurrent.futures.as_completed(
-                futures,
-                timeout=self._timeouts["fetch_formulieren"],
-            ):
-                try:
-                    subs_with_api_group.extend(task.result())
-                except BaseException:
-                    logger.exception("Error fetching and pre-processing formulieren")
-        except concurrent.futures.TimeoutError:
-            logger.warning("Timeout while fetching formulieren")
+            try:
+                for task in concurrent.futures.as_completed(
+                    futures,
+                    timeout=self._timeouts["fetch_formulieren"],
+                ):
+                    try:
+                        subs_with_api_group.extend(task.result())
+                    except BaseException:
+                        logger.exception(
+                            "Error fetching and pre-processing formulieren"
+                        )
+            # TODO: add OTEL metrics
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timeout while fetching formulieren")
 
         subs_with_api_group.sort(
             key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
@@ -397,18 +399,18 @@ class ZGWService:
                 )
                 for group in all_api_groups
             ]
-
-        try:
-            for task in concurrent.futures.as_completed(
-                futures,
-                timeout=self._timeouts["fetch_raw_zaken"],
-            ):
-                try:
-                    fetched_zaken.extend(task.result())
-                except BaseException:
-                    logger.exception("Error fetching raw zaken for group")
-        except concurrent.futures.TimeoutError:
-            logger.warning("Timed out fetching raw zaken", exc_info=True)
+            try:
+                for task in concurrent.futures.as_completed(
+                    futures,
+                    timeout=self._timeouts["fetch_raw_zaken"],
+                ):
+                    try:
+                        fetched_zaken.extend(task.result())
+                    except BaseException:
+                        logger.exception("Error fetching raw zaken for group")
+            # TODO: add OTEL metrics
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timed out fetching raw zaken", exc_info=True)
 
         return fetched_zaken
 
@@ -450,28 +452,26 @@ class ZGWService:
         )
 
         fetched_zaken: list[ZaakWithApiGroup] = []
-        fetch_raw_zaken_futures: list[
-            concurrent.futures.Future[list[ZaakWithApiGroup]]
-        ] = []
         with parallel(max_workers=self._max_workers) as executor:
-            fetch_raw_zaken_futures.extend(
-                executor.submit(self._get_raw_zaken_for_api_group, group, user_identification)
+            futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = [
+                executor.submit(
+                    self._get_raw_zaken_for_api_group, group, user_identification
+                )
                 for group in all_api_groups
-            )
+            ]
+            try:
+                for task in concurrent.futures.as_completed(
+                    futures,
+                    timeout=self._timeouts["fetch_raw_zaken"],
+                ):
+                    raw_zaken_for_group = task.result()
+                    fetched_zaken.extend(raw_zaken_for_group)
+            # TODO: add OTEL metrics
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timed out fetching raw zaken for group", exc_info=True)
+            except BaseException:
+                logger.exception("Unhandled error fetching raw zaken")
 
-        try:
-            for task in concurrent.futures.as_completed(
-                fetch_raw_zaken_futures,
-                timeout=self._timeouts["fetch_raw_zaken"],
-            ):
-                raw_zaken_for_group = task.result()
-                fetched_zaken.extend(raw_zaken_for_group)
-        except concurrent.futures.TimeoutError:
-            logger.warning("Timed out fetching raw zaken for group", exc_info=True)
-        except BaseException:
-            logger.exception("Unhandled error fetching raw zaken")
-
-        all_futures: list[concurrent.futures.Future[None]] = []
         zaak_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
             defaultdict(list)
         )
@@ -486,18 +486,7 @@ class ZGWService:
             for zaak_with_group in fetched_zaken:
                 for func in resolver_functions:
                     future = executor.submit(func, zaak_with_group)
-                    all_futures.append(future)
                     zaak_futures[zaak_with_group].append(future)
-
-        try:
-            concurrent.futures.wait(
-                all_futures,
-                timeout=self._timeouts["resolve_zaken"],
-            )
-        except concurrent.futures.TimeoutError:
-            logger.warning("Timed out resolving zaken", exc_info=True)
-        except BaseException:
-            logger.exception("Unhandled error during zaak resolution")
 
         resolved_zaken: list[ZaakWithApiGroup] = []
         for zaak, futures in zaak_futures.items():
@@ -544,7 +533,7 @@ class ZGWService:
             )
             zaak_with_api_group.zaak.zaaktype_config = zaaktype_config
 
-            if zaaktype_config and zaak_with_api_group.zaak.status:
+            if zaak_with_api_group.zaak.status:
                 statustype_config = ZaakTypeStatusTypeConfig.objects.get(
                     zaaktype_config=zaaktype_config,
                     statustype_url=zaak_with_api_group.zaak.status.statustype.url,
