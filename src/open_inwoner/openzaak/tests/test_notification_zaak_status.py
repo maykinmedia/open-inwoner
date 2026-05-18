@@ -6,7 +6,7 @@ from django.test import RequestFactory, TestCase, override_settings
 import requests_mock
 from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
@@ -17,7 +17,7 @@ from open_inwoner.openzaak.notifications import (
     _handle_status_update,
     handle_zaken_notification,
 )
-from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, Lookups
 
 from .factories import (
@@ -26,6 +26,7 @@ from .factories import (
     ZaakTypeStatusTypeConfigFactory,
 )
 from .helpers import copy_with_new_uuid
+from .shared import ZAKEN_ROOT
 from .test_notification_data import MockAPIData, MockAPIDataAlt
 
 
@@ -200,6 +201,75 @@ class StatusNotificationHandlerTestCase(
     def test_status_bails_when_no_roles_found_for_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["case_roles"])
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+        self.assertTimelineLog(
+            "ignored status notification: cannot retrieve rollen for zaak https://",
+            lookup=Lookups.startswith,
+            level=logging.INFO,
+        )
+
+    def test_handle_zaak_status_notifications_with_betrokkene_type_flag(
+        self, m, mock_handle: Mock
+    ):
+        """
+        Happy path when fetch_rollen_with_betrokkene_type=True: roles are fetched per
+        betrokkene type and the handler correctly finds users and proceeds.
+        """
+        MockAPIData.api_group.fetch_rollen_with_betrokkene_type = True
+        MockAPIData.api_group.save()
+
+        data = MockAPIData().install_mocks(m)
+        zaak_url = data.zaak["url"]
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={RolTypes.natuurlijk_persoon}",
+            json=paginated_response(data.case_roles),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={RolTypes.niet_natuurlijk_persoon}",
+            json=paginated_response([]),
+        )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={RolTypes.vestiging}",
+            json=paginated_response([]),
+        )
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+
+        handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_called_once()
+        args = mock_handle.call_args.args
+        self.assertEqual(args[1], data.user_initiator)
+        self.assertEqual(args[2].url, data.zaak["url"])
+
+    def test_status_bails_when_no_roles_found_with_betrokkene_type_flag(
+        self, m, mock_handle: Mock
+    ):
+        """
+        When fetch_rollen_with_betrokkene_type=True, empty results across all betrokkene
+        type queries cause the handler to bail.
+        """
+        MockAPIData.api_group.fetch_rollen_with_betrokkene_type = True
+        MockAPIData.api_group.save()
+
+        data = MockAPIData().install_mocks(m)
+        zaak_url = data.zaak["url"]
+        for betrokkene_type in RolTypes:
+            m.get(
+                f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={betrokkene_type}",
+                json=paginated_response([]),
+            )
 
         handle_zaken_notification(data.status_notification)
 
