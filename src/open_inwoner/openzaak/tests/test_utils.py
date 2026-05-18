@@ -6,11 +6,11 @@ from zgw_consumers.test import generate_oas_component
 
 from open_inwoner.openzaak.api_models import InformatieObject, Zaak, ZaakType
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.tests.factories import generate_rol
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_info_object_visible,
-    is_zaak_visible,
 )
 from open_inwoner.utils.test import ClearCachesMixin
 
@@ -137,32 +137,32 @@ class TestUtils(ClearCachesMixin, TestCase):
             with self.assertRaisesMessage(
                 ValueError, "expected zaak.zaaktype to be resolved from url to model"
             ):
-                is_zaak_visible(zaak)
+                ZGWService._is_zaak_visible(zaak)
 
         # resolve the zaaktype
         zaak.zaaktype = zaaktype
 
         with self.subTest("normal visible without status"):
-            self.assertFalse(is_zaak_visible(zaak))
+            self.assertFalse(ZGWService._is_zaak_visible(zaak))
 
         config.show_cases_without_status = True
         config.save()
 
         with self.subTest("normal visible"):
-            self.assertTrue(is_zaak_visible(zaak))
+            self.assertTrue(ZGWService._is_zaak_visible(zaak))
 
         with self.subTest("invisible when zaaktype intern"):
             zaaktype.indicatie_intern_of_extern = "intern"
-            self.assertFalse(is_zaak_visible(zaak))
+            self.assertFalse(ZGWService._is_zaak_visible(zaak))
 
         with self.subTest("invisible when zaak vertrouwelijkheidaanduiding too high"):
             zaaktype.indicatie_intern_of_extern = "extern"
             zaak.vertrouwelijkheidaanduiding = VertrouwelijkheidsAanduidingen.geheim
-            self.assertFalse(is_zaak_visible(zaak))
+            self.assertFalse(ZGWService._is_zaak_visible(zaak))
 
         with self.subTest("invisible when zaaktype not properly resolved"):
             zaak.zaaktype = None
-            self.assertFalse(is_zaak_visible(zaak))
+            self.assertFalse(ZGWService._is_zaak_visible(zaak))
 
     def test_get_role_name_display(self):
         with self.subTest("natuurlijk_persoon > all fields"):

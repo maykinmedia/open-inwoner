@@ -9,9 +9,9 @@ from treebeard.mp_tree import MP_NodeQuerySet
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
 from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZaakTypeConfig
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.views import LogMixin
 
 
@@ -52,17 +52,12 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
         """
         Returns the categories linked to ZaakTypen for which the request's user has Zaken.
         """
-        if not request.user.bsn and not request.user.kvk:
+        user_identity = UserIdentity.from_request(request)
+        if not user_identity:
             return self
 
-        clients = build_zaken_clients()
-        proxy_result = MultiZgwClientProxy(clients)
-        proxy_result = proxy_result.fetch_zaken(UserIdentity.from_request(request))
-        if proxy_result.has_errors:
-            self.log_system_action("unable to retrieve cases", user=request.user)
-
-        cases = proxy_result.join_results()
-
+        raw_zaken = ZGWService().get_raw_zaken(user_identity)
+        cases = [z.zaak for z in raw_zaken]
         return self.filter_by_zaken(cases)
 
     def filter_by_zaken(self, cases: list[Zaak]):

@@ -15,10 +15,12 @@ from zgw_consumers.concurrent import parallel
 from open_inwoner.openzaak.api_models import (
     Formulier,
     InformatieObject,
+    Rol,
     Status,
     StatusType,
     Zaak,
     ZaakInformatieObject,
+    ZaakType,
 )
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
@@ -38,7 +40,7 @@ from open_inwoner.openzaak.models import (
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_info_object_visible,
-    is_zaak_visible,
+    is_object_visible,
 )
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -161,6 +163,31 @@ class ZGWService:
     def _catalogi_client_factory(group: ZGWApiGroupConfig) -> CatalogiClient:
         return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
 
+    @staticmethod
+    def _is_zaak_visible(zaak: Zaak) -> bool:
+        config = OpenZaakConfig.get_solo()
+        if isinstance(zaak.zaaktype, str):
+            raise ValueError("expected zaak.zaaktype to be resolved from url to model")
+        if not zaak.status and not config.show_cases_without_status:
+            logger.info(
+                "Ignoring zaak as not visible for users: zaak has no status and show_cases_without_status is disabled",
+                zaak_url=zaak.url,
+            )
+            return False
+        if not zaak.zaaktype:
+            logger.info(
+                "Ignoring zaak as not visible for users: zaak has no zaaktype",
+                zaak_url=zaak.url,
+            )
+            return False
+        if zaak.zaaktype.indicatie_intern_of_extern != "extern":
+            logger.info(
+                "Ignoring zaak as not visible for users: zaaktype is intern",
+                zaak_url=zaak.url,
+            )
+            return False
+        return is_object_visible(zaak, config.zaak_max_confidentiality)
+
     def _get_formulieren_for_api_group(
         self, group: ZGWApiGroupConfig, user_identity: UserIdentity
     ) -> list[FormulierWithApiGroup]:
@@ -217,6 +244,66 @@ class ZGWService:
 
         return subs_with_api_group
 
+    def fetch_zaak_by_url(
+        self, zaak_url: str, api_group: ZGWApiGroupConfig
+    ) -> Zaak | None:
+        return self._zaken_client_factory(api_group).fetch_zaak_by_url_no_cache(
+            zaak_url
+        )
+
+    def fetch_status_history(
+        self, zaak_url: str, api_group: ZGWApiGroupConfig
+    ) -> list[Status]:
+        client = self._zaken_client_factory(api_group)
+        if self._use_cache:
+            return client.fetch_status_history(zaak_url)
+        return client.fetch_status_history_no_cache(zaak_url)
+
+    def fetch_zaak_roles(
+        self, zaak_url: str, api_group: ZGWApiGroupConfig
+    ) -> list[Rol]:
+        client = self._zaken_client_factory(api_group)
+        if not client.fetch_rollen_with_betrokkene_type:
+            return client.fetch_zaak_roles(zaak_url)
+        # Only query types that can map to a user account; medewerker and
+        # organisatorische_eenheid are internal government roles and some
+        # backends (e.g. iConnect/Decos) reject those types with a 400.
+        available_user_betrokkene_types = (
+            RolTypes.natuurlijk_persoon,
+            RolTypes.niet_natuurlijk_persoon,
+            RolTypes.vestiging,
+        )
+        roles = []
+        for betrokkene_type in available_user_betrokkene_types:
+            roles += client.fetch_zaak_roles(zaak_url, betrokkene_type=betrokkene_type)
+        return roles
+
+    def fetch_zaaktype_by_url(
+        self, zaaktype_url: str, api_group: ZGWApiGroupConfig
+    ) -> ZaakType | None:
+        return self._catalogi_client_factory(api_group).fetch_single_zaaktype(
+            zaaktype_url
+        )
+
+    def fetch_single_zaak_information_object(
+        self, ziobj_url: str, api_group: ZGWApiGroupConfig
+    ) -> ZaakInformatieObject | None:
+        return self._zaken_client_factory(
+            api_group
+        ).fetch_single_zaak_information_object(ziobj_url)
+
+    def fetch_single_status(
+        self, status_url: str, api_group: ZGWApiGroupConfig
+    ) -> Status | None:
+        return self._zaken_client_factory(api_group).fetch_single_status(status_url)
+
+    def fetch_single_status_type(
+        self, status_type_url: str, api_group: ZGWApiGroupConfig
+    ) -> StatusType | None:
+        return self._catalogi_client_factory(api_group).fetch_single_status_type(
+            status_type_url
+        )
+
     def check_zaak_access(
         self,
         zaak_id: str,
@@ -261,17 +348,22 @@ class ZGWService:
             logger.info("check_zaak_access: no zaaktype for zaak", zaak_url=zaak.url)
             return None
 
-        if not is_zaak_visible(zaak):
+        if not self._is_zaak_visible(zaak):
             logger.info("check_zaak_access: zaak not visible", zaak_url=zaak.url)
             return None
 
         return zaak, api_group
 
     def _get_raw_zaken_for_api_group(
-        self, group: ZGWApiGroupConfig, user_identity: UserIdentity
+        self,
+        group: ZGWApiGroupConfig,
+        user_identity: UserIdentity,
+        zaak_identificatie: str | None = None,
     ) -> list[ZaakWithApiGroup]:
         raw_zaken = group.zaken_client.fetch_zaken(
-            user_identity, use_rsin=group.fetch_eherkenning_zaken_with_rsin
+            user_identity,
+            use_rsin=group.fetch_eherkenning_zaken_with_rsin,
+            identificatie=zaak_identificatie,
         )
         return [
             ZaakWithApiGroup(
@@ -280,7 +372,11 @@ class ZGWService:
             for raw_zaak in raw_zaken
         ]
 
-    def get_raw_zaken(self, user_identity: UserIdentity) -> list[ZaakWithApiGroup]:
+    def get_raw_zaken(
+        self,
+        user_identity: UserIdentity,
+        zaak_identificatie: str | None = None,
+    ) -> list[ZaakWithApiGroup]:
         """Fetch zaken without resolution. For PDC and cache seeding."""
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related("zrc_service").all()
@@ -289,7 +385,12 @@ class ZGWService:
         fetched_zaken: list[ZaakWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
-                executor.submit(self._get_raw_zaken_for_api_group, group, user_identity)
+                executor.submit(
+                    self._get_raw_zaken_for_api_group,
+                    group,
+                    user_identity,
+                    zaak_identificatie,
+                )
                 for group in all_api_groups
             ]
 
@@ -306,6 +407,26 @@ class ZGWService:
             logger.warning("Timed out fetching raw zaken", exc_info=True)
 
         return fetched_zaken
+
+    def search_zaken(
+        self, user_identity: UserIdentity, zaak_identificatie: str
+    ) -> list[ZaakWithApiGroup]:
+        """Search for a zaak by zaak_identificatie across all API groups. Returns visible matches."""
+        visible_zaken = []
+        for zaak_with_group in self.get_raw_zaken(user_identity, zaak_identificatie):
+            try:
+                # TODO: could be done in parallel
+                self._resolve_zaak_type(zaak_with_group)
+            except ResolveCaseException:
+                logger.warning(
+                    "Unable to resolve zaaktype for search result",
+                    zaak_url=zaak_with_group.zaak.url,
+                )
+                continue
+            if self._is_zaak_visible(zaak_with_group.zaak):
+                visible_zaken.append(zaak_with_group)
+
+        return visible_zaken
 
     def get_zaken(self, user_identity: UserIdentity) -> list[ZaakWithApiGroup]:
         if not user_identity:
@@ -383,7 +504,7 @@ class ZGWService:
                 zaak
             )
 
-            if is_zaak_visible(zaak_with_resolved_zgw_refs.zaak):
+            if self._is_zaak_visible(zaak_with_resolved_zgw_refs.zaak):
                 resolved_zaken.append(zaak_with_resolved_zgw_refs)
             else:
                 logger.debug(

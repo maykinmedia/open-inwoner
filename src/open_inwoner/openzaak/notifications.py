@@ -18,7 +18,6 @@ from open_inwoner.openzaak.api_models import (
     Zaak,
     ZaakInformatieObject,
 )
-from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
 from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
 from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.models import (
@@ -29,11 +28,11 @@ from open_inwoner.openzaak.models import (
     ZaakTypeStatusTypeConfig,
     ZGWApiGroupConfig,
 )
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.utils import (
     get_zaak_type_config,
     get_zaak_type_info_object_type_config,
     is_info_object_visible,
-    is_zaak_visible,
 )
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -78,27 +77,10 @@ def handle_zaken_notification(notification: Notification):
         logger.error("No API group defined for zaak", zaak_url=zaak_url)
         return
 
-    zaken_client = api_group.zaken_client
+    service = ZGWService(use_cache=False)
 
     # check if we have users that need to be informed about this case
-    if zaken_client.fetch_rollen_with_betrokkene_type:
-        # Only query types that can map to a user account; medewerker and
-        # organisatorische_eenheid are internal government roles and some
-        # backends (e.g. iConnect/Decos) reject those types with a 400.
-        available_user_betrokkene_types = (
-            RolTypes.natuurlijk_persoon,
-            RolTypes.niet_natuurlijk_persoon,
-            RolTypes.vestiging,
-        )
-        roles = []
-        for betrokkene_type in available_user_betrokkene_types:
-            roles += zaken_client.fetch_zaak_roles(
-                zaak_url, betrokkene_type=betrokkene_type
-            )
-    else:
-        roles = zaken_client.fetch_zaak_roles(zaak_url)
-
-    if not roles:
+    if not (roles := service.fetch_zaak_roles(zaak_url, api_group)):
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for zaak {zaak_url}",
             # NOTE this used to be logging.ERROR, but as this is also our first call
@@ -121,25 +103,23 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this case is visible
-    if not (zaak := zaken_client.fetch_zaak_by_url_no_cache(zaak_url)):
+    if not (zaak := service.fetch_zaak_by_url(zaak_url, api_group)):
         log_system_action(
             f"ignored {r} notification: cannot retrieve zaak {zaak_url}",
             log_level=logging.ERROR,
         )
         return
 
-    zaaktype = api_group.catalogi_client.fetch_single_zaaktype(zaak.zaaktype)
-
-    if not zaaktype:
+    zaaktype_url = zaak.zaaktype  # URL string before resolution
+    if not (zaaktype := service.fetch_zaaktype_by_url(zaaktype_url, api_group)):
         log_system_action(
-            f"ignored {r} notification: cannot retrieve zaaktype {zaak.zaaktype} for zaak {zaak_url}",
+            f"ignored {r} notification: cannot retrieve zaaktype {zaaktype_url}",
             log_level=logging.ERROR,
         )
         return
-
     zaak.zaaktype = zaaktype
 
-    if not is_zaak_visible(zaak):
+    if not service._is_zaak_visible(zaak):
         log_system_action(
             f"ignored {r} notification: zaak not visible after applying website "
             f"visibility filter for zaak {zaak_url}",
@@ -148,7 +128,9 @@ def handle_zaken_notification(notification: Notification):
         return
 
     if notification.resource == "status":
-        _handle_status_notification(notification, zaak, inform_users, api_group)
+        _handle_status_notification(
+            notification, zaak, inform_users, api_group, service
+        )
     elif notification.resource == "zaakinformatieobject":
         _handle_zaakinformatieobject_notification(
             notification, zaak, inform_users, api_group
@@ -226,12 +208,14 @@ def _handle_zaakinformatieobject_notification(
 
     # check if this is a zaakinformatieobject we want to inform on
     ziobj_url = notification.resource_url
+    service = ZGWService(use_cache=False)
 
-    ziobj = api_group.zaken_client.fetch_single_zaak_information_object(ziobj_url)
-
-    if not ziobj:
+    if not (
+        ziobj := service.fetch_single_zaak_information_object(ziobj_url, api_group)
+    ):
         log_system_action(
-            f"ignored {r} notification: cannot retrieve zaakinformatieobject {ziobj_url} for zaak {zaak.url}",
+            f"ignored {r} notification: cannot retrieve zaakinformatieobject "
+            f"{ziobj_url} for zaak {zaak.url}",
             log_level=logging.ERROR,
         )
         return
@@ -333,13 +317,16 @@ def _handle_zaakinformatieobject_update(
 # Helper functions for status update notifications
 #
 def _check_status_history(
-    notification: Notification, zaak: Zaak, client: ZakenClient
+    notification: Notification,
+    zaak: Zaak,
+    service: ZGWService,
+    api_group: ZGWApiGroupConfig,
 ) -> list[Status] | None:
     """
     Check if more than one status exists for `zaak` (else notifications are skipped)
     """
     resource = notification.resource
-    status_history = client.fetch_status_history_no_cache(zaak.url)
+    status_history = service.fetch_status_history(zaak.url, api_group)
 
     if not status_history:
         log_system_action(
@@ -362,7 +349,8 @@ def _check_status(
     notification: Notification,
     zaak: Zaak,
     status_history: list[Status],
-    client: ZakenClient,
+    service: ZGWService,
+    api_group: ZGWApiGroupConfig,
 ) -> Status | None:
     """
     Check if this is a status we want to inform on
@@ -376,8 +364,7 @@ def _check_status(
             break
     else:
         # TODO currently not covered in tests?
-        if client:
-            status = client.fetch_single_status(status_url)
+        status = service.fetch_single_status(status_url, api_group)
 
     if not status:
         log_system_action(
@@ -394,12 +381,13 @@ def _check_status_type(
     zaak: Zaak,
     status: Status,
     oz_config: OpenZaakConfig,
-    catalogi_client: CatalogiClient,
+    service: ZGWService,
+    api_group: ZGWApiGroupConfig,
 ) -> StatusType | None:
     """
     Check if a status_type exists for `status` and if notifications are enabled
     """
-    status_type = catalogi_client.fetch_single_status_type(status.statustype)
+    status_type = service.fetch_single_status_type(status.statustype, api_group)
     resource = notification.resource
 
     if not status_type:
@@ -520,23 +508,26 @@ def _handle_status_notification(
     zaak: Zaak,
     inform_users: list[User],
     api_group: ZGWApiGroupConfig,
+    service: ZGWService,
 ):
     """
     Check status notification settings of user and case-related objects/configs
     """
     oz_config = api_group.open_zaak_config
-    catalogi_client = api_group.catalogi_client
-    zaken_client = api_group.zaken_client
 
-    if not (status_history := _check_status_history(notification, zaak, zaken_client)):
+    if not (
+        status_history := _check_status_history(notification, zaak, service, api_group)
+    ):
         return
 
-    if not (status := _check_status(notification, zaak, status_history, zaken_client)):
+    if not (
+        status := _check_status(notification, zaak, status_history, service, api_group)
+    ):
         return
 
     if not (
         status_type := _check_status_type(
-            notification, zaak, status, oz_config, catalogi_client
+            notification, zaak, status, oz_config, service, api_group
         )
     ):
         return
@@ -544,7 +535,7 @@ def _handle_status_notification(
     if not (ztc := _check_zaaktype_config(notification, zaak, oz_config)):
         return
 
-    status = zaken_client.fetch_single_status(zaak.status)
+    status = service.fetch_single_status(zaak.status, api_group)
     if not status:
         # TODO: check if should we return or continue if the case has no status
         logger.error("Unable to fetch status", status_url=zaak.status)

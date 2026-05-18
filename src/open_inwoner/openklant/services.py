@@ -79,9 +79,9 @@ from open_inwoner.openklant.wrap import (
     get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.clients import MultiZgwClientProxy
 from open_inwoner.openzaak.identity import BSNIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
@@ -801,29 +801,20 @@ class eSuiteVragenService(KlantenService):
         ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
         if ocm and ocm.object_type == "zaak":
             zaak_url = ocm.object
-            groups = ZGWApiGroupConfig.objects.filter(
-                klant_backend=KlantenServiceType.ESUITE.value
-            )
-            proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-            proxy_response = proxy.fetch_zaak_by_url_no_cache(zaak_url)
-            cases_found = proxy_response.truthy_responses
-            if (case_count := len(cases_found)) == 0:
+            try:
+                api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
+                    url=zaak_url
+                )
+            except ZGWApiGroupConfig.DoesNotExist:
                 logger.error(
                     "Unable to find matched contactmomenten zaak in any zgw backend"
                 )
             else:
-                if case_count > 1:
-                    logger.error("Zaak found in multiple backends", zaak_url=zaak_url)
-
-                zaak_with_api_group = next(
-                    ZaakWithApiGroup(
-                        zaak=zaak.result,
-                        api_group=ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                            client=zaak.client
-                        ),
+                zaak = ZGWService().fetch_zaak_by_url(zaak_url, api_group)
+                if zaak:
+                    zaak_with_api_group = ZaakWithApiGroup(
+                        zaak=zaak, api_group=api_group
                     )
-                    for zaak in cases_found
-                )
 
         return self._build_question_dto(kcm), zaak_with_api_group
 
@@ -1883,54 +1874,27 @@ class OpenKlant2Service(
 
         onderwerp_object = onderwerp_objecten[0]
 
-        # fetch zaken for user
-        groups = ZGWApiGroupConfig.objects.filter(
-            klant_backend=KlantenServiceType.OPENKLANT2.value
+        # find the unique zaak + relevant api group for the question
+        identificatie = onderwerp_object["onderwerpobjectidentificator"]["objectId"]
+        results = ZGWService().search_zaken(
+            BSNIdentity(bsn=user.bsn), identificatie=identificatie
         )
-        proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-        proxy_response = proxy.fetch_zaken(BSNIdentity(bsn=user.bsn))
 
-        if not (truthy_responses := proxy_response.truthy_responses):
+        if not results:
             logger.info(
                 "Unable to find matched contactmomenten zaak with OpenKlant2 backend"
             )
             return self._build_question_dto(question_ok2=question, user=user), None
 
-        # find the unique zaak + relevant api client for the question
-        zaken_for_question: list = []
-        clients = []
-        for response in truthy_responses:
-            # discard the client for determining the api_group; we only need the zaak
-            zaken = response.result
-            client = response.client
-            zaken_filtered = filter(
-                lambda z: z.identificatie
-                == onderwerp_object["onderwerpobjectidentificator"]["objectId"],
-                zaken,
-            )
-            zaken_for_question.extend(zaken_filtered)
-            clients.append(client)
-
-        # sanity checks
-        if not zaken_for_question:
-            logger.info(
-                "Could not find zaak corresponding to question",
+        if len(results) > 1:
+            logger.error(
+                "More than one zaak found for question",
                 question_kcm_uuid=question.question_kcm_uuid,
             )
             return self._build_question_dto(question_ok2=question, user=user), None
-        if len(zaken_for_question) > 1:
-            logger.error(
-                "More than one zaak found for question",
-                question_uuid=question.question_kcm_uuid,
-            )
-            return self._build_question_dto(question_ok2=question, user=user), None
-        if len(clients) > 1:
-            logger.error("Found one zaak in multiple backends")
-            return self._build_question_dto(question_ok2=question, user=user), None
 
-        group = ZGWApiGroupConfig.objects.resolve_group_from_hints(client=clients[0])
         zaak_with_api_group = ZaakWithApiGroup(
-            zaak=zaken_for_question[0], api_group=group
+            zaak=results[0].zaak, api_group=results[0].api_group
         )
 
         return (
