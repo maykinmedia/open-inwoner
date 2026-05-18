@@ -175,6 +175,9 @@ class GenericOIDCLogoutView(OIDCLogoutView):
         auth.logout(request)
         return HttpResponseRedirect(self.get_success_url())
 
+    # Implement POST logout similar to the GET to prevent status 405 on log-out.
+    post = get
+
 
 generic_oidc_logout = GenericOIDCLogoutView.as_view()
 

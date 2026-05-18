@@ -84,6 +84,7 @@ Onderhoud
   geïmporteerd in openzaak-modules die deze klasse nodig hebben. Andere sites moeten in plaats
   daarvan de nieuwe ZGWService gebruiken. Verbeterde testdekking door het toevoegen van tests
   voor ZGWService.
+* [:gh:`2494`]: Uitloglink vervangen door een formulierknop (POST) conform Django 5-vereisten.
 
 2.2.0 (2026-04-20)
 ==================
