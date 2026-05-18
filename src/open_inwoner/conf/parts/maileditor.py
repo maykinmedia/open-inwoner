@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 def _readfile(name: str) -> str:
     p = Path(__file__).parent / name
-    return p.read_text()
+    return p.read_text(encoding="utf-8")
 
 
 # mail-editor

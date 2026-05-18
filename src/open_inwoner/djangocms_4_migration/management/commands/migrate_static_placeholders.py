@@ -59,7 +59,7 @@ def _process_templates(process_addons=True):
             filename = os.path.join(root, file)
             logger.info(f"Analysing template: {filename}")
 
-            with open(filename, "r") as f:
+            with open(filename, "r", encoding="utf-8") as f:
                 contents = f.read()
 
             # Attempt to replace static_placeholder tags with static_alias tags
@@ -76,7 +76,7 @@ def _process_templates(process_addons=True):
                 contents,
             )
 
-            with open(filename, "w") as f:
+            with open(filename, "w", encoding="utf-8") as f:
                 f.write(contents)
 
             logger.info(f"Changes made to template: {filename}")
