@@ -14,8 +14,9 @@ from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
+from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
+from open_inwoner.openzaak.utils import is_zaak_visible
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
@@ -84,12 +85,12 @@ class SearchView(
             self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # Check if the query exactly matches with a case that belongs to the user
-        if search_params := get_user_fetch_parameters(self.request):
+        if user_identity := UserIdentity.from_request(self.request):
             clients = build_zaken_clients()
             if clients:
                 proxy_result = MultiZgwClientProxy(clients)
                 proxy_result = proxy_result.fetch_zaken(
-                    **search_params,
+                    user_identity,
                     identificatie=query,
                 )
                 if proxy_result.has_errors:

@@ -13,10 +13,10 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import (
     FormulierWithApiGroup,
-    UserIdentity,
     ZaakWithApiGroup,
     ZGWService,
 )

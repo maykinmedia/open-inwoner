@@ -80,6 +80,7 @@ from open_inwoner.openklant.wrap import (
 )
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.clients import MultiZgwClientProxy
+from open_inwoner.openzaak.identity import BSNIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
@@ -1887,7 +1888,7 @@ class OpenKlant2Service(
             klant_backend=KlantenServiceType.OPENKLANT2.value
         )
         proxy = MultiZgwClientProxy([group.zaken_client for group in groups])
-        proxy_response = proxy.fetch_zaken(user_bsn=user.bsn)
+        proxy_response = proxy.fetch_zaken(BSNIdentity(bsn=user.bsn))
 
         if not (truthy_responses := proxy_response.truthy_responses):
             logger.info(

@@ -15,8 +15,9 @@ from open_inwoner.cms.cases.metrics import (
     case_list_views,
 )
 from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.services import UserIdentity, ZaakNotFound, ZGWService
+from open_inwoner.openzaak.services import ZaakNotFound, ZGWService
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.views import LogMixin
 

@@ -23,6 +23,7 @@ from open_inwoner.openzaak.clients import (
     build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
+from open_inwoner.openzaak.identity import KVKIdentity
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
@@ -691,7 +692,9 @@ class FetchZakenForCompanyTests(TestCase):
             json={"count": 0, "next": None, "previous": None, "results": []},
         )
 
-        self.zaken_client.fetch_zaken(user_kvk="12345678", vestigingsnummer="987654321")
+        self.zaken_client.fetch_zaken(
+            KVKIdentity(kvk="12345678", vestigingsnummer="987654321"), use_rsin=False
+        )
 
         self.assertEqual(len(m.request_history), 1)
         req = m.request_history[0]

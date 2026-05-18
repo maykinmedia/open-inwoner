@@ -15,7 +15,8 @@ from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.constants import TypeAanvraag
-from open_inwoner.openzaak.services import UserIdentity, ZGWService
+from open_inwoner.openzaak.identity import UserIdentity
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.types import UniformCase
 
 logger = structlog.stdlib.get_logger(__name__)

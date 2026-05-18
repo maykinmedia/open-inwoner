@@ -10,8 +10,8 @@ from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
+from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZaakTypeConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters
 from open_inwoner.utils.views import LogMixin
 
 
@@ -57,7 +57,7 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
 
         clients = build_zaken_clients()
         proxy_result = MultiZgwClientProxy(clients)
-        proxy_result = proxy_result.fetch_zaken(**get_user_fetch_parameters(request))
+        proxy_result = proxy_result.fetch_zaken(UserIdentity.from_request(request))
         if proxy_result.has_errors:
             self.log_system_action("unable to retrieve cases", user=request.user)
 
