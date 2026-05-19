@@ -22,6 +22,7 @@ from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.components.file_item import FileItem
 from open_inwoner.openzaak.clients import build_documenten_clients, build_zaken_clients
+from open_inwoner.openzaak.exceptions import ZgwAPIClientError, ZgwAPIServerError
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
@@ -463,7 +464,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             # no roles for our user found
             json=paginated_response([self.not_our_user_role]),
         )
-        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
         m.get(self.zaak["url"], json=self.zaak)
@@ -479,7 +480,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             indicatieInternOfExtern="intern",
         )
         m.get(self.zaaktype["url"], json=zaaktype_intern)
-        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_no_matching_case_info_object_is_found(self, m):
         m.get(self.zaak["url"], json=self.zaak)
@@ -730,11 +731,11 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=404)
         (documenten_client, _) = build_documenten_clients()
-        created_document = documenten_client.upload_document(
-            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
-        )
 
-        self.assertIsNone(created_document)
+        with self.assertRaises(ZgwAPIClientError):
+            documenten_client.upload_document(
+                self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            )
 
     def test_document_response_is_none_when_http_500(self, m):
         self._setUpMocks(m)
@@ -753,11 +754,11 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         m.post(f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten", status_code=500)
         (documenten_client, _) = build_documenten_clients()
-        created_document = documenten_client.upload_document(
-            self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
-        )
 
-        self.assertIsNone(created_document)
+        with self.assertRaises(ZgwAPIServerError):
+            documenten_client.upload_document(
+                self.user, file, title, zaak_type_iotc.id, self.zaak["bronorganisatie"]
+            )
 
     def test_document_case_relationship_is_created(self, m):
         self._setUpMocks(m)
@@ -775,11 +776,11 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=400,
         )
-        created_relationship = self.zaken_client.connect_case_with_document(
-            self.zaak["url"], self.informatie_object["url"]
-        )
 
-        self.assertIsNone(created_relationship)
+        with self.assertRaises(ZgwAPIClientError):
+            self.zaken_client.connect_case_with_document(
+                self.zaak["url"], self.informatie_object["url"]
+            )
 
     def test_document_case_relationship_is_not_created_when_http_500(self, m):
         self._setUpMocks(m)
@@ -788,8 +789,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             f"{ZAKEN_ROOT}zaakinformatieobjecten",
             status_code=500,
         )
-        created_relationship = self.zaken_client.connect_case_with_document(
-            self.zaak["url"], self.informatie_object["url"]
-        )
 
-        self.assertIsNone(created_relationship)
+        with self.assertRaises(ZgwAPIServerError):
+            self.zaken_client.connect_case_with_document(
+                self.zaak["url"], self.informatie_object["url"]
+            )

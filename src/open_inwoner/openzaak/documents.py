@@ -6,14 +6,12 @@ from open_inwoner.utils.decorators import cache as cache_result
 
 
 @cache_result("information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT)
-def fetch_single_information_object_from_url(
-    url: str, api_group
-) -> InformatieObject | None:
+def fetch_single_information_object_from_url(url: str, api_group) -> InformatieObject:
     return api_group.documenten_client._fetch_single_information_object(url=url)
 
 
 # not cached because currently only used in info-object download view
 def fetch_single_information_object_uuid(
     uuid: str, documenten_client: DocumentenClient
-) -> InformatieObject | None:
+) -> InformatieObject:
     return documenten_client._fetch_single_information_object(uuid=uuid)

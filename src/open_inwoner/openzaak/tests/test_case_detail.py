@@ -1944,20 +1944,7 @@ class TestCaseDetailView(
             # no roles for our user found
             json=paginated_response([self.not_initiator_role]),
         )
-        # m.get(
-        #     f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}",
-        #     json=[self.zaak_informatie_object_old, self.zaak_informatie_object_invisible],
-        # )
-        # m.get(
-        #     f"{ZAKEN_ROOT}statussen?zaak={self.zaak['url']}",
-        #     json=paginated_response([self.status_finish, self.status_new]),
-        # )
-        response = self.app.get(self.case_detail_url, user=self.user)
-
-        self.assertTemplateUsed("pages/cases/403.html")
-        self.assertContains(
-            response, _("Sorry, you don't have access to this page (403)")
-        )
+        self.app.get(self.case_detail_url, user=self.user, status=404)
 
     def test_no_access_when_no_roles_are_found_for_user_kvk_or_rsin(self, m):
         not_initiator_role = generate_oas_component_cached(
@@ -1990,13 +1977,8 @@ class TestCaseDetailView(
                 )
                 self.zaak_config.save()
 
-                response = self.app.get(
-                    self.case_detail_url, user=self.eherkenning_user
-                )
-
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
+                self.app.get(
+                    self.case_detail_url, user=self.eherkenning_user, status=404
                 )
 
     def test_access_as_vestiging_when_only_role_for_vestiging(self, m):
@@ -2084,10 +2066,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
-                )
+                self.assertEqual(response.status_code, 404)
 
     def test_no_access_when_incorrect_role_for_user_bsn(self, m):
         """
@@ -2123,12 +2102,7 @@ class TestCaseDetailView(
                     json=paginated_response([non_initiator_rol]),
                 )
 
-                response = self.app.get(self.case_detail_url, user=self.user)
-
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
-                )
+                self.app.get(self.case_detail_url, user=self.user, status=404)
 
         with self.subTest(no_role=True):
             m.get(self.zaak["url"], json=self.zaak)
@@ -2138,12 +2112,7 @@ class TestCaseDetailView(
                 json=paginated_response([]),
             )
 
-            response = self.app.get(self.case_detail_url, user=self.user)
-
-            self.assertTemplateUsed("pages/cases/403.html")
-            self.assertContains(
-                response, _("Sorry, you don't have access to this page (403)")
-            )
+            self.app.get(self.case_detail_url, user=self.user, status=404)
 
     def test_no_access_when_incorrect_role_for_user_kvk_or_rsin(self, m):
         """
@@ -2200,14 +2169,8 @@ class TestCaseDetailView(
                         )
                         self.zaak_config.save()
 
-                        response = self.app.get(
-                            self.case_detail_url, user=self.eherkenning_user
-                        )
-
-                        self.assertTemplateUsed("pages/cases/403.html")
-                        self.assertContains(
-                            response,
-                            _("Sorry, you don't have access to this page (403)"),
+                        self.app.get(
+                            self.case_detail_url, user=self.eherkenning_user, status=404
                         )
 
         with self.subTest(no_role=True):
@@ -2227,14 +2190,8 @@ class TestCaseDetailView(
                     )
                     self.zaak_config.save()
 
-                    response = self.app.get(
-                        self.case_detail_url, user=self.eherkenning_user
-                    )
-
-                    self.assertTemplateUsed("pages/cases/403.html")
-                    self.assertContains(
-                        response,
-                        _("Sorry, you don't have access to this page (403)"),
+                    self.app.get(
+                        self.case_detail_url, user=self.eherkenning_user, status=404
                     )
 
     def test_no_access_when_incorrect_role_for_vestigingsnummer(self, m):
@@ -2275,10 +2232,7 @@ class TestCaseDetailView(
 
                 response = self.client.get(self.case_detail_url)
 
-                self.assertTemplateUsed("pages/cases/403.html")
-                self.assertContains(
-                    response, _("Sorry, you don't have access to this page (403)")
-                )
+                self.assertEqual(response.status_code, 404)
 
         with self.subTest(no_role=True):
             m.get(self.zaak["url"], json=self.zaak)
@@ -2290,10 +2244,7 @@ class TestCaseDetailView(
 
             response = self.client.get(self.case_detail_url)
 
-            self.assertTemplateUsed("pages/cases/403.html")
-            self.assertContains(
-                response, _("Sorry, you don't have access to this page (403)")
-            )
+            self.assertEqual(response.status_code, 404)
 
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
@@ -2325,12 +2276,7 @@ class TestCaseDetailView(
         self.eherkenning_user.rsin = ""
         self.eherkenning_user.save()
 
-        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
-
-        self.assertTemplateUsed("pages/cases/403.html")
-        self.assertContains(
-            response, _("Sorry, you don't have access to this page (403)")
-        )
+        self.app.get(self.case_detail_url, user=self.eherkenning_user, status=404)
 
     def test_no_data_is_retrieved_when_zaaktype_is_internal(self, m):
         m.get(self.zaak["url"], json=self.zaak)
@@ -2346,23 +2292,17 @@ class TestCaseDetailView(
             indicatieInternOfExtern="intern",
         )
         m.get(self.zaaktype["url"], json=zaaktype_intern)
-        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_http_404(self, m):
         m.get(self.zaak["url"], status_code=404)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
-
-        self.assertIsNone(response.context.get("zaak"))
-        self.assertContains(response, _("There is no available data at the moment."))
+        self.app.get(self.case_detail_url, user=self.user, status=404)
 
     def test_no_data_is_retrieved_when_http_500(self, m):
         m.get(self.zaak["url"], status_code=500)
 
-        response = self.app.get(self.case_detail_url, user=self.user)
-
-        self.assertIsNone(response.context.get("zaak"))
-        self.assertContains(response, _("There is no available data at the moment."))
+        self.app.get(self.case_detail_url, user=self.user, status=503)
 
     def test_no_access_when_case_is_confidential(self, m):
         m.get(self.zaak_invisible["url"], json=self.zaak_invisible)
@@ -2372,7 +2312,7 @@ class TestCaseDetailView(
             json=paginated_response([self.user_role, self.not_initiator_role]),
         )
 
-        response = self.app.get(
+        self.app.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={
@@ -2381,11 +2321,7 @@ class TestCaseDetailView(
                 },
             ),
             user=self.user,
-        )
-
-        self.assertTemplateUsed("pages/cases/403.html")
-        self.assertContains(
-            response, _("Sorry, you don't have access to this page (403)")
+            status=404,
         )
 
     def test_single_expected_information_object_type_is_available_in_upload_form(
@@ -2648,7 +2584,7 @@ class TestCaseDetailView(
         self._setUpMocks(m)
 
         m.get(self.zaak["url"], status_code=500)
-        response = self.app.get(
+        self.app.get(
             reverse(
                 "cases:case_detail_content",
                 kwargs={
@@ -2657,10 +2593,8 @@ class TestCaseDetailView(
                 },
             ),
             user=self.user,
+            status=503,
         )
-
-        self.assertNotIn("document-upload", response.forms)
-        self.assertContains(response, _("There is no available data at the moment."))
 
     def test_upload_form_is_not_rendered_when_no_information_object_types_exist(
         self, m
@@ -3412,7 +3346,9 @@ class TestCaseDetailView(
         ocm.contactmoment = None
         cm_client_mock.return_value = [ocm]
 
-        response = self.app.get(self.case_detail_url, user=self.eherkenning_user)
+        response = self.app.get(
+            self.eherkenning_case_detail_url, user=self.eherkenning_user
+        )
 
         self.assertEqual(response.status_code, 200)
 

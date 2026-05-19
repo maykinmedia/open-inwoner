@@ -1,5 +1,31 @@
 from typing import Sequence
 
+from open_inwoner.utils.api import APIError
+
+
+class ZgwAPIError(APIError):
+    pass
+
+
+class ZgwAPIClientError(ZgwAPIError):
+    pass
+
+
+class ZgwAPIServerError(ZgwAPIError):
+    pass
+
+
+class ZgwAPIInvalidJSONError(ZgwAPIError):
+    pass
+
+
+class ZgwAPIDataError(ZgwAPIError):
+    pass
+
+
+class ZgwAPINetworkError(ZgwAPIError):
+    pass
+
 
 class InvalidAuth(Exception):
     pass

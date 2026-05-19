@@ -9,9 +9,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.functional import SimpleLazyObject
 
 import structlog
-from ape_pie.client import APIClient
-from requests import HTTPError, RequestException, Response
-from zgw_consumers.api_models.base import factory
+from requests import Response
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client
@@ -26,8 +24,15 @@ from open_inwoner.accounts.user_identification import (
     UserIdentification,
 )
 from open_inwoner.openzaak.api_models import InformatieObject
-from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
-from open_inwoner.utils.api import ClientError, get_json_response
+from open_inwoner.openzaak.exceptions import (
+    MultiZgwClientProxyError,
+    ZgwAPIClientError,
+    ZgwAPIDataError,
+    ZgwAPIInvalidJSONError,
+    ZgwAPINetworkError,
+    ZgwAPIServerError,
+)
+from open_inwoner.utils.api import BaseAPIClient
 from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
@@ -50,8 +55,14 @@ CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class ZgwAPIClient(APIClient):
+class ZgwAPIClient(BaseAPIClient):
     """A client for interacting with ZGW services."""
+
+    network_error_type = ZgwAPINetworkError
+    client_error_type = ZgwAPIClientError
+    server_error_type = ZgwAPIServerError
+    invalid_json_error_type = ZgwAPIInvalidJSONError
+    data_error_type = ZgwAPIDataError
 
     configured_from: Service
 
@@ -143,32 +154,22 @@ class ZakenClient(ZgwAPIClient):
                 {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
             )
 
-        try:
-            response = self.get(
-                "zaken",
-                params=params,
+        response = self.get(
+            "zaken",
+            params=params,
+            headers=CRS_HEADERS,
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(
+            pagination_helper(
+                self,
+                data,
+                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 headers=CRS_HEADERS,
             )
-            data = get_json_response(response)
-            all_data = list(
-                pagination_helper(
-                    self,
-                    data,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-                    headers=CRS_HEADERS,
-                )
-            )
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve zaken by BSN",
-                user_bsn=user_bsn,
-                zaak_identificatie=identificatie,
-            )
-            return []
-
-        zaken = factory(Zaak, all_data)
-
-        return zaken
+        )
+        return self.factory(Zaak, all_data)
 
     @cache_result(
         "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
@@ -228,124 +229,66 @@ class ZakenClient(ZgwAPIClient):
                 {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
             )
 
-        try:
-            response = self.get(
-                "zaken",
-                params=params,
+        response = self.get(
+            "zaken",
+            params=params,
+            headers=CRS_HEADERS,
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(
+            pagination_helper(
+                self,
+                data,
+                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 headers=CRS_HEADERS,
             )
-            data = get_json_response(response)
-            all_data = list(
-                pagination_helper(
-                    self,
-                    data,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-                    headers=CRS_HEADERS,
-                )
-            )
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve zaken for eHerkenning user",
-                kvk_or_rsin=kvk_or_rsin,
-                vestigingsnummer=vestigingsnummer,
-                zaak_identificatie=zaak_identificatie,
-            )
-            return []
-
-        zaken = factory(Zaak, all_data)
-
-        return zaken
+        )
+        return self.factory(Zaak, all_data)
 
     @cache_result(
         "{self.base_url}:single_zaak:{zaak_uuid}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_zaak(self, zaak_uuid: str) -> Zaak | None:
-        try:
-            response = self.get(f"zaken/{zaak_uuid}", headers=CRS_HEADERS)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve zaak",
-                zaak_uuid=zaak_uuid,
-            )
-            return
+    def fetch_single_zaak(self, zaak_uuid: str) -> Zaak:
+        response = self.get(f"zaken/{zaak_uuid}", headers=CRS_HEADERS)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(Zaak, data)
 
-        zaak = factory(Zaak, data)
-
-        return zaak
-
-    def fetch_zaak_by_url_no_cache(self, zaak_url: str) -> Zaak | None:
-        try:
-            response = self.get(url=zaak_url, headers=CRS_HEADERS)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve zaak",
-                zaak_url=zaak_url,
-            )
-            return
-
-        zaak = factory(Zaak, data)
-
-        return zaak
+    def fetch_zaak_by_url_no_cache(self, zaak_url: str) -> Zaak:
+        response = self.get(url=zaak_url, headers=CRS_HEADERS)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(Zaak, data)
 
     @cache_result(
         "{self.base_url}:single_zaak_information_object:{url}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_zaak_information_object(
-        self, url: str
-    ) -> ZaakInformatieObject | None:
-        try:
-            response = self.get(url=url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve single informatieobject",
-                informatieobject_url=url,
-            )
-            return
-
-        zaak_info_object = factory(ZaakInformatieObject, data)
-
-        return zaak_info_object
+    def fetch_single_zaak_information_object(self, url: str) -> ZaakInformatieObject:
+        response = self.get(url=url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(ZaakInformatieObject, data)
 
     def fetch_zaak_information_objects(
         self, zaak_url: str
     ) -> list[ZaakInformatieObject]:
-        try:
-            response = self.get(
-                "zaakinformatieobjecten",
-                params={"zaak": zaak_url},
-            )
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve informatieobjecten for zaak",
-                zaak_url=zaak_url,
-            )
-            return []
-
-        zaak_info_objects = factory(ZaakInformatieObject, data)
-
-        return zaak_info_objects
+        response = self.get(
+            "zaakinformatieobjecten",
+            params={"zaak": zaak_url},
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(ZaakInformatieObject, data)
 
     def fetch_status_history_no_cache(self, zaak_url: str) -> list[Status]:
-        try:
-            response = self.get("statussen", params={"zaak": zaak_url})
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve statussen for zaak",
-                zaak_url=zaak_url,
-            )
-            return []
-
+        response = self.get("statussen", params={"zaak": zaak_url})
+        self.raise_for_status(response)
+        data = self.parse_json(response)
         # TODO use pagination_helper?
-        statuses = factory(Status, data["results"])
-
-        return statuses
+        return self.factory(Status, data["results"])
 
     @cache_result(
         "{self.base_url}:status_history:{zaak_url}",
@@ -358,20 +301,11 @@ class ZakenClient(ZgwAPIClient):
         "{self.base_url}:status:{status_url}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_status(self, status_url: str) -> Status | None:
-        try:
-            response = self.get(url=status_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve single status",
-                status_url=status_url,
-            )
-            return
-
-        status = factory(Status, data)
-
-        return status
+    def fetch_single_status(self, status_url: str) -> Status:
+        response = self.get(url=status_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(Status, data)
 
     @cache_result(
         "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}:{betrokkene_type}",
@@ -396,21 +330,14 @@ class ZakenClient(ZgwAPIClient):
         if betrokkene_type:
             params["betrokkeneType"] = betrokkene_type
 
-        try:
-            response = self.get(
-                "rollen",
-                params=params,
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve zaak roles",
-                zaak_url=zaak_url,
-            )
-            return []
-
-        roles = factory(Rol, all_data)
+        response = self.get(
+            "rollen",
+            params=params,
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(pagination_helper(self, data))
+        roles = self.factory(Rol, all_data)
 
         # Taiga #961 process eSuite response to apply ignored filter query
         if role_desc_generic:
@@ -529,136 +456,80 @@ class ZakenClient(ZgwAPIClient):
     def fetch_zaak_information_objects_for_zaak_and_info(
         self, zaak_url: str, info_object_url: str
     ) -> list[ZaakInformatieObject]:
-        try:
-            response = self.get(
-                "zaakinformatieobjecten",
-                params={
-                    "zaak": zaak_url,
-                    "informatieobject": info_object_url,
-                },
-            )
-            data = get_json_response(response)
-        except (RequestException, ClientError) as e:
-            logger.exception(
-                "Failed to retrieve informatieobjecten for zaak",
-                zaak_url=zaak_url,
-                informatieobject_url=info_object_url,
-            )
-            return []
-
-        zaak_info_objects = factory(ZaakInformatieObject, data)
-
-        return zaak_info_objects
+        response = self.get(
+            "zaakinformatieobjecten",
+            params={
+                "zaak": zaak_url,
+                "informatieobject": info_object_url,
+            },
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(ZaakInformatieObject, data)
 
     @cache_result(
         "{self.base_url}:single_result:{result_url}",
         timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
     )
-    def fetch_single_result(self, result_url: str) -> Resultaat | None:
-        try:
-            response = self.get(url=result_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve single zaak result",
-                result_url=result_url,
-            )
-            return
+    def fetch_single_result(self, result_url: str) -> Resultaat:
+        response = self.get(url=result_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(Resultaat, data)
 
-        result = factory(Resultaat, data)
-
-        return result
-
-    def connect_case_with_document(
-        self, zaak_url: str, document_url: str
-    ) -> dict | None:
-        try:
-            response = self.post(
-                "zaakinformatieobjecten",
-                json={"zaak": zaak_url, "informatieobject": document_url},
-            )
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to connect zaak with document",
-                zaak_url=zaak_url,
-                document_url=document_url,
-            )
-            return
-
-        return data
+    def connect_case_with_document(self, zaak_url: str, document_url: str) -> dict:
+        response = self.post(
+            "zaakinformatieobjecten",
+            json={"zaak": zaak_url, "informatieobject": document_url},
+        )
+        self.raise_for_status(response)
+        return self.parse_json(response)
 
 
 class CatalogiClient(ZgwAPIClient):
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
     def fetch_statustypes_no_cache(self, zaaktype_url: str) -> list[StatusType]:
-        try:
-            response = self.get(
-                "statustypen",
-                params={"zaaktype": zaaktype_url},
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception("")
-            return []
-
-        status_types = factory(StatusType, all_data)
-
-        return status_types
+        response = self.get(
+            "statustypen",
+            params={"zaaktype": zaaktype_url},
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(pagination_helper(self, data))
+        return self.factory(StatusType, all_data)
 
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
     def fetch_resultaattypes_no_cache(self, zaaktype_url: str) -> list[ResultaatType]:
-        try:
-            response = self.get(
-                "resultaattypen",
-                params={"zaaktype": zaaktype_url},
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        result_types = factory(ResultaatType, all_data)
-
-        return result_types
+        response = self.get(
+            "resultaattypen",
+            params={"zaaktype": zaaktype_url},
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(pagination_helper(self, data))
+        return self.factory(ResultaatType, all_data)
 
     @cache_result(
         "{self.base_url}:status_type:{status_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_status_type(self, status_type_url: str) -> StatusType | None:
-        try:
-            response = self.get(url=status_type_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        status_type = factory(StatusType, data)
-
-        return status_type
+    def fetch_single_status_type(self, status_type_url: str) -> StatusType:
+        response = self.get(url=status_type_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(StatusType, data)
 
     @cache_result(
         "{self.base_url}:resultaat_type:{resultaat_type_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_resultaat_type(
-        self, resultaat_type_url: str
-    ) -> ResultaatType | None:
-        try:
-            response = self.get(url=resultaat_type_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        resultaat_type = factory(ResultaatType, data)
-
-        return resultaat_type
+    def fetch_single_resultaat_type(self, resultaat_type_url: str) -> ResultaatType:
+        response = self.get(url=resultaat_type_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(ResultaatType, data)
 
     def fetch_zaaktypes_no_cache(
         self, identificatie: str | None = None
@@ -667,49 +538,31 @@ class CatalogiClient(ZgwAPIClient):
         if identificatie:
             params = {"identificatie": identificatie}
 
-        try:
-            response = self.get("zaaktypen", params=params)
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        zaak_types = factory(ZaakType, all_data)
-
-        return zaak_types
+        response = self.get("zaaktypen", params=params)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(pagination_helper(self, data))
+        return self.factory(ZaakType, all_data)
 
     @cache_result(
         "{self.base_url}:zaaktype:{zaaktype_url}",
         timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
     )
-    def fetch_single_zaaktype(self, zaaktype_url: str) -> ZaakType | None:
-        try:
-            response = self.get(url=zaaktype_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        zaaktype = factory(ZaakType, data)
-
-        return zaaktype
+    def fetch_single_zaaktype(self, zaaktype_url: str) -> ZaakType:
+        response = self.get(url=zaaktype_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(ZaakType, data)
 
     def fetch_catalogs_no_cache(self) -> list[Catalogus]:
         """
         note the eSuite implementation returns status 500 for this call
         """
-        try:
-            response = self.get("catalogussen")
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self, data))
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        catalogs = factory(Catalogus, all_data)
-
-        return catalogs
+        response = self.get("catalogussen")
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(pagination_helper(self, data))
+        return self.factory(Catalogus, all_data)
 
     @cache_result(
         "{self.base_url}:information_object_type:{information_object_type_url}",
@@ -718,48 +571,32 @@ class CatalogiClient(ZgwAPIClient):
     def fetch_single_information_object_type(
         self,
         information_object_type_url: str,
-    ) -> InformatieObjectType | None:
-        try:
-            response = self.get(url=information_object_type_url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        information_object_type = factory(InformatieObjectType, data)
-
-        return information_object_type
+    ) -> InformatieObjectType:
+        response = self.get(url=information_object_type_url)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(InformatieObjectType, data)
 
 
 class DocumentenClient(ZgwAPIClient):
     def _fetch_single_information_object(
         self, *, url: str | None = None, uuid: str | None = None
-    ) -> InformatieObject | None:
+    ) -> InformatieObject:
         if (url and uuid) or (not url and not uuid):
             raise ValueError("supply either 'url' or 'uuid' argument")
 
-        try:
-            if url:
-                response = self.get(url=url)
-            else:
-                response = self.get(f"enkelvoudiginformatieobjecten/{uuid}")
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        info_object = factory(InformatieObject, data)
-
-        return info_object
-
-    def download_document(self, url: str) -> Response | None:
-        try:
-            response = self.get(url)
-            response.raise_for_status()
-        except HTTPError:
-            logger.exception("exception while making request")
+        if url:
+            response = self.get(url=url)
         else:
-            return response
+            response = self.get(f"enkelvoudiginformatieobjecten/{uuid}")
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        return self.factory(InformatieObject, data)
+
+    def download_document(self, url: str) -> Response:
+        response = self.get(url)
+        self.raise_for_status(response)
+        return response
 
     def upload_document(
         self,
@@ -768,7 +605,7 @@ class DocumentenClient(ZgwAPIClient):
         title: str,
         informatieobjecttype_url: str,
         source_organization: str,
-    ) -> dict | None:
+    ) -> dict:
         document_body = {
             "bronorganisatie": source_organization,
             "creatiedatum": date.today().strftime("%Y-%m-%d"),
@@ -785,14 +622,9 @@ class DocumentenClient(ZgwAPIClient):
         if file.content_type:
             document_body["formaat"] = file.content_type
 
-        try:
-            response = self.post("enkelvoudiginformatieobjecten", json=document_body)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        return data
+        response = self.post("enkelvoudiginformatieobjecten", json=document_body)
+        self.raise_for_status(response)
+        return self.parse_json(response)
 
 
 class FormulierenClient(ZgwAPIClient):
@@ -832,24 +664,18 @@ class FormulierenClient(ZgwAPIClient):
         user_bsn: str,
         max_requests: int | None = None,
     ) -> list[Formulier]:
-        try:
-            response = self.get(
-                "openstaande-inzendingen",
-                params={"bsn": user_bsn},
+        response = self.get(
+            "openstaande-inzendingen",
+            params={"bsn": user_bsn},
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(
+            pagination_helper(
+                self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
             )
-            data = get_json_response(response)
-            all_data = list(
-                pagination_helper(
-                    self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
-                )
-            )
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        results = factory(Formulier, all_data)
-
-        return results
+        )
+        return self.factory(Formulier, all_data)
 
     def fetch_formulieren_by_kvk(
         self,
@@ -861,24 +687,18 @@ class FormulierenClient(ZgwAPIClient):
         if vestigingsnummer:
             request_params["vestigingsnummer"] = vestigingsnummer
 
-        try:
-            response = self.get(
-                "openstaande-inzendingen",
-                params=request_params,
+        response = self.get(
+            "openstaande-inzendingen",
+            params=request_params,
+        )
+        self.raise_for_status(response)
+        data = self.parse_json(response)
+        all_data = list(
+            pagination_helper(
+                self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
             )
-            data = get_json_response(response)
-            all_data = list(
-                pagination_helper(
-                    self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
-                )
-            )
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return []
-
-        results = factory(Formulier, all_data)
-
-        return results
+        )
+        return self.factory(Formulier, all_data)
 
     def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
         if not bsn:
@@ -888,15 +708,13 @@ class FormulierenClient(ZgwAPIClient):
             "openstaande-taken",
             params={"bsn": bsn},
         )
-        data = get_json_response(response)
+        self.raise_for_status(response)
+        data = self.parse_json(response)
         all_data = list(pagination_helper(self, data))
-
-        results = factory(OpenstaandeTaak, all_data)
-
-        return results
+        return self.factory(OpenstaandeTaak, all_data)
 
 
-TClient = TypeVar("TClient", bound=APIClient)
+TClient = TypeVar("TClient", bound=BaseAPIClient)
 
 
 @dataclass(frozen=True)

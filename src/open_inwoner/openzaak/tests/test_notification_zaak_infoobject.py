@@ -226,7 +226,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
     ):
         """
         When fetch_rollen_with_betrokkene_type=True, empty results across all betrokkene
-        type queries cause the handler to bail.
+        type queries means no initiators can be found, so the handler bails.
         """
         MockAPIData.api_group.fetch_rollen_with_betrokkene_type = True
         MockAPIData.api_group.save()
@@ -243,7 +243,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
 
         mock_handle.assert_not_called()
         self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve rollen for zaak https://",
+            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
             lookup=Lookups.startswith,
             level=logging.INFO,
         )
