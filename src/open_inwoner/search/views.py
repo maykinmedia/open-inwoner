@@ -13,9 +13,7 @@ import structlog
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.clients import MultiZgwClientProxy, build_zaken_clients
-from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.utils import get_user_fetch_parameters, is_zaak_visible
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
 
@@ -84,45 +82,29 @@ class SearchView(
             self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # Check if the query exactly matches with a case that belongs to the user
-        if search_params := get_user_fetch_parameters(self.request):
-            clients = build_zaken_clients()
-            if clients:
-                proxy_result = MultiZgwClientProxy(clients)
-                proxy_result = proxy_result.fetch_zaken(
-                    **search_params,
-                    identificatie=query,
-                )
-                if proxy_result.has_errors:
-                    self.log_system_action("unable to retrieve cases", user=user)
+        if self.request.user.is_authenticated and (
+            user_identification := self.request.user.identification
+        ):
+            results = ZGWService().search_zaken(
+                user_identification, zaak_identificatie=query
+            )
 
-                # TODO: We should simply return multiple cases in the search results,
-                # rather than redirect. For now, we maintain the existing behavior
-                # by returning and redirect to the first case found, if any.
-                if len(proxy_result.join_results()) > 1:
-                    logger.error(
-                        "found multiple cases for a single set of search params"
+            # TODO: We should simply return multiple cases in the search results,
+            # rather than redirect. For now, we maintain the existing behavior
+            # by returning and redirect to the first case found, if any.
+            if len(results) > 1:
+                logger.error("found multiple cases for a single set of search params")
+
+            for zaak_with_group in results:
+                return HttpResponseRedirect(
+                    reverse(
+                        "cases:case_detail",
+                        kwargs={
+                            "object_id": str(zaak_with_group.zaak.uuid),
+                            "api_group_id": zaak_with_group.api_group.id,
+                        },
                     )
-
-                for case_result in proxy_result.successful_responses:
-                    if case_result.result:
-                        api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(
-                            client=case_result.client
-                        )
-                        for zaak in case_result.result:
-                            zaaktype = api_group.catalogi_client.fetch_single_zaaktype(
-                                zaak.zaaktype
-                            )
-                            zaak.zaaktype = zaaktype
-                            if is_zaak_visible(zaak):
-                                return HttpResponseRedirect(
-                                    reverse(
-                                        "cases:case_detail",
-                                        kwargs={
-                                            "object_id": str(zaak.uuid),
-                                            "api_group_id": api_group.id,
-                                        },
-                                    )
-                                )
+                )
 
         # perform search
         try:

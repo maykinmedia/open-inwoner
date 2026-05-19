@@ -1,6 +1,5 @@
 import base64
 import concurrent.futures
-import functools
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar, cast
@@ -21,6 +20,11 @@ from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
 
+from open_inwoner.accounts.user_identification import (
+    BSNIdentification,
+    KVKIdentification,
+    UserIdentification,
+)
 from open_inwoner.openzaak.api_models import InformatieObject
 from open_inwoner.openzaak.exceptions import MultiZgwClientProxyError
 from open_inwoner.utils.api import ClientError, get_json_response
@@ -76,39 +80,39 @@ class ZakenClient(ZgwAPIClient):
 
     def fetch_zaken(
         self,
-        user_bsn: str | None = None,
-        user_kvk: str | None = None,
-        user_rsin: str | None = None,
+        user_identification: UserIdentification,
+        use_rsin: bool = True,
         max_requests: int | None = None,
         identificatie: str | None = None,
-        vestigingsnummer: str | None = None,
-    ):
-        if user_bsn and (user_kvk or user_rsin or vestigingsnummer):
-            raise ValueError(
-                "either `user_bsn` or `user_kvk`/`user_risin` (+ optionally `vestigingsnummer`) "
-                "should be supplied, not both"
-            )
-
-        if user_bsn:
-            return self.fetch_zaken_by_bsn(
-                user_bsn,
-                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-                identificatie=identificatie,
-            )
-
-        fetch_zaken_for_company = functools.partial(
-            self.fetch_zaken_for_company,
-            max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-            zaak_identificatie=identificatie,
-        )
-        if vestigingsnummer or user_kvk or user_rsin:
-            user_kvk_or_rsin = user_rsin if user_rsin else user_kvk
-            return fetch_zaken_for_company(
-                vestigingsnummer=vestigingsnummer,
-                kvk_or_rsin=user_kvk_or_rsin,
-            )
-
-        raise ValueError("You must supply either a bsn or kvk/rsin/vestigingsnummer")
+    ) -> list[Zaak]:
+        match user_identification:
+            case BSNIdentification():
+                return self.fetch_zaken_by_bsn(
+                    user_identification.bsn,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                    identificatie=identificatie,
+                )
+            case KVKIdentification():
+                if use_rsin:
+                    if not user_identification.rsin:
+                        logger.warning(
+                            "Skipping zaken fetch: group requires RSIN but user has none",
+                            kvk=user_identification.kvk,
+                        )
+                        return []
+                    kvk_or_rsin = user_identification.rsin
+                else:
+                    kvk_or_rsin = user_identification.kvk
+                return self.fetch_zaken_for_company(
+                    kvk_or_rsin=kvk_or_rsin,
+                    vestigingsnummer=user_identification.vestigingsnummer,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                    zaak_identificatie=identificatie,
+                )
+            case _:
+                raise TypeError(
+                    f"Unexpected identity type: {type(user_identification)}"
+                )
 
     @cache_result(
         "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}",
@@ -494,6 +498,33 @@ class ZakenClient(ZgwAPIClient):
 
         return roles
 
+    def fetch_rollen_for_user(
+        self,
+        zaak_url: str,
+        user_identification: UserIdentification,
+        use_rsin: bool = True,
+    ) -> list[Rol]:
+        match user_identification:
+            case BSNIdentification():
+                return self.fetch_roles_for_zaak_and_bsn(
+                    zaak_url, user_identification.bsn
+                )
+            case KVKIdentification():
+                if user_identification.vestigingsnummer:
+                    return self.fetch_roles_for_zaak_and_vestigingsnummer(
+                        zaak_url, user_identification.vestigingsnummer
+                    )
+                kvk_or_rsin = (
+                    user_identification.rsin
+                    if use_rsin and user_identification.rsin
+                    else user_identification.kvk
+                )
+                return self.fetch_roles_for_zaak_and_kvk_or_rsin(zaak_url, kvk_or_rsin)
+            case _:
+                raise TypeError(
+                    f"Unexpected user_identification type: {type(user_identification)}"
+                )
+
     # not cached because currently only used in info-object download view
     def fetch_zaak_information_objects_for_zaak_and_info(
         self, zaak_url: str, info_object_url: str
@@ -767,31 +798,34 @@ class DocumentenClient(ZgwAPIClient):
 class FormulierenClient(ZgwAPIClient):
     def fetch_formulieren(
         self,
-        user_bsn: str | None = None,
-        user_kvk: str | None = None,
-        vestigingsnummer: str | None = None,
+        user_identification: UserIdentification,
+        use_rsin: bool = True,
         max_requests: int | None = None,
-        **kwargs,
     ) -> list[Formulier]:
-        if user_bsn and (user_kvk or vestigingsnummer):
-            raise ValueError(
-                "either `user_bsn` or `user_kvk` (optionally with `vestigingsnummer`) "
-                "should be supplied, not both"
-            )
-
-        if user_bsn:
-            return self.fetch_formulieren_by_bsn(
-                user_bsn, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
-            )
-
-        if user_kvk:
-            return self.fetch_formulieren_by_kvk(
-                user_kvk,
-                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-                vestigingsnummer=vestigingsnummer,
-            )
-
-        return []
+        match user_identification:
+            case BSNIdentification():
+                return self.fetch_formulieren_by_bsn(
+                    user_identification.bsn,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                )
+            case KVKIdentification():
+                if use_rsin:
+                    # forms service does not support RSIN; skip when group is configured for RSIN
+                    if not user_identification.rsin:
+                        logger.warning(
+                            "Skipping formulieren fetch: group requires RSIN but user has none",
+                            kvk=user_identification.kvk,
+                        )
+                    return []
+                return self.fetch_formulieren_by_kvk(
+                    user_identification.kvk,
+                    vestigingsnummer=user_identification.vestigingsnummer,
+                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                )
+            case _:
+                raise TypeError(
+                    f"Unexpected identity type: {type(user_identification)}"
+                )
 
     def fetch_formulieren_by_bsn(
         self,

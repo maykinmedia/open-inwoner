@@ -12,6 +12,7 @@ from zgw_consumers.api_models.constants import (
 )
 from zgw_consumers.constants import APITypes
 
+from open_inwoner.accounts.user_identification import KVKIdentification
 from open_inwoner.openzaak.clients import (
     MultiZgwClientProxy,
     MultiZgwClientProxyResult,
@@ -691,7 +692,10 @@ class FetchZakenForCompanyTests(TestCase):
             json={"count": 0, "next": None, "previous": None, "results": []},
         )
 
-        self.zaken_client.fetch_zaken(user_kvk="12345678", vestigingsnummer="987654321")
+        self.zaken_client.fetch_zaken(
+            KVKIdentification(kvk="12345678", vestigingsnummer="987654321"),
+            use_rsin=False,
+        )
 
         self.assertEqual(len(m.request_history), 1)
         req = m.request_history[0]

@@ -143,6 +143,11 @@ ignore-names = [
 # Ignore security rules in test files
 "**/test_*.py" = ["S"]
 "**/tests/**/*.py" = ["S"]
+# MultiZgwClientProxy may only be used in its own module and in its dedicated tests
+"src/open_inwoner/openzaak/clients.py" = ["TID251"]
+"src/open_inwoner/openzaak/exceptions.py" = ["TID251"]
+"src/open_inwoner/openzaak/services.py" = ["TID251"]
+"src/open_inwoner/openzaak/tests/test_clients.py" = ["TID251"]
 
 # Import sorting configuration (equivalent to isort)
 [tool.ruff.lint.isort]
@@ -170,3 +175,4 @@ line-ending = "lf"
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "logging".msg = "Use `structlog.get_logger(__name__)` instead of the stdlib logging module."
+"open_inwoner.openzaak.clients.MultiZgwClientProxy".msg = "Use ZGWService instead of MultiZgwClientProxy directly."

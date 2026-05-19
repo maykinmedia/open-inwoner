@@ -75,6 +75,11 @@ Onderhoud
   ``django-silk`` (5.5.0) en ``django-cms`` (4.1.10).
 * [:gh:`2481`]: zizmor toegevoegd aan de CI-pipeline voor automatische beveiligingsanalyse van GitHub Actions-workflows.
 * [:gh:`2499`]: Python bijgewerkt naar versie ``3.13``.
+* [:gh:`2501`]: Alle logica met betrekking tot ZGW is gecentraliseerd in de nieuwe ZGWService
+  in openzaak/services.py. Een linting-regel zorgt ervoor dat MultiZgwClientProxy alleen wordt
+  geïmporteerd in openzaak-modules die deze klasse nodig hebben. Andere sites moeten in plaats
+  daarvan de nieuwe ZGWService gebruiken. Verbeterde testdekking door het toevoegen van tests
+  voor ZGWService.
 
 2.2.0 (2026-04-20)
 ==================

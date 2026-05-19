@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import Http404, HttpRequest
 from django.template.response import TemplateResponse
@@ -12,9 +14,10 @@ from open_inwoner.cms.cases.metrics import (
     case_document_uploads,
     case_list_views,
 )
-from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
+from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.openzaak.services import ZaakNotFound, ZGWService
 from open_inwoner.openzaak.types import UniformCase
-from open_inwoner.openzaak.utils import is_zaak_visible
 from open_inwoner.utils.views import LogMixin
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -108,12 +111,16 @@ class CaseAccessMixin(AccessMixin):
     - case confidentiality is not higher than globally configured
     """
 
+    zaak: Zaak | None = None
+    api_group: ZGWApiGroupConfig | None = None
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             logger.info("CaseAccessMixin - permission denied: user not authenticated")
             return self.handle_no_permission()
 
-        if not request.user.bsn and not request.user.kvk:
+        user_identification = request.user.identification
+        if not user_identification:
             logger.info(
                 "CaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
             )
@@ -129,86 +136,20 @@ class CaseAccessMixin(AccessMixin):
                 logger.exception("Non-existent ZGWApiGroupConfig passed")
                 raise Http404 from exc
 
-            client = api_group.zaken_client
-            self.zaak = client.fetch_single_zaak(object_id)
-            if self.zaak:
-                # check if we have the correct role in this case
-                config = OpenZaakConfig.get_solo()
-                limit_access_to_role = config.limit_user_visible_cases_to_role
-                if request.user.bsn:
-                    rollen = client.fetch_roles_for_zaak_and_bsn(
-                        self.zaak.url, request.user.bsn
-                    )
-                    if not rollen or (
-                        limit_access_to_role
-                        and not any(
-                            rol.omschrijving_generiek == limit_access_to_role
-                            for rol in rollen
-                        )
-                    ):
-                        logger.info(
-                            "CaseAccessMixin - permission denied via bsn: no or incorrect role for the case",
-                            zaak_url=self.zaak.url,
-                        )
-                        return self.handle_no_permission()
-                elif request.user.kvk:
-                    identifier = self.request.user.kvk
-                    if api_group.fetch_eherkenning_zaken_with_rsin:
-                        identifier = self.request.user.rsin
-
-                    vestigingsnummer = request.user.vestiging
-                    if vestigingsnummer:
-                        rollen = client.fetch_roles_for_zaak_and_vestigingsnummer(
-                            self.zaak.url, vestigingsnummer
-                        )
-                        if not rollen or (
-                            limit_access_to_role
-                            and not any(
-                                rol.omschrijving_generiek == limit_access_to_role
-                                for rol in rollen
-                            )
-                        ):
-                            logger.info(
-                                "CaseAccessMixin - permission denied via vestigingsnummer: no or incorrect role for the case",
-                                zaak_url=self.zaak.url,
-                            )
-                            return self.handle_no_permission()
-                    else:
-                        rollen = client.fetch_roles_for_zaak_and_kvk_or_rsin(
-                            self.zaak.url, identifier
-                        )
-                        if not rollen or (
-                            limit_access_to_role
-                            and not any(
-                                rol.omschrijving_generiek == limit_access_to_role
-                                for rol in rollen
-                            )
-                        ):
-                            logger.info(
-                                "CaseAccessMixin - permission denied via kvk/rsin: no or incorrect role for the case",
-                                zaak_url=self.zaak.url,
-                            )
-                            return self.handle_no_permission()
-
-                # resolve case-type
-                catalogi_client = api_group.catalogi_client
-                self.zaak.zaaktype = catalogi_client.fetch_single_zaaktype(
-                    self.zaak.zaaktype
+            try:
+                result = ZGWService().check_zaak_access(
+                    object_id, user_identification, api_group
                 )
-                if not self.zaak.zaaktype:
-                    logger.info(
-                        "CaseAccessMixin - permission denied: no case type for case",
-                        zaak_url=self.zaak.url,
-                    )
+            except ZaakNotFound:
+                # TODO: distinguish between temporary API failures and genuine 404 when
+                # the refactoring of error-handling is complete (GH #2142)
+                pass
+            else:
+                if result is None:
                     return self.handle_no_permission()
-
-                # check if case + case-type are visible
-                if not is_zaak_visible(self.zaak):
-                    logger.info(
-                        "CaseAccessMixin - permission denied: case  is not visible",
-                        zaak_url=self.zaak.url,
-                    )
-                    return self.handle_no_permission()
+                zaak, api_group = result
+                self.zaak = zaak
+                self.api_group = api_group
 
         return super().dispatch(request, *args, **kwargs)
 

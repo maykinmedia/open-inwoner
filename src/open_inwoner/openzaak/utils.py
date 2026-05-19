@@ -1,9 +1,9 @@
 import structlog
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.openzaak.api_models import InformatieObject, Rol, Zaak, ZaakType
+from open_inwoner.openzaak.api_models import InformatieObject, Rol, ZaakType
 
-from .models import OpenZaakConfig, ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
+from .models import ZaakTypeConfig, ZaakTypeInformatieObjectTypeConfig
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -51,34 +51,6 @@ def is_info_object_visible(
         return False
 
     return is_object_visible(info_object, max_confidentiality_level)
-
-
-def is_zaak_visible(zaak: Zaak) -> bool:
-    """Check if zaak is visible for users"""
-    config = OpenZaakConfig.get_solo()
-    if isinstance(zaak.zaaktype, str):
-        raise ValueError("expected zaak.zaaktype to be resolved from url to model")
-
-    if not zaak.status and not config.show_cases_without_status:
-        logger.info(
-            "Ignoring zaak as not visible for users: zaak has no status and show_cases_without_status is disabled",
-            zaak_url=zaak.url,
-        )
-        return False
-    if not zaak.zaaktype:
-        logger.info(
-            "Ignoring zaak as not visible for users: zaak has no zaaktype",
-            zaak_url=zaak.url,
-        )
-        return False
-    if zaak.zaaktype.indicatie_intern_of_extern != "extern":
-        logger.info(
-            "Ignoring zaak  as not visible for users: zaaktype is intern",
-            zaak_url=zaak.url,
-        )
-        return False
-
-    return is_object_visible(zaak, config.zaak_max_confidentiality)
 
 
 def get_role_name_display(rol: Rol) -> str:
