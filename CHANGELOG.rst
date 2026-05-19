@@ -52,6 +52,10 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2537`]: De mijn zaken-plugin gebruikt nu de ``vervolg_link`` van een
+  formulier als doorlink-URL voor de kaart, in plaats van een zaakdetail-URL
+  die niet van toepassing is op formulieren. Formulieren zonder ``vervolg_link``
+  tonen geen klikbare URL.
 * [:gh:`2535`]: ``klantcontacten_for_partij`` in de OpenKlant2-service verwerkt
   nu robuust klantcontacten waarbij ``_expand.hadBetrokkenen`` ontbreekt of een
   onverwachte structuur heeft. Dergelijke items worden overgeslagen (met een
