@@ -1,4 +1,5 @@
 import datetime
+import re
 import uuid
 from dataclasses import dataclass
 from datetime import timedelta
@@ -31,6 +32,7 @@ from openklant_client.types.resources.betrokkene import (
 from openklant_client.types.resources.digitaal_adres import (
     DigitaalAdres,
     DigitaalAdresCreateData,
+    DigitaalAdresPartialUpdateData,
 )
 from openklant_client.types.resources.interne_taak import InterneTaak
 from openklant_client.types.resources.klant_contact import (
@@ -85,6 +87,18 @@ from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import LogMixin
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+def _normalize_phone(phone: str) -> str:
+    """Strip formatting; convert leading '+' to '00' (API requires 00-prefix, not +)."""
+    stripped = re.sub(r"[^0-9+]", "", phone.strip())
+    if stripped.startswith("+"):
+        stripped = "00" + stripped[1:]
+    return stripped
+
+
+def _normalize_email(email: str) -> str:
+    return email.strip().lower()
 
 
 class BsnFetchParam(TypedDict):
@@ -1251,9 +1265,18 @@ class OpenKlant2Service(
         uuid: str,
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
-        is_standaard_adres: bool = False,
+        is_standaard_adres: bool | None = None,
         adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
+        match soort_adres:
+            case "telefoonnummer":
+                normalize = _normalize_phone
+            case "email":
+                normalize = _normalize_email
+            case _:
+                assert_never(soort_adres)
+        adres = normalize(adres)
+
         digitale_adressen = self._filter_digitale_addressen(
             subject_type=subject_type,
             uuid=uuid,
@@ -1261,17 +1284,23 @@ class OpenKlant2Service(
             adressen=adressen,
         )
         for digitaal_adres in digitale_adressen:
-            if (
-                digitaal_adres["adres"] == adres
-                and digitaal_adres["isStandaardAdres"] == is_standaard_adres
-            ):
+            if normalize(digitaal_adres["adres"]) == adres:
+                if (
+                    is_standaard_adres is True
+                    and not digitaal_adres["isStandaardAdres"]
+                ):
+                    updated = self.client.digitaal_adres.partial_update(
+                        digitaal_adres["uuid"],
+                        data=DigitaalAdresPartialUpdateData(isStandaardAdres=True),
+                    )
+                    return updated, False
                 return digitaal_adres, False
 
         if subject_type == "partij":
             adres_data = DigitaalAdresCreateData(
                 adres=adres,
                 soortDigitaalAdres=soort_adres,
-                isStandaardAdres=is_standaard_adres,
+                isStandaardAdres=is_standaard_adres or False,
                 omschrijving="OIP profiel",
                 verstrektDoorPartij={"uuid": uuid},
                 verstrektDoorBetrokkene=None,
@@ -1280,7 +1309,7 @@ class OpenKlant2Service(
             adres_data = DigitaalAdresCreateData(
                 adres=adres,
                 soortDigitaalAdres=soort_adres,
-                isStandaardAdres=is_standaard_adres,
+                isStandaardAdres=is_standaard_adres or False,
                 omschrijving="OIP profiel",
                 verstrektDoorBetrokkene={"uuid": uuid},
                 verstrektDoorPartij=None,
@@ -1293,7 +1322,7 @@ class OpenKlant2Service(
         partij_uuid: str,
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
-        is_standaard_adres: bool = False,
+        is_standaard_adres: bool | None = None,
         adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
         return self._get_or_create_digitaal_adres(
@@ -1310,7 +1339,7 @@ class OpenKlant2Service(
         betrokkene_uuid: str,
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
-        is_standaard_adres: bool = False,
+        is_standaard_adres: bool | None = None,
         adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
         return self._get_or_create_digitaal_adres(

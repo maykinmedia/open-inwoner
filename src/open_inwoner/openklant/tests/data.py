@@ -278,16 +278,6 @@ class MockAPIReadPatchData(MockAPIData):
                 "results": [],
             },
         )
-        m.post(
-            f"{OPENKLANT2_ROOT}/digitaleadressen",
-            headers={"Content-Type": "application/json"},
-            json={
-                "count": 1,
-                "next": None,
-                "previous": None,
-                "results": [],
-            },
-        )
         m.get(
             f"http://localhost:8338/klantinteracties/api/v1/digitaleadressen?verstrektDoorPartij__uuid={self.partij_uuid}",
             json={
@@ -363,17 +353,25 @@ class MockAPIReadPatchData(MockAPIData):
             },
         )
 
-        # Mock for creating new digital addresses
+        # Mock for creating new digital addresses: echo back the request body so the
+        # returned soortDigitaalAdres matches what was sent (prevents false cache hits).
+        def _create_digitaal_adres(request, context):
+            body = request.json()
+            return {
+                "uuid": "new-adres-uuid",
+                "adres": body["adres"],
+                "soortDigitaalAdres": body["soortDigitaalAdres"],
+                "isStandaardAdres": body.get("isStandaardAdres", False),
+                "verstrektDoorPartij": body.get("verstrektDoorPartij")
+                or {"uuid": self.partij_uuid},
+                "verstrektDoorBetrokkene": body.get("verstrektDoorBetrokkene"),
+                "omschrijving": body.get("omschrijving", ""),
+            }
+
         m.post(
             "http://localhost:8338/klantinteracties/api/v1/digitaleadressen",
             headers={"Content-Type": "application/json"},
-            json={
-                "uuid": "new-email-uuid",
-                "adres": "new@example.com",
-                "soortDigitaalAdres": "email",
-                "isStandaardAdres": True,
-                "verstrektDoorPartij": {"uuid": self.partij_uuid},
-            },
+            json=_create_digitaal_adres,
         )
 
         klantcontact = {
