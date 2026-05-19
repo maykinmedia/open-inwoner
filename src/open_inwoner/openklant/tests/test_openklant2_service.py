@@ -8,6 +8,8 @@ from open_inwoner.openklant.services import (
     OpenKlant2Answer,
     OpenKlant2Question,
     OpenKlant2Service,
+    _normalize_email,
+    _normalize_phone,
 )
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 
@@ -868,6 +870,219 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(q3.question, "Question 3?")
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
+
+
+class NormalizeHelpersTestCase(TestCase):
+    def test_normalize(self):
+        cases = [
+            (_normalize_phone, "06-12 345 678", "0612345678"),
+            (_normalize_phone, "+31 6 12 34 56 78", "0031612345678"),
+            (_normalize_phone, "  0612345678  ", "0612345678"),
+            (_normalize_email, "User@Example.COM", "user@example.com"),
+            (_normalize_email, "  user@example.com  ", "user@example.com"),
+        ]
+        for fn, value, expected in cases:
+            with self.subTest(fn=fn.__name__, value=value):
+                self.assertEqual(fn(value), expected, f"{fn.__name__}({value!r})")
+
+
+def _make_digitaal_adres(adres, soort, is_standaard=True, uuid_str="addr-uuid"):
+    return {
+        "uuid": uuid_str,
+        "soortDigitaalAdres": soort,
+        "adres": adres,
+        "isStandaardAdres": is_standaard,
+        "omschrijving": "OIP profiel",
+        "verstrektDoorPartij": {"uuid": "partij-uuid"},
+        "verstrektDoorBetrokkene": None,
+    }
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class GetOrCreateDigitaalAdresNormalizationTestCase(TestCase):
+    """Deduplication must survive formatting differences in stored vs incoming values."""
+
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+
+    def _service_with_existing(self, mock_client_class, existing_adres):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [existing_adres],
+        }
+        return OpenKlant2Service(config=self.config), mock_client
+
+    def test_phone_not_duplicated_when_formatting_differs(self, mock_client_class):
+        existing = _make_digitaal_adres("06-12 345 678", "telefoonnummer")
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="0612345678",
+            is_standaard_adres=True,
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+
+    def test_phone_not_duplicated_when_international_format_differs(
+        self, mock_client_class
+    ):
+        existing = _make_digitaal_adres("+31 6 12345678", "telefoonnummer")
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="+31612345678",
+            is_standaard_adres=True,
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+
+    def test_email_not_duplicated_when_case_differs(self, mock_client_class):
+        existing = _make_digitaal_adres("User@Example.COM", "email", is_standaard=False)
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="email",
+            adres="user@example.com",
+            is_standaard_adres=False,
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+
+    def test_phone_created_normalized_when_no_existing(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = {
+            "count": 0,
+            "next": None,
+            "previous": None,
+            "results": [],
+        }
+        mock_client.digitaal_adres.create.return_value = _make_digitaal_adres(
+            "0612345678", "telefoonnummer"
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="06-12 345 678",
+            is_standaard_adres=True,
+        )
+
+        create_call = mock_client.digitaal_adres.create.call_args
+        self.assertEqual(create_call[1]["data"]["adres"], "0612345678")
+
+    def test_email_created_normalized_when_no_existing(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = {
+            "count": 0,
+            "next": None,
+            "previous": None,
+            "results": [],
+        }
+        mock_client.digitaal_adres.create.return_value = _make_digitaal_adres(
+            "user@example.com", "email", is_standaard=False
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="email",
+            adres="  User@Example.COM  ",
+            is_standaard_adres=False,
+        )
+
+        create_call = mock_client.digitaal_adres.create.call_args
+        self.assertEqual(create_call[1]["data"]["adres"], "user@example.com")
+
+    def test_different_phone_still_creates_new(self, mock_client_class):
+        existing = _make_digitaal_adres("0612345678", "telefoonnummer")
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+        mock_client.digitaal_adres.create.return_value = _make_digitaal_adres(
+            "0687654321", "telefoonnummer", uuid_str="new-uuid"
+        )
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="0687654321",
+            is_standaard_adres=True,
+        )
+
+        self.assertTrue(created)
+        mock_client.digitaal_adres.create.assert_called_once()
+
+    def test_not_duplicated_when_only_is_standaard_differs(self, mock_client_class):
+        existing = _make_digitaal_adres(
+            "0612345678", "telefoonnummer", is_standaard=True
+        )
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="0612345678",
+            is_standaard_adres=False,
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+        mock_client.digitaal_adres.partial_update.assert_not_called()
+
+    def test_not_duplicated_when_is_standaard_adres_is_none(self, mock_client_class):
+        existing = _make_digitaal_adres(
+            "0612345678", "telefoonnummer", is_standaard=True
+        )
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+
+        _, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="0612345678",
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+        mock_client.digitaal_adres.partial_update.assert_not_called()
+
+    def test_patches_is_standaard_when_existing_is_not_standaard(
+        self, mock_client_class
+    ):
+        existing = _make_digitaal_adres(
+            "0612345678", "telefoonnummer", is_standaard=False
+        )
+        service, mock_client = self._service_with_existing(mock_client_class, existing)
+        patched = _make_digitaal_adres(
+            "0612345678", "telefoonnummer", is_standaard=True
+        )
+        mock_client.digitaal_adres.partial_update.return_value = patched
+
+        result, created = service.get_or_create_digitaal_adres_for_partij(
+            partij_uuid="partij-uuid",
+            soort_adres="telefoonnummer",
+            adres="0612345678",
+            is_standaard_adres=True,
+        )
+
+        self.assertFalse(created)
+        mock_client.digitaal_adres.create.assert_not_called()
+        mock_client.digitaal_adres.partial_update.assert_called_once_with(
+            "addr-uuid", data={"isStandaardAdres": True}
+        )
+        self.assertEqual(result, patched)
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
