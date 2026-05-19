@@ -49,6 +49,11 @@ from .choices import (
 )
 from .managers import ActionQueryset, DigidManager, UserManager, eHerkenningManager
 from .query import InviteQuerySet, MessageQuerySet
+from .user_identification import (
+    BSNIdentification,
+    KVKIdentification,
+    UserIdentification,
+)
 
 if TYPE_CHECKING:
     from open_inwoner.haalcentraal.api_models import BRP2xPersoon, BRP13Persoon
@@ -824,6 +829,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_bsn_user(self) -> bool:
         return bool(self.bsn)
+
+    @property
+    def identification(self) -> UserIdentification | None:
+        if self.bsn:
+            return BSNIdentification(bsn=self.bsn)
+        if self.kvk:
+            return KVKIdentification(
+                kvk=self.kvk,
+                rsin=self.rsin or None,
+                vestigingsnummer=self.vestiging or None,
+            )
+        return None
 
     @property
     def is_bsn_user_with_brp(self) -> bool:

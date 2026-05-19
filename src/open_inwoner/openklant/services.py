@@ -79,7 +79,6 @@ from open_inwoner.openklant.wrap import (
     get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.identity import BSNIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.api import ClientError, get_json_response
@@ -1877,7 +1876,7 @@ class OpenKlant2Service(
         # find the unique zaak + relevant api group for the question
         identificatie = onderwerp_object["onderwerpobjectidentificator"]["objectId"]
         results = ZGWService().search_zaken(
-            BSNIdentity(bsn=user.bsn), identificatie=identificatie
+            user.identification, zaak_identificatie=identificatie
         )
 
         if not results:

@@ -9,7 +9,6 @@ from treebeard.mp_tree import MP_NodeQuerySet
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZaakTypeConfig
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.views import LogMixin
@@ -52,11 +51,11 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
         """
         Returns the categories linked to ZaakTypen for which the request's user has Zaken.
         """
-        user_identity = UserIdentity.from_request(request)
-        if not user_identity:
+        user_identification = request.user.identification
+        if not user_identification:
             return self
 
-        raw_zaken = ZGWService().get_raw_zaken(user_identity)
+        raw_zaken = ZGWService().get_raw_zaken(user_identification)
         cases = [z.zaak for z in raw_zaken]
         return self.filter_by_zaken(cases)
 

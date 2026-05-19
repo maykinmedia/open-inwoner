@@ -15,7 +15,6 @@ from open_inwoner.cms.cases.metrics import (
     case_list_views,
 )
 from open_inwoner.openzaak.api_models import Zaak
-from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZaakNotFound, ZGWService
 from open_inwoner.openzaak.types import UniformCase
@@ -120,8 +119,8 @@ class CaseAccessMixin(AccessMixin):
             logger.info("CaseAccessMixin - permission denied: user not authenticated")
             return self.handle_no_permission()
 
-        identity = UserIdentity.from_request(request)
-        if not identity:
+        user_identification = request.user.identification
+        if not user_identification:
             logger.info(
                 "CaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"
             )
@@ -138,7 +137,9 @@ class CaseAccessMixin(AccessMixin):
                 raise Http404 from exc
 
             try:
-                result = ZGWService().check_zaak_access(object_id, identity, api_group)
+                result = ZGWService().check_zaak_access(
+                    object_id, user_identification, api_group
+                )
             except ZaakNotFound:
                 # TODO: distinguish between temporary API failures and genuine 404 when
                 # the refactoring of error-handling is complete (GH #2142)

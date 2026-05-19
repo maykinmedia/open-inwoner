@@ -46,7 +46,6 @@ from open_inwoner.openklant.services import (
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
 from open_inwoner.openzaak.documents import fetch_single_information_object_uuid
-from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -258,8 +257,10 @@ class InnerCaseDetailView(
 
             openzaak_config = OpenZaakConfig.get_solo()
             api_group = self.api_group
-            identity = UserIdentity.from_request(self.request)
-            zaak_detail = ZGWService().get_zaak_detail(self.zaak, api_group, identity)
+            user_identification = self.request.user.identification
+            zaak_detail = ZGWService().get_zaak_detail(
+                self.zaak, api_group, user_identification
+            )
 
             self.store_statustype_mapping(self.zaak.zaaktype.identificatie)
 

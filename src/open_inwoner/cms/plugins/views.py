@@ -15,7 +15,6 @@ from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.constants import TypeAanvraag
-from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.types import UniformCase
 
@@ -41,7 +40,9 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         return _("Zaaknummer: %(identification)s") % {"identification": identification}
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
-        identity = UserIdentity.from_request(request)
+        user_identification = (
+            request.user.identification if request.user.is_authenticated else None
+        )
         case_service = ZGWService()
 
         # Get plugin instance for title
@@ -78,7 +79,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         )
         try:
             formulieren: Sequence[UniformCase] | None = case_service.get_formulieren(
-                identity
+                user_identification
             )
         except Exception:
             logger.error("Failed to retrieve formulieren", user=request.user)
@@ -86,7 +87,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             msg = partial_error_msg
         try:
             preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken(
-                identity
+                user_identification
             )
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)

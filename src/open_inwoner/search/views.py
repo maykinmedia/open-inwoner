@@ -13,7 +13,6 @@ import structlog
 from furl import furl
 
 from open_inwoner.configurations.models import SiteConfiguration
-from open_inwoner.openzaak.identity import UserIdentity
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin, LogMixin
@@ -83,8 +82,12 @@ class SearchView(
             self.log_user_action(user, _("search query: {query}").format(query=query))
 
         # Check if the query exactly matches with a case that belongs to the user
-        if user_identity := UserIdentity.from_request(self.request):
-            results = ZGWService().search_zaken(user_identity, zaak_identificatie=query)
+        if self.request.user.is_authenticated and (
+            user_identification := self.request.user.identification
+        ):
+            results = ZGWService().search_zaken(
+                user_identification, zaak_identificatie=query
+            )
 
             # TODO: We should simply return multiple cases in the search results,
             # rather than redirect. For now, we maintain the existing behavior

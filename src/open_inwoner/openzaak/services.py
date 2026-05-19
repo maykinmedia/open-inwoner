@@ -12,6 +12,11 @@ import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.concurrent import parallel
 
+from open_inwoner.accounts.user_identification import (
+    BSNIdentification,
+    KVKIdentification,
+    UserIdentification,
+)
 from open_inwoner.openzaak.api_models import (
     Formulier,
     InformatieObject,
@@ -29,7 +34,6 @@ from open_inwoner.openzaak.clients import (
 )
 from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
-from open_inwoner.openzaak.identity import BSNIdentity, KVKIdentity, UserIdentity
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -189,7 +193,7 @@ class ZGWService:
         return is_object_visible(zaak, config.zaak_max_confidentiality)
 
     def _get_formulieren_for_api_group(
-        self, group: ZGWApiGroupConfig, user_identity: UserIdentity
+        self, group: ZGWApiGroupConfig, user_identification: UserIdentification
     ) -> list[FormulierWithApiGroup]:
         if not group.forms_client:
             raise ValueError(f"{group} has no `forms_client`")
@@ -201,14 +205,14 @@ class ZGWService:
                 type_aanvraag=TypeAanvraag.FORMULIER,
             )
             for formulier in group.forms_client.fetch_formulieren(
-                user_identity, use_rsin=group.fetch_eherkenning_zaken_with_rsin
+                user_identification, use_rsin=group.fetch_eherkenning_zaken_with_rsin
             )
         ]
 
     def get_formulieren(
-        self, user_identity: UserIdentity | None
+        self, user_identification: UserIdentification | None
     ) -> list[FormulierWithApiGroup]:
-        if not user_identity:
+        if not user_identification:
             return []
 
         all_api_groups = list(
@@ -221,7 +225,7 @@ class ZGWService:
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
                 executor.submit(
-                    self._get_formulieren_for_api_group, group, user_identity
+                    self._get_formulieren_for_api_group, group, user_identification
                 )
                 for group in all_api_groups
             ]
@@ -307,7 +311,7 @@ class ZGWService:
     def check_zaak_access(
         self,
         zaak_id: str,
-        user_identity: UserIdentity,
+        user_identification: UserIdentification,
         api_group: ZGWApiGroupConfig,
     ) -> tuple[Zaak, ZGWApiGroupConfig] | None:
         zaken_client = self._zaken_client_factory(api_group)
@@ -324,7 +328,7 @@ class ZGWService:
 
         rollen = zaken_client.fetch_rollen_for_user(
             zaak.url,
-            user_identity,
+            user_identification,
             use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
         )
 
@@ -357,11 +361,11 @@ class ZGWService:
     def _get_raw_zaken_for_api_group(
         self,
         group: ZGWApiGroupConfig,
-        user_identity: UserIdentity,
+        user_identification: UserIdentification,
         zaak_identificatie: str | None = None,
     ) -> list[ZaakWithApiGroup]:
         raw_zaken = group.zaken_client.fetch_zaken(
-            user_identity,
+            user_identification,
             use_rsin=group.fetch_eherkenning_zaken_with_rsin,
             identificatie=zaak_identificatie,
         )
@@ -374,7 +378,7 @@ class ZGWService:
 
     def get_raw_zaken(
         self,
-        user_identity: UserIdentity,
+        user_identification: UserIdentification,
         zaak_identificatie: str | None = None,
     ) -> list[ZaakWithApiGroup]:
         """Fetch zaken without resolution. For PDC and cache seeding."""
@@ -388,7 +392,7 @@ class ZGWService:
                 executor.submit(
                     self._get_raw_zaken_for_api_group,
                     group,
-                    user_identity,
+                    user_identification,
                     zaak_identificatie,
                 )
                 for group in all_api_groups
@@ -409,11 +413,13 @@ class ZGWService:
         return fetched_zaken
 
     def search_zaken(
-        self, user_identity: UserIdentity, zaak_identificatie: str
+        self, user_identification: UserIdentification, zaak_identificatie: str
     ) -> list[ZaakWithApiGroup]:
         """Search for a zaak by zaak_identificatie across all API groups. Returns visible matches."""
         visible_zaken = []
-        for zaak_with_group in self.get_raw_zaken(user_identity, zaak_identificatie):
+        for zaak_with_group in self.get_raw_zaken(
+            user_identification, zaak_identificatie
+        ):
             try:
                 # TODO: could be done in parallel
                 self._resolve_zaak_type(zaak_with_group)
@@ -428,8 +434,10 @@ class ZGWService:
 
         return visible_zaken
 
-    def get_zaken(self, user_identity: UserIdentity) -> list[ZaakWithApiGroup]:
-        if not user_identity:
+    def get_zaken(
+        self, user_identification: UserIdentification
+    ) -> list[ZaakWithApiGroup]:
+        if not user_identification:
             return []
 
         all_api_groups = list(
@@ -447,7 +455,7 @@ class ZGWService:
         ] = []
         with parallel(max_workers=self._max_workers) as executor:
             fetch_raw_zaken_futures.extend(
-                executor.submit(self._get_raw_zaken_for_api_group, group, user_identity)
+                executor.submit(self._get_raw_zaken_for_api_group, group, user_identification)
                 for group in all_api_groups
             )
 
@@ -717,7 +725,7 @@ class ZGWService:
         self,
         zaak: Zaak,
         api_group: ZGWApiGroupConfig,
-        user_identity: UserIdentity,
+        user_identification: UserIdentification,
     ) -> str:
         zaken_client = api_group.zaken_client
 
@@ -726,12 +734,12 @@ class ZGWService:
                 zaak.url, role_desc_generic=RolOmschrijving.initiator
             )
         else:
-            match user_identity:
-                case BSNIdentity():
+            match user_identification:
+                case BSNIdentification():
                     betrokkene_type = RolTypes.natuurlijk_persoon
-                case KVKIdentity(vestigingsnummer=str()):
+                case KVKIdentification(vestigingsnummer=str()):
                     betrokkene_type = RolTypes.vestiging
-                case KVKIdentity():
+                case KVKIdentification():
                     betrokkene_type = RolTypes.niet_natuurlijk_persoon
                 case _:
                     return ""
@@ -747,7 +755,7 @@ class ZGWService:
         self,
         zaak: Zaak,
         api_group: ZGWApiGroupConfig,
-        user_identity: UserIdentity,
+        user_identification: UserIdentification,
     ) -> ZaakDetailData:
         """Fetch and resolve all ZGW API data for the zaak detail page.
 
@@ -770,7 +778,7 @@ class ZGWService:
         )
 
         documents = self._fetch_zaak_documents(zaak, api_group)
-        initiator = self._get_initiator_display(zaak, api_group, user_identity)
+        initiator = self._get_initiator_display(zaak, api_group, user_identification)
 
         result: dict = {}
         if zaak.resultaat:
