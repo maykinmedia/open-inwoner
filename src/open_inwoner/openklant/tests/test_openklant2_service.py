@@ -868,3 +868,191 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(q3.question, "Question 3?")
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class UpdatePartijFromUserDataTestCase(TestCase):
+    PARTIJ_UUID = "partij-uuid-1234"
+
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+
+    def _make_adres(self, uuid, soort, adres, is_standaard=False):
+        return {
+            "uuid": uuid,
+            "soortDigitaalAdres": soort,
+            "adres": adres,
+            "isStandaardAdres": is_standaard,
+            "omschrijving": "OIP profiel",
+            "verstrektDoorPartij": {"uuid": self.PARTIJ_UUID},
+            "verstrektDoorBetrokkene": None,
+        }
+
+    def _list_response(self, results):
+        return {
+            "count": len(results),
+            "next": None,
+            "previous": None,
+            "results": results,
+        }
+
+    def test_fetches_adressen_exactly_once_for_multiple_fields(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+        mock_client.digitaal_adres.create.side_effect = [
+            self._make_adres(
+                "ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+            ),
+            self._make_adres("em-uuid", "email", "test@example.com"),
+        ]
+
+        service = OpenKlant2Service(config=self.config)
+        service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={"phonenumber": "0612345678", "email": "test@example.com"},
+        )
+
+        mock_client.digitaal_adres.list.assert_called_once()
+
+    def test_returns_empty_when_update_data_is_empty(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={},
+        )
+
+        self.assertEqual(result, [])
+        mock_client.digitaal_adres.create.assert_not_called()
+
+    def test_reuses_existing_adres_without_creating(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        existing = self._make_adres("existing-uuid", "email", "test@example.com")
+        mock_client.digitaal_adres.list.return_value = self._list_response([existing])
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={"email": "test@example.com"},
+        )
+
+        self.assertEqual(result, [])
+        mock_client.digitaal_adres.create.assert_not_called()
+
+    def test_creates_missing_adres_and_reports_field(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+        mock_client.digitaal_adres.create.return_value = self._make_adres(
+            "new-uuid", "email", "new@example.com"
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={"email": "new@example.com"},
+        )
+
+        self.assertEqual(result, ["digitaleAddresen.email"])
+        mock_client.digitaal_adres.create.assert_called_once()
+
+    def test_phonenumber_created_as_standaard_adres(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+        mock_client.digitaal_adres.create.return_value = self._make_adres(
+            "ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={"phonenumber": "0612345678"},
+        )
+
+        create_data = mock_client.digitaal_adres.create.call_args[1]["data"]
+        self.assertTrue(create_data["isStandaardAdres"])
+        self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
+
+    def test_phonenumber_alternative_created_as_non_standaard(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+        mock_client.digitaal_adres.create.return_value = self._make_adres(
+            "ph-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={"phonenumber_alternative": "0687654321"},
+        )
+
+        create_data = mock_client.digitaal_adres.create.call_args[1]["data"]
+        self.assertFalse(create_data["isStandaardAdres"])
+        self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
+
+    def test_newly_created_adres_visible_to_subsequent_calls_without_extra_fetch(
+        self, mock_client_class
+    ):
+        """
+        A newly created standard phonenumber is appended to the local cache so the
+        alternative phonenumber lookup can find it via the same list — no second API call.
+        """
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = self._list_response([])
+        mock_client.digitaal_adres.create.side_effect = [
+            self._make_adres(
+                "ph-std-uuid", "telefoonnummer", "0612345678", is_standaard=True
+            ),
+            self._make_adres(
+                "ph-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+            ),
+        ]
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={
+                "phonenumber": "0612345678",
+                "phonenumber_alternative": "0687654321",
+            },
+        )
+
+        self.assertEqual(mock_client.digitaal_adres.list.call_count, 1)
+        self.assertEqual(mock_client.digitaal_adres.create.call_count, 2)
+        self.assertEqual(result.count("digitaleAddresen.telefoonnummer"), 2)
+
+    def test_existing_standard_phone_reused_alternative_still_created(
+        self, mock_client_class
+    ):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        existing_standard = self._make_adres(
+            "existing-ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+        )
+        mock_client.digitaal_adres.list.return_value = self._list_response(
+            [existing_standard]
+        )
+        mock_client.digitaal_adres.create.return_value = self._make_adres(
+            "new-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_partij_from_user_data(
+            partij_uuid=self.PARTIJ_UUID,
+            update_data={
+                "phonenumber": "0612345678",
+                "phonenumber_alternative": "0687654321",
+            },
+        )
+
+        mock_client.digitaal_adres.list.assert_called_once()
+        mock_client.digitaal_adres.create.assert_called_once()
+        self.assertEqual(result, ["digitaleAddresen.telefoonnummer"])

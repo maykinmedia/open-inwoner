@@ -34,6 +34,8 @@ Nieuwe features
   zodat duplicaten die door OpenZaak worden aangemaakt (vermeldingen met dezelfde
   'omschrijving' als bestaande vermeldingen) automatisch worden ingevuld met de
   configuratiewaarden van bestaande vermeldingen in OIP.
+* [:taiga-is:`3639`]: Overbodige API-aanroepen bij het bijwerken van digitale adressen
+  verminderd.
 
 Bugfixes
 --------

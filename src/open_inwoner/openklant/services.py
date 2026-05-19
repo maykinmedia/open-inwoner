@@ -1343,11 +1343,13 @@ class OpenKlant2Service(
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
         is_standaard_adres: bool = False,
+        adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
         digitale_adressen = self._filter_digitale_addressen(
             subject_type=subject_type,
             uuid=uuid,
             soort_digital_adres=soort_adres,
+            adressen=adressen,
         )
         for digitaal_adres in digitale_adressen:
             if (
@@ -1383,6 +1385,7 @@ class OpenKlant2Service(
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
         is_standaard_adres: bool = False,
+        adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
         return self._get_or_create_digitaal_adres(
             "partij",
@@ -1390,6 +1393,7 @@ class OpenKlant2Service(
             soort_adres=soort_adres,
             adres=adres,
             is_standaard_adres=is_standaard_adres,
+            adressen=adressen,
         )
 
     def get_or_create_digitaal_adres_for_betrokkene(
@@ -1398,6 +1402,7 @@ class OpenKlant2Service(
         soort_adres: Literal["email", "telefoonnummer"],
         adres: str,
         is_standaard_adres: bool = False,
+        adressen: list[DigitaalAdres] | None = None,
     ) -> tuple[DigitaalAdres, bool]:
         return self._get_or_create_digitaal_adres(
             "betrokkene",
@@ -1405,6 +1410,7 @@ class OpenKlant2Service(
             soort_adres=soort_adres,
             adres=adres,
             is_standaard_adres=is_standaard_adres,
+            adressen=adressen,
         )
 
     def update_user_from_partij(self, partij_uuid: str, user: User):
@@ -1454,30 +1460,35 @@ class OpenKlant2Service(
         update_data: PartijUpdateData,
     ) -> list[str]:
         updated_fields: list[str] = []
+        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
 
         if phonenumber := update_data.get("phonenumber"):
-            _, created = self.get_or_create_digitaal_adres_for_partij(
+            digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
                 partij_uuid=partij_uuid,
                 soort_adres="telefoonnummer",
                 adres=phonenumber,
                 is_standaard_adres=True,
+                adressen=adressen,
             )
             if created:
                 updated_fields.append("digitaleAddresen.telefoonnummer")
+                adressen.append(digital_adres)
 
         for attr, soort_adres in (
             ("email", "email"),
             ("phonenumber_alternative", "telefoonnummer"),
         ):
             if adres := update_data.get(attr):
-                _, created = self.get_or_create_digitaal_adres_for_partij(
+                digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
                     partij_uuid=partij_uuid,
                     soort_adres=cast(Literal["email", "telefoonnummer"], soort_adres),
                     adres=adres,
                     is_standaard_adres=False,
+                    adressen=adressen,
                 )
                 if created:
                     updated_fields.append(f"digitaleAddresen.{soort_adres}")
+                    adressen.append(digital_adres)
 
         if updated_fields:
             system_action(
