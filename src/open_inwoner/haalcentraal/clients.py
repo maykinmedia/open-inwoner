@@ -3,16 +3,31 @@ from abc import ABC
 
 from django.core.exceptions import ImproperlyConfigured
 
-import requests
 from zgw_consumers.client import build_client
 
 from open_inwoner.haalcentraal.api_models import BRP2xPersoon, BRP13Persoon
 from open_inwoner.haalcentraal.models import BrpVersionChoices, HaalCentraalConfig
-from open_inwoner.utils.api import get_json_response
+from open_inwoner.utils.api import BaseAPIClient
+
+from .exceptions import (
+    BRPAPIClientError,
+    BRPAPIInvalidJSONError,
+    BRPAPINetworkError,
+    BRPAPIServerError,
+)
+
+
+class BRPAPIClient(BaseAPIClient):
+    network_error_type = BRPAPINetworkError
+    client_error_type = BRPAPIClientError
+    server_error_type = BRPAPIServerError
+    invalid_json_error_type = BRPAPIInvalidJSONError
 
 
 class BRPClient(ABC):
-    def __init__(self, client, version: str, extra_headers: dict | None = None):
+    def __init__(
+        self, client: BRPAPIClient, version: str, extra_headers: dict | None = None
+    ):
         self.client = client
         self.version = version
         self.extra_headers = extra_headers or {}
@@ -22,7 +37,7 @@ class BRPClient(ABC):
         config = HaalCentraalConfig.get_solo()
         if not config.service:
             raise ImproperlyConfigured("No service configured for Haal Centraal")
-        client = build_client(config.service)
+        client = build_client(config.service, client_factory=BRPAPIClient)
         extra_headers = {
             item["key"]: item["value"] for item in config.headers if item.get("key")
         }
@@ -76,7 +91,8 @@ class BRPClient13(BRPClient):
                 "geboorte.datum.datum,geboorte.plaats.omschrijving"
             },
         )
-        data = get_json_response(response, strict=True)
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
         if not data:
             return None
         return BRP13Persoon.model_validate(data)
@@ -91,7 +107,7 @@ class BRPClient2x(BRPClient):
     fields is stable across all these versions.
     """
 
-    def make_request(self, user_bsn: str) -> requests.Response:
+    def make_request(self, user_bsn: str):
         url = "personen"
 
         headers = {
@@ -125,8 +141,10 @@ class BRPClient2x(BRPClient):
         return response
 
     def fetch_brp_data_for_bsn(self, user_bsn: str) -> BRP2xPersoon | None:
-        data = get_json_response(self.make_request(user_bsn), strict=True)
-        personen = (data or {}).get("personen", [])
+        response = self.make_request(user_bsn)
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        personen = data.get("personen", [])
         if not personen:
             return None
         return BRP2xPersoon.model_validate(personen[0])

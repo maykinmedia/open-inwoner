@@ -23,7 +23,7 @@ from open_inwoner.cms.plugins.api_models import (
 from open_inwoner.cms.plugins.models import TasksConfig
 from open_inwoner.openzaak.api_models import OpenstaandeTaak
 from open_inwoner.openzaak.clients import build_forms_clients
-from open_inwoner.utils.api import ClientError
+from open_inwoner.openzaak.exceptions import ZGWAPIError
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -145,7 +145,7 @@ class TasksPlugin(CMSPluginBase):
         for zgw_client in build_forms_clients():
             try:
                 taken = zgw_client.fetch_open_tasks(bsn=bsn)
-            except (RequestException, ClientError):
+            except (ZGWAPIError, RequestException):
                 logger.exception(
                     "Error fetching 'openstaande taken' from ZGW API",
                     zgw_client=zgw_client,

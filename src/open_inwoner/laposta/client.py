@@ -4,13 +4,18 @@ from django.conf import settings
 from django.core.cache import cache
 
 import structlog
-from ape_pie.client import APIClient
-from requests.exceptions import RequestException
 
-from open_inwoner.utils.api import ClientError, get_json_response
+from open_inwoner.utils.api import BaseAPIClient
 from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import LapostaList, Member, UserData
+from .exceptions import (
+    LapostaAPIClientError,
+    LapostaAPIError,
+    LapostaAPIInvalidJSONError,
+    LapostaAPINetworkError,
+    LapostaAPIServerError,
+)
 from .models import LapostaConfig
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -24,22 +29,23 @@ def quote_email(email: str) -> str:
     return quote(email_with_quoted_plus)
 
 
-class LapostaClient(APIClient):
+class LapostaClient(BaseAPIClient):
+    network_error_type = LapostaAPINetworkError
+    client_error_type = LapostaAPIClientError
+    server_error_type = LapostaAPIServerError
+    invalid_json_error_type = LapostaAPIInvalidJSONError
+
     @cache_result("laposta_lists", timeout=settings.CACHE_LAPOSTA_API_TIMEOUT)
     def get_lists(self) -> list[LapostaList]:
-        try:
-            response = self.get("list")
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("error while fetching newsletters with Laposta")
-            return []
+        response = self.get("list")
+        self.raise_for_status(response)
+        data = self.parse_json(response)
 
-        if not data:
-            return []
-
-        lists = [LapostaList(**entry["list"]) for entry in data["data"]]
-
-        return lists
+        if not isinstance(data, dict):
+            raise LapostaAPIError(
+                f"Expected dict response from Laposta list endpoint, got {type(data).__name__}"
+            )
+        return [LapostaList(**entry["list"]) for entry in data.get("data", [])]
 
     def create_subscription(self, list_id: str, user_data: UserData) -> Member | None:
         response = self.post(
@@ -59,9 +65,8 @@ class LapostaClient(APIClient):
                     ip=user_data.ip,
                 )
 
-        data = get_json_response(response)
-        if not data:
-            return None
+        self.raise_for_status(response)
+        data = self.parse_json(response)
 
         # Ensure the current subscriptions for this email address are fetched again after
         # this API call
@@ -82,9 +87,8 @@ class LapostaClient(APIClient):
                 logger.info("Subscription does not exist for user")
                 return None
 
-        data = get_json_response(response)
-        if not data:
-            return None
+        self.raise_for_status(response)
+        data = self.parse_json(response)
 
         # Ensure the current subscriptions for this email address are fetched again after
         # this API call
