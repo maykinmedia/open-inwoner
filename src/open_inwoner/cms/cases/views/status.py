@@ -45,7 +45,6 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.documents import fetch_single_information_object_uuid
 from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -645,9 +644,10 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
+        service = ZGWService()
         try:
-            info_object = fetch_single_information_object_uuid(
-                info_object_uuid, api_group.documenten_client
+            info_object = service.fetch_information_object_by_uuid(
+                info_object_uuid, api_group
             )
         except ZgwAPIError as exc:
             raise Http404 from exc
@@ -655,8 +655,8 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         # check if this info_object belongs to this zaak
         try:
             zaak_info_objects = (
-                api_group.zaken_client.fetch_zaak_information_objects_for_zaak_and_info(
-                    self.zaak.url, info_object.url
+                service.fetch_zaak_information_objects_for_zaak_and_info(
+                    self.zaak.url, info_object.url, api_group
                 )
             )
         except ZgwAPIError as exc:
@@ -778,6 +778,7 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
         files = cleaned_data["files"]
 
         created_documents = []
+        service = ZGWService()
 
         for file in files:
             title = os.path.splitext(file.name)[0] or file.name
@@ -785,21 +786,20 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
             source_organization = self.zaak.bronorganisatie
 
             try:
-                created_document = api_group.documenten_client.upload_document(
+                created_document = service.upload_document(
                     request.user,
                     file,
                     title,
                     document_type.informatieobjecttype_url,
                     source_organization,
+                    api_group,
                 )
             except ZgwAPIError:
                 return self.handle_document_error(request, file)
 
             try:
-                created_relationship = (
-                    api_group.zaken_client.connect_case_with_document(
-                        self.zaak.url, created_document.get("url")
-                    )
+                service.connect_case_with_document(
+                    self.zaak.url, created_document.get("url"), api_group
                 )
             except ZgwAPIError:
                 return self.handle_document_error(request, file)

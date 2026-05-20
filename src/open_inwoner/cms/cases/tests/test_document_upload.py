@@ -38,15 +38,6 @@ class CaseDocumentUploadTitleTest(ClearCachesMixin, TestCase):
         self.mock_iot = MagicMock()
         self.mock_iot.informatieobjecttype_url = "http://example.com/iot/1/"
 
-        self.mock_api_group = MagicMock()
-        self.mock_api_group.documenten_client.upload_document.return_value = {
-            "url": "http://example.com/docs/1",
-            "titel": "placeholder",
-        }
-        self.mock_api_group.zaken_client.connect_case_with_document.return_value = {
-            "url": "http://example.com/zio/1"
-        }
-
     def _call_handle_upload(self, filename):
         view, request = _make_view(self.user, self.api_group.id, self.mock_zaak)
 
@@ -54,17 +45,30 @@ class CaseDocumentUploadTitleTest(ClearCachesMixin, TestCase):
         mock_form = MagicMock()
         mock_form.cleaned_data = {"files": [mock_file], "type": self.mock_iot}
 
+        mock_upload = MagicMock(
+            return_value={"url": "http://example.com/docs/1", "titel": "placeholder"}
+        )
+        mock_connect = MagicMock(return_value={"url": "http://example.com/zio/1"})
+
         with (
             patch(
                 "open_inwoner.cms.cases.views.status.ZGWApiGroupConfig.objects.get",
-                return_value=self.mock_api_group,
+                return_value=MagicMock(),
+            ),
+            patch(
+                "open_inwoner.cms.cases.views.status.ZGWService.upload_document",
+                mock_upload,
+            ),
+            patch(
+                "open_inwoner.cms.cases.views.status.ZGWService.connect_case_with_document",
+                mock_connect,
             ),
             patch.object(CaseLogMixin, "log_case_document_uploaded"),
             patch("open_inwoner.cms.cases.views.status.messages.add_message"),
         ):
             view.handle_document_upload(request, mock_form)
 
-        return self.mock_api_group.documenten_client.upload_document.call_args
+        return mock_upload.call_args
 
     def test_title_excludes_extension(self):
         cases = [
@@ -74,6 +78,5 @@ class CaseDocumentUploadTitleTest(ClearCachesMixin, TestCase):
         ]
         for filename, expected_title in cases:
             with self.subTest(filename=filename):
-                self.mock_api_group.documenten_client.upload_document.reset_mock()
                 call_args = self._call_handle_upload(filename)
                 self.assertEqual(call_args.args[2], expected_title)

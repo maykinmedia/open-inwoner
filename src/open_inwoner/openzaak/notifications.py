@@ -19,7 +19,6 @@ from open_inwoner.openzaak.api_models import (
     Zaak,
     ZaakInformatieObject,
 )
-from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
 from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.models import (
@@ -229,8 +228,8 @@ def _handle_zaakinformatieobject_notification(
         return
 
     try:
-        info_object = fetch_single_information_object_from_url(
-            ziobj.informatieobject, api_group=api_group
+        info_object = service.fetch_information_object_by_url(
+            ziobj.informatieobject, api_group
         )
     except ZgwAPIError:
         log_system_action(

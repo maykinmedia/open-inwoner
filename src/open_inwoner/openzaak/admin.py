@@ -16,8 +16,8 @@ import structlog
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
-from open_inwoner.openzaak.clients import build_zgw_client_from_service
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.forms import LimitedUploadFileField
 
 from .models import (
@@ -425,11 +425,9 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
     @admin.display(description=_("Externe naam (eSuite)"))
     def esuite_compat_naam(self, instance) -> str:
         try:
-            catalogi_client = build_zgw_client_from_service(
-                service=instance.zaaktype_config.catalogus.service
-            )
-            result_type = catalogi_client.fetch_single_resultaat_type(
-                resultaat_type_url=instance.resultaattype_url
+            result_type = ZGWService().fetch_single_resultaat_type_for_service(
+                instance.resultaattype_url,
+                instance.zaaktype_config.catalogus.service,
             )
         except Exception:
             logger.exception("Error fetching resultaattype for zaaktype_config admin.")

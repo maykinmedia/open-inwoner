@@ -20,6 +20,8 @@ from open_inwoner.accounts.user_identification import (
 from open_inwoner.openzaak.api_models import (
     Formulier,
     InformatieObject,
+    OpenstaandeTaak,
+    ResultaatType,
     Rol,
     Status,
     StatusType,
@@ -29,11 +31,11 @@ from open_inwoner.openzaak.api_models import (
 )
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
+    DocumentenClient,
     ZakenClient,
     build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.constants import TypeAanvraag
-from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
 from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -47,6 +49,7 @@ from open_inwoner.openzaak.utils import (
     is_info_object_visible,
     is_object_visible,
 )
+from open_inwoner.utils.decorators import cache as cache_result
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -158,6 +161,10 @@ class ZGWService:
     @staticmethod
     def _catalogi_client_factory(group: ZGWApiGroupConfig) -> CatalogiClient:
         return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
+
+    @staticmethod
+    def _documenten_client_factory(group: ZGWApiGroupConfig) -> DocumentenClient:
+        return cast(DocumentenClient, build_zgw_client_from_service(group.drc_service))
 
     @staticmethod
     def _is_zaak_visible(zaak: Zaak) -> bool:
@@ -651,8 +658,8 @@ class ZGWService:
         documents = []
         for case_info_obj in case_info_objects:
             try:
-                info_obj = fetch_single_information_object_from_url(
-                    case_info_obj.informatieobject, api_group=api_group
+                info_obj = self.fetch_information_object_by_url(
+                    case_info_obj.informatieobject, api_group
                 )
             except ZgwAPIError:
                 logger.error(

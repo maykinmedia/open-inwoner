@@ -12,7 +12,6 @@ from cms.plugin_pool import plugin_pool
 from objectsapiclient.models import ObjectsAPIServiceConfiguration
 from objectsapiclient.services import ObjectsAPIService
 from pydantic import ValidationError
-from requests import RequestException
 
 from open_inwoner.cms.plugins.api_models import (
     ExternFormulierTaakObject,
@@ -22,8 +21,7 @@ from open_inwoner.cms.plugins.api_models import (
 )
 from open_inwoner.cms.plugins.models import TasksConfig
 from open_inwoner.openzaak.api_models import OpenstaandeTaak
-from open_inwoner.openzaak.clients import build_forms_clients
-from open_inwoner.openzaak.exceptions import ZGWAPIError
+from open_inwoner.openzaak.services import ZGWService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -141,18 +139,7 @@ class TasksPlugin(CMSPluginBase):
         """
         Fetch `openstaande taken` from ZGW API's
         """
-        zgw_taken = []
-        for zgw_client in build_forms_clients():
-            try:
-                taken = zgw_client.fetch_open_tasks(bsn=bsn)
-            except (ZGWAPIError, RequestException):
-                logger.exception(
-                    "Error fetching 'openstaande taken' from ZGW API",
-                    zgw_client=zgw_client,
-                )
-            else:
-                zgw_taken.extend(taken)
-        return zgw_taken
+        return ZGWService().fetch_open_tasks(bsn)
 
     def get_tasks(
         self, instance

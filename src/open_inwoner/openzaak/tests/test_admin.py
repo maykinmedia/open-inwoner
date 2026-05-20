@@ -127,8 +127,10 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertFalse(self.ztiotc.document_upload_enabled)
 
     @requests_mock.Mocker()
-    @mock.patch("open_inwoner.openzaak.admin.build_zgw_client_from_service")
-    def test_display_esuite_compat_naam(self, m, mock_client):
+    @mock.patch(
+        "open_inwoner.openzaak.services.ZGWService.fetch_single_resultaat_type_for_service"
+    )
+    def test_display_esuite_compat_naam(self, m, mock_fetch):
         ZaakTypeResultaatTypeConfigFactory(
             zaaktype_config=self.ztc,
         )
@@ -143,9 +145,7 @@ class TestZaakTypeConfigAdmin(WebTest):
             archiefnominatie="foo",
             esuite_compat_naam="foobar",
         )
-        mock_client.return_value.fetch_single_resultaat_type.return_value = (
-            resultaat_type
-        )
+        mock_fetch.return_value = resultaat_type
 
         response = self.app.get(
             reverse(
