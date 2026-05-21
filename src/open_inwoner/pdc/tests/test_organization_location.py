@@ -21,7 +21,7 @@ class TestLocationFormInput(WebTest):
         user = UserFactory(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_organization_add"), user=user)
-        form = response.forms[1]
+        form = response.forms["organization_form"]
         form["name"] = organization.name
         form["slug"] = "a-slug-example"
         form["type"] = organization.type.pk
