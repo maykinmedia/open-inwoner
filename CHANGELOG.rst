@@ -36,6 +36,8 @@ Nieuwe features
   configuratiewaarden van bestaande vermeldingen in OIP.
 * [:taiga-is:`3639`]: Overbodige API-aanroepen bij het bijwerken van digitale adressen
   verminderd.
+* [:gh:`2517`]: ``min-release-age=2`` toegevoegd aan ``.npmrc``, minimale npm-versie
+  vastgelegd via ``engines`` in ``package.json`` en node bijgewerkt naar ``24.15`` (LTS).
 
 Bugfixes
 --------
