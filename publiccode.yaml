@@ -7,8 +7,8 @@ publiccodeYmlVersion: '0.2'
 name: Open Inwoner Platform
 url: 'http://github.com/maykinmedia/open-inwoner.git'
 softwareType: standalone
-softwareVersion: 2.1.2-rc2
-releaseDate: '2026-05-13'
+softwareVersion: 2.1.2
+releaseDate: '2026-05-22'
 logo: 'https://github.com/maykinmedia/open-inwoner/blob/develop/docs/logo.png'
 platforms:
   - web
