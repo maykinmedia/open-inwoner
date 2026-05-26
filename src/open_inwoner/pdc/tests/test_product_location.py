@@ -230,7 +230,7 @@ class TestLocationFormInput(WebTest):
         user = UserFactory(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
-        form = response.form
+        form = response.forms["productlocation_form"]
         form_response = form.submit("_save")
 
         self.assertListEqual(

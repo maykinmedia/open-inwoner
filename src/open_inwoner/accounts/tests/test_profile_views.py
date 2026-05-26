@@ -97,10 +97,10 @@ class ProfileViewTests(WebTest):
     def test_show_correct_logout_button_for_login_type_default(self):
         response = self.app.get(self.url, user=self.user)
 
-        logout_title = _("Logout")
-        logout_link = response.pyquery.find(f"[title='{logout_title}']")
+        logout_url = reverse("logout")
+        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
 
-        self.assertEqual(logout_link.attr("href"), reverse("logout"))
+        self.assertEqual(logout_form.attr["action"], logout_url)
 
     @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
     def test_show_correct_logout_button_for_login_type_digid(self, mock_solo):
@@ -114,10 +114,9 @@ class ProfileViewTests(WebTest):
 
                 response = self.app.get(self.url, user=self.digid_user)
 
-                logout_title = _("Logout")
-                logout_link = response.pyquery.find(f"[title='{logout_title}']")
+                logout_form = response.pyquery.find(f"form[action='{logout_url}']")
 
-                self.assertEqual(logout_link.attr("href"), logout_url)
+                self.assertEqual(logout_form.attr["action"], logout_url)
 
     def test_show_correct_logout_button_for_login_type_eherkenning(self):
         """eHerkenning always uses OIDC logout"""
@@ -125,10 +124,9 @@ class ProfileViewTests(WebTest):
 
         response = self.app.get(self.url, user=self.eherkenning_user)
 
-        logout_title = _("Logout")
-        logout_link = response.pyquery.find(f"[title='{logout_title}']")
+        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
 
-        self.assertEqual(logout_link.attr("href"), logout_url)
+        self.assertEqual(logout_form.attr["action"], logout_url)
 
     def test_show_correct_logout_button_for_login_type_eidas(self):
         """eIDAS always uses OIDC logout"""
@@ -142,10 +140,9 @@ class ProfileViewTests(WebTest):
 
         response = self.app.get(self.url, user=eidas_user)
 
-        logout_title = _("Logout")
-        logout_link = response.pyquery.find(f"[title='{logout_title}']")
+        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
 
-        self.assertEqual(logout_link.attr("href"), logout_url)
+        self.assertEqual(logout_form.attr["action"], logout_url)
 
     @patch(
         "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True

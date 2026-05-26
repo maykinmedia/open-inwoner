@@ -38,13 +38,21 @@ a:hover {
   }
 }
 
-#user-tools a {
+#user-tools a,
+#user-tools button {
   border-bottom: none;
   text-decoration: underline;
 
   &:focus,
   &:hover {
     color: $color_darkest;
+  }
+}
+
+#logout-form button {
+  &:hover,
+  &:active {
+    margin-bottom: 0;
   }
 }
 

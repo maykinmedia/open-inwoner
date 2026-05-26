@@ -41,8 +41,10 @@ class DeleteContactInvitationsTest(AssertTimelineLogMixin, TestCase):
             self.assertIn("total 2 timelinelogs", log_dump)
 
             self.assertIn(
-                f'deleted_invitations=["{invite1.invitee_email} (invited on 2023-09-26)", "{invite2.invitee_email} (invited on 2023-09-26)"',
-                log_dump,
+                f'"{invite1.invitee_email} (invited on 2023-09-26)"', log_dump
+            )
+            self.assertIn(
+                f'"{invite2.invitee_email} (invited on 2023-09-26)"', log_dump
             )
             self.assertIn(
                 f'deleted_invitations=["{invite3.invitee_email} (invited on 2023-09-26)"',

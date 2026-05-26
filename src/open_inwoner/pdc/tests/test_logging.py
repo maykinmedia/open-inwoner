@@ -107,7 +107,7 @@ class TestProductLogging(WebTest):
             reverse("admin:pdc_product_delete", kwargs={"object_id": self.product.id}),
             user=self.user,
         )
-        form = response.forms[0]
+        form = response.forms[1]
         form.submit()
         products = Product.objects.all().count()
 
@@ -142,10 +142,10 @@ class TestProductLogging(WebTest):
         )
         byte_data = str.encode(dataset.export("csv"))
         response = self.app.get(reverse("admin:pdc_product_import"), user=self.user)
-        form = response.forms[0]
+        form = next(f for f in response.forms.values() if "import_file" in f.fields)
         form["import_file"] = Upload("products.csv", byte_data, "text/csv")
         form["input_format"] = 1
-        response_form = form.submit().forms[0]
+        response_form = form.submit().forms[1]
         response_form.submit()
         log_entry = TimelineLog.objects.last()
         product = Product.objects.first()
@@ -166,7 +166,7 @@ class TestProductLogging(WebTest):
     def test_export_is_logged(self):
         ProductFactory(categories=(self.category,))
         response = self.app.get(reverse("admin:pdc_product_export"), user=self.user)
-        form = response.forms[0]
+        form = next(f for f in response.forms.values() if "file_format" in f.fields)
         form["file_format"] = 1
         form.submit()
         log_entry = TimelineLog.objects.last()
@@ -278,7 +278,7 @@ class TestCategoryLogging(WebTest):
             reverse("admin:pdc_category_delete", kwargs={"object_id": category.id}),
             user=self.user,
         )
-        form = response.forms[0]
+        form = response.forms[1]
         form.submit()
         categories = Category.objects.all().count()
 
@@ -300,10 +300,10 @@ class TestCategoryLogging(WebTest):
         )
         byte_data = str.encode(dataset.export("csv"))
         response = self.app.get(reverse("admin:pdc_category_import"), user=self.user)
-        form = response.forms[0]
+        form = next(f for f in response.forms.values() if "import_file" in f.fields)
         form["import_file"] = Upload("categories.csv", byte_data, "text/csv")
         form["input_format"] = 1
-        response_form = form.submit().forms[0]
+        response_form = form.submit().forms[1]
         response_form.submit()
         log_entry = TimelineLog.objects.last()
         category = Category.objects.first()
@@ -324,7 +324,7 @@ class TestCategoryLogging(WebTest):
     def test_export_is_logged(self):
         CategoryFactory()
         response = self.app.get(reverse("admin:pdc_category_export"), user=self.user)
-        form = response.forms[0]
+        form = next(f for f in response.forms.values() if "file_format" in f.fields)
         form["file_format"] = 1
         form.submit()
         log_entry = TimelineLog.objects.last()

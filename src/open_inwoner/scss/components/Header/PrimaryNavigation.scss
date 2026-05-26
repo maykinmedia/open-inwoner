@@ -355,6 +355,18 @@
     }
   }
 
+  // Logout form
+  form[action] {
+    display: contents;
+
+    button.link {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+  }
+
   /// Mobile nested list.
 
   @media (max-width: 767px) {

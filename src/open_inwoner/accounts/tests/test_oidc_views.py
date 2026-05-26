@@ -3209,13 +3209,10 @@ class EIDASOIDCFlowTests(WebTest):
 class GenericOIDCLogoutViewTests(WebTest):
     """Tests for the generic OIDC logout view (for staff/admin users)."""
 
-    def test_generic_oidc_logout_accepts_get_request_for_oidc_users(self):
+    def test_generic_oidc_logout_accepts_post_request_for_oidc_users(self):
         """
-        Test that the generic OIDC logout view accepts GET requests for users
+        Test that the generic OIDC logout view accepts POST requests for users
         with login_type=oidc.
-
-        Needed because staff users who log in via OIDC need to be able to log
-        out using a simple link (GET request), not a form POST.
         """
         user = UserFactory.create(login_type=LoginTypeChoices.oidc)
         self.client.force_login(user)
@@ -3225,8 +3222,8 @@ class GenericOIDCLogoutViewTests(WebTest):
         # Verify user is logged in
         self.assertTrue(self.client.session.get("_auth_user_id"))
 
-        # Perform logout via GET request
-        response = self.client.get(logout_url)
+        # Perform logout via POST request
+        response = self.client.post(logout_url)
 
         # Should redirect to logout redirect URL
         self.assertRedirects(
@@ -3293,7 +3290,7 @@ class GenericOIDCLogoutViewTests(WebTest):
                 self.client.force_login(user)
 
                 # User with non-OIDC login_type tries to use generic OIDC logout
-                response = self.client.get(reverse("oidc_logout"))
+                response = self.client.post(reverse("oidc_logout"))
 
                 # Should redirect to the correct logout URL for their login type
                 expected_logout_url = user.get_logout_url()

@@ -107,13 +107,15 @@ class TestAdminProductForm(WebTest):
             response = self.app.get(url, user=super_user)
 
             # all categories visible
-            self.assertEqual(len(response.form["categories"].options), 3)
             self.assertEqual(
-                set(response.form["categories"].value),
+                len(response.forms["product_form"]["categories"].options), 3
+            )
+            self.assertEqual(
+                set(response.forms["product_form"]["categories"].value),
                 {str(category_general.id), str(category_grouped.id)},
             )
-            fix_inline_formsets(response.form)
-            response = response.form.submit("_continue").follow()
+            fix_inline_formsets(response.forms["product_form"])
+            response = response.forms["product_form"].submit("_continue").follow()
 
             # no changes on resubmit
             self.assertEqual(
@@ -121,19 +123,21 @@ class TestAdminProductForm(WebTest):
             )
 
             # sanity check with different combinations
-            response.form["categories"].select_multiple(
+            response.forms["product_form"]["categories"].select_multiple(
                 value=[str(category_general.id), str(category_extra.id)]
             )
-            fix_inline_formsets(response.form)
-            response = response.form.submit("_continue").follow()
+            fix_inline_formsets(response.forms["product_form"])
+            response = response.forms["product_form"].submit("_continue").follow()
             self.assertEqual(
                 set(product.categories.all()), {category_general, category_extra}
             )
 
             # sanity check with different combinations
-            response.form["categories"].select_multiple(value=[str(category_extra.id)])
-            fix_inline_formsets(response.form)
-            response = response.form.submit("_continue").follow()
+            response.forms["product_form"]["categories"].select_multiple(
+                value=[str(category_extra.id)]
+            )
+            fix_inline_formsets(response.forms["product_form"])
+            response = response.forms["product_form"].submit("_continue").follow()
             self.assertEqual(set(product.categories.all()), {category_extra})
 
         product.categories.set([category_general, category_grouped])
@@ -142,22 +146,26 @@ class TestAdminProductForm(WebTest):
             response = self.app.get(url, user=group_user)
 
             # only our restricted
-            self.assertEqual(len(response.form["categories"].options), 2)
             self.assertEqual(
-                set(response.form["categories"].value),
+                len(response.forms["product_form"]["categories"].options), 2
+            )
+            self.assertEqual(
+                set(response.forms["product_form"]["categories"].value),
                 {str(category_grouped.id)},
             )
-            fix_inline_formsets(response.form)
-            response = response.form.submit("_continue").follow()
+            fix_inline_formsets(response.forms["product_form"])
+            response = response.forms["product_form"].submit("_continue").follow()
 
             # on resubmit the non-group category is still there
             self.assertEqual(
                 set(product.categories.all()), {category_general, category_grouped}
             )
             # select different category
-            response.form["categories"].select_multiple(value=[str(category_extra.id)])
-            fix_inline_formsets(response.form)
-            response.form.submit().follow()
+            response.forms["product_form"]["categories"].select_multiple(
+                value=[str(category_extra.id)]
+            )
+            fix_inline_formsets(response.forms["product_form"])
+            response.forms["product_form"].submit().follow()
 
             # swapped different category but the non-group category is still there
             self.assertEqual(
@@ -165,9 +173,9 @@ class TestAdminProductForm(WebTest):
             )
 
             # requires at least one category
-            response.form["categories"].select_multiple(value=[])
-            fix_inline_formsets(response.form)
-            response = response.form.submit()
+            response.forms["product_form"]["categories"].select_multiple(value=[])
+            fix_inline_formsets(response.forms["product_form"])
+            response = response.forms["product_form"].submit()
             self.assertEqual(response.status_code, 200)
             self.assertEqual(
                 response.context["errors"][0][0],

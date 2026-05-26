@@ -174,8 +174,8 @@ class TestAdminCategoryForm(WebTest):
             ),
             user=group_user,
         )
-        self.assertIn("name", response.form.fields)
-        self.assertNotIn("access_groups", response.form.fields)
+        self.assertIn("name", response.forms["category_form"].fields)
+        self.assertNotIn("access_groups", response.forms["category_form"].fields)
 
     @patch("open_inwoner.openzaak.models.OpenZaakConfig.get_solo")
     def test_user_can_link_zaaktypen_if_category_filtering_with_zaken_feature_flag_enabled(
@@ -191,7 +191,7 @@ class TestAdminCategoryForm(WebTest):
             user=self.user,
         )
 
-        form = response_get.form
+        form = response_get.forms[1]
 
         # Fix inline formsets - set TOTAL_FORMS to INITIAL_FORMS to prevent validation errors
         # on empty inline forms (QuestionInline has required fields)
@@ -225,7 +225,7 @@ class TestAdminCategoryForm(WebTest):
             user=self.user,
         )
 
-        form = response_get.form
+        form = response_get.forms[1]
 
         # Fix inline formsets - set TOTAL_FORMS to INITIAL_FORMS to prevent validation errors
         # on empty inline forms (QuestionInline has required fields)
