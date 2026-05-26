@@ -99,6 +99,14 @@ class ZaakWithApiGroup:
         return hash((self.identification, self.api_group.pk))
 
 
+class ZaakWithApiGroupZaakTypeResolved(ZaakWithApiGroup):
+    """ZaakWithApiGroup whose zaaktype has been resolved from URL to ZaakType."""
+
+
+class ZaakWithApiGroupFullyResolved(ZaakWithApiGroupZaakTypeResolved):
+    """ZaakWithApiGroup with zaaktype, status, and resultaat all resolved."""
+
+
 @dataclass(frozen=True)
 class FormulierWithApiGroup:
     formulier: Formulier
@@ -121,9 +129,10 @@ class FormulierWithApiGroup:
 
 
 class Timeouts(TypedDict):
-    fetch_raw_zaken: int | float
-    resolve_zaken: int | float
-    fetch_formulieren: int | float
+    get_raw_zaken: int | float
+    get_visible_zaken: int | float
+    fully_resolve_zaken: int | float
+    get_formulieren: int | float
 
 
 class ZGWService:
@@ -133,9 +142,10 @@ class ZGWService:
     def __init__(self, use_cache: bool = True):
         self._use_cache = use_cache
         self._timeouts = {
-            "fetch_raw_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
-            "resolve_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.5,
-            "fetch_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
+            "get_raw_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
+            "get_visible_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
+            "fully_resolve_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
+            "get_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
         }
         self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
         # Resolvers mutate Zaak fields in parallel futures; the lock prevents concurrent writes.
@@ -175,26 +185,32 @@ class ZGWService:
     @staticmethod
     def _is_zaak_visible(zaak: Zaak) -> bool:
         config = OpenZaakConfig.get_solo()
+
         if isinstance(zaak.zaaktype, str):
             raise ValueError("expected zaak.zaaktype to be resolved from url to model")
+
         if not zaak.status and not config.show_cases_without_status:
             logger.info(
-                "Ignoring zaak as not visible for users: zaak has no status and show_cases_without_status is disabled",
+                "Ignoring zaak as not visible for users: zaak has no status and "
+                "show_cases_without_status is disabled",
                 zaak_url=zaak.url,
             )
             return False
+
         if not zaak.zaaktype:
             logger.info(
                 "Ignoring zaak as not visible for users: zaak has no zaaktype",
                 zaak_url=zaak.url,
             )
             return False
+
         if zaak.zaaktype.indicatie_intern_of_extern != "extern":
             logger.info(
                 "Ignoring zaak as not visible for users: zaaktype is intern",
                 zaak_url=zaak.url,
             )
             return False
+
         return is_object_visible(zaak, config.zaak_max_confidentiality)
 
     def _get_formulieren_for_api_group(
@@ -237,7 +253,7 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["fetch_formulieren"],
+                    timeout=self._timeouts["get_formulieren"],
                 ):
                     try:
                         subs_with_api_group.extend(task.result())
@@ -408,7 +424,7 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["fetch_raw_zaken"],
+                    timeout=self._timeouts["get_raw_zaken"],
                 ):
                     try:
                         fetched_zaken.extend(task.result())
@@ -422,12 +438,9 @@ class ZGWService:
 
     def search_zaken(
         self, user_identification: UserIdentification, zaak_identificatie: str
-    ) -> list[ZaakWithApiGroup]:
-        """
-        Search for a zaak by zaak_identificatie across all API groups.
-        Returns visible matches.
-        """
-        visible_zaken = []
+    ) -> list[ZaakWithApiGroupZaakTypeResolved]:
+        """Search for a zaak by zaak_identificatie across all API groups. Returns visible matches."""
+        visible_zaken: list[ZaakWithApiGroupZaakTypeResolved] = []
         for zaak_with_group in self.get_raw_zaken(
             user_identification, zaak_identificatie
         ):
@@ -451,13 +464,25 @@ class ZGWService:
                 continue
 
             if self._is_zaak_visible(zaak_with_group.zaak):
-                visible_zaken.append(zaak_with_group)
+                visible_zaken.append(
+                    ZaakWithApiGroupZaakTypeResolved(
+                        zaak=zaak_with_group.zaak,
+                        api_group=zaak_with_group.api_group,
+                        type_aanvraag=zaak_with_group.type_aanvraag,
+                    )
+                )
 
         return visible_zaken
 
-    def get_zaken(
+    def get_visible_zaken(
         self, user_identification: UserIdentification
-    ) -> list[ZaakWithApiGroup]:
+    ) -> list[ZaakWithApiGroupZaakTypeResolved]:
+        """
+        Fetch all visible zaken with only zaaktype resolved (status/resultaat
+        left as raw URLs). This is cheap because zaaktype lookups are cached and
+        status presence is checked from raw data. Use this for pagination and
+        total-count; pass the page slice to fully_resolve_zaken for display.
+        """
         if not user_identification:
             return []
 
@@ -489,82 +514,140 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["fetch_raw_zaken"],
+                    timeout=self._timeouts["get_raw_zaken"],
                 ):
                     try:
                         fetched_zaken.extend(task.result())
                     except BaseException:
                         logger.exception("Error fetching raw zaken for group")
-            # TODO: add OTEL metrics
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken for group", exc_info=True)
 
-        zaak_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
-            defaultdict(list)
-        )
-
-        with parallel(max_workers=self._max_workers) as executor:
-            for zaak_with_group in fetched_zaken:
-                group = zaak_with_group.api_group
-                zaak_futures[zaak_with_group].append(
-                    executor.submit(
-                        self._resolve_zaak_type,
-                        zaak_with_group,
-                        self._catalogi_client_factory(group),
-                    )
-                )
-                zaak_futures[zaak_with_group].append(
-                    executor.submit(
-                        self._resolve_status_and_status_type,
-                        zaak_with_group,
-                        self._zaken_client_factory(group, config),
-                        self._catalogi_client_factory(group),
-                    )
-                )
-                zaak_futures[zaak_with_group].append(
-                    executor.submit(
-                        self._resolve_resultaat_and_resultaat_type,
-                        zaak_with_group,
-                        self._zaken_client_factory(group, config),
-                        self._catalogi_client_factory(group),
-                    )
-                )
-
-        # TODO add wait call or refactor: we want either all futures to complete or timeout
-        resolved_zaken: list[ZaakWithApiGroup] = []
-        for zaak, futures in zaak_futures.items():
-            if not all(f.done() and not f.exception() for f in futures):
-                logger.warning(
-                    "Culling zaak %s because not all resolutions completed successfully",
-                    zaak.identification,
-                )
-                continue
-
-            zaak_with_resolved_zgw_refs = self._replace_catalogus_api_with_model_refs(
-                zaak
-            )
-
-            if self._is_zaak_visible(zaak_with_resolved_zgw_refs.zaak):
-                resolved_zaken.append(zaak_with_resolved_zgw_refs)
-            else:
-                logger.debug(
-                    "Culling zaak %s because it is invisible",
-                    zaak_with_resolved_zgw_refs.identification,
-                )
-
-        resolved_zaken.sort(
+        fetched_zaken.sort(
             key=lambda c: (
                 # negate ordinal for descending order: date has no __neg__.
                 -c.zaak.startdatum.toordinal(),
                 all_api_groups.index(c.api_group),
             )
         )
-        return resolved_zaken
+
+        future_to_zaak: dict[concurrent.futures.Future, ZaakWithApiGroup] = {}
+        visible_ids: set[int] = set()
+        with parallel(max_workers=self._max_workers) as executor:
+            for zaak_with_group in fetched_zaken:
+                f = executor.submit(
+                    self._resolve_zaak_type,
+                    zaak_with_group,
+                    self._catalogi_client_factory(zaak_with_group.api_group),
+                )
+                future_to_zaak[f] = zaak_with_group
+            try:
+                for future in concurrent.futures.as_completed(
+                    future_to_zaak,
+                    timeout=self._timeouts["get_visible_zaken"],
+                ):
+                    zaak_with_group = future_to_zaak[future]
+                    try:
+                        future.result()
+                    except (ZgwAPIError, ResolveCaseException):
+                        logger.warning(
+                            "Culling zaak %s because zaaktype resolution failed",
+                            zaak_with_group.identification,
+                        )
+                        continue
+                    if self._is_zaak_visible(zaak_with_group.zaak):
+                        visible_ids.add(id(zaak_with_group))
+                    else:
+                        logger.debug(
+                            "Culling zaak %s because it is invisible",
+                            zaak_with_group.identification,
+                        )
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timed out resolving zaaktypes", exc_info=True)
+
+        return [
+            ZaakWithApiGroupZaakTypeResolved(
+                zaak=z.zaak, api_group=z.api_group, type_aanvraag=z.type_aanvraag
+            )
+            for z in fetched_zaken
+            if id(z) in visible_ids
+        ]
+
+    def fully_resolve_zaken(
+        self, zaken: list[ZaakWithApiGroupZaakTypeResolved]
+    ) -> list[ZaakWithApiGroupFullyResolved]:
+        """
+        Fully resolve status+statustype and resultaat+resultaattype
+        for a page slice. Input zaken must already have zaaktype resolved
+        (as returned by get_visible_zaken). Mutates zaak objects in
+        place; zaken that fail resolution are culled from the result.
+        The result list is ordered by construction (the input list is
+        already ordered).
+        """
+        future_to_zaak: dict[
+            concurrent.futures.Future, ZaakWithApiGroupZaakTypeResolved
+        ] = {}
+        remaining: dict[int, int] = {}
+        failed_ids: set[int] = set()
+
+        # Each thread gets its own zaken client because requests.Session is not
+        # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
+        config = OpenZaakConfig.get_solo()
+
+        with parallel(max_workers=self._max_workers) as executor:
+            for zaak_with_group in zaken:
+                zid = id(zaak_with_group)
+                remaining[zid] = 1
+                group = zaak_with_group.api_group
+                f = executor.submit(
+                    self._resolve_resultaat_and_resultaat_type,
+                    zaak_with_group,
+                    self._zaken_client_factory(group, config),
+                    self._catalogi_client_factory(group),
+                )
+                future_to_zaak[f] = zaak_with_group
+                if isinstance(zaak_with_group.zaak.status, str):
+                    f = executor.submit(
+                        self._resolve_status_and_status_type,
+                        zaak_with_group,
+                        self._zaken_client_factory(group, config),
+                        self._catalogi_client_factory(group),
+                    )
+                    future_to_zaak[f] = zaak_with_group
+                    remaining[zid] += 1
+            try:
+                for future in concurrent.futures.as_completed(
+                    future_to_zaak,
+                    timeout=self._timeouts["fully_resolve_zaken"],
+                ):
+                    zaak_with_group = future_to_zaak[future]
+                    remaining[id(zaak_with_group)] -= 1
+                    try:
+                        future.result()
+                    except (ZgwAPIError, ResolveCaseException):
+                        failed_ids.add(id(zaak_with_group))
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timed out resolving zaken", exc_info=True)
+
+        fully_resolved: list[ZaakWithApiGroupFullyResolved] = []
+        for zaak_with_group in zaken:
+            zid = id(zaak_with_group)
+            if remaining[zid] != 0 or zid in failed_ids:
+                logger.warning(
+                    "Culling zaak %s because not all resolutions completed successfully",
+                    zaak_with_group.identification,
+                )
+                continue
+            fully_resolved.append(
+                self._replace_catalogus_api_with_model_refs(zaak_with_group)
+            )
+
+        return fully_resolved
 
     def _replace_catalogus_api_with_model_refs(
         self,
-        zaak_with_api_group: ZaakWithApiGroup,
-    ) -> ZaakWithApiGroup:
+        zaak_with_api_group: ZaakWithApiGroupZaakTypeResolved,
+    ) -> ZaakWithApiGroupFullyResolved:
         try:
             zaaktype_config = ZaakTypeConfig.objects.filter_zaak_type(
                 zaak_with_api_group.zaak.zaaktype
@@ -595,7 +678,11 @@ class ZGWService:
                 exc_info=True,
             )
 
-        return zaak_with_api_group
+        return ZaakWithApiGroupFullyResolved(
+            zaak=zaak_with_api_group.zaak,
+            api_group=zaak_with_api_group.api_group,
+            type_aanvraag=zaak_with_api_group.type_aanvraag,
+        )
 
     def _resolve_zaak_type(
         self,
@@ -620,6 +707,9 @@ class ZGWService:
         zaken_client: ZakenClient,
         catalogi_client: CatalogiClient,
     ) -> None:
+        if zaak_with_group.zaak.status is None:
+            return
+
         if not isinstance(zaak_with_group.zaak.status, str):
             raise ResolveCaseException(
                 f"`case.status` for case {zaak_with_group.zaak.identificatie} "

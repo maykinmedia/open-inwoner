@@ -160,6 +160,42 @@ class PaginationMixin:
             "is_paginated": is_paginated,
         }
 
+    def paginate_preloaded(
+        self,
+        items: list,
+        total_count: int,
+        page_number: int,
+        page_size: int,
+    ) -> PaginationContext:
+        """
+        Build pagination context for a pre-sliced page of items.
+
+        Use when the caller has already determined the correct items
+        for the current page (e.g. after server-side filtering and slicing).
+        The paginator uses total_count for metadata (num_pages, has_next,
+        etc.) without re-slicing the list.
+        """
+        paginator = self.paginator_class(
+            range(total_count),
+            page_size,
+            orphans=self.paginate_orphans,
+            allow_empty_first_page=self.allow_empty,
+        )
+        try:
+            page = paginator.page(page_number)
+        except InvalidPage as exc:
+            raise Http404(
+                _("Invalid page (%(page_number)s): %(message)s")
+                % {"page_number": page_number, "message": str(exc)}
+            ) from exc
+        page.object_list = items
+        return {
+            "paginator": paginator,
+            "page_obj": page,
+            "object_list": items,
+            "is_paginated": paginator.num_pages > 1,
+        }
+
 
 class UUIDAdminFirstInOrder:
     def get_fields(self, request, obj):

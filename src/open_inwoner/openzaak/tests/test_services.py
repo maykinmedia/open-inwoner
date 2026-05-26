@@ -63,7 +63,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         self.assertEqual(result, [])
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
-    def test_get_zaken_logs_timeout_warning_on_raw_fetch(self):
+    def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
         release = threading.Event()
         timer = threading.Timer(0.05, release.set)
 
@@ -78,7 +78,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 with self.assertLogs(
                     "open_inwoner.openzaak.services", level="WARNING"
                 ) as cm:
-                    result = self.service.get_zaken(_USER_IDENTIFICATION)
+                    result = self.service.get_visible_zaken(_USER_IDENTIFICATION)
             finally:
                 release.set()
                 timer.cancel()
