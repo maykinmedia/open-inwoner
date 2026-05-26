@@ -9,6 +9,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+import requests
 import structlog
 from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
@@ -22,6 +23,7 @@ from open_inwoner.openklant.api_models import (
 )
 from open_inwoner.openklant.clients import KlantenClient, build_klanten_client
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenService
@@ -243,14 +245,18 @@ class ContactFormView(
         if klant:
             self._update_klant_with_form_data(klant, form.cleaned_data)
 
-        contactmoment = self._create_contactmoment(
-            form.cleaned_data, esuite_config, klant
-        )
+        try:
+            contactmoment = self._create_contactmoment(
+                form.cleaned_data, esuite_config, klant
+            )
+        except (KlantAPIError, requests.RequestException):
+            logger.error("Error creating contactmoment via eSuite")
+            self.log_contactmoment_registered_via_esuite(False)
+            return False, ""
 
-        success = bool(contactmoment)
-        self.log_contactmoment_registered_via_esuite(success)
+        self.log_contactmoment_registered_via_esuite(True)
 
-        return success, getattr(klant, "emailadres", None)
+        return True, getattr(klant, "emailadres", None)
 
     def _fetch_klant(self) -> Klant | None:
         user = self.request.user
@@ -264,9 +270,13 @@ class ContactFormView(
         if not self.vragen_service:
             return
 
-        klant = self.klanten_client.retrieve_klant(
-            **self.vragen_service.get_fetch_parameters(self.request.user)
-        )
+        try:
+            klant = self.klanten_client.retrieve_klant(
+                **self.vragen_service.get_fetch_parameters(self.request.user)
+            )
+        except (KlantAPIError, requests.RequestException):
+            logger.error("Error retrieving klant for contactform")
+            return None
 
         return klant
 
@@ -280,7 +290,11 @@ class ContactFormView(
         if not klant.telefoonnummer and phonenumber:
             update_data["telefoonnummer"] = phonenumber
         if update_data:
-            self.klanten_client.partial_update_klant(klant, update_data)
+            try:
+                self.klanten_client.partial_update_klant(klant, update_data)
+            except (KlantAPIError, requests.RequestException):
+                logger.error("Error updating klant with form data")
+                return
             self.log_klant_patched(list(update_data.keys()))
 
     def _create_contactmoment(

@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 
 import structlog
 from mail_editor.helpers import find_template
+from requests import RequestException
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 
 from open_inwoner.accounts.models import User
@@ -18,7 +19,7 @@ from open_inwoner.openzaak.api_models import (
     Zaak,
     ZaakInformatieObject,
 )
-from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
+from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.mixins import WebhookLogMixin
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
@@ -80,7 +81,9 @@ def handle_zaken_notification(notification: Notification):
     service = ZGWService(use_cache=False)
 
     # check if we have users that need to be informed about this case
-    if not (roles := service.fetch_zaak_roles(zaak_url, api_group)):
+    try:
+        roles = service.fetch_zaak_roles(zaak_url, api_group)
+    except (ZgwAPIError, RequestException):
         log_system_action(
             f"ignored {r} notification: cannot retrieve rollen for zaak {zaak_url}",
             # NOTE this used to be logging.ERROR, but as this is also our first call
@@ -103,7 +106,9 @@ def handle_zaken_notification(notification: Notification):
         return
 
     # check if this case is visible
-    if not (zaak := service.fetch_zaak_by_url(zaak_url, api_group)):
+    try:
+        zaak = service.fetch_zaak_by_url(zaak_url, api_group)
+    except (ZgwAPIError, RequestException):
         log_system_action(
             f"ignored {r} notification: cannot retrieve zaak {zaak_url}",
             log_level=logging.ERROR,
@@ -111,7 +116,9 @@ def handle_zaken_notification(notification: Notification):
         return
 
     zaaktype_url = zaak.zaaktype  # URL string before resolution
-    if not (zaaktype := service.fetch_zaaktype_by_url(zaaktype_url, api_group)):
+    try:
+        zaaktype = service.fetch_zaaktype_by_url(zaaktype_url, api_group)
+    except (ZgwAPIError, RequestException):
         log_system_action(
             f"ignored {r} notification: cannot retrieve zaaktype {zaaktype_url}",
             log_level=logging.ERROR,
@@ -210,9 +217,9 @@ def _handle_zaakinformatieobject_notification(
     ziobj_url = notification.resource_url
     service = ZGWService(use_cache=False)
 
-    if not (
-        ziobj := service.fetch_single_zaak_information_object(ziobj_url, api_group)
-    ):
+    try:
+        ziobj = service.fetch_single_zaak_information_object(ziobj_url, api_group)
+    except (ZgwAPIError, RequestException):
         log_system_action(
             f"ignored {r} notification: cannot retrieve zaakinformatieobject "
             f"{ziobj_url} for zaak {zaak.url}",
@@ -220,10 +227,11 @@ def _handle_zaakinformatieobject_notification(
         )
         return
 
-    info_object = fetch_single_information_object_from_url(
-        ziobj.informatieobject, api_group=api_group
-    )
-    if not info_object:
+    try:
+        info_object = service.fetch_information_object_by_url(
+            ziobj.informatieobject, api_group
+        )
+    except ZgwAPIError:
         log_system_action(
             f"ignored {r} notification: cannot retrieve informatieobject "
             f"{ziobj.informatieobject} for zaak {zaak.url}",
@@ -326,7 +334,14 @@ def _check_status_history(
     Check if more than one status exists for `zaak` (else notifications are skipped)
     """
     resource = notification.resource
-    status_history = service.fetch_status_history(zaak.url, api_group)
+    try:
+        status_history = service.fetch_status_history(zaak.url, api_group)
+    except (ZgwAPIError, RequestException):
+        log_system_action(
+            f"ignored {resource} notification: cannot retrieve status_history for zaak {zaak.url}",
+            log_level=logging.ERROR,
+        )
+        return None
 
     if not status_history:
         log_system_action(
@@ -387,10 +402,11 @@ def _check_status_type(
     """
     Check if a status_type exists for `status` and if notifications are enabled
     """
-    status_type = service.fetch_single_status_type(status.statustype, api_group)
     resource = notification.resource
 
-    if not status_type:
+    try:
+        status_type = service.fetch_single_status_type(status.statustype, api_group)
+    except (ZgwAPIError, RequestException):
         log_system_action(
             f"ignored {resource} notification: cannot retrieve status_type "
             f"{status.statustype} for zaak {zaak.url}",

@@ -9,6 +9,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView, UpdateView
 
+import requests
 import structlog
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
@@ -23,6 +24,7 @@ from open_inwoner.accounts.models import (
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.mail.verification import send_user_email_verification_mail
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.openklant.types import PartijUpdateData
@@ -248,25 +250,21 @@ class NecessaryFieldsUserView(
 
         user = form.instance
 
-        klant, _ = service.get_or_create_klant(
-            user=user, fetch_params=service.get_fetch_parameters(user)
-        )
-
-        if not klant:
-            logger.error(
-                "Unable to create klant during post-registration sync",
-                user=user,
+        try:
+            klant, _ = service.get_or_create_klant(
+                user=user, fetch_params=service.get_fetch_parameters(user)
             )
-            return
 
-        update_fields = ["emailadres"]
-        if "phonenumber" in form.cleaned_data:
-            update_fields.append("telefoonnummer")
+            update_fields = ["emailadres"]
+            if "phonenumber" in form.cleaned_data:
+                update_fields.append("telefoonnummer")
 
-        if "case_notification_channel" in form.cleaned_data:
-            update_fields.append("toestemmingZaakNotificatiesAlleenDigitaal")
+            if "case_notification_channel" in form.cleaned_data:
+                update_fields.append("toestemmingZaakNotificatiesAlleenDigitaal")
 
-        service.update_klant_from_user(klant, user, update_fields=update_fields)
+            service.update_klant_from_user(klant, user, update_fields=update_fields)
+        except (KlantAPIError, requests.RequestException):
+            logger.error("Error updating klant during post-registration sync")
 
 
 class EmailVerificationUserView(RegistrationLogMixin, LoginRequiredMixin, TemplateView):

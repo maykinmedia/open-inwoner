@@ -21,7 +21,6 @@ from django.utils.translation import gettext_lazy as _
 
 import glom
 import structlog
-from ape_pie.client import APIClient
 from openklant_client import OpenKlantClient
 from openklant_client.types.common import ForeignKeyRef
 from openklant_client.types.resources.betrokkene import (
@@ -45,9 +44,7 @@ from openklant_client.types.resources.partij import (
 )
 from openklant_client.types.resources.partij_identificator import PartijIdentificator
 from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
-from requests.exceptions import RequestException
 from typing_extensions import TypedDict
-from zgw_consumers.api_models.base import factory
 from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.models.services import Service as ServiceConfig
 from zgw_consumers.utils import pagination_helper
@@ -64,7 +61,9 @@ from open_inwoner.openklant.api_models import (
     KlantWritePayload,
     ObjectContactMoment,
 )
+from open_inwoner.openklant.clients import KlantAPIClient
 from open_inwoner.openklant.constants import KlantenServiceType, Status
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ContactFormSubject,
     ESuiteKlantConfig,
@@ -81,7 +80,6 @@ from open_inwoner.openklant.wrap import (
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
-from open_inwoner.utils.api import ClientError, get_json_response
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.views import LogMixin
@@ -159,7 +157,7 @@ class eSuiteKlantenService(
     KlantenService,
 ):
     config: ESuiteKlantConfig
-    client: APIClient
+    client: KlantAPIClient
     service_config: ServiceConfig
 
     def __init__(self, config: ESuiteKlantConfig | None = None):
@@ -176,7 +174,7 @@ class eSuiteKlantenService(
 
         self.service_config = self.config.klanten_service
         self.client = build_zgw_client(
-            service=self.service_config, client_factory=APIClient
+            service=self.service_config, client_factory=KlantAPIClient
         )
         if not self.client:
             raise ImproperlyConfigured("eSuiteKlantenService instance needs a client")
@@ -187,11 +185,10 @@ class eSuiteKlantenService(
         if klant := self.retrieve_klant(**fetch_params):
             msg = "retrieved klant for user"
             created = False
-        elif klant := self.create_klant(**fetch_params):
+        else:
+            klant = self.create_klant(**fetch_params)
             msg = f"created klant ({klant.klantnummer}) for user"
             created = True
-        else:
-            return None, False
 
         system_action(msg, content_object=user)
         return klant, created
@@ -215,23 +212,14 @@ class eSuiteKlantenService(
         return klanten[0] if klanten else None
 
     def _retrieve_klanten_for_bsn(self, user_bsn: str) -> list[Klant]:
-        try:
-            response = self.client.get(
-                "klanten",
-                params={"subjectNatuurlijkPersoon__inpBsn": user_bsn},
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve klanten for BSN",
-                bsn=user_bsn,
-            )
-            return []
-
-        klanten = factory(Klant, all_data)
-
-        return klanten
+        response = self.client.get(
+            "klanten",
+            params={"subjectNatuurlijkPersoon__inpBsn": user_bsn},
+        )
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        all_data = list(pagination_helper(self.client, data))
+        return self.client.factory(Klant, all_data)
 
     def _retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
@@ -245,25 +233,11 @@ class eSuiteKlantenService(
                 "subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin,
             }
         )
-
-        try:
-            response = self.client.get(
-                "klanten",
-                params=params,
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve klanten for eHerkenning user",
-                user_kvk_or_rsin=user_kvk_or_rsin,
-                vestigingsnummer=vestigingsnummer,
-            )
-            return []
-
-        klanten = factory(Klant, all_data)
-
-        return klanten
+        response = self.client.get("klanten", params=params)
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        all_data = list(pagination_helper(self.client, data))
+        return self.client.factory(Klant, all_data)
 
     def create_klant(
         self,
@@ -303,20 +277,10 @@ class eSuiteKlantenService(
                     "subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}
                 }
 
-        try:
-            response = self.client.post("klanten", json=payload)
-            response_data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to create klant for user",
-                user_bsn=user_bsn,
-                user_kvk_or_rsin=user_kvk_or_rsin,
-            )
-            return
-
-        klant = factory(Klant, response_data)
-
-        return klant
+        response = self.client.post("klanten", json=payload)
+        self.client.raise_for_status(response)
+        response_data = self.client.parse_json(response)
+        return self.client.factory(Klant, response_data)
 
     def update_user_from_klant(self, klant: Klant, user: User):
         update_data = {}
@@ -384,20 +348,11 @@ class eSuiteKlantenService(
                 content_object=user,
             )
 
-    def partial_update_klant(self, klant: Klant, update_data) -> Klant | None:
-        try:
-            response = self.client.patch(url=klant.url, json=update_data)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to update klant",
-                klant=klant,
-            )
-            return
-
-        klant = factory(Klant, data)
-
-        return klant
+    def partial_update_klant(self, klant: Klant, update_data) -> Klant:
+        response = self.client.patch(url=klant.url, json=update_data)
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        return self.client.factory(Klant, data)
 
     def update_klant_from_user(
         self,
@@ -465,24 +420,20 @@ class eSuiteVragenService(KlantenService):
                 "eSuiteVragenService instance needs a servivce configuration"
             )
 
-        self.client = build_zgw_client(service=self.service_config)
+        self.client = build_zgw_client(
+            service=self.service_config, client_factory=KlantAPIClient
+        )
         if not self.client:
             raise ImproperlyConfigured("eSuiteVragenService instance needs a client")
 
     #
     # contactmomenten
     #
-    def retrieve_contactmoment(self, url) -> ContactMoment | None:
-        try:
-            response = self.client.get(url)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception("exception while making request")
-            return
-
-        contact_moment = factory(ContactMoment, data)
-
-        return contact_moment
+    def retrieve_contactmoment(self, url) -> ContactMoment:
+        response = self.client.get(url)
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        return self.client.factory(ContactMoment, data)
 
     def create_contactmoment(
         self,
@@ -490,38 +441,24 @@ class eSuiteVragenService(KlantenService):
         *,
         klant: Klant | None = None,
         rol: str | None = KlantContactRol.BELANGHEBBENDE,
-    ) -> ContactMoment | None:
-        try:
-            response = self.client.post("contactmomenten", json=data)
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to create contactmoment",
-                contactmoment_data=data,
-            )
-            return
-
-        contactmoment = factory(ContactMoment, data)
+    ) -> ContactMoment:
+        response = self.client.post("contactmomenten", json=data)
+        self.client.raise_for_status(response)
+        raw_data = self.client.parse_json(response)
+        contactmoment = self.client.factory(ContactMoment, raw_data)
 
         if klant:
             # relate contact to klant though a klantcontactmoment
-            try:
-                self.client.post(
-                    "klantcontactmomenten",
-                    json={
-                        "klant": klant.url,
-                        "contactmoment": contactmoment.url,
-                        "verzendBevestigingsmail": self.config.send_klantcontact_confirmation_email,
-                        "rol": rol,
-                    },
-                )
-            except (RequestException, ClientError):
-                logger.exception(
-                    "Failed to create klantcontactmoment",
-                    klant=klant,
-                    contactmoment=contactmoment,
-                )
-                return
+            response = self.client.post(
+                "klantcontactmomenten",
+                json={
+                    "klant": klant.url,
+                    "contactmoment": contactmoment.url,
+                    "verzendBevestigingsmail": self.config.send_klantcontact_confirmation_email,
+                    "rol": rol,
+                },
+            )
+            self.client.raise_for_status(response)
 
         return contactmoment
 
@@ -552,46 +489,27 @@ class eSuiteVragenService(KlantenService):
         contactmoment: ContactMoment,
         zaak: Zaak,
         object_type: str = "zaak",
-    ) -> ObjectContactMoment | None:
-        try:
-            response = self.client.post(
-                "objectcontactmomenten",
-                json={
-                    "contactmoment": contactmoment.url,
-                    "object": zaak.url,
-                    "objectType": object_type,
-                },
-            )
-            data = get_json_response(response)
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to create objectcontactmoment",
-                zaak=zaak,
-                contactmoment=contactmoment,
-            )
-            return None
-
-        object_contact_moment = factory(ObjectContactMoment, data)
-
-        return object_contact_moment
+    ) -> ObjectContactMoment:
+        response = self.client.post(
+            "objectcontactmomenten",
+            json={
+                "contactmoment": contactmoment.url,
+                "object": zaak.url,
+                "objectType": object_type,
+            },
+        )
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        return self.client.factory(ObjectContactMoment, data)
 
     def retrieve_objectcontactmomenten_for_zaak(
         self, zaak: Zaak
     ) -> list[ObjectContactMoment]:
-        try:
-            response = self.client.get(
-                "objectcontactmomenten", params={"object": zaak.url}
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve objectcontactmoment for zaak",
-                zaak=zaak,
-            )
-            return []
-
-        object_contact_momenten = factory(ObjectContactMoment, all_data)
+        response = self.client.get("objectcontactmomenten", params={"object": zaak.url})
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        all_data = list(pagination_helper(self.client, data))
+        object_contact_momenten = self.client.factory(ObjectContactMoment, all_data)
 
         # resolve linked resources
         contactmoment_mapping = {}
@@ -613,22 +531,13 @@ class eSuiteVragenService(KlantenService):
     def retrieve_objectcontactmomenten_for_contactmoment(
         self, contactmoment: ContactMoment
     ) -> list[ObjectContactMoment]:
-        try:
-            response = self.client.get(
-                "objectcontactmomenten", params={"contactmoment": contactmoment.url}
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve objectcontactmomenten for contactmoment",
-                contactmoment=contactmoment,
-            )
-            return []
-
-        object_contact_momenten = factory(ObjectContactMoment, all_data)
-
-        return object_contact_momenten
+        response = self.client.get(
+            "objectcontactmomenten", params={"contactmoment": contactmoment.url}
+        )
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        all_data = list(pagination_helper(self.client, data))
+        return self.client.factory(ObjectContactMoment, all_data)
 
     #
     # klantcontactmomenten
@@ -636,21 +545,14 @@ class eSuiteVragenService(KlantenService):
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
     ) -> list[KlantContactMoment]:
-        try:
-            response = self.client.get(
-                "klantcontactmomenten",
-                params={"klant": klant.url},
-            )
-            data = get_json_response(response)
-            all_data = list(pagination_helper(self.client, data))
-        except (RequestException, ClientError):
-            logger.exception(
-                "Failed to retrieve klantcontactmomenten for klant",
-                klant=klant,
-            )
-            return []
-
-        klanten_contact_moments = factory(KlantContactMoment, all_data)
+        response = self.client.get(
+            "klantcontactmomenten",
+            params={"klant": klant.url},
+        )
+        self.client.raise_for_status(response)
+        data = self.client.parse_json(response)
+        all_data = list(pagination_helper(self.client, data))
+        klanten_contact_moments = self.client.factory(KlantContactMoment, all_data)
 
         # resolve linked resources
         for kcm in klanten_contact_moments:
@@ -797,7 +699,14 @@ class eSuiteVragenService(KlantenService):
             return None, None
 
         zaak_with_api_group: ZaakWithApiGroup | None = None
-        ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
+        try:
+            ocm = self.retrieve_objectcontactmoment(kcm.contactmoment, "zaak")
+        except KlantAPIError:
+            logger.warning(
+                "Failed to retrieve objectcontactmoment for contactmoment",
+                contactmoment_url=kcm.contactmoment.url,
+            )
+            ocm = None
         if ocm and ocm.object_type == "zaak":
             zaak_url = ocm.object
             try:

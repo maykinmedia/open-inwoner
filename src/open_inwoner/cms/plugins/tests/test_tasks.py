@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 
 import requests_mock
-from requests import RequestException
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from open_inwoner.accounts.tests.factories import (
     DigidUserFactory,
@@ -157,7 +157,7 @@ class TasksPluginTest(TestCase):
         """
         ZGWApiGroupConfigFactory(form_service__api_root=FORMS_ROOT)
 
-        m.get(f"{FORMS_ROOT}openstaande-taken", exc=RequestException)
+        m.get(f"{FORMS_ROOT}openstaande-taken", exc=RequestsConnectionError)
 
         user = DigidUserFactory(bsn="111222333")
 

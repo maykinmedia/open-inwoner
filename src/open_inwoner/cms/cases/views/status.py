@@ -25,7 +25,6 @@ from django.views.generic import FormView, TemplateView
 import structlog
 from django_htmx.http import HttpResponseClientRedirect
 from mail_editor.helpers import find_template
-from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
@@ -33,6 +32,7 @@ from open_inwoner.cms.cases.forms import CaseContactForm, CaseUploadForm
 from open_inwoner.components.file_item import FileItem
 from open_inwoner.mail.service import send_contact_confirmation_mail
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
     KlantenSysteemConfig,
@@ -45,7 +45,7 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.documents import fetch_single_information_object_uuid
+from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -272,13 +272,10 @@ class InnerCaseDetailView(
                             self.zaak, user=self.request.user
                         )
                         questions.extend(service_questions)
-                    except RequestException:
-                        # TODO: This can happen. Ideally, we would present the user with
-                        # warning noting that not all questions might be visible.
-                        logger.warning(
-                            "Connection error for service",
-                            service_type=service_type,
-                            exc_info=True,
+                    except KlantAPIError:
+                        logger.error(
+                            "Error fetching questions for service",
+                            service_type=service_type.value,
                         )
                     except BaseException:
                         logger.exception(
@@ -647,16 +644,24 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
-        info_object = fetch_single_information_object_uuid(
-            info_object_uuid, api_group.documenten_client
-        )
-        if not info_object:
-            raise Http404
+        service = ZGWService()
+        try:
+            info_object = service.fetch_information_object_by_uuid(
+                info_object_uuid, api_group
+            )
+        except ZgwAPIError as exc:
+            raise Http404 from exc
 
         # check if this info_object belongs to this zaak
-        if not api_group.zaken_client.fetch_zaak_information_objects_for_zaak_and_info(
-            self.zaak.url, info_object.url
-        ):
+        try:
+            zaak_info_objects = (
+                service.fetch_zaak_information_objects_for_zaak_and_info(
+                    self.zaak.url, info_object.url, api_group
+                )
+            )
+        except ZgwAPIError as exc:
+            raise Http404 from exc
+        if not zaak_info_objects:
             raise PermissionDenied()
 
         # check if this info_object should be visible
@@ -665,12 +670,10 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise PermissionDenied()
 
         # retrieve and stream content
-        content_stream = api_group.documenten_client.download_document(
-            info_object.inhoud
-        )
-
-        if not content_stream:
-            raise Http404
+        try:
+            content_stream = service.download_document(info_object.inhoud, api_group)
+        except ZgwAPIError as exc:
+            raise Http404 from exc
 
         # Validate the actual content length matches the expected size. Note that this
         # is best-effort: if somehow content-length is malformed or bestandsomvang is
@@ -775,26 +778,30 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
         files = cleaned_data["files"]
 
         created_documents = []
+        service = ZGWService()
 
         for file in files:
             title = os.path.splitext(file.name)[0] or file.name
             document_type = cleaned_data["type"]
             source_organization = self.zaak.bronorganisatie
 
-            created_document = api_group.documenten_client.upload_document(
-                request.user,
-                file,
-                title,
-                document_type.informatieobjecttype_url,
-                source_organization,
-            )
-            if not created_document:
+            try:
+                created_document = service.upload_document(
+                    request.user,
+                    file,
+                    title,
+                    document_type.informatieobjecttype_url,
+                    source_organization,
+                    api_group,
+                )
+            except ZgwAPIError:
                 return self.handle_document_error(request, file)
 
-            created_relationship = api_group.zaken_client.connect_case_with_document(
-                self.zaak.url, created_document.get("url")
-            )
-            if not created_relationship:
+            try:
+                service.connect_case_with_document(
+                    self.zaak.url, created_document.get("url"), api_group
+                )
+            except ZgwAPIError:
                 return self.handle_document_error(request, file)
 
             self.log_case_document_uploaded(self.zaak, file.name)
@@ -992,10 +999,13 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
         except (ImproperlyConfigured, RuntimeError):
             self.log_system_action("could not build client for klanten API")
         else:
-            fetch_params = service.get_fetch_parameters(user)
-            klant, created = service.get_or_create_klant(
-                fetch_params=fetch_params, user=user
-            )
+            try:
+                fetch_params = service.get_fetch_parameters(user)
+                klant, created = service.get_or_create_klant(
+                    fetch_params=fetch_params, user=user
+                )
+            except KlantAPIError:
+                logger.error("Error retrieving/creating klant for contactmoment")
 
         # create contact moment
         question = form.cleaned_data["question"]
@@ -1016,7 +1026,10 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             logger.error("Failed to build eSuiteVragenService")
             return
 
-        if not (contactmoment := service.create_contactmoment(data, klant=klant)):
+        try:
+            contactmoment = service.create_contactmoment(data, klant=klant)
+        except KlantAPIError:
+            logger.error("Error creating contactmoment")
             self.log_contactmoment_for_zaak_registered_by_api(
                 contactmoment_success=False
             )
@@ -1026,9 +1039,14 @@ class CaseContactFormView(CaseAccessMixin, CaseLogMixin, FormView):
             )
             return False
 
-        objectcontactmoment = service.create_objectcontactmoment(
-            contactmoment, self.zaak
-        )
+        try:
+            objectcontactmoment = service.create_objectcontactmoment(
+                contactmoment, self.zaak
+            )
+        except KlantAPIError:
+            logger.error("Error creating objectcontactmoment")
+            objectcontactmoment = None
+
         self.log_contactmoment_for_zaak_registered_by_api(
             contactmoment_success=True,
             objectcontactmoment_success=bool(objectcontactmoment),

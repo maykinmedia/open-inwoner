@@ -1,5 +1,6 @@
 from typing import Iterable, Protocol
 
+from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponseRedirect
@@ -10,14 +11,15 @@ from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic import TemplateView
 
+import requests
 import structlog
-from requests import RequestException
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.views.mixins import ContactmomentLogMixin
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.constants import KlantenServiceType
+from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantContactMomentAnswer, KlantenSysteemConfig
 from open_inwoner.openklant.services import (
     KlantenService,
@@ -140,27 +142,36 @@ class KlantContactMomentListView(
         ctx = super().get_context_data(**kwargs)
 
         questions = []
+        fetch_error = False
         for service_type in KlantenServiceType:
-            if service := self.get_service(service_type=service_type):
-                try:
-                    service_questions = service.list_questions(
-                        self.get_fetch_params(service),
-                        user=self.request.user,
-                    )
-                    questions.extend(service_questions)
-                except RequestException:
-                    # TODO: This can happen. Ideally, we would present the user with
-                    # warning noting that not all questions might be visible.
-                    logger.warning(
-                        "Connection error for service",
-                        service_type=service_type.value,
-                        exc_info=True,
-                    )
-                except BaseException:
-                    logger.exception(
-                        "Unable to fetch questions for service",
-                        service_type=service_type.value,
-                    )
+            service = self.get_service(service_type=service_type)
+            if not service:
+                continue
+
+            try:
+                service_questions = service.list_questions(
+                    self.get_fetch_params(service),
+                    user=self.request.user,
+                )
+                questions.extend(service_questions)
+            except KlantAPIError:
+                fetch_error = True
+                logger.error(
+                    "Error fetching questions for service",
+                    service_type=service_type.value,
+                )
+            except Exception:
+                fetch_error = True
+                logger.exception(
+                    "Unkown error fetching questions with Klant service",
+                    service_type=service_type.value,
+                )
+
+        if fetch_error:
+            messages.error(
+                self.request,
+                _("Something went wrong. You might not see all of your questions."),
+            )
 
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
 
@@ -207,11 +218,18 @@ class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBase
         if not service:
             raise ImproperlyConfigured("Unknown KlantenServiceType")
 
-        question, zaak_with_api_group = service.retrieve_question(
-            self.get_fetch_params(service),
-            question_uuid=kwargs["kcm_uuid"],
-            user=self.request.user,
-        )
+        try:
+            question, zaak_with_api_group = service.retrieve_question(
+                self.get_fetch_params(service),
+                question_uuid=kwargs["kcm_uuid"],
+                user=self.request.user,
+            )
+        except (KlantAPIError, requests.RequestException) as exc:
+            logger.error(
+                "Error fetching question detail",
+                question_uuid=kwargs.get("kcm_uuid"),
+            )
+            raise Http404() from exc
         if not question:
             raise Http404()
 

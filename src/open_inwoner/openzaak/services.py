@@ -20,6 +20,8 @@ from open_inwoner.accounts.user_identification import (
 from open_inwoner.openzaak.api_models import (
     Formulier,
     InformatieObject,
+    OpenstaandeTaak,
+    ResultaatType,
     Rol,
     Status,
     StatusType,
@@ -29,11 +31,12 @@ from open_inwoner.openzaak.api_models import (
 )
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
+    DocumentenClient,
     ZakenClient,
     build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.constants import TypeAanvraag
-from open_inwoner.openzaak.documents import fetch_single_information_object_from_url
+from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -46,20 +49,12 @@ from open_inwoner.openzaak.utils import (
     is_info_object_visible,
     is_object_visible,
 )
+from open_inwoner.utils.decorators import cache as cache_result
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
 class ResolveCaseException(Exception):
-    pass
-
-
-# TODO: temporary workaround for our practice of swalling exceptions into None
-# at the client layer. Should be removed when the refactoring of error-handling
-# is completed (see GH #2142)
-class ZaakNotFound(Exception):
-    """Raised by check_zaak_access when the zaak cannot be fetched (API error or 404)."""
-
     pass
 
 
@@ -166,6 +161,10 @@ class ZGWService:
     @staticmethod
     def _catalogi_client_factory(group: ZGWApiGroupConfig) -> CatalogiClient:
         return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
+
+    @staticmethod
+    def _documenten_client_factory(group: ZGWApiGroupConfig) -> DocumentenClient:
+        return cast(DocumentenClient, build_zgw_client_from_service(group.drc_service))
 
     @staticmethod
     def _is_zaak_visible(zaak: Zaak) -> bool:
@@ -319,11 +318,6 @@ class ZGWService:
         zaken_client = self._zaken_client_factory(api_group)
 
         zaak = zaken_client.fetch_single_zaak(zaak_id)
-        # TODO: temporary workaround for our practice of swalling exceptions into None
-        # at the client layer. Should be removed when the refactoring of error-handling
-        # is completed (see GH #2142)
-        if not zaak:
-            raise ZaakNotFound(f"Zaak {zaak_id!r} not found or API unavailable")
 
         config = OpenZaakConfig.get_solo()
         limit_access_to_role = config.limit_user_visible_cases_to_role
@@ -350,9 +344,6 @@ class ZGWService:
 
         catalogi_client = self._catalogi_client_factory(api_group)
         zaak.zaaktype = catalogi_client.fetch_single_zaaktype(zaak.zaaktype)
-        if not zaak.zaaktype:
-            logger.info("check_zaak_access: no zaaktype for zaak", zaak_url=zaak.url)
-            return None
 
         if not self._is_zaak_visible(zaak):
             logger.info("check_zaak_access: zaak not visible", zaak_url=zaak.url)
@@ -425,12 +416,19 @@ class ZGWService:
             try:
                 # TODO: could be done in parallel
                 self._resolve_zaak_type(zaak_with_group)
-            except ResolveCaseException:
+            except (ZgwAPIError, ResolveCaseException):
                 logger.warning(
                     "Unable to resolve zaaktype for search result",
                     zaak_url=zaak_with_group.zaak.url,
                 )
                 continue
+            except Exception:
+                logger.exception(
+                    "Unkown error resolving zaak type",
+                    zaak_url=zaak_with_group.zaak.url,
+                )
+                continue
+
             if self._is_zaak_visible(zaak_with_group.zaak):
                 visible_zaken.append(zaak_with_group)
 
@@ -464,13 +462,13 @@ class ZGWService:
                     futures,
                     timeout=self._timeouts["fetch_raw_zaken"],
                 ):
-                    raw_zaken_for_group = task.result()
-                    fetched_zaken.extend(raw_zaken_for_group)
+                    try:
+                        fetched_zaken.extend(task.result())
+                    except BaseException:
+                        logger.exception("Error fetching raw zaken for group")
             # TODO: add OTEL metrics
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken for group", exc_info=True)
-            except BaseException:
-                logger.exception("Unhandled error fetching raw zaken")
 
         zaak_futures: dict[ZaakWithApiGroup, list[concurrent.futures.Future[None]]] = (
             defaultdict(list)
@@ -488,6 +486,7 @@ class ZGWService:
                     future = executor.submit(func, zaak_with_group)
                     zaak_futures[zaak_with_group].append(future)
 
+        # TODO add wait call or refactor: we want either all futures to complete or timeout
         resolved_zaken: list[ZaakWithApiGroup] = []
         for zaak, futures in zaak_futures.items():
             if not all(f.done() and not f.exception() for f in futures):
@@ -563,10 +562,6 @@ class ZGWService:
             return
 
         zaaktype = client.fetch_single_zaaktype(zaak_with_group.zaak.zaaktype)
-        if not zaaktype:
-            raise ResolveCaseException(
-                f"Unable to resolve zaaktype for url: {zaak_with_group.zaak.zaaktype}"
-            )
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.zaaktype = zaaktype
@@ -584,18 +579,7 @@ class ZGWService:
             )
 
         status = zaken_client.fetch_single_status(zaak_with_group.zaak.status)
-        if not status:
-            raise ResolveCaseException(
-                f"Unable to resolve status {zaak_with_group.zaak.status} "
-                f"for case {zaak_with_group.zaak.identificatie}"
-            )
-
         status_type = catalogi_client.fetch_single_status_type(status.statustype)
-        if not status_type:
-            raise ResolveCaseException(
-                f"Unable to resolve status_type {status.statustype} "
-                f"for case {zaak_with_group.zaak.identificatie}"
-            )
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.status = status
@@ -617,18 +601,9 @@ class ZGWService:
             )
 
         resultaat = zaken_client.fetch_single_result(zaak_with_group.zaak.resultaat)
-        if not resultaat:
-            raise ResolveCaseException(
-                f"Unable to fetch resultaat for {zaak_with_group.zaak}"
-            )
-
         resultaattype = catalogi_client.fetch_single_resultaat_type(
             resultaat.resultaattype
         )
-        if not resultaattype:
-            raise ResolveCaseException(
-                f"Unable to resolve resultaattype for {resultaat.resultaattype}"
-            )
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.resultaat = resultaat
@@ -678,17 +653,19 @@ class ZGWService:
         case_info_objects = api_group.zaken_client.fetch_zaak_information_objects(
             zaak.url
         )
-        info_objects = [
-            fetch_single_information_object_from_url(
-                case_info.informatieobject, api_group=api_group
-            )
-            for case_info in case_info_objects
-        ]
 
         config = OpenZaakConfig.get_solo()
         documents = []
-        for case_info_obj, info_obj in zip(case_info_objects, info_objects):
-            if not info_obj:
+        for case_info_obj in case_info_objects:
+            try:
+                info_obj = self.fetch_information_object_by_url(
+                    case_info_obj.informatieobject, api_group
+                )
+            except ZgwAPIError:
+                logger.error(
+                    "Failed to fetch document info object",
+                    informatieobject_url=case_info_obj.informatieobject,
+                )
                 continue
             if not is_info_object_visible(
                 info_obj, config.document_max_confidentiality
@@ -739,6 +716,75 @@ class ZGWService:
             )
 
         return ", ".join(get_role_name_display(r) for r in roles)
+
+    @cache_result(
+        "information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+    )
+    def fetch_information_object_by_url(
+        self, url: str, api_group: ZGWApiGroupConfig
+    ) -> InformatieObject:
+        return self._documenten_client_factory(
+            api_group
+        )._fetch_single_information_object(url=url)
+
+    def fetch_information_object_by_uuid(
+        self, uuid: str, api_group: ZGWApiGroupConfig
+    ) -> InformatieObject:
+        return self._documenten_client_factory(
+            api_group
+        )._fetch_single_information_object(uuid=uuid)
+
+    def fetch_zaak_information_objects_for_zaak_and_info(
+        self, zaak_url: str, info_object_url: str, api_group: ZGWApiGroupConfig
+    ) -> list:
+        return self._zaken_client_factory(
+            api_group
+        ).fetch_zaak_information_objects_for_zaak_and_info(zaak_url, info_object_url)
+
+    def download_document(self, url: str, api_group: ZGWApiGroupConfig):
+        return self._documenten_client_factory(api_group).download_document(url)
+
+    def upload_document(
+        self,
+        user,
+        file,
+        title: str,
+        informatieobjecttype_url: str,
+        source_organization: str,
+        api_group: ZGWApiGroupConfig,
+    ) -> dict:
+        return self._documenten_client_factory(api_group).upload_document(
+            user, file, title, informatieobjecttype_url, source_organization
+        )
+
+    def connect_case_with_document(
+        self, zaak_url: str, document_url: str, api_group: ZGWApiGroupConfig
+    ) -> dict:
+        return self._zaken_client_factory(api_group).connect_case_with_document(
+            zaak_url, document_url
+        )
+
+    def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
+        all_api_groups = list(
+            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
+                "form_service"
+            )
+        )
+        tasks = []
+        for group in all_api_groups:
+            try:
+                tasks.extend(group.forms_client.fetch_open_tasks(bsn=bsn))
+            except ZgwAPIError:
+                logger.exception(
+                    "Error fetching open tasks from ZGW API", api_group=str(group)
+                )
+        return tasks
+
+    def fetch_single_resultaat_type_for_service(
+        self, resultaat_type_url: str, service
+    ) -> ResultaatType:
+        client = cast(CatalogiClient, build_zgw_client_from_service(service))
+        return client.fetch_single_resultaat_type(resultaat_type_url)
 
     def get_zaak_detail(
         self,

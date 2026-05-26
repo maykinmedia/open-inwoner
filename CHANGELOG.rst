@@ -38,6 +38,7 @@ Nieuwe features
   verminderd.
 * [:gh:`2517`]: ``min-release-age=2`` toegevoegd aan ``.npmrc``, minimale npm-versie
   vastgelegd via ``engines`` in ``package.json`` en node bijgewerkt naar ``24.15`` (LTS).
+* [:gh:`2142`]: Verbeterde foutafhandeling voor Klanten API-services en clients.
 
 Bugfixes
 --------
@@ -85,6 +86,10 @@ Onderhoud
   daarvan de nieuwe ZGWService gebruiken. Verbeterde testdekking door het toevoegen van tests
   voor ZGWService.
 * [:gh:`2494`]: Uitloglink vervangen door een formulierknop (POST) conform Django 5-vereisten.
+* [:gh:`2142`]: Foutafhandeling in API-clients verbeterd: fouten worden nu doorgegeven als
+  getypeerde uitzonderingen in plaats van stilzwijgend onderdrukt. Bij het ophalen van
+  zaakgegevens geeft een tijdelijke servicefout nu een duidelijke melding met de optie om het
+  later opnieuw te proberen.
 
 2.2.0 (2026-04-20)
 ==================

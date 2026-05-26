@@ -15,12 +15,24 @@ from open_inwoner.cms.cases.metrics import (
     case_list_views,
 )
 from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.exceptions import (
+    ZgwAPIClientError,
+    ZgwAPINetworkError,
+    ZgwAPIServerError,
+)
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.services import ZaakNotFound, ZGWService
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.views import LogMixin
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class ServiceUnavailableResponse(TemplateResponse):
+    status_code = 503
+
+    def __init__(self, request):
+        super().__init__(request, "pages/cases/service_unavailable.html")
 
 
 class CaseLogMixin(LogMixin):
@@ -140,13 +152,17 @@ class CaseAccessMixin(AccessMixin):
                 result = ZGWService().check_zaak_access(
                     object_id, user_identification, api_group
                 )
-            except ZaakNotFound:
-                # TODO: distinguish between temporary API failures and genuine 404 when
-                # the refactoring of error-handling is complete (GH #2142)
-                pass
+            except ZgwAPIClientError as exc:
+                raise Http404 from exc
+            except (ZgwAPIServerError, ZgwAPINetworkError):
+                return ServiceUnavailableResponse(request)
             else:
                 if result is None:
-                    return self.handle_no_permission()
+                    logger.warning(
+                        "CaseAccessMixin - zaak not found or access denied",
+                        object_id=object_id,
+                    )
+                    raise Http404
                 zaak, api_group = result
                 self.zaak = zaak
                 self.api_group = api_group

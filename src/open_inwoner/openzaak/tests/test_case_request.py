@@ -3,6 +3,7 @@ from django.test import TestCase
 import requests_mock
 
 from open_inwoner.openzaak.clients import build_zaken_clients
+from open_inwoner.openzaak.exceptions import ZgwAPIClientError, ZgwAPIServerError
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.utils.test import ClearCachesMixin
 
@@ -48,20 +49,11 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def test_no_case_is_retrieved_when_http_404(self, m):
         m.get(self.zaak["url"], status_code=404)
 
-        case = self.zaken_client.fetch_single_zaak(
-            "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
-        )
-
-        self.assertIsNone(case)
+        with self.assertRaises(ZgwAPIClientError):
+            self.zaken_client.fetch_single_zaak("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")
 
     def test_no_case_is_retrieved_when_http_500(self, m):
-        m.get(
-            self.zaak["url"],
-            status_code=500,
-        )
+        m.get(self.zaak["url"], status_code=500)
 
-        case = self.zaken_client.fetch_single_zaak(
-            "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
-        )
-
-        self.assertIsNone(case)
+        with self.assertRaises(ZgwAPIServerError):
+            self.zaken_client.fetch_single_zaak("d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d")

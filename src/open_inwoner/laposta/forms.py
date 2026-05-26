@@ -5,12 +5,11 @@ from django.utils.translation import gettext_lazy as _
 
 import structlog
 from ipware import get_client_ip
-from requests.exceptions import RequestException
 
 from open_inwoner.accounts.models import User
 from open_inwoner.laposta.api_models import UserData
+from open_inwoner.laposta.exceptions import LapostaAPIError
 from open_inwoner.laposta.models import LapostaConfig
-from open_inwoner.utils.api import ClientError
 
 from .choices import get_list_choices, get_list_remarks_mapping
 from .client import create_laposta_client
@@ -32,7 +31,11 @@ class NewsletterSubscriptionForm(forms.Form):
             return
 
         if laposta_client := create_laposta_client():
-            lists = laposta_client.get_lists()
+            try:
+                lists = laposta_client.get_lists()
+            except LapostaAPIError:
+                logger.exception("error while fetching newsletters with Laposta")
+                return
             self.fields["newsletters"].choices = get_list_choices(lists)
             self.fields["newsletters"].remarks_mapping = get_list_remarks_mapping(lists)
             if limited_to := LapostaConfig.get_solo().limit_list_selection_to:
@@ -82,7 +85,7 @@ class NewsletterSubscriptionForm(forms.Form):
 
             try:
                 client.create_subscription(list_id, user_data)
-            except (RequestException, ClientError):
+            except LapostaAPIError:
                 logger.exception(
                     "Something went wrong while trying to create subscription"
                 )
@@ -101,7 +104,7 @@ class NewsletterSubscriptionForm(forms.Form):
         for list_id in unsubscribe_from_ids:
             try:
                 client.remove_subscription(list_id, user.verified_email)
-            except (RequestException, ClientError):
+            except LapostaAPIError:
                 logger.exception(
                     "Something went wrong while trying to delete subscription"
                 )
