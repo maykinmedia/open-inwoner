@@ -166,7 +166,7 @@ class InnerCaseListView(
         combined_total = formulieren_count + len(all_visible_zaken)
 
         paginator_dict = self.paginate_preloaded(
-            page_items, combined_total, page_number
+            page_items, combined_total, page_number, self.paginate_by
         )
         zaken_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 

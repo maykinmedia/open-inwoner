@@ -672,7 +672,7 @@ class CasesPlaywrightTests(
     def test_cases_spinner_hides_on_fetch_error(self, m, contactmoment_mock):
         """When the ZGW API fails, the view returns an error template and the spinner is hidden."""
         with patch("open_inwoner.cms.cases.views.cases.ZGWService") as MockService:
-            MockService.return_value.get_cheap_visible_zaken.side_effect = RuntimeError(
+            MockService.return_value.get_visible_zaken.side_effect = RuntimeError(
                 "API error"
             )
             MockService.return_value.get_formulieren.return_value = []

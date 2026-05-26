@@ -136,15 +136,19 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(response.status_code, 400)
 
     @patch(
-        "open_inwoner.cms.plugins.views.ZGWService.get_zaken",
+        "open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken",
         return_value=[],
+    )
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_endpoint_returns_empty_state(
-        self, mock_formulieren, mock_zaken
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
         ServiceFactory(api_root=ZAKEN_ROOT)
         ZGWApiGroupConfigFactory()
@@ -163,12 +167,18 @@ class CMSZakenPluginTest(TestCase):
         # Should have no zaak items
         self.assertNotIn("oip-home-plugin-card", content)
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
-    def test_htmx_content_endpoint_returns_cases(self, mock_formulieren, mock_zaken):
+    def test_htmx_content_endpoint_returns_cases(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_zaak = MagicMock()
@@ -179,7 +189,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = [mock_zaak]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -205,10 +215,16 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
-    def test_htmx_content_endpoint_complete_failure(self, mock_formulieren, mock_zaken):
-        mock_zaken.side_effect = Exception("Cases API error")
+    def test_htmx_content_endpoint_complete_failure(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        mock_visible_zaken.side_effect = Exception("Cases API error")
         mock_formulieren.side_effect = Exception("formulieren API error")
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
@@ -226,9 +242,15 @@ class CMSZakenPluginTest(TestCase):
         # Should have no zaak items
         self.assertNotIn("oip-home-plugin-card", content)
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
-    def test_htmx_content_endpoint_partial_failure(self, mock_formulieren, mock_zaken):
+    def test_htmx_content_endpoint_partial_failure(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
         api_group = ZGWApiGroupConfigFactory()
 
         # formulieren fail
@@ -243,7 +265,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = [mock_zaak]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -267,12 +289,18 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(len(error_slot), 1)
         self.assertIn("technisch probleem", error_slot.text().lower())
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
-    def test_num_zaken_parameter_limits_results(self, mock_formulieren, mock_zaken):
+    def test_num_zaken_parameter_limits_results(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_cases_list = []
@@ -287,7 +315,7 @@ class CMSZakenPluginTest(TestCase):
             }
             mock_cases_list.append(mock_zaak)
 
-        mock_zaken.return_value = mock_cases_list
+        mock_visible_zaken.return_value = mock_cases_list
 
         plugin_model = cms_tools._init_plugin(
             CMSZakenPlugin, {"title": "Mijn Zaken", "num_zaken": 3}
@@ -315,10 +343,14 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("ZAAK-001", identifications)
         self.assertIn("ZAAK-002", identifications)
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_num_zaken_parameter_with_mixed_formulieren_and_cases(
-        self, mock_formulieren, mock_zaken
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
         api_group = ZGWApiGroupConfigFactory()
 
@@ -336,7 +368,7 @@ class CMSZakenPluginTest(TestCase):
             mock_formulieren_list.append(mock_submission)
 
         # 7 mock cases
-        mock_zaken_list = []
+        mock_visible_zaken_list = []
         for i in range(7):
             mock_zaak = MagicMock()
             mock_zaak.process_data.return_value = {
@@ -346,10 +378,10 @@ class CMSZakenPluginTest(TestCase):
                 "api_group": api_group,
                 "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
-            mock_zaken_list.append(mock_zaak)
+            mock_visible_zaken_list.append(mock_zaak)
 
         mock_formulieren.return_value = mock_formulieren_list
-        mock_zaken.return_value = mock_zaken_list
+        mock_visible_zaken.return_value = mock_visible_zaken_list
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -381,16 +413,22 @@ class CMSZakenPluginTest(TestCase):
         # But not the 3rd case
         self.assertNotIn("ZAAK-002", identifications)
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
-    def test_num_zaken_parameter_invalid_input(self, mock_formulieren, mock_zaken):
+    def test_num_zaken_parameter_invalid_input(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
         """Test that invalid values for num_zaken fall back to MAX_CASES_DEFAULT"""
         api_group = ZGWApiGroupConfigFactory()
 
-        mock_zaken_list = []
+        mock_visible_zaken_list = []
         for i in range(15):
             mock_zaak = MagicMock()
             mock_zaak.process_data.return_value = {
@@ -400,9 +438,9 @@ class CMSZakenPluginTest(TestCase):
                 "api_group": api_group,
                 "type_aanvraag": TypeAanvraag.ZAAK.value,
             }
-            mock_zaken_list.append(mock_zaak)
+            mock_visible_zaken_list.append(mock_zaak)
 
-        mock_zaken.return_value = mock_zaken_list
+        mock_visible_zaken.return_value = mock_visible_zaken_list
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -426,12 +464,18 @@ class CMSZakenPluginTest(TestCase):
                 # Should return MAX_CASES_DEFAULT
                 self.assertEqual(len(zaak_items), MAX_CASES_DEFAULT)
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
-    def test_htmx_content_maps_naam_to_description(self, mock_formulieren, mock_zaken):
+    def test_htmx_content_maps_naam_to_description(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
         api_group = ZGWApiGroupConfigFactory()
 
         mock_zaak = MagicMock()
@@ -442,7 +486,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = [mock_zaak]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -462,13 +506,17 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("Zaaknummer:", zaak_item.attr("description"))
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
         return_value=[],
     )
     def test_htmx_content_handles_missing_optional_fields(
-        self, mock_formulieren, mock_zaken
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
         api_group = ZGWApiGroupConfigFactory()
 
@@ -480,7 +528,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = [mock_zaak]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -500,10 +548,14 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(zaak_item.attr("identificatie"), "")
         self.assertEqual(zaak_item.attr("description"), "")
 
-    @patch("open_inwoner.cms.plugins.views.ZGWService.get_zaken")
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: zaken,
+    )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_handles_both_naam_and_description_fields(
-        self, mock_formulieren, mock_zaken
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
         """
         Test that both 'naam' field (from formulieren) and 'description' field
@@ -533,7 +585,7 @@ class CMSZakenPluginTest(TestCase):
         }
 
         mock_formulieren.return_value = [mock_submission]
-        mock_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = [mock_zaak]
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 

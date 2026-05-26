@@ -1,4 +1,3 @@
-import itertools
 from typing import Sequence
 
 from django.http import HttpRequest, HttpResponse
@@ -86,14 +85,12 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             formulieren = None
             msg = partial_error_msg
         try:
-            preprocessed_zaken: Sequence[UniformCase] | None = case_service.get_zaken(
-                user_identification
-            )
+            all_visible_zaken = case_service.get_visible_zaken(user_identification)
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
-            preprocessed_zaken = None
+            all_visible_zaken = None
 
-        if formulieren is None and preprocessed_zaken is None:
+        if formulieren is None and all_visible_zaken is None:
             context = {
                 "show_zaken_plugin": True,
                 "zaken": [],
@@ -103,13 +100,14 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             }
             return render(request, "cms/plugins/zaken/zaken.html", context)
 
-        # process and combine zaken
+        # Formulieren fill the first slots; only fully-resolve as many zaken as needed.
+        formulieren_to_show = (formulieren or [])[:num_zaken]
+        zaak_limit = max(0, num_zaken - len(formulieren_to_show))
+        zaken_page = case_service.fully_resolve_zaken(
+            (all_visible_zaken or [])[:zaak_limit]
+        )
         zaken_dicts = [
-            zaak.process_data()
-            for zaak in itertools.islice(
-                itertools.chain(formulieren or [], preprocessed_zaken or []),
-                num_zaken,
-            )
+            zaak.process_data() for zaak in [*formulieren_to_show, *zaken_page]
         ]
         self.log_case_list_accessed(zaken_dicts)
 
