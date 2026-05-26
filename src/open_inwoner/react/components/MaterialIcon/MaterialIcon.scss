@@ -1,5 +1,11 @@
-// TODO Test if we can import material-icons SCSS here (together with shadow: true)
+@use 'material-icons/iconfont/material-icons.css';
 
-material-icon {
+:host {
   height: 24px;
+}
+
+.material-icons--small {
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
 }

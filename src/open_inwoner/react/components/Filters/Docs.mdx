@@ -1,0 +1,75 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as FiltersStories from './Filters.stories';
+
+<Meta of={FiltersStories} />
+
+# Filters
+
+Filter context provider (`oip-filters`) that must be rendered inside `oip-form`. Maintains a label registry mapping field-name + value → display label, and implements the concrete submit action (GET navigation with URL query params).
+
+## Component tree
+
+| Tag | Role |
+| --- | --- |
+| `oip-filter-bar` | Toolbar that houses filter controls and the submit button |
+| `oip-filter-chips` | Renders active filters as removable chips |
+| `oip-select` | Multi-select field; registers option labels into FilterContext |
+| `oip-modal` | Generic modal dialog primitive |
+| `oip-filter-modal` | Modal variant of the filter panel |
+| `oip-fieldset` | Groups related filter fields with a legend |
+
+## Context
+
+`FilterContext` (`FilterContextValue`) is provided by `oip-filters` and consumed by its descendants.
+
+| Field | Signature | Description |
+| --- | --- | --- |
+| `registerLabel` | `(fieldName, value, label) => void` | Called by `oip-select-option` on mount to store a human-readable label for a raw option value. Re-registering the same pair is a no-op if the label is unchanged. |
+| `getLabel` | `(fieldName, value) => string` | Returns the registered display label for a field/value pair. Falls back to the raw `value` if no label was registered. |
+| `submit` | `() => void` | Delegates to `FormContext.submit`, serialises current field values into repeated URL query params (`?key=a&key=b`), and navigates via `window.location.assign`. Called by `oip-form-button`. |
+
+## Behaviour
+
+- Wrapped with `withContextGuard(useFormContext, …)` — renders nothing if placed outside an `oip-form` tree.
+- Maintains an `optionLabels` Preact signal (`Record<fieldName, Record<value, label>>`). Updates are immutable (spread merge) to trigger signal subscribers.
+- `registerLabel` short-circuits when the existing label matches, preventing unnecessary signal writes.
+- `submit` performs GET-only navigation — no HTML form submission is triggered.
+- Renders a `<div class="oip-filters">` wrapper around its children.
+- Uses shadow DOM and i18n (see `constants.ts` options).
+
+## Examples
+
+### Default
+
+A filter bar with two selects and a submit button — the minimal usage pattern.
+
+<Canvas of={FiltersStories.Default} />
+
+### WithPreselectedValues
+
+Filters initialised with values already selected, verifying the `value` prop and chip rendering.
+
+<Canvas of={FiltersStories.WithPreselectedValues} />
+
+### WithModal
+
+Combines the desktop filter bar with an `oip-filter-modal` panel for narrow viewports.
+
+<Canvas of={FiltersStories.WithModal} />
+
+## Usage
+
+```html
+<oip-form>
+  <oip-filters>
+    <oip-filter-bar>
+      <oip-select name="status" label="Status" multiple>
+        <oip-select-option value="open" label="Open"></oip-select-option>
+        <oip-select-option value="closed" label="Closed"></oip-select-option>
+      </oip-select>
+      <oip-form-button>Apply</oip-form-button>
+    </oip-filter-bar>
+    <oip-filter-chips></oip-filter-chips>
+  </oip-filters>
+</oip-form>
+```

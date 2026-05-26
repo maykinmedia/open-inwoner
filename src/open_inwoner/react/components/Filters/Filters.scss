@@ -1,4 +1,8 @@
-.oip-filter__wrapper {
+:host {
+  display: block;
+}
+
+.oip-filters {
   display: flex;
   flex-direction: column;
   gap: var(--oip-filter-wrapper-gap);

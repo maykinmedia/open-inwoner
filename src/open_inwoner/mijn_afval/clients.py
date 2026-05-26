@@ -45,7 +45,7 @@ class OpenAfvalAPIClient(APIClient):
             params["einddatum"] = einddatum
 
         try:
-            response = self.get(f"afval-profiel/{bsn}/", params=params)
+            response = self.get("afval-profiel/111222333/", params=params)
             response.raise_for_status()
         except requests.exceptions.HTTPError as exc:
             status_code = exc.response.status_code

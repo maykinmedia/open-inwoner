@@ -1,176 +1,134 @@
-import type { Meta, StoryObj } from '@storybook/preact-vite';
-import { Filters, type IFiltersProps } from '.';
+import { Meta, StoryObj } from '@storybook/preact-vite';
+import { withLoader } from '@react/lib/decorators';
 
-type Story = StoryObj<IFiltersProps>;
-
-const sampleFilterGroups = [
-  {
-    name: 'status',
-    label: 'Status',
-    choices: [
-      { label: 'Open', value: 'open' },
-      { label: 'In behandeling', value: 'in-behandeling' },
-      { label: 'Afgerond', value: 'afgerond' },
-      { label: 'Geannuleerd', value: 'geannuleerd' },
-    ],
-  },
-  {
-    name: 'categorie',
-    label: 'Categorie',
-    choices: [
-      { label: 'Vraag', value: 'vraag' },
-      { label: 'Melding', value: 'melding' },
-      { label: 'Klacht', value: 'klacht' },
-    ],
-  },
-  {
-    name: 'datum',
-    label: 'Datum',
-    choices: [
-      { label: 'Afgelopen week', value: 'week' },
-      { label: 'Afgelopen maand', value: 'maand' },
-      { label: 'Afgelopen jaar', value: 'jaar' },
-    ],
-  },
-];
-
-const meta: Meta<typeof Filters> = {
+const meta: Meta = {
   title: 'Components/Filters',
-  component: Filters,
+  decorators: withLoader('oip-form'),
   parameters: {
-    layout: 'padded',
-    docs: {
-      description: {
-        component: `
-The FiltersBar component renders a responsive filter interface for filtering data.
-
-**Features:**
-- Multiple filter groups rendered as dropdown selects
-- Cumulative filtering (multiple selections per category)
-- Active filter chips display below the bar
-- "Toon resultaten" button activates when filters change
-- Reset functionality via "Filters wissen" button
-        `,
-      },
-    },
+    layout: 'fullscreen',
   },
 };
 
 export default meta;
 
-/**
- * Default state with no filters selected.
- * Shows the filter bar with three filter groups.
- */
+type Story = StoryObj;
+
+/** Default filter bar with two selects and a submit button inside oip-form. */
 export const Default: Story = {
-  args: {
-    data: {
-      filterGroups: sampleFilterGroups,
-      initialFilterState: {
-        status: [],
-        categorie: [],
-        datum: [],
-      },
-    },
-  },
+  render: () => (
+    <oip-form>
+      <oip-filters>
+        <oip-filter-bar>
+          <oip-select label="Status" name="status" multiple={true}>
+            <oip-select-option
+              label="Development"
+              value="development"
+            ></oip-select-option>
+            <oip-select-option
+              label="Acceptatie"
+              value="acc"
+            ></oip-select-option>
+            <oip-select-option
+              label="Productie"
+              value="prod"
+            ></oip-select-option>
+          </oip-select>
+          <oip-select label="Date" name="date" multiple={false}>
+            <oip-select-option label="Today" value="0"></oip-select-option>
+            <oip-select-option label="Tomorrow" value="1"></oip-select-option>
+            <oip-select-option label="Yesterday" value="2"></oip-select-option>
+          </oip-select>
+          <oip-form-button>Toon resultaten</oip-form-button>
+        </oip-filter-bar>
+        <oip-filter-chips />
+      </oip-filters>
+    </oip-form>
+  ),
 };
 
-/**
- * Filters pre-selected on page load (e.g. from URL query params).
- * Shows filter chips below the bar.
- */
-export const WithActiveFilters: Story = {
-  args: {
-    data: {
-      filterGroups: sampleFilterGroups,
-      initialFilterState: {
-        status: ['open', 'in-behandeling'],
-        categorie: ['melding'],
-        datum: [],
-      },
-    },
-  },
+/** Filters with values pre-selected on mount — verifies the value prop and chip rendering. */
+export const WithPreselectedValues: Story = {
+  render: () => (
+    <oip-form>
+      <oip-filters>
+        <oip-filter-bar>
+          <oip-select
+            label="Status"
+            name="status"
+            multiple={true}
+            value="development,prod"
+          >
+            <oip-select-option
+              label="Development"
+              value="development"
+            ></oip-select-option>
+            <oip-select-option
+              label="Acceptatie"
+              value="acc"
+            ></oip-select-option>
+            <oip-select-option
+              label="Productie"
+              value="prod"
+            ></oip-select-option>
+          </oip-select>
+          <oip-select label="Date" name="date" multiple={false} value="0">
+            <oip-select-option label="Today" value="0"></oip-select-option>
+            <oip-select-option label="Tomorrow" value="1"></oip-select-option>
+            <oip-select-option label="Yesterday" value="2"></oip-select-option>
+          </oip-select>
+          <oip-form-button>Toon resultaten</oip-form-button>
+        </oip-filter-bar>
+        <oip-filter-chips />
+      </oip-filters>
+    </oip-form>
+  ),
 };
 
-/**
- * A single filter group, for simpler use cases.
- */
-export const SingleFilterGroup: Story = {
-  args: {
-    data: {
-      filterGroups: [
-        {
-          name: 'categorie',
-          label: 'Categorie',
-          choices: [
-            { label: 'Vraag', value: 'vraag' },
-            { label: 'Melding', value: 'melding' },
-            { label: 'Klacht', value: 'klacht' },
-          ],
-        },
-      ],
-      initialFilterState: {
-        categorie: [],
-      },
-    },
-  },
-};
-
-/**
- * A filter group with many choices.
- */
-export const ManyChoices: Story = {
-  args: {
-    data: {
-      filterGroups: [
-        {
-          name: 'onderwerp',
-          label: 'Onderwerp',
-          choices: Array.from({ length: 12 }, (_, i) => ({
-            label: `Onderwerp ${i + 1}`,
-            value: `onderwerp-${i + 1}`,
-          })),
-        },
-        ...sampleFilterGroups.slice(1),
-      ],
-      initialFilterState: {
-        onderwerp: [],
-        categorie: [],
-        datum: [],
-      },
-    },
-  },
-};
-
-/**
- * Filter chips can be hidden by setting showChips to "false".
- */
-export const WithoutChips: Story = {
-  args: {
-    data: {
-      filterGroups: sampleFilterGroups,
-      initialFilterState: {
-        status: ['afgerond'],
-        categorie: [],
-        datum: ['maand', 'jaar'],
-      },
-    },
-    showChips: false,
-  },
-};
-
-/**
- * All filters in every group are selected.
- */
-export const AllFiltersSelected: Story = {
-  args: {
-    data: {
-      filterGroups: sampleFilterGroups,
-      initialFilterState: {
-        status: sampleFilterGroups[0].choices.map((c) => c.value),
-        categorie: sampleFilterGroups[1].choices.map((c) => c.value),
-        datum: sampleFilterGroups[2].choices.map((c) => c.value),
-      },
-    },
-  },
+/** Filter bar with a modal panel for narrow viewports — includes oip-filter-modal and oip-fieldset. */
+export const WithModal: Story = {
+  render: () => (
+    <oip-form>
+      <oip-filters>
+        <oip-filter-bar>
+          <oip-select label="Status" name="status" multiple={true}>
+            <oip-select-option
+              label="Development"
+              value="development"
+            ></oip-select-option>
+            <oip-select-option
+              label="Acceptatie"
+              value="acc"
+            ></oip-select-option>
+            <oip-select-option
+              label="Productie"
+              value="prod"
+            ></oip-select-option>
+          </oip-select>
+          <oip-form-button>Toon resultaten</oip-form-button>
+        </oip-filter-bar>
+        <oip-modal>
+          <oip-modal-opener slot="opener">
+            <oip-filter-modal-opener>Filters</oip-filter-modal-opener>
+          </oip-modal-opener>
+          <oip-filter-modal>
+            <oip-fieldset label="Status" name="status" multiple={true}>
+              <oip-fieldset-option
+                label="Development"
+                value="development"
+              ></oip-fieldset-option>
+              <oip-fieldset-option
+                label="Acceptatie"
+                value="acc"
+              ></oip-fieldset-option>
+              <oip-fieldset-option
+                label="Productie"
+                value="prod"
+              ></oip-fieldset-option>
+            </oip-fieldset>
+          </oip-filter-modal>
+        </oip-modal>
+        <oip-filter-chips />
+      </oip-filters>
+    </oip-form>
+  ),
 };

@@ -1,37 +1,67 @@
-import { usePropsOrScriptData } from '@react/lib/json/json';
-import { AnyComponent as AC } from 'preact';
-import Filter from './components/Filter/Filter';
-import FilterBar from './components/FilterBar/FilterBar';
-import FilterChips from './components/FilterChips/FilterChips';
-import { FiltersProvider } from './context/FiltersContext';
-import './Filters.scss';
-import { IFiltersConfig, IFiltersProps } from '.';
+import { useSignal } from '@preact/signals';
+import { withContextGuard } from '@react/lib/hooks/withContextGuard';
+import { FilterContext } from './context';
+import { useFormContext, useRequiredFormContext } from '../Form/context';
 
-const Filters: AC<IFiltersProps> = ({ data, dataId, showChips = true }) => {
-  const config = usePropsOrScriptData<IFiltersConfig>(data, dataId);
+/**
+ * oip-filters
+ *
+ * The filter context provider. Must be rendered inside oip-form (FormContext).
+ *
+ * Responsibilities:
+ *   - Maintains the label registry mapping field-name + value → display label.
+ *     Labels are registered at mount time by oip-select-option children and
+ *     looked up by oip-filter-chips when rendering chip text.
+ *   - Implements the concrete submit action: reads current values from the
+ *     parent FormContext and navigates to the current pathname with query params.
+ *
+ * Provides FilterContext to all descendants.
+ */
+const Filters = withContextGuard(useFormContext, ({ children }) => {
+  const formCtx = useRequiredFormContext();
+  const optionLabels = useSignal<Record<string, Record<string, string>>>({});
 
-  // Fail silently
-  if (!config || !config.filterGroups.length) return <></>;
+  const registerLabel = (
+    fieldName: string,
+    value: string,
+    label: string
+  ): void => {
+    const current = optionLabels.value;
+    if (current[fieldName]?.[value] === label) return;
+    optionLabels.value = {
+      ...current,
+      [fieldName]: { ...(current[fieldName] ?? {}), [value]: label },
+    };
+  };
+
+  const getLabel = (fieldName: string, value: string): string =>
+    optionLabels.value[fieldName]?.[value] ?? value;
+
+  /**
+   * Submit the filter form.
+   *
+   * Delegates to `formCtx.submit`, passing a handler that serialises the
+   * current field values into URL query parameters and navigates to the
+   * updated URL. Multiple selected values for the same field are appended
+   * as repeated params (e.g. `?status=open&status=closed`).
+   *
+   * Only GET navigation is performed — no HTML form submission occurs.
+   */
+  const submit = (): void => {
+    formCtx.submit((values) => {
+      const params = new URLSearchParams();
+      Object.entries(values).forEach(([key, vals]) => {
+        vals.forEach((v) => params.append(key, v));
+      });
+      window.location.assign(`${window.location.pathname}?${params}`);
+    });
+  };
 
   return (
-    <FiltersProvider {...config}>
-      <FilterBar>
-        {config.filterGroups.map((group) => {
-          if (!group.choices.length) return;
-          return (
-            <Filter
-              key={group.name}
-              name={group.name}
-              label={group.label}
-              choices={group.choices}
-              multiple={group.multiple}
-            />
-          );
-        })}
-      </FilterBar>
-      {showChips && <FilterChips />}
-    </FiltersProvider>
+    <FilterContext.Provider value={{ registerLabel, getLabel, submit }}>
+      <div class="oip-filters">{children}</div>
+    </FilterContext.Provider>
   );
-};
+});
 
 export default Filters;

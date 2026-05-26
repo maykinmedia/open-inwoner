@@ -1,24 +1,31 @@
-import {
-  FilterState,
-  IFilterGroup,
-  IFiltersConfig,
-} from '@react/components/Filters';
 import { useMemo } from 'preact/hooks';
 import { useIntl } from 'react-intl';
 import { AfvalFilterConfig, AfvalFilterTypes } from '..';
 
-/**
- * Hook tailor made for Mijn Afval filters.
- * Creates both the filterGroups and initialFilterState.
- * @param config
- */
+export interface FilterChoice {
+  value: string;
+  label: string;
+}
+
+export interface FilterGroup {
+  name: AfvalFilterTypes;
+  label: string;
+  choices: FilterChoice[];
+  multiple?: boolean;
+}
+
+export interface AfvalFilterResult {
+  filterGroups: FilterGroup[];
+  initialFilterState: Record<AfvalFilterTypes, string[]>;
+}
+
 export const useAfvalFilter = (
   config: AfvalFilterConfig
-): IFiltersConfig<AfvalFilterTypes> => {
+): AfvalFilterResult => {
   const intl = useIntl();
 
-  const filterGroups = useMemo(() => {
-    const groups: IFilterGroup<AfvalFilterTypes>[] = [];
+  const filterGroups = useMemo<FilterGroup[]>(() => {
+    const groups: FilterGroup[] = [];
 
     if (config.periode) {
       groups.push({
@@ -28,13 +35,13 @@ export const useAfvalFilter = (
           description: 'The label for the filter period',
           defaultMessage: 'Periode',
         }),
-        choices: config.periode.map((choice) => ({
+        choices: config.periode.map((year) => ({
+          value: String(year),
           label: `${intl.formatMessage({
             id: 'filter.period_filter_year_prefix',
             description: 'The prefix for the options of type period',
             defaultMessage: 'Jaar',
-          })} ${choice}`,
-          value: String(choice),
+          })} ${year}`,
         })),
         multiple: false,
       });
@@ -60,9 +67,9 @@ export const useAfvalFilter = (
           description: 'The label for the filter adres',
           defaultMessage: 'Adres',
         }),
-        choices: config.addresses.map((choice) => ({
-          label: choice,
-          value: choice,
+        choices: config.addresses.map((address) => ({
+          value: address,
+          label: address,
         })),
       });
     }
@@ -70,13 +77,12 @@ export const useAfvalFilter = (
     return groups;
   }, [config]);
 
-  const defaultValues = new URLSearchParams(window.location.search);
-
-  const initialFilterState: FilterState<AfvalFilterTypes> = {
-    periode: defaultValues.getAll('periode'),
-    adres: defaultValues.getAll('adres'),
-    'afval-type': defaultValues.getAll('afval-type'),
+  const params = new URLSearchParams(window.location.search);
+  const initialFilterState: Record<AfvalFilterTypes, string[]> = {
+    periode: params.getAll('periode'),
+    adres: params.getAll('adres'),
+    'afval-type': params.getAll('afval-type'),
   };
 
-  return { initialFilterState, filterGroups };
+  return { filterGroups, initialFilterState };
 };

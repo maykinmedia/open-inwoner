@@ -1,0 +1,102 @@
+// oip-filter-modal is slotted inside <dialog> (owned by oip-modal).
+// :host takes on the visual layout that was previously on the <dialog> element.
+:host {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  max-height: calc(100% - 1rem);
+  overflow-y: auto;
+  background-color: var(--oip-filter-modal-background-color);
+  border-radius: var(--oip-filter-modal-border-radius)
+    var(--oip-filter-modal-border-radius) 0 0;
+  padding: var(--oip-filter-modal-padding);
+  gap: var(--oip-filter-modal-gap);
+}
+
+.oip-filter-modal {
+  // ── Header ──────────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: var(--oip-filter-modal-header-gap);
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--oip-filter-modal-header-gap);
+    width: 100%;
+  }
+
+  &__heading {
+    font-size: var(--oip-filter-modal-heading-font-size);
+    font-weight: var(--oip-filter-modal-heading-font-weight);
+    color: var(--oip-filter-modal-heading-color);
+    font-family: var(--font-family-heading);
+    margin: 0;
+  }
+
+  // ── Action buttons in the header ────────────────────────────────────────
+
+  &__close-button {
+    padding: 0;
+    height: fit-content;
+    width: var(--oip-filter-modal-close-button-size);
+
+    span[class*='icon'] {
+      width: var(--oip-filter-modal-close-button-size);
+      font-size: var(--oip-filter-modal-close-button-size);
+    }
+  }
+
+  &__reset-button {
+    font-weight: bold;
+    height: 24px;
+    padding: 0 var(--oip-filter-modal-header-gap);
+  }
+
+  // ── Scrollable filter content area ──────────────────────────────────────
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-family-body);
+    overflow-y: auto;
+    gap: var(--oip-filter-modal-content-gap);
+  }
+
+  // ── Sticky footer with apply button ─────────────────────────────────────
+
+  &__footer {
+    padding-bottom: var(--oip-filter-modal-footer-padding-bottom);
+    flex-shrink: 0;
+  }
+}
+
+// ── Opener button (mobile-only) ────────────────────────────────────────────
+
+.oip-filter-modal-opener {
+  display: flex;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    color: var(--oip-filter-bar-label-color, inherit);
+  }
+
+  &__label {
+    font-family: var(--font-family-body);
+  }
+}

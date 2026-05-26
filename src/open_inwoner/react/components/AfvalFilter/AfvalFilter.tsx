@@ -1,50 +1,66 @@
-import { Filters, IFilterChoice } from '@react/components/Filters';
+import FormButton from '@react/components/Form/components/FormButton';
+import Form from '@react/components/Form/Form';
+import FilterBar from '@react/components/FilterBar/FilterBar';
+import FilterChips from '@react/components/FilterChips/FilterChips';
+import Filters from '@react/components/Filters/Filters';
+import Select from '@react/components/Select/Select';
+import SelectOption from '@react/components/SelectOption/SelectOption';
 import { usePropsOrScriptData } from '@react/lib/json';
 import { AnyComponent as AC } from 'preact';
-import { useAfvalFilter } from '.';
+import { useAfvalFilter } from './hooks/useAfvalFilters';
 
-/**
- * Type of the data.
- * The actual format is defined in the backend.
- */
 export interface AfvalFilterConfig {
   addresses: string[];
-  afval_types: IFilterChoice[];
+  afval_types: Array<{ value: string; label: string }>;
   periode: number[];
 }
 
-/**
- * The names of the filters.
- * The name will be used in the GET query string.
- */
 export type AfvalFilterTypes = 'periode' | 'adres' | 'afval-type';
 
-/**
- * The AfvalFilter component props.
- * @param
- * @param
- */
 export type IAfvalFilterProps = {
   /**
-   * `dataId` is used by web-components.
-   * Only works in combination with a json script.
-   * The json script should contain data conform the `AfvalFilterConfig` type.
+   * Used by web components to load config from a `<script type="application/json">` tag.
    */
   dataId?: string;
   /**
-   * `data` is used by Preact components to pass data as an object.
+   * Used by Preact components (e.g. Storybook) to pass config directly.
    */
   data?: AfvalFilterConfig;
 };
 
 const AfvalFilter: AC<IAfvalFilterProps> = ({ data, dataId }) => {
   const config = usePropsOrScriptData<AfvalFilterConfig>(data, dataId);
-  if (!config) return <></>;
+  if (!config) return null;
 
-  const afvalFilter = useAfvalFilter(config);
-  if (!afvalFilter) return <></>;
+  const { filterGroups, initialFilterState } = useAfvalFilter(config);
 
-  return <Filters data={afvalFilter} />;
+  return (
+    <Form>
+      <Filters>
+        <FilterBar>
+          {filterGroups.map((group) => (
+            <Select
+              key={group.name}
+              name={group.name}
+              label={group.label}
+              multiple={group.multiple ?? true}
+              value={initialFilterState[group.name].join(',')}
+            >
+              {group.choices.map((choice) => (
+                <SelectOption
+                  key={choice.value}
+                  value={choice.value}
+                  label={choice.label}
+                />
+              ))}
+            </Select>
+          ))}
+          <FormButton />
+        </FilterBar>
+        <FilterChips />
+      </Filters>
+    </Form>
+  );
 };
 
 export default AfvalFilter;

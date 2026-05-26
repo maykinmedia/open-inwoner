@@ -39,7 +39,9 @@ export class WebComponentLoader {
    * @returns a unique array of strings from the found component names.
    */
   private static findWebComponentsOnPage(): WebComponentTagName[] {
-    const selector = Object.keys(WebComponentLoader.registry).join(',');
+    const selector = Object.keys(WebComponentLoader.registry).join(
+      ':not([data-subcomponent]),'
+    );
     const elements = document.querySelectorAll<HTMLElement>(selector);
     const foundComponents = [...elements].map((el) => el.tagName.toLowerCase());
     return Array.from(new Set(foundComponents)) as WebComponentTagName[];
@@ -161,7 +163,9 @@ export class WebComponentLoader {
 
       const config = WebComponentLoader.registry[name];
 
-      WebComponentLoader.registerWebComponent<ExtractGeneric<typeof Component>>(
+      const a = WebComponentLoader.registerWebComponent<
+        ExtractGeneric<typeof Component>
+      >(
         Component as AC<ExtractGeneric<typeof Component>>,
         config.tagName,
         config.propNames as (keyof ExtractGeneric<typeof Component>)[],
@@ -191,7 +195,6 @@ export class WebComponentLoader {
    */
   static async registerWebComponents() {
     try {
-      // Look for all web components on the current page
       const foundComponents = WebComponentLoader.findWebComponentsOnPage();
 
       // Only continue if there are web components on the current page
