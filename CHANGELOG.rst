@@ -42,6 +42,9 @@ Nieuwe features
 * [:gh:`2203`, :oip-nlds:`41`, :oip-nlds:`42` :oip-nlds:`43`]: Alle 'utrecht' paragrafen
   vervangen door 'nl' paragrafen, als herbruikbaar web component, waardoor hun huisstijl
   overschrijfbaar wordt met de nieuwe candidate NL design-tokens.
+* [:gh:`2514`]: De ZGW-cache wordt bij het inloggen op de achtergrond voorgeladen via een
+  Celery-taak, zodat de zakenlijst en zaakdetailpagina's bij het eerste bezoek al vanuit
+  de cache worden bediend.
 
 Bugfixes
 --------

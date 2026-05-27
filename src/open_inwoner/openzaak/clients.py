@@ -77,17 +77,23 @@ class ZgwAPIClient(BaseAPIClient):
 class ZakenClient(ZgwAPIClient):
     use_openzaak_120_params: bool
     fetch_rollen_with_betrokkene_type: bool
+    zaak_max_confidentiality: str
+    limit_user_visible_cases_to_role: str | None
 
     def __init__(
         self,
         *args,
         use_openzaak_120_params: bool,
         fetch_rollen_with_betrokkene_type: bool,
+        zaak_max_confidentiality: str,
+        limit_user_visible_cases_to_role: str | None = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.use_openzaak_120_params = use_openzaak_120_params
         self.fetch_rollen_with_betrokkene_type = fetch_rollen_with_betrokkene_type
+        self.zaak_max_confidentiality = zaak_max_confidentiality
+        self.limit_user_visible_cases_to_role = limit_user_visible_cases_to_role
 
     def fetch_zaken(
         self,
@@ -141,17 +147,15 @@ class ZakenClient(ZgwAPIClient):
         :param:max_requests - used to limit the number of requests to list_zaken resource.
         :param:identificatie - used to filter the zaken by a specific identification
         """
-        config = OpenZaakConfig.get_solo()
-
         params = {
             "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": user_bsn,
-            "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
+            "maximaleVertrouwelijkheidaanduiding": self.zaak_max_confidentiality,
         }
         if identificatie:
             params.update({"identificatie": identificatie})
-        if config.limit_user_visible_cases_to_role:
+        if self.limit_user_visible_cases_to_role:
             params.update(
-                {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
+                {"rol__omschrijvingGeneriek": self.limit_user_visible_cases_to_role}
             )
 
         response = self.get(
@@ -196,10 +200,8 @@ class ZakenClient(ZgwAPIClient):
                 "You must set either a `kvk_or_rsin` or `vestigingsnummer`"
             )
 
-        config = OpenZaakConfig.get_solo()
-
         params = {
-            "maximaleVertrouwelijkheidaanduiding": config.zaak_max_confidentiality,
+            "maximaleVertrouwelijkheidaanduiding": self.zaak_max_confidentiality,
         }
 
         vestigingsnummer_param = (
@@ -224,9 +226,9 @@ class ZakenClient(ZgwAPIClient):
         if zaak_identificatie:
             params.update({"identificatie": zaak_identificatie})
 
-        if config.limit_user_visible_cases_to_role:
+        if self.limit_user_visible_cases_to_role:
             params.update(
-                {"rol__omschrijvingGeneriek": config.limit_user_visible_cases_to_role}
+                {"rol__omschrijvingGeneriek": self.limit_user_visible_cases_to_role}
             )
 
         response = self.get(
@@ -875,6 +877,8 @@ def _build_all_zgw_clients_for_type(
                 client_init_kwargs = {
                     "use_openzaak_120_params": api_group.fetch_eherkenning_zaken_with_openzaak_120_params,
                     "fetch_rollen_with_betrokkene_type": api_group.fetch_rollen_with_betrokkene_type,
+                    "zaak_max_confidentiality": config.zaak_max_confidentiality,
+                    "limit_user_visible_cases_to_role": config.limit_user_visible_cases_to_role,
                 }
 
             client = build_zgw_client_from_service(service, **client_init_kwargs)

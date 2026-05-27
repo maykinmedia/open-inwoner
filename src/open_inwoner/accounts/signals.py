@@ -17,6 +17,10 @@ import requests
 import structlog
 from axes.signals import user_locked_out
 
+from open_inwoner.accounts.user_identification import (
+    BSNIdentification,
+    KVKIdentification,
+)
 from open_inwoner.haalcentraal.clients import BRPClient
 from open_inwoner.kvk.client import KvKClient
 from open_inwoner.kvk.exceptions import KVKAPIException
@@ -24,6 +28,7 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
+from open_inwoner.openzaak.tasks import warm_cache_for_user
 from open_inwoner.utils.logentry import system_action, user_action
 
 from .metrics import login_failures, logins, logouts, user_lockouts
@@ -253,6 +258,32 @@ def increment_logins_counter(
             "http_target": request.path if request else "",
         },
     )
+
+
+@receiver(user_logged_in, dispatch_uid="user_logged_in.warm_zgw_cache")
+def warm_zgw_cache_on_login(
+    sender: type[User], request: HttpRequest | None, user: User, **kwargs
+) -> None:
+    try:
+        match user.identification:
+            case BSNIdentification(bsn=bsn):
+                warm_cache_for_user.delay(
+                    user_bsn=bsn,
+                    user_kvk=None,
+                    user_rsin=None,
+                    user_vestigingsnummer=None,
+                )
+            case KVKIdentification(
+                kvk=kvk, rsin=rsin, vestigingsnummer=vestigingsnummer
+            ):
+                warm_cache_for_user.delay(
+                    user_bsn=None,
+                    user_kvk=kvk,
+                    user_rsin=rsin,
+                    user_vestigingsnummer=vestigingsnummer,
+                )
+    except Exception:
+        logger.warning("Failed to dispatch ZGW cache warm-up task", exc_info=True)
 
 
 @receiver(user_logged_out, dispatch_uid="user_logged_out.increment_counter")
