@@ -6,12 +6,12 @@
       padding: 0;
     }
 
-    *[class^='utrecht-heading'] + .utrecht-paragraph--oip-compact {
-      margin-top: 0;
+    [class^='utrecht-heading'] + nl-paragraph {
+      margin-block-start: 0;
     }
 
-    .utrecht-paragraph + .form {
-      margin-top: 0;
+    nl-paragraph + .form {
+      margin-block-start: 0;
     }
   }
 

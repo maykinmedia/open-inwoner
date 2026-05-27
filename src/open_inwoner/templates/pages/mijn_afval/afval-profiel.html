@@ -12,7 +12,7 @@
         {% render_column start=1 span=12 %}
             <h1 class="utrecht-heading-1" id="title">{{ page_heading }}</h1>
             {% if page_description %}
-                <p class="utrecht-paragraph utrecht-paragraph--lead">{{ page_description }}</p>
+                <nl-paragraph>{{ page_description }}</nl-paragraph>
             {% endif %}
             {% if filter_options %}
                 {# Filter Component #}
@@ -32,7 +32,7 @@
                         {# hidden is added to avoid a flash of unstyled content (value resetted inside the web component) #}
                         <div class="accordion__heading" slot="summary" hidden>
                             <h3 class="utrecht-heading-3">{{ afval_obj.object_address }}</h3>
-                            <p class="utrecht-paragraph">{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}</p>
+                            <nl-paragraph>{% trans "Totaal afgelopen periode:" %} {{ afval_obj.totaal_gewicht }}</nl-paragraph>
                         </div>
                         <material-icon name="keyboard_arrow_down" extra-class-name='accordion__icon' slot="icon"></material-icon>
                         {# Container Sections - Same rendering for all types #}
@@ -49,7 +49,7 @@
                     </oip-accordion>
                 </article>
             {% empty %}
-                <p class="utrecht-paragraph">{% trans "Geen afvalgegevens beschikbaar." %}</p>
+                <nl-paragraph>{% trans "Geen afvalgegevens beschikbaar." %}</nl-paragraph>
             {% endfor %}
         {% endrender_column %}
     {% endrender_grid %}

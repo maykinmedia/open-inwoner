@@ -42,23 +42,16 @@
     height: 100%;
     color: var(--oip-plugin-card-heading-color);
 
-    .utrecht-paragraph {
+    nl-paragraph {
       color: inherit;
       font-weight: 700;
-      margin-block: 0;
+      margin-block-start: 0;
+      margin-block-end: 0;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
       display: flex;
       flex-direction: column;
       gap: 4px;
-
-      & + .utrecht-paragraph {
-        margin-block: 0;
-      }
-
-      &-muted {
-        color: #676767;
-        margin-block: 0;
-        font-weight: 400;
-      }
     }
 
     .utrecht-heading-2 {

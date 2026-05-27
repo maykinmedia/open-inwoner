@@ -15,14 +15,14 @@
                 <section class="contactmoment">
                     <div>
                         <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Uw vraag" %}</h2>
-                        <p class="contactmoment__text">{{ question.question_text }}</p>
+                        <nl-paragraph>{{ question.question_text }}</nl-paragraph>
                     </div>
                     <div>
                         <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Antwoord" %}</h2>
                         {% if question.answer_text %}
-                            <p class="contactmoment__text">{{ question.answer_text }}</p>
+                            <nl-paragraph>{{ question.answer_text }}</nl-paragraph>
                         {% else %}
-                            <p class="contactmoment__text">{% trans "Nog geen antwoord beschijkbaar" %}</p>
+                            <nl-paragraph>{% trans "Nog geen antwoord beschijkbaar" %}</nl-paragraph>
                         {% endif %}
                     </div>
                     <div>
@@ -42,6 +42,6 @@
         {% endrender_grid %}
 
     {% else %}
-        <p class="utrecht-paragraph"><strong>{% trans 'There is no available data at the moment.' %}</strong></p>
+        <nl-paragraph><strong>{% trans 'There is no available data at the moment.' %}</strong></nl-paragraph>
     {% endif %}
 {% endblock content %}

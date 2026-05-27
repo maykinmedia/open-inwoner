@@ -105,7 +105,6 @@
   &--type-info:after {
     background-color: var(--color-info);
     border-radius: var(--border-radius);
-    //box-shadow: -2px 2px 1px 1px rgba(0, 0, 0, 0.1);
     content: '';
     height: var(--card-size-dog-ear);
     position: absolute;
@@ -190,7 +189,10 @@
 
   &__caption {
     color: var(--color-gray-dark-900);
-    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 
   &__text--small {
@@ -227,6 +229,10 @@
       display: inline-block;
       width: 100%;
       height: var(--row-height);
+    }
+
+    .list-item {
+      color: var(--oip-color-fg);
     }
 
     /// clickable plans on home page after authenticated
@@ -272,8 +278,8 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
-    .utrecht-paragraph {
-      margin-top: 4px;
+    nl-paragraph {
+      margin-block-start: var(--spacing-small);
     }
 
     .button {
@@ -337,7 +343,7 @@
       width: 100%;
     }
 
-    .utrecht-paragraph {
+    nl-paragraph {
       width: 100%;
     }
   }
@@ -399,5 +405,10 @@
 
   &.hidden {
     display: none;
+  }
+
+  // Remove Safari iOS phone-parsing and control color when zaaknummer is inside anchor for card-as-link
+  .skip-phone-parsing {
+    color: var(--oip-color-fg);
   }
 }

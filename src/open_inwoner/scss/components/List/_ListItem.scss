@@ -22,18 +22,19 @@
     padding: 0;
   }
 
-  & .list-item__caption {
-    line-height: var(--font-line-height-body-small);
-  }
-
   &--compact:first-child {
     padding-top: 0;
   }
 
   & &__caption {
+    display: block;
     color: var(--color-gray-dark-900);
     font-size: var(--font-size-body-small);
-    margin-top: 0;
+    line-height: var(--font-line-height-body-small);
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 
   .link {
@@ -46,8 +47,8 @@
     margin: 0;
   }
 
-  .utrecht-paragraph + .utrecht-paragraph {
-    margin-top: 0;
+  nl-paragraph + nl-paragraph {
+    margin-block-start: 0;
   }
 
   & + & {

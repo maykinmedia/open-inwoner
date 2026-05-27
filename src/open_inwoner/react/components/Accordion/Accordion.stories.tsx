@@ -76,7 +76,7 @@ export const Default: Story = {
     <oip-accordion initial-open={initialOpen}>
       <div class="accordion__heading" slot="summary" hidden>
         <h3 class="utrecht-heading-3">{title}</h3>
-        <p class="utrecht-paragraph">{subtitle}</p>
+        <nl-paragraph>{subtitle}</nl-paragraph>
       </div>
       <material-icon name="keyboard_arrow_down" slot="icon" />
       <MockAccordionChild>Accordion as a web component</MockAccordionChild>
@@ -124,7 +124,7 @@ export const InitialOpen: Story = {
     <oip-accordion initial-open={initialOpen}>
       <div class="accordion__heading" slot="summary" hidden>
         <h3 class="utrecht-heading-3">{title}</h3>
-        <p class="utrecht-paragraph">{subtitle}</p>
+        <nl-paragraph>{subtitle}</nl-paragraph>
       </div>
       <material-icon name="keyboard_arrow_down" slot="icon" />
       <MockAccordionChild>Accordion as a web component</MockAccordionChild>
@@ -152,7 +152,7 @@ export const WithCustomIcon: Story = {
     <oip-accordion initial-open={initialOpen}>
       <div class="accordion__heading" slot="summary" hidden>
         <h3 class="utrecht-heading-3">{title}</h3>
-        <p class="utrecht-paragraph">{subtitle}</p>
+        <nl-paragraph>{subtitle}</nl-paragraph>
       </div>
       <material-icon name="keyboard_double_arrow_down" slot="icon" />
       <MockAccordionChild>With custom icon</MockAccordionChild>
@@ -182,7 +182,7 @@ export const WCCombinedWithActionList: Story = {
     <oip-accordion initial-open={args.initialOpen}>
       <div class="accordion__heading" slot="summary" hidden>
         <h3 class="utrecht-heading-3">{args.title}</h3>
-        <p class="utrecht-paragraph">{args.subtitle}</p>
+        <nl-paragraph>{args.subtitle}</nl-paragraph>
       </div>
       <material-icon name="keyboard_arrow_down" slot="icon" />
       <oip-action-list>

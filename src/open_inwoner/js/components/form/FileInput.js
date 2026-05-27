@@ -322,13 +322,13 @@ export class FileInput extends Component {
           ${
             typeError && sizeError
               ? `
-              <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small error">
+              <p class="nl-paragraph nl-paragraph--oip nl-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 <span class="file-error__content file-error__type-size">Dit type bestand (${ext}) is ongeldig en te groot. Geldige bestandstypen zijn: ${uploadFileTypes}</span>
               </p>`
               : typeError || sizeError
                 ? `
-              <p class="utrecht-paragraph utrecht-paragraph--oip utrecht-paragraph--oip-small error">
+              <p class="nl-paragraph nl-paragraph--oip nl-paragraph--oip-small error">
                 <span aria-hidden="true" class="material-icons-outlined">warning_amber</span>
                 ${
                   typeError

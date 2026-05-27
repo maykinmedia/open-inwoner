@@ -192,8 +192,8 @@
   --color-font-accent: var(--color-gray-dark);
 
   --color-body: var(--color-gray-dark);
-  // changed to #949494 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
-  --color-mute: #949494;
+  // changed to #757575 to get the required 3:1 contrast ratio - in case of decorative border use var(--color-gray).
+  --color-mute: var(--oip-color-fg-muted);
   // text-color for muted text inside tinted cards
   --color-tinted-mute: #696969;
 
@@ -251,13 +251,11 @@
   --font-size-body: var(--utrecht-document-font-size);
   --font-line-height-body: 24px;
 
-  --font-size-body-extra-small: 12px;
-  --font-size-body-small: var(--utrecht-paragraph-small-font-size);
+  --font-size-body-small: var(--oip-text-small-font-size);
   --font-size-body-larger: 18px;
   --font-size-body-large: 20px;
   --font-size-icon-large: 32px;
   --font-line-height-body-small: 20px;
-  --font-line-height-body-medium: 24px;
   --font-line-height-body-large: 28px;
 
   --row-height: 40px;

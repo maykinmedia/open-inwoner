@@ -51,7 +51,7 @@
   }
 
   &__file .link,
-  &__file .utrecht-paragraph {
+  &__file nl-paragraph {
     padding: var(--spacing-large);
     box-sizing: border-box;
   }
@@ -89,11 +89,11 @@
 
   &__file--recent {
     color: var(--color-red-notification);
-    font-size: var(--font-size-body-extra-small);
+    font-size: var(--font-size-body-small);
     vertical-align: middle;
   }
 
   &__date {
-    font-size: var(--font-size-body-extra-small);
+    font-size: var(--font-size-body-small);
   }
 }

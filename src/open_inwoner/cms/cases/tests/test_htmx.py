@@ -466,7 +466,7 @@ class CasesPlaywrightTests(
         )
 
         # check case is visible
-        expect(page.get_by_text(self.zaak["identificatie"])).to_be_visible()
+        expect(page.locator("h1#title")).to_contain_text(self.zaaktype["omschrijving"])
 
         # check documents show
         documents = page.locator(".file-list").get_by_role("listitem")
@@ -531,7 +531,9 @@ class CasesPlaywrightTests(
 
         notification = page.locator(".notification__content")
         expect(notification).to_be_visible()
-        expect(notification.get_by_text(_("Vraag verstuurd!"))).to_be_visible()
+        expect(
+            notification.locator("nl-paragraph", has_text=_("Vraag verstuurd!"))
+        ).to_be_visible()
 
         # finally check if our mock matchers are accurate
         self.assertMockMatchersCalled(self.matchers)
@@ -677,10 +679,11 @@ class CasesPlaywrightTests(
             page = context.new_page()
             page.goto(self.live_reverse("cases:index"))
 
-            error_message = page.get_by_text(
-                _(
+            error_message = page.locator(
+                "nl-paragraph",
+                has_text=_(
                     "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw."
-                )
+                ),
             )
             expect(error_message).to_be_visible()
             expect(page.locator("#spinner-container")).not_to_be_visible()

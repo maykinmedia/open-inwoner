@@ -19,7 +19,7 @@
                         {% csrf_token %}
                         {% date_field form.end_date icon="calendar_today" icon_position="after" %}
                         <div class="plan__contacts">
-                            <p class="utrecht-paragraph">Contactpersoon</p>
+                            <nl-paragraph>Contactpersoon</nl-paragraph>
                             {% checkboxes form.plan_contacts %}
                         </div>
                         <div>
@@ -34,10 +34,10 @@
                         </div>
                     {% endrender_form %}
                 {% else %}
-                    <div class="utrecht-paragraph">
+                    <nl-paragraph>
                         {% url 'profile:contact_create' as contact_create %}
                         {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
-                    </div>
+                    </nl-paragraph>
                 {% endif %}
             {% endrender_column %}
         {% endrender_grid %}

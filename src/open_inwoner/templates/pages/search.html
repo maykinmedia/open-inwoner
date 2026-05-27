@@ -4,7 +4,7 @@
 {% block main_inner %}
     {#  search term section #}
     <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
-    <p class="search-results__title-small">{{ paginator.count }} {% trans "resultaten" %} </p>
+    <nl-paragraph>{{ paginator.count }} {% trans "resultaten" %}</nl-paragraph>
 
     {#  facets and results section #}
     {% render_grid %}
@@ -28,7 +28,7 @@
                     <a href="{{ hit.link }}" class="card card__description-card search-results__item">
                         <div class="card__body card__body--tabled">
                             <h3 class="utrecht-heading-3 search-results__item-title">{{ hit.title }}</h3>
-                            <p class="utrecht-paragraph search-results__item-intro">{{ hit.summary }}</p>
+                            <nl-paragraph>{{ hit.summary }}</nl-paragraph>
                             <span class="link link--icon link--primary">
                                 <span class="link__text">Bekijk resultaat</span>
                                 {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
@@ -73,7 +73,7 @@
                                 <div class="feedback__remark">
                                     <div class="form__control">
                                         <label class="label">
-                                            <span class="feedback__label-text utrecht-paragraph"></span>
+                                            <span class="feedback__label-text"></span>
                                             {{ feedback_form.remark|addclass:"textarea" }}
                                         </label>
                                     </div>
@@ -100,7 +100,7 @@
                         {% if configurable_text.search_page.search_zero_results_text.html %}
                             {{ configurable_text.search_page.search_zero_results_text.html|safe }}
                         {% else %}
-                            <p class="utrecht-paragraph">{% trans "Probeer het nog eens met deze tips:" %}</p>
+                            <nl-paragraph>{% trans "Probeer het nog eens met deze tips:" %}</nl-paragraph>
                             <ul class="ul">
                                 <li class="li">{% trans "Zorg ervoor dat alle woorden goed gespeld zijn." %}</li>
                                 <li class="li">{% trans "Probeer andere zoektermen." %}</li>
