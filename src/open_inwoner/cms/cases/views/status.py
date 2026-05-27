@@ -341,18 +341,27 @@ class InnerCaseDetailView(
                 "cases:case_detail_document_form", kwargs=self.kwargs
             )
             context["metrics"] = [
-                {"label": _("Zaaknummer:"), "value": zaak_context.identification},
-                {"label": _("Zaak ingediend op:"), "value": zaak_context.start_date},
+                {
+                    "label": openzaak_config.zaak_identificatie_label,
+                    "value": zaak_context.identification,
+                },
+                {
+                    "label": openzaak_config.zaak_start_date_label,
+                    "value": zaak_context.start_date,
+                },
             ]
             if zaak_context.end_date:
                 context["metrics"].append(
-                    {"label": _("Besluit genomen op:"), "value": zaak_context.end_date},
+                    {
+                        "label": openzaak_config.zaak_end_date_label,
+                        "value": zaak_context.end_date,
+                    },
                 )
             else:
                 end_date = zaak_context.end_date_legal or zaak_context.end_date_planned
                 context["metrics"].append(
                     {
-                        "label": _("U ontvangt een besluit vóór:"),
+                        "label": openzaak_config.zaak_expected_end_date_label,
                         "value": end_date + dt.timedelta(days=1)
                         if end_date
                         else _("unkown"),

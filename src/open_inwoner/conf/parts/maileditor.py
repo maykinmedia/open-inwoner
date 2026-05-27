@@ -361,6 +361,13 @@ MAIL_EDITOR_CONF = {
                 "example": "ZAAK-1234",
             },
             {
+                "name": "zaak_identificatie_label",
+                "description": _(
+                    "The label shown next to the case identification number"
+                ),
+                "example": _("Zaaknummer"),
+            },
+            {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
                 "example": _("Casetype placeholder"),
@@ -434,6 +441,13 @@ MAIL_EDITOR_CONF = {
                 "example": "ZAAK-1234",
             },
             {
+                "name": "zaak_identificatie_label",
+                "description": _(
+                    "The label shown next to the case identification number"
+                ),
+                "example": _("Zaaknummer"),
+            },
+            {
                 "name": "type_description",
                 "description": _("The description of the type of the case"),
                 "example": _("Casetype placeholder"),
@@ -493,6 +507,13 @@ MAIL_EDITOR_CONF = {
                 "name": "identification",
                 "description": _("The identification of the case"),
                 "example": "ZAAK-1234",
+            },
+            {
+                "name": "zaak_identificatie_label",
+                "description": _(
+                    "The label shown next to the case identification number"
+                ),
+                "example": _("Zaaknummer"),
             },
             {
                 "name": "type_description",

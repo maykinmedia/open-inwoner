@@ -1297,7 +1297,7 @@ class TestCaseDetailView(
         metrics = response.context.get("metrics")
 
         self.assertIn(
-            {"label": "Besluit genomen op:", "value": datetime.date(2025, 5, 10)},
+            {"label": "Besluit genomen op", "value": datetime.date(2025, 5, 10)},
             metrics,
         )
 

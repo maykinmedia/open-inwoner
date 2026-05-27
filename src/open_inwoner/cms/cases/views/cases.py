@@ -174,6 +174,7 @@ class InnerCaseListView(
         context.update(paginator_dict)
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
+        context["zaak_identificatie_label"] = config.zaak_identificatie_label
 
         self.log_case_list_accessed(zaken_dicts)
 
