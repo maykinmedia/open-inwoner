@@ -151,6 +151,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                     client_init_kwargs = {
                         "use_openzaak_120_params": group.fetch_eherkenning_zaken_with_openzaak_120_params,
                         "fetch_rollen_with_betrokkene_type": group.fetch_rollen_with_betrokkene_type,
+                        "zaak_max_confidentiality": VertrouwelijkheidsAanduidingen.openbaar,
                     }
                 client = build_zgw_client_from_service(service, **client_init_kwargs)
                 url = service.api_root
@@ -244,6 +245,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
             api_group.zrc_service,
             use_openzaak_120_params=False,
             fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
+            zaak_max_confidentiality=VertrouwelijkheidsAanduidingen.openbaar,
         )
 
         case_url_1 = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
@@ -338,6 +340,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
             api_group.zrc_service,
             use_openzaak_120_params=False,
             fetch_rollen_with_betrokkene_type=api_group.fetch_rollen_with_betrokkene_type,
+            zaak_max_confidentiality=VertrouwelijkheidsAanduidingen.openbaar,
         )
 
         case_url = f"{ZAKEN_ROOT}zaken/12345678-1234-1234-1234-123456789012"
@@ -597,16 +600,17 @@ class FetchZakenForCompanyTests(TestCase):
         self.api_group = ZGWApiGroupConfigFactory(
             zrc_service__api_root=ZAKEN_ROOT,
         )
-        self.zaken_client = build_zgw_client_from_service(
-            self.api_group.zrc_service,
-            use_openzaak_120_params=False,
-            fetch_rollen_with_betrokkene_type=False,
-        )
         config = OpenZaakConfig.get_solo()
         config.zaak_max_confidentiality = (
             VertrouwelijkheidsAanduidingen.beperkt_openbaar
         )
         config.save()
+        self.zaken_client = build_zgw_client_from_service(
+            self.api_group.zrc_service,
+            use_openzaak_120_params=False,
+            fetch_rollen_with_betrokkene_type=False,
+            zaak_max_confidentiality=config.zaak_max_confidentiality,
+        )
 
     def test_raises_value_error_when_neither_kvk_nor_vestigingsnummer_given(self, m):
         with self.assertRaises(ValueError):

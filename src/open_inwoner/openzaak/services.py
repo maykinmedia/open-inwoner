@@ -149,12 +149,15 @@ class ZGWService:
 
     @staticmethod
     def _zaken_client_factory(group: ZGWApiGroupConfig) -> ZakenClient:
+        config = OpenZaakConfig.get_solo()
         return cast(
             ZakenClient,
             build_zgw_client_from_service(
                 group.zrc_service,
                 use_openzaak_120_params=group.fetch_eherkenning_zaken_with_openzaak_120_params,
                 fetch_rollen_with_betrokkene_type=group.fetch_rollen_with_betrokkene_type,
+                zaak_max_confidentiality=config.zaak_max_confidentiality,
+                limit_user_visible_cases_to_role=config.limit_user_visible_cases_to_role,
             ),
         )
 
@@ -355,11 +358,13 @@ class ZGWService:
         self,
         group: ZGWApiGroupConfig,
         user_identification: UserIdentification,
+        zaken_client: ZakenClient,
+        use_rsin: bool,
         zaak_identificatie: str | None = None,
     ) -> list[ZaakWithApiGroup]:
-        raw_zaken = group.zaken_client.fetch_zaken(
+        raw_zaken = zaken_client.fetch_zaken(
             user_identification,
-            use_rsin=group.fetch_eherkenning_zaken_with_rsin,
+            use_rsin=use_rsin,
             identificatie=zaak_identificatie,
         )
         return [
@@ -379,17 +384,30 @@ class ZGWService:
             ZGWApiGroupConfig.objects.select_related("zrc_service").all()
         )
 
+        # Build clients in the main thread so spawned threads make no DB queries
+        clients_per_group = {
+            group.pk: (
+                self._zaken_client_factory(group),
+                group.fetch_eherkenning_zaken_with_rsin,
+            )
+            for group in all_api_groups
+        }
+
         fetched_zaken: list[ZaakWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
-            futures = [
-                executor.submit(
-                    self._get_raw_zaken_for_api_group,
-                    group,
-                    user_identification,
-                    zaak_identificatie,
+            futures = []
+            for group in all_api_groups:
+                zaken_client, use_rsin = clients_per_group[group.pk]
+                futures.append(
+                    executor.submit(
+                        self._get_raw_zaken_for_api_group,
+                        group,
+                        user_identification,
+                        zaken_client,
+                        use_rsin,
+                        zaak_identificatie,
+                    )
                 )
-                for group in all_api_groups
-            ]
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
@@ -415,7 +433,10 @@ class ZGWService:
         ):
             try:
                 # TODO: could be done in parallel
-                self._resolve_zaak_type(zaak_with_group)
+                catalogi_client = self._catalogi_client_factory(
+                    zaak_with_group.api_group
+                )
+                self._resolve_zaak_type(zaak_with_group, catalogi_client)
             except (ZgwAPIError, ResolveCaseException):
                 logger.warning(
                     "Unable to resolve zaaktype for search result",
@@ -449,14 +470,30 @@ class ZGWService:
             ).all()
         )
 
+        # Build clients in the main thread so spawned threads make no DB queries.
+        clients_per_group = {
+            group.pk: (
+                self._zaken_client_factory(group),
+                self._catalogi_client_factory(group),
+                group.fetch_eherkenning_zaken_with_rsin,
+            )
+            for group in all_api_groups
+        }
+
         fetched_zaken: list[ZaakWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
-            futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = [
-                executor.submit(
-                    self._get_raw_zaken_for_api_group, group, user_identification
+            futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = []
+            for group in all_api_groups:
+                zaken_client, _catalogi_client, use_rsin = clients_per_group[group.pk]
+                futures.append(
+                    executor.submit(
+                        self._get_raw_zaken_for_api_group,
+                        group,
+                        user_identification,
+                        zaken_client,
+                        use_rsin,
+                    )
                 )
-                for group in all_api_groups
-            ]
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
@@ -474,17 +511,32 @@ class ZGWService:
             defaultdict(list)
         )
 
-        resolver_functions = [
-            self._resolve_resultaat_and_resultaat_type,
-            self._resolve_status_and_status_type,
-            self._resolve_zaak_type,
-        ]
-
         with parallel(max_workers=self._max_workers) as executor:
             for zaak_with_group in fetched_zaken:
-                for func in resolver_functions:
-                    future = executor.submit(func, zaak_with_group)
-                    zaak_futures[zaak_with_group].append(future)
+                zaken_client, catalogi_client, _ = clients_per_group[
+                    zaak_with_group.api_group.pk
+                ]
+                zaak_futures[zaak_with_group].append(
+                    executor.submit(
+                        self._resolve_zaak_type, zaak_with_group, catalogi_client
+                    )
+                )
+                zaak_futures[zaak_with_group].append(
+                    executor.submit(
+                        self._resolve_status_and_status_type,
+                        zaak_with_group,
+                        zaken_client,
+                        catalogi_client,
+                    )
+                )
+                zaak_futures[zaak_with_group].append(
+                    executor.submit(
+                        self._resolve_resultaat_and_resultaat_type,
+                        zaak_with_group,
+                        zaken_client,
+                        catalogi_client,
+                    )
+                )
 
         # TODO add wait call or refactor: we want either all futures to complete or timeout
         resolved_zaken: list[ZaakWithApiGroup] = []
@@ -553,8 +605,11 @@ class ZGWService:
 
         return zaak_with_api_group
 
-    def _resolve_zaak_type(self, zaak_with_group: ZaakWithApiGroup) -> None:
-        client = ZGWService._catalogi_client_factory(zaak_with_group.api_group)
+    def _resolve_zaak_type(
+        self,
+        zaak_with_group: ZaakWithApiGroup,
+        catalogi_client: CatalogiClient,
+    ) -> None:
         if not isinstance(zaak_with_group.zaak.zaaktype, str):
             logger.debug(
                 "Case %s already has a resolved zaaktype",
@@ -562,17 +617,17 @@ class ZGWService:
             )
             return
 
-        zaaktype = client.fetch_single_zaaktype(zaak_with_group.zaak.zaaktype)
+        zaaktype = catalogi_client.fetch_single_zaaktype(zaak_with_group.zaak.zaaktype)
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.zaaktype = zaaktype
 
     def _resolve_status_and_status_type(
-        self, zaak_with_group: ZaakWithApiGroup
+        self,
+        zaak_with_group: ZaakWithApiGroup,
+        zaken_client: ZakenClient,
+        catalogi_client: CatalogiClient,
     ) -> None:
-        zaken_client = ZGWService._zaken_client_factory(zaak_with_group.api_group)
-        catalogi_client = ZGWService._catalogi_client_factory(zaak_with_group.api_group)
-
         if not isinstance(zaak_with_group.zaak.status, str):
             raise ResolveCaseException(
                 f"`case.status` for case {zaak_with_group.zaak.identificatie} "
@@ -587,13 +642,13 @@ class ZGWService:
             zaak_with_group.zaak.status.statustype = status_type
 
     def _resolve_resultaat_and_resultaat_type(
-        self, zaak_with_group: ZaakWithApiGroup
+        self,
+        zaak_with_group: ZaakWithApiGroup,
+        zaken_client: ZakenClient,
+        catalogi_client: CatalogiClient,
     ) -> None:
         if zaak_with_group.zaak.resultaat is None:
             return
-
-        zaken_client = ZGWService._zaken_client_factory(zaak_with_group.api_group)
-        catalogi_client = ZGWService._catalogi_client_factory(zaak_with_group.api_group)
 
         if not isinstance(zaak_with_group.zaak.resultaat, str):
             raise ResolveCaseException(
@@ -651,9 +706,9 @@ class ZGWService:
         api_group: ZGWApiGroupConfig,
     ) -> list[ZaakDocumentData]:
         """Fetch zaak documents filtered by visibility. Sorted newest-first."""
-        case_info_objects = api_group.zaken_client.fetch_zaak_information_objects(
-            zaak.url
-        )
+        case_info_objects = self._zaken_client_factory(
+            api_group
+        ).fetch_zaak_information_objects(zaak.url)
 
         config = OpenZaakConfig.get_solo()
         documents = []
@@ -694,7 +749,7 @@ class ZGWService:
         api_group: ZGWApiGroupConfig,
         user_identification: UserIdentification,
     ) -> str:
-        zaken_client = api_group.zaken_client
+        zaken_client = self._zaken_client_factory(api_group)
 
         if not api_group.fetch_rollen_with_betrokkene_type:
             roles = zaken_client.fetch_zaak_roles(
