@@ -141,6 +141,10 @@ class OIDCLogoutView(View):
         logger.warning("No OIDC logout endpoint defined")
         return HttpResponseRedirect(self.get_success_url())
 
+    # Implement POST logout similar to the GET to prevent status 405 on log-out.
+    def post(self, request):
+        return self.get(request)
+
 
 class GenericOIDCLogoutView(OIDCLogoutView):
     """
@@ -174,9 +178,6 @@ class GenericOIDCLogoutView(OIDCLogoutView):
 
         auth.logout(request)
         return HttpResponseRedirect(self.get_success_url())
-
-    # Implement POST logout similar to the GET to prevent status 405 on log-out.
-    post = get
 
 
 generic_oidc_logout = GenericOIDCLogoutView.as_view()
