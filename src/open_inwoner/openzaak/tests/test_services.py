@@ -49,7 +49,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_raw_zaken_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_raw_zaken"] = 0.001
+            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
@@ -72,7 +72,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_raw_zaken_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_raw_zaken"] = 0.001
+            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
@@ -95,7 +95,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_formulieren_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_formulieren"] = 0.001
+            self.service._timeouts["get_formulieren"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(

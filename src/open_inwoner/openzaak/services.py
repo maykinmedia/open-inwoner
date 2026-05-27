@@ -165,6 +165,10 @@ class ZGWService:
     _max_workers: int
     _timeouts: Timeouts
 
+    # -------------------------------------------------------------------------
+    # Setup
+    # -------------------------------------------------------------------------
+
     def __init__(self, use_cache: bool = True):
         self._use_cache = use_cache
         self._timeouts = {
@@ -243,165 +247,9 @@ class ZGWService:
 
         return True, None
 
-    def _get_formulieren_for_api_group(
-        self, group: ZGWApiGroupConfig, user_identification: UserIdentification
-    ) -> list[FormulierWithApiGroup]:
-        if not group.forms_client:
-            raise ValueError(f"{group} has no `forms_client`")
-
-        return [
-            FormulierWithApiGroup(
-                formulier=formulier,
-                api_group=group,
-                type_aanvraag=TypeAanvraag.FORMULIER,
-            )
-            for formulier in group.forms_client.fetch_formulieren(
-                user_identification, use_rsin=group.fetch_eherkenning_zaken_with_rsin
-            )
-        ]
-
-    def get_formulieren(
-        self, user_identification: UserIdentification | None
-    ) -> list[FormulierWithApiGroup]:
-        if not user_identification:
-            return []
-
-        all_api_groups = list(
-            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
-                "form_service",
-            )
-        )
-
-        subs_with_api_group: list[FormulierWithApiGroup] = []
-        with parallel(max_workers=self._max_workers) as executor:
-            futures = [
-                executor.submit(
-                    self._get_formulieren_for_api_group, group, user_identification
-                )
-                for group in all_api_groups
-            ]
-            try:
-                for task in concurrent.futures.as_completed(
-                    futures,
-                    timeout=self._timeouts["get_formulieren"],
-                ):
-                    try:
-                        subs_with_api_group.extend(task.result())
-                    except BaseException:
-                        logger.exception(
-                            "Error fetching and pre-processing formulieren"
-                        )
-            # TODO: add OTEL metrics
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timeout while fetching formulieren")
-
-        subs_with_api_group.sort(
-            key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
-        )
-
-        return subs_with_api_group
-
-    def fetch_zaak_by_url(
-        self, zaak_url: str, api_group: ZGWApiGroupConfig
-    ) -> Zaak | None:
-        return self._zaken_client_factory(api_group).fetch_zaak_by_url_no_cache(
-            zaak_url
-        )
-
-    def fetch_status_history(
-        self, zaak_url: str, api_group: ZGWApiGroupConfig
-    ) -> list[Status]:
-        client = self._zaken_client_factory(api_group)
-        if self._use_cache:
-            return client.fetch_status_history(zaak_url)
-        return client.fetch_status_history_no_cache(zaak_url)
-
-    def fetch_zaak_roles(
-        self, zaak_url: str, api_group: ZGWApiGroupConfig
-    ) -> list[Rol]:
-        client = self._zaken_client_factory(api_group)
-        if not client.fetch_rollen_with_betrokkene_type:
-            return client.fetch_zaak_roles(zaak_url)
-        # Only query types that can map to a user account; medewerker and
-        # organisatorische_eenheid are internal government roles and some
-        # backends (e.g. iConnect/Decos) reject those types with a 400.
-        available_user_betrokkene_types = (
-            RolTypes.natuurlijk_persoon,
-            RolTypes.niet_natuurlijk_persoon,
-            RolTypes.vestiging,
-        )
-        roles = []
-        for betrokkene_type in available_user_betrokkene_types:
-            roles += client.fetch_zaak_roles(zaak_url, betrokkene_type=betrokkene_type)
-        return roles
-
-    def fetch_zaaktype_by_url(
-        self, zaaktype_url: str, api_group: ZGWApiGroupConfig
-    ) -> ZaakType | None:
-        return self._catalogi_client_factory(api_group).fetch_single_zaaktype(
-            zaaktype_url
-        )
-
-    def fetch_single_zaak_information_object(
-        self, ziobj_url: str, api_group: ZGWApiGroupConfig
-    ) -> ZaakInformatieObject | None:
-        return self._zaken_client_factory(
-            api_group
-        ).fetch_single_zaak_information_object(ziobj_url)
-
-    def fetch_single_status(
-        self, status_url: str, api_group: ZGWApiGroupConfig
-    ) -> Status | None:
-        return self._zaken_client_factory(api_group).fetch_single_status(status_url)
-
-    def fetch_single_status_type(
-        self, status_type_url: str, api_group: ZGWApiGroupConfig
-    ) -> StatusType | None:
-        return self._catalogi_client_factory(api_group).fetch_single_status_type(
-            status_type_url
-        )
-
-    def check_zaak_access(
-        self,
-        zaak_id: str,
-        user_identification: UserIdentification,
-        api_group: ZGWApiGroupConfig,
-    ) -> tuple[Zaak, ZGWApiGroupConfig] | None:
-        zaken_client = self._zaken_client_factory(api_group)
-
-        zaak = zaken_client.fetch_single_zaak(zaak_id)
-
-        config = OpenZaakConfig.get_solo()
-        limit_access_to_role = config.limit_user_visible_cases_to_role
-
-        rollen = zaken_client.fetch_rollen_for_user(
-            zaak.url,
-            user_identification,
-            use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
-        )
-
-        if not rollen:
-            logger.info("check_zaak_access: no role for zaak", zaak_url=zaak.url)
-            return None
-
-        if limit_access_to_role and not any(
-            rol.omschrijving_generiek == limit_access_to_role for rol in rollen
-        ):
-            logger.info(
-                "check_zaak_access: incorrect role for zaak",
-                zaak_url=zaak.url,
-                required_role=limit_access_to_role,
-            )
-            return None
-
-        catalogi_client = self._catalogi_client_factory(api_group)
-        zaak.zaaktype = catalogi_client.fetch_single_zaaktype(zaak.zaaktype)
-
-        if self._get_zaak_skip_reason(zaak) is not None:
-            logger.info("check_zaak_access: zaak not visible", zaak_url=zaak.url)
-            return None
-
-        return zaak, api_group
+    # -------------------------------------------------------------------------
+    # Zaak list
+    # -------------------------------------------------------------------------
 
     def _get_raw_zaken_for_api_group(
         self,
@@ -710,46 +558,6 @@ class ZGWService:
                 )
 
         return ZakenResult(zaken=fully_resolved, skipped=skipped)
-
-    def _replace_catalogus_api_with_model_refs(
-        self,
-        zaak_with_api_group: ZaakWithApiGroupZaakTypeResolved,
-    ) -> ZaakWithApiGroupFullyResolved:
-        try:
-            zaaktype_config = ZaakTypeConfig.objects.filter_zaak_type(
-                zaak_with_api_group.zaak.zaaktype
-            ).get()
-
-            logger.debug(
-                "Resolved zaaktype URL to config",
-                zaaktype_url=zaak_with_api_group.zaak.zaaktype.url,
-                zaaktype_config=zaaktype_config,
-            )
-            zaak_with_api_group.zaak.zaaktype_config = zaaktype_config
-
-            if zaak_with_api_group.zaak.status:
-                statustype_config = ZaakTypeStatusTypeConfig.objects.get(
-                    zaaktype_config=zaaktype_config,
-                    statustype_url=zaak_with_api_group.zaak.status.statustype.url,
-                )
-                zaak_with_api_group.zaak.statustype_config = statustype_config
-        except ZaakTypeConfig.DoesNotExist:
-            logger.warning(
-                "No matching ZaakTypeConfig for type",
-                zaaktype_url=zaak_with_api_group.zaak.zaaktype.url,
-            )
-        except ZaakTypeStatusTypeConfig.DoesNotExist:
-            logger.warning(
-                "No matching ZaakTypeStatusTypeConfig_config for statustype_url",
-                statustype_url=zaak_with_api_group.zaak.status.statustype.url,
-                exc_info=True,
-            )
-
-        return ZaakWithApiGroupFullyResolved(
-            zaak=zaak_with_api_group.zaak,
-            api_group=zaak_with_api_group.api_group,
-            type_aanvraag=zaak_with_api_group.type_aanvraag,
-        )
 
     def _resolve_zaak_type(
         self,
@@ -1063,49 +871,6 @@ class ZGWService:
 
         return status_types_mapping
 
-    def _fetch_zaak_documents(
-        self,
-        zaak: Zaak,
-        api_group: ZGWApiGroupConfig,
-    ) -> list[ZaakDocumentData]:
-        """Fetch zaak documents filtered by visibility. Sorted newest-first."""
-        case_info_objects = self._zaken_client_factory(
-            api_group
-        ).fetch_zaak_information_objects(zaak.url)
-
-        config = OpenZaakConfig.get_solo()
-        documents = []
-        for case_info_obj in case_info_objects:
-            try:
-                info_obj = self.fetch_information_object_by_url(
-                    case_info_obj.informatieobject, api_group
-                )
-            except ZgwAPIError:
-                logger.error(
-                    "Failed to fetch document info object",
-                    informatieobject_url=case_info_obj.informatieobject,
-                )
-                continue
-            if not is_info_object_visible(
-                info_obj, config.document_max_confidentiality
-            ):
-                continue
-            documents.append(
-                ZaakDocumentData(case_info_obj=case_info_obj, info_obj=info_obj)
-            )
-
-        try:
-            return sorted(
-                documents,
-                key=lambda d: d.case_info_obj.registratiedatum,
-                reverse=True,
-            )
-        except TypeError:
-            try:
-                return sorted(documents, key=lambda d: d.info_obj.titel)
-            except TypeError:
-                return documents
-
     def _get_initiator_display(
         self,
         zaak: Zaak,
@@ -1135,75 +900,6 @@ class ZGWService:
             )
 
         return ", ".join(get_role_name_display(r) for r in roles)
-
-    @cache_result(
-        "information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
-    )
-    def fetch_information_object_by_url(
-        self, url: str, api_group: ZGWApiGroupConfig
-    ) -> InformatieObject:
-        return self._documenten_client_factory(
-            api_group
-        )._fetch_single_information_object(url=url)
-
-    def fetch_information_object_by_uuid(
-        self, uuid: str, api_group: ZGWApiGroupConfig
-    ) -> InformatieObject:
-        return self._documenten_client_factory(
-            api_group
-        )._fetch_single_information_object(uuid=uuid)
-
-    def fetch_zaak_information_objects_for_zaak_and_info(
-        self, zaak_url: str, info_object_url: str, api_group: ZGWApiGroupConfig
-    ) -> list:
-        return self._zaken_client_factory(
-            api_group
-        ).fetch_zaak_information_objects_for_zaak_and_info(zaak_url, info_object_url)
-
-    def download_document(self, url: str, api_group: ZGWApiGroupConfig):
-        return self._documenten_client_factory(api_group).download_document(url)
-
-    def upload_document(
-        self,
-        user,
-        file,
-        title: str,
-        informatieobjecttype_url: str,
-        source_organization: str,
-        api_group: ZGWApiGroupConfig,
-    ) -> dict:
-        return self._documenten_client_factory(api_group).upload_document(
-            user, file, title, informatieobjecttype_url, source_organization
-        )
-
-    def connect_case_with_document(
-        self, zaak_url: str, document_url: str, api_group: ZGWApiGroupConfig
-    ) -> dict:
-        return self._zaken_client_factory(api_group).connect_case_with_document(
-            zaak_url, document_url
-        )
-
-    def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
-        all_api_groups = list(
-            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
-                "form_service"
-            )
-        )
-        tasks = []
-        for group in all_api_groups:
-            try:
-                tasks.extend(group.forms_client.fetch_open_tasks(bsn=bsn))
-            except ZgwAPIError:
-                logger.exception(
-                    "Error fetching open tasks from ZGW API", api_group=str(group)
-                )
-        return tasks
-
-    def fetch_single_resultaat_type_for_service(
-        self, resultaat_type_url: str, service
-    ) -> ResultaatType:
-        client = cast(CatalogiClient, build_zgw_client_from_service(service))
-        return client.fetch_single_resultaat_type(resultaat_type_url)
 
     def get_zaak_detail(
         self,
@@ -1264,3 +960,117 @@ class ZGWService:
             result=result,
             initiator=initiator,
         )
+
+    # -------------------------------------------------------------------------
+    # Documenten
+    # -------------------------------------------------------------------------
+
+    def _fetch_zaak_documents(
+        self,
+        zaak: Zaak,
+        api_group: ZGWApiGroupConfig,
+    ) -> list[ZaakDocumentData]:
+        """Fetch zaak documents filtered by visibility. Sorted newest-first."""
+        case_info_objects = self._zaken_client_factory(
+            api_group
+        ).fetch_zaak_information_objects(zaak.url)
+
+        config = OpenZaakConfig.get_solo()
+        documents = []
+        for case_info_obj in case_info_objects:
+            try:
+                info_obj = self.fetch_information_object_by_url(
+                    case_info_obj.informatieobject, api_group
+                )
+            except ZgwAPIError:
+                logger.error(
+                    "Failed to fetch document info object",
+                    informatieobject_url=case_info_obj.informatieobject,
+                )
+                continue
+            if not is_info_object_visible(
+                info_obj, config.document_max_confidentiality
+            ):
+                continue
+            documents.append(
+                ZaakDocumentData(case_info_obj=case_info_obj, info_obj=info_obj)
+            )
+
+        try:
+            return sorted(
+                documents,
+                key=lambda d: d.case_info_obj.registratiedatum,
+                reverse=True,
+            )
+        except TypeError:
+            try:
+                return sorted(documents, key=lambda d: d.info_obj.titel)
+            except TypeError:
+                return documents
+
+    @cache_result(
+        "information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
+    )
+    def fetch_information_object_by_url(
+        self, url: str, api_group: ZGWApiGroupConfig
+    ) -> InformatieObject:
+        return self._documenten_client_factory(
+            api_group
+        )._fetch_single_information_object(url=url)
+
+    def fetch_information_object_by_uuid(
+        self, uuid: str, api_group: ZGWApiGroupConfig
+    ) -> InformatieObject:
+        return self._documenten_client_factory(
+            api_group
+        )._fetch_single_information_object(uuid=uuid)
+
+    def fetch_zaak_information_objects_for_zaak_and_info(
+        self, zaak_url: str, info_object_url: str, api_group: ZGWApiGroupConfig
+    ) -> list:
+        return self._zaken_client_factory(
+            api_group
+        ).fetch_zaak_information_objects_for_zaak_and_info(zaak_url, info_object_url)
+
+    def download_document(self, url: str, api_group: ZGWApiGroupConfig):
+        return self._documenten_client_factory(api_group).download_document(url)
+
+    def upload_document(
+        self,
+        user,
+        file,
+        title: str,
+        informatieobjecttype_url: str,
+        source_organization: str,
+        api_group: ZGWApiGroupConfig,
+    ) -> dict:
+        return self._documenten_client_factory(api_group).upload_document(
+            user, file, title, informatieobjecttype_url, source_organization
+        )
+
+    def connect_case_with_document(
+        self, zaak_url: str, document_url: str, api_group: ZGWApiGroupConfig
+    ) -> dict:
+        return self._zaken_client_factory(api_group).connect_case_with_document(
+            zaak_url, document_url
+        )
+
+    # -------------------------------------------------------------------------
+    # Tasks
+    # -------------------------------------------------------------------------
+
+    def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
+        all_api_groups = list(
+            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
+                "form_service"
+            )
+        )
+        tasks = []
+        for group in all_api_groups:
+            try:
+                tasks.extend(group.forms_client.fetch_open_tasks(bsn=bsn))
+            except ZgwAPIError:
+                logger.exception(
+                    "Error fetching open tasks from ZGW API", api_group=str(group)
+                )
+        return tasks
