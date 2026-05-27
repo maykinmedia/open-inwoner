@@ -169,6 +169,7 @@ def send_case_update_email(
     template = find_template(template_name)
     context = {
         "identification": zaak.identification,
+        "zaak_identificatie_label": config.zaak_identificatie_label,
         "case_description": zaak.omschrijving,
         "type_description": zaak.zaaktype.omschrijving,
         "start_date": zaak.startdatum,

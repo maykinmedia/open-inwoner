@@ -212,7 +212,7 @@ class CMSZakenPluginTest(TestCase):
         # Check attributes (note: template uses 'identificatie' not 'identification')
         zaak_item = zaak_items.eq(0)
         self.assertEqual(zaak_item.attr("identificatie"), "ZAAK-001")
-        self.assertIn("Zaaknummer:", zaak_item.attr("description"))
+        self.assertIn("Zaaknummer", zaak_item.attr("description"))
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
         self.assertIn("test-uuid-123", zaak_item.attr("detail-url"))
 
@@ -508,7 +508,7 @@ class CMSZakenPluginTest(TestCase):
         zaak_item = pyquery.find("oip-home-plugin-card")
 
         # Verify naam is mapped to description attribute with Zaaknummer label
-        self.assertIn("Zaaknummer:", zaak_item.attr("description"))
+        self.assertIn("Zaaknummer", zaak_item.attr("description"))
         self.assertIn("ZAAK-001", zaak_item.attr("description"))
 
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
@@ -565,7 +565,7 @@ class CMSZakenPluginTest(TestCase):
         """
         Test that both 'naam' field (from formulieren) and 'description' field
         (from regular zaken) are correctly mapped to 'description' in the component output.
-        Formulieren should have empty description, cases should show "Zaaknummer: " label.
+        Formulieren should have empty description, cases should show "Zaaknummer" label.
         """
         api_group = ZGWApiGroupConfigFactory()
 
@@ -614,10 +614,10 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(submission_item.attr("identificatie"), "SUBMISSION-001")
         self.assertEqual(submission_item.attr("description"), "")
 
-        # Second item should be the case with "Zaaknummer: " label
+        # Second item should be the case with "Zaaknummer" label
         case_item = zaak_items.eq(1)
         self.assertEqual(case_item.attr("identificatie"), "ZAAK-001")
-        self.assertIn("Zaaknummer:", case_item.attr("description"))
+        self.assertIn("Zaaknummer", case_item.attr("description"))
         self.assertIn("ZAAK-001", case_item.attr("description"))
 
     @patch(

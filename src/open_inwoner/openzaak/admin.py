@@ -108,6 +108,18 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                 ],
             },
         ),
+        (
+            _("Zaakdetail dashboard labels"),
+            {
+                "classes": ("collapse",),
+                "fields": [
+                    "zaak_identificatie_label",
+                    "zaak_start_date_label",
+                    "zaak_end_date_label",
+                    "zaak_expected_end_date_label",
+                ],
+            },
+        ),
     )
 
 

@@ -250,19 +250,19 @@ class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBase
         )
         ctx["metrics"] = [
             {
-                "label": _("Status: "),
+                "label": _("Status"),
                 "value": question["status"].capitalize(),
             },
             {
-                "label": _("Ingediend op: "),
+                "label": _("Ingediend op"),
                 "value": question["registered_date"],
             },
             {
-                "label": _("Vraag nummer: "),
+                "label": _("Vraag nummer"),
                 "value": question["identification"],
             },
             {
-                "label": _("Contact gehad via: "),
+                "label": _("Contact gehad via"),
                 "value": question["channel"].capitalize(),
             },
         ]

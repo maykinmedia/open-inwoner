@@ -86,7 +86,7 @@
                                 {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
                             {% endif %}
                             <li class="list-item list-item--compact">
-                                <span class="list-item__caption">{% trans "Zaaknummer" %}</span>
+                                <span class="list-item__caption">{{ zaak_identificatie_label }}</span>
                                 <span class="skip-phone-parsing">&zwj;{{ zaak.identification }}</span>
                             </li>
                         {% endrender_list %}

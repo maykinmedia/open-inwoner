@@ -4,7 +4,7 @@
     <ul class="dashboard__list">
         {% for metric in metrics %}
             <li class="dashboard__list-item">
-                <nl-paragraph><span class="dashboard__item-label">{{ metric.label }}</span> {{ metric.value|default:'-' }}</nl-paragraph>
+                <nl-paragraph><span class="dashboard__item-label">{{ metric.label }}:</span> {{ metric.value|default:'-' }}</nl-paragraph>
             </li>
         {% endfor %}
     </ul>

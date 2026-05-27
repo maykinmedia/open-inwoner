@@ -470,6 +470,41 @@ class OpenZaakConfig(SingletonModel):
         help_text=_("Give users the option to filter zaken by status"),
     )
 
+    # Case detail dashboard metric labels
+    zaak_identificatie_label = models.CharField(
+        verbose_name=_("Label: zaaknummer"),
+        max_length=100,
+        default=_("Zaaknummer"),
+        help_text=_(
+            "Label shown next to the case identification number on the case detail page."
+        ),
+    )
+    zaak_start_date_label = models.CharField(
+        verbose_name=_("Label: zaak ingediend op"),
+        max_length=100,
+        default=_("Zaak ingediend op"),
+        help_text=_(
+            "Label shown next to the case submission date on the case detail page."
+        ),
+    )
+    zaak_end_date_label = models.CharField(
+        verbose_name=_("Label: besluit genomen op"),
+        max_length=100,
+        default=_("Besluit genomen op"),
+        help_text=_(
+            "Label shown when the case has a final decision date (einddatum is set)."
+        ),
+    )
+    zaak_expected_end_date_label = models.CharField(
+        verbose_name=_("Label: verwachte einddatum"),
+        max_length=100,
+        default=_("U ontvangt een besluit vóór"),
+        help_text=_(
+            "Label shown when no final decision date is known yet; displays the "
+            "legal or planned deadline."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Open Zaak configuration")
 

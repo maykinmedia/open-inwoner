@@ -14,6 +14,7 @@ from open_inwoner.cms.plugins.models import CMSZakenPluginConfig
 from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT, MIN_CASES
 from open_inwoner.htmx.mixins import RequiresHtmxMixin
 from open_inwoner.openzaak.constants import TypeAanvraag
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.types import UniformCase
 
@@ -25,7 +26,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
     HTMX endpoint that fetches and returns content for the `CMSZakenPlugin`.
     """
 
-    def _get_detail_label(self, zaak: dict) -> str:
+    def _get_detail_label(self, zaak: dict, zaak_identificatie_label: str) -> str:
         """
         Generate the detail label to display under the card title.
         """
@@ -36,7 +37,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         if is_formulier or not identification:
             return ""
 
-        return _("Zaaknummer: %(identification)s") % {"identification": identification}
+        return f"{zaak_identificatie_label} {identification}"
 
     def get(self, request: HttpRequest, plugin_id: int) -> HttpResponse:
         user_identification = (
@@ -113,6 +114,8 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         ]
         self.log_case_list_accessed(zaken_dicts)
 
+        openzaak_config = OpenZaakConfig.get_solo()
+
         # format data for web component
         cases_for_component = []
         for zaak in zaken_dicts:
@@ -135,7 +138,9 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
                     "url": url,
                     "identification": zaak.get("identification", ""),
                     "title": zaak.get("naam", zaak.get("description", "")),
-                    "detail_label": self._get_detail_label(zaak),
+                    "detail_label": self._get_detail_label(
+                        zaak, openzaak_config.zaak_identificatie_label
+                    ),
                 }
             except (AttributeError, KeyError):
                 logger.error(
