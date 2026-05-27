@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
-from django.test import RequestFactory, TestCase, TransactionTestCase
+from django.test import RequestFactory, TestCase
 
 import requests_mock as requests_mock_module
 from zgw_consumers.api_models.base import factory as zgw_factory
@@ -168,14 +168,14 @@ class ZgwCachingUnitTest(ClearCachesMixin, TestCase):
         self.assertEqual(len(m.request_history), calls_after_first)
 
 
-class ZgwCachingIntegrationTest(ClearCachesMixin, TransactionTestCase):
+class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
     """
     Integration test covering the full signal -> task -> cache chain.
 
-    Uses TransactionTestCase so that DB rows committed by setUp are visible to
-    threads spawned by get_raw_zaken -> parallel(). warm_cache_for_user.delay is
-    patched to call the underlying run() directly, bypassing QueueOnce (which
-    requires Redis) while still exercising the full task body.
+    warm_cache_for_user.delay is patched to call the underlying run() directly,
+    bypassing QueueOnce (which requires Redis) while still exercising the full
+    task body. Threads spawned by parallel() make no DB queries (clients are
+    pre-built in the main thread), so TestCase is sufficient.
     """
 
     def setUp(self):

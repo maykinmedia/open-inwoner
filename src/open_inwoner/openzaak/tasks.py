@@ -17,6 +17,7 @@ from open_inwoner.accounts.user_identification import (
 from open_inwoner.celery import app
 from open_inwoner.openzaak.api_models import Notification, Zaak
 from open_inwoner.openzaak.clients import CatalogiClient, ZakenClient
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.notifications import handle_zaken_notification
 from open_inwoner.openzaak.services import ZGWService
 
@@ -84,24 +85,18 @@ def warm_cache_for_user(
         logger.info("Finished ZGW cache warm-up: no zaken found")
         return
 
-    # Pre-build clients per api_group in the main thread so spawned threads only
-    # do HTTP requests and never open Django DB connections.
-    clients_per_group: dict[int, tuple[ZakenClient, CatalogiClient, bool]] = {}
-    for zaak_with_group in raw_zaken:
-        group = zaak_with_group.api_group
-        if group.pk not in clients_per_group:
-            clients_per_group[group.pk] = (
-                ZGWService._zaken_client_factory(group),
-                ZGWService._catalogi_client_factory(group),
-                group.fetch_eherkenning_zaken_with_rsin,
-            )
+    # Each thread gets its own zaken client because requests.Session is not
+    # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
+    config = OpenZaakConfig.get_solo()
 
     with parallel(max_workers=10) as executor:
         futures = {
             executor.submit(
                 _warm_single_zaak,
                 zaak_with_group.zaak,
-                *clients_per_group[zaak_with_group.api_group.pk],
+                ZGWService._zaken_client_factory(zaak_with_group.api_group, config),
+                ZGWService._catalogi_client_factory(zaak_with_group.api_group),
+                zaak_with_group.api_group.fetch_eherkenning_zaken_with_rsin,
                 identification,
             ): zaak_with_group
             for zaak_with_group in raw_zaken
