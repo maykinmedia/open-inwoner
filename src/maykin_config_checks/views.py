@@ -3,6 +3,7 @@ from typing import Any
 from django.apps import apps
 from django.db.models import Model
 from django.forms import Form
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseForbidden, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import NoReverseMatch, reverse
@@ -17,6 +18,10 @@ def run_config_check(
     model_name: str | None = None,
     pk: int | None = None,
 ) -> HttpResponse:
+    # Enforce base-line access: authenticated users with staff priviliges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        raise PermissionDenied
+
     obj: Model | None = None
     model: type[Model] | None = None
 
