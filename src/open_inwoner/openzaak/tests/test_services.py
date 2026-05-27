@@ -83,7 +83,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 release.set()
                 timer.cancel()
 
-        self.assertEqual(result, [])
+        self.assertEqual(result.zaken, [])
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_formulieren_logs_timeout_warning(self):

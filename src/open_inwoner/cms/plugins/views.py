@@ -85,7 +85,9 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             formulieren = None
             msg = partial_error_msg
         try:
-            all_visible_zaken = case_service.get_visible_zaken(user_identification)
+            all_visible_zaken = case_service.get_visible_zaken(
+                user_identification
+            ).zaken
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
             all_visible_zaken = None
@@ -105,7 +107,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         zaak_limit = max(0, num_zaken - len(formulieren_to_show))
         zaken_page = case_service.fully_resolve_zaken(
             (all_visible_zaken or [])[:zaak_limit]
-        )
+        ).zaken
         zaken_dicts = [
             zaak.process_data() for zaak in [*formulieren_to_show, *zaken_page]
         ]

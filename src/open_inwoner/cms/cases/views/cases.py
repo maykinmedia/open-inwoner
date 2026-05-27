@@ -115,7 +115,7 @@ class InnerCaseListView(
         formulieren: Sequence[UniformCase] = case_service.get_formulieren(
             user_identification
         )
-        all_visible_zaken = case_service.get_visible_zaken(user_identification)
+        all_visible_zaken = case_service.get_visible_zaken(user_identification).zaken
 
         if config.zaken_filter_enabled:
             case_status_frequencies = _get_zaak_status_frequencies(
@@ -160,7 +160,7 @@ class InnerCaseListView(
         zaak_end = max(0, combined_end - formulieren_count)
         zaak_page = case_service.fully_resolve_zaken(
             all_visible_zaken[zaak_start:zaak_end]
-        )
+        ).zaken
 
         page_items = [*formulieren_page, *zaak_page]
         combined_total = formulieren_count + len(all_visible_zaken)

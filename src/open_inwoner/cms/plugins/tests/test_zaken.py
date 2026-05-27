@@ -13,6 +13,7 @@ from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
+from open_inwoner.openzaak.services import ZakenResult
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZGWApiGroupConfigFactory,
@@ -137,11 +138,11 @@ class CMSZakenPluginTest(TestCase):
 
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken",
-        return_value=[],
+        return_value=ZakenResult(zaken=[], skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -170,7 +171,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -189,7 +190,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_visible_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -218,7 +219,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_endpoint_complete_failure(
@@ -245,7 +246,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_endpoint_partial_failure(
@@ -265,7 +266,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_visible_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -292,7 +293,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -315,7 +316,7 @@ class CMSZakenPluginTest(TestCase):
             }
             mock_cases_list.append(mock_zaak)
 
-        mock_visible_zaken.return_value = mock_cases_list
+        mock_visible_zaken.return_value = ZakenResult(zaken=mock_cases_list, skipped=[])
 
         plugin_model = cms_tools._init_plugin(
             CMSZakenPlugin, {"title": "Mijn Zaken", "num_zaken": 3}
@@ -346,7 +347,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_num_zaken_parameter_with_mixed_formulieren_and_cases(
@@ -381,7 +382,9 @@ class CMSZakenPluginTest(TestCase):
             mock_visible_zaken_list.append(mock_zaak)
 
         mock_formulieren.return_value = mock_formulieren_list
-        mock_visible_zaken.return_value = mock_visible_zaken_list
+        mock_visible_zaken.return_value = ZakenResult(
+            zaken=mock_visible_zaken_list, skipped=[]
+        )
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -416,7 +419,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -440,7 +443,9 @@ class CMSZakenPluginTest(TestCase):
             }
             mock_visible_zaken_list.append(mock_zaak)
 
-        mock_visible_zaken.return_value = mock_visible_zaken_list
+        mock_visible_zaken.return_value = ZakenResult(
+            zaken=mock_visible_zaken_list, skipped=[]
+        )
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -467,7 +472,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -486,7 +491,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_visible_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -509,7 +514,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
@@ -528,7 +533,7 @@ class CMSZakenPluginTest(TestCase):
             "api_group": api_group,
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
-        mock_visible_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
@@ -551,7 +556,7 @@ class CMSZakenPluginTest(TestCase):
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
         "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
-        side_effect=lambda zaken: zaken,
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
     )
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
     def test_htmx_content_handles_both_naam_and_description_fields(
@@ -585,7 +590,7 @@ class CMSZakenPluginTest(TestCase):
         }
 
         mock_formulieren.return_value = [mock_submission]
-        mock_visible_zaken.return_value = [mock_zaak]
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 

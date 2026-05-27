@@ -126,7 +126,7 @@ def handle_zaken_notification(notification: Notification):
         return
     zaak.zaaktype = zaaktype
 
-    if not service._is_zaak_visible(zaak):
+    if not service._is_zaak_visible(zaak)[0]:
         log_system_action(
             f"ignored {r} notification: zaak not visible after applying website "
             f"visibility filter for zaak {zaak_url}",
