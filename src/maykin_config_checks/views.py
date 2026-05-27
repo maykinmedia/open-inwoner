@@ -39,6 +39,11 @@ def run_config_check(
     if check_class is None:
         raise Http404(f"No check registered with id={check_id}")
 
+    form_class = getattr(check_class, "form_class", None)
+
+    if form_class is None:
+        raise ValueError(f"{check_class.__name__} must define 'form_class'")
+
     permissions = getattr(check_class, "required_permissions", None)
 
     if permissions is None:
@@ -55,8 +60,8 @@ def run_config_check(
 
     form_kwargs: dict[str, Any] = check_class.get_form_kwargs(instance=obj)
 
-    form: Form = check_class.form_class(
-        request.POST or None,
+    form: Form = form_class(
+        request.POST if request.method == "POST" else None,
         **form_kwargs,
     )
     result = None
