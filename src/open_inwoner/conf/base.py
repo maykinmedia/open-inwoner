@@ -1069,6 +1069,12 @@ ZGW_CASE_LIST_FETCH_TIMEOUT = config("ZGW_CASE_LIST_FETCH_TIMEOUT", default=25)
 # status history, roles, and documents on top of what the list view resolves.
 ZGW_CACHE_WARMUP_TIMEOUT = config("ZGW_CACHE_WARMUP_TIMEOUT", default=120)
 
+# Celery queue to use for cache-seeding tasks (IO-bound, latency-sensitive).
+# Operators may dedicate a separate high-priority queue/worker pool for these.
+# Defaults to Celery's built-in default queue so no extra infrastructure is
+# needed out of the box.
+CACHE_SEEDING_QUEUE = config("CACHE_SEEDING_QUEUE", default="celery")
+
 # notifications
 ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
     "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY", default=60 * 15
