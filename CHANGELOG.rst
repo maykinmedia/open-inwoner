@@ -106,6 +106,13 @@ Onderhoud
   getypeerde uitzonderingen in plaats van stilzwijgend onderdrukt. Bij het ophalen van
   zaakgegevens geeft een tijdelijke servicefout nu een duidelijke melding met de optie om het
   later opnieuw te proberen.
+* Verschillende afhankelijkheden bijgewerkt: ``pyopenssl`` (25.1.0 → 26.2.0),
+  ``cbor2`` (5.8.0 → 6.1.1), ``cryptography`` (45.0.7 → 48.0.0),
+  ``urllib3`` (2.6.3 → 2.7.0), ``python-dotenv`` (1.0.1 → 1.2.2),
+  ``pytest`` (8.1.1 → 9.0.3), ``Django`` (5.2.13 → 5.2.14),
+  ``filelock`` (3.18.0 → 3.29.0), ``markdown`` (3.3.6 → 3.10.2),
+  ``pygments`` (2.19.2 → 2.20.0), ``requests`` (2.32.5 → 2.34.2) en
+  ``virtualenv`` (20.34.0 → 21.4.1).
 
 2.2.0 (2026-04-20)
 ==================

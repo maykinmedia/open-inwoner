@@ -759,7 +759,7 @@ humanfriendly==10.0
     #   -r requirements/ci.txt
 identify==2.6.10
     # via pre-commit
-idna==3.7
+idna==3.16
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -823,7 +823,7 @@ locust==2.39.1
     # via -r requirements/dev.in
 locust-cloud==1.29.0
     # via locust
-lxml==6.0.0
+lxml==6.1.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -843,7 +843,7 @@ mail-parser==3.15.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-yubin
-markdown==3.3.6
+markdown==3.10.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
