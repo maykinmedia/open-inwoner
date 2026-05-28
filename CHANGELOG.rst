@@ -273,6 +273,164 @@ Onderhoud
 * [:gh:`2370`]: ``djangocms-link`` bijgewerkt naar versie ``5.1.1``.
 * [:gh:`2370`]: ``djangocms-file`` verwijderd.
 
+2.1.2 (2026-05-22)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.2`.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`2465`]: E-mailsjablonen die handmatig zijn bewerkt en opgeslagen via het
+  beheerscherm kunnen opmaak zijn kwijtgeraakt. Dit is een gevolg van een
+  migratieprobleem bij de Django Prosemirror-upgrade (geïntroduceerd in release
+  2.0.0) dat nu pas aan het licht is gekomen. Installaties die zijn geüpgraded
+  naar versie 2.1.0 of hoger en sindsdien e-mailsjablonen hebben bewerkt, kunnen
+  door dit probleem zijn getroffen.
+
+  Controleer na de upgrade of de opmaak van uw e-mailsjablonen intact is. Voer
+  het management command ``find_modified_mail_templates`` uit voor een overzicht
+  van mogelijk aangetaste sjablonen, of controleer alle sjablonen visueel via het
+  beheerscherm (via "Configuratie → Mail templates"). Herstel aangetaste
+  sjablonen op één van de volgende manieren:
+
+  * Open het sjabloon in de **productieomgeving** (op een versie vóór 2.1.0) via
+    de **Broncode**-knop en kopieer de broncode. Open vervolgens hetzelfde
+    sjabloon in de **acceptatieomgeving** via de **Broncode**-weergave en plak de
+    gekopieerde inhoud daar in. Dit werkt alleen als de productieomgeving nog op
+    een versie vóór 2.1.0 draait; vanaf 2.1.0 is de opmaak mogelijk al
+    verwijderd.
+  * **Of**: Herstel naar de standaardopmaak via **Actie → Reset templates** en
+    pas daarna de gewenste aanpassingen opnieuw toe.
+
+Bugfixes
+--------
+
+* [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
+  wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
+  het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
+  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
+  dezelfde versheid garandeert als de zaakdetailpagina.
+* [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
+  verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
+  valideren nu standaard het servercertificaat.
+* [:gh:`2465`]: ``CKEDITOR_CONFIGS`` is toegevoegd aan de configuratie om te
+  voorkomen dat de opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het
+  beheercommando ``find_modified_mail_templates`` is toegevoegd om e-mailsjablonen
+  op te sporen die mogelijk beschadigd zijn.
+* [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
+  te voorkomen.
+* [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
+  zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
+  afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
+* [:gh:`2416`]: Beheerpagina's voor gebruikers, plannen en uitnodigingen konden vastlopen of
+  crashen op productie wanneer er veel gebruikers in het systeem staan. De keuzelijsten voor
+  contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
+  aanvraag in plaats van alle records tegelijk in te laden.
+* [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
+* [:gh:`2320`]: Verbeterde controles op de rol van betrokkenen: gebruikers hebben alleen toegang
+  tot een zaak en worden alleen op de hoogte gebracht van wijzigingen in een zaak als ze de juiste
+  rol hebben.
+* [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
+  (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
+
+Onderhoud
+---------
+
+* [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
+* ``lodash`` bijgewerkt naar versie ``4.18.1``.
+
+2.1.2-rc2 (2026-05-13)
+======================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.2-rc2`.
+
+.. note::
+
+   Dit is een release candidate, bedoeld voor beoordeling en kwaliteitsborging. Deze
+   versie is niet bestemd voor productie. Feedback wordt verwerkt in een volgende RC, of
+   - als er geen problemen worden gevonden - resulteert dit in een definitieve release.
+
+Bugfixes
+--------
+
+* [:gh:`2426`]: De zaakstatus feedmelding toont de statusomschrijving nu tussen dubbele aanhalingstekens
+  (bijv. ``"Aanvraag is in behandeling"``) in plaats van een HTML ``<span>``-element.
+
+
+2.1.2-rc1 (2026-05-12)
+=======================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.1.2-rc1`.
+
+.. note::
+
+   Dit is een release candidate, bedoeld voor beoordeling en kwaliteitsborging. Deze
+   versie is niet bestemd voor productie. Feedback wordt verwerkt in een volgende RC, of
+   - als er geen problemen worden gevonden - resulteert dit in een definitieve release.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`2465`]: E-mailsjablonen die handmatig zijn bewerkt en opgeslagen via het
+  beheerscherm kunnen opmaak zijn kwijtgeraakt. Dit is een gevolg van een
+  migratieprobleem bij de Django Prosemirror-upgrade (geïntroduceerd in release
+  2.0.0) dat nu pas aan het licht is gekomen. Installaties die zijn geüpgraded
+  naar versie 2.1.0 of hoger en sindsdien e-mailsjablonen hebben bewerkt, kunnen
+  door dit probleem zijn getroffen.
+
+  Controleer na de upgrade of de opmaak van uw e-mailsjablonen intact is. Voer
+  het management command ``find_modified_mail_templates`` uit voor een overzicht
+  van mogelijk aangetaste sjablonen, of controleer alle sjablonen visueel via het
+  beheerscherm (via "Configuratie → Mail templates"). Herstel aangetaste
+  sjablonen op één van de volgende manieren:
+
+  * Open het sjabloon in de **productieomgeving** (op een versie vóór 2.1.0) via
+    de **Broncode**-knop en kopieer de broncode. Open vervolgens hetzelfde
+    sjabloon in de **acceptatieomgeving** via de **Broncode**-weergave en plak de
+    gekopieerde inhoud daar in. Dit werkt alleen als de productieomgeving nog op
+    een versie vóór 2.1.0 draait; vanaf 2.1.0 is de opmaak mogelijk al
+    verwijderd.
+  * **Of**: Herstel naar de standaardopmaak via **Actie → Reset templates** en
+    pas daarna de gewenste aanpassingen opnieuw toe.
+
+Bugfixes
+--------
+
+* [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
+  wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
+  het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
+  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
+  dezelfde versheid garandeert als de zaakdetailpagina.
+* [:gh:`2411`]: SSL-certificaatvalidatie werd ten onrechte uitgeschakeld bij
+  verzoeken aan de Haal Centraal BRP API. Dit is gecorrigeerd; verzoeken
+  valideren nu standaard het servercertificaat.
+* [:gh:`2465`]: ``CKEDITOR_CONFIGS`` is toegevoegd aan de configuratie om te
+  voorkomen dat de opmaak van e-mailsjablonen verloren gaat bij het opslaan. Het
+  beheercommando ``find_modified_mail_templates`` is toegevoegd om e-mailsjablonen
+  op te sporen die mogelijk beschadigd zijn.
+* [:gh:`2450`]: De ProseMirror-migraties zijn aangepast om directe toewijzing van niet-JSON-inhoud
+  te voorkomen.
+* [:gh:`2384`]: Foutieve verwijzingen naar ``case`` (in plaats van ``zaak``) in de
+  zaakstatus template zijn gecorrigeerd. Dit veroorzaakte onjuiste weergave van de
+  afsluitende status, resultaatomschrijving en upload-knop in de zaakdetailpagina.
+* [:gh:`2416`]: Beheerpagina's voor gebruikers, plannen en uitnodigingen konden vastlopen of
+  crashen op productie wanneer er veel gebruikers in het systeem staan. De keuzelijsten voor
+  contacten, categorieën, plandeelnemers en uitnodigingen laden nu alleen zoekresultaten op
+  aanvraag in plaats van alle records tegelijk in te laden.
+* [:gh:`2390`]: Probleem opgelost waarbij de hoogte van de waarschuwingsbanner onjuist werd weergegeven.
+* [:gh:`2320`]: Verbeterde controles op de rol van betrokkenen: gebruikers hebben alleen toegang
+  tot een zaak en worden alleen op de hoogte gebracht van wijzigingen in een zaak als ze de juiste
+  rol hebben.
+
+Onderhoud
+---------
+
+* [:gh:`2395`]: ``Django`` bijgewerkt naar versie ``4.2.30``.
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.6.0``.
+* ``lodash`` bijgewerkt naar versie ``4.18.1``.
+
 2.1.1 (2026-03-19)
 ==================
 
