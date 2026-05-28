@@ -16,6 +16,8 @@ import structlog
 from privates.storages import PrivateMediaFileSystemStorage
 from solo.admin import SingletonModelAdmin
 
+from maykin_config_checks.api.api import with_config_checks
+from open_inwoner.openzaak.config_checks.fetch_cases import FetchCasesCheck
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.forms import LimitedUploadFileField
@@ -67,8 +69,10 @@ class ZGWApiGroupConfig(admin.StackedInline):
 
 
 @admin.register(OpenZaakConfig)
+@with_config_checks(FetchCasesCheck)
 class OpenZaakConfigAdmin(SingletonModelAdmin):
     inlines = [ZGWApiGroupConfig]
+    readonly_fields = ("config_check_links",)
 
     fieldsets = (
         (
@@ -106,6 +110,12 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "reformat_esuite_zaak_identificatie",
                     "derive_zaak_titel_from",
                 ],
+            },
+        ),
+        (
+            _("Checks"),
+            {
+                "fields": ("config_check_links",),
             },
         ),
     )

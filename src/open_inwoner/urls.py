@@ -70,6 +70,7 @@ urlpatterns = [
     path("admin/", include((urlpatterns, "maykin_2fa"))),
     path("admin/", include((webauthn_urlpatterns, "two_factor"))),
     path("admin/login/failure/", AdminLoginFailure.as_view(), name="admin-oidc-error"),
+    path("", include("maykin_config_checks.admin_urls")),
     path("admin/", admin.site.urls),
     path("csp/", include("cspreports.urls")),
     path("prosemirror/", include("django_prosemirror.urls")),

@@ -48,6 +48,7 @@ exclude = [
     "env",
 
     # Project specific
+    "src/maykin_config_checks",
     "src/open_inwoner/conf/local.py",
     "performance-tests",
     "bootstrap.py",
@@ -153,7 +154,7 @@ ignore-names = [
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-wrap-aliases = false
-known-first-party = ["open_inwoner"]
+known-first-party = ["open_inwoner", "maykin_config_checks"]
 lines-after-imports = -1
 relative-imports-order = "furthest-to-closest"
 sections = { django = ["django"] }
