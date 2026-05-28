@@ -122,6 +122,7 @@ class SkipReason(enum.Enum):
 class SkippedZaak:
     zaak_url: str
     reason: SkipReason
+    api_group: ZGWApiGroupConfig
 
 
 _ZaakT = TypeVar("_ZaakT", bound=ZaakWithApiGroupZaakTypeResolved)
@@ -440,6 +441,7 @@ class ZGWService:
                             SkippedZaak(
                                 zaak_url=zaak_with_group.zaak.url,
                                 reason=SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
+                                api_group=zaak_with_group.api_group,
                             )
                         )
                         continue
@@ -457,12 +459,17 @@ class ZGWService:
                             SkippedZaak(
                                 zaak_url=zaak_with_group.zaak.url,
                                 reason=skip_reason,
+                                api_group=zaak_with_group.api_group,
                             )
                         )
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out resolving zaaktypes", exc_info=True)
                 skipped.extend(
-                    SkippedZaak(zaak_url=z.zaak.url, reason=SkipReason.TIMEOUT)
+                    SkippedZaak(
+                        zaak_url=z.zaak.url,
+                        reason=SkipReason.TIMEOUT,
+                        api_group=z.api_group,
+                    )
                     for z in future_to_zaak.values()
                     if id(z) not in processed_ids
                 )
@@ -543,6 +550,7 @@ class ZGWService:
                     SkippedZaak(
                         zaak_url=zaak_with_group.zaak.url,
                         reason=SkipReason.TIMEOUT,
+                        api_group=zaak_with_group.api_group,
                     )
                 )
             elif zid in failed_ids:
@@ -550,6 +558,7 @@ class ZGWService:
                     SkippedZaak(
                         zaak_url=zaak_with_group.zaak.url,
                         reason=SkipReason.FULL_RESOLUTION_FAILED,
+                        api_group=zaak_with_group.api_group,
                     )
                 )
             else:
