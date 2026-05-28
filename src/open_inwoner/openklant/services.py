@@ -1625,29 +1625,42 @@ class OpenKlant2Service(
             "kanaal": kanaal or self.config.mijn_vragen_kanaal,
         }
         klantcontacten = self.client.klant_contact.list_iter(params=params)
-        klantcontacten_for_partij = filter(
-            lambda row: partij_uuid
-            in glom.glom(
-                row,
-                (
-                    "_expand.hadBetrokkenen",
-                    [(glom.Coalesce("wasPartij.uuid", default=glom.SKIP),)],
-                ),
-            ),
-            klantcontacten,
-        )
 
-        # only show questions initiated by the current user
-        klantcontacten_for_initiator = filter(
-            lambda row: True
-            in glom.glom(
-                row,
-                ("_expand.hadBetrokkenen", ["initiator"]),
-            ),
-            klantcontacten_for_partij,
-        )
+        def _has_partij_uuid(row) -> bool:
+            try:
+                uuids = glom.glom(
+                    row,
+                    (
+                        glom.Coalesce("_expand.hadBetrokkenen", default=[]),
+                        [(glom.Coalesce("wasPartij.uuid", default=glom.SKIP),)],
+                    ),
+                )
+                return partij_uuid in uuids
+            except glom.GlomError:
+                logger.warning(
+                    "klantcontact_partij_filter_error",
+                    klantcontact_uuid=row.get("uuid"),
+                )
+                return False
 
-        return klantcontacten_for_initiator
+        def _has_initiator(row) -> bool:
+            try:
+                initiators = glom.glom(
+                    row,
+                    (
+                        glom.Coalesce("_expand.hadBetrokkenen", default=[]),
+                        ["initiator"],
+                    ),
+                )
+                return True in initiators
+            except glom.GlomError:
+                logger.warning(
+                    "klantcontact_initiator_filter_error",
+                    klantcontact_uuid=row.get("uuid"),
+                )
+                return False
+
+        return filter(_has_initiator, filter(_has_partij_uuid, klantcontacten))
 
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         """
