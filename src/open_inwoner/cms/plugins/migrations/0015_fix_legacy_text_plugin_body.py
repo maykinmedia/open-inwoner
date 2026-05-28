@@ -4,7 +4,7 @@ from django.db import migrations
 
 import structlog
 from django_prosemirror.config import ProsemirrorConfig
-from django_prosemirror.constants import EMPTY_DOC
+from django_prosemirror.constants import get_empty_doc
 from django_prosemirror.schema import MarkType, NodeType
 from django_prosemirror.serde import html_to_doc
 
@@ -18,9 +18,9 @@ def fix_legacy_text_plugin_body(apps, schema_editor):
     After replacing djangocms_text_ckeditor with the Prosemirror-based TextPlugin,
     the body column may contain JSON strings (not dicts) from the old plugin:
 
-    - Empty string JSON values ("") -> set to EMPTY_DOC (body column is NOT NULL)
+    - Empty string JSON values ("") -> set to get_empty_doc() (body column is NOT NULL)
     - Non-empty legacy HTML strings -> convert to Prosemirror JSON via html_to_doc;
-      fall back to EMPTY_DOC if conversion fails
+      fall back to get_empty_doc() if conversion fails
 
     Raw SQL is required because the ProsemirrorModelField descriptor raises
     ValidationError when Django tries to instantiate models with string body values,
@@ -79,7 +79,7 @@ def fix_legacy_text_plugin_body(apps, schema_editor):
             with schema_editor.connection.cursor() as cursor:
                 cursor.execute(
                     "UPDATE plugins_text SET body = %s::jsonb WHERE cmsplugin_ptr_id = %s",
-                    (json.dumps(EMPTY_DOC), plugin_id),
+                    (json.dumps(get_empty_doc()), plugin_id),
                 )
             fixed_empty += 1
         elif isinstance(raw_value, str):
@@ -97,7 +97,7 @@ def fix_legacy_text_plugin_body(apps, schema_editor):
                 )
             except Exception:
                 logger.warning(
-                    "Could not convert legacy Text.body, setting to EMPTY_DOC",
+                    "Could not convert legacy Text.body, setting to get_empty_doc()",
                     plugin_id=plugin_id,
                     raw_value=raw_value[:100],
                     exc_info=True,
@@ -105,7 +105,7 @@ def fix_legacy_text_plugin_body(apps, schema_editor):
                 with schema_editor.connection.cursor() as cursor:
                     cursor.execute(
                         "UPDATE plugins_text SET body = %s::jsonb WHERE cmsplugin_ptr_id = %s",
-                        (json.dumps(EMPTY_DOC), plugin_id),
+                        (json.dumps(get_empty_doc()), plugin_id),
                     )
                 failed += 1
 
