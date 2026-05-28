@@ -118,6 +118,7 @@ Onderhoud
   ``pygments`` (2.19.2 → 2.20.0), ``requests`` (2.32.5 → 2.34.2) en
   ``virtualenv`` (20.34.0 → 21.4.1).
 * [:gh:`2491`]: ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.7.0``.
+* [:cve:`CVE-2026-41305`] ``postcss`` bijgewerkt naar versie (8.5.6 → 8.5.10)
 
 2.2.0 (2026-04-20)
 ==================
