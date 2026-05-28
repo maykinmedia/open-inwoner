@@ -1056,3 +1056,106 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         mock_client.digitaal_adres.list.assert_called_once()
         mock_client.digitaal_adres.create.assert_called_once()
         self.assertEqual(result, ["digitaleAddresen.telefoonnummer"])
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class KlantcontactenForPartijTestCase(TestCase):
+    PARTIJ_UUID = "partij-uuid-1234"
+
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+
+    def _make_kc(self, uuid, partij_uuid=None, initiator=True, expand_key="_expand"):
+        betrokkene = {"initiator": initiator}
+        if partij_uuid is not None:
+            betrokkene["wasPartij"] = {"uuid": partij_uuid}
+        else:
+            betrokkene["wasPartij"] = None
+        return {
+            "uuid": uuid,
+            expand_key: {"hadBetrokkenen": [betrokkene]},
+        }
+
+    def test_matching_klantcontact_is_returned(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        kc = self._make_kc("kc-1", partij_uuid=self.PARTIJ_UUID, initiator=True)
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [kc])
+
+    def test_different_partij_uuid_is_excluded(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        kc = self._make_kc("kc-1", partij_uuid="other-partij-uuid", initiator=True)
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [])
+
+    def test_non_initiator_is_excluded(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        kc = self._make_kc("kc-1", partij_uuid=self.PARTIJ_UUID, initiator=False)
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [])
+
+    def test_missing_expand_key_is_excluded_without_exception(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        kc = {"uuid": "kc-bad"}  # no _expand key at all
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [])
+
+    def test_missing_had_betrokkenen_in_expand_is_excluded_without_exception(
+        self, mock_client_class
+    ):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        kc = {"uuid": "kc-bad", "_expand": {}}  # hadBetrokkenen absent
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [])
+
+    def test_null_was_partij_is_excluded_without_exception(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        # wasPartij is null — the betrokkene belongs to no partij
+        kc = self._make_kc("kc-1", partij_uuid=None, initiator=True)
+        mock_client.klant_contact.list_iter.return_value = iter([kc])
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [])
+
+    def test_malformed_items_excluded_valid_items_returned(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        good = self._make_kc("kc-good", partij_uuid=self.PARTIJ_UUID, initiator=True)
+        bad_no_expand = {"uuid": "kc-bad-1"}
+        bad_empty_expand = {"uuid": "kc-bad-2", "_expand": {}}
+        mock_client.klant_contact.list_iter.return_value = iter(
+            [bad_no_expand, bad_empty_expand, good]
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        self.assertEqual(result, [good])

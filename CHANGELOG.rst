@@ -52,6 +52,10 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2535`]: ``klantcontacten_for_partij`` in de OpenKlant2-service verwerkt
+  nu robuust klantcontacten waarbij ``_expand.hadBetrokkenen`` ontbreekt of een
+  onverwachte structuur heeft. Dergelijke items worden overgeslagen (met een
+  waarschuwing in de log) in plaats van dat er helemaal niets getoond wordt.
 * [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
   wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
   het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
