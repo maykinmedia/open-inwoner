@@ -619,3 +619,119 @@ class CMSZakenPluginTest(TestCase):
         self.assertEqual(case_item.attr("identificatie"), "ZAAK-001")
         self.assertIn("Zaaknummer:", case_item.attr("description"))
         self.assertIn("ZAAK-001", case_item.attr("description"))
+
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken",
+        return_value=ZakenResult(zaken=[], skipped=[]),
+    )
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
+    )
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
+    def test_formulier_uses_vervolg_link_as_url(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        mock_submission = MagicMock()
+        mock_submission.process_data.return_value = {
+            "uuid": "submission-uuid-1",
+            "identification": "SUBMISSION-001",
+            "naam": "Test formulier",
+            "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.FORMULIER.value,
+            "vervolg_link": "https://example.com/formulier/123",
+        }
+        mock_formulieren.return_value = [mock_submission]
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        item = pyquery.find("oip-home-plugin-card").eq(0)
+        self.assertEqual(item.attr("detail-url"), "https://example.com/formulier/123")
+
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken",
+        return_value=ZakenResult(zaken=[], skipped=[]),
+    )
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
+    )
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
+    def test_formulier_without_vervolg_link_has_empty_url(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        mock_submission = MagicMock()
+        mock_submission.process_data.return_value = {
+            "uuid": "submission-uuid-1",
+            "identification": "SUBMISSION-001",
+            "naam": "Test formulier",
+            "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.FORMULIER.value,
+            "vervolg_link": None,
+        }
+        mock_formulieren.return_value = [mock_submission]
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        item = pyquery.find("oip-home-plugin-card").eq(0)
+        self.assertEqual(item.attr("detail-url"), "")
+
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
+        return_value=[],
+    )
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
+    )
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    def test_zaak_uses_case_detail_url(
+        self, mock_visible_zaken, mock_fully_resolve, mock_formulieren
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        mock_zaak = MagicMock()
+        mock_zaak.process_data.return_value = {
+            "uuid": "zaak-uuid-1",
+            "identification": "ZAAK-001",
+            "naam": "Test zaak",
+            "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
+        }
+        mock_visible_zaken.return_value = ZakenResult(zaken=[mock_zaak], skipped=[])
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        item = pyquery.find("oip-home-plugin-card").eq(0)
+        detail_url = item.attr("detail-url")
+        self.assertIn("/cases/", detail_url)
+        self.assertIn("zaak-uuid-1", detail_url)
+        self.assertIn("/status/", detail_url)

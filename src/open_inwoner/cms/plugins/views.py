@@ -117,21 +117,23 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         cases_for_component = []
         for zaak in zaken_dicts:
             try:
-                f_url = furl(
-                    reverse(
-                        "cases:case_detail",
-                        kwargs={
-                            "object_id": zaak["uuid"],
-                            "api_group_id": str(zaak["api_group"].id),
-                        },
-                    )
-                )
+                is_formulier = zaak.get("type_aanvraag") == TypeAanvraag.FORMULIER.value
+                if is_formulier:
+                    url = zaak.get("vervolg_link") or ""
+                else:
+                    url = furl(
+                        reverse(
+                            "cases:case_detail",
+                            kwargs={
+                                "object_id": zaak["uuid"],
+                                "api_group_id": str(zaak["api_group"].id),
+                            },
+                        )
+                    ).url
                 case_data = {
                     "uuid": zaak["uuid"],
-                    "url": f_url.url,
+                    "url": url,
                     "identification": zaak.get("identification", ""),
-                    # for 'formulieren':
-                    # "naam" from API -> "description" for web component
                     "title": zaak.get("naam", zaak.get("description", "")),
                     "detail_label": self._get_detail_label(zaak),
                 }
