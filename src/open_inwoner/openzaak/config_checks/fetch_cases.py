@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import Any, Optional, TypedDict
 
 from django import forms
@@ -11,28 +12,23 @@ from maykin_config_checks.permissions import IsSuperUser
 from maykin_config_checks.protocols import InteractiveConfigCheck
 from maykin_config_checks.registry import registry
 from open_inwoner.accounts.user_identification import BSNIdentification
-from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
+from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.logentry import system_action, user_action
 
 
 class FetchCasesForm(forms.Form):
-    api_group = forms.ModelChoiceField(
-        queryset=ZGWApiGroupConfig.objects.all(),
-        required=False,
-        help_text=_("Select API group (required if not running from object page)"),
-    )
     bsn = forms.CharField(max_length=9, label="BSN")
 
 
 class FetchCasesCheckParams(TypedDict):
-    api_group: ZGWApiGroupConfig | None
     bsn: str
 
 
 class FetchCasesCheck(
     InteractiveConfigCheck[
         FetchCasesCheckParams,
-        ZGWApiGroupConfig,
+        OpenZaakConfig,
     ]
 ):
     identifier = "fetch_cases"
@@ -44,26 +40,21 @@ class FetchCasesCheck(
     @classmethod
     def get_form_kwargs(
         cls,
-        instance: Optional[ZGWApiGroupConfig] = None,
+        instance: Optional[OpenZaakConfig] = None,
     ) -> dict[str, Any]:
-        initial = {}
-
-        if instance:
-            initial["api_group"] = instance
-
-        return {"initial": initial}
+        return {}
 
     def get_target_object(
         self,
         data: FetchCasesCheckParams,
-        instance: Optional[ZGWApiGroupConfig],
-    ) -> Optional[ZGWApiGroupConfig]:
-        return data.get("api_group") or instance
+        instance: Optional[OpenZaakConfig],
+    ) -> Optional[OpenZaakConfig]:
+        return instance
 
     def run(
         self,
         data: FetchCasesCheckParams,
-        instance: Optional[ZGWApiGroupConfig] = None,
+        instance: Optional[OpenZaakConfig] = None,
         request: Optional[HttpRequest] = None,
     ) -> GenericConfigCheckResult:
         bsn = data["bsn"]
@@ -71,11 +62,7 @@ class FetchCasesCheck(
         log_message = f"fetch cases check run for bsn {masked_bsn}"
 
         if request:
-            user_action(
-                request,
-                request.user,
-                log_message,
-            )
+            user_action(request, request.user, log_message)
         else:
             system_action(log_message)
 
@@ -88,99 +75,55 @@ class FetchCasesCheck(
                 extra={},
             )
 
-        obj = self.get_target_object(data, instance)
-
-        if not obj:
-            return GenericConfigCheckResult(
-                success=False,
-                identifier=self.identifier,
-                verbose_name=self.label,
-                message=_("No API group selected"),
-                extra={
-                    "hint": _("Select an API group or run this from an object page")
-                },
-            )
-
         try:
-            client = obj.zaken_client
-            zaken = client.fetch_zaken(user_identification=BSNIdentification(bsn=bsn))
-            count = len(zaken)
+            service = ZGWService()
+            result = service.get_visible_zaken(BSNIdentification(bsn=bsn))
+            count = len(result.zaken)
+            skipped = dict(Counter(s.reason.value for s in result.skipped))
+            not_visible_count = sum(skipped.values())
 
-            config = OpenZaakConfig.get_solo()
+            by_group = {}
+            for z in result.zaken:
+                name = str(z.api_group)
+                by_group.setdefault(
+                    name,
+                    {"total_visible": 0, "total_not_visible": 0, "not_visible": {}},
+                )
+                by_group[name]["total_visible"] += 1
+            for s in result.skipped:
+                name = str(s.api_group)
+                by_group.setdefault(
+                    name,
+                    {"total_visible": 0, "total_not_visible": 0, "not_visible": {}},
+                )
+                by_group[name]["total_not_visible"] += 1
+                by_group[name]["not_visible"][s.reason.value] = (
+                    by_group[name]["not_visible"].get(s.reason.value, 0) + 1
+                )
+
+            extra = {
+                "total": count + not_visible_count,
+                "total_visible": count,
+                "total_not_visible": not_visible_count,
+                "not_visible": skipped,
+                "by_group": by_group,
+            }
 
             if count == 0:
-                hints = []
-                base_url = getattr(client, "base_url", "") or ""
-
-                if config.limit_user_visible_cases_to_role:
-                    hints.append(
-                        _("Filtered by role '%(role)s'")
-                        % {"role": config.limit_user_visible_cases_to_role}
-                    )
-
-                if config.zaak_max_confidentiality != "openbaar":
-                    hints.append(
-                        _("Filtered by confidentiality ≤ '%(level)s'")
-                        % {"level": config.zaak_max_confidentiality}
-                    )
-
-                if not hints:
-                    hints.append(
-                        _("No filtering detected — likely no data exists for this BSN")
-                    )
-
                 return GenericConfigCheckResult(
                     success=False,
                     identifier=self.identifier,
                     verbose_name=self.label,
-                    message=_("No cases returned"),
-                    extra={
-                        "diagnosis": _(
-                            "No data returned by API (not a connectivity error)"
-                        ),
-                        "count": 0,
-                        "bsn": masked_bsn,
-                        "service": str(obj.zrc_service),
-                        "client": {
-                            "base_url": base_url,
-                        },
-                        "query": {
-                            "bsn_param": "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn",
-                            "max_confidentiality": config.zaak_max_confidentiality,
-                        },
-                        "openzaak_config": {
-                            "max_confidentiality": config.zaak_max_confidentiality,
-                            "limit_role": config.limit_user_visible_cases_to_role
-                            or None,
-                        },
-                        "hints": hints,
-                    },
+                    message=_("No visible cases returned"),
+                    extra=extra,
                 )
 
             return GenericConfigCheckResult(
                 success=True,
                 identifier=self.identifier,
                 verbose_name=self.label,
-                message=_("Fetched %(count)s cases for BSN %(bsn)s")
-                % {"count": count, "bsn": bsn},
-                extra={
-                    "count": count,
-                    "sample": getattr(zaken[0], "identificatie", None),
-                    "service": str(obj.zrc_service),
-                    "base_url": getattr(client, "base_url", None),
-                    "config": {
-                        "use_openzaak_120_params": getattr(
-                            obj,
-                            "fetch_eherkenning_zaken_with_openzaak_120_params",
-                            None,
-                        ),
-                        "fetch_rollen_with_betrokkene_type": getattr(
-                            obj,
-                            "fetch_rollen_with_betrokkene_type",
-                            None,
-                        ),
-                    },
-                },
+                message=_("%(count)s cases returned") % {"count": count},
+                extra=extra,
             )
 
         except RequestException as exc:
@@ -189,11 +132,7 @@ class FetchCasesCheck(
                 identifier=self.identifier,
                 verbose_name=self.label,
                 message=_("Failed to connect to Zaken API"),
-                extra={
-                    "error": str(exc),
-                    "type": type(exc).__name__,
-                    "base_url": getattr(client, "base_url", None),
-                },
+                extra={"error": str(exc), "type": type(exc).__name__},
             )
 
         except Exception as exc:
@@ -202,10 +141,7 @@ class FetchCasesCheck(
                 identifier=self.identifier,
                 verbose_name=self.label,
                 message=_("Unexpected error while fetching cases"),
-                extra={
-                    "exception": str(exc),
-                    "type": type(exc).__name__,
-                },
+                extra={"exception": str(exc), "type": type(exc).__name__},
             )
 
 

@@ -37,11 +37,9 @@ from .models import (
 logger = structlog.stdlib.get_logger(__name__)
 
 
-@with_config_checks(FetchCasesCheck)
 class ZGWApiGroupConfig(admin.StackedInline):
     model = ZGWApiGroupConfig
     extra = 0
-    readonly_fields = ("config_check_links",)
 
     fieldsets = (
         (
@@ -67,18 +65,14 @@ class ZGWApiGroupConfig(admin.StackedInline):
                 ]
             },
         ),
-        (
-            _("Checks"),
-            {
-                "fields": ("config_check_links",),
-            },
-        ),
     )
 
 
 @admin.register(OpenZaakConfig)
+@with_config_checks(FetchCasesCheck)
 class OpenZaakConfigAdmin(SingletonModelAdmin):
     inlines = [ZGWApiGroupConfig]
+    readonly_fields = ("config_check_links",)
 
     fieldsets = (
         (
@@ -116,6 +110,12 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "reformat_esuite_zaak_identificatie",
                     "derive_zaak_titel_from",
                 ],
+            },
+        ),
+        (
+            _("Checks"),
+            {
+                "fields": ("config_check_links",),
             },
         ),
     )
