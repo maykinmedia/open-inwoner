@@ -75,11 +75,7 @@ LOGGING["loggers"].update(
 # in memory cache and django-axes don't get along.
 # https://django-axes.readthedocs.io/en/latest/configuration.html#known-configuration-problems
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/0",
-        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
-    },
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
     "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
 }
 
@@ -103,10 +99,6 @@ if "test" in sys.argv:
     ELASTICSEARCH_DSL_AUTO_REFRESH = False
     ELASTICSEARCH_DSL_AUTOSYNC = False
     ES_INDEX_PRODUCTS = "products_test"
-    CACHES = {
-        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
-        "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
-    }
 
 # Django debug toolbar
 INSTALLED_APPS += ["django_extensions"]
