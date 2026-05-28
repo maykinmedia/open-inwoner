@@ -51,6 +51,7 @@ x-app-env: &x-app-env
   - UWSGI_BUFFER_SIZE
   # Overridable ZGW API settings
   - ZGW_MAX_REQUESTS
+  - CACHE_SEEDING_QUEUE=${CACHE_SEEDING_QUEUE:-cache-seeding}
   - STATIC_ROOT_VOLUME=/srv/static
   # Enabling Open Telemetry requires the services in docker/docker-compose.observability.yml
   # to be up and running.
@@ -190,6 +191,26 @@ services:
         # pending, the database also needs to be ready for Celery itself. We
         # therefore have the health check here, and make Celery beat and
         # monitor containers depend on the celery container.
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - openinwoner-dev
+
+  celery-cache-seeding:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment: *x-app-env
+    command: /celery_worker_cache_seeding.sh
+    healthcheck:
+      test: ['CMD', 'python', '/app/bin/check_celery_worker_liveness.py']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes: *web_volumes
+    depends_on:
+      web:
         condition: service_healthy
       redis:
         condition: service_started
