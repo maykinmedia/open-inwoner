@@ -64,7 +64,7 @@ brotli==1.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   fonttools
-cbor2==5.8.0
+cbor2==6.1.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -144,7 +144,7 @@ cron-descriptor==1.4.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-celery-beat
-cryptography==45.0.7
+cryptography==48.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -182,7 +182,7 @@ diff-match-patch==20200713
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-import-export
-django==5.2.13
+django==5.2.14
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -960,7 +960,7 @@ playwright==1.50.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-pluggy==1.4.0
+pluggy==1.6.0
     # via pytest
 polyfactory==2.13.0
     # via -r requirements/test-tools.in
@@ -1018,10 +1018,11 @@ pyee==12.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   playwright
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   pytest
     #   rich
     #   sphinx
     #   sphinx-tabs
@@ -1032,7 +1033,7 @@ pyjwt==2.12.1
     #   gemma-zds-client
     #   messagebird
     #   zgw-consumers
-pyopenssl==25.1.0
+pyopenssl==26.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1051,7 +1052,7 @@ pyrsistent==0.18.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   jsonschema
-pytest==8.1.1
+pytest==9.0.3
     # via
     #   -r requirements/test-tools.in
     #   pytest-recording
@@ -1078,7 +1079,7 @@ python-decouple==3.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   maykin-common
-python-dotenv==1.0.1
+python-dotenv==1.2.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1122,7 +1123,7 @@ reportlab==4.4.2
     #   -r requirements/base.txt
     #   easy-thumbnails
     #   svglib
-requests==2.32.5
+requests==2.34.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1292,7 +1293,7 @@ uritemplate==4.1.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   drf-spectacular
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

@@ -82,6 +82,13 @@ Bugfixes
 Onderhoud
 ---------
 
+* Verschillende libraries bijgewerkt: ``pyopenssl`` (25.1.0 → 26.2.0),
+  ``cbor2`` (5.8.0 → 6.1.1), ``cryptography`` (45.0.7 → 48.0.0),
+  ``urllib3`` (2.6.3 → 2.7.0), ``python-dotenv`` (1.0.1 → 1.2.2),
+  ``pytest`` (8.1.1 → 9.0.3), ``wheel`` (0.42.0 → 0.45.1),
+  ``filelock`` (3.18.0 → 3.29.0), ``pygments`` (2.19.2 → 2.20.0),
+  ``requests`` (2.32.5 → 2.34.2), ``virtualenv`` (20.34.0 → 21.4.1) en
+  ``Django`` (5.2.13 → 5.2.14).
 * [:gh:`2414`]: ClamAV Python-client (``clamd``) toegevoegd.
 * [:gh:`2455`]: ``django-admin-index`` bijgewerkt naar versie ``4.0.0``.
 * [:gh:`2366`, :gh:`2371`]: ``Django`` bijgewerkt naar versie ``5.2``, samen met
