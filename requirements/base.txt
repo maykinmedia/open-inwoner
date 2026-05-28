@@ -399,7 +399,7 @@ grpcio==1.74.0
     # via opentelemetry-exporter-otlp-proto-grpc
 humanfriendly==10.0
     # via -r requirements/base.in
-idna==3.7
+idna==3.16
     # via
     #   email-validator
     #   requests
@@ -417,7 +417,7 @@ jsonschema==4.1.0
     # via drf-spectacular
 kombu==5.5.4
     # via celery
-lxml==6.0.0
+lxml==6.1.1
     # via
     #   django-digid-eherkenning
     #   mail-editor
@@ -429,7 +429,7 @@ mail-editor==0.3.8
     # via -r requirements/base.in
 mail-parser==3.15.0
     # via django-yubin
-markdown==3.3.6
+markdown==3.10.2
     # via -r requirements/base.in
 markdown-it-py==4.0.0
     # via rich
