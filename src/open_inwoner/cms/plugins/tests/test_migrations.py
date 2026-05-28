@@ -14,7 +14,7 @@ class FixLegacyTextPluginBodyMigrationTest(TestSuccessfulMigrations):
     Prosemirror JSON documents.
 
     Scenarios:
-    - Empty JSON string ("") → EMPTY_DOC (body is NOT NULL)
+    - Empty JSON string ("") → get_empty_doc() (body is NOT NULL)
     - HTML string → Prosemirror JSON dict
     - Plain text string → Prosemirror JSON dict (wrapped in paragraph)
     - None → unchanged

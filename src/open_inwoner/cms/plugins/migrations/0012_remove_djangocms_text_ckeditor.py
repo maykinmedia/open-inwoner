@@ -6,7 +6,7 @@ from django.db import connection, migrations, transaction
 
 import structlog
 from django_prosemirror.config import ProsemirrorConfig
-from django_prosemirror.constants import EMPTY_DOC
+from django_prosemirror.constants import get_empty_doc
 from django_prosemirror.schema import MarkType, NodeType
 from django_prosemirror.serde import html_to_doc
 
@@ -171,7 +171,7 @@ def migrate_ckeditor_text_plugins_to_new_text_plugin(apps, schema_editor):
                     # Create an empty ProseMirror document (single empty paragraph)
                     # This ensures the plugin always has valid content structure
 
-                    prosemirror_doc = EMPTY_DOC
+                    prosemirror_doc = get_empty_doc()
                     logger.info(
                         "Plugin %d has empty/whitespace content, using empty ProseMirror document",
                         plugin_id,

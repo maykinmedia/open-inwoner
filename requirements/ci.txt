@@ -785,7 +785,7 @@ maykin-common[cli, health-checks, otel]==0.14.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-django-prosemirror[images]==0.6.0
+maykin-django-prosemirror[images]==0.7.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

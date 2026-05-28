@@ -20,7 +20,7 @@ from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.plugins import get_plugins
-from django_prosemirror.constants import EMPTY_DOC
+from django_prosemirror.constants import get_empty_doc
 from djangocms_versioning.constants import DRAFT, PUBLISHED
 from djangocms_versioning.models import Version
 
@@ -337,7 +337,7 @@ def create_cms_page_with_content(
         placeholder=content_placeholder,
         plugin_type="TextPlugin",
         language="nl",
-        body=EMPTY_DOC,
+        body=get_empty_doc(),
     )
     if content:
         plugin.body.html = f"<p>{content}</p>"

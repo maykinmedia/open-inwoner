@@ -113,6 +113,7 @@ Onderhoud
   ``filelock`` (3.18.0 → 3.29.0), ``markdown`` (3.3.6 → 3.10.2),
   ``pygments`` (2.19.2 → 2.20.0), ``requests`` (2.32.5 → 2.34.2) en
   ``virtualenv`` (20.34.0 → 21.4.1).
+* [:gh:`2491`]: ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.7.0``.
 
 2.2.0 (2026-04-20)
 ==================

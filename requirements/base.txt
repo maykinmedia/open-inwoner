@@ -441,7 +441,7 @@ maykin-2fa==1.0.2
     # via -r requirements/base.in
 maykin-common[cli, health-checks, otel]==0.14.0
     # via -r requirements/base.in
-maykin-django-prosemirror[images]==0.6.0
+maykin-django-prosemirror[images]==0.7.0
     # via -r requirements/base.in
 maykin-python3-saml==1.16.1
     # via
