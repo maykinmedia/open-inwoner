@@ -37,3 +37,6 @@ d2e40fbe2f6d8887ae16ffd5be45d84fb7e0c368
 
 # refactor: apply new prettier rules
 c307bc411297480eebb02306769923beccf205f5
+
+# refactor: re-order ZGWService methods
+386c85c475a2835d2187d92fb32e696b633ceff1

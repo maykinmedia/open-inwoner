@@ -16,7 +16,7 @@ from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import (
     FormulierWithApiGroup,
-    ZaakWithApiGroup,
+    ZaakWithApiGroupZaakTypeResolved,
     ZGWService,
 )
 from open_inwoner.openzaak.types import UniformCase
@@ -41,7 +41,7 @@ def _get_zaak_filter_status(zaak: Zaak) -> CaseFilterFormOption:
 
 
 def _get_zaak_status_frequencies(
-    zaken: Iterable[ZaakWithApiGroup],
+    zaken: Iterable[ZaakWithApiGroupZaakTypeResolved],
     formulieren: Iterable[FormulierWithApiGroup],
 ) -> dict[CaseFilterFormOption, int]:
     zaak_statuses = [_get_zaak_filter_status(zaak.zaak) for zaak in zaken]
@@ -107,26 +107,26 @@ class InnerCaseListView(
         case_service = ZGWService()
         context["filter_form_enabled"] = config.zaken_filter_enabled
 
-        # update ctx with formulieren and cases (possibly filtered)
+        try:
+            page_number = int(self.request.GET.get(self.page_kwarg, 1))
+        except (TypeError, ValueError):
+            page_number = 1
+
         formulieren: Sequence[UniformCase] = case_service.get_formulieren(
             user_identification
         )
-        preprocessed_zaken: Sequence[UniformCase] = case_service.get_zaken(
-            user_identification
-        )
+        all_visible_zaken = case_service.get_visible_zaken(user_identification).zaken
 
         if config.zaken_filter_enabled:
             case_status_frequencies = _get_zaak_status_frequencies(
-                zaken=preprocessed_zaken,
+                zaken=all_visible_zaken,
                 formulieren=formulieren,
             )
-            # Separate frequency data from statusname
             context["status_freqs"] = [
                 (status.value, frequency)
                 for status, frequency in case_status_frequencies.items()
             ]
 
-            # Validate statuses are valid according to the options enum
             statuses: list[CaseFilterFormOption] = []
             for status in self.request.GET.getlist("status"):
                 try:
@@ -138,24 +138,40 @@ class InnerCaseListView(
                         user=self.request.user,
                     )
 
-            # Actually filter the formulieren
             if statuses:
                 formulieren = (
                     formulieren if CaseFilterFormOption.FORMULIER in statuses else []
                 )
-                preprocessed_zaken = [
+                all_visible_zaken = [
                     zaak
-                    for zaak in preprocessed_zaken
+                    for zaak in all_visible_zaken
                     if _get_zaak_filter_status(zaak.zaak) in statuses
                 ]
 
-        paginator_dict = self.paginate_with_context([*formulieren, *preprocessed_zaken])
+        # Formulieren fill the first slots; zaken follow.
+        # max(0, ...) prevents negative indices when the page falls entirely within
+        # the formulieren block, in which case zaak_start == zaak_end == 0 and
+        # all_visible_zaken[0:0] == [] so no zaken are resolved.
+        formulieren_count = len(formulieren)
+        combined_start = (page_number - 1) * self.paginate_by
+        combined_end = page_number * self.paginate_by
+        formulieren_page = formulieren[combined_start:combined_end]
+        zaak_start = max(0, combined_start - formulieren_count)
+        zaak_end = max(0, combined_end - formulieren_count)
+        zaak_page = case_service.fully_resolve_zaken(
+            all_visible_zaken[zaak_start:zaak_end]
+        ).zaken
+
+        page_items = [*formulieren_page, *zaak_page]
+        combined_total = formulieren_count + len(all_visible_zaken)
+
+        paginator_dict = self.paginate_preloaded(
+            page_items, combined_total, page_number, self.paginate_by
+        )
         zaken_dicts = [case.process_data() for case in paginator_dict["object_list"]]
 
         context["zaken"] = zaken_dicts
         context.update(paginator_dict)
-
-        # other data
         context["hxget"] = reverse("cases:cases_content")
         context["title_text"] = config.title_text
 

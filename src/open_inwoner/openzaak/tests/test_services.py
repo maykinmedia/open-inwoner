@@ -49,7 +49,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_raw_zaken_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_raw_zaken"] = 0.001
+            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
@@ -63,7 +63,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         self.assertEqual(result, [])
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
-    def test_get_zaken_logs_timeout_warning_on_raw_fetch(self):
+    def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
         release = threading.Event()
         timer = threading.Timer(0.05, release.set)
 
@@ -72,18 +72,18 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_raw_zaken_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_raw_zaken"] = 0.001
+            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
                     "open_inwoner.openzaak.services", level="WARNING"
                 ) as cm:
-                    result = self.service.get_zaken(_USER_IDENTIFICATION)
+                    result = self.service.get_visible_zaken(_USER_IDENTIFICATION)
             finally:
                 release.set()
                 timer.cancel()
 
-        self.assertEqual(result, [])
+        self.assertEqual(result.zaken, [])
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_formulieren_logs_timeout_warning(self):
@@ -95,7 +95,7 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
             "_get_formulieren_for_api_group",
             side_effect=self._make_blocking_fetch(release),
         ):
-            self.service._timeouts["fetch_formulieren"] = 0.001
+            self.service._timeouts["get_formulieren"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
