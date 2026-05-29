@@ -98,6 +98,11 @@ GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", None)
 # Custom JavaScript feature flag
 ALLOW_CUSTOM_JS = config("ALLOW_CUSTOM_JS", default=False)
 
+# Whether to enable the experimental interactive config checks
+ENABLE_INTERACTIVE_CONFIG_CHECKS = config(
+    "ENABLE_INTERACTIVE_CONFIG_CHECKS", default=False
+)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -226,7 +231,7 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     *default_health_check_apps,
-    "maykin_config_checks",
+    *(["maykin_config_checks"] if ENABLE_INTERACTIVE_CONFIG_CHECKS else []),
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
