@@ -6,7 +6,6 @@ os.environ.setdefault("ENVIRONMENT", "ci")
 os.environ.setdefault("SECRET_KEY", "for-testing-purposes-only")
 os.environ.setdefault("IS_HTTPS", "no")
 os.environ.setdefault("ALLOWED_HOSTS", "")
-os.environ.setdefault("ENABLE_INTERACTIVE_CONFIG_CHECKS", "True")
 
 from .base import *  # noqa isort:skip
 

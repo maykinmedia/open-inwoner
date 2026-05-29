@@ -13,4 +13,3 @@ from .production import *  # noqa isort:skip
 
 CSP_REPORTS_SAVE = True
 PLAYWRIGHT_MULTI_ONLY_DEFAULT = False
-ENABLE_INTERACTIVE_CONFIG_CHECKS = True

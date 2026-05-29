@@ -6,9 +6,6 @@ Voor een volledig overzicht van alle commits, zie ...
 Deployment aandachtspunten
 --------------------------
 
-* [:gh:`2440`]: Er is een experimenteel framework voor interactieve configuratiechecks
-  toegevoegd. Dit is standaard uitgeschakeld. Activeer de feature via de
-  omgevingsvariabele ``ENABLE_INTERACTIVE_CONFIG_CHECKS=true``.
 * [:gh:`2414`]: De virusscanner maakt gebruik van een ClamAV-daemon. Om
   bestandsuploads te scannen dient een ClamAV-daemon bereikbaar te zijn en
   moet het veld ``Virusscanner inschakelen`` in de siteconfiguratie worden
