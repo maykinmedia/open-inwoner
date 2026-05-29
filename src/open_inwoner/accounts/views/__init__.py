@@ -13,6 +13,7 @@ from .auth import (
     CustomDigiDAssertionConsumerServiceView,
     CustomeHerkenningAssertionConsumerServiceMockView,
     CustomeHerkenningAssertionConsumerServiceView,
+    LogoutConfirmView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
@@ -58,6 +59,7 @@ from .profile import (
 from .registration import CustomRegistrationView, NecessaryFieldsUserView
 
 __all__ = [
+    "LogoutConfirmView",
     "ActionCreateView",
     "ActionExportView",
     "ActionHistoryView",

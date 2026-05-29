@@ -32,15 +32,10 @@
                         {% endif %}
                     {% endif %}
                     <li class="primary-navigation__list-item primary-navigation__list-item--always-visible">
-                        {% with logout_url=request.user.get_logout_url %}
-                            <form method="post" action="{{ logout_url }}">
-                                {% csrf_token %}
-                                <button type="submit" class="link link--primary link--icon link--icon-position-before">
-                                    <span class="link__text">{% trans "Uitloggen" %}</span>
-                                    {% icon icon="logout" %}
-                                </button>
-                            </form>
-                        {% endwith %}
+                        <a href="{% url 'logout_confirm' %}" class="link link--primary link--icon link--icon-position-before">
+                            <span class="link__text">{% trans "Uitloggen" %}</span>
+                            {% icon icon="logout" %}
+                        </a>
                     </li>
                 </ul>
             </li>

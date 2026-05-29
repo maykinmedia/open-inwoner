@@ -91,13 +91,10 @@
                                 {% endif %}
                             {% endif %}
                             <li class="header__list-item">
-                                <form method="post" action="{{ request.user.get_logout_url }}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="link link--primary link--icon link--icon-position-before">
-                                        <span class="link__text">{% trans "Uitloggen" %}</span>
-                                        {% icon icon="logout" %}
-                                    </button>
-                                </form>
+                                <a href="{% url 'logout_confirm' %}" class="link link--primary link--icon link--icon-position-before">
+                                    <span class="link__text">{% trans "Uitloggen" %}</span>
+                                    {% icon icon="logout" %}
+                                </a>
                             </li>
                         </ul>
                     {% elif config.login_show %}

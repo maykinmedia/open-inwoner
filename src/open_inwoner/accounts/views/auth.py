@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import auth, messages
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordResetConfirmView,
@@ -9,7 +9,8 @@ from django.contrib.auth.views import (
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy as _l
+from django.views.generic import TemplateView
 
 from digid_eherkenning.mock import conf as digid_conf
 from digid_eherkenning.mock.views.digid import DigiDAssertionConsumerServiceMockView
@@ -237,3 +238,13 @@ class CustomeHerkenningAssertionConsumerServiceView(
             del session["invite_url"]
 
         return super().get_success_url()
+
+
+class LogoutConfirmView(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/logout_confirm.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["logout_url"] = self.request.user.get_logout_url()
+        context["page_title"] = _l("Uitloggen")
+        return context
