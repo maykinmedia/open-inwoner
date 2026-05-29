@@ -68,7 +68,7 @@ PATCHED_MIDDLEWARE = [
 class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
-        self.return_url = reverse("logout")
+        self.return_url = reverse("logout_confirm")
         self.user = UserFactory(
             first_name="Erik", street="MyStreet", messages_notifications=True
         )
@@ -94,55 +94,20 @@ class ProfileViewTests(WebTest):
         response = self.app.get(self.url)
         self.assertRedirects(response, f"{login_url}?next={self.url}")
 
-    def test_show_correct_logout_button_for_login_type_default(self):
-        response = self.app.get(self.url, user=self.user)
-
-        logout_url = reverse("logout")
-        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
-
-        self.assertEqual(logout_form.attr["action"], logout_url)
-
-    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
-    def test_show_correct_logout_button_for_login_type_digid(self, mock_solo):
-        for oidc_enabled in [True, False]:
-            with self.subTest(oidc_enabled=oidc_enabled):
-                mock_solo.return_value.enabled = oidc_enabled
-
-                logout_url = (
-                    reverse("digid_oidc:logout") if oidc_enabled else reverse("logout")
-                )
-
-                response = self.app.get(self.url, user=self.digid_user)
-
-                logout_form = response.pyquery.find(f"form[action='{logout_url}']")
-
-                self.assertEqual(logout_form.attr["action"], logout_url)
-
-    def test_show_correct_logout_button_for_login_type_eherkenning(self):
-        """eHerkenning always uses OIDC logout"""
-        logout_url = reverse("eherkenning_oidc:logout")
-
-        response = self.app.get(self.url, user=self.eherkenning_user)
-
-        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
-
-        self.assertEqual(logout_form.attr["action"], logout_url)
-
-    def test_show_correct_logout_button_for_login_type_eidas(self):
-        """eIDAS always uses OIDC logout"""
-        logout_url = reverse("eidas_oidc:logout")
-
+    def test_show_logout_link_in_header(self):
+        """All login types show a link to the logout confirm page in the header."""
+        confirm_url = reverse("logout_confirm")
         eidas_user = UserFactory(
             login_type=LoginTypeChoices.eidas_person_bsn,
             bsn="123456789",
             eidas_pseudo_id="eidas-test",
         )
 
-        response = self.app.get(self.url, user=eidas_user)
-
-        logout_form = response.pyquery.find(f"form[action='{logout_url}']")
-
-        self.assertEqual(logout_form.attr["action"], logout_url)
+        for user in [self.user, self.digid_user, self.eherkenning_user, eidas_user]:
+            with self.subTest(login_type=user.login_type):
+                response = self.app.get(self.url, user=user)
+                logout_link = response.pyquery.find(f"a[href='{confirm_url}']")
+                self.assertIsNotNone(logout_link.attr["href"])
 
     @patch(
         "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True

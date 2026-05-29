@@ -2248,6 +2248,64 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
             ],
         )
 
+    def test_logout_confirm_requires_login(self):
+        response = self.client.get(reverse("logout_confirm"))
+        self.assertRedirects(
+            response, f"{reverse('login')}?next={reverse('logout_confirm')}"
+        )
+
+    def test_logout_confirm_renders_for_authenticated_user(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("logout_confirm"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            PyQuery(response.content)("#logout-form").attr["action"],
+            self.user.get_logout_url(),
+        )
+
+    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo")
+    def test_logout_confirm_form_action_for_digid_user(self, mock_solo):
+        for oidc_enabled in [True, False]:
+            with self.subTest(oidc_enabled=oidc_enabled):
+                mock_solo.return_value.enabled = oidc_enabled
+                expected_url = (
+                    reverse("digid_oidc:logout") if oidc_enabled else reverse("logout")
+                )
+                user = DigidUserFactory()
+                self.client.force_login(user)
+                response = self.client.get(reverse("logout_confirm"))
+                self.assertEqual(
+                    PyQuery(response.content)("#logout-form").attr["action"],
+                    expected_url,
+                )
+
+    def test_logout_confirm_form_action_for_eherkenning_user(self):
+        user = eHerkenningUserFactory()
+        self.client.force_login(user)
+        # Satisfy KvKLoginMiddleware: mark branch selection as done so the
+        # middleware does not redirect before the confirm view can render.
+        session = self.client.session
+        session[EHerkenningSessionContext.KVK_INITIAL_BRANCH_SELECTION_DONE_KEY] = True
+        session.save()
+        response = self.client.get(reverse("logout_confirm"))
+        self.assertEqual(
+            PyQuery(response.content)("#logout-form").attr["action"],
+            reverse("eherkenning_oidc:logout"),
+        )
+
+    def test_logout_confirm_form_action_for_eidas_user(self):
+        user = UserFactory(
+            login_type=LoginTypeChoices.eidas_person_bsn,
+            bsn="123456789",
+            eidas_pseudo_id="eidas-test",
+        )
+        self.client.force_login(user)
+        response = self.client.get(reverse("logout_confirm"))
+        self.assertEqual(
+            PyQuery(response.content)("#logout-form").attr["action"],
+            reverse("eidas_oidc:logout"),
+        )
+
     def test_logout(self):
         """Test that a user is able to log out and page redirects to root endpoint."""
         # Django 5 LogoutView requires POST and enforces @csrf_protect at the view

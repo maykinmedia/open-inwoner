@@ -20,6 +20,7 @@ from open_inwoner.accounts.views import (
     CustomeHerkenningAssertionConsumerServiceView,
     CustomLoginView,
     CustomRegistrationView,
+    LogoutConfirmView,
     LogPasswordChangeView,
     LogPasswordResetConfirmView,
     LogPasswordResetView,
@@ -95,6 +96,11 @@ urlpatterns = [
         name="password_reset_confirm",
     ),
     path("accounts/login/", CustomLoginView.as_view(), name="login"),
+    path(
+        "accounts/logout-confirm/",
+        LogoutConfirmView.as_view(),
+        name="logout_confirm",
+    ),
     path("accounts/verify/", VerifyTokenView.as_view(), name="verify_token"),
     path("accounts/resend-token/", ResendTokenView.as_view(), name="resend_token"),
     path(

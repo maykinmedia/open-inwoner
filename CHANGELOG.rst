@@ -55,6 +55,9 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2544`]: De uitlogknop gebruikt nu een tussenliggende bevestigingspagina
+  in plaats van een formulier met een CSRF-token. Hierdoor werkt uitloggen ook
+  na langdurig openstaan van een browser venster.
 * [:gh:`2537`]: De mijn zaken-plugin gebruikt nu de ``vervolg_link`` van een
   formulier als doorlink-URL voor de kaart, in plaats van een zaakdetail-URL
   die niet van toepassing is op formulieren. Formulieren zonder ``vervolg_link``

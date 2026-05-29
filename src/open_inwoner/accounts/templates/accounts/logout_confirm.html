@@ -1,0 +1,22 @@
+{% extends 'master.html' %}
+{% load i18n button_tags %}
+
+{% block content %}
+    <form id="logout-form" method="post" action="{{ logout_url }}"
+        hx-post="{{ logout_url }}"
+        hx-trigger="load delay:4s"
+        hx-target="body"
+        hx-push-url="true">
+        {% csrf_token %}
+        <div class="grid__main">
+            <header class="oip-header-group">
+                <h1 class="utrecht-heading-1">{% trans "Uitloggen" %}</h1>
+            </header>
+            <nl-paragraph>{% trans "U wordt automatisch uitgelogd, of klik hieronder om direct uit te loggen." %}</nl-paragraph>
+            <div class="button-row">
+                {% button href="/" secondary=True transparent=True text=_("Annuleren") %}
+                {% button type="submit" primary=True text=_("Nu uitloggen") %}
+            </div>
+        </div>
+    </form>
+{% endblock content %}
