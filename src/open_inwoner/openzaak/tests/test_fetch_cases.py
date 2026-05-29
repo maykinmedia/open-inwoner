@@ -35,7 +35,7 @@ class FetchCasesCheckTests(TestCase):
         result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Invalid BSN", result.message)
+        self.assertIn("Ongeldig BSN", result.message)
 
     def test_no_cases_returned(self):
         form = FetchCasesForm(data={"bsn": "123456789"})
@@ -45,7 +45,7 @@ class FetchCasesCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("No visible cases", result.message)
+        self.assertIn("Geen zichtbare zaken", result.message)
         self.assertEqual(result.extra["total"], 0)
         self.assertEqual(result.extra["total_visible"], 0)
         self.assertEqual(result.extra["total_not_visible"], 0)
@@ -155,7 +155,7 @@ class FetchCasesCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Failed to connect", result.message)
+        self.assertIn("Gefaald om verbinding te maken", result.message)
 
 
 class FetchCasesViewTests(TestCase):
@@ -185,7 +185,7 @@ class FetchCasesViewTests(TestCase):
         response = self.client.get(self.get_url())
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Fetch cases for BSN")
+        self.assertContains(response, "Zaken ophalen voor BSN")
 
     def test_post_runs_check(self):
         self.client.force_login(self.superuser)
@@ -194,7 +194,7 @@ class FetchCasesViewTests(TestCase):
             response = self.client.post(self.get_url(), {"bsn": "123456789"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No visible cases")
+        self.assertContains(response, "Geen zichtbare zaken")
 
 
 class FetchCasesStandaloneTests(TestCase):
@@ -211,4 +211,4 @@ class FetchCasesStandaloneTests(TestCase):
             response = self.client.post(url, {"bsn": "123456789"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No visible cases")
+        self.assertContains(response, "Geen zichtbare zaken")

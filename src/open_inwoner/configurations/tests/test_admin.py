@@ -178,7 +178,7 @@ class TestAdminForm(WebTest):
         response = self.form.submit()
 
         self.assertIn(
-            "ClamAV host cannot be empty when virus scanning is enabled.",
+            "ClamAV host kan niet leeg zijn wanneer virus scannen is ingeschakeld.",
             response.text,
         )
 
