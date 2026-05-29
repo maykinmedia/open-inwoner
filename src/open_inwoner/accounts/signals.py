@@ -1,5 +1,7 @@
+import functools
 from typing import Literal
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.signals import (
     user_logged_in,
@@ -264,23 +266,30 @@ def increment_logins_counter(
 def warm_zgw_cache_on_login(
     sender: type[User], request: HttpRequest | None, user: User, **kwargs
 ) -> None:
+    dispatch = functools.partial(
+        warm_cache_for_user.apply_async, queue=settings.CACHE_SEEDING_QUEUE
+    )
     try:
         match user.identification:
             case BSNIdentification(bsn=bsn):
-                warm_cache_for_user.delay(
-                    user_bsn=bsn,
-                    user_kvk=None,
-                    user_rsin=None,
-                    user_vestigingsnummer=None,
+                dispatch(
+                    kwargs={
+                        "user_bsn": bsn,
+                        "user_kvk": None,
+                        "user_rsin": None,
+                        "user_vestigingsnummer": None,
+                    }
                 )
             case KVKIdentification(
                 kvk=kvk, rsin=rsin, vestigingsnummer=vestigingsnummer
             ):
-                warm_cache_for_user.delay(
-                    user_bsn=None,
-                    user_kvk=kvk,
-                    user_rsin=rsin,
-                    user_vestigingsnummer=vestigingsnummer,
+                dispatch(
+                    kwargs={
+                        "user_bsn": None,
+                        "user_kvk": kvk,
+                        "user_rsin": rsin,
+                        "user_vestigingsnummer": vestigingsnummer,
+                    }
                 )
     except Exception:
         logger.warning("Failed to dispatch ZGW cache warm-up task", exc_info=True)

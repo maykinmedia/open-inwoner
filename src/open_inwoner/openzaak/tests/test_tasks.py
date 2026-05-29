@@ -205,7 +205,11 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
         request.user = user
 
         with patch.object(
-            warm_cache_for_user, "delay", side_effect=warm_cache_for_user.run
+            warm_cache_for_user,
+            "apply_async",
+            side_effect=lambda *args, **kwargs: warm_cache_for_user.run(
+                **kwargs["kwargs"]
+            ),
         ):
             user_logged_in.send(sender=None, request=request, user=user)
 

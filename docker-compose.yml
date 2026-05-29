@@ -14,54 +14,55 @@
 version: '3.4'
 
 x-app-env: &x-app-env
-  - LOG_STDOUT=true
-  - DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker
-  - SECRET_KEY=${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
-  - ALLOWED_HOSTS=*
-  - CORS_ALLOW_ALL_ORIGINS=${CORS_ALLOW_ALL_ORIGINS:-true}
-  - CSRF_TRUSTED_ORIGINS='http://localhost:9000'
-  - CACHE_DEFAULT=redis:6379/0
-  - CACHE_AXES=redis:6379/0
-  - CACHE_OIDC=redis:6379/0
-  - CACHE_PORTALOCKER=redis:6379/0
-  - CELERY_BROKER_URL=redis://redis:6379/0
-  - CELERY_RESULT_BACKEND=redis://redis:6379/0
-  - CELERY_LOGLEVEL=DEBUG
-  - ES_HOST=http://elasticsearch:9200
-  - ES_USERNAME=${ES_USERNAME:-elastic}
-  - ES_PASSWORD=${ES_PASSWORD:-elastic}
-  - OIDC_FRONTEND_LOGOUT_WITH_HINTS=true
+  LOG_STDOUT: 'true'
+  DJANGO_SETTINGS_MODULE: open_inwoner.conf.docker
+  SECRET_KEY: ${SECRET_KEY:-7bk)w=_%lnm#68rc!c)h@gy&5+%^fl=okq17bv!)yv!l0udu2y}
+  ALLOWED_HOSTS: '*'
+  CORS_ALLOW_ALL_ORIGINS: ${CORS_ALLOW_ALL_ORIGINS:-true}
+  CSRF_TRUSTED_ORIGINS: "'http://localhost:9000'"
+  CACHE_DEFAULT: redis:6379/0
+  CACHE_AXES: redis:6379/0
+  CACHE_OIDC: redis:6379/0
+  CACHE_PORTALOCKER: redis:6379/0
+  CACHE_SEEDING_QUEUE: low-latency
+  CELERY_BROKER_URL: redis://redis:6379/0
+  CELERY_RESULT_BACKEND: redis://redis:6379/0
+  CELERY_LOGLEVEL: DEBUG
+  ES_HOST: http://elasticsearch:9200
+  ES_USERNAME: ${ES_USERNAME:-elastic}
+  ES_PASSWORD: ${ES_PASSWORD:-elastic}
+  OIDC_FRONTEND_LOGOUT_WITH_HINTS: 'true'
   # Needed for Celery Flower to match the TIME_ZONE configured in the
   # settings used by workers and beat containers.
-  - TZ=Europe/Amsterdam
+  TZ: Europe/Amsterdam
   # WARNING: Strictly for development!
-  - DISABLE_2FA=${DISABLE_2FA:-True}
-  - DEBUG=True
-  - IS_HTTPS=no
-  - ALLOW_CUSTOM_JS=False
+  DISABLE_2FA: ${DISABLE_2FA:-True}
+  DEBUG: 'True'
+  IS_HTTPS: 'no'
+  ALLOW_CUSTOM_JS: 'False'
   # Overridable uwsgi settings
-  - UWSGI_PROCESSES
-  - UWSGI_THREADS
-  - PORT
-  - UWSGI_HTTP_KEEPALIVE
-  - UWSGI_HTTP_TIMEOUT
-  - UWSGI_HARAKIRI
-  - UWSGI_MAX_REQUESTS
-  - UWSGI_POST_BUFFERING
-  - UWSGI_BUFFER_SIZE
+  UWSGI_PROCESSES:
+  UWSGI_THREADS:
+  PORT:
+  UWSGI_HTTP_KEEPALIVE:
+  UWSGI_HTTP_TIMEOUT:
+  UWSGI_HARAKIRI:
+  UWSGI_MAX_REQUESTS:
+  UWSGI_POST_BUFFERING:
+  UWSGI_BUFFER_SIZE:
   # Overridable ZGW API settings
-  - ZGW_MAX_REQUESTS
-  - STATIC_ROOT_VOLUME=/srv/static
+  ZGW_MAX_REQUESTS:
+  STATIC_ROOT_VOLUME: /srv/static
   # Enabling Open Telemetry requires the services in docker/docker-compose.observability.yml
   # to be up and running.
-  - OTEL_SDK_DISABLED=${OTEL_SDK_DISABLED:-true}
-  - OTEL_RESOURCE_ATTRIBUTES=oip.target=docker-compose
-  - OTEL_METRIC_EXPORT_INTERVAL=${OTEL_METRIC_EXPORT_INTERVAL:-60000}
-  - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4317} # gRPC
+  OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED:-true}
+  OTEL_RESOURCE_ATTRIBUTES: oip.target=docker-compose
+  OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL:-60000}
+  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4317} # gRPC
   # otel:supersecret, escape spaces and = with percent encoding
-  - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic b3RlbDpzdXBlcnNlY3JldA==
-  - OTEL_EXPORTER_OTLP_METRICS_INSECURE=${OTEL_EXPORTER_OTLP_METRICS_INSECURE:-true}
-  - _OTEL_ENABLE_CONTAINER_RESOURCE_DETECTOR=true
+  OTEL_EXPORTER_OTLP_HEADERS: Authorization=Basic b3RlbDpzdXBlcnNlY3JldA==
+  OTEL_EXPORTER_OTLP_METRICS_INSECURE: ${OTEL_EXPORTER_OTLP_METRICS_INSECURE:-true}
+  _OTEL_ENABLE_CONTAINER_RESOURCE_DETECTOR: 'true'
 
 services:
   db:
@@ -190,6 +191,29 @@ services:
         # pending, the database also needs to be ready for Celery itself. We
         # therefore have the health check here, and make Celery beat and
         # monitor containers depend on the celery container.
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - openinwoner-dev
+
+  celery-low-latency:
+    build: *web_build
+    image: maykinmedia/open-inwoner:${TAG:-latest}
+    environment:
+      <<: *x-app-env
+      CELERY_WORKER_QUEUE: ${CELERY_WORKER_QUEUE:-low-latency}
+      CELERY_WORKER_CONCURRENCY: ${CELERY_WORKER_CONCURRENCY:-10}
+    command: /celery_worker.sh
+    healthcheck:
+      test: ['CMD', 'python', '/app/bin/check_celery_worker_liveness.py']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes: *web_volumes
+    depends_on:
+      web:
         condition: service_healthy
       redis:
         condition: service_started
