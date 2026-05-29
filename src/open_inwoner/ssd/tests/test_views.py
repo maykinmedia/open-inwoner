@@ -135,7 +135,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         response = self.client.post(url, data={"report_date": "1985-12-25"})
 
         messages = [str(m) for m in get_messages(response.wsgi_request)]
-        self.assertTrue(any("try again later" in m for m in messages))
+        self.assertTrue(any("Probeer het later nog eens" in m for m in messages))
 
     @patch(
         "open_inwoner.ssd.client.UitkeringClient.get_reports",
@@ -154,7 +154,7 @@ class TestMonthlyBenefitsFormView(TestCase):
         response = self.client.post(url, data={"report_date": "1985-12-25"})
 
         messages = [str(m) for m in get_messages(response.wsgi_request)]
-        self.assertTrue(any("contact the municipality" in m for m in messages))
+        self.assertTrue(any("contact op met de gemeente" in m for m in messages))
 
     @patch("open_inwoner.ssd.models.SSDConfig.get_solo")
     def test_uitkering_get_reports_not_enabled(self, mock_solo):

@@ -217,7 +217,7 @@ class NoVirusValidatorTests(TestCase):
         }
         with self.assertRaises(ValidationError) as ctx:
             NoVirusValidator()(self._uploaded_file())
-        self.assertIn("error", str(ctx.exception).lower())
+        self.assertIn("fout", str(ctx.exception).lower())
 
     def test_clamd_connection_error_raises_retry_message(self, mock_clamd_cls):
         mock_clamd_cls.return_value.instream.side_effect = clamd.ConnectionError(
@@ -225,7 +225,7 @@ class NoVirusValidatorTests(TestCase):
         )
         with self.assertRaises(ValidationError) as ctx:
             NoVirusValidator()(self._uploaded_file())
-        self.assertIn("retry", str(ctx.exception).lower())
+        self.assertIn("opnieuw", str(ctx.exception).lower())
 
     def test_unexpected_exception_raises_validation_error(self, mock_clamd_cls):
         mock_clamd_cls.return_value.instream.side_effect = OSError("broken pipe")
@@ -238,7 +238,7 @@ class NoVirusValidatorTests(TestCase):
         }
         with self.assertRaises(ValidationError) as ctx:
             NoVirusValidator()(self._uploaded_file())
-        self.assertIn("unexpected", str(ctx.exception).lower())
+        self.assertIn("onverwachte status", str(ctx.exception).lower())
 
     def test_scanner_constructed_with_config_values(self, mock_clamd_cls):
         self.config.clamav_host = "av.internal"

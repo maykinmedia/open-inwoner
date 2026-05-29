@@ -126,6 +126,8 @@ Onderhoud
   ``virtualenv`` (20.34.0 → 21.4.1).
 * [:gh:`2491`]: ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.7.0``.
 * [:cve:`CVE-2026-41305`] ``postcss`` bijgewerkt naar versie (8.5.6 → 8.5.10)
+* [:gh:`2543`]: Nederlandse vertalingen bijgewerkt: ontbrekende vertalingen toegevoegd,
+  verouderde (obsolete) vermeldingen verwijderd en fuzzy vertalingen gecorrigeerd.
 
 2.2.0 (2026-04-20)
 ==================
