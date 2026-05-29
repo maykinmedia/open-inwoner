@@ -1,7 +1,7 @@
-2.3.0-dev (2026-XX-YY)
-======================
+2.3.0 (2026-05-29)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.3.0`.
 
 Deployment aandachtspunten
 --------------------------
@@ -83,7 +83,7 @@ Bugfixes
 * [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
   wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
   het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
-  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
+  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 300 seconden), zodat de zakenlijst
   dezelfde versheid garandeert als de zaakdetailpagina.
 * [:gh:`2289`] Validate content-length in ZGW document downloads to prevent broken downloads
   when the backend returns error messages instead of file content.
