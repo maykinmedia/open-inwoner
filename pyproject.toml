@@ -184,6 +184,17 @@ tag_format = "v$version"
 version_scheme = "semver2"
 version_provider = "pep621"
 update_changelog_on_bump = true
+pre_bump_hooks = [
+    "sed -i \"s/releaseDate: '.*'/releaseDate: '$(date +%Y-%m-%d)'/\" publiccode.yaml",
+    "uv lock",
+    "pre-commit run --files pyproject.toml README.rst publiccode.yaml src/open_inwoner/conf/base.py $CZ_PRE_CHANGELOG_FILE_NAME uv.lock || true",
+    "git add -u",
+]
+version_files = [
+    "README.rst::Version: ",
+    "publiccode.yaml:softwareVersion: ",
+    'src/open_inwoner/conf/base.py:RELEASE = "v',
+]
 
 [tool.commitizen.customize]
 commit_parser = "^(?P<change_type>feat|fix|docs|style|refactor|test|build|ci|chore|revert)(?:\\((?P<scope>[^)]+)\\))?!?:\\s(?P<message>.+)"
