@@ -114,6 +114,7 @@ click==8.1.3
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   djlint
     #   typer
 click-didyoumean==0.3.0
     # via
@@ -130,6 +131,8 @@ click-repl==0.2.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   celery
+colorama==0.4.6
+    # via djlint
 commonmark==0.9.1
     # via recommonmark
 confusable-homoglyphs==3.2.0
@@ -160,6 +163,8 @@ css-inline==0.13.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mail-editor
+cssbeautifier==1.15.4
+    # via djlint
 cssselect==1.3.0
     # via
     #   -c requirements/base.txt
@@ -566,6 +571,8 @@ djangorestframework-camel-case==1.4.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   notifications-api-common
+djlint==1.36.4
+    # via -r requirements/test-tools.in
 dnspython==2.6.1
     # via
     #   -c requirements/base.txt
@@ -595,6 +602,10 @@ ecs-logging==2.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   elastic-apm
+editorconfig==0.17.1
+    # via
+    #   cssbeautifier
+    #   jsbeautifier
 elastic-apm==6.20.0
     # via
     #   -c requirements/base.txt
@@ -725,6 +736,12 @@ josepy==1.13.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc
+jsbeautifier==1.15.4
+    # via
+    #   cssbeautifier
+    #   djlint
+json5==0.12.1
+    # via djlint
 jsonschema==4.1.0
     # via
     #   -c requirements/base.txt
@@ -940,6 +957,8 @@ packaging==26.0
     #   opentelemetry-instrumentation
     #   pytest
     #   sphinx
+pathspec==0.12.1
+    # via djlint
 phonenumbers==8.13.29
     # via
     #   -c requirements/base.txt
@@ -1098,6 +1117,7 @@ pyyaml==6.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   djlint
     #   drf-spectacular
     #   gemma-zds-client
     #   pydantic-settings
@@ -1117,6 +1137,8 @@ redis==5.0.3
     #   -r requirements/base.txt
     #   celery-once
     #   django-redis
+regex==2025.9.18
+    # via djlint
 reportlab==4.4.2
     # via
     #   -c requirements/base.txt
@@ -1180,9 +1202,11 @@ six==1.16.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   click-repl
+    #   cssbeautifier
     #   django-elasticsearch-dsl
     #   furl
     #   isodate
+    #   jsbeautifier
     #   mail-parser
     #   orderedmultidict
     #   python-dateutil
@@ -1256,6 +1280,8 @@ tinyhtml5==2.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   weasyprint
+tqdm==4.67.1
+    # via djlint
 typer==0.21.1
     # via
     #   -c requirements/base.txt

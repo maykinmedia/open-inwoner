@@ -1,6 +1,5 @@
 {% extends "master.html" %}
 {% load i18n static form_tags grid_tags button_tags card_tags %}
-
 {% block content %}
     {% render_grid %}
         {% render_column start=4 span=6 %}
@@ -9,19 +8,16 @@
             {% else %}
                 <h1 class="utrecht-heading-1" id="title">{% trans "Log in" %}</h1>
             {% endif %}
-
-            <form method="POST" id="eherkenning-branch-form" class="form">
+            <form method="post" id="eherkenning-branch-form" class="form">
                 {% csrf_token %}
                 {% if form.branch_number.errors %}
                     {% errors errors=form.branch_number.errors %}
                 {% endif %}
-
                 {# React combobox with data only - translations handled by react-intl #}
                 {{ vestigingen_combobox_data|json_script:"branch-data" }}
-                <kvk-branch-selector branches-id="branch-data" label="{% trans 'Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen' %}" name="branch_number"></kvk-branch-selector>
-
+                <kvk-branch-selector branches-id="branch-data" label="{% trans "Selecteer de rechtspersoon of vestiging waarmee u wilt inloggen" %}" name="branch_number"></kvk-branch-selector>
                 <div class="form__actions form__actions--fullwidth">
-                    {% button primary=True name="submit" text=_('Ga door') title=_('Ga door met gekozen vestiging') icon="east" icon_position="after" icon_outlined=True extra_classes="button--disabled" %}
+                    {% button primary=True name="submit" text=_("Ga door") title=_("Ga door met gekozen vestiging") icon="east" icon_position="after" icon_outlined=True extra_classes="button--disabled" %}
                     {% if user.vestiging %}
                         {% button href="profile:detail" icon="west" text=_("Terug naar huidige vestiging") icon_outlined=True transparent=True %}
                     {% endif %}

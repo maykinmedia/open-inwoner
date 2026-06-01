@@ -1,13 +1,11 @@
-{% extends 'master.html' %}
-
+{% extends "master.html" %}
 {% block robots %}
     <meta name="robots" content="noindex">
 {% endblock robots %}
-
 {% block content %}
-  {% if exception %}
-    <h1 class="utrecht-heading-1">{{ exception }}</h1>
-  {% else %}
-    <h1 class="utrecht-heading-1">Sorry, you don't have access to this page (403)</h1>
-  {% endif %}
+    {% if exception %}
+        <h1 class="utrecht-heading-1">{{ exception }}</h1>
+    {% else %}
+        <h1 class="utrecht-heading-1">Sorry, you don't have access to this page (403)</h1>
+    {% endif %}
 {% endblock content %}

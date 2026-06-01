@@ -9,9 +9,9 @@
                 <span class="indicator"><a class="link secondary indicator__link" href="{{ url }}">{{ child.indicator }}</a></span>
             {% endif %}
             {% if child.children %}
-            <ul class="primary-navigation__list subpage-list">
-                {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
-            </ul>
+                <ul class="primary-navigation__list subpage-list">
+                    {% show_menu from_level to_level extra_inactive extra_active template "" "" child %}
+                </ul>
             {% endif %}
         </li>
     {% endwith %}

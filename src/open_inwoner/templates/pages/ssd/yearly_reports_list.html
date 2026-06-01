@@ -1,43 +1,46 @@
-{% extends 'pages/ssd/reports_base.html' %}
+{% extends "pages/ssd/reports_base.html" %}
 {% load i18n grid_tags form_tags button_tags icon_tags render_tags ssd_tags %}
-
 {% block report %}
-            <div class="tab--container">
-                <div class="tabs">
-                    <ul class="list tabs__headers">
-                        <li class="list-item tab__header--item"><a href="{% url 'ssd:monthly_benefits_index' %}" id="yearly" class="link tab__header">{% trans "Maandspecificaties" %}</a></li>
-                        <li class="list-item tab__header--item"><span id="yearly" class="link tab__header active" aria-current="page">{% trans "Jaaropgaven" %}</span></li>
-                    </ul>
-
-                    {% if client.config.jaaropgave_enabled is True %}
-                    <div class="tabs__body">
+    <div class="tab--container">
+        <div class="tabs">
+            <ul class="list tabs__headers">
+                <li class="list-item tab__header--item">
+                    <a href="{% url "ssd:monthly_benefits_index" %}"
+                       id="yearly"
+                       class="link tab__header">{% trans "Maandspecificaties" %}</a>
+                </li>
+                <li class="list-item tab__header--item">
+                    <span id="yearly" class="link tab__header active" aria-current="page">{% trans "Jaaropgaven" %}</span>
+                </li>
+            </ul>
+            {% if client.config.jaaropgave_enabled is True %}
+                <div class="tabs__body">
                     {# Note: Mijn uitkeringen tab-content styles need to be independent from the URL, unlike the Tabs of the Login page #}
                     {# URL-dependent styles would be coming from src/open_inwoner/js/components/tab-panels #}
                     {# Setting class to 'tab__contents' instead of 'tab__content' is a quick-fix #}
-                        <div id="maandspecificaties" class="tab__contents active">
-                            <div class="wysiwyg">
-                                {% blocktrans with jaaropgave_text=client.config.jaaropgave_display_text.html|safe %}
+                    <div id="maandspecificaties" class="tab__contents active">
+                        <div class="wysiwyg">
+                            {% blocktrans with jaaropgave_text=client.config.jaaropgave_display_text.html|safe %}
                                     {{ jaaropgave_text }}
                                 {% endblocktrans %}
-                            </div>
-                            {% render_form form=form method="POST" id="yearlyreports-form" show_required=False submit_text=_('Download') %}
-                                {% csrf_token %}
-                                {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True %}
-                                {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
-                            {% endrender_form %}
-
-                            <div>
+                        </div>
+                        {% render_form form=form method="POST" id="yearlyreports-form" show_required=False submit_text=_("Download") %}
+                            {% csrf_token %}
+                            {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True %}
+                            {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
+                        {% endrender_form %}
+                        <div>
                             {% if report_not_found %}
-                              {% blocktrans with time_period=report_not_found|date:"Y" %}
+                                {% blocktrans with time_period=report_not_found|date:"Y" %}
                                 Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                               {% endblocktrans %}
                             {% endif %}
-                            </div>
                         </div>
                     </div>
-                    {% else %}
-                        <div>{% trans "Download of yearly reports not supported." %}</div>
-                    {% endif %}
                 </div>
-            </div>
+            {% else %}
+                <div>{% trans "Download of yearly reports not supported." %}</div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock report %}

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="robots" content="noindex">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Server Error</title>
-    <style type="text/css" nonce="{{ request.csp_nonce  }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>Server Error</title>
+        <style type="text/css" nonce="{{ request.csp_nonce  }}">
 :root {
   --background-color: #fff;
   --foreground-color: #333;
@@ -125,16 +125,13 @@ p.lead {
   }
 }
 
-    </style>
-
-</head>
-
-<body>
-  <h1 class="utrecht-heading-1">Sorry, a server error has occurred (500)</h1>
-  <p class="lead">We have been automatically notified about the problem and will investigate as soon as possible.</p>
-  <p class="lead">
-    <a href="/" class="button">Back to home</a>
-  </p>
-</body>
-
+        </style>
+    </head>
+    <body>
+        <h1 class="utrecht-heading-1">Sorry, a server error has occurred (500)</h1>
+        <p class="lead">We have been automatically notified about the problem and will investigate as soon as possible.</p>
+        <p class="lead">
+            {# djlint:off D018 #}<a href="/" class="button">Back to home</a>{# djlint:on D018 #}
+        </p>
+    </body>
 </html>

@@ -1,10 +1,7 @@
-{% extends 'base_pdf.html' %}
+{% extends "base_pdf.html" %}
 {% load i18n link_tags file_tags helpers %}
-
 {% block content %}
-
     <h1 class="utrecht-heading-1">{% trans "Plan" %} {{ object.title }}</h1>
-
     <table class="table">
         <tr>
             <th class="table__header">{% trans "Title" %}</th>
@@ -39,14 +36,10 @@
             <td class="table__item">{{ object.updated_at }}</td>
         </tr>
     </table>
-
-
     <h2 class="utrecht-heading-2 utrecht-heading-2--extra">{% trans "Bestanden" %}</h2>
     {% if object.get_all_files %}
         {% file_table files=object.get_all_files download_view="profile:documents_download" %}
     {% endif %}
-
     <h2 class="utrecht-heading-2 utrecht-heading-2--extra">{% trans "Acties" %}</h2>
     {% include "export/include/actions.html" with actions=object.actions.visible %}
-
-{% endblock %}
+{% endblock content %}

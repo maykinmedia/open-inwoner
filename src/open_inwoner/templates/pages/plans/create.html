@@ -1,6 +1,5 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags string_tags link_tags %}
-
 {% block content %}
     <div class="plan-create">
         <div class="plan-template__header">
@@ -11,9 +10,7 @@
                 {% endif %}
             </div>
         </div>
-
         {% optional_paragraph configurable_text.plans_page.plans_intro %}
-
         {% render_grid %}
             {% render_column start=4 span=6 %}
                 {% if request.user.get_active_contacts %}
@@ -22,20 +19,17 @@
                         {% input form.title %}
                         {% input form.goal %}
                         {% input form.description %}
-
                         {# TODO: create new model field to add a File to the plan #}
                         {# {% input form.file %} #}
-
                         {% date_field form.end_date icon="calendar_today" icon_position="after" %}
                         <div class="plan__contacts">
-                            <nl-paragraph>{% trans 'Contactpersoon' %}</nl-paragraph>
+                            <nl-paragraph>{% trans "Contactpersoon" %}</nl-paragraph>
                             {% checkboxes form.plan_contacts %}
                         </div>
-
                         <div>
-                        {% if form.template.errors %}
-                            {% errors errors=form.template.errors %}
-                        {% endif %}
+                            {% if form.template.errors %}
+                                {% errors errors=form.template.errors %}
+                            {% endif %}
                         </div>
                         <div class="form__actions form__actions--fullwidth">
                             {% button text=_("Maak samenwerking aan") primary=True type="submit" %}
@@ -44,12 +38,11 @@
                     {% endrender_form %}
                 {% else %}
                     <nl-paragraph>
-                        {% url 'profile:contact_create' as contact_create %}
-                        {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
+                    {% url "profile:contact_create" as contact_create %}
+                    {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
                     </nl-paragraph>
                 {% endif %}
-
             {% endrender_column %}
         {% endrender_grid %}
     </div>
-{% endblock %}
+{% endblock content %}

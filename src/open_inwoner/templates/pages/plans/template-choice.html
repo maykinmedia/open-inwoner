@@ -1,53 +1,55 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n button_tags card_tags map_tags form_tags grid_tags icon_tags string_tags link_tags %}
-
 {% block content %}
     <div class="plan-create">
         <h1 class="utrecht-heading-1">{% trans "Kies een voorstel" %}</h1>
         {% optional_paragraph configurable_text.plans_page.plans_intro %}
-
         {% if request.user.get_active_contacts %}
-
             {% render_form id="template-choice-form" form=form method="POST" %}
                 {% csrf_token %}
-
                 <div class="plan-template">
                     <div class="plan-template__header">
                         <span class="plan-tag">{% trans "Voorgesteld" %}</span>
                         <div class="plan-template__header-nav">
-                                {% button href="collaborate:plan_create" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
+                            {% button href="collaborate:plan_create" text=_("Zelf in te vullen samenwerking") primary=True transparent=True extra_classes="link--bold" icon="insert_drive_file" icon_outlined=True %}
                         </div>
                     </div>
-
                     <div class="plan-template__options">
                         <ul class="choice-list choice-list--single">
-
                             {% for plan_template in templates %}
                                 <li class="choice-list__item">
                                     <label class="choice-list__label">
-                                        <input type="radio" id="id_template_{{ plan_template.id }}" name="template" value="{{ plan_template.id }}" class="choice-list__radio">
+                                        <input type="radio"
+                                               id="id_template_{{ plan_template.id }}"
+                                               name="template"
+                                               value="{{ plan_template.id }}"
+                                               class="choice-list__radio">
                                         <div class="choice-list__content">
                                             <h3 class="utrecht-heading-4">{{ plan_template.name }}</h3>
                                             <div>
-                                                <span class="choice-list__p">{% trans 'Dit sjabloon bevat:' %}</span>
+                                                <span class="choice-list__p">{% trans "Dit sjabloon bevat:" %}</span>
                                                 <ul class="list--styled">
                                                     {% if plan_template.goal %}
-                                                        <li class="li">{% trans 'Doel:' %}
+                                                        <li class="li">
+                                                            {% trans "Doel:" %}
                                                             {{ plan_template.goal|truncatewords:8 }}
                                                         </li>
                                                     {% endif %}
                                                     {% if plan_template.file %}
-                                                        <li class="li">{% trans 'Bestand' %}
+                                                        <li class="li">
+                                                            {% trans "Bestand" %}
                                                             "{{ plan_template.file }}"
                                                         </li>
                                                     {% endif %}
                                                     {% if plan_template.actiontemplates %}
-                                                        <li class="li">{{ plan_template.actiontemplates.all|length }} {% trans 'actie(s):' %}</li>
+                                                        <li class="li">{{ plan_template.actiontemplates.all|length }} {% trans "actie(s):" %}</li>
                                                     {% endif %}
                                                 </ul>
                                             </div>
                                             <div class="plan-template__icon">
-                                                <button class="button button--textless button--icon button--transparent show-preview" type="button" data-id="template-{{ plan_template.id }}">
+                                                <button class="button button--textless button--icon button--transparent show-preview"
+                                                        type="button"
+                                                        data-id="template-{{ plan_template.id }}">
                                                     {% icon icon="visibility" outlined=True %} Bekijk voorstel
                                                 </button>
                                             </div>
@@ -55,12 +57,9 @@
                                     </label>
                                 </li>
                             {% endfor %}
-
                         </ul>
                     </div>
-
                 </div>
-
                 {% for plan_template in templates %}
                     <div class="modal modal--no-reset" id="template-{{ plan_template.id }}">
                         <div class="modal__container">
@@ -82,24 +81,20 @@
                         </div>
                     </div>
                 {% endfor %}
-
                 {% if form.template.errors %}
                     {% errors errors=form.template.errors %}
                 {% endif %}
-
-{#                {% form_actions nogrid=True primary_text=_("Gebruik dit voorstel") %}#}
+                {#                {% form_actions nogrid=True primary_text=_("Gebruik dit voorstel") %}#}
                 <div class="form__actions form__actions--fullwidth">
                     {% button text=_("Gebruik dit voorstel") primary=True type="submit" extra_classes="modal__close" %}
                     {% button href="collaborate:plan_list" icon="west" text=_("Terug naar Mijn samenwerkingen") icon_outlined=True transparent=True %}
                 </div>
             {% endrender_form %}
-
         {% else %}
             <nl-paragraph>
-                {% url 'profile:contact_create' as contact_create %}
-                {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
+            {% url "profile:contact_create" as contact_create %}
+            {% link href=contact_create text=_("Maak uw eerste contact aan voordat u een samenwerking start") icon="arrow_forward" icon_position="after" primary=True %}
             </nl-paragraph>
         {% endif %}
     </div>
-
-{% endblock %}
+{% endblock content %}

@@ -1,16 +1,14 @@
 {% load i18n solo_tags form_tags button_tags icon_tags %}
-
-{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
-
+{% get_solo "openzaak.OpenZaakConfig" as openzaak_config %}
 <div id="form_upload">
-{% render_form id="document-upload" form=form method="POST" form_action=form_action enctype="multipart/form-data" submit_text=_("Bestand uploaden") extra_classes="file-input-form" %}
-    {% csrf_token %}
-    {# Name of the file is a hidden input #}
-    {% file_input form.file multiple=False primary_text=_("Upload document") max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
-    <div class="non-field-error" hidden>
-        <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">
+    {% render_form id="document-upload" form=form method="POST" form_action=form_action enctype="multipart/form-data" submit_text=_("Bestand uploaden") extra_classes="file-input-form" %}
+        {% csrf_token %}
+        {# Name of the file is a hidden input #}
+        {% file_input form.file multiple=False primary_text=_("Upload document") max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
+        <div class="non-field-error" hidden>
+            <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">
             {% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}
-        </nl-paragraph>
-    </div>
-{% endrender_form %}
+            </nl-paragraph>
+        </div>
+    {% endrender_form %}
 </div>

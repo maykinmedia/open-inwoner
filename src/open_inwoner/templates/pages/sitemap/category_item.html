@@ -1,12 +1,10 @@
 {% load i18n list_tags icon_tags %}
-
 <li class="utrecht-unordered-list__item">
     {# include root category #}
     <a href="{{ node.category.get_absolute_url }}" class="link--secondary">
         {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
         <span class="link__text">{% trans node.category.name %}</span>
     </a>
-
     {# include products #}
     {% if node.products %}
         <ul class="utrecht-unordered-list utrecht-unordered-list--nested">
@@ -20,7 +18,6 @@
             {% endfor %}
         </ul>
     {% endif %}
-
     {# recursively include sub-categories #}
     {% if node.sub_categories %}
         <ul class="utrecht-unordered-list utrecht-unordered-list--nested">

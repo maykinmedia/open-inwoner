@@ -1,43 +1,49 @@
-{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
-<html
-    lang="nl"
-    class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
->
+{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}
+<!DOCTYPE html>
+<html lang="nl"
+      class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock view_class %}">
     <head>
         <meta charset="utf-8">
         {% block robots %}
-            <meta name="robots" content="{% if enable_crawler_indexing %}all{% else %}noindex{% endif %}">
+            <meta name="robots"
+                  content="{% if enable_crawler_indexing %}all{% else %}noindex{% endif %}">
         {% endblock robots %}
         <meta name="format-detection" content="telephone=no">
-        <title>{% block title %}{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}{% endblock %}</title>
+        <title>
+            {% block title %}
+                {% if page_title %}{{ page_title }} -{% endif %}
+                {{ site_name }}
+            {% endblock title %}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <meta property="og:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
-        <meta name="twitter:title" content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        <meta property="og:title"
+              content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
+        <meta name="twitter:title"
+              content="{% if page_title %}{{ page_title }} - {% endif %}{{ site_name }}">
         {% if meta_description %}
             <meta property="og:description" content="{{ meta_description }}">
             <meta name="twitter:description" content="{{ meta_description }}">
-            <meta name="description" content="{{ meta_description }}"/>
+            <meta name="description" content="{{ meta_description }}" />
         {% endif %}
         {% if meta_image_url %}
             <meta property="og:image" content="{{ meta_image_url }}">
-            <meta name="twitter:image" content="{{ meta_image_url  }}">
+            <meta name="twitter:image" content="{{ meta_image_url }}">
         {% endif %}
-        {% if meta_page_url %}
-            <meta property="og:url" content="{{ meta_page_url }}">
-        {% endif %}
+        {% if meta_page_url %}<meta property="og:url" content="{{ meta_page_url }}">{% endif %}
         <meta property="og:type" content="article">
-
-        <script nonce="{{ request.csp_nonce }}">
-            window.NONCE = "{{ request.csp_nonce }}";
-        </script>
-
-        {% if favicon %}<link rel="icon" href="{{ favicon }}" />
-        <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
-
-        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
-        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-frontend.css' %}" media="all" rel="stylesheet" />
-
+        <script nonce="{{ request.csp_nonce }}">window.NONCE = "{{ request.csp_nonce }}";</script>
+        {% if favicon %}
+            <link rel="icon" href="{{ favicon }}" />
+            <link rel="apple-touch-icon" href="{{ favicon }}">
+        {% endif %}
+        <link nonce="{{ request.csp_nonce }}"
+              href="{% static "bundles/open_inwoner-css.css" %}"
+              media="all"
+              rel="stylesheet" />
+        <link nonce="{{ request.csp_nonce }}"
+              href="{% static "bundles/open_inwoner-frontend.css" %}"
+              media="all"
+              rel="stylesheet" />
         <style nonce="{{ request.csp_nonce }}">
             :root {
                 --color-primary-h: {{theming.primary.0}};
@@ -56,147 +62,151 @@
         </style>
         {% render_block "css" %}
         {% if theme_stylesheet %}
-            <link id="theme-css" nonce="{{ request.csp_nonce }}" media="all" rel="stylesheet" href="{{ theme_stylesheet }}" />
+            <link id="theme-css"
+                  nonce="{{ request.csp_nonce }}"
+                  media="all"
+                  rel="stylesheet"
+                  href="{{ theme_stylesheet }}" />
         {% endif %}
-        {% block extra_css %}{% endblock %}
-        {% if extra_css %}
-            <style id="extra-css" nonce="{{ request.csp_nonce }}">
-                {{ extra_css }}
-            </style>
-        {% endif %}
+        {% block extra_css %}
+        {% endblock extra_css %}
+        {% if extra_css %}<style id="extra-css" nonce="{{ request.csp_nonce }}">{{ extra_css }}</style>{% endif %}
         {% block custom_scripts %}
             {% if custom_javascript_url %}
-                <script nonce="{{ request.csp_nonce }}" src="{{ custom_javascript_url }}" defer></script>
+                <script nonce="{{ request.csp_nonce }}"
+                        src="{{ custom_javascript_url }}"
+                        defer></script>
             {% endif %}
         {% endblock custom_scripts %}
-        {% block extra_head %}{% endblock %}
-    {% include "analytics/siteimprove.html" %}
-	{% if request|cookies_accepted %}
-	  {% include "analytics/google.html" %}
-	  {% include "analytics/matomo.html" %}
-	{% endif %}
+        {% block extra_head %}
+        {% endblock extra_head %}
+        {% include "analytics/siteimprove.html" %}
+        {% if request|cookies_accepted %}
+            {% include "analytics/google.html" %}
+            {% include "analytics/matomo.html" %}
+        {% endif %}
     </head>
-
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="utrecht-page">
-        {% get_solo 'configurations.SiteConfiguration' as config %}
-
+        {% get_solo "configurations.SiteConfiguration" as config %}
         {% if cookiebanner_enabled %}
-        {# render cookiebanner first #}
-        <div class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-banner__title" aria-describedby="cookie-banner__text">
-            <div class="cookie-banner__container">
-                <div class="cookie-banner__text" id="cookie-banner__text">
-                    {{cookie_info_text}} <span class="cookie-banner__link" id="cookie-banner__link">{% link href=cookie_link_url text=cookie_link_text secondary=True extra_classes="link--cookie" %}</span></div>
-                <div class="cookie-banner__actions" id="cookie-banner__actions">
-                    {% button_row %}
-                        {% button text=_("Alles weigeren") name="cookie_reject" secondary=True bordered=True id="reject-button" extra_classes="cookie-banner__reject reject-button" %}
-                        {% button text=_("Alles toestaan") name="cookie_approve" primary=True id="accept-button" extra_classes="cookie-banner__confirm accept-button" %}
-                    {% endbutton_row %}
+            {# render cookiebanner first #}
+            <div class="cookie-banner"
+                 id="cookie-banner"
+                 aria-labelledby="cookie-banner__title"
+                 aria-describedby="cookie-banner__text">
+                <div class="cookie-banner__container">
+                    <div class="cookie-banner__text" id="cookie-banner__text">
+                        {{ cookie_info_text }} <span class="cookie-banner__link" id="cookie-banner__link">{% link href=cookie_link_url text=cookie_link_text secondary=True extra_classes="link--cookie" %}</span>
+                    </div>
+                    <div class="cookie-banner__actions" id="cookie-banner__actions">
+                        {% button_row %}
+                            {% button text=_("Alles weigeren") name="cookie_reject" secondary=True bordered=True id="reject-button" extra_classes="cookie-banner__reject reject-button" %}
+                            {% button text=_("Alles toestaan") name="cookie_approve" primary=True id="accept-button" extra_classes="cookie-banner__confirm accept-button" %}
+                        {% endbutton_row %}
+                    </div>
                 </div>
             </div>
-        </div>
         {% endif %}
-
         {% include "components/Header/AccessibilitySkipLink.html" %}
-
         {% if warning_banner_enabled %}
-          {% include "components/Header/WarningHeader.html" %}
+            {% include "components/Header/WarningHeader.html" %}
         {% endif %}
-
         {% cms_toolbar %}
-
         {# render the cms menu and save for display in both mobile and desktop #}
         {% capture as rendered_cms_menu__home %}
             {% show_menu_below_id "home" 0 100 100 100 "cms/menu/primary.html" %}
         {% endcapture %}
         {% include "components/Header/Header.html" %}
-
         {# javascript and the form-attribute are used to connect various forms and controls to this invisible form #}
         {% if config.search_enabled %}
-            <form id="search-form" class="form--hidden" method="GET" action="{% url 'search:search' %}" novalidate="">
-                <input name="query" type="hidden" value="{% firstof search_form.query.value "" %}">
+            <form id="search-form"
+                  class="form--hidden"
+                  method="get"
+                  action="{% url "search:search" %}"
+                  novalidate="">
+                <input name="query"
+                       type="hidden"
+                       value="{% firstof search_form.query.value "" %}">
             </form>
         {% endif %}
-
         {% if anchors and not custom_anchors %}
             {% anchor_menu anchors=anchors desktop=False %}
-                {% block extra_mobile_anchor %}{% endblock extra_mobile_anchor %}
-            {% endanchor_menu%}
-        {% elif custom_anchors%}
+                {% block extra_mobile_anchor %}
+                {% endblock extra_mobile_anchor %}
+            {% endanchor_menu %}
+        {% elif custom_anchors %}
             {% block mobile_anchors %}
             {% endblock mobile_anchors %}
         {% endif %}
-
         {% render_breadcrumbs "components/Header/Breadcrumbs.html" %}
-
-        {% block header_image %}{% endblock header_image %}
-
+        {% block header_image %}
+        {% endblock header_image %}
         {% block notifications %}
-            <div class="container container--no-margin">
-                {% notifications messages closable=True %}
-            </div>
-        {% endblock %}
-
+            <div class="container container--no-margin">{% notifications messages closable=True %}</div>
+        {% endblock notifications %}
         {% block main_outer %}
             <main id="content" class="container">
                 {% block main_inner %}
-                    <div class="grid{% block grid_class %}{% endblock %}">
-                        {% spaceless %}<div class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</div>{% endspaceless %}
-
+                    <div class="grid{% block grid_class %}{% endblock grid_class %}">
+                        {% spaceless %}
+                            <div class="grid__sidebar">
+                                {% block sidebar_content %}
+                                {% endblock sidebar_content %}
+                            </div>
+                        {% endspaceless %}
                         <div class="grid__main">
-                            {% block content %}Please provide the content{% endblock content %}
+                            {% block content %}
+                                Please provide the content
+                            {% endblock content %}
                         </div>
-
-                        {% block extra_grid %}{% endblock extra_grid %}
+                        {% block extra_grid %}
+                        {% endblock extra_grid %}
                     </div>
                 {% endblock main_inner %}
             </main>
         {% endblock main_outer %}
-
         {% if footer %}
-        <footer class="footer">
-            {% if footer.logo_title or footer.logo %}
-            <div class="footer__header">
-                {% if footer.logo_title %}
-                    <div class="footer__logo-text">
-                        <nl-paragraph>{{ footer.logo_title|linebreaksbr }}</nl-paragraph>
+            <footer class="footer">
+                {% if footer.logo_title or footer.logo %}
+                    <div class="footer__header">
+                        {% if footer.logo_title %}
+                            <div class="footer__logo-text">
+                                <nl-paragraph>{{ footer.logo_title|linebreaksbr }}</nl-paragraph>
+                            </div>
+                        {% endif %}
+                        {% if footer.logo and footer.logo.url %}
+                            <div class="footer__logo">
+                                {% firstof footer.logo.default_alt_text config.name as footer_logo_alt_text %}
+                                {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer_logo_alt_text href=footer.logo_url svg_height=60 only %}
+                            </div>
+                        {% endif %}
                     </div>
                 {% endif %}
-                {% if footer.logo and footer.logo.url %}
-                    <div class="footer__logo">
-                        {% firstof footer.logo.default_alt_text config.name as footer_logo_alt_text %}
-                        {% include "components/Logo/Logo.html" with src=footer.logo.url alt=footer_logo_alt_text href=footer.logo_url svg_height=60 only %}
+                <div class="footer__left wysiwyg">{% static_alias "footer_left" %}</div>
+                <div class="footer__center wysiwyg">{% static_alias "footer_center" %}</div>
+                <div class="footer__right wysiwyg">{% static_alias "footer_right" %}</div>
+                {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
+                    <div class="kcm-survey">
+                        {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
                     </div>
                 {% endif %}
-            </div>
-            {% endif %}
-            <div class="footer__left wysiwyg">{% static_alias "footer_left" %}</div>
-            <div class="footer__center wysiwyg">{% static_alias "footer_center" %}</div>
-            <div class="footer__right wysiwyg">{% static_alias "footer_right" %}</div>
-
-            {% if config.kcm_survey_link_url and config.kcm_survey_link_text %}
-                <div class="kcm-survey">
-                    {% link bold=True href=config.kcm_survey_link_url text=config.kcm_survey_link_text blank=True hide_external_icon=True %}
-                </div>
-            {% endif %}
-
-        </footer>
+            </footer>
         {% endif %}
-
         {% session_timeout %}
-
         {% include "components/Modal/Modal.html" %}
-
         {% render_block "js" %}
-        {% block extra_js %}{% endblock %}
-
+        {% block extra_js %}
+        {% endblock extra_js %}
         {% if debug %}
-        {# Enables Dev only console logs, like for Siteimprove testing #}
-        <script nonce="{{ request.csp_nonce }}">
-            window.IS_DEV = true;
-        </script>
+            {# Enables Dev only console logs, like for Siteimprove testing #}
+            <script nonce="{{ request.csp_nonce }}">window.IS_DEV = true;</script>
         {% endif %}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
+        <script nonce="{{ request.csp_nonce }}"
+                src="{% static "bundles/open_inwoner-js.js" %}"
+                type="module"></script>
         {# Including this script will allow the page to use the preact web-components #}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-frontend.js' %}" type="module"></script>
+        <script nonce="{{ request.csp_nonce }}"
+                src="{% static "bundles/open_inwoner-frontend.js" %}"
+                type="module"></script>
     </body>
 </html>

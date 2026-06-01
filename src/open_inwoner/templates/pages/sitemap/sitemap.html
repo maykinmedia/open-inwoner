@@ -1,9 +1,7 @@
 {% extends "master.html" %}
 {% load i18n list_tags icon_tags %}
-
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans "Links naar pagina's op " %}{{ site_name }}</h1>
-
     <div class="sitemap">
         {# All pages - flat list, alphabetically sorted #}
         <section class="sitemap__section">
@@ -25,13 +23,12 @@
                 {% endfor %}
             </ul>
         </section>
-
         {# Onderwerpen - separate section with category tree #}
         {% if category_nodes %}
             <section class="sitemap__section">
                 <ul class="utrecht-unordered-list">
                     <li class="utrecht-unordered-list__item">
-                        <a href="{% url 'products:category_list' %}" class="link--secondary">
+                        <a href="{% url "products:category_list" %}" class="link--secondary">
                             {% icon icon="chevron_right" icon_position="before" primary=True outlined=True %}
                             <span class="link__text">{% trans "Onderwerpen" %}</span>
                         </a>

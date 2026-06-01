@@ -1,101 +1,107 @@
 {% load i18n button_tags icon_tags render_tags %}
-
 {% if zaak.statuses %}
-<h2 class="utrecht-heading-2" id="statuses">{% trans 'Status' %}</h2>
-
-<aside class="status-list" aria-label="{% trans "Status lijst" %}">
-    <ul class="status-list__list">
-        {% for status in zaak.statuses %}
-
-            {% if forloop.last %}
-                {# Current active status class #}
-                <li class="status-list__list-item {% if zaak.end_statustype_data %}status--current status-list__list-item--{{ status.status_indicator }} status--open{% endif %} {# Final status class #}{% if not zaak.end_statustype_data %}status--final status-list__list-item--info status--open{% endif %}">
-                {% firstof zaak.id|slugify as id %}
-                {% firstof 'content-'|add:id|add:'-id' as content_id %}
-                    {% icon icon="circle" extra_classes="status-step" %}
-                    <span class="sr-only">{% trans "Niet voltooid" %}</span>
-                    <div class="status-list__notification status-list__notification--{{ status.status_indicator }}">
-                        <h3 class="utrecht-heading-3 utrecht-accordion__header">
-                            {# Interactive accordion when case is ongoing, and active status is shown as expanded  #}
-                            {% if zaak.end_statustype_data %}
-                                <button class="button--borderless status-list__button" aria-controls="{{ content_id }}" aria-expanded="true" id="{{ id }}">
-                                    <span class="link link--bold">{{ status.label }}</span>
-                                    {% icon icon="expand_more" icon_position="after" outlined=True %}
-                                </button>{% endif %}
-
-                            {# Non-interactive element when case is finalized #}
-                            {% if not zaak.end_statustype_data %}
-                                <span class="status-list__open-paragraph" id="{{ id }}">
-                                    {{ status.label }}
-                                </span>
-                            {% endif %}
-                        </h3>
-
-                        <div class="status-list__notification-content {% if zaak.end_statustype_data %}status-content--open{% endif %} {% if not zaak.end_statustype_data %}status-content--open{% endif %}" id="{{ content_id }}">
-                            <nl-paragraph class-name="status-list__text">
+    <h2 class="utrecht-heading-2" id="statuses">{% trans "Status" %}</h2>
+    <aside class="status-list" aria-label="{% trans "Status lijst" %}">
+        <ul class="status-list__list">
+            {% for status in zaak.statuses %}
+                {% if forloop.last %}
+                    {# Current active status class #}
+                    <li class="status-list__list-item {% if zaak.end_statustype_data %}status--current status-list__list-item--{{ status.status_indicator }} status--open{% endif %} {# Final status class #}{% if not zaak.end_statustype_data %}status--final status-list__list-item--info status--open{% endif %}">
+                        {% firstof zaak.id|slugify as id %}
+                        {% firstof "content-"|add:id|add:"-id" as content_id %}
+                        {% icon icon="circle" extra_classes="status-step" %}
+                        <span class="sr-only">{% trans "Niet voltooid" %}</span>
+                        <div class="status-list__notification status-list__notification--{{ status.status_indicator }}">
+                            <h3 class="utrecht-heading-3 utrecht-accordion__header">
+                                {# Interactive accordion when case is ongoing, and active status is shown as expanded  #}
+                                {% if zaak.end_statustype_data %}
+                                    <button class="button--borderless status-list__button"
+                                            aria-controls="{{ content_id }}"
+                                            aria-expanded="true"
+                                            id="{{ id }}">
+                                        <span class="link link--bold">{{ status.label }}</span>
+                                        {% icon icon="expand_more" icon_position="after" outlined=True %}
+                                    </button>
+                                {% endif %}
+                                {# Non-interactive element when case is finalized #}
+                                {% if not zaak.end_statustype_data %}
+                                    <span class="status-list__open-paragraph" id="{{ id }}">{{ status.label }}</span>
+                                {% endif %}
+                            </h3>
+                            <div class="status-list__notification-content {% if zaak.end_statustype_data %}status-content--open{% endif %} {% if not zaak.end_statustype_data %}status-content--open{% endif %}"
+                                 id="{{ content_id }}">
+                                <nl-paragraph class-name="status-list__text">
                                 {% if zaak.end_statustype_data %}<span>{{ status.description|default:""|prosemirror_content|safe }}</span>{% endif %}
-                                {% if not zaak.end_statustype_data %}<span class="status--result">{{ zaak.result_description|default:"" }}</span>{% endif %}
-                            </nl-paragraph>
-                            <nl-paragraph class-name="status-list__date">{{ status.date|date }}</nl-paragraph>
-                            {% if status.call_to_action_url %}
-                                {% button href=status.call_to_action_url text=status.call_to_action_text title=status.call_to_action_text primary=True icon="arrow_forward" icon_position="after" %}
-                            {% else %}
-                                <nl-paragraph class-name="status-list__upload {% if zaak.end_statustype_data %}status-list__upload--enabled{% endif %}">
-                                {% if zaak.internal_upload_enabled or zaak.external_upload_enabled %}
-                                    {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
+                                {% if not zaak.end_statustype_data %}
+                                    <span class="status--result">{{ zaak.result_description|default:"" }}</span>
                                 {% endif %}
                                 </nl-paragraph>
-                            {% endif %}
+                                <nl-paragraph class-name="status-list__date">{{ status.date|date }}</nl-paragraph>
+                                {% if status.call_to_action_url %}
+                                    {% button href=status.call_to_action_url text=status.call_to_action_text title=status.call_to_action_text primary=True icon="arrow_forward" icon_position="after" %}
+                                {% else %}
+                                    <nl-paragraph class-name="status-list__upload
+                                    {% if zaak.end_statustype_data %}status-list__upload--enabled{% endif %}
+                                    ">
+                                    {% if zaak.internal_upload_enabled or zaak.external_upload_enabled %}
+                                        {% button href="#documents-upload" text=_("Scroll omlaag") title=_("Ga direct naar document upload sectie.") primary=True icon="arrow_downward" icon_position="after" %}
+                                    {% endif %}
+                                    </nl-paragraph>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                </li>
-
-            {% else %}
-                {# Completed past statuses #}
-                <li class="status--completed status-list__list-item">
-                {% firstof zaak.id|slugify as id %}
-                {% firstof 'completed-'|add:id|add:'-id' as completed_id %}
-                    {% icon icon="task_alt" %}
-                    <span class="sr-only">{% trans "Voltooid" %}</span>
-                    <div class="status-list__notification">
-                        <h3 class="utrecht-heading-3 utrecht-accordion__header">
-                            <button class="status-list__button button--borderless" aria-controls="{{ completed_id }}" aria-expanded="false" id="{{ id }}"><span class="link link-success">{{ status.label }}</span>{% icon icon="expand_more" icon_position="after" outlined=True %}</button>
-                        </h3>
-                        <div class="status-list__notification-content" id="{{ completed_id }}">
-                            <nl-paragraph class-name="status-list__text">
+                    </li>
+                {% else %}
+                    {# Completed past statuses #}
+                    <li class="status--completed status-list__list-item">
+                        {% firstof zaak.id|slugify as id %}
+                        {% firstof "completed-"|add:id|add:"-id" as completed_id %}
+                        {% icon icon="task_alt" %}
+                        <span class="sr-only">{% trans "Voltooid" %}</span>
+                        <div class="status-list__notification">
+                            <h3 class="utrecht-heading-3 utrecht-accordion__header">
+                                <button class="status-list__button button--borderless"
+                                        aria-controls="{{ completed_id }}"
+                                        aria-expanded="false"
+                                        id="{{ id }}">
+                                    <span class="link link-success">{{ status.label }}</span>{% icon icon="expand_more" icon_position="after" outlined=True %}
+                                </button>
+                            </h3>
+                            <div class="status-list__notification-content" id="{{ completed_id }}">
+                                <nl-paragraph class-name="status-list__text">
                                 {# Configurable texts #}
                                 <span>{{ status.description|default:""|prosemirror_content|safe }}</span>
-                            </nl-paragraph>
-                            <nl-paragraph class-name="status-list__date">{{ status.date|date }}</nl-paragraph>
+                                </nl-paragraph>
+                                <nl-paragraph class-name="status-list__date">{{ status.date|date }}</nl-paragraph>
+                            </div>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {# Preview of upcoming second status #}
+            {% if zaak.second_status_preview %}
+                <li class="status--future status-list__list-item status-list__list-item--future">
+                    {% icon icon="circle_outlined" outlined=True %}
+                    <span class="sr-only">{% trans "Toekomstige status" %}</span>
+                    <div class="status-list__notification status-list__notification">
+                        <div class="status-list__open">
+                            <span class="link link-future">{{ zaak.second_status_preview.omschrijving }}</span>
                         </div>
                     </div>
                 </li>
             {% endif %}
-        {% endfor %}
-
-        {# Preview of upcoming second status #}
-        {% if zaak.second_status_preview %}
-            <li class="status--future status-list__list-item status-list__list-item--future">
-                {% icon icon="circle_outlined" outlined=True %}
-                <span class="sr-only">{% trans "Toekomstige status" %}</span>
-                <div class="status-list__notification status-list__notification">
-                    <div class="status-list__open"><span class="link link-future">{{ zaak.second_status_preview.omschrijving }}</span></div>
-                </div>
-            </li>
-        {% endif %}
-
-        {# Future end status #}
-        {% if zaak.end_statustype_data %}
-            <li class="status--future status-list__list-item status-list__list-item--future">
-                {% icon icon="circle_outlined" outlined=True %}
-                <span class="sr-only">{% trans "Toekomstige voltooide status" %}</span>
-                <div class="status-list__notification status-list__notification--future">
-                    <div class="status-list__open"><span class="link link-future">{{ zaak.end_statustype_data.label }}</span></div>
-                </div>
-            </li>
-        {% endif %}
-
-    </ul>
-</aside>
-
+            {# Future end status #}
+            {% if zaak.end_statustype_data %}
+                <li class="status--future status-list__list-item status-list__list-item--future">
+                    {% icon icon="circle_outlined" outlined=True %}
+                    <span class="sr-only">{% trans "Toekomstige voltooide status" %}</span>
+                    <div class="status-list__notification status-list__notification--future">
+                        <div class="status-list__open">
+                            <span class="link link-future">{{ zaak.end_statustype_data.label }}</span>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+    </aside>
 {% endif %}
