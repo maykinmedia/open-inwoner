@@ -143,7 +143,7 @@ SOLO_CACHE = None
 TWO_FACTOR_PATCH_ADMIN = False
 
 # Disable two-factor authentication by default for development
-if config("DISABLE_2FA", default=True, cast=bool):
+if config("DISABLE_2FA", default=True):
     MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = AUTHENTICATION_BACKENDS
 
 # playwright multi browser

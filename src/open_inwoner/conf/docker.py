@@ -15,5 +15,5 @@ os.environ.setdefault("LOG_FORMAT_CONSOLE", "json")
 
 from .production import *  # noqa isort:skip
 
-if config("DISABLE_2FA", default=False, cast=bool):
+if config("DISABLE_2FA", default=False):
     MAYKIN_2FA_ALLOW_MFA_BYPASS_BACKENDS = AUTHENTICATION_BACKENDS
