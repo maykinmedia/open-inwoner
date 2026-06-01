@@ -2,16 +2,16 @@
 {% load i18n button_tags grid_tags link_tags icon_tags pagination_tags action_tags %}
 {% block content %}
     {% render_grid %}
-    {% render_column span=9 %}
-    <h1 class="utrecht-heading-1" id="title">
-        {% trans "Mijn acties" %}
-        {% button href="profile:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
-    </h1>
-    {% button_row align="right" %}
-    {% button href="profile:action_list_export" text=_("Exporteer naar PDF") hide_text=True icon="file-pdf" icon_outlined=True transparent=True secondary=True %}
-{% endbutton_row %}
-{% actions actions=actions request=request action_form=action_form show_plans=show_plans %}
-{% pagination page_obj=page_obj paginator=paginator request=request href="profile:detail" text=_("Terug naar mijn profiel") %}
-{% endrender_column %}
-{% endrender_grid %}
+        {% render_column span=9 %}
+            <h1 class="utrecht-heading-1" id="title">
+                {% trans "Mijn acties" %}
+                {% button href="profile:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
+            </h1>
+            {% button_row align="right" %}
+                {% button href="profile:action_list_export" text=_("Exporteer naar PDF") hide_text=True icon="file-pdf" icon_outlined=True transparent=True secondary=True %}
+            {% endbutton_row %}
+            {% actions actions=actions request=request action_form=action_form show_plans=show_plans %}
+            {% pagination page_obj=page_obj paginator=paginator request=request href="profile:detail" text=_("Terug naar mijn profiel") %}
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}

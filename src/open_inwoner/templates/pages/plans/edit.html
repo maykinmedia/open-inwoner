@@ -4,14 +4,14 @@
     <h1 class="utrecht-heading-1">{% trans "Samenwerken" %}</h1>
     {% optional_paragraph configurable_text.plans_page.plans_intro %}
     {% render_form id="plan-form" form=form method="POST" %}
-    {% csrf_token %}
-    {% input form.title %}
-    {% input form.goal %}
-    {% input form.description %}
-    {% render_grid %}
-    {% checkboxes form.plan_contacts %}
-    {% date_field form.end_date %}
-{% endrender_grid %}
-{% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
-{% endrender_form %}
+        {% csrf_token %}
+        {% input form.title %}
+        {% input form.goal %}
+        {% input form.description %}
+        {% render_grid %}
+            {% checkboxes form.plan_contacts %}
+            {% date_field form.end_date %}
+        {% endrender_grid %}
+        {% form_actions primary_text=_("Verzenden") primary_icon="arrow_forward" %}
+    {% endrender_form %}
 {% endblock content %}

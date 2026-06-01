@@ -2,14 +2,9 @@
 <nav class="footer__links" aria-label="Footer navigatie">
     <ul class="footer__list">
         {% for cms_page in cms_pages %}
-            <li class="footer__list-item">
-                {% link text=cms_page.get_title secondary=True href=cms_page.get_absolute_url %}
-            </li>
+            <li class="footer__list-item">{% link text=cms_page.get_title secondary=True href=cms_page.get_absolute_url %}</li>
         {% endfor %}
-
         {# sitemap #}
-        <li class="footer__list-item">
-            {% link text="Sitemap" secondary=True href="sitemap" %}
-        </li>
+        <li class="footer__list-item">{% link text="Sitemap" secondary=True href="sitemap" %}</li>
     </ul>
 </nav>

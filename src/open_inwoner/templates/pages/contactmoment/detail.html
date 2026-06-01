@@ -3,44 +3,44 @@
 {% block content %}
     {% if question %}
         {% render_grid %}
-        {% render_column span=12 %}
-        <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
-        {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
-    {% endrender_column %}
-{% endrender_grid %}
-{% render_grid %}
-{% render_column start=4 span=6 %}
-<section class="contactmoment">
-    <div>
-        <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Uw vraag" %}</h2>
-        <nl-paragraph>{{ question.question_text }}</nl-paragraph>
-    </div>
-    <div>
-        <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Antwoord" %}</h2>
-        {% if question.answer_text %}
-            <nl-paragraph>{{ question.answer_text }}</nl-paragraph>
-        {% else %}
-            <nl-paragraph>{% trans "Nog geen antwoord beschijkbaar" %}</nl-paragraph>
-        {% endif %}
-    </div>
-    <div>
-        <a href="{{ origin.url }}"
-           id="origin_link"
-           class="button button--primary contactmoment__actions">{% icon "arrow_backward" %}{{ origin.label }}</a>
-    </div>
-    {% if destination %}
-        <div>
-            <a href="{{ destination.url }}"
-               id="destination_link"
-               class="button button--transparent contactmoment__actions">
-                <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
-            </a>
-        </div>
+            {% render_column span=12 %}
+                <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
+                {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
+            {% endrender_column %}
+        {% endrender_grid %}
+        {% render_grid %}
+            {% render_column start=4 span=6 %}
+                <section class="contactmoment">
+                    <div>
+                        <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Uw vraag" %}</h2>
+                        <nl-paragraph>{{ question.question_text }}</nl-paragraph>
+                    </div>
+                    <div>
+                        <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Antwoord" %}</h2>
+                        {% if question.answer_text %}
+                            <nl-paragraph>{{ question.answer_text }}</nl-paragraph>
+                        {% else %}
+                            <nl-paragraph>{% trans "Nog geen antwoord beschijkbaar" %}</nl-paragraph>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <a href="{{ origin.url }}"
+                           id="origin_link"
+                           class="button button--primary contactmoment__actions">{% icon "arrow_backward" %}{{ origin.label }}</a>
+                    </div>
+                    {% if destination %}
+                        <div>
+                            <a href="{{ destination.url }}"
+                               id="destination_link"
+                               class="button button--transparent contactmoment__actions">
+                                <span>{{ destination.label }}</span>{% icon "arrow_forward" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                </section>
+            {% endrender_column %}
+        {% endrender_grid %}
+    {% else %}
+        <nl-paragraph><strong>{% trans "There is no available data at the moment." %}</strong></nl-paragraph>
     {% endif %}
-</section>
-{% endrender_column %}
-{% endrender_grid %}
-{% else %}
-<nl-paragraph><strong>{% trans "There is no available data at the moment." %}</strong></nl-paragraph>
-{% endif %}
 {% endblock content %}

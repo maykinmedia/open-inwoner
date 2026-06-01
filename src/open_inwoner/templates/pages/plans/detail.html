@@ -10,123 +10,123 @@
 {% endblock notifications %}
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True export_button=True %}
-{% endblock sidebar_content %}
-{% block content %}
-    <div class="plan">
-        <h1 class="utrecht-heading-1" id="title">{{ object.title }}</h1>
-        {#  Upload notification #}
-        {% notifications messages show_local_messages=True closable=True %}
-        <aside class="dashboard plan-contact" aria-label="Dashboard">
-            <ul class="dashboard__list">
-                <li class="dashboard__list-item">
-                    <nl-paragraph>
-                    <span class="dashboard__item-label">{% trans "Aangemaakt door" %}:</span>
-                    <span class="plan-contact__information">
-                        <span class="plan-contact__info">{{ object.created_by.get_full_name }}</span>
-                        <span class="plan-contact__info">{{ object.created_by.email }}</span>
-                    </span>
-                    </nl-paragraph>
-                </li>
-                <li class="dashboard__list-item">
-                    <nl-paragraph>
-                    <span class="dashboard__item-label">{% trans "Deelnemers" %}:</span>
-                    <span class="plan-contact__information">
-                        {% for user in contact_users %}
-                            <span class="plan-contact__info">{{ user.get_full_name }}</span>
-                            <span class="plan-contact__info">{{ user.email }}</span>
-                        {% endfor %}
-                    </span>
-                    </nl-paragraph>
-                </li>
-                <li class="dashboard__list-item">
-                    <nl-paragraph>
-                    <span class="dashboard__item-label">{% trans "Samenwerking loopt tot" %}:</span>
-                    <span class="plan-contact__information">
-                        <span class="plan-contact__info">{{ object.end_date }}</span>
-                    </span>
-                    </nl-paragraph>
-                </li>
-            </ul>
-        </aside>
-        <section class="tabled tabled--flexible oip-section oip-section--bordered"
-                 aria-labelledby="goal">
-            <div class="tabled__section">
-                <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
-                    <div class="tabled__item--mobile-big">
-                        {% if is_creator %}
-                            {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") aria_label=_("Doel en omschrijving bewerken") transparent=True %}
-                        {% endif %}
-                    </div>
-                </header>
-            </div>
-            <div class="tabled__inner">
-                <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
-                <nl-paragraph>{{ object.goal|linebreaksbr }}</nl-paragraph>
-                {% if object.description %}
-                    <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
-                    <nl-paragraph>{{ object.description|linebreaksbr }}</nl-paragraph>
-                {% endif %}
-            </div>
-        </section>
-        <section class="tabled tabled--flexible oip-section" aria-labelledby="files">
-            <div class="tabled__section">
-                <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
-                </header>
-            </div>
-            <div class="plan__file">
-                {% if object.get_latest_file %}
-                    {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
-                    <file-nlds name="{{ object.get_latest_file.file.name }}" download-url="{{ download_url }}" size="{{ object.get_latest_file.file.size }}"></file-nlds>
-                    {% if object.get_other_files %}
-                        {% file_table files=object.get_other_files download_view="profile:documents_download" %}
-                    {% endif %}
-                {% else %}
-                    <p>{% trans "No files uploaded yet." %}</p>
-                {% endif %}
-            </div>
-            <div class="plan__upload-document">
-                <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
-                <div id="form_upload_wrapper">
-                    <oip-loading-spinner id="form_upload" compact loading-text="{% trans "Gegevens laden..." %}" loaded-text="{% trans "Gegevens zijn geladen." %}" hx-get="{% url "collaborate:plan_add_file" uuid=object.uuid %}" hx-target="#form_upload" hx-swap="outerHTML" hx-trigger="revealed" data-spinner-for="form_upload" data-spinner-live-region="plan-spinner-live-region">
-                    </oip-loading-spinner>
+    {% endblock sidebar_content %}
+    {% block content %}
+        <div class="plan">
+            <h1 class="utrecht-heading-1" id="title">{{ object.title }}</h1>
+            {#  Upload notification #}
+            {% notifications messages show_local_messages=True closable=True %}
+            <aside class="dashboard plan-contact" aria-label="Dashboard">
+                <ul class="dashboard__list">
+                    <li class="dashboard__list-item">
+                        <nl-paragraph>
+                        <span class="dashboard__item-label">{% trans "Aangemaakt door" %}:</span>
+                        <span class="plan-contact__information">
+                            <span class="plan-contact__info">{{ object.created_by.get_full_name }}</span>
+                            <span class="plan-contact__info">{{ object.created_by.email }}</span>
+                        </span>
+                        </nl-paragraph>
+                    </li>
+                    <li class="dashboard__list-item">
+                        <nl-paragraph>
+                        <span class="dashboard__item-label">{% trans "Deelnemers" %}:</span>
+                        <span class="plan-contact__information">
+                            {% for user in contact_users %}
+                                <span class="plan-contact__info">{{ user.get_full_name }}</span>
+                                <span class="plan-contact__info">{{ user.email }}</span>
+                            {% endfor %}
+                        </span>
+                        </nl-paragraph>
+                    </li>
+                    <li class="dashboard__list-item">
+                        <nl-paragraph>
+                        <span class="dashboard__item-label">{% trans "Samenwerking loopt tot" %}:</span>
+                        <span class="plan-contact__information">
+                            <span class="plan-contact__info">{{ object.end_date }}</span>
+                        </span>
+                        </nl-paragraph>
+                    </li>
+                </ul>
+            </aside>
+            <section class="tabled tabled--flexible oip-section oip-section--bordered"
+                     aria-labelledby="goal">
+                <div class="tabled__section">
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="goal">{% trans "Doel en omschrijving" %}</h2>
+                        <div class="tabled__item--mobile-big">
+                            {% if is_creator %}
+                                {% button href="collaborate:plan_edit_goal" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Doel en omschrijving bewerken") aria_label=_("Doel en omschrijving bewerken") transparent=True %}
+                            {% endif %}
+                        </div>
+                    </header>
                 </div>
-            </div>
-        </section>
-        <section class="tabled tabled--flexible oip-section oip-section--bordered"
-                 aria-labelledby="notes">
-            <div class="tabled__section">
-                <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="notes">{% trans "Notities" %}</h2>
-                    <div class="tabled__item--mobile-big">
-                        {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") aria_label=_("Notitie aanvullen") transparent=True %}
+                <div class="tabled__inner">
+                    <h3 class="utrecht-heading-3">{% trans "Doel" %}</h3>
+                    <nl-paragraph>{{ object.goal|linebreaksbr }}</nl-paragraph>
+                    {% if object.description %}
+                        <h3 class="utrecht-heading-3" id="description">{% trans "Description" %}</h3>
+                        <nl-paragraph>{{ object.description|linebreaksbr }}</nl-paragraph>
+                    {% endif %}
+                </div>
+            </section>
+            <section class="tabled tabled--flexible oip-section" aria-labelledby="files">
+                <div class="tabled__section">
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="files">{% trans "Samenwerkingsplan" %}</h2>
+                    </header>
+                </div>
+                <div class="plan__file">
+                    {% if object.get_latest_file %}
+                        {% url "profile:documents_download" uuid=object.get_latest_file.uuid as download_url %}
+                        <file-nlds name="{{ object.get_latest_file.file.name }}" download-url="{{ download_url }}" size="{{ object.get_latest_file.file.size }}"></file-nlds>
+                        {% if object.get_other_files %}
+                            {% file_table files=object.get_other_files download_view="profile:documents_download" %}
+                        {% endif %}
+                    {% else %}
+                        <p>{% trans "No files uploaded yet." %}</p>
+                    {% endif %}
+                </div>
+                <div class="plan__upload-document">
+                    <h3 class="utrecht-heading-3" id="files">{% trans "Upload een nieuwe versie" %}</h3>
+                    <div id="form_upload_wrapper">
+                        <oip-loading-spinner id="form_upload" compact loading-text="{% trans "Gegevens laden..." %}" loaded-text="{% trans "Gegevens zijn geladen." %}" hx-get="{% url "collaborate:plan_add_file" uuid=object.uuid %}" hx-target="#form_upload" hx-swap="outerHTML" hx-trigger="revealed" data-spinner-for="form_upload" data-spinner-live-region="plan-spinner-live-region">
+                        </oip-loading-spinner>
                     </div>
-                </header>
-            </div>
-            <div class="tabled__inner">
-                {% if object.note %}
-                    <div class="wysiwyg">
-                        <nl-paragraph>{{ object.note|linebreaksbr }}</nl-paragraph>
-                    </div>
-                {% else %}
-                    <nl-paragraph><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></nl-paragraph>
-                    <nl-paragraph>
-                    {% trans "Klik op "Bewerk" om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld." %}
-                    </nl-paragraph>
-                {% endif %}
-            </div>
-        </section>
-        <section class="tabled tabled--flexible oip-section">
-            <div class="tabled__section">
-                <header class="oip-header-group title">
-                    <h2 class="utrecht-heading-2" id="actions">{% trans "Acties" %}</h2>
-                    <div class="tabled__item--mobile-big">
-                        {% button href="collaborate:plan_action_create" uuid=object.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
-                    </div>
-                </header>
-            </div>
-        </section>
-        {% actions actions=actions request=request action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
-    </div>
-{% endblock content %}
+                </div>
+            </section>
+            <section class="tabled tabled--flexible oip-section oip-section--bordered"
+                     aria-labelledby="notes">
+                <div class="tabled__section">
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="notes">{% trans "Notities" %}</h2>
+                        <div class="tabled__item--mobile-big">
+                            {% button href="collaborate:plan_edit_note" uuid=object.uuid icon="edit" icon_outlined=True text=_("Bewerk") title=_("Notitie aanvullen") aria_label=_("Notitie aanvullen") transparent=True %}
+                        </div>
+                    </header>
+                </div>
+                <div class="tabled__inner">
+                    {% if object.note %}
+                        <div class="wysiwyg">
+                            <nl-paragraph>{{ object.note|linebreaksbr }}</nl-paragraph>
+                        </div>
+                    {% else %}
+                        <nl-paragraph><strong>{% trans "Er zijn nog geen notities toegevoegd." %}</strong></nl-paragraph>
+                        <nl-paragraph>
+                        {% trans "Klik op "Bewerk" om een nieuwe notitie toe te voegen. Deze kan later nog worden aangevuld." %}
+                        </nl-paragraph>
+                    {% endif %}
+                </div>
+            </section>
+            <section class="tabled tabled--flexible oip-section">
+                <div class="tabled__section">
+                    <header class="oip-header-group title">
+                        <h2 class="utrecht-heading-2" id="actions">{% trans "Acties" %}</h2>
+                        <div class="tabled__item--mobile-big">
+                            {% button href="collaborate:plan_action_create" uuid=object.uuid icon="add_circle_outlined" icon_outlined=True text=_("Nieuw actie toevoegen") transparent=True %}
+                        </div>
+                    </header>
+                </div>
+            </section>
+            {% actions actions=actions request=request action_form=action_form form_action=request.path|add:"#actions" plan=plan %}
+        </div>
+    {% endblock content %}

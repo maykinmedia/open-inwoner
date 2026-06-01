@@ -5,17 +5,17 @@
 {% endblock sidebar_content %}
 {% block content %}
     {% render_grid %}
-    {% render_column span=9 %}
-    <h1 class="utrecht-heading-1" id="title">{{ page_title }}</h1>
-    <p>
-        {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text.html|safe %}
+        {% render_column span=9 %}
+            <h1 class="utrecht-heading-1" id="title">{{ page_title }}</h1>
+            <p>
+                {% blocktrans with mijn_uitkeringen_text=client.config.mijn_uitkeringen_text.html|safe %}
                     {{ mijn_uitkeringen_text }}
                 {% endblocktrans %}
-    </p>
-    <p>
-        {% block report %}
-        {% endblock report %}
-    </p>
-{% endrender_column %}
-{% endrender_grid %}
+            </p>
+            <p>
+                {% block report %}
+                {% endblock report %}
+            </p>
+        {% endrender_column %}
+    {% endrender_grid %}
 {% endblock content %}

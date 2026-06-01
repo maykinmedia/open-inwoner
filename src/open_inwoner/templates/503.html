@@ -1,25 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="robots" content="noindex">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-    <title> - Service Unavailable</title>
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-    <style type="text/css">
+    <head>
+        <meta charset="utf-8">
+        <meta name="robots" content="noindex">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>- Service Unavailable</title>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <!-- Optional theme -->
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <style type="text/css">
 /*
  * Globals
  */
@@ -179,30 +175,21 @@ body {
     width: 700px;
   }
 }
-    </style>
-
-</head>
-
-<body>
-  <div class="site-wrapper">
-
-    <div class="site-wrapper-inner">
-
-      <div class="cover-container">
-
-        <div class="inner cover">
-          <h1 class="utrecht-heading-1">Sorry, this website is closed for repair / is unavailable (503)</h1>
-          <p class="lead">Please try again in a few moments.</p>
-          <p class="lead">
-            <a href="/" class="btn btn-lg btn-default">Back to home</a>
-          </p>
+        </style>
+    </head>
+    <body>
+        <div class="site-wrapper">
+            <div class="site-wrapper-inner">
+                <div class="cover-container">
+                    <div class="inner cover">
+                        <h1 class="utrecht-heading-1">Sorry, this website is closed for repair / is unavailable (503)</h1>
+                        <p class="lead">Please try again in a few moments.</p>
+                        <p class="lead">
+                            {# djlint:off D018 #}<a href="/" class="btn btn-lg btn-default">Back to home</a>{# djlint:on D018 #}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-
-      </div>
-
-    </div>
-
-  </div>
-</body>
-
+    </body>
 </html>

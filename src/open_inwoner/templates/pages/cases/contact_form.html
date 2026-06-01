@@ -8,11 +8,11 @@
 {% endblocktrans %}
 </nl-paragraph>
 {% render_form form=contact_form method="POST" id="contact-form" hxpost=hxpost_contact_action hxtarget="#cases-contact-form" extra_classes="contact-form" %}
-{% csrf_token %}
-{% textarea contact_form.question %}
-<div class="form__submit">
-    {% button_row %}
-    {% button text=_("Vraag versturen") id="submit_contact" type="submit" disabled=True primary=True name="contact_form_submit" %}
-{% endbutton_row %}
-</div>
+    {% csrf_token %}
+    {% textarea contact_form.question %}
+    <div class="form__submit">
+        {% button_row %}
+            {% button text=_("Vraag versturen") id="submit_contact" type="submit" disabled=True primary=True name="contact_form_submit" %}
+        {% endbutton_row %}
+    </div>
 {% endrender_form %}

@@ -25,22 +25,22 @@
                             {% endblocktrans %}
                         </div>
                         {% render_form form=form method="POST" id="monthlyreports-form" show_required=False submit_text=_("Download") %}
-                        {% csrf_token %}
-                        {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True extra_classes="form__control--no-help" %}
-                        {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
-                    {% endrender_form %}
-                    <div>
-                        {% if report_not_found %}
-                            {% blocktrans with time_period=report_not_found|date:"F Y" %}
+                            {% csrf_token %}
+                            {% input form.report_date icon="expand_more" icon_position="after" icon_outlined=True extra_classes="form__control--no-help" %}
+                            {% form_actions primary_text=_("Download") primary_icon="file_download" icon_position="before" extra_classes="ssd" %}
+                        {% endrender_form %}
+                        <div>
+                            {% if report_not_found %}
+                                {% blocktrans with time_period=report_not_found|date:"F Y" %}
                                     Geen uitkeringsspecificatie gevonden voor {{ time_period }}.
                                 {% endblocktrans %}
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <div>{% trans "Download of monthly reports not supported." %}</div>
-        {% endif %}
+            {% else %}
+                <div>{% trans "Download of monthly reports not supported." %}</div>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endblock report %}

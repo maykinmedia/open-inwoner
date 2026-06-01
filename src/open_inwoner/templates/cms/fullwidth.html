@@ -16,35 +16,37 @@
 {% endblock title %}
 {% block header_image %}
     {% placeholder "banner_image" %}
-{% endblock header_image %}
-{% block main_outer %}
-    <main id="content" class="container container--fullwidth">
-        {% block main_inner %}
-            {% has_sidenav_items as has_menu %}
-            <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock grid_class %}">
-                {% spaceless %}
-                    {% if has_menu %}
-                        <div class="grid__sidebar">
-                            {% block sidebar_content %}
-                                {% include "components/Sidenav/Sidenav.html" %}
-                            {% endblock sidebar_content %}
-                        </div>
-                    {% endif %}
-                {% endspaceless %}
-                <div class="grid__main">
-                    {% block content %}
-                        {% if not request.user.is_authenticated %}
-                            <section class="grid__welcome">
-                                <h1 class="utrecht-heading-1">{{ configurable_text.home_page.home_welcome_title }}</h1>
-                                <nl-paragraph>{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</nl-paragraph>
-                            </section>
-                        {% else %}
-                            {% placeholder "banner_text" %}
+    {% endblock header_image %}
+    {% block main_outer %}
+        <main id="content" class="container container--fullwidth">
+            {% block main_inner %}
+                {% has_sidenav_items as has_menu %}
+                <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock grid_class %}">
+                    {% spaceless %}
+                        {% if has_menu %}
+                            <div class="grid__sidebar">
+                                {% block sidebar_content %}
+                                    {% include "components/Sidenav/Sidenav.html" %}
+                                {% endblock sidebar_content %}
+                            </div>
                         {% endif %}
-                        {% placeholder "content" or %}{% trans "There is no content." %}{% endplaceholder %}
-                    {% endblock content %}
-                </div>
-            </div>
-        {% endblock main_inner %}
-    </main>
-{% endblock main_outer %}
+                    {% endspaceless %}
+                    <div class="grid__main">
+                        {% block content %}
+                            {% if not request.user.is_authenticated %}
+                                <section class="grid__welcome">
+                                    <h1 class="utrecht-heading-1">{{ configurable_text.home_page.home_welcome_title }}</h1>
+                                    <nl-paragraph>{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</nl-paragraph>
+                                </section>
+                            {% else %}
+                                {% placeholder "banner_text" %}
+                                {% endif %}
+                                {% placeholder "content" or %}
+                                    {% trans "There is no content." %}
+                                {% endplaceholder %}
+                            {% endblock content %}
+                        </div>
+                    </div>
+                {% endblock main_inner %}
+            </main>
+        {% endblock main_outer %}

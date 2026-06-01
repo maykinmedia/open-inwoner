@@ -11,18 +11,18 @@
 {% endblock header_image %}
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
-    {% if not product.has_cta_tag %}
-        {% if product.form %}
-            <li class="anchor-menu__list-item">
-                {% button href=product.form_link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
-            </li>
-        {% elif product.link %}
-            <li class="anchor-menu__list-item">
-                {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
-            </li>
+        {% if not product.has_cta_tag %}
+            {% if product.form %}
+                <li class="anchor-menu__list-item">
+                    {% button href=product.form_link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                </li>
+            {% elif product.link %}
+                <li class="anchor-menu__list-item">
+                    {% button href=product.link size="big" text=_("Aanvraag starten") primary=True icon="arrow_forward" icon_position="before" %}
+                </li>
+            {% endif %}
         {% endif %}
-    {% endif %}
-{% endanchor_menu %}
+    {% endanchor_menu %}
 {% endblock sidebar_content %}
 {% block content %}
     <h1 class="utrecht-heading-1" id="title">
@@ -71,94 +71,94 @@
         {# Conditions #}
         {% if object.conditions.exists %}
             {% render_grid %}
-            {% render_column span=6 compact=True %}
-            <h3 class="utrecht-heading-3">{% trans "U komt in aanmerking" %}</h3>
-            {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all only %}
-        {% endrender_column %}
-        {% render_column start=7 span=6 compact=True %}
-        <h3 class="utrecht-heading-3">{% trans "U komt niet in aanmerking" %}</h3>
-        {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
-    {% endrender_column %}
-{% endrender_grid %}
-{% endif %}
-{# Locations #}
-{% if object.locations.exists %}
-    {% with centroid=object.locations.get_centroid %}
-        {% map centroid.lat centroid.lng id="locations" title=_("Locaties") geojson_feature_collection=object.locations.get_geojson_feature_collection %}
-    {% endwith %}
-    {% include "components/Card/CardContainer.html" with locations=object.locations.all columns=3 only %}
-{% endif %}
-{% render_grid %}
-{% render_column span=5 %}
-{# Links. #}
-{% if product_links.exists %}
-    <nav class="link-list" aria-label="{% trans "links" %}">
-        <h3 class="utrecht-heading-3" id="links">{% trans "Links" %}</h3>
-        <ul class="link-list__list">
-            {% for link in product_links %}
-                <li class="link-list__list-item link-list__list-item--wrap">{% link href=link.url secondary=True text=link.name %}</li>
-            {% endfor %}
-        </ul>
-    </nav>
-{% endif %}
-{% endrender_column %}
-{% render_column start=related_products_start span=4 compact=True %}
-{# Related products. #}
-{% if object.related_products.published.exists %}
-    <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
-        <h3 class="utrecht-heading-3" id="see">{% trans "Zie ook" %}</h3>
-        <ul class="link-list__list">
-            {% for related in object.related_products.published %}
-                <li class="link-list__list-item link-list__list-item--wrap">
-                    {% url "products:product_detail" slug=related.slug as product_url %}
-                    {% link href=product_url text=related.name secondary=True %}
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
-{% endif %}
-{% endrender_column %}
-{% render_column span=9 %}
-{% if object.contacts.exists %}
-    <div class="contact-block">
-        <h3 class="utrecht-heading-3" id="contact">{% trans "Contact" %}</h3>
-        {% for contact in object.contacts.all %}
-            {% render_grid compact=True %}
-            {% render_column span=12 %}
-            <h4 class="utrecht-heading-4">{{ contact.first_name }} {{ contact.last_name }}</h4>
-        {% endrender_column %}
-        {% if contact.phonenumber %}
-            {% render_column span=6 %}
-            <nl-paragraph>{{ contact.role|default:_("Telefoonnummer") }}</nl-paragraph>
-        {% endrender_column %}
-        {% render_column start=7 span=6 %}
-        {% link href="tel:"|add:contact.phonenumber text=contact.phonenumber secondary=True %}
-    {% endrender_column %}
-{% endif %}
-{% if contact.email %}
-    {% render_column span=6 %}
-    <nl-paragraph>{{ contact.organization|default:_("E-mail") }}</nl-paragraph>
-{% endrender_column %}
-{% render_column start=7 span=6 %}
-{% link href="mailto:"|add:contact.email text=contact.email secondary=True %}
-{% endrender_column %}
-{% endif %}
-{% endrender_grid %}
-{% endfor %}
-</div>
-{% endif %}
-{% endrender_column %}
-{% endrender_grid %}
-{% if display_social %}
-    <nav class="sharing-list" aria-label="{% trans "Deel dit artikel" %}">
-        <h3 class="utrecht-heading-3" id="sharing">{% trans "Deel dit artikel" %}</h3>
-        {% with request.build_absolute_uri as page_url %}
-            {% include "components/ShareButton/ShareButton.html" with platform="facebook" platform_verbose="Facebook" text_to_share=page_url %}
-            {% include "components/ShareButton/ShareButton.html" with platform="x-twitter" platform_verbose="X" text_to_share=page_url %}
-            {% include "components/ShareButton/ShareButton.html" with platform="whatsapp" platform_verbose="WhatsApp" text_to_share=page_url %}
-            {% include "components/ShareButton/ShareButton.html" with platform="linkedin" platform_verbose="LinkedIn" text_to_share=page_url %}
-        {% endwith %}
-    </nav>
-{% endif %}
-</div>
+                {% render_column span=6 compact=True %}
+                    <h3 class="utrecht-heading-3">{% trans "U komt in aanmerking" %}</h3>
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all only %}
+                {% endrender_column %}
+                {% render_column start=7 span=6 compact=True %}
+                    <h3 class="utrecht-heading-3">{% trans "U komt niet in aanmerking" %}</h3>
+                    {% include "components/Condition/ConditionList.html" with conditions=object.conditions.all negative=True only %}
+                {% endrender_column %}
+            {% endrender_grid %}
+        {% endif %}
+        {# Locations #}
+        {% if object.locations.exists %}
+            {% with centroid=object.locations.get_centroid %}
+                {% map centroid.lat centroid.lng id="locations" title=_("Locaties") geojson_feature_collection=object.locations.get_geojson_feature_collection %}
+            {% endwith %}
+            {% include "components/Card/CardContainer.html" with locations=object.locations.all columns=3 only %}
+        {% endif %}
+        {% render_grid %}
+            {% render_column span=5 %}
+                {# Links. #}
+                {% if product_links.exists %}
+                    <nav class="link-list" aria-label="{% trans "links" %}">
+                        <h3 class="utrecht-heading-3" id="links">{% trans "Links" %}</h3>
+                        <ul class="link-list__list">
+                            {% for link in product_links %}
+                                <li class="link-list__list-item link-list__list-item--wrap">{% link href=link.url secondary=True text=link.name %}</li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endrender_column %}
+            {% render_column start=related_products_start span=4 compact=True %}
+                {# Related products. #}
+                {% if object.related_products.published.exists %}
+                    <nav class="link-list" aria-label="{% trans "Gerelateerde links" %}">
+                        <h3 class="utrecht-heading-3" id="see">{% trans "Zie ook" %}</h3>
+                        <ul class="link-list__list">
+                            {% for related in object.related_products.published %}
+                                <li class="link-list__list-item link-list__list-item--wrap">
+                                    {% url "products:product_detail" slug=related.slug as product_url %}
+                                    {% link href=product_url text=related.name secondary=True %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endrender_column %}
+            {% render_column span=9 %}
+                {% if object.contacts.exists %}
+                    <div class="contact-block">
+                        <h3 class="utrecht-heading-3" id="contact">{% trans "Contact" %}</h3>
+                        {% for contact in object.contacts.all %}
+                            {% render_grid compact=True %}
+                                {% render_column span=12 %}
+                                    <h4 class="utrecht-heading-4">{{ contact.first_name }} {{ contact.last_name }}</h4>
+                                {% endrender_column %}
+                                {% if contact.phonenumber %}
+                                    {% render_column span=6 %}
+                                        <nl-paragraph>{{ contact.role|default:_("Telefoonnummer") }}</nl-paragraph>
+                                    {% endrender_column %}
+                                    {% render_column start=7 span=6 %}
+                                        {% link href="tel:"|add:contact.phonenumber text=contact.phonenumber secondary=True %}
+                                    {% endrender_column %}
+                                {% endif %}
+                                {% if contact.email %}
+                                    {% render_column span=6 %}
+                                        <nl-paragraph>{{ contact.organization|default:_("E-mail") }}</nl-paragraph>
+                                    {% endrender_column %}
+                                    {% render_column start=7 span=6 %}
+                                        {% link href="mailto:"|add:contact.email text=contact.email secondary=True %}
+                                    {% endrender_column %}
+                                {% endif %}
+                            {% endrender_grid %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endrender_column %}
+        {% endrender_grid %}
+        {% if display_social %}
+            <nav class="sharing-list" aria-label="{% trans "Deel dit artikel" %}">
+                <h3 class="utrecht-heading-3" id="sharing">{% trans "Deel dit artikel" %}</h3>
+                {% with request.build_absolute_uri as page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="facebook" platform_verbose="Facebook" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="x-twitter" platform_verbose="X" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="whatsapp" platform_verbose="WhatsApp" text_to_share=page_url %}
+                    {% include "components/ShareButton/ShareButton.html" with platform="linkedin" platform_verbose="LinkedIn" text_to_share=page_url %}
+                {% endwith %}
+            </nav>
+        {% endif %}
+    </div>
 {% endblock content %}

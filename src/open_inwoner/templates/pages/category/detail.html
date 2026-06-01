@@ -28,21 +28,21 @@
         {% endif %}
         {% if category.question_set.all %}
             {% render_grid %}
-            {% render_column span=6 %}
-            {% include "components/Faq/Faq.html" with questions=category.question_set.all only %}
-        {% endrender_column %}
-    {% endrender_grid %}
-{% endif %}
-{% if questionnaire_roots %}
-    <div class="grid">
-        <div class="column column--start-1 column--span-6 ">
-            <aside class="questionnaire">
-                <h2 class="utrecht-heading-2">{{ configurable_text.questionnaire_page.select_questionnaire_title }}</h2>
-                {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
-                {% include "components/Questionnaire/Questionnaire.html" with root_nodes=questionnaire_roots only %}
-            </aside>
-        </div>
+                {% render_column span=6 %}
+                    {% include "components/Faq/Faq.html" with questions=category.question_set.all only %}
+                {% endrender_column %}
+            {% endrender_grid %}
+        {% endif %}
+        {% if questionnaire_roots %}
+            <div class="grid">
+                <div class="column column--start-1 column--span-6 ">
+                    <aside class="questionnaire">
+                        <h2 class="utrecht-heading-2">{{ configurable_text.questionnaire_page.select_questionnaire_title }}</h2>
+                        {% optional_paragraph configurable_text.questionnaire_page.select_questionnaire_intro %}
+                        {% include "components/Questionnaire/Questionnaire.html" with root_nodes=questionnaire_roots only %}
+                    </aside>
+                </div>
+            </div>
+        {% endif %}
     </div>
-{% endif %}
-</div>
 {% endblock content %}

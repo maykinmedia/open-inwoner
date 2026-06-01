@@ -1,22 +1,20 @@
 {% load i18n icon_tags button_tags %}
-
 {% if userfeed %}
-<section class="plugin userfeed">
-    <header class="userfeed__header">
-        <div class="heading-2__indicator">
-            <h2 class="utrecht-heading-2 {% if userfeed.action_required %}indicator{% endif %}">
-                {{ instance.title }}
-            </h2>
-            {% if userfeed.action_required %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
-        </div>
-    </header>
-
-    <div class="card-container card-container--columns-1 plugin-card">
-        <oip-action-list>
+    <section class="plugin userfeed">
+        <header class="userfeed__header">
+            <div class="heading-2__indicator">
+                <h2 class="utrecht-heading-2 {% if userfeed.action_required %}indicator{% endif %}">{{ instance.title }}</h2>
+                {% if userfeed.action_required %}
+                    {% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}
+                {% endif %}
+            </div>
+        </header>
+        <div class="card-container card-container--columns-1 plugin-card">
+            <oip-action-list>
             {% for item in userfeed_item_list_json %}
-                <oip-action title="{{item.title}}" message="{{item.message}}" action-url="{{item.action_url}}"></oip-action>
+                <oip-action title="{{ item.title }}" message="{{ item.message }}" action-url="{{ item.action_url }}"></oip-action>
             {% endfor %}
-        </oip-action-list>
-    </div>
-</section>
+            </oip-action-list>
+        </div>
+    </section>
 {% endif %}

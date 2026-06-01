@@ -9,18 +9,18 @@
             <div class="plans-cards card-container card-container--columns-4">
                 {% for plan in plans %}
                     {% render_card image_object_fit="cover" href=plan.get_absolute_url %}
-                    <div class="card__content">
-                        <h3 class="utrecht-heading-3 card__heading-3 plan-list">{{ plan.title }}</h3>
-                        <nl-paragraph>{{ plan.goal|truncatewords:20 }}</nl-paragraph>
-                        <nl-paragraph>{{ plan.description|truncatewords:20 }}</nl-paragraph>
-                        <span class="spacer"></span>
-                        <span class="button button--icon-before button--transparent">{% icon icon="arrow_forward" outlined=True %}</span>
-                    </div>
-                {% endrender_card %}
-            {% endfor %}
-        </div>
-    {% else %}
-        <nl-paragraph>{{ configurable_text.plans_page.plans_no_plans_message }}</nl-paragraph>
-    {% endif %}
-</section>
+                        <div class="card__content">
+                            <h3 class="utrecht-heading-3 card__heading-3 plan-list">{{ plan.title }}</h3>
+                            <nl-paragraph>{{ plan.goal|truncatewords:20 }}</nl-paragraph>
+                            <nl-paragraph>{{ plan.description|truncatewords:20 }}</nl-paragraph>
+                            <span class="spacer"></span>
+                            <span class="button button--icon-before button--transparent">{% icon icon="arrow_forward" outlined=True %}</span>
+                        </div>
+                    {% endrender_card %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <nl-paragraph>{{ configurable_text.plans_page.plans_no_plans_message }}</nl-paragraph>
+        {% endif %}
+    </section>
 {% endif %}

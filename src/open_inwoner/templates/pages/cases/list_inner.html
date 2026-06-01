@@ -40,70 +40,70 @@
     {% endif %}
     <div class="card__grid">
         {% render_grid %}
-        {% if not zaken %}
-            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
-        {% endif %}
-        {% for zaak in zaken %}
-            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
-            {# "openstaande formulieren/inzendingen" #}
-            {% if zaak.type_aanvraag == "Formulier" %}
-                <a href="{{ zaak.vervolg_link }}"
-                   class="card card card__description-card card--stretch"
-                   target="_blank">
-                    <div class="card__body">
-                        <h2 class="card__heading-2">{{ zaak.naam }}</h2>
-                        {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
-                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
-                        {% render_list %}
-                        <li class="list-item list-item--compact">
-                            {% with date_modified=zaak.datum_laatste_wijziging|date %}
-                                <span class="card__caption card__text--small"><span>{% trans "Laatst gewijzigd op:" %}</span><span class="card__text--dark">{{ date_modified }}</span></span>
-                            {% endwith %}
-                        </li>
-                        {% list_item text=_("Nog niet afgerond formulier") caption=_("Status") compact=True strong=False %}
-                    {% endrender_list %}
-                    <span class="link link--icon link--bold link--primary">
-                        <span class="link__text">{% trans "Formulier afronden" %}</span>
-                        {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                    </span>
-                </div>
-            </a>
-            {# other aanvragen #}
-        {% else %}
-            <a href="{% url "cases:case_detail" api_group_id=zaak.api_group.id object_id=zaak.uuid %}"
-               class="card card card__description-card card--stretch">
-                <div class="card__body">
-                    <h2 class="card__heading-2">{{ zaak.description }}</h2>
-                    {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
-                    {% render_list %}
-                    <li class="list-item list-item--compact">
-                        <span class="card__caption card__text--small">
-                            <span>{% trans "Zaak ingediend op:" %}</span>
-                            <span class="card__text--dark">{{ zaak.start_date }}</span>
-                        </span>
-                    </li>
-                    {% if zaak.result %}
-                        {% list_item zaak.result caption=_("Resultaat") compact=True strong=False %}
+            {% if not zaken %}
+                <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
+            {% endif %}
+            {% for zaak in zaken %}
+                {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+                    {# "openstaande formulieren/inzendingen" #}
+                    {% if zaak.type_aanvraag == "Formulier" %}
+                        <a href="{{ zaak.vervolg_link }}"
+                           class="card card card__description-card card--stretch"
+                           target="_blank">
+                            <div class="card__body">
+                                <h2 class="card__heading-2">{{ zaak.naam }}</h2>
+                                {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
+                                {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
+                                {% render_list %}
+                                    <li class="list-item list-item--compact">
+                                        {% with date_modified=zaak.datum_laatste_wijziging|date %}
+                                            <span class="card__caption card__text--small"><span>{% trans "Laatst gewijzigd op:" %}</span><span class="card__text--dark">{{ date_modified }}</span></span>
+                                        {% endwith %}
+                                    </li>
+                                    {% list_item text=_("Nog niet afgerond formulier") caption=_("Status") compact=True strong=False %}
+                                {% endrender_list %}
+                                <span class="link link--icon link--bold link--primary">
+                                    <span class="link__text">{% trans "Formulier afronden" %}</span>
+                                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                </span>
+                            </div>
+                        </a>
+                        {# other aanvragen #}
                     {% else %}
-                        {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
+                        <a href="{% url "cases:case_detail" api_group_id=zaak.api_group.id object_id=zaak.uuid %}"
+                           class="card card card__description-card card--stretch">
+                            <div class="card__body">
+                                <h2 class="card__heading-2">{{ zaak.description }}</h2>
+                                {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
+                                {% render_list %}
+                                    <li class="list-item list-item--compact">
+                                        <span class="card__caption card__text--small">
+                                            <span>{% trans "Zaak ingediend op:" %}</span>
+                                            <span class="card__text--dark">{{ zaak.start_date }}</span>
+                                        </span>
+                                    </li>
+                                    {% if zaak.result %}
+                                        {% list_item zaak.result caption=_("Resultaat") compact=True strong=False %}
+                                    {% else %}
+                                        {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
+                                    {% endif %}
+                                    <li class="list-item list-item--compact">
+                                        <span class="list-item__caption">{{ zaak_identificatie_label }}</span>
+                                        <span class="skip-phone-parsing">‍{{ zaak.identification }}</span>
+                                    </li>
+                                {% endrender_list %}
+                                <span class="link link--icon link--bold link--primary">
+                                    <span class="link__text">{{ zaak.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
+                                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                                </span>
+                            </div>
+                        </a>
                     {% endif %}
-                    <li class="list-item list-item--compact">
-                        <span class="list-item__caption">{{ zaak_identificatie_label }}</span>
-                        <span class="skip-phone-parsing">‍{{ zaak.identification }}</span>
-                    </li>
-                {% endrender_list %}
-                <span class="link link--icon link--bold link--primary">
-                    <span class="link__text">{{ zaak.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
-                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
-                </span>
-            </div>
-        </a>
+                {% endrender_column %}
+            {% endfor %}
+        {% endrender_grid %}
+    </div>
+    {% if zaken %}
+        {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget="#cases-content" %}
     {% endif %}
-{% endrender_column %}
-{% endfor %}
-{% endrender_grid %}
-</div>
-{% if zaken %}
-    {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget="#cases-content" %}
-{% endif %}
 {% endif %}

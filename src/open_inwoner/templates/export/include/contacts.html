@@ -1,5 +1,4 @@
 {% load i18n link_tags icon_tags %}
-
 <table class="table">
     <thead class="table__heading">
         <tr>
@@ -13,16 +12,16 @@
     <tbody>
         {% for invite in pending_invitations %}
             <tr>
-                <td class="table__item">{{invite.get_full_name}}</td>
+                <td class="table__item">{{ invite.get_full_name }}</td>
                 <td class="table__item"></td>
-                <td class="table__item">{{invite.invitee_email}}</td>
+                <td class="table__item">{{ invite.invitee_email }}</td>
                 <td class="table__item">-</td>
                 <td class="table__item">{% icon "check" extra_classes="icon icon--disabled" %}</td>
             </tr>
         {% endfor %}
         {% for contact in contacts_for_approval %}
             <tr>
-                <td class="table__item">{{contact.get_full_name}}</td>
+                <td class="table__item">{{ contact.get_full_name }}</td>
                 <td class="table__item">{{ contact.get_contact_type_display }}</td>
                 <td class="table__item">{{ contact.email }}</td>
                 <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>
@@ -31,7 +30,7 @@
         {% endfor %}
         {% for contact in active_contacts %}
             <tr>
-                <td class="table__item">{{contact.get_full_name}}</td>
+                <td class="table__item">{{ contact.get_full_name }}</td>
                 <td class="table__item">{{ contact.get_contact_type_display }}</td>
                 <td class="table__item">{{ contact.email }}</td>
                 <td class="table__item">{{ contact.phonenumber|default:"-" }}</td>
