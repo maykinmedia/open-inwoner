@@ -1,7 +1,7 @@
-2.3.0-dev (2026-XX-YY)
-======================
+2.3.0 (2026-05-29)
+==================
 
-Voor een volledig overzicht van alle commits, zie ...
+Voor een volledig overzicht van alle commits, zie :release:`v2.3.0`.
 
 Deployment aandachtspunten
 --------------------------
@@ -15,6 +15,23 @@ Deployment aandachtspunten
 * [:gh:`2363`]: ``manage.py add_missing_templates`` is toegevoegd aan het
   opstartsscript (``bin/docker_start.sh``) en wordt voortaan automatisch
   uitgevoerd bij elke deploy.
+* [:gh:`2514`]: Nieuwe omgevingsvariabele ``ZGW_CACHE_WARMUP_TIMEOUT``
+  (standaard: ``120`` seconden) stelt de maximale uitvoeringstijd in voor de
+  Celery-taak die de ZGW-cache voorlaadt bij het inloggen. Pas deze waarde aan
+  als de Celery-taak bij grote aantallen zaken regelmatig times out.
+* [:gh:`2513`, :gh:`2514`]: De standaardwaarde van
+  ``CACHE_ZGW_ZAKEN_TIMEOUT`` is gewijzigd van ``60`` naar ``300`` seconden
+  (5 minuten). Installaties die deze variabele niet expliciet hebben ingesteld
+  krijgen hierdoor een langere cache-TTL voor zakengegevens.
+* [:gh:`2539`]: Bij het inloggen van een gebruiker worden ZGW gegevens op de achtergrond
+  ingeladen, zodat de pagina's als "Mijn Zaken" sneller laden. Standaard worden deze
+  taken op de bestaande Celery-worker uitgevoerd via de standaard queue: er is geen
+  extra infrastructuur nodig. Operators die deze "cache warming" willen isoleren op een
+  dedicated worker (zodat de cache tijdig gevuld is voor een gebruiker) kunnen de
+  omgevingsvariabele ``CACHE_SEEDING_QUEUE`` instellen op een aparte queuenaam en een
+  dedicated worker draaien. Zie voor een voorbeeld de ``celery-low-latency`` service in
+  ``docker-compose.yml``, configureerbaar via ``CELERY_WORKER_QUEUE`` en
+  ``CELERY_WORKER_CONCURRENCY``.
 
 Nieuwe features
 ---------------
@@ -66,7 +83,7 @@ Bugfixes
 * [:gh:`2447`]: De status van een zaak wordt nu correct bijgewerkt in de zakenlijst
   wanneer een ZGW-backend (bijv. eSuite) een bestaand statusobject aanpast zonder
   het URL te wijzigen. De cache-timeout van ``fetch_single_status`` is gelijkgesteld
-  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 60 seconden), zodat de zakenlijst
+  aan ``CACHE_ZGW_ZAKEN_TIMEOUT`` (standaard 300 seconden), zodat de zakenlijst
   dezelfde versheid garandeert als de zaakdetailpagina.
 * [:gh:`2289`] Validate content-length in ZGW document downloads to prevent broken downloads
   when the backend returns error messages instead of file content.
