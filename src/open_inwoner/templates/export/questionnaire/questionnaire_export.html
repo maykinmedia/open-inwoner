@@ -1,34 +1,32 @@
-{% extends 'base_pdf.html' %}
+{% extends "base_pdf.html" %}
 {% load i18n render_tags %}
-
 {% block content %}
     <div class="qa">
         <h1 class="utrecht-heading-1">{% trans "Zelfdiagnose results" %}</h1>
         <ol>
             {% for step in steps %}
-            <li>
-                <h4>{% trans "Question:" %}</h4>
-                <nl-paragraph>{{ step.question }}</nl-paragraph>
-                <h4>{% trans "Answer:" %}</h4>
-                <nl-paragraph>{{ step.answer }}</nl-paragraph>
-            </li>
+                <li>
+                    <h4>{% trans "Question:" %}</h4>
+                    <nl-paragraph>{{ step.question }}</nl-paragraph>
+                    <h4>{% trans "Answer:" %}</h4>
+                    <nl-paragraph>{{ step.answer }}</nl-paragraph>
+                </li>
             {% endfor %}
         </ol>
     </div>
-
     <div class="qa_results">
         <h4 class="utrecht-heading-4">{{ last_step.question }}</h4>
-        <nl-paragraph>{{ last_step.content.html|safe}}</nl-paragraph>
+        <nl-paragraph>{{ last_step.content.html|safe }}</nl-paragraph>
         {% if related_products.exists %}
             <h4>{% trans "Related products:" %}</h4>
             <ol>
                 {% for product in related_products %}
-                <li>
-                    <h4>{{ product.name }}</h4>
-                    <nl-paragraph>{{ product.summary }}</nl-paragraph>
-                </li>
+                    <li>
+                        <h4>{{ product.name }}</h4>
+                        <nl-paragraph>{{ product.summary }}</nl-paragraph>
+                    </li>
                 {% endfor %}
             </ol>
         {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}

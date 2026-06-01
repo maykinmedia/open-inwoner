@@ -1,9 +1,9 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load render_tags %}
-
-{% block title %}{% with page_title=flatpage.title %}{{ block.super }}{% endwith %}{% endblock %}
-
+{% block title %}
+    {% with page_title=flatpage.title %}{{ block.super }}{% endwith %}
+{% endblock title %}
 {% block content %}
-  <h1 class="utrecht-heading-1">{{ flatpage.title }}</h1>
-  <nl-paragraph>{{ flatpage.content|prosemirror_content|safe }}</nl-paragraph>
+    <h1 class="utrecht-heading-1">{{ flatpage.title }}</h1>
+    <nl-paragraph>{{ flatpage.content|prosemirror_content|safe }}</nl-paragraph>
 {% endblock content %}

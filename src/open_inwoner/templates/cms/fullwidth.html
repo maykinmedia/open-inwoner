@@ -1,24 +1,27 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n cms_tags sekizai_tags static menu %}
-
 {% block extra_head %}
-{% page_attribute "meta_description" as meta_description %}
-{{ block.super }}
+    {% page_attribute "meta_description" as meta_description %}
+    {{ block.super }}
     <meta name="description" content="{{ meta_description }}" />
 {% endblock extra_head %}
-
-{% block title %}{% page_attribute "title" as title %}{% page_attribute "page_title" as page_title %}{% if page_title %}{{ page_title }}{% else %}{{ title }}{% endif %} - {{ site_name }}{% endblock title %}
-
-
+{% block title %}
+    {% page_attribute "title" as title %}{% page_attribute "page_title" as page_title %}
+    {% if page_title %}
+        {{ page_title }}
+    {% else %}
+        {{ title }}
+    {% endif %}
+    - {{ site_name }}
+{% endblock title %}
 {% block header_image %}
-    {% placeholder 'banner_image' %}
+    {% placeholder "banner_image" %}
 {% endblock header_image %}
-
 {% block main_outer %}
     <main id="content" class="container container--fullwidth">
         {% block main_inner %}
             {% has_sidenav_items as has_menu %}
-            <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock %}">
+            <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock grid_class %}">
                 {% spaceless %}
                     {% if has_menu %}
                         <div class="grid__sidebar">
@@ -28,7 +31,6 @@
                         </div>
                     {% endif %}
                 {% endspaceless %}
-
                 <div class="grid__main">
                     {% block content %}
                         {% if not request.user.is_authenticated %}
@@ -37,10 +39,9 @@
                                 <nl-paragraph>{{ configurable_text.home_page.home_welcome_intro|linebreaksbr }}</nl-paragraph>
                             </section>
                         {% else %}
-                            {% placeholder 'banner_text' %}
+                            {% placeholder "banner_text" %}
                         {% endif %}
-
-                        {% placeholder 'content' or %}{% trans "There is no content." %}{% endplaceholder %}
+                        {% placeholder "content" or %}{% trans "There is no content." %}{% endplaceholder %}
                     {% endblock content %}
                 </div>
             </div>

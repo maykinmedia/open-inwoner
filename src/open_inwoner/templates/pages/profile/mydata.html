@@ -1,25 +1,19 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n l10n link_tags anchor_menu_tags dropdown_tags icon_tags button_tags %}
-
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
-
 {% block content %}
-
     <div class="profile__grid">
-        <h1 class="utrecht-heading-1" id="title">
-            {% trans "Persoonlijke gegevens" %}
-        </h1>
-
+        <h1 class="utrecht-heading-1" id="title">{% trans "Persoonlijke gegevens" %}</h1>
         <nl-paragraph>
-            {% trans "Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden op " %}
-            {% link href="https://mijn.overheid.nl" text="mijn.overheid.nl" primary=True %}
+        {% trans "Hier ziet u een beperkte set van gegevens die van u zijn opgeslagen in de Basisregistratie Personen (BRP). Al uw persoonlijke gegevens kunt u vinden op " %}
+        {% link href="https://mijn.overheid.nl" text="mijn.overheid.nl" primary=True %}
         </nl-paragraph>
-
         <!-- BRP personal data -->
         {% with request.user as user %}
-            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+            <section class="tabled tabled--flexible profile-section"
+                     id="profile-notifications">
                 <div class="tabled__section">
                     <header class="oip-header-group title">
                         <h2 class="utrecht-heading-2" id="notifications">{% trans "Mijn BRP gegevens" %}</h2>
@@ -58,9 +52,9 @@
                     <div class="tabled__item tabled__value">{{ my_data.gender|default:"-" }}</div>
                 </div>
             </section>
-
             <!-- BRP registration data -->
-            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+            <section class="tabled tabled--flexible profile-section"
+                     id="profile-notifications">
                 <div class="tabled__section">
                     <header class="oip-header-group title">
                         <h2 class="utrecht-heading-2" id="notifications">{% trans "Inschrijfadres" %}</h2>
@@ -89,9 +83,9 @@
                     </div>
                 {% endif %}
             </section>
-
             <!-- BRP contact data -->
-            <section class="tabled tabled--flexible profile-section" id="profile-notifications">
+            <section class="tabled tabled--flexible profile-section"
+                     id="profile-notifications">
                 <div class="tabled__section">
                     <header class="oip-header-group title">
                         <h2 class="utrecht-heading-2 title" id="notifications">{% trans "Contactgegevens" %}</h2>
@@ -109,9 +103,6 @@
                     <div class="tabled__item tabled__value tabled__break">{{ user.email|default:"-" }}</div>
                 </div>
             </section>
-
         {% endwith %}
-
     </div>
-
 {% endblock content %}

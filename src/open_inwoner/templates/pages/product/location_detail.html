@@ -1,29 +1,19 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n l10n grid_tags %}
-
-
 {% block content %}
     <div class="location">
         <h1 class="utrecht-heading-1">{{ object.name }}</h1>
-
         <div class="location__details">
             <div class="location__address">
-                {% if object.address_line_1 %}
-                    <nl-paragraph>{{ object.address_line_1 }}</nl-paragraph>
-                {% endif %}
+                {% if object.address_line_1 %}<nl-paragraph>{{ object.address_line_1 }}</nl-paragraph>{% endif %}
                 <nl-paragraph>{{ object.address_line_2 }}</nl-paragraph>
             </div>
             <div class="location__contact">
-                {% if object.phonenumber %}
-                    <nl-paragraph>{{ object.phonenumber }}</nl-paragraph>
-                {% endif %}
-                {% if object.email %}
-                    <nl-paragraph>{{ object.email }}</nl-paragraph>
-                {% endif %}
+                {% if object.phonenumber %}<nl-paragraph>{{ object.phonenumber }}</nl-paragraph>{% endif %}
+                {% if object.email %}<nl-paragraph>{{ object.email }}</nl-paragraph>{% endif %}
             </div>
         </div>
     </div>
-
     {% if products %}
         {% include "components/Card/CardContainer.html" with products=products small=True only %}
     {% else %}

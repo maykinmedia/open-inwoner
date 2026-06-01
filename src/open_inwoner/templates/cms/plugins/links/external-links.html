@@ -1,22 +1,19 @@
 {% load i18n icon_tags %}
-
 {% if link_plugin and link_plugin.child_plugin_instances %}
     <section class="plugin external-links">
-       <h2 class="utrecht-heading-2">{{ link_plugin.title }}</h2>
-       <ul class="external-links__list">
-        {% for link in link_plugin.child_plugin_instances %}
-            <li class="external-links__list-item">
-                <a href="{{ link.get_link }}" class="external-link" {% if link.target %}target="{{ link.target }}" rel="noopener noreferrer" aria-label="{{ link.name_text }} {% trans '(opens in new window)' %}"{% endif %}>
-                    <span class="external-link__custom-icon">
-                    {% icon icon=link.icon outlined=True %}
-                    </span>
-                    <span class="external-link__content">{{ link.name.html|safe }}</span>
-                    <span class="external-link__arrow">
-                    {% icon icon="east" icon_position="after" primary=True outlined=True %}
-                    </span>
-                </a>
-            </li>
-        {% endfor %}
-       </ul>
+        <h2 class="utrecht-heading-2">{{ link_plugin.title }}</h2>
+        <ul class="external-links__list">
+            {% for link in link_plugin.child_plugin_instances %}
+                <li class="external-links__list-item">
+                    <a href="{{ link.get_link }}"
+                       class="external-link"
+                       {% if link.target %}target="{{ link.target }}" rel="noopener noreferrer" aria-label="{{ link.name_text }} {% trans "(opens in new window)" %}"{% endif %}>
+                        <span class="external-link__custom-icon">{% icon icon=link.icon outlined=True %}</span>
+                        <span class="external-link__content">{{ link.name.html|safe }}</span>
+                        <span class="external-link__arrow">{% icon icon="east" icon_position="after" primary=True outlined=True %}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
     </section>
 {% endif %}

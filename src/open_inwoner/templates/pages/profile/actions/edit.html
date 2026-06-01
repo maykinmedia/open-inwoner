@@ -1,7 +1,5 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n button_tags file_tags form_tags grid_tags %}
-
-
 {% block content %}
     <div class="plan-edit">
         <div class="plan-template__header">
@@ -14,48 +12,40 @@
             </h1>
         </div>
         {% render_grid %}
-            {% render_column start=4 span=6 %}
-                {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
-                    {% csrf_token %}
-                    {% input form.name no_help=True %}
-                    {% input form.description no_help=True %}
-                    {% if action.file %}
-                        {% url "profile:action_download" uuid=action.uuid as download_url %}
-                        <file-nlds
-                            name="{{ action.file }}"
-                            download-url="{{ download_url }}"
-                            last-updated="{{ action.file.created_on }}"
-                            size="{{ action.file.size }}"
-                        ></file-nlds>
-                        {% input form.file icon="file_upload" outlined=True icon_position="after" %}
-                    {% else %}
-                        {% input form.file icon="file_upload" outlined=True icon_position="after" %}
-                    {% endif %}
-                    {% input form.status no_help=True icon="expand_more" icon_position="after" extra_classes='form__control--no-help' %}
-                    {% date_field form.end_date no_help=True icon="calendar_today" icon_position="after" extra_classes='form__control--no-help' %}
-                    {% input form.is_for no_help=True icon="account_circle" icon_position="after" extra_classes='form__control--no-help' %}
-
-                    <div>
-                        {% if form.template.errors %}
-                            {% errors errors=form.template.errors %}
-                        {% endif %}
-                    </div>
-
-                    <div class="form__actions form__actions--fullwidth">
-                        {% if action %}
-                            {% button text=_("Actie opslaan") primary=True type="submit" extra_classes='submit-once-button' %}
-                        {% else %}
-                            {% button text=_("Maak actie aan") primary=True type="submit" extra_classes='submit-once-button' %}
-                        {% endif %}
-                        {% if plan %}
-                            {% button href=plan.get_absolute_url icon="west" text=_("Terug naar ")|add:plan.title icon_outlined=True transparent=True %}
-                        {% else %}
-                            {% button href='profile:action_list' icon="west" text=_("Terug naar acties") icon_outlined=True transparent=True %}
-                        {% endif %}
-
-                    </div>
-                {% endrender_form %}
-            {% endrender_column %}
-        {% endrender_grid %}
-    </div>
+        {% render_column start=4 span=6 %}
+        {% render_form id="action-create" form=form method="POST" enctype="multipart/form-data" %}
+        {% csrf_token %}
+        {% input form.name no_help=True %}
+        {% input form.description no_help=True %}
+        {% if action.file %}
+            {% url "profile:action_download" uuid=action.uuid as download_url %}
+            <file-nlds name="{{ action.file }}" download-url="{{ download_url }}" last-updated="{{ action.file.created_on }}" size="{{ action.file.size }}"></file-nlds>
+            {% input form.file icon="file_upload" outlined=True icon_position="after" %}
+        {% else %}
+            {% input form.file icon="file_upload" outlined=True icon_position="after" %}
+        {% endif %}
+        {% input form.status no_help=True icon="expand_more" icon_position="after" extra_classes="form__control--no-help" %}
+        {% date_field form.end_date no_help=True icon="calendar_today" icon_position="after" extra_classes="form__control--no-help" %}
+        {% input form.is_for no_help=True icon="account_circle" icon_position="after" extra_classes="form__control--no-help" %}
+        <div>
+            {% if form.template.errors %}
+                {% errors errors=form.template.errors %}
+            {% endif %}
+        </div>
+        <div class="form__actions form__actions--fullwidth">
+            {% if action %}
+                {% button text=_("Actie opslaan") primary=True type="submit" extra_classes="submit-once-button" %}
+            {% else %}
+                {% button text=_("Maak actie aan") primary=True type="submit" extra_classes="submit-once-button" %}
+            {% endif %}
+            {% if plan %}
+                {% button href=plan.get_absolute_url icon="west" text=_("Terug naar ")|add:plan.title icon_outlined=True transparent=True %}
+            {% else %}
+                {% button href="profile:action_list" icon="west" text=_("Terug naar acties") icon_outlined=True transparent=True %}
+            {% endif %}
+        </div>
+    {% endrender_form %}
+{% endrender_column %}
+{% endrender_grid %}
+</div>
 {% endblock content %}

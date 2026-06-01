@@ -1,55 +1,50 @@
 {% extends "admin/base.html" %}
 {% load i18n static utils %}
-
 {% block title %}
-{{ title }} | {{ site_title|default:_('Administration') }}
-{% endblock %}
-
+    {{ title }} | {{ site_title|default:_("Administration") }}
+{% endblock title %}
 {% block extrastyle %}
     {{ block.super }}
-
-    <link rel="stylesheet" type="text/css" href="{% static 'bundles/admin_overrides.css' %}">
-{% endblock %}
-
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static "bundles/admin_overrides.css" %}">
+{% endblock extrastyle %}
 {% block branding %}
     {% version as build %}
     <h1 class="utrecht-heading-1" id="site-name">
-        <a href="{% url 'admin:index' %}">
-            {{ site_header|default:_('Administration') }}
-
-            {% if build %}
-                <span class="version">
-                    ({{ build }})
-                </span>
-            {% endif %}
+        <a href="{% url "admin:index" %}">
+            {{ site_header|default:_("Administration") }}
+            {% if build %}<span class="version">({{ build }})</span>{% endif %}
         </a>
     </h1>
-{% endblock %}
-
+{% endblock branding %}
 {% block userlinks %}
     {% if site_url %}
-        <a href="{{ site_url }}">{% if settings.SITE_TITLE %}{{ settings.SITE_TITLE }}{% else %}{% trans 'View site' %}{% endif %}</a> /
+        <a href="{{ site_url }}">
+            {% if settings.SITE_TITLE %}
+                {{ settings.SITE_TITLE }}
+            {% else %}
+                {% trans "View site" %}
+            {% endif %}
+        </a> /
     {% endif %}
-    {% url 'admin:two_factor:profile' as 2fa_profile_url %}
+    {% url "admin:two_factor:profile" as 2fa_profile_url %}
     {% if 2fa_profile_url %}
         <a href="{{ 2fa_profile_url }}">{% trans "View 2fa profile" %}</a> /
     {% endif %}
     {% if user.has_usable_password %}
-    <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+        <a href="{% url "admin:password_change" %}">{% trans "Change password" %}</a> /
     {% endif %}
-    <form method="post" action="{% url 'admin:logout' %}" id="logout-form">
+    <form method="post" action="{% url "admin:logout" %}" id="logout-form">
         {% csrf_token %}
-        <button type="submit">{% trans 'Log out' %}</button>
+        <button type="submit">{% trans "Log out" %}</button>
     </form>
-{% endblock %}
-
+{% endblock userlinks %}
 {% block nav-global %}
-{% endblock %}
-
-
+{% endblock nav-global %}
 {% block footer %}
     {{ block.super }}
     {# Load the custom JS #}
-    <script src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
-    <script src="{% static 'bundles/django-admin.js' %}"></script>
-{% endblock %}
+    <script src="{% static "bundles/open_inwoner-js.js" %}" type="module"></script>
+    <script src="{% static "bundles/django-admin.js" %}"></script>
+{% endblock footer %}

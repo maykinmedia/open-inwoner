@@ -1,12 +1,8 @@
-{% extends 'base_pdf.html' %}
+{% extends "base_pdf.html" %}
 {% load i18n link_tags %}
-
 {% block content %}
-
     <h1 class="utrecht-heading-1">{% trans "Action" %} {{ object }}</h1>
-
     {% url "profile:action_download" uuid=object.uuid as download_url %}
-
     <table class="table">
         <tr>
             <th class="table__header">{% trans "Name" %}</th>
@@ -34,7 +30,11 @@
         </tr>
         <tr>
             <th class="table__header">{% trans "File" %}</th>
-            <td class="table__item">{% if object.file %}{% link href=download_url text=object.file.name download=True %}{% endif %}</td>
+            <td class="table__item">
+                {% if object.file %}
+                    {% link href=download_url text=object.file.name download=True %}
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <th class="table__header">{% trans "Created on" %}</th>
@@ -45,5 +45,4 @@
             <td class="table__item">{{ object.updated_on }}</td>
         </tr>
     </table>
-
-{% endblock %}
+{% endblock content %}

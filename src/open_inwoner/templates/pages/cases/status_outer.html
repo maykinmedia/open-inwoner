@@ -1,21 +1,16 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n %}
-
 {% block notifications %}
-    <div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="spinner-live-region"
+         class="sr-only"
+         role="status"
+         aria-live="polite"
+         aria-atomic="true"></div>
     <div id="cases-status-messages-oob"></div>
 {% endblock notifications %}
-
 {% block content %}
     <div class="case-detail" id="cases-detail-content">
-        <oip-loading-spinner
-            loading-text="{% trans 'Gegevens laden...' %}"
-            loaded-text="{% trans 'Gegevens zijn geladen.' %}"
-            hx-get="{{ hxget }}"
-            hx-trigger="load"
-            hx-target="#cases-detail-content"
-            data-spinner-live-region="spinner-live-region"
-            data-spinner-for="cases-detail-content">
+        <oip-loading-spinner loading-text="{% trans "Gegevens laden..." %}" loaded-text="{% trans "Gegevens zijn geladen." %}" hx-get="{{ hxget }}" hx-trigger="load" hx-target="#cases-detail-content" data-spinner-live-region="spinner-live-region" data-spinner-for="cases-detail-content">
         </oip-loading-spinner>
     </div>
 {% endblock content %}

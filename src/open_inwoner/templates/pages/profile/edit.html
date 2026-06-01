@@ -1,65 +1,54 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n l10n grid_tags form_tags anchor_menu_tags icon_tags button_tags %}
-
 {% block sidebar_content %}
     {% anchor_menu anchors=anchors desktop=True %}
 {% endblock sidebar_content %}
-
 {% block extra_head %}
     {{ form.media }}
-{% endblock %}
-
+{% endblock extra_head %}
 {% block content %}
-
     <div class="profile__grid">
-        <h1 class="utrecht-heading-1" id="title">
-            {% trans "Bewerk contactgegevens" %}
-        </h1>
-
+        <h1 class="utrecht-heading-1" id="title">{% trans "Bewerk contactgegevens" %}</h1>
         {% render_grid %}
-            {% render_column start=0 span=8 %}
-
-                {% render_form id="profile-edit" method="POST" form=form form_action=form_action enctype="multipart/form-data" %}
-                    {% csrf_token %}
-
-                    {% with request.user as user %}
-                        {% if user.is_eherkenning_user %}
-                            {% input form.email %}
-                            {% input form.phonenumber %}
-                            {% input form.phonenumber_alternative %}
-                        {% elif user.is_bsn_user_with_brp %}
-                            {% input form.email %}
-                            {% input form.phonenumber %}
-                            {% input form.phonenumber_alternative %}
-                            {% if user.contact_type == "begeleider" %}
-                                {% input form.image no_help=True %}
-                                {% image_crop form.cropping %}
-                            {% endif %}
-                        {% else %}
-                            {% input form.first_name %}
-                            {% input form.infix %}
-                            {% input form.last_name %}
-                            {% input form.email %}
-                            {% input form.phonenumber %}
-                            {% input form.phonenumber_alternative %}
-                            {% input form.street %}
-                            {% input form.housenumber %}
-                            {% input form.postcode %}
-                            {% input form.city %}
-                            {% if user.contact_type == "begeleider" %}
-                                {% input form.image no_help=True %}
-                                {% image_crop form.cropping %}
-                            {% endif %}
-                        {% endif %}
-                    {% endwith %}
-                    <div class="form__actions form__actions--fullwidth">
-                        {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="profile-edit" %}
-                        {% button href="profile:detail" icon="west" text=_("Terug naar Mijn profiel") icon_outlined=True transparent=True %}
-                    </div>
-                {% endrender_form %}
-
-            {% endrender_column %}
-        {% endrender_grid %}
-    </div>
-
+        {% render_column start=0 span=8 %}
+        {% render_form id="profile-edit" method="POST" form=form form_action=form_action enctype="multipart/form-data" %}
+        {% csrf_token %}
+        {% with request.user as user %}
+            {% if user.is_eherkenning_user %}
+                {% input form.email %}
+                {% input form.phonenumber %}
+                {% input form.phonenumber_alternative %}
+            {% elif user.is_bsn_user_with_brp %}
+                {% input form.email %}
+                {% input form.phonenumber %}
+                {% input form.phonenumber_alternative %}
+                {% if user.contact_type == "begeleider" %}
+                    {% input form.image no_help=True %}
+                    {% image_crop form.cropping %}
+                {% endif %}
+            {% else %}
+                {% input form.first_name %}
+                {% input form.infix %}
+                {% input form.last_name %}
+                {% input form.email %}
+                {% input form.phonenumber %}
+                {% input form.phonenumber_alternative %}
+                {% input form.street %}
+                {% input form.housenumber %}
+                {% input form.postcode %}
+                {% input form.city %}
+                {% if user.contact_type == "begeleider" %}
+                    {% input form.image no_help=True %}
+                    {% image_crop form.cropping %}
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+        <div class="form__actions form__actions--fullwidth">
+            {% button text=_("Sla wijzigingen op") primary=True type="submit" form_id="profile-edit" %}
+            {% button href="profile:detail" icon="west" text=_("Terug naar Mijn profiel") icon_outlined=True transparent=True %}
+        </div>
+    {% endrender_form %}
+{% endrender_column %}
+{% endrender_grid %}
+</div>
 {% endblock content %}

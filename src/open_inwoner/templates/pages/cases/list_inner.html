@@ -1,111 +1,109 @@
 {% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
-
 {% if fetch_error %}
     <nl-paragraph>{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</nl-paragraph>
 {% else %}
-
-<h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
-<nl-paragraph>{{ title_text }}</nl-paragraph>
-
-{% if filter_form_enabled %}
-<div class="filter-bar__backdrop" id="filterBarBackdrop">
-    <div class="filter-bar" id="filterBar">
-        <div class="filter-bar__mobile-controls">
-            {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
-            <div class="form__reset--mobile form__actions--fullwidth form__actions--reset">
-                <button class="button button--primary button--transparent" type="button" name="" value="" title="Wis alle filters" aria-label="Wis alle filters" id="resetAllFilters">
-                    Wis alle filters
-                </button>
+    <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
+    <nl-paragraph>{{ title_text }}</nl-paragraph>
+    {% if filter_form_enabled %}
+        <div class="filter-bar__backdrop" id="filterBarBackdrop">
+            <div class="filter-bar" id="filterBar">
+                <div class="filter-bar__mobile-controls">
+                    {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
+                    <div class="form__reset--mobile form__actions--fullwidth form__actions--reset">
+                        <button class="button button--primary button--transparent"
+                                type="button"
+                                name=""
+                                value=""
+                                title="Wis alle filters"
+                                aria-label="Wis alle filters"
+                                id="resetAllFilters">Wis alle filters</button>
+                    </div>
+                </div>
+                <div class="filter-bar__mobile-button">
+                    <p class="filter-bar__heading">Filters</p>
+                    <div class="filter-bar__mobile-selection" id="selectionFilterBar">
+                        {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
+                        {% icon icon="check" icon_position="after" outlined=True %}
+                        <span class="sr-only">Gekozen filters</span>
+                    </div>
+                    <p class="filter-bar__status-text">Status</p>
+                </div>
+                <form class="form filter-bar__form"
+                      method="get"
+                      id="filter-form"
+                      novalidate>
+                    <span class="filter-bar__label">{% trans "Filter op" %}:</span>
+                    {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
+                </form>
             </div>
         </div>
-        <div class="filter-bar__mobile-button">
-            <p class="filter-bar__heading">Filters</p>
-            <div class="filter-bar__mobile-selection" id="selectionFilterBar">
-                {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
-                {% icon icon="check" icon_position="after" outlined=True %}
-                <span class="sr-only">Gekozen filters</span>
-            </div>
-            <p class="filter-bar__status-text">Status</p>
-        </div>
-        <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
-            <span class="filter-bar__label">{% trans 'Filter op' %}:</span>
-            {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
-        </form>
-    </div>
-</div>
-{% endif %}
-
-<div class="card__grid">
-{% render_grid %}
-    {% if not zaken %}
-        <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
     {% endif %}
-
-    {% for zaak in zaken %}
-        {% render_column start=forloop.counter_0|multiply:4 span=4 %}
+    <div class="card__grid">
+        {% render_grid %}
+        {% if not zaken %}
+            <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
+        {% endif %}
+        {% for zaak in zaken %}
+            {% render_column start=forloop.counter_0|multiply:4 span=4 %}
             {# "openstaande formulieren/inzendingen" #}
             {% if zaak.type_aanvraag == "Formulier" %}
-                <a href="{{ zaak.vervolg_link }}" class="card card card__description-card card--stretch" target="_blank">
+                <a href="{{ zaak.vervolg_link }}"
+                   class="card card card__description-card card--stretch"
+                   target="_blank">
                     <div class="card__body">
-
                         <h2 class="card__heading-2">{{ zaak.naam }}</h2>
                         {# Meaningful sequence for accessibility: any text belonging to a heading must be below the heading #}
                         {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
-
                         {% render_list %}
-                            <li class="list-item list-item--compact">
-                                {% with date_modified=zaak.datum_laatste_wijziging|date %}
-                                    <span class="card__caption card__text--small"><span>{% trans "Laatst gewijzigd op:" %}</span><span class="card__text--dark">{{ date_modified }}</span></span>
-                                {% endwith %}
-                            </li>
-                            {% list_item text=_("Nog niet afgerond formulier") caption=_("Status") compact=True strong=False %}
-                        {% endrender_list %}
-                        <span class="link link--icon link--bold link--primary">
+                        <li class="list-item list-item--compact">
+                            {% with date_modified=zaak.datum_laatste_wijziging|date %}
+                                <span class="card__caption card__text--small"><span>{% trans "Laatst gewijzigd op:" %}</span><span class="card__text--dark">{{ date_modified }}</span></span>
+                            {% endwith %}
+                        </li>
+                        {% list_item text=_("Nog niet afgerond formulier") caption=_("Status") compact=True strong=False %}
+                    {% endrender_list %}
+                    <span class="link link--icon link--bold link--primary">
                         <span class="link__text">{% trans "Formulier afronden" %}</span>
                         {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
                     </span>
-                    </div>
-                </a>
+                </div>
+            </a>
             {# other aanvragen #}
-            {% else %}
-                <a href="{% url 'cases:case_detail' api_group_id=zaak.api_group.id object_id=zaak.uuid %}" class="card card card__description-card card--stretch">
-                    <div class="card__body">
-                        <h2 class="card__heading-2">{{ zaak.description }}</h2>
-                        {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
-
-                        {% render_list %}
-                            <li class="list-item list-item--compact">
-                                <span class="card__caption card__text--small">
-                                    <span>{% trans "Zaak ingediend op:" %}</span>
-                                    <span class="card__text--dark">{{ zaak.start_date }}</span>
-                                </span>
-                            </li>
-                            {% if zaak.result %}
-                                {% list_item zaak.result caption=_("Resultaat") compact=True strong=False %}
-                            {% else %}
-                                {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
-                            {% endif %}
-                            <li class="list-item list-item--compact">
-                                <span class="list-item__caption">{{ zaak_identificatie_label }}</span>
-                                <span class="skip-phone-parsing">&zwj;{{ zaak.identification }}</span>
-                            </li>
-                        {% endrender_list %}
-
-                        <span class="link link--icon link--bold link--primary">
-                            <span class="link__text">{{ zaak.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
-                            {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+        {% else %}
+            <a href="{% url "cases:case_detail" api_group_id=zaak.api_group.id object_id=zaak.uuid %}"
+               class="card card card__description-card card--stretch">
+                <div class="card__body">
+                    <h2 class="card__heading-2">{{ zaak.description }}</h2>
+                    {% include "components/StatusIndicator/StatusIndicator.html" with status_indicator=zaak.statustype_config.status_indicator status_indicator_text=zaak.statustype_config.status_indicator_text %}
+                    {% render_list %}
+                    <li class="list-item list-item--compact">
+                        <span class="card__caption card__text--small">
+                            <span>{% trans "Zaak ingediend op:" %}</span>
+                            <span class="card__text--dark">{{ zaak.start_date }}</span>
                         </span>
-                    </div>
-                </a>
-            {% endif %}
-
-        {% endrender_column %}
-    {% endfor %}
+                    </li>
+                    {% if zaak.result %}
+                        {% list_item zaak.result caption=_("Resultaat") compact=True strong=False %}
+                    {% else %}
+                        {% list_item zaak.current_status caption=_("Status") compact=True strong=False %}
+                    {% endif %}
+                    <li class="list-item list-item--compact">
+                        <span class="list-item__caption">{{ zaak_identificatie_label }}</span>
+                        <span class="skip-phone-parsing">‍{{ zaak.identification }}</span>
+                    </li>
+                {% endrender_list %}
+                <span class="link link--icon link--bold link--primary">
+                    <span class="link__text">{{ zaak.statustype_config.case_link_text|default:"Bekijk zaak" }}</span>
+                    {% icon icon="arrow_forward" icon_position="after" primary=True outlined=True %}
+                </span>
+            </div>
+        </a>
+    {% endif %}
+{% endrender_column %}
+{% endfor %}
 {% endrender_grid %}
 </div>
-
 {% if zaken %}
-    {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget='#cases-content' %}
+    {% pagination page_obj=page_obj paginator=paginator request=request hxget=hxget hxtarget="#cases-content" %}
 {% endif %}
-
 {% endif %}

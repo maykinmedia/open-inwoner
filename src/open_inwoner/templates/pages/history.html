@@ -1,41 +1,34 @@
-{% extends 'master.html' %}
+{% extends "master.html" %}
 {% load i18n button_tags link_tags icon_tags helpers %}
-
-
 {% block content %}
-<h1 class="utrecht-heading-1" id="title">
-    {% trans "History of changes" %}
-</h1>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th class="table__header">{% trans "Date" %}</th>
-            <th class="table__header">{% trans "Changed by" %}</th>
-            <th class="table__header">{% trans "Details" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for log in logs %}
-            {% with log.extra_data.message as log_message %}
+    <h1 class="utrecht-heading-1" id="title">{% trans "History of changes" %}</h1>
+    <table class="table">
+        <thead>
             <tr>
-                <td class="table__item table__item--top">{{ log.timestamp|date:"d F Y" }}</td>
-                <td class="table__item table__item--top">{{ log.user.get_full_name }}</td>
-                <td class="table__item">
-                    {% if not log_message|is_list_instance %}
-                        - {{ log_message }}
-                    {% else %}
-                        {% for message in log_message %}
-                            - {{message}}<br>
-                        {% endfor %}
-                    {% endif %}
-                </td>
+                <th class="table__header">{% trans "Date" %}</th>
+                <th class="table__header">{% trans "Changed by" %}</th>
+                <th class="table__header">{% trans "Details" %}</th>
             </tr>
-            {% endwith %}
-        {% endfor %}
-    </tbody>
-</table>
-
-
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                {% with log.extra_data.message as log_message %}
+                    <tr>
+                        <td class="table__item table__item--top">{{ log.timestamp|date:"d F Y" }}</td>
+                        <td class="table__item table__item--top">{{ log.user.get_full_name }}</td>
+                        <td class="table__item">
+                            {% if not log_message|is_list_instance %}
+                                - {{ log_message }}
+                            {% else %}
+                                {% for message in log_message %}
+                                    - {{ message }}
+                                    <br>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endwith %}
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock content %}

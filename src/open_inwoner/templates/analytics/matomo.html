@@ -1,8 +1,7 @@
 {% load utils %}
-
 {% if matomo_enabled %}
-<!-- Matomo -->
-<script type="text/javascript" nonce="{{ request.csp_nonce }}">
+    <!-- Matomo -->
+    <script type="text/javascript" nonce="{{ request.csp_nonce }}">
   var _paq = window._paq = window._paq || [];
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
@@ -13,6 +12,6 @@
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
-</script>
-<!-- End Matomo Code -->
+    </script>
+    <!-- End Matomo Code -->
 {% endif %}

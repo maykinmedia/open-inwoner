@@ -1,13 +1,11 @@
 {% load i18n solo_tags form_tags button_tags icon_tags %}
-
-{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
-
+{% get_solo "openzaak.OpenZaakConfig" as openzaak_config %}
 {% render_form id="document-upload" form=form method="POST" hxencoding="multipart/form-data" hxpost=hxpost_document_action hxtarget="#form_upload" submit_text=_("Bestand uploaden") extra_classes="file-input-form" %}
-    {% csrf_token %}
-    {% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
-    {# Select and POST states in fileInput component #}
-    {% file_input form.files multiple=True primary_text=_("Upload documenten") max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
-    <div class="non-field-error" hidden>
-        <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">{% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}</nl-paragraph>
-    </div>
+{% csrf_token %}
+{% input form.type no_label=True no_help=True class="label input" id="id_type" extra_classes="file-type__select" %}
+{# Select and POST states in fileInput component #}
+{% file_input form.files multiple=True primary_text=_("Upload documenten") max_upload_size=openzaak_config.max_upload_size allowed_file_extensions=openzaak_config.allowed_file_extensions %}
+<div class="non-field-error" hidden>
+    <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">{% trans "Verwijder eerst bestanden die niet voldoen aan de voorwaarden" %}</nl-paragraph>
+</div>
 {% endrender_form %}
