@@ -4,3 +4,5 @@ files=[
     "src/open_inwoner/conf/parts/*.html"
 ]
 custom_blocks="anchor_menu,button_row,capture,choice_list,dropdown,placeholder,render_card,render_column,render_form,render_grid,render_list"
+# H005: html lang attribute; H006: img width/height; H016: title tag; H030/H031: meta description/keywords
+ignore="H005,H006,H016,H030,H031"
