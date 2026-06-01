@@ -1,36 +1,14 @@
 import os
 from shutil import which
 from subprocess import CalledProcessError, check_output
-from typing import Any
 
 from django.conf import settings
 
 import structlog
-from decouple import Csv, config as _config, undefined
+from maykin_common.config import config
 from sentry_sdk.integrations import DidNotEnable, django, redis
 
 logger = structlog.stdlib.get_logger(__name__)
-
-
-def config(option: str, default: Any = undefined, *args, **kwargs):
-    """
-    Pull a config parameter from the environment.
-
-    Read the config variable ``option``. If it's optional, use the ``default`` value.
-    Input is automatically cast to the correct type, where the type is derived from the
-    default value if possible.
-
-    Pass ``split=True`` to split the comma-separated input into a list.
-    """
-    if "split" in kwargs:
-        kwargs.pop("split")
-        kwargs["cast"] = Csv()
-        if isinstance(default, list):
-            default = ",".join(default)
-
-    if default is not undefined and default is not None:
-        kwargs.setdefault("cast", type(default))
-    return _config(option, default=default, *args, **kwargs)
 
 
 def get_sentry_integrations() -> list:

@@ -1,9 +1,9 @@
 from django.urls import reverse_lazy
 
-from open_inwoner.conf.utils import config
+from maykin_common.config import config
 
 # The Open Forms SDK files might differ from the API domain.
-OPEN_FORMS_API_DOMAIN = config("OPEN_FORMS_DOMAIN", "")
+OPEN_FORMS_API_DOMAIN = config("OPEN_FORMS_DOMAIN", default="")
 OPEN_FORMS_SDK_DOMAIN = OPEN_FORMS_API_DOMAIN
 
 #
@@ -56,15 +56,17 @@ CSP_EXCLUDE_URL_PREFIXES = (
 )
 
 # report to our own django-csp-reports
-CSP_REPORT_ONLY = config("CSP_REPORT_ONLY", False)  # danger
+CSP_REPORT_ONLY = config("CSP_REPORT_ONLY", default=False)  # danger
 CSP_REPORT_URI = reverse_lazy("report_csp")
 
 #
 # Django CSP-report settings
 #
-CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", True)  # save as model
-CSP_REPORTS_LOG = config("CSP_REPORTS_LOG", True)  # logging
+CSP_REPORTS_SAVE = config("CSP_REPORTS_SAVE", default=True)  # save as model
+CSP_REPORTS_LOG = config("CSP_REPORTS_LOG", default=True)  # logging
 CSP_REPORTS_LOG_LEVEL = "warning"
 CSP_REPORTS_EMAIL_ADMINS = False
-CSP_REPORT_PERCENTAGE = config("CSP_REPORT_PERCENTAGE", 1.0)  # float between 0 and 1
+CSP_REPORT_PERCENTAGE = config(
+    "CSP_REPORT_PERCENTAGE", default=1.0
+)  # float between 0 and 1
 CSP_REPORTS_FILTER_FUNCTION = "cspreports.filters.filter_browser_extensions"

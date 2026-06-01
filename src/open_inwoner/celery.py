@@ -7,8 +7,7 @@ from django.conf import settings
 import structlog
 from celery import Celery, bootsteps
 from celery.signals import setup_logging, worker_ready, worker_shutdown
-
-from open_inwoner.conf.utils import config
+from maykin_common.config import config
 
 from .setup import setup_env
 

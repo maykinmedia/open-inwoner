@@ -10,13 +10,14 @@ import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
+from maykin_common.config import config
 from maykin_common.health_checks import (
     default_health_check_apps,
     default_health_check_subsets,
 )
 
 from .structlog_sentry import SentryStructlogProcessor
-from .utils import config, get_sentry_integrations
+from .utils import get_sentry_integrations
 
 # django.utils.timezone.utc was removed in Django 5.0. Restore it as a
 # compatibility shim for third-party packages (e.g. zgw-consumers-oas) that
@@ -52,7 +53,7 @@ if secret_key_fallback := config("SECRET_KEY_FALLBACK", default=""):
 DEBUG = config("DEBUG", default=False)
 
 # = domains we're running on
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", split=True)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], split=True)
 
 IS_HTTPS = config("IS_HTTPS", default=not DEBUG)
 
@@ -82,18 +83,18 @@ USE_THOUSAND_SEPARATOR = True
 #
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", "django.contrib.gis.db.backends.postgis"),
-        "NAME": config("DB_NAME", "open_inwoner"),
-        "USER": config("DB_USER", "open_inwoner"),
-        "PASSWORD": config("DB_PASSWORD", "open_inwoner"),
-        "HOST": config("DB_HOST", "localhost"),
-        "PORT": config("DB_PORT", 5432),
+        "ENGINE": config("DB_ENGINE", default="django.contrib.gis.db.backends.postgis"),
+        "NAME": config("DB_NAME", default="open_inwoner"),
+        "USER": config("DB_USER", default="open_inwoner"),
+        "PASSWORD": config("DB_PASSWORD", default="open_inwoner"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default=5432),
     }
 }
 
 # Geospatial libraries
-GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", None)
-GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", None)
+GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", default=None)
+GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", default=None)
 
 # Custom JavaScript feature flag
 ALLOW_CUSTOM_JS = config("ALLOW_CUSTOM_JS", default=False)
@@ -101,7 +102,7 @@ ALLOW_CUSTOM_JS = config("ALLOW_CUSTOM_JS", default=False)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', 'localhost:6379/0')}",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -109,7 +110,7 @@ CACHES = {
     },
     "axes": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', 'localhost:6379/0')}",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -373,7 +374,7 @@ STATICFILES_FINDERS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", "")
+MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", default="")
 
 if MEDIA_SUBFOLDER:
     MEDIA_ROOT = os.path.join(MEDIA_ROOT, MEDIA_SUBFOLDER)
@@ -610,7 +611,7 @@ SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 ADMIN_SESSION_COOKIE_AGE = config(
-    "ADMIN_SESSION_COOKIE_AGE", 3600
+    "ADMIN_SESSION_COOKIE_AGE", default=3600
 )  # Default 1 hour max session duration for admins
 SESSION_WARN_DELTA = 120  # Warn 2 minutes before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
@@ -618,7 +619,9 @@ SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
-OIDC_FRONTEND_LOGOUT_WITH_HINTS = config("OIDC_FRONTEND_LOGOUT_WITH_HINTS", True)
+OIDC_FRONTEND_LOGOUT_WITH_HINTS = config(
+    "OIDC_FRONTEND_LOGOUT_WITH_HINTS", default=True
+)
 
 #
 # SECURITY settings
@@ -646,7 +649,7 @@ FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "conf", "fixtures"),)
 # Custom settings
 #
 PROJECT_NAME = "open_inwoner"
-ENVIRONMENT = config("ENVIRONMENT", "")
+ENVIRONMENT = config("ENVIRONMENT", default="")
 SHOW_ALERT = True
 
 ##############################
@@ -888,7 +891,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 #
 # SENTRY - error monitoring
 #
-SENTRY_DSN = config("SENTRY_DSN", None)
+SENTRY_DSN = config("SENTRY_DSN", default=None)
 RELEASE = "v2.3.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
@@ -999,7 +1002,7 @@ if SENTRY_DSN:
 ELASTIC_APM_SERVER_URL = os.getenv("ELASTIC_APM_SERVER_URL", None)
 ELASTIC_APM = {
     "SERVICE_NAME": f"open_inwoner {ENVIRONMENT}",
-    "SECRET_TOKEN": config("ELASTIC_APM_SECRET_TOKEN", "default"),
+    "SECRET_TOKEN": config("ELASTIC_APM_SECRET_TOKEN", default="default"),
     "SERVER_URL": ELASTIC_APM_SERVER_URL,
 }
 if not ELASTIC_APM_SERVER_URL:
@@ -1015,19 +1018,19 @@ GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG
-_es_username = config("ES_USERNAME", "")
-_es_password = config("ES_PASSWORD", "")
+_es_username = config("ES_USERNAME", default="")
+_es_password = config("ES_PASSWORD", default="")
 if bool(_es_username) ^ bool(_es_password):
     raise ImproperlyConfigured(
         "Both ES_USERNAME and ES_PASSWORD must be set to enable Elasticsearch "
         "authentication. Only one of the two is currently configured."
     )
-_es_connection: dict = {"hosts": config("ES_HOST", "http://localhost:9200")}
+_es_connection: dict = {"hosts": config("ES_HOST", default="http://localhost:9200")}
 if _es_username and _es_password:
     _es_connection["basic_auth"] = (_es_username, _es_password)
 ELASTICSEARCH_DSL = {"default": _es_connection}
-ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", "products")
-ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", "cms_pages")
+ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", default="products")
+ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", default="cms_pages")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
@@ -1134,10 +1137,10 @@ ACCOUNTS_USER_TOKEN_EXPIRE_TIME = 300
 ACCOUNTS_SMS_MESSAGE = _("Inlogcode: {token} (deze code is 5 minuten geldig.)")
 ACCOUNTS_SMS_GATEWAY = {
     "BACKEND": config(
-        "ACCOUNTS_SMS_GATEWAY_BACKEND", "open_inwoner.accounts.gateways.Dummy"
+        "ACCOUNTS_SMS_GATEWAY_BACKEND", default="open_inwoner.accounts.gateways.Dummy"
     ),
-    "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", "openinwoner"),
-    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", "Gemeente"),
+    "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", default="openinwoner"),
+    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", default="Gemeente"),
 }
 
 from .app.csp import *  # noqa
