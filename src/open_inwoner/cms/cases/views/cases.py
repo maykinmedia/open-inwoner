@@ -71,9 +71,12 @@ class OuterCaseListView(
         context = super().get_context_data(**kwargs)
 
         statuses = self.request.GET.getlist("status")
+        search = self.request.GET.get("search", "")
 
         f_url = furl(reverse("cases:cases_content"))
         f_url.args.addlist("status", statuses)
+        if search:
+            f_url.args["search"] = search
 
         context["hxget"] = f_url.url
         return context
@@ -112,10 +115,21 @@ class InnerCaseListView(
         except (TypeError, ValueError):
             page_number = 1
 
-        formulieren: Sequence[UniformCase] = case_service.get_formulieren(
-            user_identification
-        )
-        all_visible_zaken = case_service.get_visible_zaken(user_identification).zaken
+        all_visible_zaken = []
+        formulieren = []
+
+        search = self.request.GET.get("search", "").strip()
+        if search and self.request.user.is_authenticated and user_identification:
+            all_visible_zaken = case_service.search_zaken(
+                user_identification, zaak_identificatie=search
+            )
+        else:
+            formulieren: Sequence[UniformCase] = case_service.get_formulieren(
+                user_identification
+            )
+            all_visible_zaken = case_service.get_visible_zaken(
+                user_identification
+            ).zaken
 
         if config.zaken_filter_enabled:
             case_status_frequencies = _get_zaak_status_frequencies(

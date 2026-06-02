@@ -1,6 +1,21 @@
 .cases {
   position: relative;
 
+  // Empty result container
+  & &__empty {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    flex-basis: 100% !important;
+
+    p,
+    a {
+      margin: 0;
+    }
+  }
+
   /// cards on cases list
   .card {
     &__body {

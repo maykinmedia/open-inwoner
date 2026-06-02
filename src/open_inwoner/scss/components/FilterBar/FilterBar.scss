@@ -5,6 +5,7 @@
   padding: 0;
   position: relative;
   display: inline-block;
+  box-sizing: border-box;
 
   @media (min-width: 768px) {
     padding: var(--spacing-large);
@@ -42,6 +43,7 @@
       display: flex;
       flex-direction: row;
       align-items: flex-start;
+      flex-wrap: wrap;
       gap: var(--spacing-extra-large);
     }
   }
@@ -134,9 +136,13 @@
 
     .filter-bar__form {
       display: flex !important;
-      flex-direction: row;
+      flex-direction: column;
       align-items: flex-start;
-      gap: var(--spacing-extra-large);
+      gap: var(--spacing-medium);
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+      }
     }
 
     .filter-bar__mobile-controls {
@@ -166,16 +172,17 @@
       font-size: var(--font-size-body-larger);
       font-weight: bold;
       margin-block-start: 0;
-      margin-block-end: var(--row-height);
+      margin-block-end: 0;
       margin-inline-start: 0;
       margin-inline-end: 0;
     }
 
     .filter-bar__status-text {
       color: var(--color-gray-dark);
+      margin-top: var(--spacing-large);
       display: block;
       margin-block-start: 0;
-      margin-block-end: calc(-1 * (var(--row-height) - var(--spacing-large)));
+      margin-block-end: 0;
       margin-inline-start: 0;
       margin-inline-end: 0;
     }
@@ -209,6 +216,20 @@
           display: none;
         }
       }
+    }
+  }
+
+  .filter-bar__multiselect-listbox:has(+ oip-search) {
+    margin-right: auto;
+  }
+
+  oip-search {
+    order: -1;
+    width: 100%;
+
+    @media (min-width: 768px) {
+      order: unset;
+      max-width: 260px;
     }
   }
 }
