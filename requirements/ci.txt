@@ -359,7 +359,7 @@ django-fsm-2==4.2.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   djangocms-versioning
-django-health-check==3.20.8
+django-health-check==4.4.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -570,6 +570,7 @@ dnspython==2.6.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   django-health-check
     #   email-validator
 docutils==0.21.2
     # via

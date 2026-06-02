@@ -227,7 +227,7 @@ django-formtools==2.3
     #   django-two-factor-auth
 django-fsm-2==4.2.4
     # via djangocms-versioning
-django-health-check==3.20.8
+django-health-check==4.4.1
     # via maykin-common
 django-htmx==1.23.0
     # via -r requirements/base.in
@@ -345,7 +345,9 @@ djangorestframework-camel-case==1.4.2
     #   -r requirements/base.in
     #   notifications-api-common
 dnspython==2.6.1
-    # via email-validator
+    # via
+    #   django-health-check
+    #   email-validator
 docutils==0.21.2
     # via django-setup-configuration
 drf-spectacular==0.20.1
