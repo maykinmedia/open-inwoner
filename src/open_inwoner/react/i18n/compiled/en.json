@@ -111,6 +111,12 @@
       "value": "Clear"
     }
   ],
+  "kvkbranchselector.error": [
+    {
+      "type": 0,
+      "value": "A problem occurred while loading the branch locations. Try refreshing the page."
+    }
+  ],
   "kvkbranchselector.placeholder": [
     {
       "type": 0,
