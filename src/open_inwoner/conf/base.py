@@ -11,10 +11,7 @@ from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
 from maykin_common.config import config
-from maykin_common.health_checks import (
-    default_health_check_apps,
-    default_health_check_subsets,
-)
+from maykin_common.health_checks import default_health_check_apps
 
 from .structlog_sentry import SentryStructlogProcessor
 from .utils import get_sentry_integrations
@@ -316,9 +313,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "open_inwoner.urls"
 
 # Health check
-HEALTH_CHECK = {
-    "SUBSETS": default_health_check_subsets,
-}
+HEALTH_CHECK = {}
 
 
 # List of callables that know how to import templates from various sources.
