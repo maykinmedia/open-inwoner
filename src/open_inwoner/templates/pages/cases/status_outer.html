@@ -7,6 +7,8 @@
 {% endblock notifications %}
 
 {% block content %}
+    <div class="case-detail" id="any-error" data-error-message="{% trans 'We kunnen op dit moment de gegevens niet ophalen, probeer het later opnieuw.' %}"></div>
+
     <div class="case-detail" id="cases-detail-content">
         <oip-loading-spinner
             loading-text="{% trans 'Gegevens laden...' %}"
