@@ -10,7 +10,7 @@ import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
-from maykin_common.config import config
+from maykin_common.config import DocumentationParams, config
 from maykin_common.health_checks import default_health_check_apps
 
 from .structlog_sentry import SentryStructlogProcessor
@@ -34,25 +34,83 @@ BASE_DIR = os.path.abspath(
 #
 # Core Django settings
 #
-SITE_ID = config("SITE_ID", default=1)
+SITE_ID = config(
+    "SITE_ID",
+    default=1,
+    documentation=DocumentationParams(
+        help_text="Database ID of the Django Site object for this installation.",
+        group="Application",
+    ),
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config(
+    "SECRET_KEY",
+    documentation=DocumentationParams(
+        help_text=(
+            "A long, random string used for cryptographic signing. "
+            "Must be unique per environment and never committed to version control."
+        ),
+        group="Application",
+    ),
+)
 
 # To facilitate key rotation and migrations. We currently only allow a single value
 # (hence the singular `SECRET_KEY_FALLBACK` config attribute).
-if secret_key_fallback := config("SECRET_KEY_FALLBACK", default=""):
+if secret_key_fallback := config(
+    "SECRET_KEY_FALLBACK",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "A previous SECRET_KEY value to support gradual key rotation. "
+            "Sessions and tokens signed with this key remain valid during the transition."
+        ),
+        group="Security",
+    ),
+):
     SECRET_KEY_FALLBACKS = [secret_key_fallback]
 
 # NEVER run with DEBUG=True in production-like environments
-DEBUG = config("DEBUG", default=False)
+DEBUG = config(
+    "DEBUG",
+    default=False,
+    documentation=DocumentationParams(
+        help_text=(
+            "Enables Django debug mode. Must be False in production: "
+            "exposes tracebacks and disables security hardening."
+        ),
+        group="Security",
+    ),
+)
 
 # = domains we're running on
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=[], split=True)
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default=[],
+    split=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Comma-separated list of domains (without spaces) that serve this installation. "
+            "Protects against HTTP Host header attacks. "
+            "Example: example.com,www.example.com"
+        ),
+        group="Application",
+    ),
+)
 
-IS_HTTPS = config("IS_HTTPS", default=not DEBUG)
+IS_HTTPS = config(
+    "IS_HTTPS",
+    default=not DEBUG,
+    documentation=DocumentationParams(
+        help_text=(
+            "Set to True when the application is served over HTTPS. "
+            "Enables secure cookies and HSTS. Defaults to the inverse of DEBUG."
+        ),
+        group="Security",
+    ),
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -80,26 +138,98 @@ USE_THOUSAND_SEPARATOR = True
 #
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", default="django.contrib.gis.db.backends.postgis"),
-        "NAME": config("DB_NAME", default="open_inwoner"),
-        "USER": config("DB_USER", default="open_inwoner"),
-        "PASSWORD": config("DB_PASSWORD", default="open_inwoner"),
-        "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("DB_PORT", default=5432),
+        "ENGINE": config(
+            "DB_ENGINE",
+            default="django.contrib.gis.db.backends.postgis",
+            documentation=DocumentationParams(
+                help_text="Django database backend to use. The default enables PostGIS (spatial data support).",
+                group="Database",
+            ),
+        ),
+        "NAME": config(
+            "DB_NAME",
+            default="open_inwoner",
+            documentation=DocumentationParams(
+                help_text="Name of the PostgreSQL database.",
+                group="Database",
+            ),
+        ),
+        "USER": config(
+            "DB_USER",
+            default="open_inwoner",
+            documentation=DocumentationParams(
+                help_text="PostgreSQL database user.",
+                group="Database",
+            ),
+        ),
+        "PASSWORD": config(
+            "DB_PASSWORD",
+            default="open_inwoner",
+            documentation=DocumentationParams(
+                help_text="Password for the PostgreSQL database user.",
+                group="Database",
+            ),
+        ),
+        "HOST": config(
+            "DB_HOST",
+            default="localhost",
+            documentation=DocumentationParams(
+                help_text="Hostname or IP address of the PostgreSQL server.",
+                group="Database",
+            ),
+        ),
+        "PORT": config(
+            "DB_PORT",
+            default=5432,
+            documentation=DocumentationParams(
+                help_text="Port the PostgreSQL server listens on.",
+                group="Database",
+            ),
+        ),
     }
 }
 
 # Geospatial libraries
-GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", default=None)
-GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", default=None)
+GEOS_LIBRARY_PATH = config(
+    "GEOS_LIBRARY_PATH",
+    default=None,
+    documentation=DocumentationParams(
+        help_text=(
+            "Absolute path to the GEOS shared library. "
+            "Only required when the library cannot be found automatically."
+        ),
+        group="Database",
+    ),
+)
+GDAL_LIBRARY_PATH = config(
+    "GDAL_LIBRARY_PATH",
+    default=None,
+    documentation=DocumentationParams(
+        help_text=(
+            "Absolute path to the GDAL shared library. "
+            "Only required when the library cannot be found automatically."
+        ),
+        group="Database",
+    ),
+)
 
 # Custom JavaScript feature flag
-ALLOW_CUSTOM_JS = config("ALLOW_CUSTOM_JS", default=False)
+ALLOW_CUSTOM_JS = config(
+    "ALLOW_CUSTOM_JS",
+    default=False,
+    documentation=DocumentationParams(
+        help_text=(
+            "Allow administrators to inject custom JavaScript via the admin interface. "
+            "Disable in environments where strict CSP is required."
+        ),
+        group="Application",
+    ),
+)
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0')}",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(help_text='Redis connection string for the default cache, in host:port/db format.', group='Cache'))}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -107,7 +237,7 @@ CACHES = {
     },
     "axes": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0')}",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -122,12 +252,49 @@ CACHES = {
 SOLO_CACHE_TIMEOUT = 5  # 5 seconds
 SOLO_CACHE = "local"  # Avoid Redis overhead
 
+# ZGW API caches
+CACHE_ZGW_CATALOGI_TIMEOUT = config(
+    "CACHE_ZGW_CATALOGI_TIMEOUT",
+    default=60 * 60 * 24,
+    documentation=DocumentationParams(
+        help_text=(
+            "Seconds to cache ZGW catalogus data (zaaktypen, statustypen, etc.). "
+            "Catalogue data changes infrequently; a long TTL reduces API load."
+        ),
+        group="ZGW",
+    ),
+)
+CACHE_ZGW_ZAKEN_TIMEOUT = config(
+    "CACHE_ZGW_ZAKEN_TIMEOUT",
+    default=60 * 5,
+    documentation=DocumentationParams(
+        help_text="Seconds to cache individual zaak data fetched from ZGW APIs.",
+        group="ZGW",
+    ),
+)
 
 # Maximum number of pagination requests to follow when fetching zaken from ZGW APIs
-ZGW_MAX_REQUESTS = config("ZGW_MAX_REQUESTS", default=8)
+ZGW_MAX_REQUESTS = config(
+    "ZGW_MAX_REQUESTS",
+    default=8,
+    documentation=DocumentationParams(
+        help_text=(
+            "Maximum number of paginated API calls to follow when fetching zaken from ZGW APIs. "
+            "Limits the total number of cases loaded per request."
+        ),
+        group="ZGW",
+    ),
+)
 
 # Laposta API caching
-CACHE_LAPOSTA_API_TIMEOUT = config("CACHE_LAPOSTA_API_TIMEOUT", default=60 * 15)
+CACHE_LAPOSTA_API_TIMEOUT = config(
+    "CACHE_LAPOSTA_API_TIMEOUT",
+    default=60 * 15,
+    documentation=DocumentationParams(
+        help_text="Seconds to cache responses from the Laposta mailing list API.",
+        group="Cache",
+    ),
+)
 
 
 #
@@ -266,7 +433,17 @@ INSTALLED_APPS = [
     "notifications_api_common",
 ]
 
-_log_requests_via_middleware = config("LOG_REQUESTS", default=True)
+_log_requests_via_middleware = config(
+    "LOG_REQUESTS",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Enable structured request logging via django-structlog middleware. "
+            "Logs method, path, status code, and duration for every request."
+        ),
+        group="Logging",
+    ),
+)
 _structlog_middleware = (
     [
         "django_structlog.middlewares.RequestMiddleware",
@@ -369,7 +546,17 @@ STATICFILES_FINDERS = [
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_SUBFOLDER = config("MEDIA_SUBFOLDER", default="")
+MEDIA_SUBFOLDER = config(
+    "MEDIA_SUBFOLDER",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Optional subdirectory appended to MEDIA_ROOT and PRIVATE_MEDIA_ROOT. "
+            "Useful for separating media files across deployments sharing the same storage."
+        ),
+        group="Application",
+    ),
+)
 
 if MEDIA_SUBFOLDER:
     MEDIA_ROOT = os.path.join(MEDIA_ROOT, MEDIA_SUBFOLDER)
@@ -381,16 +568,56 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 #
 # Sending EMAIL
 #
-EMAIL_HOST = config("EMAIL_HOST", default="localhost")
+EMAIL_HOST = config(
+    "EMAIL_HOST",
+    default="localhost",
+    documentation=DocumentationParams(
+        help_text="Hostname of the SMTP server used to send outgoing email.",
+        group="Email",
+    ),
+)
 EMAIL_PORT = config(
-    "EMAIL_PORT", default=25
+    "EMAIL_PORT",
+    default=25,
+    documentation=DocumentationParams(
+        help_text="Port of the SMTP server. Port 25 is blocked on Google Cloud; use 587 instead.",
+        group="Email",
+    ),
 )  # disabled on Google Cloud, use 487 instead
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)
+EMAIL_HOST_USER = config(
+    "EMAIL_HOST_USER",
+    default="",
+    documentation=DocumentationParams(
+        help_text="Username for SMTP authentication. Leave empty if the server does not require auth.",
+        group="Email",
+    ),
+)
+EMAIL_HOST_PASSWORD = config(
+    "EMAIL_HOST_PASSWORD",
+    default="",
+    documentation=DocumentationParams(
+        help_text="Password for SMTP authentication.",
+        group="Email",
+    ),
+)
+EMAIL_USE_TLS = config(
+    "EMAIL_USE_TLS",
+    default=False,
+    documentation=DocumentationParams(
+        help_text="Enable STARTTLS when connecting to the SMTP server.",
+        group="Email",
+    ),
+)
 EMAIL_TIMEOUT = 10
 
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="openinwoner@maykinmedia.nl")
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default="openinwoner@maykinmedia.nl",
+    documentation=DocumentationParams(
+        help_text="Default sender address for outgoing email.",
+        group="Email",
+    ),
+)
 
 EMAIL_BACKEND = "django_yubin.backends.QueuedEmailBackend"
 MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -398,8 +625,25 @@ MAILER_USE_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 #
 # LOGGING
 #
-LOG_STDOUT = config("LOG_STDOUT", default=False)
-CELERY_LOGLEVEL = config("CELERY_LOGLEVEL", default="INFO")
+LOG_STDOUT = config(
+    "LOG_STDOUT",
+    default=False,
+    documentation=DocumentationParams(
+        help_text=(
+            "Write application and request logs to stdout instead of rotating log files. "
+            "Enable in containerised deployments where stdout is collected by the platform."
+        ),
+        group="Logging",
+    ),
+)
+CELERY_LOGLEVEL = config(
+    "CELERY_LOGLEVEL",
+    default="INFO",
+    documentation=DocumentationParams(
+        help_text="Log level for Celery workers. One of DEBUG, INFO, WARNING, ERROR, CRITICAL.",
+        group="Logging",
+    ),
+)
 
 LOGGING_DIR = os.path.join(BASE_DIR, "log")
 
@@ -455,7 +699,17 @@ LOGGING = {
         "console": {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
-            "formatter": config("LOG_FORMAT_CONSOLE", default="plain_console"),
+            "formatter": config(
+                "LOG_FORMAT_CONSOLE",
+                default="plain_console",
+                documentation=DocumentationParams(
+                    help_text=(
+                        "Formatter to use for console log output. "
+                        "Use 'json' for machine-readable output or 'plain_console' for human-readable output."
+                    ),
+                    group="Logging",
+                ),
+            ),
         },
         "django": {
             "level": "DEBUG",
@@ -569,7 +823,17 @@ DJANGO_STRUCTLOG_CELERY_ENABLED = True
 #
 # LOG OUTGOING REQUESTS
 #
-LOG_OUTGOING_REQUESTS_DB_SAVE = config("LOG_OUTGOING_REQUESTS_DB_SAVE", default=True)
+LOG_OUTGOING_REQUESTS_DB_SAVE = config(
+    "LOG_OUTGOING_REQUESTS_DB_SAVE",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Persist outgoing HTTP request logs to the database so they are "
+            "viewable in the admin interface."
+        ),
+        group="Logging",
+    ),
+)
 LOG_OUTGOING_REQUESTS_RESET_DB_SAVE_AFTER = None  # reset config after $ minutes
 
 
@@ -606,7 +870,15 @@ SESSION_COOKIE_NAME = "open_inwoner_sessionid"
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 ADMIN_SESSION_COOKIE_AGE = config(
-    "ADMIN_SESSION_COOKIE_AGE", default=3600
+    "ADMIN_SESSION_COOKIE_AGE",
+    default=3600,
+    documentation=DocumentationParams(
+        help_text=(
+            "Maximum admin session duration in seconds. "
+            "Sessions older than this are invalidated to reduce the window for session hijacking."
+        ),
+        group="Security",
+    ),
 )  # Default 1 hour max session duration for admins
 SESSION_WARN_DELTA = 120  # Warn 2 minutes before end of session.
 SESSION_COOKIE_AGE = 900  # Set to 15 minutes or less for testing
@@ -615,7 +887,15 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 OIDC_FRONTEND_LOGOUT_WITH_HINTS = config(
-    "OIDC_FRONTEND_LOGOUT_WITH_HINTS", default=True
+    "OIDC_FRONTEND_LOGOUT_WITH_HINTS",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Pass login_hint and id_token_hint when redirecting to the IdP logout endpoint. "
+            "Enables single-logout for OIDC sessions."
+        ),
+        group="Security",
+    ),
 )
 
 #
@@ -644,7 +924,17 @@ FIXTURE_DIRS = (os.path.join(DJANGO_PROJECT_DIR, "conf", "fixtures"),)
 # Custom settings
 #
 PROJECT_NAME = "open_inwoner"
-ENVIRONMENT = config("ENVIRONMENT", default="")
+ENVIRONMENT = config(
+    "ENVIRONMENT",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Name of the deployment environment (e.g. production, staging, review). "
+            "Included in Sentry reports and the admin page title."
+        ),
+        group="Monitoring",
+    ),
+)
 SHOW_ALERT = True
 
 ##############################
@@ -807,7 +1097,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # CELERY - async task queue
 #
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
-CELERY_TASK_TIME_LIMIT = config("CELERY_TASK_HARD_TIME_LIMIT", default=15 * 60)
+CELERY_TASK_TIME_LIMIT = config(
+    "CELERY_TASK_HARD_TIME_LIMIT",
+    default=15 * 60,
+    documentation=DocumentationParams(
+        help_text=(
+            "Hard time limit in seconds for Celery tasks. "
+            "A task exceeding this limit is forcibly terminated."
+        ),
+        group="Celery",
+    ),
+)
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html#beat-entries
 CELERY_BEAT_SCHEDULE = {
@@ -886,7 +1186,17 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 #
 # SENTRY - error monitoring
 #
-SENTRY_DSN = config("SENTRY_DSN", default=None)
+SENTRY_DSN = config(
+    "SENTRY_DSN",
+    default=None,
+    documentation=DocumentationParams(
+        help_text=(
+            "Sentry Data Source Name (DSN) for error reporting. "
+            "Leave empty to disable Sentry."
+        ),
+        group="Monitoring",
+    ),
+)
 RELEASE = "v2.3.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
@@ -937,6 +1247,13 @@ CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     split=True,
     default=CORS_ALLOWED_ORIGINS,
+    documentation=DocumentationParams(
+        help_text=(
+            "Comma-separated list of origins trusted for CSRF verification. "
+            "Required when the application is accessed via a different domain or through a reverse proxy."
+        ),
+        group="Security",
+    ),
 )
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
@@ -997,7 +1314,14 @@ if SENTRY_DSN:
 ELASTIC_APM_SERVER_URL = os.getenv("ELASTIC_APM_SERVER_URL", None)
 ELASTIC_APM = {
     "SERVICE_NAME": f"open_inwoner {ENVIRONMENT}",
-    "SECRET_TOKEN": config("ELASTIC_APM_SECRET_TOKEN", default="default"),
+    "SECRET_TOKEN": config(
+        "ELASTIC_APM_SECRET_TOKEN",
+        default="default",
+        documentation=DocumentationParams(
+            help_text="Secret token for authenticating with the Elastic APM server.",
+            group="Monitoring",
+        ),
+    ),
     "SERVER_URL": ELASTIC_APM_SERVER_URL,
 }
 if not ELASTIC_APM_SERVER_URL:
@@ -1013,19 +1337,56 @@ GEOCODER = "open_inwoner.utils.geocode.PdocLocatieserver"
 
 
 # ELASTICSEARCH CONFIG
-_es_username = config("ES_USERNAME", default="")
-_es_password = config("ES_PASSWORD", default="")
+_es_username = config(
+    "ES_USERNAME",
+    default="",
+    documentation=DocumentationParams(
+        help_text="Username for Elasticsearch basic authentication. Must be set together with ES_PASSWORD.",
+        group="Elasticsearch",
+    ),
+)
+_es_password = config(
+    "ES_PASSWORD",
+    default="",
+    documentation=DocumentationParams(
+        help_text="Password for Elasticsearch basic authentication. Must be set together with ES_USERNAME.",
+        group="Elasticsearch",
+    ),
+)
 if bool(_es_username) ^ bool(_es_password):
     raise ImproperlyConfigured(
         "Both ES_USERNAME and ES_PASSWORD must be set to enable Elasticsearch "
         "authentication. Only one of the two is currently configured."
     )
-_es_connection: dict = {"hosts": config("ES_HOST", default="http://localhost:9200")}
+_es_connection: dict = {
+    "hosts": config(
+        "ES_HOST",
+        default="http://localhost:9200",
+        documentation=DocumentationParams(
+            help_text="URL of the Elasticsearch node, including scheme and port.",
+            group="Elasticsearch",
+        ),
+    )
+}
 if _es_username and _es_password:
     _es_connection["basic_auth"] = (_es_username, _es_password)
 ELASTICSEARCH_DSL = {"default": _es_connection}
-ES_INDEX_PRODUCTS = config("ES_INDEX_PRODUCTS", default="products")
-ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", default="cms_pages")
+ES_INDEX_PRODUCTS = config(
+    "ES_INDEX_PRODUCTS",
+    default="products",
+    documentation=DocumentationParams(
+        help_text="Elasticsearch index name for PDC product records.",
+        group="Elasticsearch",
+    ),
+)
+ES_INDEX_CMS_PAGES = config(
+    "ES_INDEX_CMS_PAGES",
+    default="cms_pages",
+    documentation=DocumentationParams(
+        help_text="Elasticsearch index name for CMS page records.",
+        group="Elasticsearch",
+    ),
+)
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
@@ -1036,13 +1397,27 @@ ELASTICSEARCH_DSL_AUTO_REFRESH = config("ELASTICSEARCH_DSL_AUTO_REFRESH", defaul
 ELASTICSEARCH_DSL_AUTOSYNC = config("ELASTICSEARCH_DSL_AUTOSYNC", default=True)
 
 # Search page pagination trigger
-RESULTS_PER_PAGE = config("RESULTS_PER_PAGE", default=9)
+RESULTS_PER_PAGE = config(
+    "RESULTS_PER_PAGE",
+    default=9,
+    documentation=DocumentationParams(
+        help_text="Number of search results shown per page.",
+        group="Elasticsearch",
+    ),
+)
 
 # django import-export
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 # invite expires in X days after sending
-INVITE_EXPIRY_DAYS = config("INVITE_EXPIRY_DAYS", default=30)
+INVITE_EXPIRY_DAYS = config(
+    "INVITE_EXPIRY_DAYS",
+    default=30,
+    documentation=DocumentationParams(
+        help_text="Number of days before a user invitation link expires.",
+        group="Application",
+    ),
+)
 
 # zgw-consumers
 ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
@@ -1050,23 +1425,104 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
+# The maximum number of workers to use when concurrently fetching and resolving
+# cases on the "Mijn Zaken" page
+ZGW_CASE_LIST_NUM_WORKERS = (
+    config(
+        "ZGW_CASE_LIST_NUM_WORKERS",
+        default=0,
+        documentation=DocumentationParams(
+            help_text=(
+                "Number of threads used to concurrently fetch cases on the Mijn Zaken page. "
+                "Set to 0 to use the library default."
+            ),
+            group="ZGW",
+        ),
+    )
+    # Because auto config has no clean way to express "int | None", and we want to fall
+    # back to the library default
+    or None
+)
+
+# The aggregate number of seconds workers can concurrently fetch and resolve
+# cases on the "Mijn Zaken" page. Should be set to slightly less than the overall
+# timeout.
+ZGW_CASE_LIST_FETCH_TIMEOUT = config(
+    "ZGW_CASE_LIST_FETCH_TIMEOUT",
+    default=25,
+    documentation=DocumentationParams(
+        help_text=(
+            "Total seconds the Mijn Zaken worker pool may spend fetching cases. "
+            "Should be slightly less than the overall request timeout."
+        ),
+        group="ZGW",
+    ),
+)
+
 # Timeout in seconds for the login cache warm-up task per API group.
-# Should be longer than ZGWApiGroupConfig.case_list_fetch_timeout because the
-# warm-up fetches status history, roles, and documents on top of what the list view resolves.
-ZGW_CACHE_WARMUP_TIMEOUT = config("ZGW_CACHE_WARMUP_TIMEOUT", default=120)
+# Needs to be longer than ZGW_CASE_LIST_FETCH_TIMEOUT because the warm-up fetches
+# status history, roles, and documents on top of what the list view resolves.
+ZGW_CACHE_WARMUP_TIMEOUT = config(
+    "ZGW_CACHE_WARMUP_TIMEOUT",
+    default=120,
+    documentation=DocumentationParams(
+        help_text=(
+            "Seconds the login cache warm-up task may run per API group. "
+            "Must exceed ZGW_CASE_LIST_FETCH_TIMEOUT because the warm-up fetches "
+            "additional data (statuses, roles, documents)."
+        ),
+        group="ZGW",
+    ),
+)
 
 # Celery queue to use for cache-seeding tasks (IO-bound, latency-sensitive).
 # Operators may dedicate a separate high-priority queue/worker pool for these.
 # Defaults to Celery's built-in default queue so no extra infrastructure is
 # needed out of the box.
-CACHE_SEEDING_QUEUE = config("CACHE_SEEDING_QUEUE", default="celery")
+CACHE_SEEDING_QUEUE = config(
+    "CACHE_SEEDING_QUEUE",
+    default="celery",
+    documentation=DocumentationParams(
+        help_text=(
+            "Celery queue for cache-seeding tasks. "
+            "Point this to a dedicated high-priority queue to keep warm-up latency low."
+        ),
+        group="Celery",
+    ),
+)
 
+# notifications
+ZGW_LIMIT_NOTIFICATIONS_FREQUENCY = config(
+    "ZGW_LIMIT_NOTIFICATIONS_FREQUENCY",
+    default=60 * 15,
+    documentation=DocumentationParams(
+        help_text=(
+            "Minimum seconds between duplicate ZGW notifications for the same zaak. "
+            "Prevents notification storms when the same event is delivered multiple times."
+        ),
+        group="ZGW",
+    ),
+)
 
 # recent documents: created/added no longer than n days in the past
-DOCUMENT_RECENT_DAYS = config("DOCUMENT_RECENT_DAYS", default=1)
+DOCUMENT_RECENT_DAYS = config(
+    "DOCUMENT_RECENT_DAYS",
+    default=1,
+    documentation=DocumentationParams(
+        help_text="Documents created within this many days are labelled as recent in the UI.",
+        group="ZGW",
+    ),
+)
 
 # recent answers to contactmomenten: no longer than n days in the past
-CONTACTMOMENT_NEW_DAYS = config("CONTACTMOMENT_NEW_DAYS", default=7)
+CONTACTMOMENT_NEW_DAYS = config(
+    "CONTACTMOMENT_NEW_DAYS",
+    default=7,
+    documentation=DocumentationParams(
+        help_text="Contactmoment answers created within this many days are shown as new in the UI.",
+        group="ZGW",
+    ),
+)
 
 #
 # Maykin 2FA
@@ -1087,13 +1543,40 @@ UPLOAD_FILE_TYPES = "application/vnd.openxmlformats-officedocument.wordprocessin
 #
 # DIGID
 #
-DIGID_ENABLED = config("DIGID_ENABLED", default=True)
-DIGID_MOCK = config("DIGID_MOCK", default=True)
+DIGID_ENABLED = config(
+    "DIGID_ENABLED",
+    default=True,
+    documentation=DocumentationParams(
+        help_text="Enable DigiD authentication. Set to False to hide DigiD login options.",
+        group="Authentication",
+    ),
+)
+DIGID_MOCK = config(
+    "DIGID_MOCK",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Use the DigiD mock backend instead of the real SAML integration. "
+            "Must be False in production."
+        ),
+        group="Authentication",
+    ),
+)
 
 #
 # EHERKENNING
 #
-EHERKENNING_MOCK = config("EHERKENNING_MOCK", default=True)
+EHERKENNING_MOCK = config(
+    "EHERKENNING_MOCK",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Use the eHerkenning mock backend instead of the real SAML integration. "
+            "Must be False in production."
+        ),
+        group="Authentication",
+    ),
+)
 
 THUMBNAIL_ALIASES = {
     "": {
@@ -1118,7 +1601,15 @@ OIDC_STORE_ID_TOKEN = True
 
 # Amount of elapsed time before redirecting the user back to the IdP for re-authentication
 OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = config(
-    "OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS", default=15 * 60
+    "OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS",
+    default=15 * 60,
+    documentation=DocumentationParams(
+        help_text=(
+            "Seconds before an OIDC session is considered stale and the user is "
+            "redirected to the IdP for re-authentication."
+        ),
+        group="Security",
+    ),
 )
 
 # In order to support zaaktypeconfig admin screens with many statusses/results
@@ -1132,10 +1623,32 @@ ACCOUNTS_USER_TOKEN_EXPIRE_TIME = 300
 ACCOUNTS_SMS_MESSAGE = _("Inlogcode: {token} (deze code is 5 minuten geldig.)")
 ACCOUNTS_SMS_GATEWAY = {
     "BACKEND": config(
-        "ACCOUNTS_SMS_GATEWAY_BACKEND", default="open_inwoner.accounts.gateways.Dummy"
+        "ACCOUNTS_SMS_GATEWAY_BACKEND",
+        default="open_inwoner.accounts.gateways.Dummy",
+        documentation=DocumentationParams(
+            help_text=(
+                "Python dotted path to the SMS gateway backend class. "
+                "Use the Dummy backend for local development."
+            ),
+            group="Authentication",
+        ),
     ),
-    "API_KEY": config("ACCOUNTS_SMS_GATEWAY_API_KEY", default="openinwoner"),
-    "ORIGINATOR": config("ACCOUNTS_SMS_GATEWAY_ORIGINATOR", default="Gemeente"),
+    "API_KEY": config(
+        "ACCOUNTS_SMS_GATEWAY_API_KEY",
+        default="openinwoner",
+        documentation=DocumentationParams(
+            help_text="API key for the configured SMS gateway.",
+            group="Authentication",
+        ),
+    ),
+    "ORIGINATOR": config(
+        "ACCOUNTS_SMS_GATEWAY_ORIGINATOR",
+        default="Gemeente",
+        documentation=DocumentationParams(
+            help_text="Sender name or number shown on SMS messages (max 11 alphanumeric characters).",
+            group="Authentication",
+        ),
+    ),
 }
 
 from .app.csp import *  # noqa
