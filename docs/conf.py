@@ -46,6 +46,7 @@ extensions = [
     # "sphinx_markdown_tables",
     "django_setup_configuration.documentation.setup_config_example",
     "django_setup_configuration.documentation.setup_config_usage",
+    "maykin_common.documentation.config_directives",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -136,5 +137,8 @@ extlinks = {
     "gh": ("https://github.com/maykinmedia/open-inwoner/issues/%s", "#%s"),
     "release": ("https://github.com/maykinmedia/open-inwoner/releases/tag/%s", "%s"),
     "cve": ("https://cve.mitre.org/cgi-bin/cvename.cgi?name=%s", "%s"),
-    "oip-nlds": ("https://github.com/maykinmedia/open-inwoner-design-tokens/pull/%s", "PR %s"),
+    "oip-nlds": (
+        "https://github.com/maykinmedia/open-inwoner-design-tokens/pull/%s",
+        "PR %s",
+    ),
 }
