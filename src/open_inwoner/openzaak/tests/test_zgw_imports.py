@@ -1072,6 +1072,46 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertIn("Failed to fetch informatieobjecttype", excluded.error_message)
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
 
+    def test_import_informatieobjecttype_configs_zaaktype_fetch_api_error(self, m):
+        """Test that an API error when fetching zaaktypes does not raise and is excluded"""
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            exc=ConnectionError("Failed to fetch zaaktypes"),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_informatieobjecttype_configs_for_zaaktype(
+            zaaktype_config
+        )
+
+        self.assertEqual(len(result.created), 0)
+        self.assertEqual(len(result.updated), 0)
+        self.assertEqual(len(result.excluded), 1)
+
+        excluded = result.excluded[0]
+        self.assertEqual(excluded.object_type, "InformatieObjectType")
+        self.assertEqual(excluded.url, f"{root}zaaktypen/zt-001")
+        self.assertEqual(excluded.identificatie, "ZAAK-001")
+        self.assertEqual(excluded.reason, ExclusionReason.API_ERROR)
+        self.assertIn("Failed to fetch zaaktypes", excluded.error_message)
+
     def test_import_informatieobjecttype_configs_database_error_on_create(self, m):
         """Test that database errors during create are tracked in excluded list"""
         # Setup: create catalogus and zaaktype
@@ -1648,6 +1688,44 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(excluded.reason, ExclusionReason.API_ERROR)
         self.assertIn("Failed to fetch statustype", excluded.error_message)
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
+
+    def test_import_statustype_configs_zaaktype_fetch_api_error(self, m):
+        """Test that an API error when fetching zaaktypes does not raise and is excluded"""
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            exc=ConnectionError("Failed to fetch zaaktypes"),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_statustype_configs_for_zaaktype(zaaktype_config)
+
+        self.assertEqual(len(result.created), 0)
+        self.assertEqual(len(result.updated), 0)
+        self.assertEqual(len(result.excluded), 1)
+
+        excluded = result.excluded[0]
+        self.assertEqual(excluded.object_type, "StatusType")
+        self.assertEqual(excluded.url, f"{root}zaaktypen/zt-001")
+        self.assertEqual(excluded.identificatie, "ZAAK-001")
+        self.assertEqual(excluded.reason, ExclusionReason.API_ERROR)
+        self.assertIn("Failed to fetch zaaktypes", excluded.error_message)
 
     def test_import_statustype_configs_database_error_on_create(self, m):
         """Test that database errors during create are tracked in excluded list"""
@@ -2269,6 +2347,46 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertEqual(excluded.extra_context["zaaktype_identificatie"], "ZAAK-001")
 
         # Verify no config was created in database
+        self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 0)
+
+    def test_import_resultaattype_configs_zaaktype_fetch_api_error(self, m):
+        """Test that an API error when fetching zaaktypes does not raise and is excluded"""
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        zaaktype_config = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Test Zaaktype",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001"],
+        )
+
+        m.get(
+            f"{root}zaaktypen?identificatie=ZAAK-001",
+            exc=ConnectionError("Failed to fetch zaaktypes"),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_resultaattype_configs_for_zaaktype(zaaktype_config)
+
+        self.assertEqual(len(result.created), 0)
+        self.assertEqual(len(result.updated), 0)
+        self.assertEqual(len(result.excluded), 1)
+
+        excluded = result.excluded[0]
+        self.assertEqual(excluded.object_type, "ResultaatType")
+        self.assertEqual(excluded.url, f"{root}zaaktypen/zt-001")
+        self.assertEqual(excluded.identificatie, "ZAAK-001")
+        self.assertEqual(excluded.reason, ExclusionReason.API_ERROR)
+        self.assertIn("Failed to fetch zaaktypes", excluded.error_message)
+
         self.assertEqual(ZaakTypeResultaatTypeConfig.objects.count(), 0)
 
     def test_import_resultaattype_configs_database_error_on_create(self, m):

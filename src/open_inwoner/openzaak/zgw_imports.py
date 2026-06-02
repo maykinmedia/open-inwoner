@@ -781,7 +781,24 @@ class ZGWCatalogusImporter:
             zaaktype_config=ztc
         )
 
-        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+        try:
+            zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+        except Exception as exc:
+            logger.exception(
+                "Failed to fetch zaaktypes for informatieobjecttype import",
+                identificatie=ztc.identificatie,
+            )
+            result.excluded.append(
+                ExcludedObject(
+                    object_type="InformatieObjectType",
+                    url=ztc.urls[0] if ztc.urls else "",
+                    identificatie=ztc.identificatie,
+                    reason=ExclusionReason.API_ERROR,
+                    error_message=str(exc),
+                    extra_context={"zaaktype_identificatie": ztc.identificatie},
+                )
+            )
+            return result
 
         # Collect and implicitly de-duplicate informatieobjecttype urls
         info_queue = defaultdict(list)
@@ -968,7 +985,25 @@ class ZGWCatalogusImporter:
         result = ZaakTypeRelatedImportResult[ZaakTypeStatusTypeConfig](
             zaaktype_config=ztc
         )
-        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+
+        try:
+            zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+        except Exception as exc:
+            logger.exception(
+                "Failed to fetch zaaktypes for statustype import",
+                identificatie=ztc.identificatie,
+            )
+            result.excluded.append(
+                ExcludedObject(
+                    object_type="StatusType",
+                    url=ztc.urls[0] if ztc.urls else "",
+                    identificatie=ztc.identificatie,
+                    reason=ExclusionReason.API_ERROR,
+                    error_message=str(exc),
+                    extra_context={"zaaktype_identificatie": ztc.identificatie},
+                )
+            )
+            return result
 
         # Collect and implicitly de-duplicate statustype urls
         status_queue = defaultdict(list)
@@ -1169,7 +1204,24 @@ class ZGWCatalogusImporter:
             zaaktype_config=ztc
         )
 
-        zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+        try:
+            zaak_types = self.get_api_zaaktypen_for_saved_ztc(ztc)
+        except Exception as exc:
+            logger.exception(
+                "Failed to fetch zaaktypes for resultaattype import",
+                identificatie=ztc.identificatie,
+            )
+            result.excluded.append(
+                ExcludedObject(
+                    object_type="ResultaatType",
+                    url=ztc.urls[0] if ztc.urls else "",
+                    identificatie=ztc.identificatie,
+                    reason=ExclusionReason.API_ERROR,
+                    error_message=str(exc),
+                    extra_context={"zaaktype_identificatie": ztc.identificatie},
+                )
+            )
+            return result
 
         # Map existing config records by url and by omschrijving (natural key).
         # The omschrijving lookup is used to copy OIP config fields onto newly
