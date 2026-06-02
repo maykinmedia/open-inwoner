@@ -19,36 +19,18 @@ on:
 permissions: {}
 
 jobs:
-  compile_dependencies_linux:
-    name: Run compile_dependencies on Linux
-    runs-on: ubuntu-latest
+  compile_dependencies:
+    name: Run compile_dependencies on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
 
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-        with:
-          python-version-file: 'pyproject.toml'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
-        with:
-          enable-cache: false
-
-      - name: Make sure current directory can be detected a git repository
-        run: git init
-
-      - name: Run bin/compile_dependencies.sh
-        run: ./bin/compile_dependencies.sh
-
-  compile_dependencies_macos:
-    name: Run compile_dependencies on MacOS
-    runs-on: macos-latest
-    permissions:
-      contents: read
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-latest
+            brew_deps: postgresql
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -59,7 +41,8 @@ jobs:
           python-version-file: 'pyproject.toml'
 
       - name: Install OS-level deps
-        run: brew install postgresql
+        if: matrix.brew_deps
+        run: brew install ${{ matrix.brew_deps }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
@@ -68,9 +51,6 @@ jobs:
 
       - name: Make sure current directory can be detected a git repository
         run: git init
-
-      - name: Install OS-level deps
-        run: brew install postgresql
 
       - name: Run bin/compile_dependencies.sh
         run: ./bin/compile_dependencies.sh
