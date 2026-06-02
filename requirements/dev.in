@@ -1,7 +1,6 @@
 -c ci.txt
 
 # Helpers
-pip-tools
 pre-commit
 
 # Debug tooling
