@@ -9,7 +9,7 @@ import {
   MouseEventHandler,
 } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Paragraph } from '../Paragraph';
 
 export interface ComboBoxItem {
@@ -40,6 +40,11 @@ type BranchData = {
 /**
  * Accessible combobox component for branch selection with search filtering.
  * Supports keyboard navigation, mouse/touchscreen, and form submission.
+ *
+ * Note: the custom element itself receives id="branch-number" from the Django
+ * template. To avoid a duplicate id conflict (custom element + input both having
+ * the same id), the internal input uses id="${id}-input" and the label uses
+ * htmlFor="${id}-input".
  */
 const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
   id,
@@ -55,6 +60,10 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
   // Wait 300ms after user stops typing before filtering results
   const debouncedQuery = useDebounce(query, 300);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Derived ids — avoids duplicate id collision with the host custom element
+  const inputId = `${id}-input`;
+  const listboxId = `${id}-listbox`;
 
   // Get branches data from props or script tag
   // Script tag format: { items: ComboBoxItem[], selected_id?: string }
@@ -267,7 +276,7 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
     if (selectedBranch) {
       setQuery(getDisplayText(selectedBranch));
     }
-  }, [selectedId]); // Only run when selectedId changes, not when query changes
+  }, [selectedBranch]);
 
   // Scroll focused option into view for keyboard navigation
   useEffect(() => {
@@ -293,10 +302,12 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
       form.appendChild(hiddenInput);
     }
 
-    // Map 'rechtspersoon' ID to empty string for Django backend
-    if (selectedId !== undefined) {
-      hiddenInput.value = selectedId === 'rechtspersoon' ? '' : selectedId;
-    }
+    // Map 'rechtspersoon' ID to empty string for Django backend;
+    // also clear when selection is undefined (user cleared the input)
+    hiddenInput.value =
+      selectedId === undefined || selectedId === 'rechtspersoon'
+        ? ''
+        : selectedId;
 
     // Enable/disable submit button based on selection state
     const submitButton = form.querySelector<HTMLButtonElement>(
@@ -322,46 +333,60 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
         className="utrecht-form-field utrecht-form-field--text"
         ref={containerRef}
       >
-        <Paragraph style={{ color: 'var(--color-red-notification)' }}>
-          Er is een probleem opgetreden bij het laden van de vestigingen.
-          Probeer de pagina te vernieuwen.
-        </Paragraph>
+        <FormattedMessage
+          id="kvkbranchselector.error"
+          description="Error message shown when branches fail to load"
+          defaultMessage="Er is een probleem opgetreden bij het laden van de vestigingen. Probeer de pagina te vernieuwen."
+        >
+          {(text) => (
+            <Paragraph style={{ color: 'var(--color-red-notification)' }}>
+              {text}
+            </Paragraph>
+          )}
+        </FormattedMessage>
       </div>
     );
   }
-
-  if (!data) return <></>;
 
   return (
     <div
       className="utrecht-form-field utrecht-form-field--text"
       ref={containerRef}
     >
-      <label htmlFor={id} className="utrecht-form-label">
+      <label htmlFor={inputId} className="utrecht-form-label">
         {label}
       </label>
 
       <div className="oip-combobox">
-        <input
-          ref={inputRef}
-          id={id}
-          className="utrecht-textbox oip-combobox__input"
-          type="text"
-          role="combobox"
-          value={query}
-          onChange={handleInputChange}
-          onClick={handleInputClick}
-          onFocus={handleInputFocus}
-          onKeyDown={handleKeyDown}
-          aria-expanded={isOpen}
-          aria-controls={`${id}-listbox`}
-          placeholder={intl.formatMessage({
-            id: 'kvkbranchselector.placeholder',
-            description: 'Placeholder text for branch search input',
-            defaultMessage: 'Enter name, address or branch number...',
-          })}
-          autoComplete="off"
-        />
+        <div className="utrecht-combobox__input">
+          <input
+            ref={inputRef}
+            id={inputId}
+            className="utrecht-textbox oip-combobox__input"
+            type="text"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+            aria-controls={listboxId}
+            aria-activedescendant={
+              isOpen && filtered?.[focusedIndex]
+                ? `${listboxId}-option-${focusedIndex}`
+                : undefined
+            }
+            value={query}
+            onChange={handleInputChange}
+            onClick={handleInputClick}
+            onFocus={handleInputFocus}
+            onKeyDown={handleKeyDown}
+            placeholder={intl.formatMessage({
+              id: 'kvkbranchselector.placeholder',
+              description: 'Placeholder text for branch search input',
+              defaultMessage: 'Enter name, address or branch number...',
+            })}
+            autoComplete="off"
+          />
+        </div>
 
         {/* TODO: Replace with NLDS Buttons once available */}
         {hasText ? (
@@ -388,7 +413,7 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
               defaultMessage: 'Toggle dropdown',
             })}
             aria-expanded={isOpen}
-            aria-controls={`${id}-listbox`}
+            aria-controls={listboxId}
           >
             <MaterialIcon name="keyboard_arrow_down" />
           </button>
@@ -398,13 +423,14 @@ const KVKBranchSelector: AC<KVKBranchSelectorProps> = ({
           <div
             className="utrecht-listbox oip-combobox__popover oip-combobox__popover--block-end"
             role="listbox"
-            id={`${id}-listbox`}
+            id={listboxId}
             aria-label={label}
           >
             <ul className="utrecht-listbox__list" ref={listRef}>
               {filtered?.map((item, i) => (
                 <li
                   key={item.id}
+                  id={`${listboxId}-option-${i}`}
                   role="option"
                   aria-selected={selectedId === item.id}
                   className={clsx('utrecht-listbox__option', {

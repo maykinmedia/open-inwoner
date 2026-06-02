@@ -79,6 +79,11 @@
     "description": "Clear search button label",
     "originalDefault": "Clear"
   },
+  "kvkbranchselector.error": {
+    "defaultMessage": "Er is een probleem opgetreden bij het laden van de vestigingen. Probeer de pagina te vernieuwen.",
+    "description": "Error message shown when branches fail to load",
+    "originalDefault": "Er is een probleem opgetreden bij het laden van de vestigingen. Probeer de pagina te vernieuwen."
+  },
   "kvkbranchselector.placeholder": {
     "defaultMessage": "Vul naam, adres of vestigingsnummer in...",
     "description": "Placeholder text for branch search input",

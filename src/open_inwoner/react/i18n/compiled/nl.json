@@ -111,6 +111,12 @@
       "value": "Wissen"
     }
   ],
+  "kvkbranchselector.error": [
+    {
+      "type": 0,
+      "value": "Er is een probleem opgetreden bij het laden van de vestigingen. Probeer de pagina te vernieuwen."
+    }
+  ],
   "kvkbranchselector.placeholder": [
     {
       "type": 0,
