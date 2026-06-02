@@ -1,0 +1,19 @@
+@use '@utrecht/form-field-css/dist/index.css' as *;
+@use '@utrecht/form-label-css/dist/index.css' as *;
+@use '@utrecht/textbox-css/dist/index.css' as *;
+@use '@utrecht/form-field-description-css/dist/index.css' as *;
+@use '@utrecht/form-field-error-message-css/dist/index.css' as *;
+
+// The project design tokens leave the textbox transparent (ghost style).
+// Override here to give it a visible border and white background.
+.utrecht-form-field {
+  // The project design tokens leave the textbox transparent (ghost style).
+  // Override here to give it a visible border and white background.
+  --utrecht-textbox-background-color: #ffffff;
+  --utrecht-textbox-border-color: var(--oip-color-border);
+  --utrecht-textbox-max-inline-size: 100%;
+
+  // Invalid / error state
+  --utrecht-textbox-invalid-border-color: var(--color-error);
+  --utrecht-form-field-error-message-color: var(--color-error);
+}

@@ -12,6 +12,7 @@ import { AFVAL_FILTERS_DEFINITION } from '@react/components/AfvalFilter/constant
 import { FILE_ITEM_DEFINITION } from '@react/components/File/constants';
 import { PARAGRAPH_DEFINITION } from '@react/components/Paragraph/constants';
 import { ACTION_DEFINITION } from '@react/components/Action/constants';
+import { SEARCH_DEFINITION } from '@react/components/Search/constants';
 
 /**
  * Web component registry
@@ -39,4 +40,5 @@ export const WEB_COMPONENT_REGISTRY = {
   [FILE_ITEM_DEFINITION.tagName]: FILE_ITEM_DEFINITION,
   [PARAGRAPH_DEFINITION.tagName]: PARAGRAPH_DEFINITION,
   [ACTION_DEFINITION.tagName]: ACTION_DEFINITION,
+  [SEARCH_DEFINITION.tagName]: SEARCH_DEFINITION,
 } as const;

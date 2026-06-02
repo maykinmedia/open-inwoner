@@ -102,6 +102,7 @@
   .multiselect-listbox__content {
     position: static;
     opacity: 1;
+    visibility: visible;
     width: 100%;
     z-index: 1;
 
@@ -112,6 +113,7 @@
       left: 0;
       min-width: 280px;
       opacity: 0;
+      visibility: hidden;
       top: 40px;
       z-index: 1;
       width: 280px;
@@ -206,13 +208,17 @@
 
     .form__actions {
       background-color: var(--color-white);
-      padding-top: var(--spacing-small);
+
+      @media (min-width: 768px) {
+        padding-top: var(--spacing-small);
+      }
     }
   }
 
   .show {
     display: inline-block;
     opacity: 1;
+    visibility: visible;
     z-index: 2000;
   }
 

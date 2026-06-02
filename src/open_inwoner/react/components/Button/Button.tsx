@@ -8,7 +8,7 @@ import './Button.scss';
 
 export type ButtonProps = {
   text?: string;
-  handleClick: MouseEventHandler<HTMLButtonElement>;
+  handleClick?: MouseEventHandler<HTMLButtonElement>;
   variant: 'primary' | 'secondary';
   transparent?: boolean;
   className?: string;

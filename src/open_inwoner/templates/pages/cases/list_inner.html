@@ -1,4 +1,4 @@
-{% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils %}
+{% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils form_tags %}
 
 {% if fetch_error %}
     <nl-paragraph>{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</nl-paragraph>
@@ -13,23 +13,24 @@
         <div class="filter-bar__mobile-controls">
             {% button icon="close" text=_("Sluiten") hide_text=True icon_outlined=True transparent=True extra_classes="show-controls" %}
             <div class="form__reset--mobile form__actions--fullwidth form__actions--reset">
-                <button class="button button--primary button--transparent" type="button" name="" value="" title="Wis alle filters" aria-label="Wis alle filters" id="resetAllFilters">
-                    Wis alle filters
+                <button class="button button--primary button--transparent" type="button" name="" value="" title="{% trans "Wis alle filters"%} " aria-label="{% trans "Wis alle filters"%}" id="resetAllFilters">
+                    {% trans "Wis alle filters" %}
                 </button>
             </div>
         </div>
         <div class="filter-bar__mobile-button">
-            <p class="filter-bar__heading">Filters</p>
+            <p class="filter-bar__heading">{% trans "Filters" %}</p>
             <div class="filter-bar__mobile-selection" id="selectionFilterBar">
                 {% button icon="filter_alt" text=_("Filters") icon_outlined=True transparent=True extra_classes="show-modal" %}
                 {% icon icon="check" icon_position="after" outlined=True %}
-                <span class="sr-only">Gekozen filters</span>
+                <span class="sr-only">{% trans "Gekozen filters" %}</span>
             </div>
-            <p class="filter-bar__status-text">Status</p>
         </div>
         <form class="form filter-bar__form" method="GET" id="filter-form" novalidate>
             <span class="filter-bar__label">{% trans 'Filter op' %}:</span>
+            <p class="filter-bar__status-text">{% trans "Status" %}</p>
             {% include "components/FilterBar/MultiSelectListbox.html" with statusfrequencies=status_freqs %}
+            <oip-search placeholder="{% trans "Zaaknummer..." %}" initial-value="{{request.GET.search|default:""}}" name="search"></oip-search>
         </form>
     </div>
 </div>
@@ -38,7 +39,22 @@
 <div class="card__grid">
 {% render_grid %}
     {% if not zaken %}
-        <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
+        {% render_column start=1 span=12 extra_classes="cases__empty" %}
+            {% if request.GET.search|default:"" or request.GET.status|default:"" %}
+                {% if request.GET.search|default:"" %}<nl-paragraph>{% trans "Geen zaken gevonden voor:" %} {{request.GET.search|default:""}}</nl-paragraph>{% endif %}
+                {% if request.GET.status|default:"" %}
+                    <nl-paragraph>{% trans "De filter 'status' is ingeschakeld." %} {% trans "Verwijder de filter en zoek opnieuw naar zaken" %}</nl-paragraph>
+                    {% url "cases:index" as reset_url %}
+                    {% if request.GET.search %}
+                        {% button text=_("Zoek zonder filters") primary=True transparent=True href=reset_url|add:"?search="|add:request.GET.search %}
+                    {% else %}
+                        {% button text=_("Zoek zonder filters") primary=True transparent=True href=reset_url %}
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <nl-paragraph><strong>{% trans "U heeft op dit moment nog geen lopende zaken." %}</strong></nl-paragraph>
+            {% endif %}
+        {% endrender_column %}
     {% endif %}
 
     {% for zaak in zaken %}
