@@ -17,6 +17,7 @@ def get_always_pass_prefixes() -> tuple[str, ...]:
         reverse("login"),
         reverse("logout"),
         reverse("kvk:branches"),
+        reverse("logout_confirm"),
         # prefixes from urls.py
         "/admin/",
         "/csp/",

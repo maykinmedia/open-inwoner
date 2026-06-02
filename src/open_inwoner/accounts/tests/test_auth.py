@@ -1646,6 +1646,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
 
                 self.assertRedirects(response, redirect.url)
 
+    def test_logout_confirm_not_blocked_by_necessary_fields(self):
+        user = NewDigidUserFactory()
+        self.assertTrue(user.require_necessary_fields())
+        response = self.app.get(reverse("logout_confirm"), user=user)
+        self.assertEqual(response.status_code, 200)
+
     def test_submit_without_invite(self):
         config = SiteConfiguration.get_solo()
         config.notifications_cases_enabled = True
