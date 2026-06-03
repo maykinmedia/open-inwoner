@@ -65,7 +65,7 @@ def cache(
     key: str,
     alias: str = "default",
     *,
-    timeout: int = _DEFAULT_CACHE_TIMEOUT,
+    timeout: int | Callable[..., int] = _DEFAULT_CACHE_TIMEOUT,
 ):
     """
     Decorator factory for updating the django low-level cache.
@@ -79,11 +79,12 @@ def cache(
     syntax.
     :param alias: the Django cache to use, defaults to "default"
     :param timeout: the timeout for the cache in seconds. Defaults to 60. Note that you
-    cannot cache forever (`None` will raise a `ValueError`, but you can set this to `0`
-    to avoid caching, as per the Django low-level cache docs.
+    can set this to `0` to avoid caching, as per the Django low-level cache docs. Pass
+    a callable that accepts the bound instance (``self``) to resolve the timeout
+    dynamically at call time (only valid when decorating a method).
     """
-    if not isinstance(timeout, int):
-        raise ValueError("`timeout` must be an integer")
+    if not callable(timeout) and not isinstance(timeout, int):
+        raise ValueError("`timeout` must be an integer or a callable")
 
     def decorator(func: Callable[..., RT]) -> Callable[..., RT]:
         argspec = inspect.getfullargspec(func)
@@ -101,6 +102,12 @@ def cache(
 
         @wraps(func)
         def wrapped(*args, **kwargs) -> RT:
+            match timeout:
+                case int():
+                    resolved_timeout = timeout
+                case _ if callable(timeout):
+                    resolved_timeout = timeout(*args[:1])
+
             key_kwargs = defaults.copy()
             named_args = dict(zip(argspec.args, args), **kwargs)
             key_kwargs.update(**named_args)
@@ -149,7 +156,7 @@ def cache(
             # The key does not exist so we call the decorated function and set the cache
             logger.debug("Cache miss", cache_key=cache_key)
             result = func(*args, **kwargs)
-            _cache.set(cache_key, result, timeout=timeout)
+            _cache.set(cache_key, result, timeout=resolved_timeout)
 
             return result
 
