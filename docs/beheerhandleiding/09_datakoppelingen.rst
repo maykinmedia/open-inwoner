@@ -126,6 +126,8 @@ Hier kunt u het private deel van het certificaat uploaden.
 **Passphrase**
 Hier vult u het wachtwoord in om het private deel van het certificaat te ontgrendelen
 
+.. _zgw-api-configuratie:
+
 9.3. Configuratie ‘Open Zaak’
 =============================
 
@@ -351,6 +353,8 @@ Om de notificaties van de componentconfiguratie in te stellen volgt u het volgen
    Er is een cronjob om deze catalogus te importeren. Dit commando kan te allen tijde
    worden uitgevoerd door via de "Period tasks" pagina onder "Overige/Diverse" de
    "Importeer ZGW data" taak handmatig te starten via de "Start taak" knop.
+
+.. _objects-api-configuratie:
 
 9.8. Objects API client configuration
 =====================================

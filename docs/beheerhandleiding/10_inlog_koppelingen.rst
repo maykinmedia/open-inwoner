@@ -431,7 +431,7 @@ authenticatiesessie om te controleren of de gebruiker nog steeds ingelogd is bij
 Identity Provider (IdP).
 
 10.7.1. Automatische sessievernieuwing
---------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 De omgevingsvariabele ``OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS`` bepaalt hoe vaak
 de sessie wordt ververst. De standaardwaarde is **15 minuten**. Na deze periode wordt de

@@ -673,7 +673,7 @@ ingesteld:
 
 3. **ZGW API configuratie** (optioneel) - Indien u ook openstaande taken uit
    zaaksystemen wilt tonen, configureer dan de ZGW API koppelingen. Zie :ref:`hoofdstuk
-   9.7 <zgw-api-configuratie>`.
+   9.3 <zgw-api-configuratie>`.
 
 **Plugin toevoegen aan een pagina**
 
