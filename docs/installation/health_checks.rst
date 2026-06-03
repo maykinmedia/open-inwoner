@@ -144,4 +144,5 @@ Troubleshooting
 If health checks fail, examine the response body for details:
 
 .. code-block:: bash
+
     curl -H "Accept: application/json" http://your-open-inwoner/_healthz/?format=json
