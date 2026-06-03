@@ -13,7 +13,7 @@ MockCache = mock.create_autospec(DummyCache)
 
 
 @override_settings(
-    CACHES={"default": {"BACKEND": "open_inwoner.utils.tests.test_utils.MockCache"}}
+    CACHES={"default": {"BACKEND": "open_inwoner.utils.tests.test_cache.MockCache"}}
 )
 class DynamicCacheKeyTest(DjangoTestCase):
     def setUp(self):
@@ -271,6 +271,64 @@ class CacheBehaviorTest(DjangoTestCase):
         self.assertEqual(result3, "foo:bar:None")
         self.assertEqual(result4, "foo:bar:None")
         self.assertEqual(result5, "foo:bar:baz")
+
+    @freezegun.freeze_time("2024-05-31 12:00:00", as_kwarg="frozen_time")
+    def test_callable_timeout_is_resolved_per_instance(self, frozen_time):
+        m = mock.Mock(side_effect=lambda x: x)
+
+        class TestClass:
+            def __init__(self, cache_timeout):
+                self.cache_timeout = cache_timeout
+
+            @cache(
+                "key:{self.cache_timeout}:{x}", timeout=lambda self: self.cache_timeout
+            )
+            def method(self, x):
+                return m(x)
+
+        short = TestClass(cache_timeout=1)
+        long = TestClass(cache_timeout=100)
+
+        short.method(42)
+        long.method(42)
+        self.assertEqual(m.call_count, 2)
+
+        # Both hit
+        short.method(42)
+        long.method(42)
+        self.assertEqual(m.call_count, 2)
+
+        # Advance past the short timeout but not the long one
+        frozen_time.tick(delta=timedelta(seconds=2))
+
+        short.method(42)
+        self.assertEqual(m.call_count, 3, "short-timeout entry should have expired")
+
+        long.method(42)
+        self.assertEqual(m.call_count, 3, "long-timeout entry should still be cached")
+
+    def test_zero_timeout_does_not_cache(self):
+        m = mock.Mock(side_effect=lambda x: x)
+
+        @cache("key:{x}", timeout=0)
+        def func(x):
+            return m(x)
+
+        func(42)
+        func(42)
+
+        self.assertEqual(m.call_count, 2)
+
+    def test_callable_timeout_on_plain_function_receives_no_arguments(self):
+        timeout_func = mock.Mock(return_value=0)
+
+        @cache("key", timeout=timeout_func)
+        def func():
+            return 42
+
+        func()
+
+        timeout_func.assert_called_once_with()
 
     def test_none_and_empty_string_produce_different_cache_keys(self):
         m = mock.Mock(side_effect=lambda x: f"result:{x}")

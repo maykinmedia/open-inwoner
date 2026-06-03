@@ -79,6 +79,7 @@ class ZakenClient(ZgwAPIClient):
     fetch_rollen_with_betrokkene_type: bool
     zaak_max_confidentiality: str
     limit_user_visible_cases_to_role: str | None
+    cache_zaken_timeout: int
 
     def __init__(
         self,
@@ -87,6 +88,7 @@ class ZakenClient(ZgwAPIClient):
         fetch_rollen_with_betrokkene_type: bool,
         zaak_max_confidentiality: str,
         limit_user_visible_cases_to_role: str | None = None,
+        cache_zaken_timeout: int | None = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -94,6 +96,7 @@ class ZakenClient(ZgwAPIClient):
         self.fetch_rollen_with_betrokkene_type = fetch_rollen_with_betrokkene_type
         self.zaak_max_confidentiality = zaak_max_confidentiality
         self.limit_user_visible_cases_to_role = limit_user_visible_cases_to_role
+        self.cache_zaken_timeout = cache_zaken_timeout or 0
 
     def fetch_zaken(
         self,
@@ -133,7 +136,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_by_bsn(
         self,
@@ -177,7 +180,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_for_company(
         self,
@@ -250,7 +253,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:single_zaak:{zaak_uuid}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_single_zaak(self, zaak_uuid: str) -> Zaak:
         response = self.get(f"zaken/{zaak_uuid}", headers=CRS_HEADERS)
@@ -266,7 +269,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:single_zaak_information_object:{url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_single_zaak_information_object(self, url: str) -> ZaakInformatieObject:
         response = self.get(url=url)
@@ -294,14 +297,14 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:status_history:{zaak_url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_status_history(self, zaak_url: str) -> list[Status]:
         return self.fetch_status_history_no_cache(zaak_url)
 
     @cache_result(
         "{self.base_url}:status:{status_url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_single_status(self, status_url: str) -> Status:
         response = self.get(url=status_url)
@@ -311,7 +314,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:zaak_roles:{zaak_url}:{role_desc_generic}:{betrokkene_type}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaak_roles(
         self,
@@ -471,7 +474,7 @@ class ZakenClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:single_result:{result_url}",
-        timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT,
+        timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_single_result(self, result_url: str) -> Resultaat:
         response = self.get(url=result_url)
@@ -489,6 +492,12 @@ class ZakenClient(ZgwAPIClient):
 
 
 class CatalogiClient(ZgwAPIClient):
+    cache_catalogi_timeout: int
+
+    def __init__(self, *args, cache_catalogi_timeout: int | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cache_catalogi_timeout = cache_catalogi_timeout or 0
+
     # not cached because only used by tools,
     # and because caching (stale) listings can break lookups
     def fetch_statustypes_no_cache(self, zaaktype_url: str) -> list[StatusType]:
@@ -515,7 +524,7 @@ class CatalogiClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:status_type:{status_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+        timeout=lambda self: self.cache_catalogi_timeout,
     )
     def fetch_single_status_type(self, status_type_url: str) -> StatusType:
         response = self.get(url=status_type_url)
@@ -525,7 +534,7 @@ class CatalogiClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:resultaat_type:{resultaat_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+        timeout=lambda self: self.cache_catalogi_timeout,
     )
     def fetch_single_resultaat_type(self, resultaat_type_url: str) -> ResultaatType:
         response = self.get(url=resultaat_type_url)
@@ -548,7 +557,7 @@ class CatalogiClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:zaaktype:{zaaktype_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+        timeout=lambda self: self.cache_catalogi_timeout,
     )
     def fetch_single_zaaktype(self, zaaktype_url: str) -> ZaakType:
         response = self.get(url=zaaktype_url)
@@ -568,7 +577,7 @@ class CatalogiClient(ZgwAPIClient):
 
     @cache_result(
         "{self.base_url}:information_object_type:{information_object_type_url}",
-        timeout=settings.CACHE_ZGW_CATALOGI_TIMEOUT,
+        timeout=lambda self: self.cache_catalogi_timeout,
     )
     def fetch_single_information_object_type(
         self,
@@ -581,6 +590,16 @@ class CatalogiClient(ZgwAPIClient):
 
 
 class DocumentenClient(ZgwAPIClient):
+    cache_zaken_timeout: int
+
+    def __init__(self, *args, cache_zaken_timeout: int | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cache_zaken_timeout = cache_zaken_timeout or 0
+
+    @cache_result(
+        "{self.base_url}:information_object:{url}:{uuid}",
+        timeout=lambda self: self.cache_zaken_timeout,
+    )
     def _fetch_single_information_object(
         self, *, url: str | None = None, uuid: str | None = None
     ) -> InformatieObject:
@@ -879,6 +898,15 @@ def _build_all_zgw_clients_for_type(
                     "fetch_rollen_with_betrokkene_type": api_group.fetch_rollen_with_betrokkene_type,
                     "zaak_max_confidentiality": config.zaak_max_confidentiality,
                     "limit_user_visible_cases_to_role": config.limit_user_visible_cases_to_role,
+                    "cache_zaken_timeout": api_group.cache_zaken_timeout,
+                }
+            elif type_ == "catalogi":
+                client_init_kwargs = {
+                    "cache_catalogi_timeout": api_group.cache_catalogi_timeout,
+                }
+            elif type_ == "document":
+                client_init_kwargs = {
+                    "cache_zaken_timeout": api_group.cache_zaken_timeout,
                 }
 
             client = build_zgw_client_from_service(service, **client_init_kwargs)

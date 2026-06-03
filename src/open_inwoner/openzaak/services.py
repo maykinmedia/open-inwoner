@@ -7,8 +7,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Generic, TypedDict, TypeVar, cast
 
-from django.conf import settings
-
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.concurrent import parallel
@@ -49,7 +47,6 @@ from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_object_visible,
 )
-from open_inwoner.utils.decorators import cache as cache_result
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -162,8 +159,7 @@ class Timeouts(TypedDict):
 
 
 class ZGWService:
-    _max_workers: int
-    _timeouts: Timeouts
+    _max_workers: int | None
 
     # -------------------------------------------------------------------------
     # Setup
@@ -171,21 +167,28 @@ class ZGWService:
 
     def __init__(self, use_cache: bool = True):
         self._use_cache = use_cache
-        self._timeouts = {
-            "get_raw_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
-            "get_visible_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
-            "fully_resolve_zaken": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.3,
-            "get_formulieren": settings.ZGW_CASE_LIST_FETCH_TIMEOUT * 0.2,
-        }
-        self._max_workers = settings.ZGW_CASE_LIST_NUM_WORKERS
+        self._max_workers = OpenZaakConfig.get_solo().case_list_num_workers
         # Resolvers mutate Zaak fields in parallel futures; the lock prevents concurrent writes.
         self._zaak_update_lock = threading.RLock()
 
-        logger.debug(
-            "Configured ZGWService",
-            timeouts=self._timeouts,
-            max_workers=self._max_workers,
-        )
+        logger.debug("Configured ZGWService", max_workers=self._max_workers)
+
+    @staticmethod
+    def _case_list_stage_timeouts(config: OpenZaakConfig | None = None) -> Timeouts:
+        """Split the case-list time budget across pipeline stages.
+
+        The total budget is a global setting because all groups participate in every
+        stage under a single concurrent timeout. The fractions must sum to 1.
+        """
+        config = config or OpenZaakConfig.get_solo()
+
+        t = config.case_list_fetch_timeout
+        return {
+            "get_raw_zaken": t * 0.3,
+            "get_visible_zaken": t * 0.2,
+            "fully_resolve_zaken": t * 0.3,
+            "get_formulieren": t * 0.2,
+        }
 
     @staticmethod
     def _zaken_client_factory(
@@ -201,16 +204,29 @@ class ZGWService:
                 fetch_rollen_with_betrokkene_type=group.fetch_rollen_with_betrokkene_type,
                 zaak_max_confidentiality=config.zaak_max_confidentiality,
                 limit_user_visible_cases_to_role=config.limit_user_visible_cases_to_role,
+                cache_zaken_timeout=group.cache_zaken_timeout,
             ),
         )
 
     @staticmethod
     def _catalogi_client_factory(group: ZGWApiGroupConfig) -> CatalogiClient:
-        return cast(CatalogiClient, build_zgw_client_from_service(group.ztc_service))
+        return cast(
+            CatalogiClient,
+            build_zgw_client_from_service(
+                group.ztc_service,
+                cache_catalogi_timeout=group.cache_catalogi_timeout,
+            ),
+        )
 
     @staticmethod
     def _documenten_client_factory(group: ZGWApiGroupConfig) -> DocumentenClient:
-        return cast(DocumentenClient, build_zgw_client_from_service(group.drc_service))
+        return cast(
+            DocumentenClient,
+            build_zgw_client_from_service(
+                group.drc_service,
+                cache_zaken_timeout=group.cache_zaken_timeout,
+            ),
+        )
 
     @staticmethod
     def _is_zaak_visible(zaak: Zaak) -> tuple[bool, SkipReason | None]:
@@ -304,6 +320,7 @@ class ZGWService:
         # Each thread gets its own zaken client because requests.Session is not
         # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
         config = OpenZaakConfig.get_solo()
+        timeouts = self._case_list_stage_timeouts(config)
 
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related("zrc_service").all()
@@ -325,7 +342,7 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["get_raw_zaken"],
+                    timeout=timeouts["get_raw_zaken"],
                 ):
                     try:
                         fetched_zaken.extend(task.result())
@@ -388,6 +405,11 @@ class ZGWService:
         if not user_identification:
             return ZakenResult(zaken=[], skipped=[])
 
+        # Each thread gets its own zaken client because requests.Session is not
+        # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
+        config = OpenZaakConfig.get_solo()
+        timeouts = self._case_list_stage_timeouts(config)
+
         all_api_groups = list(
             ZGWApiGroupConfig.objects.select_related(
                 "zrc_service",
@@ -396,10 +418,6 @@ class ZGWService:
                 "form_service",
             ).all()
         )
-
-        # Each thread gets its own zaken client because requests.Session is not
-        # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
-        config = OpenZaakConfig.get_solo()
 
         fetched_zaken: list[ZaakWithApiGroup] = []
         with parallel(max_workers=self._max_workers) as executor:
@@ -416,7 +434,7 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["get_raw_zaken"],
+                    timeout=timeouts["get_raw_zaken"],
                 ):
                     try:
                         fetched_zaken.extend(task.result())
@@ -448,7 +466,7 @@ class ZGWService:
             try:
                 for future in concurrent.futures.as_completed(
                     future_to_zaak,
-                    timeout=self._timeouts["get_visible_zaken"],
+                    timeout=timeouts["get_visible_zaken"],
                 ):
                     zaak_with_group = future_to_zaak[future]
                     processed_ids.add(id(zaak_with_group))
@@ -527,6 +545,7 @@ class ZGWService:
         # Each thread gets its own zaken client because requests.Session is not
         # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
         config = OpenZaakConfig.get_solo()
+        timeouts = self._case_list_stage_timeouts(config)
 
         with parallel(max_workers=self._max_workers) as executor:
             for zaak_with_group in zaken:
@@ -552,7 +571,7 @@ class ZGWService:
             try:
                 for future in concurrent.futures.as_completed(
                     future_to_zaak,
-                    timeout=self._timeouts["fully_resolve_zaken"],
+                    timeout=timeouts["fully_resolve_zaken"],
                 ):
                     zaak_with_group = future_to_zaak[future]
                     remaining[id(zaak_with_group)] -= 1
@@ -720,6 +739,9 @@ class ZGWService:
         if not user_identification:
             return []
 
+        config = OpenZaakConfig.get_solo()
+        timeouts = self._case_list_stage_timeouts(config)
+
         all_api_groups = list(
             ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
                 "form_service",
@@ -737,7 +759,7 @@ class ZGWService:
             try:
                 for task in concurrent.futures.as_completed(
                     futures,
-                    timeout=self._timeouts["get_formulieren"],
+                    timeout=timeouts["get_formulieren"],
                 ):
                     try:
                         subs_with_api_group.extend(task.result())
@@ -1041,9 +1063,6 @@ class ZGWService:
             except TypeError:
                 return documents
 
-    @cache_result(
-        "information_object_url:{url}", timeout=settings.CACHE_ZGW_ZAKEN_TIMEOUT
-    )
     def fetch_information_object_by_url(
         self, url: str, api_group: ZGWApiGroupConfig
     ) -> InformatieObject:

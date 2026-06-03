@@ -227,6 +227,7 @@ class ZGWApiGroupConfig(models.Model):
                 "zrc_service",
                 use_openzaak_120_params=self.fetch_eherkenning_zaken_with_openzaak_120_params,
                 fetch_rollen_with_betrokkene_type=self.fetch_rollen_with_betrokkene_type,
+                cache_zaken_timeout=self.cache_zaken_timeout,
             ),
         )
 
@@ -244,7 +245,13 @@ class ZGWApiGroupConfig(models.Model):
     def documenten_client(self):
         from .clients import DocumentenClient
 
-        return cast(DocumentenClient, self._build_client_from_attr("drc_service"))
+        return cast(
+            DocumentenClient,
+            self._build_client_from_attr(
+                "drc_service",
+                cache_zaken_timeout=self.cache_zaken_timeout,
+            ),
+        )
 
     ztc_service = models.ForeignKey(
         "zgw_consumers.Service",
@@ -260,7 +267,13 @@ class ZGWApiGroupConfig(models.Model):
     def catalogi_client(self):
         from .clients import CatalogiClient
 
-        return cast(CatalogiClient, self._build_client_from_attr("ztc_service"))
+        return cast(
+            CatalogiClient,
+            self._build_client_from_attr(
+                "ztc_service",
+                cache_catalogi_timeout=self.cache_catalogi_timeout,
+            ),
+        )
 
     form_service = models.OneToOneField(
         "zgw_consumers.Service",
@@ -314,6 +327,27 @@ class ZGWApiGroupConfig(models.Model):
         help_text=_(
             "If enabled, zaken roles are filtered using the type of betrokkene "
             "('natuurlijk persoon', 'niet-natuurlijk persoon', 'vestiging')."
+        ),
+    )
+
+    cache_zaken_timeout = models.PositiveIntegerField(
+        verbose_name=_("Zaken cache timeout (seconds)"),
+        null=True,
+        blank=True,
+        default=60 * 5,
+        help_text=_(
+            "How long (in seconds) Zaken API responses are cached. "
+            "Leave empty to disable caching for this group."
+        ),
+    )
+    cache_catalogi_timeout = models.PositiveIntegerField(
+        verbose_name=_("Catalogi cache timeout (seconds)"),
+        null=True,
+        blank=True,
+        default=60 * 60 * 24,
+        help_text=_(
+            "How long (in seconds) Catalogi API responses are cached. "
+            "Leave empty to disable caching for this group."
         ),
     )
 
@@ -527,6 +561,26 @@ class OpenZaakConfig(SingletonModel):
         help_text=_(
             "Label shown when no final decision date is known yet; displays the "
             "legal or planned deadline."
+        ),
+    )
+
+    case_list_num_workers = models.PositiveIntegerField(
+        verbose_name=_("Case list worker threads"),
+        null=True,
+        blank=True,
+        default=None,
+        help_text=_(
+            "Maximum number of worker threads used to fetch and resolve cases in parallel "
+            "on the case list page. Leave empty to use the library default (based on CPU count)."
+        ),
+    )
+    case_list_fetch_timeout = models.PositiveIntegerField(
+        verbose_name=_("Case list fetch timeout (seconds)"),
+        default=25,
+        help_text=_(
+            "Total time budget in seconds for fetching and resolving the case list. "
+            "Divided proportionally across pipeline stages. Set slightly below the "
+            "overall HTTP response timeout of the server."
         ),
     )
 

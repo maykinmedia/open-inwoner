@@ -10,6 +10,13 @@ from open_inwoner.utils.test import ClearCachesMixin
 
 _USER_IDENTIFICATION = BSNIdentification(bsn="900222086")
 
+_TINY_TIMEOUTS = {
+    "get_raw_zaken": 0.001,
+    "get_visible_zaken": 0.001,
+    "fully_resolve_zaken": 0.001,
+    "get_formulieren": 0.001,
+}
+
 
 class TimeoutHandlingTests(ClearCachesMixin, TestCase):
     """
@@ -44,12 +51,16 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         release = threading.Event()
         timer = threading.Timer(0.05, release.set)
 
-        with patch.object(
-            self.service,
-            "_get_raw_zaken_for_api_group",
-            side_effect=self._make_blocking_fetch(release),
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
         ):
-            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
@@ -67,12 +78,16 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         release = threading.Event()
         timer = threading.Timer(0.05, release.set)
 
-        with patch.object(
-            self.service,
-            "_get_raw_zaken_for_api_group",
-            side_effect=self._make_blocking_fetch(release),
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
         ):
-            self.service._timeouts["get_raw_zaken"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(
@@ -90,12 +105,16 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         release = threading.Event()
         timer = threading.Timer(0.05, release.set)
 
-        with patch.object(
-            self.service,
-            "_get_formulieren_for_api_group",
-            side_effect=self._make_blocking_fetch(release),
+        with (
+            patch.object(
+                self.service,
+                "_get_formulieren_for_api_group",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
         ):
-            self.service._timeouts["get_formulieren"] = 0.001
             timer.start()
             try:
                 with self.assertLogs(

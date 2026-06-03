@@ -53,6 +53,15 @@ class ZGWApiGroupConfig(admin.StackedInline):
             },
         ),
         (
+            _("Caching"),
+            {
+                "fields": [
+                    "cache_zaken_timeout",
+                    "cache_catalogi_timeout",
+                ]
+            },
+        ),
+        (
             _("Backend-specific flags"),
             {
                 "fields": [
@@ -106,6 +115,16 @@ class OpenZaakConfigAdmin(SingletonModelAdmin):
                     "skip_notification_statustype_informeren",
                     "reformat_esuite_zaak_identificatie",
                     "derive_zaak_titel_from",
+                ],
+            },
+        ),
+        (
+            _("Performance"),
+            {
+                "classes": ("collapse",),
+                "fields": [
+                    "case_list_num_workers",
+                    "case_list_fetch_timeout",
                 ],
             },
         ),
