@@ -124,9 +124,6 @@ CACHES = {
 SOLO_CACHE_TIMEOUT = 5  # 5 seconds
 SOLO_CACHE = "local"  # Avoid Redis overhead
 
-# ZGW API caches
-CACHE_ZGW_CATALOGI_TIMEOUT = config("CACHE_ZGW_CATALOGI_TIMEOUT", default=60 * 60 * 24)
-CACHE_ZGW_ZAKEN_TIMEOUT = config("CACHE_ZGW_ZAKEN_TIMEOUT", default=60 * 5)
 
 # Maximum number of pagination requests to follow when fetching zaken from ZGW APIs
 ZGW_MAX_REQUESTS = config("ZGW_MAX_REQUESTS", default=8)
@@ -1045,23 +1042,9 @@ ZGW_CONSUMERS_TEST_SCHEMA_DIRS = [
     os.path.join(DJANGO_PROJECT_DIR, "openklant", "tests", "files"),
 ]
 
-# The maximum number of workers to use when concurrently fetching and resolving
-# cases on the "Mijn Zaken" page
-ZGW_CASE_LIST_NUM_WORKERS = (
-    config("ZGW_CASE_LIST_NUM_WORKERS", default=0)
-    # Because auto config has no clean way to express "int | None", and we want to fall
-    # back to the library default
-    or None
-)
-
-# The aggregate number of seconds workers can concurrently fetch and resolve
-# cases on the "Mijn Zaken" page. Should be set to slightly less than the overall
-# timeout.
-ZGW_CASE_LIST_FETCH_TIMEOUT = config("ZGW_CASE_LIST_FETCH_TIMEOUT", default=25)
-
 # Timeout in seconds for the login cache warm-up task per API group.
-# Needs to be longer than ZGW_CASE_LIST_FETCH_TIMEOUT because the warm-up fetches
-# status history, roles, and documents on top of what the list view resolves.
+# Should be longer than ZGWApiGroupConfig.case_list_fetch_timeout because the
+# warm-up fetches status history, roles, and documents on top of what the list view resolves.
 ZGW_CACHE_WARMUP_TIMEOUT = config("ZGW_CACHE_WARMUP_TIMEOUT", default=120)
 
 # Celery queue to use for cache-seeding tasks (IO-bound, latency-sensitive).
