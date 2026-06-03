@@ -439,7 +439,7 @@ django-localflavor==3.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-log-outgoing-requests==0.6.1
+django-log-outgoing-requests==0.9.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1145,6 +1145,7 @@ pygments==2.20.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-log-outgoing-requests
     #   pytest
     #   rich
     #   sphinx
@@ -1461,6 +1462,7 @@ typing-extensions==4.15.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   django-log-outgoing-requests
     #   django-stubs-ext
     #   elasticsearch
     #   mozilla-django-oidc-db

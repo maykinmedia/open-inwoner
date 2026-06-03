@@ -9,7 +9,7 @@ import sentry_sdk
 import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
-from log_outgoing_requests.formatters import HttpFormatter
+from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
 from maykin_common.health_checks import (
     default_health_check_apps,
     default_health_check_subsets,
@@ -423,6 +423,7 @@ LOGGING = {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.JSONRenderer(),
             "foreign_pre_chain": [
+                ExtractRequestAndResponseDetails(),
                 structlog.contextvars.merge_contextvars,
                 structlog.processors.TimeStamper(fmt="iso"),
                 structlog.stdlib.add_logger_name,
@@ -435,6 +436,7 @@ LOGGING = {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(pad_level=False),
             "foreign_pre_chain": [
+                ExtractRequestAndResponseDetails(),
                 structlog.contextvars.merge_contextvars,
                 structlog.processors.TimeStamper(fmt="iso"),
                 structlog.stdlib.add_logger_name,
@@ -443,7 +445,6 @@ LOGGING = {
                 structlog.processors.format_exc_info,
             ],
         },
-        "outgoing_requests": {"()": HttpFormatter},
     },
     "filters": {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
@@ -487,11 +488,6 @@ LOGGING = {
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
         },
-        "log_outgoing_requests": {
-            "level": "DEBUG",
-            "formatter": "outgoing_requests",
-            "class": "open_inwoner.utils.logging.StructlogOutgoingRequestsHandler",
-        },
         "save_outgoing_requests": {
             "level": "DEBUG",
             "class": "log_outgoing_requests.handlers.DatabaseOutgoingRequestsHandler",
@@ -519,7 +515,8 @@ LOGGING = {
             "propagate": True,
         },
         "log_outgoing_requests": {
-            "handlers": ["log_outgoing_requests", "save_outgoing_requests"],
+            "handlers": (["project"] if not LOG_STDOUT else ["console"])
+            + ["save_outgoing_requests"],
             "level": "DEBUG",
             "propagate": True,
         },

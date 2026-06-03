@@ -1,16 +1,13 @@
 from datetime import timedelta
-from logging import LogRecord  # noqa: TID251 -- needed for testing
-from unittest import TestCase, mock
+from unittest import mock
 
 from django.core.cache import caches
 from django.core.cache.backends.dummy import DummyCache
 from django.test import TestCase as DjangoTestCase, override_settings
 
 import freezegun
-from requests import PreparedRequest, RequestException, Response
 
 from open_inwoner.utils.decorators import _CACHE_MISS, _DEFAULT_CACHE_TIMEOUT, cache
-from open_inwoner.utils.logging import StructlogOutgoingRequestsHandler
 
 MockCache = mock.create_autospec(DummyCache)
 
@@ -291,156 +288,3 @@ class CacheBehaviorTest(DjangoTestCase):
         self.assertEqual(result1, "result:None")
         self.assertEqual(result2, "result:")
         self.assertEqual(result3, "result:None")
-
-
-@mock.patch("open_inwoner.utils.logging.logger")
-class StructlogOutgoingRequestsHandlerTest(TestCase):
-    @staticmethod
-    def create_mock_request_response_record(
-        method="POST",
-        url="https://api.example.com/secure",
-        request_headers=None,
-        status_code=201,
-        response_headers=None,
-        response_content=None,
-        elapsed_ms=200,
-    ) -> tuple[PreparedRequest, Response, LogRecord]:
-        request = PreparedRequest()
-        request.method = method
-        request.url = url
-        request.headers = request_headers or {"Content-Type": "application/json"}
-
-        response = Response()
-        response.status_code = status_code
-        response.headers = response_headers or {"Content-Type": "application/json"}
-        if response_content is not None:
-            response._content = response_content
-        response.elapsed = timedelta(milliseconds=elapsed_ms)
-
-        record = LogRecord(
-            name="log_outgoing_requests",
-            level=20,
-            pathname="test.py",
-            lineno=1,
-            msg="test message",
-            args=(),
-            exc_info=None,
-        )
-        record.req = request
-        record.res = response
-        record._is_log_outgoing_requests = True
-
-        return request, response, record
-
-    def test_emit_with_non_request_log_record(self, mock_logger):
-        handler = StructlogOutgoingRequestsHandler()
-        record = LogRecord(
-            name="test",
-            level=20,
-            pathname="test.py",
-            lineno=1,
-            msg="test message",
-            args=(),
-            exc_info=None,
-        )
-        record._is_log_outgoing_requests = False
-
-        handler.emit(record)
-
-        mock_logger.debug.assert_not_called()
-
-    def test_emit_with_successful_request(self, mock_logger):
-        handler = StructlogOutgoingRequestsHandler()
-
-        request, response, record = self.create_mock_request_response_record(
-            method="GET",
-            url="https://example.com/api/endpoint?foo=bar",
-            status_code=200,
-            response_content=b'{"result": "success"}',
-            elapsed_ms=150,
-        )
-        record._is_log_outgoing_requests = True
-
-        handler.emit(record)
-
-        mock_logger.debug.assert_called_once()
-        call_args = mock_logger.debug.call_args
-        self.assertEqual(call_args[0][0], "outgoing_request")
-
-        kwargs = call_args[1]
-        self.assertEqual(kwargs["status_code"], 200)
-        self.assertEqual(kwargs["method"], "GET")
-        self.assertEqual(kwargs["url"], "https://example.com/api/endpoint?foo=bar")
-        self.assertEqual(kwargs["hostname"], "example.com")
-        self.assertEqual(kwargs["response_ms"], 150)
-        self.assertIsNone(kwargs["trace"])
-
-    def test_emit_with_authorization_header_scrubbing(self, mock_logger):
-        handler = StructlogOutgoingRequestsHandler()
-
-        request, response, record = self.create_mock_request_response_record(
-            request_headers={
-                "Authorization": "Bearer secret-token-12345",
-                "Content-Type": "application/json",
-            }
-        )
-        record._is_log_outgoing_requests = True
-
-        handler.emit(record)
-
-        call_args = mock_logger.debug.call_args
-        kwargs = call_args[1]
-
-        self.assertNotIn("Bearer secret-token-12345", str(kwargs))
-
-    def test_emit_with_request_exception(self, mock_logger):
-        handler = StructlogOutgoingRequestsHandler()
-
-        request, _, _ = self.create_mock_request_response_record(
-            method="GET",
-            url="https://example.com/api/endpoint",
-        )
-
-        exception = RequestException("Connection timeout")
-        exception.request = request
-        exception.response = None
-
-        record = LogRecord(
-            name="log_outgoing_requests",
-            level=40,
-            pathname="test.py",
-            lineno=1,
-            msg="test message",
-            args=(),
-            exc_info=(RequestException, exception, None),
-        )
-        record._is_log_outgoing_requests = True
-
-        handler.emit(record)
-
-        mock_logger.debug.assert_called_once()
-        call_args = mock_logger.debug.call_args
-        kwargs = call_args[1]
-
-        self.assertEqual(kwargs["method"], "GET")
-        self.assertEqual(kwargs["url"], "https://example.com/api/endpoint")
-        self.assertIsNone(kwargs["status_code"])
-        self.assertIsNone(kwargs["response_ms"])
-        self.assertIsNotNone(kwargs["trace"])
-
-    def test_headers_to_dict(self, mock_logger):
-        headers = {
-            "Content-Type": "application/json",
-            "X-Request-ID": "12345",
-            "Accept-Encoding": "gzip, deflate",
-        }
-
-        result = StructlogOutgoingRequestsHandler._headers_to_dict(headers, "req")
-
-        expected = {
-            "req_header__content_type": "application/json",
-            "req_header__x_request_id": "12345",
-            "req_header__accept_encoding": "gzip, deflate",
-        }
-
-        self.assertEqual(result, expected)
