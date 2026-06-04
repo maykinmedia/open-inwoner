@@ -163,6 +163,73 @@ class UpdateUserFromPartijTestCase(TestCase):
             "Should log warning when more than 2 phone numbers exist",
         )
 
+    def test_clears_alternative_when_same_as_primary(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        mock_client.digitaal_adres.list.return_value = {
+            "count": 2,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "uuid": "phone1-uuid",
+                    "soortDigitaalAdres": "telefoonnummer",
+                    "adres": "0612345678",
+                    "isStandaardAdres": True,
+                    "omschrijving": "",
+                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
+                    "verstrektDoorBetrokkene": None,
+                },
+                {
+                    "uuid": "phone2-uuid",
+                    "soortDigitaalAdres": "telefoonnummer",
+                    "adres": "0612345678",
+                    "isStandaardAdres": False,
+                    "omschrijving": "",
+                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
+                    "verstrektDoorBetrokkene": None,
+                },
+            ],
+        }
+
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory(phonenumber="", phonenumber_alternative="")
+        service.update_user_from_partij("partij-uuid", user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.phonenumber, "0612345678")
+        self.assertEqual(user.phonenumber_alternative, "")
+
+    def test_skips_alternative_when_no_primary(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        mock_client.digitaal_adres.list.return_value = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "uuid": "phone1-uuid",
+                    "soortDigitaalAdres": "telefoonnummer",
+                    "adres": "0612345678",
+                    "isStandaardAdres": False,
+                    "omschrijving": "",
+                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
+                    "verstrektDoorBetrokkene": None,
+                },
+            ],
+        }
+
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory(phonenumber="", phonenumber_alternative="")
+        service.update_user_from_partij("partij-uuid", user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.phonenumber, "")
+        self.assertEqual(user.phonenumber_alternative, "")
+
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
 class CreateKlantcontactTestCase(TestCase):
