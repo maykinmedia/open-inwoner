@@ -15,7 +15,7 @@
                 {# Setting class to 'tab__contents' instead of 'tab__content' is a quick-fix #}
                     <div id="maandspecificaties" class="tab__contents active">
                         <div class="wysiwyg">
-                            {% blocktrans with display_text=client.config.maandspecificatie_display_text.html|safe %}
+                            {% blocktrans with display_text=client.config.maandspecificatie_display_text.html|prosemirror_content|safe %}
                                 {{ display_text }}
                             {% endblocktrans %}
                         </div>

@@ -1,6 +1,6 @@
-{% load cms_tags %}{% spaceless %}
+{% load render_tags cms_tags %}{% spaceless %}
 {# this needs to be in one line for rendering purpose #}
-{% endspaceless %}<a href="{{ link }}"{% if instance.target %} target="{{ instance.target }}"{% endif %}{% if instance.attributes %} {{ instance.attributes_str }}{% endif %}>{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% empty %}{{ instance.name.html|safe }}{% endfor %}</a>
+{% endspaceless %}<a href="{{ link }}"{% if instance.target %} target="{{ instance.target }}"{% endif %}{% if instance.attributes %} {{ instance.attributes_str }}{% endif %}>{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% empty %}{{ instance.name.html|prosemirror_content|safe }}{% endfor %}</a>
 
 {% comment %}
 # Modified from djangocms_link/default/link.html to support ProsemirrorModelField

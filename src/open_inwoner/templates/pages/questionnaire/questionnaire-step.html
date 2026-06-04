@@ -43,7 +43,7 @@
                 {% csrf_token %}
 
                 {% if form.instance.content %}
-                    {{ form.instance.content|safe }}
+                    {{ form.instance.content|prosemirror_content|safe }}
                 {% endif %}
 
                 {% if questionnaire_files %}
