@@ -2,11 +2,7 @@
 {% load i18n button_tags %}
 
 {% block content %}
-    <form id="logout-form" method="post" action="{{ logout_url }}"
-        hx-post="{{ logout_url }}"
-        hx-trigger="load delay:4s"
-        hx-target="body"
-        hx-push-url="true">
+    <form id="logout-form" method="post" action="{{ logout_url }}">
         {% csrf_token %}
         <div class="grid__main">
             <header class="oip-header-group">
@@ -19,4 +15,9 @@
             </div>
         </div>
     </form>
+    <script nonce="{{ request.csp_nonce }}">
+        setTimeout(function() {
+            document.getElementById('logout-form').submit();
+        }, 4000);
+    </script>
 {% endblock content %}
