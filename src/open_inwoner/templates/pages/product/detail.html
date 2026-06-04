@@ -47,6 +47,7 @@
         <div class="readmore__content" id="readmore__content" data-toggle-readmore="{{ readmore|lower }}">
             <div class="readmore__inner-content {% if object.content_is_collapsable %}readmore__content--hidden{% endif %}">
                 {{ object|product_rendered_content|safe }}
+                {# Styled with 'beautifulsoup' instead of prosemirror_content #}
             </div>
         </div>
     </div>

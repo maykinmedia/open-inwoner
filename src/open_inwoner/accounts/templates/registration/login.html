@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n static utils grid_tags card_tags form_tags link_tags button_tags icon_tags solo_tags cms_tags djangocms_alias_tags %}
+{% load i18n static utils grid_tags card_tags form_tags link_tags button_tags icon_tags solo_tags render_tags cms_tags djangocms_alias_tags %}
 
 
 {% block header_image %}
@@ -9,7 +9,7 @@
 {% block content %}
     <h1 class="utrecht-heading-1">{% trans 'Welkom' %}</h1>
     {% if login_text.html %}
-        <div class="wysiwyg">{{ login_text.html|safe }}</div>
+        <div class="wysiwyg">{{ login_text.html|prosemirror_content|safe }}</div>
     {% endif %}
 
     {# Tab panels Start #}

@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n form_tags icon_tags grid_tags pagination_tags filter_tags %}
+{% load i18n form_tags icon_tags grid_tags pagination_tags render_tags cms_tags filter_tags %}
 
 {% block main_inner %}
     {#  search term section #}
@@ -98,7 +98,7 @@
                             {% trans "We konden geen zoekresultaten vinden" %}
                         </h2>
                         {% if configurable_text.search_page.search_zero_results_text.html %}
-                            {{ configurable_text.search_page.search_zero_results_text.html|safe }}
+                            {{ configurable_text.search_page.search_zero_results_text.html|prosemirror_content|safe }}
                         {% else %}
                             <nl-paragraph>{% trans "Probeer het nog eens met deze tips:" %}</nl-paragraph>
                             <ul class="ul">

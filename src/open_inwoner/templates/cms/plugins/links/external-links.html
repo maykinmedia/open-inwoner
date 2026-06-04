@@ -1,4 +1,4 @@
-{% load i18n icon_tags %}
+{% load i18n icon_tags render_tags %}
 
 {% if link_plugin and link_plugin.child_plugin_instances %}
     <section class="plugin external-links">
@@ -10,7 +10,7 @@
                     <span class="external-link__custom-icon">
                     {% icon icon=link.icon outlined=True %}
                     </span>
-                    <span class="external-link__content">{{ link.name.html|safe }}</span>
+                    <span class="external-link__content">{{ link.name.html|prosemirror_content|safe }}</span>
                     <span class="external-link__arrow">
                     {% icon icon="east" icon_position="after" primary=True outlined=True %}
                     </span>

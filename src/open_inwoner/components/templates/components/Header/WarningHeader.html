@@ -1,4 +1,4 @@
-{% load i18n icon_tags link_tags static %}
+{% load i18n icon_tags link_tags static render_tags %}
 
 <style nonce="{{ request.csp_nonce }}">
   .warning-header {
@@ -13,7 +13,7 @@
       >{% icon icon="error_outlined" outlined=True %}</span
     >
     <span class="warning-header__text"
-      >{{ warning_banner_text.html|safe }}</span
+      >{{ warning_banner_text.html|prosemirror_content|safe }}</span
     >
   </div>
 </div>
