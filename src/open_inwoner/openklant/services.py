@@ -101,6 +101,21 @@ def _normalize_email(email: str) -> str:
     return email.strip().lower()
 
 
+def _resolve_phonenumber_update(user: "User", update_data: dict) -> None:
+    """Clear alternative phonenumber from update_data if it would violate model constraints."""
+    if (
+        "phonenumber" not in update_data
+        and "phonenumber_alternative" not in update_data
+    ):
+        return
+    primary = update_data.get("phonenumber", user.phonenumber)
+    alternative = update_data.get(
+        "phonenumber_alternative", user.phonenumber_alternative
+    )
+    if alternative and (not primary or primary == alternative):
+        update_data["phonenumber_alternative"] = ""
+
+
 class BsnFetchParam(TypedDict):
     user_bsn: str
 
@@ -348,15 +363,10 @@ class eSuiteKlantenService(
                 )
 
         if update_data:
+            _resolve_phonenumber_update(user, update_data)
             for attr, value in update_data.items():
                 setattr(user, attr, value)
-
-            if user.phonenumber and user.phonenumber == user.phonenumber_alternative:
-                user.phonenumber_alternative = ""
-                update_data["phonenumber_alternative"] = ""
-
             user.save(update_fields=update_data.keys())
-
             system_action(
                 f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
                 content_object=user,
@@ -1383,10 +1393,10 @@ class OpenKlant2Service(
                 )
 
         if update_data:
+            _resolve_phonenumber_update(user, update_data)
             for attr, value in update_data.items():
                 setattr(user, attr, value)
             user.save(update_fields=update_data.keys())
-
             system_action(
                 f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
                 content_object=user,
