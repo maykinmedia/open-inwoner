@@ -58,7 +58,7 @@ def _get_report_info(
 
     if not (info_node := tree.find(info_response_node)):
         raise SSDClientException(
-            "XML node %s not found in response", info_response_node
+            f"XML node {info_response_node!r} not found in response"
         )
 
     parser = XmlParser(context=XmlContext(), handler=LxmlEventHandler)
@@ -66,7 +66,7 @@ def _get_report_info(
     try:
         info_response = parser.parse(info_node, info_type)
     except ParserError as exc:
-        raise SSDClientException("failed to parse XML for %s", info_response) from exc
+        raise SSDClientException("failed to parse XML response") from exc
 
     # fout, waarschuwing, informatie
     if info_response.fwi:
