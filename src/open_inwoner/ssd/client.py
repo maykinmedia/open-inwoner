@@ -85,8 +85,7 @@ class SSDBaseClient(ABC):
                 **auth_kwargs,
             )
             response.raise_for_status()
-        except (requests.HTTPError, requests.RequestException) as exc:
-            logger.exception("Requests error from SSD client")
+        except requests.RequestException as exc:
             raise SSDClientException from exc
 
         return response
@@ -145,9 +144,6 @@ class JaaropgaveClient(SSDBaseClient):
     def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
-        if not response or response.status_code != 200:
-            return None
-
         jaaropgaven = get_jaaropgaven(response)
 
         if not jaaropgaven:
@@ -197,9 +193,6 @@ class UitkeringClient(SSDBaseClient):
 
     def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, period=report_date)
-
-        if not response or response.status_code != 200:
-            return None
 
         uitkeringen = get_uitkeringen(response)
 

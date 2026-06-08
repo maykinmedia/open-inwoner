@@ -157,18 +157,7 @@ class UitkeringClientTest(TestCase):
             service__url="https://example.com/soap-service/",
         )
 
-        mock_request.post(
-            "https://example.com/soap-service/maandspecificatie/",
-            status_code=300,
-        )
-        res = ssd_client.get_reports(
-            bsn="12345",
-            report_date="198507",
-            request_url="https://dummy.com",
-        )
-        self.assertIsNone(res)
-
-        for code in [400, 500]:
+        for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
                     "https://example.com/soap-service/maandspecificatie/",
@@ -227,18 +216,7 @@ class JaaropgaveClientTest(TestCase):
             service__url="https://example.com/soap-service/",
         )
 
-        mock_request.post(
-            "https://example.com/soap-service/jaaropgave/",
-            status_code=300,
-        )
-        res = ssd_client.get_reports(
-            bsn="12345",
-            report_date="198507",
-            request_url="https://dummy.com",
-        )
-        self.assertIsNone(res)
-
-        for code in [400, 500]:
+        for code in [300, 400, 500]:
             with self.subTest(code=code):
                 mock_request.post(
                     "https://example.com/soap-service/jaaropgave/",
