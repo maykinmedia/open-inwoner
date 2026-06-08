@@ -96,8 +96,6 @@ AUTHENTICATION_BACKENDS = [
 ELASTIC_APM["DEBUG"] = True
 
 if "test" in sys.argv:
-    ELASTICSEARCH_DSL_AUTO_REFRESH = False
-    ELASTICSEARCH_DSL_AUTOSYNC = False
     ES_INDEX_PRODUCTS = "products_test"
 
 # Django debug toolbar

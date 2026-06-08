@@ -1027,6 +1027,12 @@ ES_INDEX_CMS_PAGES = config("ES_INDEX_CMS_PAGES", "cms_pages")
 ES_MAX_SIZE = 10000
 ES_SUGGEST_SIZE = 5
 
+# Triggers indexing on each model save. Requires Elasticsearch to be available and
+# correctly configured, otherwise this can cause 500s on admin operations.
+# Set to False to disable autosync and rely on the Celery index rebuild task instead.
+ELASTICSEARCH_DSL_AUTO_REFRESH = config("ELASTICSEARCH_DSL_AUTO_REFRESH", default=True)
+ELASTICSEARCH_DSL_AUTOSYNC = config("ELASTICSEARCH_DSL_AUTOSYNC", default=True)
+
 # Search page pagination trigger
 RESULTS_PER_PAGE = config("RESULTS_PER_PAGE", default=9)
 
