@@ -1,0 +1,10 @@
+cms_pages_config_enable: true
+cms_pages_config:
+  homepage:
+    enabled: true
+    title: Welkom
+    mijn_zaken:
+      title: Mijn zaken
+      num_zaken: 6
+    mijn_taken:
+      title: Mijn taken

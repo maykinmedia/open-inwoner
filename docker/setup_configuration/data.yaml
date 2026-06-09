@@ -212,6 +212,68 @@ sites_config:
     - domain: test-site
       name: The Django Sites default
 
+# CMS pages
+#
+# Re-running setup_configuration overwrites the fields listed here (title,
+# extension settings, app config toggles) on every run, so admin edits to
+# them do not survive a re-run. Anything else on the page -- placeholders,
+# plugins not managed below -- is left alone.
+cms_pages_config_enable: true
+cms_pages_config:
+  homepage:
+    enabled: true
+    title: Home
+    mijn_zaken:
+      title: Mijn zaken
+      num_zaken: 4
+    mijn_taken:
+      title: Mijn taken
+  ssd:
+    enabled: true
+    title: Mijn uitkeringen
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: euro
+  cases:
+    enabled: true
+    title: Mijn zaken
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: inventory_2
+  collaborate:
+    enabled: true
+    title: Samenwerken
+    requires_auth: true
+    menu_icon: group
+  inbox:
+    enabled: true
+    title: Berichten
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_indicator: inbox_new_messages
+    menu_icon: inbox
+  products:
+    enabled: true
+    title: Onderwerpen
+    menu_icon: description
+  profile:
+    enabled: true
+    title: Mijn profiel
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: person
+  openklant:
+    enabled: true
+    title: Contact
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: help_outline
+  mijn_afval:
+    enabled: true
+    title: Mijn afval
+    requires_auth: true
+    menu_icon: delete
+
 # Set default (staff) users
 default_user_configuration_enable: true
 default_user_configuration_config:

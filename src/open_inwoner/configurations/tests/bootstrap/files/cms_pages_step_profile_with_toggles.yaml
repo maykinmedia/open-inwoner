@@ -1,0 +1,17 @@
+cms_pages_config_enable: true
+cms_pages_config:
+  profile:
+    enabled: true
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    my_data: false
+    selected_categories: false
+    mentors: false
+    my_contacts: false
+    selfdiagnose: false
+    actions: false
+    notifications: false
+    questions: false
+    ssd: true
+    newsletters: true
+    appointments: true
