@@ -14,7 +14,6 @@ import structlog
 from cms import api
 from cms.api import add_plugin
 from cms.app_base import CMSApp
-from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, Placeholder
 from cms.page_rendering import render_page
 from cms.plugin_rendering import ContentRenderer
@@ -22,11 +21,11 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.plugins import get_plugins
 from django_prosemirror.constants import get_empty_doc
 from djangocms_versioning import versionables
-from djangocms_versioning.constants import DRAFT, PUBLISHED
+from djangocms_versioning.constants import PUBLISHED
 from djangocms_versioning.models import Version
 
 from open_inwoner.accounts.models import User
-from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.cms.utils import page_setup
 from open_inwoner.utils.test import SessionMiddleware
 
 
@@ -40,18 +39,9 @@ def _get_cms_test_user():
     return user
 
 
-def publish_page(page, language):
+def publish_page(page, language, user=None):
     """Publish the draft PageContent version for a CMS 4 page."""
-    user = _get_cms_test_user()
-    page_content = PageContent._original_manager.get(page=page, language=language)
-    ct = ContentType.objects.get_for_model(PageContent)
-    version, _ = Version.objects.get_or_create(
-        content_type=ct,
-        object_id=page_content.pk,
-        defaults={"created_by": user},
-    )
-    if version.state == DRAFT:
-        version.publish(user)
+    page_setup.publish_page(page, language, user=user or _get_cms_test_user())
 
 
 def unpublish_page(page, language):
@@ -136,12 +126,7 @@ def create_homepage():
     """
     helper to create an empty, published homepage
     """
-    p = api.create_page(
-        "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
-    )
-    p.set_as_homepage()
-    publish_page(p, "nl")
-    return p
+    return page_setup.create_homepage(user=_get_cms_test_user())
 
 
 def _init_plugin(plugin_class, plugin_data=None) -> tuple[dict, str]:
@@ -313,34 +298,17 @@ def create_apphook_page(
     config_args: dict = None,
     parent_page=None,
     publish=True,
+    user=None,
 ):
-    p = api.create_page(
-        (title or hook_class.name),
-        "cms/fullwidth.html",
-        "nl",
-        slug=hook_class.app_name,
-        apphook=hook_class.__name__,
-        apphook_namespace=hook_class.app_name,
-        in_navigation=True,
-        parent=parent_page,
+    return page_setup.create_apphook_page(
+        hook_class,
+        user=user or _get_cms_test_user(),
+        title=title,
+        extension_args=extension_args,
+        config_args=config_args,
+        parent_page=parent_page,
+        publish=publish,
     )
-    # create common extension
-    if extension_args:
-        extension_args["extended_object"] = p
-        CommonExtension.objects.create(**extension_args)
-
-    # create app_config
-    if app_config := apphook_pool.get_apphook(hook_class.__name__).app_config:
-        # attach it to the page for convenience
-        if config_args is None:
-            config_args = dict()
-        config_args["namespace"] = hook_class.app_name
-        p.app_config = app_config.objects.get_or_create(**config_args)
-
-    if publish:
-        publish_page(p, "nl")
-
-    return p
 
 
 def create_cms_page_with_content(

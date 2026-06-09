@@ -1,0 +1,7 @@
+cms_pages_config_enable: true
+cms_pages_config:
+  homepage:
+    enabled: true
+    title: Home
+  cases:
+    enabled: true

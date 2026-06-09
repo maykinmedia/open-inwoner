@@ -1,280 +1,251 @@
-from django.conf import settings
+from typing import Annotated
 
-from django_setup_configuration.config_settings import ConfigSettings
+from django.utils.functional import SimpleLazyObject
+
+from cms.app_base import CMSApp
+from cms.models import Page
+from cms.plugin_base import CMSPluginBase
+from django_setup_configuration import ConfigurationModel
 from django_setup_configuration.configuration import BaseConfigurationStep
+from pydantic import Field
 
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
+from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.plugins.cms_plugins.tasks import TasksPlugin
+from open_inwoner.cms.plugins.cms_plugins.zaken import CMSZakenPlugin
+from open_inwoner.cms.plugins.models.tasks import TasksConfig
+from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
-from open_inwoner.cms.tests import cms_tools
+from open_inwoner.cms.utils import page_setup
+from open_inwoner.mijn_afval.cms.cms_apps import MijnAfvalApphook
+from open_inwoner.openklant.cms_apps import OpenklantApphook
 
 
-def create_apphook_page_args(config_mapping: dict) -> dict:
-    """
-    Helper function to create mappings with arguments for :func:`create_apphook_page`
-    """
+class ZakenPluginConfig(ConfigurationModel):
+    """Configuration for the 'Mijn zaken' plugin placed on the homepage."""
 
-    apphook_page_args = dict()
-
-    for setting_name, config_field_name in config_mapping.items():
-        setting = getattr(settings, setting_name, None)
-        if setting is not None:
-            apphook_page_args[config_field_name] = setting
-
-    return apphook_page_args
+    class Meta:
+        django_model_refs = {CMSZakenPluginConfig: ["title", "num_zaken"]}
 
 
-class GenericCMSConfigurationStep(BaseConfigurationStep):
-    """
-    Generic base class for configuring CMS apps
-    """
+class TasksPluginConfig(ConfigurationModel):
+    """Configuration for the 'Mijn taken' plugin placed on the homepage."""
 
-    def is_enabled(self):
-        return getattr(settings, self.config_settings.enable_setting, False)
-
-    def is_configured(self):
-        """
-        CMS apps have no required settings; we consider them "configured"
-        if the configuration option is enabled
-
-        Pattern for enable setting: CMS_CONFIG_APPNAME_ENABLE
-        """
-        return self.is_enabled()
-
-    def configure(self):
-        """
-        Create apphook page with common extenion settings
-
-        The method is sufficient for generic CMS apps that don't require any
-        configuration beyond the commonextension. Override to provide additional
-        arguments to :func:`create_apphook_page`.
-        """
-        if not self.is_enabled():
-            return
-
-        extension_args = create_apphook_page_args(
-            self.config_settings.extension_settings_mapping
-        )
-
-        cms_tools.create_apphook_page(self.app_hook, extension_args=extension_args)
-
-    def test_configuration(self): ...
+    class Meta:
+        django_model_refs = {TasksConfig: ["title"]}
 
 
-class CMSConfigSettings(ConfigSettings):
-    """
-    Configuration settings + documentation common to most CMS apps
+class CMSHomepageConfig(ConfigurationModel):
+    """Configuration for the site homepage (a plain CMS page with no apphook)."""
 
-    The `namespace` attribute should be of the form:
-        CMS_APPNAME
-    where APPNAME is the name of the cms app in upper case
-    """
+    enabled: bool = False
+    title: Annotated[str, Field(description="Page title for the homepage.")] = "Home"
+    mijn_zaken: Annotated[
+        ZakenPluginConfig | None,
+        Field(description="Adds a 'Mijn zaken' plugin to the homepage."),
+    ] = Field(default=None)
+    mijn_taken: Annotated[
+        TasksPluginConfig | None,
+        Field(description="Adds a 'Mijn taken' plugin to the homepage."),
+    ] = Field(default=None)
 
-    def __init__(
-        self,
-        namespace: str,
-        enable_setting: str,
-        required_settings: list | None = None,
-        optional_settings: list | None = None,
-        *args,
-        **kwargs,
-    ):
-        super().__init__(
-            *args,
-            namespace=namespace,
-            enable_setting=enable_setting,
-            required_settings=required_settings,
-            optional_settings=optional_settings,
-            **kwargs,
-        )
 
-        self.enable_setting = enable_setting
-        self.namespace = namespace
-        self.file_name = f"{self.namespace.lower()}"
-        self.required_settings = required_settings or []
-        self.optional_settings = optional_settings or [
-            f"{self.namespace}_REQUIRES_AUTH",
-            f"{self.namespace}_REQUIRES_AUTH_BSN_OR_KVK",
-            f"{self.namespace}_MENU_INDICATOR",
-            f"{self.namespace}_MENU_ICON",
-        ]
-        self.extension_settings_mapping = {
-            f"{self.namespace}_REQUIRES_AUTH": "requires_auth",
-            f"{self.namespace}_REQUIRES_AUTH_BSN_OR_KVK": "requires_auth_bsn_or_kvk",
-            f"{self.namespace}_MENU_INDICATOR": "menu_indicator",
-            f"{self.namespace}_MENU_ICON": "menu_icon",
-        }
-        self.additional_info = {
-            "requires_auth": {
-                "variable": f"{self.namespace}_REQUIRES_AUTH",
-                "description": "Whether the access to the page is restricted",
-                "possible_values": "True, False",
-            },
-            "requires_auth_bsn_or_kvk": {
-                "variable": f"{self.namespace}_REQUIRES_AUTH_BSN_OR_KVK",
-                "description": "Access to the page requires BSN or KVK",
-                "possible_values": "True, False",
-            },
-            "menu_indicator": {
-                "variable": f"{self.namespace}_MENU_INDICATOR",
-                "description": "Menu indicator for the app",
-                "possible_values": "String",
-            },
-            "menu_icon": {
-                "variable": f"{self.namespace}_MENU_ICON",
-                "description": "Icon in the menu",
-                "possible_values": "String",
-            },
+class CMSPageConfig(ConfigurationModel):
+    """Configuration for a single CMS apphook-backed page."""
+
+    enabled: bool = False
+    title: Annotated[
+        str | None,
+        Field(
+            description=(
+                "Page title shown in navigation and the browser tab. "
+                "Defaults to the apphook's built-in name when not set."
+            )
+        ),
+    ] = None
+
+    class Meta:
+        django_model_refs = {
+            CommonExtension: [
+                "requires_auth",
+                "requires_auth_bsn_or_kvk",
+                "menu_indicator",
+                "menu_icon",
+            ]
         }
 
 
-class CMSBenefitsConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS social benefits (SSD) app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_SSD_ENABLE",
-        namespace="CMS_SSD",
-        display_name="CMS apps configuration: Social Benefits",
-    )
+class CMSProfilePageConfig(CMSPageConfig):
+    """Configuration for the Profile page; extends CMSPageConfig with section toggles."""
 
-    def __init__(self):
-        self.app_name = "ssd"
-        self.app_hook = SSDApphook
-
-
-class CMSCasesConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS cases app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_CASES_ENABLE",
-        namespace="CMS_CASES",
-        display_name="CMS apps configuration: Cases",
-    )
-
-    def __init__(self):
-        self.app_name = "cases"
-        self.app_hook = CasesApphook
-
-
-class CMSCollaborateConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS collaborate app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_COLLABORATE_ENABLE",
-        display_name="CMS apps configuration: Collaboration",
-        namespace="CMS_COLLABORATE",
-    )
-
-    def __init__(self):
-        self.app_name = "collaborate"
-        self.app_hook = CollaborateApphook
-
-
-class CMSInboxConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS inbox app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_INBOX_ENABLE",
-        display_name="CMS apps configuration: Inbox",
-        namespace="CMS_INBOX",
-    )
-
-    def __init__(self):
-        self.app_name = "inbox"
-        self.app_hook = InboxApphook
-
-
-class CMSProductsConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS product app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_PRODUCTS_ENABLE",
-        display_name="CMS apps configuration: Products",
-        namespace="CMS_PRODUCTS",
-    )
-
-    def __init__(self):
-        self.app_name = "products"
-        self.app_hook = ProductsApphook
-
-
-class CMSProfileConfigurationStep(GenericCMSConfigurationStep):
-    verbose_name = "Configuration for CMS profile app"
-    config_settings = CMSConfigSettings(
-        enable_setting="CMS_CONFIG_PROFILE_ENABLE",
-        display_name="CMS apps configuration: Profile",
-        namespace="CMS_PROFILE",
-        optional_settings=[
-            # commonextension
-            "CMS_PROFILE_REQUIRES_AUTH",
-            "CMS_PROFILE_REQUIRES_AUTH_BSN_OR_KVK",
-            "CMS_PROFILE_MENU_INDICATOR",
-            "CMS_PROFILE_MENU_ICON",
-            # custom
-            "CMS_PROFILE_MY_DATA",
-            "CMS_PROFILE_SELECTED_CATEGORIES",
-            "CMS_PROFILE_MENTORS",
-            "CMS_PROFILE_MY_CONTACTS",
-            "CMS_PROFILE_SELFDIAGNOSE",
-            "CMS_PROFILE_ACTIONS",
-            "CMS_PROFILE_NOTIFICATIONS",
-            "CMS_PROFILE_QUESTIONS",
-            "CMS_PROFILE_SSD",
-            "CMS_PROFILE_NEWSLETTERS",
-            "CMS_PROFILE_APPOINTMENTS",
-        ],
-        detailed_info_extra={
-            "requires_auth": {
-                "variable": "CMS_PROFILE_REQUIRES_AUTH",
-                "description": "Whether the access to the page is restricted",
-                "possible_values": "True, False",
-            },
-            "requires_auth_bsn_or_kvk": {
-                "variable": "CMS_PROFILE_REQUIRES_AUTH_BSN_OR_KVK",
-                "description": "Access to the page requires BSN or KVK",
-                "possible_values": "True, False",
-            },
-            "menu_indicator": {
-                "variable": "CMS_PROFILE_MENU_INDICATOR",
-                "description": "Menu indicator for the app",
-                "possible_values": "String",
-            },
-            "menu_icon": {
-                "variable": "CMS_PROFILE_MENU_ICON",
-                "description": "Icon in the menu",
-                "possible_values": "String",
-            },
-        },
-    )
-
-    def __init__(self):
-        self.app_name = "profile"
-
-    def configure(self):
-        if not self.is_enabled():
-            return
-
-        extension_settings = [
-            "CMS_PROFILE_REQUIRES_AUTH",
-            "CMS_PROFILE_REQUIRES_AUTH_BSN_OR_KVK",
-            "CMS_PROFILE_MENU_INDICATOR",
-            "CMS_PROFILE_MENU_ICON",
-        ]
-        optional_settings = [
-            item
-            for item in self.config_settings.optional_settings
-            if item not in extension_settings
-        ]
-        config_mapping = {
-            setting: f"{setting.split('CMS_PROFILE_', 1)[1].lower()}"
-            for setting in optional_settings
+    class Meta:
+        django_model_refs = {
+            ProfileConfig: [
+                "my_data",
+                "selected_categories",
+                "mentors",
+                "my_contacts",
+                "selfdiagnose",
+                "actions",
+                "notifications",
+                "questions",
+                "ssd",
+                "newsletters",
+                "appointments",
+            ]
         }
 
-        config_args = create_apphook_page_args(config_mapping)
-        extension_args = create_apphook_page_args(
-            self.config_settings.extension_settings_mapping
-        )
 
-        cms_tools.create_apphook_page(
-            ProfileApphook,
-            config_args=config_args,
-            extension_args=extension_args,
+class CMSPagesConfigurationModel(ConfigurationModel):
+    """
+    Groups per-page configuration for the homepage and every CMS apphook page.
+
+    Omitting a page is the same as disabling it, hence the ``None`` defaults. A
+    model instance as default would be more direct, but the documentation
+    generator serializes field defaults to JSON and cannot handle those.
+    """
+
+    homepage: CMSHomepageConfig | None = Field(default=None)
+    ssd: CMSPageConfig | None = Field(default=None)
+    cases: CMSPageConfig | None = Field(default=None)
+    collaborate: CMSPageConfig | None = Field(default=None)
+    inbox: CMSPageConfig | None = Field(default=None)
+    products: CMSPageConfig | None = Field(default=None)
+    profile: CMSProfilePageConfig | None = Field(default=None)
+    openklant: CMSPageConfig | None = Field(default=None)
+    mijn_afval: CMSPageConfig | None = Field(default=None)
+
+
+# maps the field name on CMSPagesConfigurationModel to the apphook it configures
+# (the ordering determines the order of the pages in the navigation)
+_APP_HOOKS: dict[str, type[CMSApp]] = {
+    "ssd": SSDApphook,
+    "cases": CasesApphook,
+    "collaborate": CollaborateApphook,
+    "inbox": InboxApphook,
+    "products": ProductsApphook,
+    "profile": ProfileApphook,
+    "openklant": OpenklantApphook,
+    "mijn_afval": MijnAfvalApphook,
+}
+
+# the ProfileConfig fields, i.e. everything CMSProfilePageConfig adds on top of
+# the common page configuration
+_PROFILE_CONFIG_FIELDS = tuple(
+    name
+    for name in CMSProfilePageConfig.model_fields
+    if name not in CMSPageConfig.model_fields
+)
+
+# maps a CMSHomepageConfig field name to the plugin it configures on the
+# homepage's "content" placeholder (the ordering determines the order the
+# plugins are placed in)
+_HOMEPAGE_PLUGINS: dict[str, type[CMSPluginBase]] = {
+    "mijn_zaken": CMSZakenPlugin,
+    "mijn_taken": TasksPlugin,
+}
+_HOMEPAGE_CONTENT_SLOT = "content"
+
+
+class CMSPagesConfigurationStep(BaseConfigurationStep):
+    """
+    Creates or updates the site homepage and every individually enabled CMS
+    apphook page.
+
+    The step reads nested configuration from ``CMSPagesConfigurationModel``.
+    Each sub-model carries an ``enabled`` flag; entries whose flag is ``False``
+    (the default) are skipped so deployments only create the pages they need.
+
+    A page that already exists is not left untouched: its title, common
+    extension settings (``requires_auth`` and friends) and, for the profile
+    page, its section toggles are all overwritten to match this configuration
+    on every run, so changes made to them in the CMS admin do not survive a
+    re-run. The homepage's ``mijn_zaken``/``mijn_taken`` plugins, if
+    configured, are overwritten the same way. Anything else on a page --
+    placeholders, plugins this step doesn't explicitly manage -- is left
+    alone.
+    """
+
+    verbose_name = "Configuration for CMS pages"
+    enable_setting = "cms_pages_config_enable"
+    namespace = "cms_pages_config"
+    config_model = CMSPagesConfigurationModel
+
+    def execute(self, model: CMSPagesConfigurationModel) -> None:
+        # resolved on first use, so a run with nothing left to create does not
+        # add the service account to the user table
+        user = SimpleLazyObject(page_setup.get_cms_bootstrap_user)
+        homepage = self._get_or_create_homepage(model.homepage, user=user)
+
+        if homepage is not None:
+            self._sync_homepage_plugins(homepage, model.homepage, user=user)
+
+        for model_attr, apphook in _APP_HOOKS.items():
+            page_config: CMSPageConfig | None = getattr(model, model_attr)
+            if page_config is None or not page_config.enabled:
+                continue
+
+            extension_args = {
+                "requires_auth": page_config.requires_auth,
+                "requires_auth_bsn_or_kvk": page_config.requires_auth_bsn_or_kvk,
+                "menu_indicator": page_config.menu_indicator,
+                "menu_icon": page_config.menu_icon,
+            }
+
+            config_args = (
+                {field: getattr(page_config, field) for field in _PROFILE_CONFIG_FIELDS}
+                if isinstance(page_config, CMSProfilePageConfig)
+                else None
+            )
+
+            page_setup.get_or_create_apphook_page(
+                apphook,
+                user=user,
+                title=page_config.title,
+                extension_args=extension_args,
+                config_args=config_args,
+                parent_page=homepage,
+            )
+
+    def _get_or_create_homepage(
+        self, config: CMSHomepageConfig | None, *, user
+    ) -> Page | None:
+        """
+        Return the homepage that apphook pages are nested under.
+
+        Creates or updates it when a config is provided and enabled. If a
+        homepage already exists but this run doesn't enable one, it is
+        returned as-is (not overwritten), so disabling the homepage doesn't
+        detach the apphook pages from the page tree. Returns ``None`` only
+        if there is no homepage and none was requested.
+        """
+        if config is not None and config.enabled:
+            return page_setup.get_or_create_homepage(user=user, title=config.title)
+
+        return Page.objects.filter(reverse_id=page_setup.HOMEPAGE_REVERSE_ID).first()
+
+    def _sync_homepage_plugins(
+        self, homepage: Page, config: CMSHomepageConfig | None, *, user
+    ) -> None:
+        """
+        Add or update the plugins configured for the homepage.
+
+        A plugin field left out of the configuration is not removed if it
+        was previously added: like everything else this step doesn't
+        explicitly manage, it is left as-is for admins to change.
+        """
+        plugin_specs = []
+        if config is not None:
+            for model_attr, plugin_class in _HOMEPAGE_PLUGINS.items():
+                plugin_config = getattr(config, model_attr)
+                if plugin_config is not None:
+                    plugin_specs.append((plugin_class, plugin_config.model_dump()))
+
+        page_setup.sync_placeholder_plugins(
+            homepage, _HOMEPAGE_CONTENT_SLOT, plugin_specs, user=user
         )
