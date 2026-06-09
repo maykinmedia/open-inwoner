@@ -21,7 +21,11 @@ from open_inwoner.openzaak.tests.factories import (
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import ANOTHER_CATALOGI_ROOT, CATALOGI_ROOT
 from open_inwoner.openzaak.zgw_imports import (
+    ExcludedObject,
     ExclusionReason,
+    FullImportResult,
+    ImportResult,
+    ZaakTypeRelatedImportResult,
     ZGWCatalogusImporter,
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
@@ -2987,3 +2991,56 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
                 f"ZaakType {zt.identificatie} from API group 2 should not be affected "
                 f"by API group 1's import",
             )
+
+
+class FullImportResultAllExcludedTest(TestCase):
+    def _make_excluded(
+        self, object_type="StatusType", reason=ExclusionReason.API_ERROR
+    ):
+        return ExcludedObject(
+            object_type=object_type, url="https://example.com", reason=reason
+        )
+
+    def test_all_excluded_empty_when_no_exclusions(self):
+        api_group = ZGWApiGroupConfigFactory()
+        result = FullImportResult(api_group=api_group)
+        self.assertEqual(result.all_excluded(), [])
+
+    def test_all_excluded_collects_from_catalogi_and_zaaktypen(self):
+        api_group = ZGWApiGroupConfigFactory()
+        exc_catalogus = self._make_excluded("Catalogus")
+        exc_zaaktype = self._make_excluded("ZaakType")
+        result = FullImportResult(
+            api_group=api_group,
+            catalogi=ImportResult(excluded=[exc_catalogus]),
+            zaaktypen=ImportResult(excluded=[exc_zaaktype]),
+        )
+        self.assertEqual(result.all_excluded(), [exc_catalogus, exc_zaaktype])
+
+    def test_all_excluded_collects_from_per_zaaktype_results(self):
+        api_group = ZGWApiGroupConfigFactory()
+        exc_statustype = self._make_excluded("StatusType")
+        exc_resultaattype = self._make_excluded("ResultaatType")
+        exc_iot = self._make_excluded("InformatieObjectType")
+        result = FullImportResult(
+            api_group=api_group,
+            statustypen=[ZaakTypeRelatedImportResult(excluded=[exc_statustype])],
+            resultaattypen=[ZaakTypeRelatedImportResult(excluded=[exc_resultaattype])],
+            informatieobjecttypen=[ZaakTypeRelatedImportResult(excluded=[exc_iot])],
+        )
+        self.assertCountEqual(
+            result.all_excluded(), [exc_statustype, exc_resultaattype, exc_iot]
+        )
+
+    def test_all_excluded_returns_flat_list_across_multiple_zaaktypen(self):
+        api_group = ZGWApiGroupConfigFactory()
+        exc_a = self._make_excluded("StatusType")
+        exc_b = self._make_excluded("StatusType")
+        result = FullImportResult(
+            api_group=api_group,
+            statustypen=[
+                ZaakTypeRelatedImportResult(excluded=[exc_a]),
+                ZaakTypeRelatedImportResult(excluded=[exc_b]),
+            ],
+        )
+        self.assertEqual(result.all_excluded(), [exc_a, exc_b])
