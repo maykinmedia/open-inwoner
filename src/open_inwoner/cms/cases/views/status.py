@@ -216,13 +216,24 @@ class InnerCaseDetailView(
                 logger.warning("Failed to build eSuiteVragenService")
 
     def store_statustype_mapping(self, zaaktype_identificatie):
-        # Filter on ZaakType identificatie to avoid eSuite situation where one statustype
-        # is linked to multiple zaaktypes
-        self.statustype_config_mapping = {
-            zaaktype_statustype.statustype_url: zaaktype_statustype
-            for zaaktype_statustype in ZaakTypeStatusTypeConfig.objects.filter(
-                zaaktype_config__identificatie=zaaktype_identificatie
+        # Filter on ZaakType identificatie: one statustype can be linked to multiple zaaktypes
+        # Filter on catalogus service: a zaak could be imported + viewed with different
+        # api groups, causing a mismatch in `ZaakTypeStatusTypeConfig.statustype_url`
+        configs = list(
+            ZaakTypeStatusTypeConfig.objects.filter(
+                zaaktype_config__identificatie=zaaktype_identificatie,
+                zaaktype_config__catalogus__service=self.api_group.ztc_service,
             )
+        )
+        if not configs:
+            logger.warning(
+                "No ZaakTypeStatusTypeConfig found for zaaktype - run zgw_import_data",
+                zaaktype_identificatie=zaaktype_identificatie,
+                api_group=self.api_group.name,
+            )
+
+        self.statustype_config_mapping = {
+            config.statustype_url: config for config in configs
         }
 
     @cached_property
@@ -578,50 +589,65 @@ class InnerCaseDetailView(
     @staticmethod
     def get_statuses_data(
         statuses: list[Status],
-        statustype_config_mapping: dict | None = None,
+        statustype_config_mapping: dict,
     ) -> list[dict]:
-        return [
-            {
-                "date": s.datum_status_gezet,
-                "label": glom_multiple(
-                    s,
-                    ("statustype.statustekst", "statustype.omschrijving"),
-                    default=_("Nieuwe aanvraag"),
-                ),
-                "status_indicator": getattr(
-                    statustype_config_mapping.get(s.statustype.url),
-                    "status_indicator",
-                    None,
-                ),
-                "status_indicator_text": getattr(
-                    statustype_config_mapping.get(s.statustype.url),
-                    "status_indicator_text",
-                    None,
-                ),
-                "call_to_action_url": getattr(
-                    statustype_config_mapping.get(s.statustype.url),
-                    "call_to_action_url",
-                    None,
-                ),
-                "call_to_action_text": getattr(
-                    statustype_config_mapping.get(s.statustype.url),
-                    "call_to_action_text",
-                    None,
-                ),
-                "description": (
-                    config.description.html
-                    if (config := statustype_config_mapping.get(s.statustype.url))
-                    and config.description
-                    else ""
-                ),
-                "case_link_text": getattr(
-                    statustype_config_mapping.get(s.statustype.url),
-                    "case_link_text",
-                    _("Bekijk aanvraag"),
-                ),
-            }
-            for s in statuses
-        ]
+        statuses_data = []
+
+        for status in statuses:
+            config = statustype_config_mapping.get(status.statustype.url)
+            if config is None and status.statustype.url:
+                logger.warning(
+                    "No ZaakTypeStatusTypeConfig for statustype URL",
+                    statustype_url=status.statustype.url,
+                )
+
+            statuses_data.append(
+                {
+                    "date": status.datum_status_gezet,
+                    "label": glom_multiple(
+                        status,
+                        ("statustype.statustekst", "statustype.omschrijving"),
+                        default=_("Nieuwe aanvraag"),
+                    ),
+                    "status_indicator": getattr(
+                        statustype_config_mapping.get(status.statustype.url),
+                        "status_indicator",
+                        None,
+                    ),
+                    "status_indicator_text": getattr(
+                        statustype_config_mapping.get(status.statustype.url),
+                        "status_indicator_text",
+                        None,
+                    ),
+                    "call_to_action_url": getattr(
+                        statustype_config_mapping.get(status.statustype.url),
+                        "call_to_action_url",
+                        None,
+                    ),
+                    "call_to_action_text": getattr(
+                        statustype_config_mapping.get(status.statustype.url),
+                        "call_to_action_text",
+                        None,
+                    ),
+                    "description": (
+                        config.description.html
+                        if (
+                            config := statustype_config_mapping.get(
+                                status.statustype.url
+                            )
+                        )
+                        and config.description
+                        else ""
+                    ),
+                    "case_link_text": getattr(
+                        statustype_config_mapping.get(status.statustype.url),
+                        "case_link_text",
+                        _("Bekijk aanvraag"),
+                    ),
+                }
+            )
+
+        return statuses_data
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -3396,3 +3396,129 @@ class TestCaseDetailView(
         self.assertEqual(case.statuses[0]["label"], "Registered")
         self.assertEqual(case.statuses[1]["label"], "Modified")
         self.assertEqual(case.statuses[2]["label"], "Finish")
+
+
+class StoreStatustypeMappingTest(TestCase):
+    def _make_view_with_api_group(self, api_group):
+        view = InnerCaseDetailView()
+        view.api_group = api_group
+        return view
+
+    def test_mapping_scoped_to_current_api_group(self):
+        api_group = ZGWApiGroupConfigFactory()
+        catalogus = CatalogusConfigFactory(service=api_group.ztc_service)
+        ztc = ZaakTypeConfigFactory(catalogus=catalogus, identificatie="ZT-001")
+        config = ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=ztc,
+            statustype_url=f"{api_group.ztc_service.api_root}statustypen/abc",
+        )
+
+        view = self._make_view_with_api_group(api_group)
+        view.store_statustype_mapping("ZT-001")
+
+        self.assertEqual(
+            view.statustype_config_mapping,
+            {config.statustype_url: config},
+        )
+
+    def test_mapping_excludes_other_api_group(self):
+        api_group = ZGWApiGroupConfigFactory()
+        other_api_group = ZGWApiGroupConfigFactory()
+
+        catalogus = CatalogusConfigFactory(service=api_group.ztc_service)
+        ztc = ZaakTypeConfigFactory(catalogus=catalogus, identificatie="ZT-001")
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=ztc,
+            statustype_url=f"{api_group.ztc_service.api_root}statustypen/abc",
+        )
+
+        other_catalogus = CatalogusConfigFactory(service=other_api_group.ztc_service)
+        other_ztc = ZaakTypeConfigFactory(
+            catalogus=other_catalogus, identificatie="ZT-001"
+        )
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=other_ztc,
+            statustype_url=f"{other_api_group.ztc_service.api_root}statustypen/abc",
+        )
+
+        view = self._make_view_with_api_group(api_group)
+        view.store_statustype_mapping("ZT-001")
+
+        self.assertEqual(
+            list(view.statustype_config_mapping.keys()),
+            [f"{api_group.ztc_service.api_root}statustypen/abc"],
+        )
+
+    def test_empty_mapping_logs_warning(self):
+        api_group = ZGWApiGroupConfigFactory()
+        view = self._make_view_with_api_group(api_group)
+
+        with self.assertLogs(
+            "open_inwoner.cms.cases.views.status", level="WARNING"
+        ) as cm:
+            view.store_statustype_mapping("ZT-UNKNOWN")
+
+        self.assertTrue(
+            any("No ZaakTypeStatusTypeConfig found" in msg for msg in cm.output)
+        )
+        self.assertEqual(view.statustype_config_mapping, {})
+
+
+class GetStatusesDataTest(TestCase):
+    def _make_status(self, statustype_url, label="Test status"):
+        statustype = StatusType(
+            url=statustype_url,
+            zaaktype="https://ztc.example.com/zaaktypen/1",
+            omschrijving=label,
+            volgnummer=1,
+        )
+        status = Status(
+            url="https://zrc.example.com/statussen/1",
+            zaak="https://zrc.example.com/zaken/1",
+            statustype=statustype,
+            datum_status_gezet=datetime.datetime(2024, 1, 1),
+        )
+        return status
+
+    def test_returns_list_for_multiple_statuses(self):
+        status_a = self._make_status(
+            "https://ztc.example.com/statustypen/a", "Status A"
+        )
+        status_b = self._make_status(
+            "https://ztc.example.com/statustypen/b", "Status B"
+        )
+
+        result = InnerCaseDetailView.get_statuses_data([status_a, status_b], {})
+
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 2)
+
+    def test_uses_config_when_url_matches(self):
+        url = "https://ztc.example.com/statustypen/abc"
+        status = self._make_status(url)
+        config = ZaakTypeStatusTypeConfigFactory.build(
+            statustype_url=url,
+            status_indicator=StatusIndicators.warning,
+            status_indicator_text="Let op",
+        )
+
+        result = InnerCaseDetailView.get_statuses_data([status], {url: config})
+
+        self.assertEqual(result[0]["status_indicator"], StatusIndicators.warning)
+        self.assertEqual(result[0]["status_indicator_text"], "Let op")
+
+    def test_logs_warning_when_url_not_in_mapping(self):
+        url = "https://ztc.example.com/statustypen/missing"
+        status = self._make_status(url)
+
+        with self.assertLogs(
+            "open_inwoner.cms.cases.views.status", level="WARNING"
+        ) as cm:
+            InnerCaseDetailView.get_statuses_data([status], {})
+
+        self.assertTrue(
+            any(
+                "No ZaakTypeStatusTypeConfig for statustype URL" in msg
+                for msg in cm.output
+            )
+        )
