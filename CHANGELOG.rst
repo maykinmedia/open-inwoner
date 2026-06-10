@@ -1,3 +1,28 @@
+2.3.1 (2026-06-10)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.3.1`.
+
+Deployment aandachtspunten
+--------------------------
+
+* ...
+
+Nieuwe features
+---------------
+
+* ...
+
+Bugfixes
+--------
+
+* ...
+
+Onderhoud
+---------
+
+* ...
+
 2.3.0 (2026-05-29)
 ==================
 
