@@ -96,9 +96,24 @@ class PhoneNumberForm(forms.Form):
 
 
 class CustomRegistrationForm(RegistrationForm):
-    first_name = forms.CharField(label=_("First name"), max_length=255, required=True)
-    infix = forms.CharField(label=_("Infix"), max_length=64, required=False)
-    last_name = forms.CharField(label=_("Last name"), max_length=255, required=True)
+    first_name = forms.CharField(
+        label=_("First name"),
+        max_length=255,
+        required=True,
+        validators=[CharFieldValidator()],
+    )
+    infix = forms.CharField(
+        label=_("Infix"),
+        max_length=64,
+        required=False,
+        validators=[CharFieldValidator()],
+    )
+    last_name = forms.CharField(
+        label=_("Last name"),
+        max_length=255,
+        required=True,
+        validators=[CharFieldValidator()],
+    )
     invite = forms.ModelChoiceField(
         queryset=Invite.objects.all(),
         to_field_name="key",
@@ -136,7 +151,6 @@ class BaseUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            "first_name",
             "email",
             "phonenumber",
             "phonenumber_alternative",
@@ -151,11 +165,16 @@ class BaseUserForm(forms.ModelForm):
             del self.fields["image"]
             del self.fields["cropping"]
 
+        if "first_name" in self.fields:
+            self.fields["first_name"].validators.append(CharFieldValidator())
+
 
 class UserForm(ErrorMessageMixin, BaseUserForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = kwargs.pop("user")
+        for field_name in ("infix", "last_name"):
+            self.fields[field_name].validators.append(CharFieldValidator())
 
     class Meta:
         model = User
@@ -251,6 +270,9 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
         elif user.login_type == LoginTypeChoices.eherkenning:
             for field_name in ["first_name", "infix", "last_name"]:
                 del self.fields[field_name]
+        else:
+            for field_name in ("first_name", "infix", "last_name"):
+                self.fields[field_name].validators.append(CharFieldValidator())
 
 
 class GroupAdminForm(forms.ModelForm):
