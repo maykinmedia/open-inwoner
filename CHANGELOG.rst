@@ -38,6 +38,9 @@ Bugfixes
 * [:gh:`2598`]: Een ontbrekende ``PartijIdentificator`` bij een klant in de
   OpenKlant2-service veroorzaakte een onverwachte fout. Dit wordt nu correct
   afgehandeld.
+* [:gh:`2544`]: De uitlogbevestigingspagina gebruikt nu een ``<script>``-tag
+  met een CSP-nonce voor de auto-submit in plaats van HTMX-attributen, waardoor
+  de Content Security Policy niet langer wordt geschonden.
 * ...
 
 Onderhoud
