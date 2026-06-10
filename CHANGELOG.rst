@@ -20,6 +20,9 @@ Bugfixes
   ingevuld, kunnen nu de uitlogbevestigingspagina bereiken. Hierdoor wordt een
   redirect-loop voorkomen waarbij de middleware deze gebruikers wegstuurde
   voordat zij konden uitloggen.
+* [:gh:`2569`]: ZGW API-fouten bij het per-zaaktype importeren van gerelateerde
+  types (informatieobjecttype, statustype, resultaattype) worden nu afgevangen.
+  Een fout voor één zaaktype breekt de volledige importrun niet langer af.
 * ...
 
 Onderhoud
