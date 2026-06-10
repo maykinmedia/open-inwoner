@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from celery import group
 from requests.exceptions import RequestException
+from solo.admin import SingletonModelAdmin
 
 from open_inwoner.openzaak.tasks import process_zaken_notification
 
@@ -17,7 +18,7 @@ from .models import (
 
 
 @admin.register(NotificationProcessingConfig)
-class NotificationProcessingConfigAdmin(admin.ModelAdmin):
+class NotificationProcessingConfigAdmin(SingletonModelAdmin):
     pass
 
 
@@ -129,6 +130,9 @@ class NotificationRecordAdmin(admin.ModelAdmin):
                     "(only FAILED, SUCCESS, or SKIPPED records can be retried)."
                 ).format(skipped=skipped),
             )
+
+    def has_add_permission(self, request):
+        return False
 
     actions = ["retry_notifications"]
 
