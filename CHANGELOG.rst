@@ -16,6 +16,10 @@ Nieuwe features
 Bugfixes
 --------
 
+* [:gh:`2567`]: Gebruikers die nog niet alle verplichte registratievelden hebben
+  ingevuld, kunnen nu de uitlogbevestigingspagina bereiken. Hierdoor wordt een
+  redirect-loop voorkomen waarbij de middleware deze gebruikers wegstuurde
+  voordat zij konden uitloggen.
 * ...
 
 Onderhoud
