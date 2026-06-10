@@ -41,6 +41,9 @@ Bugfixes
 * [:gh:`2544`]: De uitlogbevestigingspagina gebruikt nu een ``<script>``-tag
   met een CSP-nonce voor de auto-submit in plaats van HTMX-attributen, waardoor
   de Content Security Policy niet langer wordt geschonden.
+* [:gh:`2600`]: De pagina 'Mijn vragen' gaf een 404-fout wanneer het
+  contactformulier niet was ingeschakeld. Dit is hersteld door de
+  contactformulier-check over te slaan bij de weergave van de vragenlijst.
 * ...
 
 Onderhoud

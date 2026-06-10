@@ -126,6 +126,13 @@ class KlantContactMomentListView(
     template_name = "pages/contactmoment/list.html"
     paginate_by = 9
 
+    def dispatch(self, request, *args, **kwargs):
+        # This page is always accessible to users with BSN/KVK (checked by
+        # KlantContactMomentAccessMixin). ContactFormView.dispatch() would gate it on
+        # contact_registration_enabled, but that flag only controls whether the embedded
+        # form renders - skip it and go straight to the access mixin.
+        return super(ContactFormView, self).dispatch(request, *args, **kwargs)
+
     @cached_property
     def crumbs(self):
         return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]

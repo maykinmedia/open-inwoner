@@ -23,6 +23,7 @@ from open_inwoner.openklant.models import (
     ContactFormSubject,
     ESuiteKlantConfig,
     KlantContactMomentAnswer,
+    KlantenSysteemConfig,
 )
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
@@ -72,9 +73,6 @@ class ContactMomentViewsTestCase(
             esuite_subject_code="e_suite_subject_code",
             esuite_config=self.klant_config,
         )
-
-        from open_inwoner.openklant.constants import KlantenServiceType
-        from open_inwoner.openklant.models import KlantenSysteemConfig
 
         self.config = KlantenSysteemConfig.get_solo()
         self.config.primary_backend = KlantenServiceType.ESUITE.value
@@ -939,3 +937,64 @@ class ContactMomentViewsTestCase(
                 )
                 response = self.app.get(url)
                 self.assertRedirects(response, f"{reverse('login')}?next={url}")
+
+    def test_contactmoment_list_accessible_without_contact_registration(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """
+        The contactmomenten list must return 200 even when contact registration
+        is fully disabled. Before the fix, ContactFormView.dispatch() raised
+        Http404 in this configuration.
+        """
+        config = KlantenSysteemConfig.get_solo()
+        config.primary_backend = ""
+        config.register_contact_email = ""
+        config.save()
+
+        self.assertFalse(config.contact_registration_enabled)
+
+        response = self.app.get(reverse("cases:contactmoment_list"), user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_contactmoment_list_contact_form_visibility(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """
+        The contact form is shown only when both the site toggle and contact
+        registration are enabled.
+        """
+        siteconfig = SiteConfiguration.get_solo()
+        siteconfig.contactmoment_contact_form_enabled = True
+        siteconfig.save()
+
+        config = KlantenSysteemConfig.get_solo()
+        list_url = reverse("cases:contactmoment_list")
+
+        cases = [
+            (
+                "no registration",
+                {"primary_backend": "", "register_contact_email": ""},
+                False,
+            ),
+            (
+                "email registration",
+                {"primary_backend": "", "register_contact_email": "test@example.com"},
+                True,
+            ),
+        ]
+        for label, config_values, expect_form in cases:
+            with self.subTest(label):
+                for attr, value in config_values.items():
+                    setattr(config, attr, value)
+                config.save()
+
+                response = self.app.get(list_url, user=self.user)
+
+                self.assertEqual(
+                    response.context["contactmoment_contact_form_enabled"], expect_form
+                )
+                if expect_form:
+                    self.assertContains(response, "question-form")
+                else:
+                    self.assertNotContains(response, "question-form")
