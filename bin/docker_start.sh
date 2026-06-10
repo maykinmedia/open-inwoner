@@ -21,7 +21,11 @@ ${SCRIPTPATH}/wait_for_db.sh
 
 # Apply database migrations
 >&2 echo "Apply database migrations"
-python src/manage.py migrate
+python src/manage.py migrate --skip-checks
+
+# Run system checks now that the database is populated
+>&2 echo "Running system checks"
+python src/manage.py check
 
 # Ensure all mail-editor templates exist in the database
 >&2 echo "Loading mail templates"

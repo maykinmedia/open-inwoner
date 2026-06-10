@@ -31,6 +31,10 @@ Bugfixes
 * [:gh:`2586`]: In het SSD-basissjabloon werd ``mijn_uitkeringen_text`` per
   abuis benaderd als HTML-object via ``.html``, terwijl het een ``TextField``
   is. Dit resulteerde in een lege weergave.
+* [:gh:`2588`]: Het Docker-opstartscript is aangepast zodat systeemchecks
+  (waaronder URL-validatie) pas worden uitgevoerd nadat de databasemigraties
+  voltooid zijn. Dit voorkomt een crash op verse deployments waarbij de
+  ``Site``-tabel nog niet bestaat.
 * ...
 
 Onderhoud
