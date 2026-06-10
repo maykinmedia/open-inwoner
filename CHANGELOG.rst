@@ -25,6 +25,9 @@ Bugfixes
   Een fout voor één zaaktype breekt de volledige importrun niet langer af.
 * [:gh:`2574`]: Bij het synchroniseren van gebruikersgegevens vanuit de Klanten
   API worden telefoonnummerbeperkingen nu correct toegepast.
+* [:gh:`2583`]: SSD-client foutafhandeling hersteld: ``SSDServiceFaultException``
+  wordt nu apart afgevangen zodat het ``meldingen``-attribuut beschikbaar is, en
+  ``SSDClientException`` in de XML-parser ontvangt nu de juiste argumenten.
 * ...
 
 Onderhoud

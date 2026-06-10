@@ -55,30 +55,21 @@ class BenefitsFormView(
             report_date = ssd_client.format_report_date(form.data["report_date"])
             request_url = request.build_absolute_uri()
 
+            user_msg = _(
+                "Your report(s) could not be retrieved due to technical problems."
+            )
             try:
                 pdf_content = ssd_client.get_reports(bsn, report_date, request_url)
-            except (ImproperlyConfigured, SSDServiceFaultException) as exc:
+            except SSDServiceFaultException as exc:
                 logger.warning(
                     "SSD service fault",
                     meldingen=[m.tekst for m in exc.meldingen],
                 )
-                messages.error(
-                    request=request,
-                    message=_(
-                        "Your report(s) could not be retrieved due to technical problems. "
-                        "Please contact the municipality."
-                    ),
-                )
+                messages.error(request=request, message=user_msg)
                 pdf_content = None
-            except SSDClientException:
+            except (ImproperlyConfigured, SSDClientException):
                 logger.exception("SSD client error")
-                messages.error(
-                    request=request,
-                    message=_(
-                        "Your report(s) could not be retrieved due to technical problems. "
-                        "Please try again later."
-                    ),
-                )
+                messages.error(request=request, message=user_msg)
                 pdf_content = None
 
             if not pdf_content:
