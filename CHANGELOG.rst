@@ -35,6 +35,9 @@ Bugfixes
   (waaronder URL-validatie) pas worden uitgevoerd nadat de databasemigraties
   voltooid zijn. Dit voorkomt een crash op verse deployments waarbij de
   ``Site``-tabel nog niet bestaat.
+* [:gh:`2598`]: Een ontbrekende ``PartijIdentificator`` bij een klant in de
+  OpenKlant2-service veroorzaakte een onverwachte fout. Dit wordt nu correct
+  afgehandeld.
 * ...
 
 Onderhoud

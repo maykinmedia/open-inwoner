@@ -999,21 +999,21 @@ class OpenKlant2Service(
 
         # Bit convoluted: find all PIs for a vestiging, then cross-reference to the kvk
         # pi for the parent
-        vestiging_pi = next(
-            result
-            for result in self.client.partij_identificator.list_iter(
-                params={
-                    "partijIdentificatorCodeSoortObjectId": "vestigingsnummer",
-                    "partijIdentificatorCodeRegister": "hr",
-                    "partijIdentificatorCodeObjecttype": "vestiging",
-                    "partijIdentificatorObjectId": vestigingsnummer,
-                }
+        try:
+            vestiging_pi = next(
+                result
+                for result in self.client.partij_identificator.list_iter(
+                    params={
+                        "partijIdentificatorCodeSoortObjectId": "vestigingsnummer",
+                        "partijIdentificatorCodeRegister": "hr",
+                        "partijIdentificatorCodeObjecttype": "vestiging",
+                        "partijIdentificatorObjectId": vestigingsnummer,
+                    }
+                )
+                if result["subIdentificatorVan"]
+                and result["subIdentificatorVan"]["uuid"] == kvk_pi["uuid"]
             )
-            if result["subIdentificatorVan"]
-            and result["subIdentificatorVan"]["uuid"] == kvk_pi["uuid"]
-        )
-
-        if not vestiging_pi:
+        except StopIteration:
             return None
 
         if not vestiging_pi["identificeerdePartij"]:
