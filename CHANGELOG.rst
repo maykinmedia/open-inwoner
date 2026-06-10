@@ -28,6 +28,9 @@ Bugfixes
 * [:gh:`2583`]: SSD-client foutafhandeling hersteld: ``SSDServiceFaultException``
   wordt nu apart afgevangen zodat het ``meldingen``-attribuut beschikbaar is, en
   ``SSDClientException`` in de XML-parser ontvangt nu de juiste argumenten.
+* [:gh:`2586`]: In het SSD-basissjabloon werd ``mijn_uitkeringen_text`` per
+  abuis benaderd als HTML-object via ``.html``, terwijl het een ``TextField``
+  is. Dit resulteerde in een lege weergave.
 * ...
 
 Onderhoud
