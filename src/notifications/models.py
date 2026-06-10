@@ -1,7 +1,7 @@
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from ape_pie import APIClient
 from solo.models import SingletonModel
@@ -50,9 +50,9 @@ class NotificationsAPIConfig(models.Model):
         api_root = (
             self.notifications_api_service.api_root
             if self.notifications_api_service
-            else _("no service configured")
+            else gettext("no service configured")
         )
-        return _("Notifications API configuration ({api_root})").format(
+        return gettext("Notifications API configuration ({api_root})").format(
             api_root=api_root
         )
 
@@ -249,4 +249,4 @@ class NotificationProcessingConfig(SingletonModel):
         verbose_name = _("Notificatieverwerking configuratie")
 
     def __str__(self):
-        return _("Notification Processing Configuration")
+        return gettext("Notification Processing Configuration")
