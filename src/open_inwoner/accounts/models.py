@@ -267,21 +267,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         blank=True,
         default="",
-        validators=[CharFieldValidator()],
     )
     infix = models.CharField(
         verbose_name=_("Infix"),
         max_length=64,
         blank=True,
         default="",
-        validators=[CharFieldValidator()],
     )
     last_name = models.CharField(
         verbose_name=_("Last name"),
         max_length=255,
         blank=True,
         default="",
-        validators=[CharFieldValidator()],
     )
     email = models.EmailField(
         verbose_name=_("Email address"),

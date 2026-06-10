@@ -1720,6 +1720,36 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(user_contact.email, contact.email)
         self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
+    def test_brp_user_with_diacritics_in_name_can_submit_necessary_form(self):
+        user = DigidUserFactory(
+            first_name="Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
+            infix="Isiah dé Maria de las Mercedes Rosalía",
+            last_name="J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
+            email="brp@example.org",
+        )
+        self.assertTrue(user.is_bsn_user_with_brp)
+        self.assertTrue(user.require_necessary_fields())
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+
+        form["email"] = "valid@example.com"
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "valid@example.com")
+        self.assertEqual(
+            user.first_name,
+            "Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
+        )
+        self.assertEqual(user.infix, "Isiah dé Maria de las Mercedes Rosalía")
+        self.assertEqual(
+            user.last_name,
+            "J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
+        )
+
     #     def test_non_unique_email_fails(self):
     #         UserFactory.create(email="john@smith.com")
     #         user = UserFactory.create(
