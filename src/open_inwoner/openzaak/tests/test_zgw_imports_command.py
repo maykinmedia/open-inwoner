@@ -2,6 +2,7 @@ from io import StringIO
 from unittest import mock
 
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase
 
 import requests_mock
@@ -18,6 +19,12 @@ from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import ANOTHER_CATALOGI_ROOT, CATALOGI_ROOT
 from open_inwoner.openzaak.tests.test_zgw_imports import CatalogMockData
+from open_inwoner.openzaak.zgw_imports import (
+    ExcludedObject,
+    ExclusionReason,
+    FullImportResult,
+    ImportResult,
+)
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 
@@ -471,3 +478,54 @@ class ZGWImportCommandWithoutConfigTest(TestCase):
         )
         # Verify the importer was never instantiated
         mock_importer.assert_not_called()
+
+
+class ZGWImportCommandErrorHandlingTest(TestCase):
+    def _make_result_with_exclusion(self, reason):
+        api_group = ZGWApiGroupConfigFactory()
+        return FullImportResult(
+            api_group=api_group,
+            zaaktypen=ImportResult(
+                excluded=[
+                    ExcludedObject(
+                        object_type="ZaakType",
+                        url="https://ztc.example.com/zaaktypen/1",
+                        reason=reason,
+                    )
+                ]
+            ),
+        )
+
+    @mock.patch(
+        "open_inwoner.openzaak.management.commands.zgw_import_data.ZGWCatalogusImporter"
+    )
+    def test_command_raises_on_api_error(self, mock_importer_cls):
+        result = self._make_result_with_exclusion(ExclusionReason.API_ERROR)
+        mock_importer_cls.return_value.import_all.return_value = result
+        # ZGWApiGroupConfig.objects.all() must return something for importers to be built
+        ZGWApiGroupConfigFactory()
+
+        with self.assertRaises(CommandError):
+            call_command("zgw_import_data", stdout=StringIO())
+
+    @mock.patch(
+        "open_inwoner.openzaak.management.commands.zgw_import_data.ZGWCatalogusImporter"
+    )
+    def test_command_raises_on_database_error(self, mock_importer_cls):
+        result = self._make_result_with_exclusion(ExclusionReason.DATABASE_ERROR)
+        mock_importer_cls.return_value.import_all.return_value = result
+        ZGWApiGroupConfigFactory()
+
+        with self.assertRaises(CommandError):
+            call_command("zgw_import_data", stdout=StringIO())
+
+    @mock.patch(
+        "open_inwoner.openzaak.management.commands.zgw_import_data.ZGWCatalogusImporter"
+    )
+    def test_command_does_not_raise_for_filtered_internal(self, mock_importer_cls):
+        result = self._make_result_with_exclusion(ExclusionReason.FILTERED_INTERNAL)
+        mock_importer_cls.return_value.import_all.return_value = result
+        ZGWApiGroupConfigFactory()
+
+        # Should not raise
+        call_command("zgw_import_data", stdout=StringIO())
