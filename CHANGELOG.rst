@@ -23,6 +23,8 @@ Bugfixes
 * [:gh:`2569`]: ZGW API-fouten bij het per-zaaktype importeren van gerelateerde
   types (informatieobjecttype, statustype, resultaattype) worden nu afgevangen.
   Een fout voor één zaaktype breekt de volledige importrun niet langer af.
+* [:gh:`2574`]: Bij het synchroniseren van gebruikersgegevens vanuit de Klanten
+  API worden telefoonnummerbeperkingen nu correct toegepast.
 * ...
 
 Onderhoud
