@@ -53,7 +53,11 @@ from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.models.services import Service as ServiceConfig
 from zgw_consumers.utils import pagination_helper
 
-from open_inwoner.accounts.choices import DigitalAddressType, NotificationChannelChoice
+from open_inwoner.accounts.choices import (
+    DigitalAddressType,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+)
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import (
@@ -1351,41 +1355,108 @@ class OpenKlant2Service(
         )
 
     def update_user_from_partij(self, partij_uuid: str, user: User):
-        update_data = {}
+        remote_adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        remote_uuids = {adres["uuid"] for adres in remote_adressen}
 
-        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        # Build lookup: ok2_uuid → mapping for all of this user's addresses
+        existing_mappings = {
+            str(m.ok2_uuid): m
+            for m in DigitaalAdresKlant2Mapping.objects.filter(
+                digital_address__user=user
+            ).select_related("digital_address")
+        }
 
-        if email_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soort_digital_adres="email", adressen=adressen
-        ):
-            email = email_adressen[0]["adres"]
-            if not User.objects.filter(email__iexact=email).exists():
-                update_data["email"] = email
+        user_update: dict[str, str] = {}
 
-        if phone_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soort_digital_adres="telefoonnummer", adressen=adressen
-        ):
-            for adres in phone_adressen:
-                if adres["isStandaardAdres"]:
-                    update_data["phonenumber"] = adres["adres"]
-                else:
-                    pass  # TODO [#2604] non-primary phones → DigitalAddress
+        for remote_adres in remote_adressen:
+            remote_uuid = remote_adres["uuid"]
+            adres_value = remote_adres["adres"]
+            soort = remote_adres["soortDigitaalAdres"]
+            is_standaard = remote_adres["isStandaardAdres"]
 
-            if len(phone_adressen) > 2:
-                logger.warning(
-                    "More than two phone numbers found for partij",
-                    partij_uuid=partij_uuid,
+            if remote_uuid in existing_mappings:
+                local_addr = existing_mappings[remote_uuid].digital_address
+                if local_addr.value != adres_value:
+                    local_addr.value = adres_value
+                    local_addr.save(update_fields=["value"])
+            else:
+                addr_type = (
+                    DigitalAddressType.email
+                    if soort == "email"
+                    else DigitalAddressType.phone
                 )
+                # For regular-user email, skip if the value already belongs to another user
+                if (
+                    soort == "email"
+                    and user.login_type == LoginTypeChoices.default
+                    and User.objects.filter(email__iexact=adres_value)
+                    .exclude(pk=user.pk)
+                    .exists()
+                ):
+                    continue
+                local_addr, _ = user.digital_addresses.get_or_create(
+                    type=addr_type,
+                    value=adres_value,
+                    defaults={"login_type": user.login_type},
+                )
+                DigitaalAdresKlant2Mapping.objects.update_or_create(
+                    digital_address=local_addr,
+                    defaults={"ok2_uuid": remote_uuid},
+                )
+                existing_mappings[remote_uuid] = local_addr
 
-        if update_data:
-            _resolve_phonenumber_update(user, update_data)
-            for attr, value in update_data.items():
+            if is_standaard:
+                match soort:
+                    case "email":
+                        if (
+                            not User.objects.filter(email__iexact=adres_value)
+                            .exclude(pk=user.pk)
+                            .exists()
+                        ):
+                            user_update["email"] = adres_value
+                    case "telefoonnummer":
+                        user_update["phonenumber"] = adres_value
+                    case _ as unreachable:
+                        assert_never(unreachable)
+
+        phone_count = sum(
+            1 for a in remote_adressen if a["soortDigitaalAdres"] == "telefoonnummer"
+        )
+        if phone_count > 2:
+            logger.warning(
+                "More than two phone numbers found for partij",
+                partij_uuid=partij_uuid,
+            )
+
+        # Delete local addresses whose mapping UUID is no longer in the remote
+        stale_mappings = DigitaalAdresKlant2Mapping.objects.filter(
+            digital_address__user=user
+        ).exclude(ok2_uuid__in=remote_uuids)
+        for mapping in stale_mappings:
+            mapping.digital_address.delete()
+
+        if user_update:
+            for attr, value in user_update.items():
                 setattr(user, attr, value)
-            user.save(update_fields=update_data.keys())
+            user.save(update_fields=user_update.keys())
             system_action(
-                f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
+                f"updated user from klant API with fields: {', '.join(sorted(user_update.keys()))}",
                 content_object=user,
             )
+
+        # Sync voorkeursDigitaalAdres
+        partij = self.client.partij.retrieve(partij_uuid)
+        if voorkeurs_ref := partij.get("voorkeursDigitaalAdres"):
+            voorkeurs_uuid = voorkeurs_ref["uuid"]
+            try:
+                mapping = DigitaalAdresKlant2Mapping.objects.get(
+                    ok2_uuid=voorkeurs_uuid
+                )
+                if user.preferred_address_id != mapping.digital_address_id:
+                    user.preferred_address = mapping.digital_address
+                    user.save(update_fields=["preferred_address"])
+            except DigitaalAdresKlant2Mapping.DoesNotExist:
+                pass  # UUID not in local mappings yet; skip
 
     def update_partij_from_user_data(
         self,

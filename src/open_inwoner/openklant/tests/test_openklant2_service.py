@@ -23,182 +23,99 @@ from open_inwoner.openklant.tests.factories import (
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
 class UpdateUserFromPartijTestCase(TestCase):
+    PARTIJ_UUID = "00000000-0000-0000-0001-000000000001"
+    EMAIL_UUID = "00000000-0000-0000-0001-000000000002"
+    PHONE1_UUID = "00000000-0000-0000-0001-000000000003"
+    PHONE2_UUID = "00000000-0000-0000-0001-000000000004"
+    PHONE3_UUID = "00000000-0000-0000-0001-000000000005"
+    VOORKEURS_UUID = "00000000-0000-0000-0001-000000000006"
+
     def setUp(self):
         self.config = OpenKlant2ConfigFactory()
+
+    def _setup_mock(self, mock_client_class, adressen, voorkeurs_uuid=None):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.digitaal_adres.list.return_value = {
+            "count": len(adressen),
+            "next": None,
+            "previous": None,
+            "results": adressen,
+        }
+        mock_client.partij.retrieve.return_value = {
+            "voorkeursDigitaalAdres": (
+                {"uuid": voorkeurs_uuid} if voorkeurs_uuid else None
+            ),
+        }
+        return mock_client
+
+    def _make_adres(self, uuid, soort, adres, is_standaard=False):
+        return {
+            "uuid": uuid,
+            "soortDigitaalAdres": soort,
+            "adres": adres,
+            "isStandaardAdres": is_standaard,
+            "omschrijving": "",
+            "verstrektDoorPartij": {"uuid": self.PARTIJ_UUID},
+            "verstrektDoorBetrokkene": None,
+        }
 
     def test_email_not_updated_when_already_exists_for_another_user(
         self, mock_client_class
     ):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-
-        # Existing user already has email
         UserFactory(email="taken@example.com")
-
-        mock_client.digitaal_adres.list.return_value = {
-            "count": 1,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "uuid": "addr-uuid",
-                    "soortDigitaalAdres": "email",
-                    "adres": "taken@example.com",
-                    "isStandaardAdres": True,
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                }
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "taken@example.com", is_standaard=True
+                ),
             ],
-        }
-
-        service = OpenKlant2Service(config=self.config)
-        user = UserFactory(email="original@example.com")
-        service.update_user_from_partij("partij-uuid", user)
-
-        user.refresh_from_db()
-        self.assertEqual(
-            user.email,
-            "original@example.com",
-            "Email should not be updated when it conflicts with another user",
         )
 
+        user = UserFactory(email="original@example.com")
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "original@example.com")
+
     def test_email_updated_when_available(self, mock_client_class):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-
-        mock_client.digitaal_adres.list.return_value = {
-            "count": 1,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "uuid": "addr-uuid",
-                    "soortDigitaalAdres": "email",
-                    "adres": "available@example.com",
-                    "isStandaardAdres": True,
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                }
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "available@example.com", is_standaard=True
+                ),
             ],
-        }
+        )
 
-        service = OpenKlant2Service(config=self.config)
         user = UserFactory(email="old@example.com")
-        service.update_user_from_partij("partij-uuid", user)
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
 
         user.refresh_from_db()
         self.assertEqual(user.email, "available@example.com")
 
-    def test_phone_numbers_mapped_by_standard_flag(self, mock_client_class):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-
-        mock_client.digitaal_adres.list.return_value = {
-            "count": 2,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "uuid": "phone1-uuid",
-                    "soortDigitaalAdres": "telefoonnummer",
-                    "adres": "0612345678",
-                    "isStandaardAdres": True,  # Primary
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                },
-                {
-                    "uuid": "phone2-uuid",
-                    "soortDigitaalAdres": "telefoonnummer",
-                    "adres": "0687654321",
-                    "isStandaardAdres": False,  # Alternative
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                },
+    def test_primary_phone_maps_to_user_phonenumber(self, mock_client_class):
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.PHONE1_UUID, "telefoonnummer", "0612345678", is_standaard=True
+                ),
+                self._make_adres(
+                    self.PHONE2_UUID, "telefoonnummer", "0687654321", is_standaard=False
+                ),
             ],
-        }
-
-        user = UserFactory(phonenumber="")
-        service = OpenKlant2Service(config=self.config)
-        service.update_user_from_partij("partij-uuid", user)
-
-        user.refresh_from_db()
-        self.assertEqual(
-            user.phonenumber, "0612345678", "Standard phone should map to primary"
-        )
-        # TODO [#2604] non-primary phone → DigitalAddress
-
-    def test_logs_warning_when_more_than_two_phone_numbers(self, mock_client_class):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-
-        mock_client.digitaal_adres.list.return_value = {
-            "count": 3,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "uuid": f"phone{i}-uuid",
-                    "soortDigitaalAdres": "telefoonnummer",
-                    "adres": f"06{i}",
-                    "isStandaardAdres": i == 0,
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                }
-                for i in range(3)
-            ],
-        }
-
-        service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
-
-        with self.assertLogs(
-            "open_inwoner.openklant.services", level="WARNING"
-        ) as logs:
-            service.update_user_from_partij("partij-uuid", user)
-
-        self.assertTrue(
-            any("More than two phone numbers found" in log for log in logs.output),
-            "Should log warning when more than 2 phone numbers exist",
         )
 
-    def test_clears_alternative_when_same_as_primary(self, mock_client_class):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-
-        mock_client.digitaal_adres.list.return_value = {
-            "count": 2,
-            "next": None,
-            "previous": None,
-            "results": [
-                {
-                    "uuid": "phone1-uuid",
-                    "soortDigitaalAdres": "telefoonnummer",
-                    "adres": "0612345678",
-                    "isStandaardAdres": True,
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                },
-                {
-                    "uuid": "phone2-uuid",
-                    "soortDigitaalAdres": "telefoonnummer",
-                    "adres": "0612345678",
-                    "isStandaardAdres": False,
-                    "omschrijving": "",
-                    "verstrektDoorPartij": {"uuid": "partij-uuid"},
-                    "verstrektDoorBetrokkene": None,
-                },
-            ],
-        }
-
         user = UserFactory(phonenumber="")
-        service = OpenKlant2Service(config=self.config)
-        service.update_user_from_partij("partij-uuid", user)
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
 
         user.refresh_from_db()
         self.assertEqual(user.phonenumber, "0612345678")
@@ -225,6 +142,186 @@ class UpdateUserFromPartijTestCase(TestCase):
             type=DigitalAddressType.phone, value="0687654321"
         )
         self.assertTrue(secondary.exists())
+
+    def test_logs_warning_when_more_than_two_phone_numbers(self, mock_client_class):
+        phone_uuids = [self.PHONE1_UUID, self.PHONE2_UUID, self.PHONE3_UUID]
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    phone_uuids[i],
+                    "telefoonnummer",
+                    f"061234567{i}",
+                    is_standaard=(i == 0),
+                )
+                for i in range(3)
+            ],
+        )
+
+        user = UserFactory()
+        with self.assertLogs(
+            "open_inwoner.openklant.services", level="WARNING"
+        ) as logs:
+            OpenKlant2Service(config=self.config).update_user_from_partij(
+                self.PARTIJ_UUID, user
+            )
+
+        self.assertTrue(
+            any("More than two phone numbers found" in log for log in logs.output)
+        )
+
+    def test_non_primary_phone_without_primary_does_not_set_phonenumber(
+        self, mock_client_class
+    ):
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.PHONE1_UUID, "telefoonnummer", "0612345678", is_standaard=False
+                ),
+            ],
+        )
+
+        user = UserFactory(phonenumber="")
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        user.refresh_from_db()
+        self.assertEqual(user.phonenumber, "")
+
+    def test_known_uuid_updates_local_value_via_mapping(self, mock_client_class):
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "new@example.com", is_standaard=True
+                ),
+            ],
+        )
+
+        user = UserFactory(email="old@example.com")
+        email_addr = user.digital_addresses.get(type="email")
+        DigitaalAdresKlant2MappingFactory(
+            digital_address=email_addr, ok2_uuid=self.EMAIL_UUID
+        )
+
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        email_addr.refresh_from_db()
+        self.assertEqual(email_addr.value, "new@example.com")
+
+    def test_unknown_uuid_creates_new_digital_address_and_mapping(
+        self, mock_client_class
+    ):
+        from open_inwoner.accounts.choices import DigitalAddressType
+
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "old@example.com", is_standaard=True
+                ),
+                self._make_adres(
+                    self.PHONE1_UUID, "telefoonnummer", "0612345678", is_standaard=True
+                ),
+            ],
+        )
+
+        user = UserFactory(email="old@example.com", phonenumber="")
+        # No mappings exist yet
+
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        self.assertTrue(
+            DigitaalAdresKlant2Mapping.objects.filter(
+                digital_address__user=user,
+                ok2_uuid=self.PHONE1_UUID,
+            ).exists()
+        )
+        self.assertTrue(
+            user.digital_addresses.filter(
+                type=DigitalAddressType.phone, value="0612345678"
+            ).exists()
+        )
+
+    def test_stale_local_address_deleted_when_absent_from_remote(
+        self, mock_client_class
+    ):
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "test@example.com", is_standaard=True
+                ),
+            ],
+        )
+
+        user = UserFactory(email="test@example.com", phonenumber="0612345678")
+        phone_addr = user.digital_addresses.get(type="phone")
+        DigitaalAdresKlant2MappingFactory(
+            digital_address=phone_addr, ok2_uuid=self.PHONE1_UUID
+        )
+        email_addr = user.digital_addresses.get(type="email")
+        DigitaalAdresKlant2MappingFactory(
+            digital_address=email_addr, ok2_uuid=self.EMAIL_UUID
+        )
+
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        self.assertFalse(user.digital_addresses.filter(type="phone").exists())
+
+    def test_voorkeurs_digitaal_adres_sets_preferred_address(self, mock_client_class):
+        # EMAIL_UUID is used for both the email address and voorkeursDigitaalAdres
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "test@example.com", is_standaard=True
+                ),
+            ],
+            voorkeurs_uuid=self.EMAIL_UUID,
+        )
+
+        user = UserFactory(email="test@example.com", phonenumber="")
+        email_addr = user.digital_addresses.get(type="email")
+        DigitaalAdresKlant2MappingFactory(
+            digital_address=email_addr, ok2_uuid=self.EMAIL_UUID
+        )
+
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        user.refresh_from_db()
+        self.assertEqual(user.preferred_address, email_addr)
+
+    def test_voorkeurs_digitaal_adres_skipped_when_no_mapping(self, mock_client_class):
+        self._setup_mock(
+            mock_client_class,
+            [
+                self._make_adres(
+                    self.EMAIL_UUID, "email", "test@example.com", is_standaard=True
+                ),
+            ],
+            voorkeurs_uuid=self.VOORKEURS_UUID,
+        )
+
+        user = UserFactory(email="test@example.com", phonenumber="")
+        # No mapping for VOORKEURS_UUID
+
+        OpenKlant2Service(config=self.config).update_user_from_partij(
+            self.PARTIJ_UUID, user
+        )
+
+        user.refresh_from_db()
+        self.assertIsNone(user.preferred_address)
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
@@ -1469,6 +1566,7 @@ class UpdatePartijFromUserDataTestCase(TestCase):
 
         mock_client.digitaal_adres.create.assert_called_once()
         mock_client.digitaal_adres.delete.assert_called_once_with(ORPHAN_UUID)
+
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
 class KlantcontactenForPartijTestCase(TestCase):
