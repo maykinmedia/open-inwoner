@@ -355,10 +355,13 @@ class MockAPIReadPatchData(MockAPIData):
 
         # Mock for creating new digital addresses: echo back the request body so the
         # returned soortDigitaalAdres matches what was sent (prevents false cache hits).
+        _adres_counter = {"n": 0}
+
         def _create_digitaal_adres(request, context):
+            _adres_counter["n"] += 1
             body = request.json()
             return {
-                "uuid": "new-adres-uuid",
+                "uuid": f"00000000-0000-0000-cafe-{_adres_counter['n']:012d}",
                 "adres": body["adres"],
                 "soortDigitaalAdres": body["soortDigitaalAdres"],
                 "isStandaardAdres": body.get("isStandaardAdres", False),

@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 import glom
 import structlog
 from openklant_client import OpenKlantClient
+from openklant_client.exceptions import NotFound as OK2NotFound
 from openklant_client.types.common import ForeignKeyRef
 from openklant_client.types.resources.betrokkene import (
     Betrokkene,
@@ -72,7 +73,6 @@ from open_inwoner.openklant.models import (
     KlantContactMomentAnswer,
     OpenKlant2Config,
 )
-from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
@@ -1388,35 +1388,109 @@ class OpenKlant2Service(
     def update_partij_from_user_data(
         self,
         partij_uuid: str,
-        update_data: PartijUpdateData,
+        user: User,
     ) -> list[str]:
+        from open_inwoner.accounts.choices import DigitalAddressType
+        from open_inwoner.openklant.models import DigitaalAdresKlant2Mapping
+
         updated_fields: list[str] = []
-        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        remote_adressen: list[DigitaalAdres] | None = None  # lazy-loaded for backfill
 
-        if phonenumber := update_data.get("phonenumber"):
-            digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
+        for address in user.digital_addresses.all():
+            soort_adres = cast(
+                Literal["email", "telefoonnummer"],
+                "email"
+                if address.type == DigitalAddressType.email
+                else "telefoonnummer",
+            )
+            is_standaard = (
+                address.type == DigitalAddressType.email and address.value == user.email
+            ) or (
+                address.type == DigitalAddressType.phone
+                and address.value == user.phonenumber
+            )
+
+            try:
+                mapping = address.openklant2_mapping
+            except DigitaalAdresKlant2Mapping.DoesNotExist:
+                mapping = None
+
+            if mapping:
+                try:
+                    self.client.digitaal_adres.partial_update(
+                        str(mapping.ok2_uuid),
+                        data=DigitaalAdresPartialUpdateData(
+                            adres=address.value,
+                            isStandaardAdres=is_standaard,
+                        ),
+                    )
+                    continue
+                except OK2NotFound:
+                    # Remote address no longer exists — drop the stale mapping and
+                    # fall through to the value-based backfill below.
+                    mapping.delete()
+
+            # Value-based lazy backfill: fetch remote adressen once
+            if remote_adressen is None:
+                remote_adressen = self.retrieve_digitale_addressen_for_partij(
+                    partij_uuid
+                )
+
+            remote_adres, created = self.get_or_create_digitaal_adres_for_partij(
                 partij_uuid=partij_uuid,
-                soort_adres="telefoonnummer",
-                adres=phonenumber,
-                is_standaard_adres=True,
-                adressen=adressen,
+                soort_adres=soort_adres,
+                adres=address.value,
+                is_standaard_adres=is_standaard,
+                adressen=remote_adressen,
+            )
+            DigitaalAdresKlant2Mapping.objects.update_or_create(
+                digital_address=address,
+                defaults={"ok2_uuid": remote_adres["uuid"]},
             )
             if created:
-                updated_fields.append("digitaleAddresen.telefoonnummer")
-                adressen.append(digital_adres)
+                updated_fields.append(f"digitaleAddresen.{soort_adres}")
+                remote_adressen.append(remote_adres)
 
-        if email := update_data.get("email"):
-            # TODO [#2604] outbound OK2 sync will iterate all DigitalAddress rows
-            digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
-                partij_uuid=partij_uuid,
-                soort_adres="email",
-                adres=email,
-                is_standaard_adres=False,
-                adressen=adressen,
-            )
-            if created:
-                updated_fields.append("digitaleAddresen.email")
-                adressen.append(digital_adres)
+        # Clean up orphaned remote adressen.
+        #
+        # This only runs when at least one local address went through the value-based
+        # backfill path (remote_adressen is not None). The backfill is triggered when a
+        # local address has no DigitaalAdresKlant2Mapping yet, which happens on the first
+        # sync after an address was added or after its value changed.
+        #
+        # When a value changes (e.g. User.email "old@" → "new@"), User.save() updates
+        # the local DigitalAddress.value in place. The next sync then creates a new remote
+        # adres for the new value. The remote adres for the old value has no local
+        # counterpart and no mapping — it is orphaned.
+        #
+        # After the loop above, every current local address either has a pre-existing
+        # mapping (PATCH path) or just had one created (backfill path). Any remote adres
+        # whose UUID is absent from mapped_ok2_uuids is therefore genuinely orphaned and
+        # safe to remove.
+        if remote_adressen is not None:
+            mapped_ok2_uuids = {
+                str(ok2_uuid)
+                for ok2_uuid in DigitaalAdresKlant2Mapping.objects.filter(
+                    digital_address__user=user
+                ).values_list("ok2_uuid", flat=True)
+            }
+            for remote_adres in remote_adressen:
+                if remote_adres["uuid"] not in mapped_ok2_uuids:
+                    self.client.digitaal_adres.delete(remote_adres["uuid"])
+
+        if user.preferred_address_id:
+            try:
+                mapping = user.preferred_address.openklant2_mapping
+                self.client.partij.partial_update(
+                    partij_uuid,
+                    data=PartialUpdatePartijData(
+                        voorkeursDigitaalAdres={"uuid": str(mapping.ok2_uuid)},
+                    ),
+                )
+                updated_fields.append("voorkeursDigitaalAdres")
+            except DigitaalAdresKlant2Mapping.DoesNotExist:
+                pass  # mapping not yet available; will sync on next pass
+
 
         if updated_fields:
             system_action(

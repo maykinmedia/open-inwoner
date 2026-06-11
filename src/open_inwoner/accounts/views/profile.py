@@ -44,7 +44,6 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -248,46 +247,42 @@ class EditProfileView(
     def form_valid(self, form):
         user: User = self.get_object()
 
-        # immediately save form if changes don't require writing to API
-        if not any(key in form.changed_data for key in ("email", "phonenumber")):
-            form.save()
-            messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-            self.log_profile_modified(user)
-            return HttpResponseRedirect(self.get_success_url())
-
-        # write changes to API's; abort saving if write fails
-        klanten_config = KlantenSysteemConfig.get_solo()
-        failed_services = []
-        if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
-            try:
-                self.update_klant_via_esuite(
-                    {k: form.cleaned_data[k] for k in form.changed_data}, user
-                )
-            except Exception:
-                logger.exception("eSuite failed during profile update", user=user)
-                failed_services.append("eSuite")
-        if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
-            try:
-                self.update_klant_via_openklant(
-                    {k: form.cleaned_data[k] for k in form.changed_data}, user
-                )
-            except Exception:
-                logger.exception("OpenKlant failed during profile update", user=user)
-                failed_services.append("OpenKlant")
-        if failed_services:
-            messages.error(
-                request=self.request,
-                message=_(
-                    "Your changes could not be saved due to technical problems. "
-                    "Please try again later"
-                ),
-            )
-
-            self.log_profile_update_failed(user, failed_services, form.changed_data)
-
-            return HttpResponseRedirect(self.get_success_url())
-
+        # Save locally first so that user.digital_addresses reflects the new
+        # values before we sync outward (eventual-consistency model).
         form.save()
+
+        if any(key in form.changed_data for key in ("email", "phonenumber")):
+            klanten_config = KlantenSysteemConfig.get_solo()
+            failed_services = []
+            if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
+                try:
+                    self.update_klant_via_esuite(
+                        {k: form.cleaned_data[k] for k in form.changed_data}, user
+                    )
+                except Exception:
+                    logger.exception("eSuite failed during profile update", user=user)
+                    failed_services.append("eSuite")
+            if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
+                try:
+                    self.update_klant_via_openklant(
+                        {k: form.cleaned_data[k] for k in form.changed_data}, user
+                    )
+                except Exception:
+                    logger.exception(
+                        "OpenKlant failed during profile update", user=user
+                    )
+                    failed_services.append("OpenKlant")
+            if failed_services:
+                messages.error(
+                    request=self.request,
+                    message=_(
+                        "Your changes could not be saved due to technical problems. "
+                        "Please try again later"
+                    ),
+                )
+                self.log_profile_update_failed(user, failed_services, form.changed_data)
+                return HttpResponseRedirect(self.get_success_url())
+
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_profile_modified(user)
         return HttpResponseRedirect(self.get_success_url())
@@ -310,38 +305,13 @@ class EditProfileView(
 
         partij, created = service.get_or_create_partij_for_user(user)
 
-        if partij and not created:
-            adressen = service.retrieve_digitale_addressen_for_partij(partij["uuid"])
-
-            # Fetch original user from DB to access old contact info
-            old_user = User.objects.get(pk=user.pk)
-
-            for address_type in ["email", "phonenumber"]:
-                old = getattr(old_user, address_type)
-                new = getattr(user, address_type)
-
-                if not old or not new:
-                    continue
-
-                if old == new:
-                    continue
-
-                try:
-                    digitaal_adres = next(
-                        obj for obj in adressen if obj["adres"] == old
-                    )
-                except StopIteration:
-                    pass
-                else:
-                    service.client.digitaal_adres.delete(digitaal_adres["uuid"])
-                    self.log_digitaal_adres_deleted(user, digitaal_adres["uuid"])
-
+        if partij:
             return service.update_partij_from_user_data(
                 partij_uuid=partij["uuid"],
-                update_data=PartijUpdateData(**user_form_data),
+                user=user,
             )
 
-        return bool(partij)
+        return False
 
     def update_klant_via_esuite(self, user_form_data: dict, user: User) -> bool:
         field_mapping = {
