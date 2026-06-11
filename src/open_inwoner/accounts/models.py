@@ -619,6 +619,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._old_bsn = self.bsn
+        self.__original_email = self.email
+        self.__original_phonenumber = self.phonenumber
 
     def __str__(self):
         identifier = self.company_name if self.kvk else self.get_full_name()
@@ -966,9 +968,72 @@ class User(AbstractBaseUser, PermissionsMixin):
 
             update_fields.add("previous_login")
 
-        return super().save(
-            force_insert, force_update, using, update_fields=update_fields
+        is_new = self._state.adding
+        # When update_fields is given, only sync for the fields actually being written.
+        sync_email = update_fields is None or "email" in update_fields
+        sync_phone = update_fields is None or "phonenumber" in update_fields
+        email_changed = (
+            sync_email and not is_new and self.email != self.__original_email
         )
+        phone_changed = (
+            sync_phone
+            and not is_new
+            and self.phonenumber != self.__original_phonenumber
+        )
+
+        with transaction.atomic():
+            super().save(force_insert, force_update, using, update_fields=update_fields)
+
+            if is_new:
+                DigitalAddress.objects.create(
+                    user=self,
+                    type=DigitalAddressType.email,
+                    value=self.email,
+                    login_type=self.login_type,
+                )
+                if self.phonenumber:
+                    DigitalAddress.objects.create(
+                        user=self,
+                        type=DigitalAddressType.phone,
+                        value=self.phonenumber,
+                        login_type=self.login_type,
+                    )
+            else:
+                if email_changed:
+                    if DigitalAddress.objects.filter(
+                        user=self, type=DigitalAddressType.email, value=self.email
+                    ).exists():
+                        # New email address already exists (e.g. created by inbound sync);
+                        # remove the now-redundant old address instead of renaming it.
+                        DigitalAddress.objects.filter(
+                            user=self,
+                            type=DigitalAddressType.email,
+                            value=self.__original_email,
+                        ).delete()
+                    else:
+                        DigitalAddress.objects.filter(
+                            user=self,
+                            type=DigitalAddressType.email,
+                            value=self.__original_email,
+                        ).update(value=self.email)
+
+                if phone_changed:
+                    if self.__original_phonenumber:
+                        DigitalAddress.objects.filter(
+                            user=self,
+                            type=DigitalAddressType.phone,
+                            value=self.__original_phonenumber,
+                        ).update(value=self.phonenumber)
+                    elif self.phonenumber:
+                        DigitalAddress.objects.create(
+                            user=self,
+                            type=DigitalAddressType.phone,
+                            value=self.phonenumber,
+                            login_type=self.login_type,
+                        )
+
+        self.__original_email = self.email
+        self.__original_phonenumber = self.phonenumber
 
 
 class Document(models.Model):
