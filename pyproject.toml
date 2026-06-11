@@ -1,6 +1,6 @@
 [project]
 name = "open-inwoner"
-version = "2.3.0"
+version = "2.3.1"
 requires-python = "~= 3.13"
 
 [tool.uv.pip]
