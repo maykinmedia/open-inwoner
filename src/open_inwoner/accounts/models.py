@@ -11,7 +11,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import models, transaction
-from django.db.models import F, Q, UniqueConstraint
+from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -384,13 +384,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=15,
         validators=[DutchPhoneNumberValidator()],
     )
-    phonenumber_alternative = models.CharField(
-        verbose_name=_("Alternative phonenumber"),
-        blank=True,
-        default="",
-        max_length=15,
-        validators=[DutchPhoneNumberValidator()],
-    )
     preferred_address = models.ForeignKey(
         "accounts.DigitalAddress",
         on_delete=models.SET_NULL,
@@ -592,22 +585,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 fields=["email"],
                 condition=Q(login_type=LoginTypeChoices.default),
                 name="unique_email_for_regular_users",
-            ),
-            models.CheckConstraint(
-                check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
-                name="phonenumber_alt_requires_phonenumber_primary",
-                violation_error_message=_(
-                    "A primary phone number is required for setting an alternative "
-                    "phone number"
-                ),
-            ),
-            models.CheckConstraint(
-                check=~Q(phonenumber=F("phonenumber_alternative"))
-                | Q(phonenumber__exact=""),
-                name="check_alternative_phonenumber_differs_from_primary_phonenumber",
-                violation_error_message=_(
-                    "Primary and secondary phone numbers cannot be the same"
-                ),
             ),
             models.CheckConstraint(
                 check=~Q(kvk__exact="", login_type=LoginTypeChoices.eherkenning),

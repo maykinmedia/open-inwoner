@@ -249,10 +249,7 @@ class EditProfileView(
         user: User = self.get_object()
 
         # immediately save form if changes don't require writing to API
-        if not any(
-            key in form.changed_data
-            for key in ("email", "phonenumber", "phonenumber_alternative")
-        ):
+        if not any(key in form.changed_data for key in ("email", "phonenumber")):
             form.save()
             messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
             self.log_profile_modified(user)
@@ -319,7 +316,7 @@ class EditProfileView(
             # Fetch original user from DB to access old contact info
             old_user = User.objects.get(pk=user.pk)
 
-            for address_type in ["email", "phonenumber", "phonenumber_alternative"]:
+            for address_type in ["email", "phonenumber"]:
                 old = getattr(old_user, address_type)
                 new = getattr(user, address_type)
 
@@ -350,7 +347,6 @@ class EditProfileView(
         field_mapping = {
             "emailadres": "email",
             "telefoonnummer": "phonenumber",
-            "telefoonnummerAlternatief": "phonenumber_alternative",
         }
         update_data = {
             api_name: user_form_data[local_name]
