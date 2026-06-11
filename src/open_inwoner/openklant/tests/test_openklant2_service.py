@@ -1470,8 +1470,6 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         mock_client.digitaal_adres.create.assert_called_once()
         mock_client.digitaal_adres.delete.assert_called_once_with(ORPHAN_UUID)
 
-
-
 @patch("open_inwoner.openklant.services.OpenKlantClient")
 class KlantcontactenForPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"

@@ -42,6 +42,7 @@ from openklant_client.types.resources.klant_contact import (
 )
 from openklant_client.types.resources.partij import (
     CreatePartijPersoonData,
+    PartialUpdatePartijData,
     Partij,
     PartijListParams,
 )
@@ -52,7 +53,7 @@ from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.models.services import Service as ServiceConfig
 from zgw_consumers.utils import pagination_helper
 
-from open_inwoner.accounts.choices import NotificationChannelChoice
+from open_inwoner.accounts.choices import DigitalAddressType, NotificationChannelChoice
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import (
@@ -69,6 +70,7 @@ from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ContactFormSubject,
+    DigitaalAdresKlant2Mapping,
     ESuiteKlantConfig,
     KlantContactMomentAnswer,
     OpenKlant2Config,
@@ -1390,9 +1392,6 @@ class OpenKlant2Service(
         partij_uuid: str,
         user: User,
     ) -> list[str]:
-        from open_inwoner.accounts.choices import DigitalAddressType
-        from open_inwoner.openklant.models import DigitaalAdresKlant2Mapping
-
         updated_fields: list[str] = []
         remote_adressen: list[DigitaalAdres] | None = None  # lazy-loaded for backfill
 
@@ -1477,7 +1476,6 @@ class OpenKlant2Service(
             for remote_adres in remote_adressen:
                 if remote_adres["uuid"] not in mapped_ok2_uuids:
                     self.client.digitaal_adres.delete(remote_adres["uuid"])
-
         if user.preferred_address_id:
             try:
                 mapping = user.preferred_address.openklant2_mapping
@@ -1490,7 +1488,6 @@ class OpenKlant2Service(
                 updated_fields.append("voorkeursDigitaalAdres")
             except DigitaalAdresKlant2Mapping.DoesNotExist:
                 pass  # mapping not yet available; will sync on next pass
-
 
         if updated_fields:
             system_action(
