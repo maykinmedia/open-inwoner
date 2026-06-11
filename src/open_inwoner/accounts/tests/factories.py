@@ -6,7 +6,19 @@ from django.db.models.signals import post_save, pre_save
 
 import factory.fuzzy
 
-from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.choices import DigitalAddressType, LoginTypeChoices
+
+
+class DigitalAddressFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "accounts.DigitalAddress"
+
+    user = factory.SubFactory("open_inwoner.accounts.tests.factories.UserFactory")
+    type = DigitalAddressType.email
+    value = factory.LazyAttribute(
+        lambda o: "%s%d@example.com" % (o.type, random.randint(0, 10000000))
+    )
+    login_type = LoginTypeChoices.default
 
 
 class GroupFactory(factory.django.DjangoModelFactory):

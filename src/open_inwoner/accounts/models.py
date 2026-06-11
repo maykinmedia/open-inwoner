@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db import models, transaction
 from django.db.models import F, Q, UniqueConstraint
 from django.urls import reverse
@@ -42,6 +43,7 @@ from open_inwoner.utils.validators import (
 
 from .choices import (
     ContactTypeChoices,
+    DigitalAddressType,
     LoginTypeChoices,
     NotificationChannelChoice,
     StatusChoices,
@@ -251,6 +253,86 @@ def generate_uuid_image_name(instance, filename):
     )
 
 
+class DigitalAddress(models.Model):
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="digital_addresses",
+        verbose_name=_("User"),
+    )
+    type = models.CharField(
+        verbose_name=_("Type"),
+        max_length=10,
+        choices=DigitalAddressType.choices,
+    )
+    value = models.CharField(
+        verbose_name=_("Value"),
+        max_length=254,
+    )
+    login_type = models.CharField(
+        verbose_name=_("Login type"),
+        max_length=50,
+        choices=LoginTypeChoices.choices,
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Created at"),
+        auto_now_add=True,
+    )
+
+    class Meta:
+        verbose_name = _("Digital address")
+        verbose_name_plural = _("Digital addresses")
+        constraints = [
+            UniqueConstraint(
+                fields=["value"],
+                condition=Q(
+                    type=DigitalAddressType.email,
+                    login_type=LoginTypeChoices.default,
+                ),
+                name="unique_email_digital_address_for_regular_users",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.get_type_display()}: {self.value}"
+
+    def clean(self):
+        super().clean()
+        match self.type:
+            case DigitalAddressType.email:
+                try:
+                    validate_email(self.value)
+                except ValidationError as exc:
+                    raise ValidationError(
+                        {"value": _("Enter a valid email address.")}
+                    ) from exc
+            case DigitalAddressType.phone:
+                try:
+                    DutchPhoneNumberValidator()(self.value)
+                except ValidationError as exc:
+                    raise ValidationError(
+                        {"value": _("Enter a valid phone number.")}
+                    ) from exc
+            case _ as unreachable:
+                assert_never(unreachable)
+
+        if self.user_id and (
+            DigitalAddress.objects.filter(
+                user=self.user, type=self.type, value=self.value
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "value": _(
+                        "A %(type)s address with this value already exists for this user."
+                    )
+                    % {"type": self.get_type_display()}
+                }
+            )
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Use the built-in user model.
@@ -308,6 +390,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         default="",
         max_length=15,
         validators=[DutchPhoneNumberValidator()],
+    )
+    preferred_address = models.ForeignKey(
+        "accounts.DigitalAddress",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("Preferred digital address"),
     )
     image = ImageCropField(
         verbose_name=_("Image"),
@@ -575,6 +665,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def clean(self, *args, **kwargs):
         """Reject non-unique emails, except for users with login_type DigiD"""
+
+        if self.preferred_address_id and self.preferred_address.user_id != self.pk:
+            raise ValidationError(
+                {
+                    "preferred_address": ValidationError(
+                        _("The preferred address must belong to this user.")
+                    )
+                }
+            )
 
         existing_users = User.objects.filter(email__iexact=self.email)
         if self.pk:

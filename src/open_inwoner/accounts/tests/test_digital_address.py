@@ -1,0 +1,191 @@
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.test import TestCase
+
+from open_inwoner.accounts.choices import DigitalAddressType, LoginTypeChoices
+from open_inwoner.accounts.models import DigitalAddress  # used for unsaved instances
+
+from .factories import DigidUserFactory, DigitalAddressFactory, UserFactory
+
+
+class DigitalAddressModelTests(TestCase):
+    def test_str(self):
+        addr = DigitalAddressFactory.build(
+            type=DigitalAddressType.email, value="test@example.com"
+        )
+        self.assertEqual(str(addr), "E-mailadres: test@example.com")
+
+    def test_create_email_address(self):
+        addr = DigitalAddressFactory(
+            type=DigitalAddressType.email, value="test@example.com"
+        )
+        self.assertEqual(addr.type, DigitalAddressType.email)
+        self.assertEqual(addr.value, "test@example.com")
+        self.assertIsNotNone(addr.created_at)
+
+    def test_create_phone_address(self):
+        addr = DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
+        self.assertEqual(addr.type, DigitalAddressType.phone)
+
+    def test_cascade_delete_with_user(self):
+        addr = DigitalAddressFactory()
+        addr_pk = addr.pk
+        addr.user.delete()
+        self.assertFalse(DigitalAddress.objects.filter(pk=addr_pk).exists())
+
+
+class DigitalAddressValueValidationTests(TestCase):
+    def test_clean_rejects_invalid_email(self):
+        addr = DigitalAddressFactory.build(
+            type=DigitalAddressType.email, value="not-an-email"
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            addr.clean()
+
+        self.assertEqual(
+            ctx.exception.message_dict, {"value": ["Voer een geldig e-mailadres in."]}
+        )
+
+    def test_clean_rejects_invalid_phone(self):
+        addr = DigitalAddressFactory.build(
+            type=DigitalAddressType.phone, value="not-a-phone"
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            addr.clean()
+
+        self.assertEqual(
+            ctx.exception.message_dict, {"value": ["Enter a valid phone number."]}
+        )
+
+    def test_clean_accepts_valid_email(self):
+        addr = DigitalAddressFactory.build(
+            type=DigitalAddressType.email, value="valid@example.com"
+        )
+        addr.clean()  # should not raise
+
+    def test_clean_accepts_valid_dutch_phone(self):
+        addr = DigitalAddressFactory.build(
+            type=DigitalAddressType.phone, value="0612345678"
+        )
+        addr.clean()  # should not raise
+
+
+class DigitalAddressCleanTests(TestCase):
+    def test_clean_rejects_duplicate_value_same_user_same_type(self):
+        existing = DigitalAddressFactory(
+            type=DigitalAddressType.email, value="test@example.com"
+        )
+        duplicate = DigitalAddress(
+            user=existing.user,
+            type=DigitalAddressType.email,
+            value="test@example.com",
+            login_type=LoginTypeChoices.default,
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            duplicate.clean()
+
+        self.assertEqual(
+            ctx.exception.message_dict,
+            {
+                "value": [
+                    "A E-mailadres address with this value already exists for this user."
+                ]
+            },
+        )
+
+    def test_clean_uniqueness_is_scoped_by_type(self):
+        # User already has an email - adding a phone with a different value is fine,
+        # and the email uniqueness check does not interfere.
+        existing = DigitalAddressFactory(
+            type=DigitalAddressType.email, value="test@example.com"
+        )
+        addr = DigitalAddress(
+            user=existing.user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            login_type=LoginTypeChoices.default,
+        )
+        addr.clean()  # should not raise
+
+    def test_clean_allows_same_value_different_user(self):
+        DigitalAddressFactory(type=DigitalAddressType.email, value="same@example.com")
+        addr = DigitalAddress(
+            user=UserFactory(),
+            type=DigitalAddressType.email,
+            value="same@example.com",
+            login_type=LoginTypeChoices.default,
+        )
+        # clean() only checks per-user uniqueness
+        addr.clean()
+
+    def test_clean_allows_update_existing_without_false_positive(self):
+        addr = DigitalAddressFactory(
+            type=DigitalAddressType.email, value="test@example.com"
+        )
+        addr.clean()  # should not raise
+
+
+class DigitalAddressUniqueConstraintTests(TestCase):
+    def test_unique_constraint_prevents_duplicate_email_for_regular_users(self):
+        DigitalAddressFactory(
+            type=DigitalAddressType.email,
+            value="shared@example.com",
+            login_type=LoginTypeChoices.default,
+        )
+        with self.assertRaises(IntegrityError):
+            DigitalAddressFactory(
+                type=DigitalAddressType.email,
+                value="shared@example.com",
+                login_type=LoginTypeChoices.default,
+            )
+
+    def test_unique_constraint_allows_duplicate_email_for_different_digid_users(self):
+        DigitalAddressFactory(
+            user=DigidUserFactory(),
+            type=DigitalAddressType.email,
+            value="shared@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+        addr = DigitalAddressFactory(
+            user=DigidUserFactory(),
+            type=DigitalAddressType.email,
+            value="shared@example.com",
+            login_type=LoginTypeChoices.digid,
+        )
+        self.assertIsNotNone(addr.pk)
+
+    def test_unique_constraint_does_not_apply_to_phone(self):
+        DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
+        addr = DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
+        self.assertIsNotNone(addr.pk)
+
+
+class PreferredAddressTests(TestCase):
+    def test_preferred_address_set_null_on_address_delete(self):
+        addr = DigitalAddressFactory()
+        addr.user.preferred_address = addr
+        addr.user.save()
+
+        addr.delete()
+        addr.user.refresh_from_db()
+        self.assertIsNone(addr.user.preferred_address)
+
+    def test_preferred_address_defaults_to_null(self):
+        user = UserFactory()
+        self.assertIsNone(user.preferred_address)
+
+    def test_clean_rejects_preferred_address_belonging_to_other_user(self):
+        user1 = UserFactory()
+        addr = DigitalAddressFactory(user=UserFactory())
+        user1.preferred_address = addr
+        with self.assertRaises(ValidationError) as ctx:
+            user1.clean()
+        self.assertEqual(
+            ctx.exception.message_dict,
+            {"preferred_address": ["The preferred address must belong to this user."]},
+        )
+
+    def test_clean_allows_preferred_address_belonging_to_same_user(self):
+        addr = DigitalAddressFactory()
+        addr.user.preferred_address = addr
+        addr.user.clean()  # should not raise
