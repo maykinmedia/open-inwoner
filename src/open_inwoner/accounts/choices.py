@@ -56,3 +56,8 @@ class TypeChoices(models.TextChoices):
 class NotificationChannelChoice(models.TextChoices):
     digital_and_post = "digital_and_post", _("Digitaal en per brief")
     digital_only = "digital_only", _("Alleen digitaal")
+
+
+class DigitalAddressType(models.TextChoices):
+    email = "email", _("E-mailadres")
+    phone = "phone", _("Telefoonnummer")
