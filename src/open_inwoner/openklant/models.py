@@ -357,3 +357,22 @@ class KlantenSysteemConfig(SingletonModel):
                 return getattr(config, "service", None) is not None
             case _:
                 return False
+
+
+class DigitaalAdresKlant2Mapping(models.Model):
+    digital_address = models.OneToOneField(
+        "accounts.DigitalAddress",
+        on_delete=models.CASCADE,
+        related_name="openklant2_mapping",
+        verbose_name=_("Digital address"),
+    )
+    ok2_uuid = models.UUIDField(
+        verbose_name=_("OpenKlant2 UUID"),
+    )
+
+    class Meta:
+        verbose_name = _("Digitaal adres OpenKlant2 mapping")
+        verbose_name_plural = _("Digitaal adres OpenKlant2 mappings")
+
+    def __str__(self):
+        return f"{self.digital_address} → {self.ok2_uuid}"

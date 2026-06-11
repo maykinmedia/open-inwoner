@@ -3,13 +3,21 @@ import datetime
 import factory
 from zgw_consumers.constants import APITypes
 
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import DigitalAddressFactory, UserFactory
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.services import Question, QuestionValidator
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.url import uuid_from_url
 
 from .data import OPENKLANT2_ROOT
+
+
+class DigitaalAdresKlant2MappingFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "openklant.DigitaalAdresKlant2Mapping"
+
+    digital_address = factory.SubFactory(DigitalAddressFactory)
+    ok2_uuid = factory.Faker("uuid4")
 
 
 class ContactFormSubjectFactory(factory.django.DjangoModelFactory):
