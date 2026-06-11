@@ -102,18 +102,8 @@ def _normalize_email(email: str) -> str:
 
 
 def _resolve_phonenumber_update(user: "User", update_data: dict) -> None:
-    """Clear alternative phonenumber from update_data if it would violate model constraints."""
-    if (
-        "phonenumber" not in update_data
-        and "phonenumber_alternative" not in update_data
-    ):
-        return
-    primary = update_data.get("phonenumber", user.phonenumber)
-    alternative = update_data.get(
-        "phonenumber_alternative", user.phonenumber_alternative
-    )
-    if alternative and (not primary or primary == alternative):
-        update_data["phonenumber_alternative"] = ""
+    """No-op: phonenumber_alternative is no longer a flat field on User."""
+    pass
 
 
 class BsnFetchParam(TypedDict):
@@ -324,11 +314,7 @@ class eSuiteKlantenService(
         if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
             update_data["phonenumber"] = klant.telefoonnummer
 
-        if (
-            klant.telefoonnummer_alternatief
-            and klant.telefoonnummer_alternatief != user.phonenumber_alternative
-        ):
-            update_data["phonenumber_alternative"] = klant.telefoonnummer_alternatief
+        # TODO [#2604] inbound eSuite alternative phone → DigitalAddress
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
@@ -406,10 +392,11 @@ class eSuiteKlantenService(
                 if field not in valid_update_fields:
                     raise ValueError(f"{field} is not a valid entry for update_fields")
 
+        # TODO [#2604] secondary phone will come from DigitalAddress
         update_data: KlantWritePayload = {
             "emailadres": user.email or None,
             "telefoonnummer": user.phonenumber or None,
-            "telefoonnummerAlternatief": user.phonenumber_alternative or None,
+            "telefoonnummerAlternatief": None,
             "toestemmingZaakNotificatiesAlleenDigitaal": user.case_notification_channel
             == NotificationChannelChoice.digital_only,
         }
@@ -1380,12 +1367,8 @@ class OpenKlant2Service(
                 if adres["isStandaardAdres"]:
                     update_data["phonenumber"] = adres["adres"]
                 else:
-                    update_data["phonenumber_alternative"] = adres["adres"]
+                    pass  # TODO [#2604] non-primary phones → DigitalAddress
 
-            # we currently only support two phone numbers: primary + secondary
-            # the following edge case cannot happen through OIP, but we cannot
-            # exclude that it happens through some external service. In this case,
-            # we pick the last one
             if len(phone_adressen) > 2:
                 logger.warning(
                     "More than two phone numbers found for partij",
@@ -1422,21 +1405,18 @@ class OpenKlant2Service(
                 updated_fields.append("digitaleAddresen.telefoonnummer")
                 adressen.append(digital_adres)
 
-        for attr, soort_adres in (
-            ("email", "email"),
-            ("phonenumber_alternative", "telefoonnummer"),
-        ):
-            if adres := update_data.get(attr):
-                digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
-                    partij_uuid=partij_uuid,
-                    soort_adres=cast(Literal["email", "telefoonnummer"], soort_adres),
-                    adres=adres,
-                    is_standaard_adres=False,
-                    adressen=adressen,
-                )
-                if created:
-                    updated_fields.append(f"digitaleAddresen.{soort_adres}")
-                    adressen.append(digital_adres)
+        if email := update_data.get("email"):
+            # TODO [#2604] outbound OK2 sync will iterate all DigitalAddress rows
+            digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
+                partij_uuid=partij_uuid,
+                soort_adres="email",
+                adres=email,
+                is_standaard_adres=False,
+                adressen=adressen,
+            )
+            if created:
+                updated_fields.append("digitaleAddresen.email")
+                adressen.append(digital_adres)
 
         if updated_fields:
             system_action(

@@ -23,7 +23,6 @@ HTML_NAME_TO_AUTOCOMPLETE = {
     "last_name": "family-name",
     "email": "email",
     "phonenumber": "tel-national",
-    "phonenumber_alternative": "tel-national",
     "street": "address-line1",
     "city": "address-level2",
     "postcode": "postal-code",

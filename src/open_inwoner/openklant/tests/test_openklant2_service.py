@@ -114,19 +114,15 @@ class UpdateUserFromPartijTestCase(TestCase):
             ],
         }
 
+        user = UserFactory(phonenumber="")
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory(phonenumber="", phonenumber_alternative="")
         service.update_user_from_partij("partij-uuid", user)
 
         user.refresh_from_db()
         self.assertEqual(
             user.phonenumber, "0612345678", "Standard phone should map to primary"
         )
-        self.assertEqual(
-            user.phonenumber_alternative,
-            "0687654321",
-            "Non-standard phone should map to alternative",
-        )
+        # TODO [#2604] non-primary phone → DigitalAddress
 
     def test_logs_warning_when_more_than_two_phone_numbers(self, mock_client_class):
         mock_client = Mock()
@@ -193,13 +189,12 @@ class UpdateUserFromPartijTestCase(TestCase):
             ],
         }
 
+        user = UserFactory(phonenumber="")
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory(phonenumber="", phonenumber_alternative="")
         service.update_user_from_partij("partij-uuid", user)
 
         user.refresh_from_db()
         self.assertEqual(user.phonenumber, "0612345678")
-        self.assertEqual(user.phonenumber_alternative, "")
 
     def test_skips_alternative_when_no_primary(self, mock_client_class):
         mock_client = Mock()
@@ -222,13 +217,12 @@ class UpdateUserFromPartijTestCase(TestCase):
             ],
         }
 
+        user = UserFactory(phonenumber="")
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory(phonenumber="", phonenumber_alternative="")
         service.update_user_from_partij("partij-uuid", user)
 
         user.refresh_from_db()
         self.assertEqual(user.phonenumber, "")
-        self.assertEqual(user.phonenumber_alternative, "")
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
@@ -1261,24 +1255,6 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         self.assertTrue(create_data["isStandaardAdres"])
         self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
 
-    def test_phonenumber_alternative_created_as_non_standaard(self, mock_client_class):
-        mock_client = Mock()
-        mock_client_class.return_value = mock_client
-        mock_client.digitaal_adres.list.return_value = self._list_response([])
-        mock_client.digitaal_adres.create.return_value = self._make_adres(
-            "ph-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
-        )
-
-        service = OpenKlant2Service(config=self.config)
-        service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"phonenumber_alternative": "0687654321"},
-        )
-
-        create_data = mock_client.digitaal_adres.create.call_args[1]["data"]
-        self.assertFalse(create_data["isStandaardAdres"])
-        self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
-
     def test_newly_created_adres_visible_to_subsequent_calls_without_extra_fetch(
         self, mock_client_class
     ):
@@ -1303,13 +1279,12 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             partij_uuid=self.PARTIJ_UUID,
             update_data={
                 "phonenumber": "0612345678",
-                "phonenumber_alternative": "0687654321",
             },
         )
 
         self.assertEqual(mock_client.digitaal_adres.list.call_count, 1)
-        self.assertEqual(mock_client.digitaal_adres.create.call_count, 2)
-        self.assertEqual(result.count("digitaleAddresen.telefoonnummer"), 2)
+        self.assertEqual(mock_client.digitaal_adres.create.call_count, 1)
+        self.assertEqual(result, ["digitaleAddresen.telefoonnummer"])
 
     def test_existing_standard_phone_reused_alternative_still_created(
         self, mock_client_class
@@ -1331,13 +1306,12 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             partij_uuid=self.PARTIJ_UUID,
             update_data={
                 "phonenumber": "0612345678",
-                "phonenumber_alternative": "0687654321",
             },
         )
 
         mock_client.digitaal_adres.list.assert_called_once()
-        mock_client.digitaal_adres.create.assert_called_once()
-        self.assertEqual(result, ["digitaleAddresen.telefoonnummer"])
+        mock_client.digitaal_adres.create.assert_not_called()
+        self.assertEqual(result, [])
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")

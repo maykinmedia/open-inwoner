@@ -204,7 +204,6 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         user = DigidUserFactory(
             email="old@example.com",
             phonenumber="0100000000",
-            phonenumber_alternative="",
         )
 
         @dataclass
@@ -255,7 +254,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         self,
     ):
         """If klant sends the same number for both fields, alternative is dropped."""
-        user = DigidUserFactory(phonenumber="0100000000", phonenumber_alternative="")
+        user = DigidUserFactory(phonenumber="0100000000")
         klant = self._make_klant(
             telefoonnummer="0611111111",
             telefoonnummer_alternatief="0611111111",
@@ -265,15 +264,12 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
 
         user.refresh_from_db()
         self.assertEqual(user.phonenumber, "0611111111")
-        self.assertEqual(user.phonenumber_alternative, "")
 
     def test_update_user_from_klant_clears_alternative_when_primary_updated_to_match_it(
         self,
     ):
         """If klant's primary number matches the user's existing alternative, alternative is dropped."""
-        user = DigidUserFactory(
-            phonenumber="0100000000", phonenumber_alternative="0611111111"
-        )
+        user = DigidUserFactory()
         klant = self._make_klant(
             telefoonnummer="0611111111",
             telefoonnummer_alternatief="0611111111",
@@ -283,4 +279,3 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
 
         user.refresh_from_db()
         self.assertEqual(user.phonenumber, "0611111111")
-        self.assertEqual(user.phonenumber_alternative, "")
