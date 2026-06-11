@@ -1,9 +1,9 @@
-from dataclasses import asdict, dataclass
-
 from django.test import TestCase
 
 import requests_mock
 
+from open_inwoner.accounts.choices import DigitalAddressType
+from open_inwoner.accounts.models import DigitalAddress
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.openklant.api_models import Klant
 from open_inwoner.openklant.services import eSuiteKlantenService
@@ -200,46 +200,39 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             ],
         )
 
-    def test_update_klant_from_user(self):
-        user = DigidUserFactory(
-            email="old@example.com",
-            phonenumber="0100000000",
+    def test_update_klant_from_user_sends_secondary_phone_from_digital_address(self):
+        user = DigidUserFactory(email="user@example.com", phonenumber="0100000000")
+        DigitalAddress.objects.create(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0687654321",
+            login_type=user.login_type,
         )
-
-        @dataclass
-        class Klant:
-            bronorganisatie: str
-            klantnummer: str
-            subjectIdentificatie: str
-            url: str
-            emailadres: str
-            telefoonnummer: str
-            telefoonnummer_alternatief: str
-            toestemmingZaakNotificatiesAlleenDigitaal: str
-
-        klant = Klant(
-            bronorganisatie="123456789",
-            klantnummer="12345678",
-            subjectIdentificatie={
-                "inpBsn": "123456789",
-            },
-            url=f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-            emailadres="old@example.com",
-            telefoonnummer="0100000000",
-            telefoonnummer_alternatief="0687654321",
-            toestemmingZaakNotificatiesAlleenDigitaal=False,
-        )
+        klant_url = f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        klant = Klant(url=klant_url, bronorganisatie="123", klantnummer="1")
 
         with requests_mock.mock() as m:
-            m.patch(klant.url, json=asdict(klant))
-
-            klant = self.service.update_klant_from_user(
-                klant,
-                user,
-                update_fields=["telefoonnummer", "telefoonnummerAlternatief"],
+            m.patch(
+                klant_url,
+                json={"url": klant_url, "bronorganisatie": "123", "klantnummer": "1"},
+            )
+            self.service.update_klant_from_user(klant, user)
+            self.assertEqual(
+                m.last_request.json()["telefoonnummerAlternatief"], "0687654321"
             )
 
-            self.assertEqual(klant.telefoonnummer_alternatief, "0687654321")
+    def test_update_klant_from_user_sends_null_when_no_secondary_phone(self):
+        user = DigidUserFactory(email="user@example.com", phonenumber="0100000000")
+        klant_url = f"{KLANTEN_ROOT}klant/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        klant = Klant(url=klant_url, bronorganisatie="123", klantnummer="1")
+
+        with requests_mock.mock() as m:
+            m.patch(
+                klant_url,
+                json={"url": klant_url, "bronorganisatie": "123", "klantnummer": "1"},
+            )
+            self.service.update_klant_from_user(klant, user)
+            self.assertIsNone(m.last_request.json()["telefoonnummerAlternatief"])
 
     def _make_klant(self, telefoonnummer="", telefoonnummer_alternatief=""):
         return Klant(

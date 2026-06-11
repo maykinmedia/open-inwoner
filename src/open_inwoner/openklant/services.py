@@ -398,11 +398,17 @@ class eSuiteKlantenService(
                 if field not in valid_update_fields:
                     raise ValueError(f"{field} is not a valid entry for update_fields")
 
-        # TODO [#2604] secondary phone will come from DigitalAddress
+        secondary_phone = (
+            user.digital_addresses.filter(type=DigitalAddressType.phone)
+            .exclude(value=user.phonenumber)
+            .order_by("-created_at")
+            .values_list("value", flat=True)
+            .first()
+        )
         update_data: KlantWritePayload = {
             "emailadres": user.email or None,
             "telefoonnummer": user.phonenumber or None,
-            "telefoonnummerAlternatief": None,
+            "telefoonnummerAlternatief": secondary_phone or None,
             "toestemmingZaakNotificatiesAlleenDigitaal": user.case_notification_channel
             == NotificationChannelChoice.digital_only,
         }
