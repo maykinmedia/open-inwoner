@@ -320,7 +320,12 @@ class eSuiteKlantenService(
         if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
             update_data["phonenumber"] = klant.telefoonnummer
 
-        # TODO [#2604] inbound eSuite alternative phone → DigitalAddress
+        if klant.telefoonnummer_alternatief:
+            user.digital_addresses.update_or_create(
+                type=DigitalAddressType.phone,
+                value=klant.telefoonnummer_alternatief,
+                defaults={"login_type": user.login_type},
+            )
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
