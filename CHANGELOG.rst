@@ -3,16 +3,6 @@
 
 Voor een volledig overzicht van alle commits, zie :release:`v2.3.1`.
 
-Deployment aandachtspunten
---------------------------
-
-* ...
-
-Nieuwe features
----------------
-
-* ...
-
 Bugfixes
 --------
 
@@ -49,12 +39,6 @@ Bugfixes
 * [:gh:`2600`]: De pagina 'Mijn vragen' gaf een 404-fout wanneer het
   contactformulier niet was ingeschakeld. Dit is hersteld door de
   contactformulier-check over te slaan bij de weergave van de vragenlijst.
-* ...
-
-Onderhoud
----------
-
-* ...
 
 2.3.0 (2026-05-29)
 ==================
