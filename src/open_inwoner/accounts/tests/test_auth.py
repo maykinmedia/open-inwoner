@@ -1869,7 +1869,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         mock_service.get_or_create_partij_for_user.assert_called_once_with(user=user)
         mock_service.update_partij_from_user_data.assert_called_once_with(
             partij_uuid="12345678-1234-1234-1234-123456789012",
-            update_data={"email": "new@example.com"},
+            user=user,
         )
 
     @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
@@ -1911,7 +1911,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(response.status_code, 302)
         mock_service.update_partij_from_user_data.assert_called_once_with(
             partij_uuid="12345678-1234-1234-1234-123456789012",
-            update_data={"email": "new@example.com"},
+            user=user,
         )
 
     @patch("open_inwoner.accounts.views.registration.eSuiteKlantenService")

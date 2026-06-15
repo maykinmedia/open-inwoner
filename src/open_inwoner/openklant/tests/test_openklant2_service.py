@@ -3,7 +3,12 @@ from unittest.mock import Mock, call, patch
 
 from django.test import TestCase
 
-from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
+from open_inwoner.accounts.choices import DigitalAddressType
+from open_inwoner.accounts.tests.factories import (
+    DigidUserFactory,
+    DigitalAddressFactory,
+    UserFactory,
+)
 from open_inwoner.openklant.services import (
     OpenKlant2Answer,
     OpenKlant2Question,
@@ -11,7 +16,10 @@ from open_inwoner.openklant.services import (
     _normalize_email,
     _normalize_phone,
 )
-from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
+from open_inwoner.openklant.tests.factories import (
+    DigitaalAdresOpenKlantMappingFactory,
+    OpenKlant2ConfigFactory,
+)
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
@@ -1178,161 +1186,240 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             "results": results,
         }
 
-    def test_fetches_adressen_exactly_once_for_multiple_fields(self, mock_client_class):
+    def test_fetches_adressen_exactly_once_for_multiple_addresses(
+        self, mock_client_class
+    ):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
         mock_client.digitaal_adres.create.side_effect = [
             self._make_adres(
-                "ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+                "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee", "email", "test@example.com"
             ),
-            self._make_adres("em-uuid", "email", "test@example.com"),
+            self._make_adres(
+                "ffffffff-ffff-ffff-ffff-ffffffffffff",
+                "telefoonnummer",
+                "0612345678",
+                is_standaard=True,
+            ),
         ]
 
-        service = OpenKlant2Service(config=self.config)
-        service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"phonenumber": "0612345678", "email": "test@example.com"},
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user, type=DigitalAddressType.email, value="test@example.com"
         )
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            is_standard_for_type=True,
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        service.update_partij_from_user_data(partij_uuid=self.PARTIJ_UUID, user=user)
 
         mock_client.digitaal_adres.list.assert_called_once()
 
-    def test_returns_empty_when_update_data_is_empty(self, mock_client_class):
+    def test_returns_empty_when_user_has_no_digital_addresses(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
-        mock_client.digitaal_adres.list.return_value = self._list_response([])
+
+        user = DigidUserFactory()
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={},
+            partij_uuid=self.PARTIJ_UUID, user=user
         )
 
         self.assertEqual(result, [])
         mock_client.digitaal_adres.create.assert_not_called()
+        mock_client.digitaal_adres.list.assert_not_called()
 
-    def test_reuses_existing_adres_without_creating(self, mock_client_class):
+    def test_mapping_patches_remote_address_via_uuid(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
-        existing = self._make_adres("existing-uuid", "email", "test@example.com")
-        mock_client.digitaal_adres.list.return_value = self._list_response([existing])
+
+        user = DigidUserFactory()
+        address = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="test@example.com",
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=address, ok_uuid="cccccccc-cccc-cccc-cccc-cccccccccccc"
+        )
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"email": "test@example.com"},
+            partij_uuid=self.PARTIJ_UUID, user=user
         )
 
-        self.assertEqual(result, [])
+        mock_client.digitaal_adres.partial_update.assert_called_once_with(
+            "cccccccc-cccc-cccc-cccc-cccccccccccc",
+            data={"adres": "test@example.com", "isStandaardAdres": True},
+        )
+        mock_client.digitaal_adres.list.assert_not_called()
         mock_client.digitaal_adres.create.assert_not_called()
+        self.assertEqual(result, [])
 
     def test_creates_missing_adres_and_reports_field(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
         mock_client.digitaal_adres.create.return_value = self._make_adres(
-            "new-uuid", "email", "new@example.com"
+            "11111111-1111-1111-1111-111111111111", "email", "new@example.com"
+        )
+
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user, type=DigitalAddressType.email, value="new@example.com"
         )
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"email": "new@example.com"},
+            partij_uuid=self.PARTIJ_UUID, user=user
         )
 
         self.assertEqual(result, ["digitaleAddresen.email"])
         mock_client.digitaal_adres.create.assert_called_once()
 
-    def test_phonenumber_created_as_standaard_adres(self, mock_client_class):
+    def test_phone_standard_created_as_standaard_adres(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
         mock_client.digitaal_adres.create.return_value = self._make_adres(
-            "ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+            "22222222-2222-2222-2222-222222222222",
+            "telefoonnummer",
+            "0612345678",
+            is_standaard=True,
+        )
+
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            is_standard_for_type=True,
         )
 
         service = OpenKlant2Service(config=self.config)
-        service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"phonenumber": "0612345678"},
-        )
+        service.update_partij_from_user_data(partij_uuid=self.PARTIJ_UUID, user=user)
 
         create_data = mock_client.digitaal_adres.create.call_args[1]["data"]
         self.assertTrue(create_data["isStandaardAdres"])
         self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
 
-    def test_phonenumber_alternative_created_as_non_standaard(self, mock_client_class):
+    def test_phone_non_standard_created_as_non_standaard_adres(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
         mock_client.digitaal_adres.create.return_value = self._make_adres(
-            "ph-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+            "33333333-3333-3333-3333-333333333333",
+            "telefoonnummer",
+            "0687654321",
+            is_standaard=False,
+        )
+
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0687654321",
+            is_standard_for_type=False,
         )
 
         service = OpenKlant2Service(config=self.config)
-        service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={"phonenumber_alternative": "0687654321"},
-        )
+        service.update_partij_from_user_data(partij_uuid=self.PARTIJ_UUID, user=user)
 
         create_data = mock_client.digitaal_adres.create.call_args[1]["data"]
         self.assertFalse(create_data["isStandaardAdres"])
         self.assertEqual(create_data["soortDigitaalAdres"], "telefoonnummer")
 
-    def test_newly_created_adres_visible_to_subsequent_calls_without_extra_fetch(
+    def test_newly_created_adres_visible_to_subsequent_addresses_without_extra_fetch(
         self, mock_client_class
     ):
         """
-        A newly created standard phonenumber is appended to the local cache so the
-        alternative phonenumber lookup can find it via the same list — no second API call.
+        A newly created address is appended locally so the next address can value-match
+        against the same list — no second API call.
         """
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
         mock_client.digitaal_adres.create.side_effect = [
             self._make_adres(
-                "ph-std-uuid", "telefoonnummer", "0612345678", is_standaard=True
+                "44444444-4444-4444-4444-444444444444",
+                "telefoonnummer",
+                "0612345678",
+                is_standaard=True,
             ),
             self._make_adres(
-                "ph-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+                "55555555-5555-5555-5555-555555555555",
+                "telefoonnummer",
+                "0687654321",
+                is_standaard=False,
             ),
         ]
 
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            is_standard_for_type=True,
+        )
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0687654321",
+            is_standard_for_type=False,
+        )
+
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={
-                "phonenumber": "0612345678",
-                "phonenumber_alternative": "0687654321",
-            },
+            partij_uuid=self.PARTIJ_UUID, user=user
         )
 
         self.assertEqual(mock_client.digitaal_adres.list.call_count, 1)
         self.assertEqual(mock_client.digitaal_adres.create.call_count, 2)
         self.assertEqual(result.count("digitaleAddresen.telefoonnummer"), 2)
 
-    def test_existing_standard_phone_reused_alternative_still_created(
-        self, mock_client_class
-    ):
+    def test_backfill_reuses_existing_remote_address(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         existing_standard = self._make_adres(
-            "existing-ph-uuid", "telefoonnummer", "0612345678", is_standaard=True
+            "66666666-6666-6666-6666-666666666666",
+            "telefoonnummer",
+            "0612345678",
+            is_standaard=True,
         )
         mock_client.digitaal_adres.list.return_value = self._list_response(
             [existing_standard]
         )
         mock_client.digitaal_adres.create.return_value = self._make_adres(
-            "new-alt-uuid", "telefoonnummer", "0687654321", is_standaard=False
+            "77777777-7777-7777-7777-777777777777",
+            "telefoonnummer",
+            "0687654321",
+            is_standaard=False,
+        )
+
+        user = DigidUserFactory()
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            is_standard_for_type=True,
+        )
+        DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.phone,
+            value="0687654321",
+            is_standard_for_type=False,
         )
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
-            partij_uuid=self.PARTIJ_UUID,
-            update_data={
-                "phonenumber": "0612345678",
-                "phonenumber_alternative": "0687654321",
-            },
+            partij_uuid=self.PARTIJ_UUID, user=user
         )
 
         mock_client.digitaal_adres.list.assert_called_once()
