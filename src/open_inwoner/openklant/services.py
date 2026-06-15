@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import re
 import uuid
@@ -24,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 import glom
 import structlog
 from openklant_client import OpenKlantClient
+from openklant_client.exceptions import NotFound as OK2NotFound
 from openklant_client.types.common import ForeignKeyRef
 from openklant_client.types.resources.betrokkene import (
     Betrokkene,
@@ -42,6 +44,7 @@ from openklant_client.types.resources.klant_contact import (
 )
 from openklant_client.types.resources.partij import (
     CreatePartijPersoonData,
+    PartialUpdatePartijData,
     Partij,
     PartijListParams,
 )
@@ -69,11 +72,11 @@ from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ContactFormSubject,
+    DigitaalAdresOpenKlantMapping,
     ESuiteKlantConfig,
     KlantContactMomentAnswer,
     OpenKlant2Config,
 )
-from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
@@ -1424,38 +1427,72 @@ class OpenKlant2Service(
     def update_partij_from_user_data(
         self,
         partij_uuid: str,
-        update_data: PartijUpdateData,
+        user: User,
     ) -> list[str]:
         updated_fields: list[str] = []
-        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        remote_adressen: list[DigitaalAdres] | None = None  # lazy-loaded for backfill
 
-        if phonenumber := update_data.get("phonenumber"):
-            digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
+        existing_mappings: dict[int, DigitaalAdresOpenKlantMapping] = {
+            m.digital_address_id: m
+            for m in DigitaalAdresOpenKlantMapping.objects.filter(
+                digital_address__user=user
+            )
+        }
+
+        for address in user.digital_addresses.all():
+            soort_adres = cast(
+                Literal["email", "telefoonnummer"],
+                "email"
+                if address.type == DigitalAddressType.email
+                else "telefoonnummer",
+            )
+            is_standaard = address.is_standard_for_type
+            mapping = existing_mappings.get(address.pk)
+
+            if mapping:
+                try:
+                    self.client.digitaal_adres.partial_update(
+                        str(mapping.ok_uuid),
+                        data=DigitaalAdresPartialUpdateData(
+                            adres=address.value,
+                            isStandaardAdres=is_standaard,
+                        ),
+                    )
+                    continue
+                except OK2NotFound:
+                    mapping.delete()
+
+            # Backfill: fetch remote list once, then value-match or create
+            if remote_adressen is None:
+                remote_adressen = self.retrieve_digitale_addressen_for_partij(
+                    partij_uuid
+                )
+
+            remote_adres, created = self.get_or_create_digitaal_adres_for_partij(
                 partij_uuid=partij_uuid,
-                soort_adres="telefoonnummer",
-                adres=phonenumber,
-                is_standaard_adres=True,
-                adressen=adressen,
+                soort_adres=soort_adres,
+                adres=address.value,
+                is_standaard_adres=is_standaard,
+                adressen=remote_adressen,
+            )
+            DigitaalAdresOpenKlantMapping.objects.update_or_create(
+                digital_address=address,
+                defaults={"ok_uuid": remote_adres["uuid"]},
             )
             if created:
-                updated_fields.append("digitaleAddresen.telefoonnummer")
-                adressen.append(digital_adres)
+                updated_fields.append(f"digitaleAddresen.{soort_adres}")
+                remote_adressen.append(remote_adres)
 
-        for attr, soort_adres in (
-            ("email", "email"),
-            ("phonenumber_alternative", "telefoonnummer"),
-        ):
-            if adres := update_data.get(attr):
-                digital_adres, created = self.get_or_create_digitaal_adres_for_partij(
-                    partij_uuid=partij_uuid,
-                    soort_adres=cast(Literal["email", "telefoonnummer"], soort_adres),
-                    adres=adres,
-                    is_standaard_adres=False,
-                    adressen=adressen,
+        if user.preferred_address_id:
+            pref_mapping = existing_mappings.get(user.preferred_address_id)
+            if pref_mapping:
+                self.client.partij.partial_update(
+                    partij_uuid,
+                    data=PartialUpdatePartijData(
+                        voorkeursDigitaalAdres={"uuid": str(pref_mapping.ok_uuid)},
+                    ),
                 )
-                if created:
-                    updated_fields.append(f"digitaleAddresen.{soort_adres}")
-                    adressen.append(digital_adres)
+                updated_fields.append("voorkeursDigitaalAdres")
 
         if updated_fields:
             system_action(
@@ -1463,6 +1500,16 @@ class OpenKlant2Service(
             )
 
         return updated_fields
+
+    def delete_remote_digitaal_adres_for_local(self, local_address) -> bool:
+        """Delete the remote digitaal adres corresponding to a local DigitalAddress."""
+        try:
+            mapping = local_address.openklant_mapping
+        except DigitaalAdresOpenKlantMapping.DoesNotExist:
+            return False
+        with contextlib.suppress(OK2NotFound):
+            self.client.digitaal_adres.delete(str(mapping.ok_uuid))
+        return True
 
     def _create_klantcontact(
         self,

@@ -18,6 +18,7 @@ from webtest import Upload
 from open_inwoner.accounts.brp import BRPData
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
+    DigitalAddressType,
     LoginTypeChoices,
     NotificationChannelChoice,
     StatusChoices,
@@ -43,6 +44,7 @@ from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFacto
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import ESuiteKlantConfig
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
+from open_inwoner.openklant.tests.factories import DigitaalAdresOpenKlantMappingFactory
 from open_inwoner.pdc.tests.factories import CategoryFactory
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.qmatic.tests.data import QmaticMockData
@@ -55,6 +57,7 @@ from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin, create_imag
 from .factories import (
     ActionFactory,
     DigidUserFactory,
+    DigitalAddressFactory,
     UserFactory,
     eHerkenningUserFactory,
 )
@@ -924,89 +927,50 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(alt_number["adres"], "0687654321")
 
     @requests_mock.Mocker()
-    def test_update_via_openklant_cleans_up_old_contact_info(self, m):
-        """Old digitaal-adres records in OpenKlant are deleted when the value changes."""
-        from open_inwoner.accounts.models import DigitalAddress, DigitalAddressType
-
+    def test_update_via_openklant_patches_when_mapping_exists(self, m):
+        """When a mapping exists, the remote address is PATCHed rather than deleted and recreated."""
         MockAPIReadPatchData.setUpServices(
             klanten_service_type=KlantenServiceType.OPENKLANT2
         )
-        MockAPIReadPatchData().install_mocks_openklant(m)
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
 
-        User.objects.all().delete()
-        digid_user = DigidUserFactory()
-
-        # Set up existing DA records so the view can detect what changed.
-        old_email_da = DigitalAddress.objects.create(
-            user=digid_user,
+        email_addr = DigitalAddressFactory(
+            user=data.digid_user,
             type=DigitalAddressType.email,
-            value="old@example.com",
-            login_type=digid_user.login_type,
+            value=data.digid_user.email,
+            login_type=LoginTypeChoices.digid,
             is_standard_for_type=True,
         )
-        digid_user.email = "old@example.com"
-        digid_user.save(update_fields=["email"])
-
-        old_phone_da = DigitalAddress.objects.create(
-            user=digid_user,
-            type=DigitalAddressType.phone,
-            value="0600000000",
-            login_type=digid_user.login_type,
-            is_standard_for_type=True,
-        )
-        digid_user.phonenumber = "0600000000"
-        digid_user.save(update_fields=["phonenumber"])
-
-        old_alt_da = DigitalAddress.objects.create(
-            user=digid_user,
-            type=DigitalAddressType.phone,
-            value="0611111111",
-            login_type=digid_user.login_type,
-            is_standard_for_type=False,
+        REMOTE_UUID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=email_addr, ok_uuid=REMOTE_UUID
         )
 
-        delete_email_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/email-uuid-123",
-            status_code=204,
-        )
-        delete_phone_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-uuid-123",
-            status_code=204,
-        )
-        delete_phone_alt_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-alt-uuid-123",
-            status_code=204,
+        patch_matcher = m.patch(
+            f"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/{REMOTE_UUID}",
+            json={"uuid": REMOTE_UUID},
         )
 
-        self.client.force_login(digid_user)
-        post_data = {}
-        post_data.update(
-            self._da_formset_data(
-                "email_addresses",
-                [("new@example.com", True)],
-                initial_pks=[old_email_da.pk],
-            )
-        )
-        post_data.update(
-            self._da_formset_data(
-                "phone_addresses",
-                [("0612345678", True), ("", False), ("0687654321", False)],
-                initial_pks=[old_phone_da.pk, old_alt_da.pk, None],
-            )
-        )
-        post_data["phone_addresses-1-DELETE"] = "on"  # delete old_alt_da
-        response = self.client.post(self.url, data=post_data)
+        response = self.app.get(self.url, user=data.digid_user)
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["email_addresses-0-value"] = "new@example.com"
+        response = form.submit()
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(delete_email_matcher.called_once)
-        self.assertTrue(delete_phone_matcher.called_once)
-        self.assertTrue(delete_phone_alt_matcher.called_once)
+        self.assertTrue(patch_matcher.called)
+
+        delete_requests = [r for r in m.request_history if r.method == "DELETE"]
+        self.assertEqual(len(delete_requests), 0)
+
         post_requests = [
-            req
-            for req in m.request_history
-            if req.method == "POST" and "digitaleadressen" in req.path
+            r
+            for r in m.request_history
+            if r.method == "POST" and "digitaleadressen" in r.path
         ]
-        self.assertEqual(len(post_requests), 3)  # email + 2 phone numbers
+        self.assertEqual(len(post_requests), 0)
 
 
 class TestForm(ErrorMessageMixin, forms.Form):
