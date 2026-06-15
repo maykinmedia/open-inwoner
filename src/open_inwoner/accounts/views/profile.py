@@ -48,7 +48,6 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
@@ -349,13 +348,7 @@ class EditProfileView(
 
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
             try:
-                self.update_klant_via_openklant(
-                    changed_data,
-                    user,
-                    old_email=old_email,
-                    old_phonenumber=old_phonenumber,
-                    old_phonenumber_alternative=old_phonenumber_alternative,
-                )
+                self.update_klant_via_openklant(changed_data, user)
             except Exception:
                 logger.exception("OpenKlant failed during profile update", user=user)
                 failed_services.append("OpenKlant")
@@ -426,56 +419,22 @@ class EditProfileView(
             if not has_remaining and formset.initial_form_count() > 0:
                 user.update_phonenumber("")
 
-    def update_klant_via_openklant(
-        self,
-        user_form_data: dict,
-        user: User,
-        old_email: str = "",
-        old_phonenumber: str = "",
-        old_phonenumber_alternative: str = "",
-    ) -> bool:
-        """
-        Update the user `partij` in OpenKlant from `user_form_data`.
-
-        Deletes old digitaal-adres records for any contact detail that changed,
-        then pushes the new values.
-        """
+    def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
         try:
             service = OpenKlant2Service()
         except Exception:
             logger.warning("OpenKlant2Service failed to build")
             return False
 
-        partij, created = service.get_or_create_partij_for_user(user)
+        partij, _ = service.get_or_create_partij_for_user(user)
 
-        if partij and not created:
-            adressen = service.retrieve_digitale_addressen_for_partij(partij["uuid"])
+        if not partij:
+            return False
 
-            old_values = {
-                "email": old_email,
-                "phonenumber": old_phonenumber,
-                "phonenumber_alternative": old_phonenumber_alternative,
-            }
-            for address_type, old in old_values.items():
-                new = user_form_data.get(address_type)
-                if not old or not new or old == new:
-                    continue
-                try:
-                    digitaal_adres = next(
-                        obj for obj in adressen if obj["adres"] == old
-                    )
-                except StopIteration:
-                    pass
-                else:
-                    service.client.digitaal_adres.delete(digitaal_adres["uuid"])
-                    self.log_digitaal_adres_deleted(user, digitaal_adres["uuid"])
-
-            return service.update_partij_from_user_data(
-                partij_uuid=partij["uuid"],
-                update_data=PartijUpdateData(**user_form_data),
-            )
-
-        return bool(partij)
+        return service.update_partij_from_user_data(
+            partij_uuid=partij["uuid"],
+            user=user,
+        )
 
     def update_klant_via_esuite(self, user_form_data: dict, user: User) -> bool:
         field_mapping = {
