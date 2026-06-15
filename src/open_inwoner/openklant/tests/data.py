@@ -1,3 +1,5 @@
+import uuid
+
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from zgw_consumers.constants import APITypes
 
@@ -358,7 +360,7 @@ class MockAPIReadPatchData(MockAPIData):
         def _create_digitaal_adres(request, context):
             body = request.json()
             return {
-                "uuid": "new-adres-uuid",
+                "uuid": str(uuid.uuid4()),
                 "adres": body["adres"],
                 "soortDigitaalAdres": body["soortDigitaalAdres"],
                 "isStandaardAdres": body.get("isStandaardAdres", False),

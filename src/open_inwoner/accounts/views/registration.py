@@ -27,7 +27,6 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.openklant.types import PartijUpdateData
 from open_inwoner.utils.text import html_tag_wrap_format
 from open_inwoner.utils.url import get_next_url_from
 from open_inwoner.utils.views import CommonPageMixin
@@ -230,15 +229,9 @@ class NecessaryFieldsUserView(
             )
             return
 
-        update_data: PartijUpdateData = {}
-        if "email" in form.cleaned_data:
-            update_data["email"] = form.cleaned_data["email"]
-        if "phonenumber" in form.cleaned_data:
-            update_data["phonenumber"] = form.cleaned_data["phonenumber"]
-
         service.update_partij_from_user_data(
             partij_uuid=partij["uuid"],
-            update_data=update_data,
+            user=user,
         )
 
     def update_klant_via_esuite(self, form: NecessaryUserForm):

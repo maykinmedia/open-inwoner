@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 import factory
 from zgw_consumers.constants import APITypes
@@ -42,6 +43,16 @@ class ESuiteConfigFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = "openklant.ESuiteKlantConfig"
+
+
+class DigitaalAdresOpenKlantMappingFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = "openklant.DigitaalAdresOpenKlantMapping"
+
+    digital_address = factory.SubFactory(
+        "open_inwoner.accounts.tests.factories.DigitalAddressFactory"
+    )
+    ok_uuid = factory.LazyFunction(uuid.uuid4)
 
 
 class OpenKlant2ConfigFactory(factory.django.DjangoModelFactory):
