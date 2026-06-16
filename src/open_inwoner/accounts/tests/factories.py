@@ -53,6 +53,18 @@ class UserFactory(factory.django.DjangoModelFactory):
     kvk = ""
     vestiging = ""
 
+    @factory.post_generation
+    def phonenumber_alternative(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        DigitalAddressFactory.create(
+            user=self,
+            type=DigitalAddressType.phone,
+            value=extracted,
+            login_type=self.login_type,
+            is_standard_for_type=False,
+        )
+
 
 class DigidUserFactory(UserFactory):
     login_type = LoginTypeChoices.digid

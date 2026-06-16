@@ -11,7 +11,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import models, transaction
-from django.db.models import F, Q, UniqueConstraint
+from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -371,20 +371,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_verified_email(self):
         return self.verified_email != "" and self.email == self.verified_email
 
-    phonenumber = models.CharField(
-        verbose_name=_("Phonenumber"),
-        blank=True,
-        default="",
-        max_length=15,
-        validators=[DutchPhoneNumberValidator()],
-    )
-    phonenumber_alternative = models.CharField(
-        verbose_name=_("Alternative phonenumber"),
-        blank=True,
-        default="",
-        max_length=15,
-        validators=[DutchPhoneNumberValidator()],
-    )
     preferred_address = models.ForeignKey(
         "accounts.DigitalAddress",
         on_delete=models.SET_NULL,
@@ -393,6 +379,72 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name="+",
         verbose_name=_("Preferred digital address"),
     )
+    phonenumber = models.CharField(
+        verbose_name=_("Phonenumber"),
+        blank=True,
+        default="",
+        max_length=15,
+        validators=[DutchPhoneNumberValidator()],
+    )
+
+    @property
+    def phonenumber_alternative(self) -> str:
+        da = (
+            self.digital_addresses.filter(
+                type=DigitalAddressType.phone,
+                is_standard_for_type=False,
+            )
+            .values_list("value", flat=True)
+            .first()
+        )
+        return da or ""
+
+    @transaction.atomic
+    def update_email(self, value: str) -> None:
+        """Update email field and keep the standard email DigitalAddress in sync."""
+        # Remove any non-standard email DA with this value first to avoid
+        # violating unique_digital_address_per_user_type_value.
+        self.digital_addresses.filter(
+            type=DigitalAddressType.email,
+            is_standard_for_type=False,
+            value=value,
+        ).delete()
+        self.email = value
+        self.save(update_fields=["email"])
+        DigitalAddress.objects.update_or_create(
+            user=self,
+            type=DigitalAddressType.email,
+            is_standard_for_type=True,
+            defaults={"value": value, "login_type": self.login_type},
+        )
+
+    @transaction.atomic
+    def update_phonenumber(self, value: str) -> None:
+        """Update phonenumber field and keep the standard phone DigitalAddress in sync."""
+        if value:
+            # Remove any non-standard phone DA with this value first to avoid
+            # violating unique_digital_address_per_user_type_value.
+            self.digital_addresses.filter(
+                type=DigitalAddressType.phone,
+                is_standard_for_type=False,
+                value=value,
+            ).delete()
+            self.phonenumber = value
+            self.save(update_fields=["phonenumber"])
+            DigitalAddress.objects.update_or_create(
+                user=self,
+                type=DigitalAddressType.phone,
+                is_standard_for_type=True,
+                defaults={"value": value, "login_type": self.login_type},
+            )
+        else:
+            self.phonenumber = ""
+            self.save(update_fields=["phonenumber"])
+            self.digital_addresses.filter(
+                type=DigitalAddressType.phone,
+                is_standard_for_type=True,
+            ).delete()
+
     image = ImageCropField(
         verbose_name=_("Image"),
         null=True,
@@ -586,22 +638,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 fields=["email"],
                 condition=Q(login_type=LoginTypeChoices.default),
                 name="unique_email_for_regular_users",
-            ),
-            models.CheckConstraint(
-                check=~Q(phonenumber__exact="") | Q(phonenumber_alternative__exact=""),
-                name="phonenumber_alt_requires_phonenumber_primary",
-                violation_error_message=_(
-                    "A primary phone number is required for setting an alternative "
-                    "phone number"
-                ),
-            ),
-            models.CheckConstraint(
-                check=~Q(phonenumber=F("phonenumber_alternative"))
-                | Q(phonenumber__exact=""),
-                name="check_alternative_phonenumber_differs_from_primary_phonenumber",
-                violation_error_message=_(
-                    "Primary and secondary phone numbers cannot be the same"
-                ),
             ),
             models.CheckConstraint(
                 check=~Q(kvk__exact="", login_type=LoginTypeChoices.eherkenning),
