@@ -133,7 +133,7 @@ def _update_user_from_openklant2(
     try:
         partij, created = service.get_or_create_partij_for_user(user)
         if partij and not created:
-            service.update_user_from_partij(partij_uuid=partij["uuid"], user=user)
+            service.update_user_from_partij(partij=partij, user=user)
 
     except Exception:
         logger.exception("Error updating user from partij via OpenKlant2")
