@@ -58,6 +58,7 @@ from zgw_consumers.utils import pagination_helper
 from open_inwoner.accounts.choices import DigitalAddressType, NotificationChannelChoice
 from open_inwoner.accounts.models import DigitalAddress, User
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openklant import metrics as openklant_metrics
 from open_inwoner.openklant.api_models import (
     ContactMoment,
     ContactMomentCreateData,
@@ -77,6 +78,7 @@ from open_inwoner.openklant.models import (
     KlantContactMomentAnswer,
     OpenKlant2Config,
 )
+from open_inwoner.openklant.types import InboundOpenklantSyncResult
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
     fetch_klantcontactmoment,
@@ -1361,68 +1363,266 @@ class OpenKlant2Service(
             adressen=adressen,
         )
 
-    @transaction.atomic
-    def update_user_from_partij(self, partij_uuid: str, user: User):
-        update_data = {}
+    def update_user_from_partij(
+        self, partij: Partij, user: User
+    ) -> InboundOpenklantSyncResult:
+        """
+        Pull the digital addresses (and preferred address) of `partij` into
+        the local `DigitalAddress` rows for `user`.
 
-        adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        OpenKlant is treated as the source of truth: addresses present remotely
+        are created or updated locally (and mapped via UUID), while previously
+        mapped addresses that are no longer present remotely are deleted
+        locally. The flat `user.email`/`user.phonenumber` fields are kept in
+        sync from the respective standard address, except that `user.email` is
+        never overwritten with a value already in use by another user.
 
-        if email_adressen := self.filter_digitale_addressen_for_partij(
-            partij_uuid, soort_digital_adres="email", adressen=adressen
-        ):
-            email = email_adressen[0]["adres"]
-            if not User.objects.filter(email__iexact=email).exists():
-                update_data["email"] = email
+        Exception: if OpenKlant has no standard email address (zero email
+        addresses, or addresses present but none marked isStandaardAdres),
+        the local standard email DigitalAddress is pushed back to OpenKlant.
 
-        phone_adressen = self.filter_digitale_addressen_for_partij(
-            partij_uuid, soort_digital_adres="telefoonnummer", adressen=adressen
-        )
-        if phone_adressen:
-            # we currently only support two phone numbers: primary + secondary
-            # the following edge case cannot happen through OIP, but we cannot
-            # exclude that it happens through some external service. In this case,
-            # we pick the last one
-            if len(phone_adressen) > 2:
-                logger.warning(
-                    "More than two phone numbers found for partij",
-                    partij_uuid=partij_uuid,
+        Returns an InboundOpenklantSyncResult summarising what changed. The
+        result is also used to drive audit logging and OTEL metrics, and is
+        suitable as an async task return value if the sync is ever offloaded.
+        """
+        partij_uuid = partij["uuid"]
+        remote_adressen = self.retrieve_digitale_addressen_for_partij(partij_uuid)
+        remote_uuids = {adres["uuid"] for adres in remote_adressen}
+        preferred_ref = partij.get("voorkeursDigitaalAdres")
+
+        result = InboundOpenklantSyncResult()
+
+        with transaction.atomic():
+            local_by_uuid: dict[str, DigitalAddress] = {
+                str(mapping.ok_uuid): mapping.digital_address
+                for mapping in DigitaalAdresOpenKlantMapping.objects.filter(
+                    digital_address__user=user
+                ).select_related("digital_address")
+            }
+
+            # Phase 1: reconcile local DigitalAddress rows against the remote list.
+            # - UUID known -> update value in place
+            # - UUID unknown -> create new address + mapping
+            # - UUID gone -> delete local address (CASCADE removes the mapping)
+            #
+            # Track flat field values that lose their DA so we can restore the
+            # invariant (user.email/phonenumber always has a matching DA) below.
+            orphaned_flat_values: set[tuple[DigitalAddressType, str]] = set()
+            for ok_uuid in list(local_by_uuid):
+                if ok_uuid not in remote_uuids:
+                    deleted_da = local_by_uuid.pop(ok_uuid)
+                    for da_type, flat_value in (
+                        (DigitalAddressType.email, user.email),
+                        (DigitalAddressType.phone, user.phonenumber),
+                    ):
+                        if (
+                            deleted_da.type == da_type
+                            and deleted_da.value == flat_value
+                        ):
+                            orphaned_flat_values.add((da_type, flat_value))
+                    deleted_da.delete()
+                    result.addresses_deleted += 1
+
+            for remote_adres in remote_adressen:
+                ok_uuid = remote_adres["uuid"]
+                value = remote_adres["adres"]
+                digital_address_type = (
+                    DigitalAddressType.email
+                    if remote_adres["soortDigitaalAdres"] == "email"
+                    else DigitalAddressType.phone
                 )
 
-            primary_value = next(
-                (a["adres"] for a in phone_adressen if a["isStandaardAdres"]), None
-            )
-            if primary_value:
-                update_data["phonenumber"] = primary_value
-                alternative_value = next(
-                    (a["adres"] for a in phone_adressen if not a["isStandaardAdres"]),
+                local_address = local_by_uuid.get(ok_uuid)
+                if local_address is not None:
+                    if local_address.value != value:
+                        local_address.value = value
+                        local_address.save(update_fields=["value"])
+                        result.addresses_updated += 1
+                    continue
+
+                if (
+                    digital_address_type == DigitalAddressType.email
+                    and User.objects.filter(email__iexact=value)
+                    .exclude(pk=user.pk)
+                    .exists()
+                ):
+                    logger.debug(
+                        "skipping remote email address: already owned by another user",
+                        partij_uuid=partij_uuid,
+                        adres_uuid=ok_uuid,
+                    )
+                    result.email_conflicts_skipped += 1
+                    continue
+
+                local_address = user.digital_addresses.create(
+                    type=digital_address_type,
+                    value=value,
+                    login_type=user.login_type,
+                )
+                DigitaalAdresOpenKlantMapping.objects.create(
+                    digital_address=local_address, ok_uuid=ok_uuid
+                )
+                local_by_uuid[ok_uuid] = local_address
+                result.addresses_created += 1
+
+            remote_standard_uuid_by_type = {
+                DigitalAddressType.email: next(
+                    (
+                        a["uuid"]
+                        for a in remote_adressen
+                        if a["soortDigitaalAdres"] == "email" and a["isStandaardAdres"]
+                    ),
                     None,
+                ),
+                DigitalAddressType.phone: next(
+                    (
+                        a["uuid"]
+                        for a in remote_adressen
+                        if a["soortDigitaalAdres"] == "telefoonnummer"
+                        and a["isStandaardAdres"]
+                    ),
+                    None,
+                ),
+            }
+
+            # Phase 2: sync is_standard_for_type from remote isStandaardAdres.
+            # Only acts when remote explicitly designates a standard; if remote
+            # has no standard for a type the local flag is left unchanged.
+            for (
+                digital_address_type,
+                standard_uuid,
+            ) in remote_standard_uuid_by_type.items():
+                if standard_uuid and (
+                    standard_address := local_by_uuid.get(standard_uuid)
+                ):
+                    user.digital_addresses.filter(type=digital_address_type).update(
+                        is_standard_for_type=False
+                    )
+                    standard_address.is_standard_for_type = True
+                    standard_address.save(update_fields=["is_standard_for_type"])
+
+            # Phase 3: keep flat fields (user.email, user.phonenumber,
+            # user.preferred_address) in sync with the remote standard addresses.
+            email_uuid = remote_standard_uuid_by_type[DigitalAddressType.email]
+            if email_uuid and (email_address := local_by_uuid.get(email_uuid)):
+                if email_address.value != user.email and not (
+                    User.objects.filter(email__iexact=email_address.value)
+                    .exclude(pk=user.pk)
+                    .exists()
+                ):
+                    user.email = email_address.value
+                    result.user_fields_updated.add("email")
+
+            phone_uuid = remote_standard_uuid_by_type[DigitalAddressType.phone]
+            if phone_uuid and (phone_address := local_by_uuid.get(phone_uuid)):
+                if phone_address.value != user.phonenumber:
+                    user.phonenumber = phone_address.value
+                    result.user_fields_updated.add("phonenumber")
+
+            if preferred_ref:
+                preferred_address = local_by_uuid.get(preferred_ref["uuid"])
+                if (
+                    preferred_address
+                    and user.preferred_address_id != preferred_address.pk
+                ):
+                    user.preferred_address = preferred_address
+                    result.user_fields_updated.add("preferred_address")
+            elif user.preferred_address_id is not None:
+                user.preferred_address = None
+                result.user_fields_updated.add("preferred_address")
+
+            if result.user_fields_updated:
+                user.save(update_fields=result.user_fields_updated)
+
+            # Restore invariant: if Phase 1 deleted the only DA that matched
+            # user.email or user.phonenumber, recreate it so the flat field is
+            # never left without a backing DigitalAddress.
+            for da_type, flat_value in orphaned_flat_values:
+                if (
+                    flat_value
+                    and not user.digital_addresses.filter(
+                        type=da_type, value=flat_value
+                    ).exists()
+                ):
+                    user.digital_addresses.create(
+                        type=da_type,
+                        value=flat_value,
+                        login_type=user.login_type,
+                        is_standard_for_type=True,
+                    )
+                    result.orphaned_addresses_restored += 1
+
+            change_summary = []
+            if result.addresses_created:
+                change_summary.append(
+                    f"created {result.addresses_created} digital address(es)"
                 )
-                # Skip alternative when it equals the primary to avoid
-                # violating unique_digital_address_per_user_type_value.
-                if alternative_value and alternative_value != primary_value:
-                    update_data["phonenumber_alternative"] = alternative_value
+            if result.addresses_updated:
+                change_summary.append(
+                    f"updated {result.addresses_updated} digital address(es)"
+                )
+            if result.addresses_deleted:
+                change_summary.append(
+                    f"deleted {result.addresses_deleted} digital address(es)"
+                )
+            if result.user_fields_updated:
+                change_summary.append(
+                    f"updated user fields: {', '.join(sorted(result.user_fields_updated))}"
+                )
+            if change_summary:
+                system_action(
+                    f"synced user from OpenKlant partij {partij_uuid}: "
+                    f"{'; '.join(change_summary)}",
+                    content_object=user,
+                )
 
-        if not update_data:
-            return
-
-        if email := update_data.get("email"):
-            user.update_email(email)
-
-        if phonenumber := update_data.get("phonenumber"):
-            user.update_phonenumber(phonenumber)
-
-        if alternative := update_data.get("phonenumber_alternative"):
-            DigitalAddress.objects.update_or_create(
-                user=user,
-                type=DigitalAddressType.phone,
-                is_standard_for_type=False,
-                defaults={"value": alternative, "login_type": user.login_type},
+        if result.addresses_created:
+            openklant_metrics.inbound_sync_address_operations.add(
+                result.addresses_created, attributes={"operation": "created"}
+            )
+        if result.addresses_updated:
+            openklant_metrics.inbound_sync_address_operations.add(
+                result.addresses_updated, attributes={"operation": "updated"}
+            )
+        if result.addresses_deleted:
+            openklant_metrics.inbound_sync_address_operations.add(
+                result.addresses_deleted, attributes={"operation": "deleted"}
+            )
+        if result.email_conflicts_skipped:
+            openklant_metrics.email_address_conflicts.add(
+                result.email_conflicts_skipped,
+                attributes={"partij_uuid": str(partij_uuid)},
             )
 
-        system_action(
-            f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
-            content_object=user,
-        )
+        # Push-back: if OpenKlant has no standard email (including when it has
+        # no email addresses at all), push the local standard email as the default.
+        if not remote_standard_uuid_by_type[DigitalAddressType.email]:
+            local_standard_email = user.digital_addresses.filter(
+                type=DigitalAddressType.email, is_standard_for_type=True
+            ).first()
+            if local_standard_email:
+                remote_adres, created = self.get_or_create_digitaal_adres_for_partij(
+                    partij_uuid=partij_uuid,
+                    soort_adres="email",
+                    adres=local_standard_email.value,
+                    is_standaard_adres=True,
+                    adressen=remote_adressen,
+                )
+                DigitaalAdresOpenKlantMapping.objects.update_or_create(
+                    digital_address=local_standard_email,
+                    defaults={"ok_uuid": remote_adres["uuid"]},
+                )
+                system_action(
+                    f"pushed standard email to OpenKlant partij {partij_uuid} "
+                    f"({'created' if created else 'updated'} remote digitaal adres)",
+                    content_object=user,
+                )
+                result.push_back_fired = True
+                openklant_metrics.email_pushback.add(
+                    1, attributes={"backend": "openklant2"}
+                )
+
+        return result
 
     def update_partij_from_user_data(
         self,
