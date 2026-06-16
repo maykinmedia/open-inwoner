@@ -119,7 +119,6 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, f"Welkom, {self.user.display_name}")
         self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
         self.assertContains(response, self.user.email)
-        self.assertContains(response, self.user.phonenumber)
         self.assertContains(response, self.user.street)
         self.assertContains(response, self.user.housenumber)
         self.assertContains(response, self.user.city)
@@ -324,8 +323,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["first_name"] = ""
         form["last_name"] = ""
         form["email"] = ""
-        form["phonenumber"] = ""
-        form["phonenumber_alternative"] = ""
         form["street"] = ""
         form["housenumber"] = ""
         form["postcode"] = ""
@@ -351,8 +348,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
         form["email"] = "user@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
         form["postcode"] = "1013 RM"
@@ -367,8 +362,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(self.user.last_name, "Last name")
         self.assertEqual(self.user.display_name, "First name")
         self.assertEqual(self.user.email, "user@example.com")
-        self.assertEqual(self.user.phonenumber, "0612345678")
-        self.assertEqual(self.user.phonenumber_alternative, "0687654321")
         self.assertEqual(self.user.street, "Keizersgracht")
         self.assertEqual(self.user.housenumber, "17 d")
         self.assertEqual(self.user.postcode, "1013 RM")
@@ -428,15 +421,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url, user=eherkenning_user)
         form = response.forms["profile-edit"]
         form["email"] = "user@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
 
         eherkenning_user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(eherkenning_user.email, "user@example.com")
-        self.assertEqual(eherkenning_user.phonenumber, "0612345678")
-        self.assertEqual(eherkenning_user.phonenumber_alternative, "0687654321")
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -478,8 +467,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             form["first_name"] = "test"
 
         form["email"] = "user@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
 
         self.assertEqual(response.url, self.return_url)
@@ -488,8 +475,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertEqual(user.display_name, "name")
         self.assertEqual(user.email, "user@example.com")
-        self.assertEqual(user.phonenumber, "0612345678")
-        self.assertEqual(user.phonenumber_alternative, "0687654321")
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -646,7 +631,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
                     form = response.forms["profile-edit"]
                     form["email"] = "new@example.com"
-                    form["phonenumber"] = "0612345678"
                     form.submit()
 
                     # user data tested in other cases
@@ -656,12 +640,11 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                         klant_patch_data,
                         {
                             "emailadres": "new@example.com",
-                            "telefoonnummer": "0612345678",
                         },
                     )
                     self.assertTimelineLog("retrieved klant for user")
                     self.assertTimelineLog(
-                        "patched klant from user profile edit with fields: emailadres, telefoonnummer"
+                        "patched klant from user profile edit with fields: emailadres"
                     )
 
     @requests_mock.Mocker()
@@ -682,70 +665,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         self.assertFalse(data.matchers[0].called)
         self.assertFalse(data.matchers[1].called)
-
-    @requests_mock.Mocker()
-    def test_modify_phone_and_email_updates_klant_api(self, m):
-        MockAPIReadPatchData.setUpServices()
-        data = MockAPIReadPatchData().install_mocks(m)
-
-        response = self.app.get(self.url, user=data.user)
-
-        # reset noise from signals
-        m.reset_mock()
-        self.clearTimelineLogs()
-
-        form = response.forms["profile-edit"]
-        form["email"] = "new@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
-        form.submit()
-
-        # user data tested in other cases
-
-        self.assertTrue(data.matchers[0].called)
-        klant_patch_data = data.matchers[1].request_history[0].json()
-        self.assertEqual(
-            klant_patch_data,
-            {
-                "emailadres": "new@example.com",
-                "telefoonnummer": "0612345678",
-                "telefoonnummerAlternatief": "0687654321",
-            },
-        )
-        self.assertTimelineLog("retrieved klant for user")
-        self.assertTimelineLog(
-            "patched klant from user profile edit with fields: emailadres, telefoonnummer, telefoonnummerAlternatief"
-        )
-
-    @requests_mock.Mocker()
-    def test_modify_phone_updates_klant_api_but_skip_unchanged_email(self, m):
-        MockAPIReadPatchData.setUpServices()
-        data = MockAPIReadPatchData().install_mocks(m)
-
-        response = self.app.get(self.url, user=data.user)
-
-        # reset noise from signals
-        m.reset_mock()
-        self.clearTimelineLogs()
-
-        form = response.forms["profile-edit"]
-        form["phonenumber"] = "0612345678"
-        form.submit()
-
-        # user data tested in other cases
-
-        self.assertTrue(data.matchers[0].called)
-        klant_patch_data = data.matchers[1].request_history[0].json()
-        self.assertEqual(
-            klant_patch_data,
-            {
-                "telefoonnummer": "0612345678",
-            },
-        )
-        self.assertTimelineLog("retrieved klant for user")
-        self.assertTimelineLog(
-            "patched klant from user profile edit with fields: telefoonnummer"
-        )
 
     @requests_mock.Mocker()
     def test_modify_email_updates_klant_api_but_skip_unchanged_phone(self, m):
@@ -792,8 +711,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         form = response.forms["profile-edit"]
         form["email"] = "new@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
         response = form.submit()
 
         self.assertEqual(response.status_code, 302)
@@ -804,7 +721,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             if "digitaleadressen" in response.path
         ]
 
-        # 1. email update
         email_requests = [
             response
             for response in digitale_adressen_requests
@@ -821,96 +737,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             email_req.json()["verstrektDoorPartij"],
             {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
         )
-
-        # 2. phone number updates
-        phone_requests = [
-            response
-            for response in digitale_adressen_requests
-            if response.method in ["POST"]
-            and response.json()
-            and response.json().get("soortDigitaalAdres") == "telefoonnummer"
-        ]
-        self.assertEqual(len(phone_requests), 2)
-
-        phone_numbers = [response.json() for response in phone_requests]
-        standard_number = next(num for num in phone_numbers if num["isStandaardAdres"])
-        self.assertEqual(
-            standard_number,
-            {
-                "adres": "0612345678",
-                "soortDigitaalAdres": "telefoonnummer",
-                "isStandaardAdres": True,
-                "verstrektDoorPartij": {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
-                "verstrektDoorBetrokkene": None,
-                "omschrijving": "OIP profiel",
-            },
-        )
-
-        alt_number = next(num for num in phone_numbers if not num["isStandaardAdres"])
-        self.assertEqual(
-            alt_number,
-            {
-                "adres": "0687654321",
-                "soortDigitaalAdres": "telefoonnummer",
-                "isStandaardAdres": False,
-                "verstrektDoorPartij": {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
-                "verstrektDoorBetrokkene": None,
-                "omschrijving": "OIP profiel",
-            },
-        )
-
-    @requests_mock.Mocker()
-    def test_update_via_openklant_cleans_up_old_contact_info(self, m):
-        """Test that old contact information is deleted from OpenKlant when updating"""
-        MockAPIReadPatchData.setUpServices(
-            klanten_service_type=KlantenServiceType.OPENKLANT2
-        )
-        MockAPIReadPatchData().install_mocks_openklant(m)
-
-        User.objects.all().delete()
-        digid_user = DigidUserFactory()
-
-        digid_user.email = "old@example.com"
-        digid_user.phonenumber = "0600000000"
-        digid_user.phonenumber_alternative = "0611111111"
-        digid_user.save()
-
-        # Mock DELETE requests for old contact info
-        delete_email_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/email-uuid-123",
-            status_code=204,
-        )
-        delete_phone_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-uuid-123",
-            status_code=204,
-        )
-        delete_phone_alt_matcher = m.delete(
-            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-alt-uuid-123",
-            status_code=204,
-        )
-
-        response = self.app.get(self.url, user=digid_user)
-
-        form = response.forms["profile-edit"]
-        form["email"] = "new@example.com"
-        form["phonenumber"] = "0612345678"
-        form["phonenumber_alternative"] = "0687654321"
-        response = form.submit()
-
-        self.assertEqual(response.status_code, 302)
-
-        # Verify DELETE requests were made for old contact info
-        self.assertTrue(delete_email_matcher.called_once)
-        self.assertTrue(delete_phone_matcher.called_once)
-        self.assertTrue(delete_phone_alt_matcher.called_once)
-
-        # Verify POST requests were made for new contact info
-        post_requests = [
-            req
-            for req in m.request_history
-            if req.method == "POST" and "digitaleadressen" in req.path
-        ]
-        self.assertEqual(len(post_requests), 3)  # email + 2 phone numbers
 
 
 class TestForm(ErrorMessageMixin, forms.Form):
@@ -1087,7 +913,6 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
             self.expected_response.city,
             self.user.bsn,
             self.user.email,
-            self.user.phonenumber,
         ]
         self.clearTimelineLogs()
 

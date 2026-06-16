@@ -5,7 +5,11 @@ from django.test.testcases import SerializeMixin
 import requests_mock
 from django_webtest import WebTest
 
-from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelChoice
+from open_inwoner.accounts.choices import (
+    DigitalAddressType,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+)
 from open_inwoner.accounts.models import User
 from open_inwoner.accounts.tests.factories import UserFactory, eHerkenningUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
@@ -184,8 +188,10 @@ class UpdateUserFromLoginSignalAPITestCase(
             ):
                 user.email = "old@example.com"
                 user.phonenumber = "0123456789"
-                user.phonenumber_alternative = ""
-                user.save()
+                user.save(update_fields=["email", "phonenumber"])
+                user.digital_addresses.filter(
+                    type=DigitalAddressType.phone, is_standard_for_type=False
+                ).delete()
                 self.clearTimelineLogs()
 
                 config = ESuiteKlantConfig.get_solo()
