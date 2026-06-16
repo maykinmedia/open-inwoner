@@ -16,6 +16,7 @@ from typing import (
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -51,8 +52,8 @@ from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.models.services import Service as ServiceConfig
 from zgw_consumers.utils import pagination_helper
 
-from open_inwoner.accounts.choices import NotificationChannelChoice
-from open_inwoner.accounts.models import User
+from open_inwoner.accounts.choices import DigitalAddressType, NotificationChannelChoice
+from open_inwoner.accounts.models import DigitalAddress, User
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import (
     ContactMoment,
@@ -99,21 +100,6 @@ def _normalize_phone(phone: str) -> str:
 
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
-
-
-def _resolve_phonenumber_update(user: "User", update_data: dict) -> None:
-    """Clear alternative phonenumber from update_data if it would violate model constraints."""
-    if (
-        "phonenumber" not in update_data
-        and "phonenumber_alternative" not in update_data
-    ):
-        return
-    primary = update_data.get("phonenumber", user.phonenumber)
-    alternative = update_data.get(
-        "phonenumber_alternative", user.phonenumber_alternative
-    )
-    if alternative and (not primary or primary == alternative):
-        update_data["phonenumber_alternative"] = ""
 
 
 class BsnFetchParam(TypedDict):
@@ -311,24 +297,17 @@ class eSuiteKlantenService(
         response_data = self.client.parse_json(response)
         return self.client.factory(Klant, response_data)
 
+    @transaction.atomic
     def update_user_from_klant(self, klant: Klant, user: User):
-        update_data = {}
+        changed_fields: list[str] = []
 
         if (
             klant.emailadres
             and klant.emailadres != user.email
             and (not User.objects.filter(email__iexact=klant.emailadres).exists())
         ):
-            update_data["email"] = klant.emailadres
-
-        if klant.telefoonnummer and klant.telefoonnummer != user.phonenumber:
-            update_data["phonenumber"] = klant.telefoonnummer
-
-        if (
-            klant.telefoonnummer_alternatief
-            and klant.telefoonnummer_alternatief != user.phonenumber_alternative
-        ):
-            update_data["phonenumber_alternative"] = klant.telefoonnummer_alternatief
+            user.update_email(klant.emailadres)
+            changed_fields.append("email")
 
         config = SiteConfiguration.get_solo()
         if config.enable_notification_channel_choice:
@@ -337,18 +316,19 @@ class eSuiteKlantenService(
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_only
             ):
-                update_data["case_notification_channel"] = (
-                    NotificationChannelChoice.digital_only
-                )
-
+                user.case_notification_channel = NotificationChannelChoice.digital_only
+                user.save(update_fields=["case_notification_channel"])
+                changed_fields.append("case_notification_channel")
             elif (
                 klant.toestemming_zaak_notificaties_alleen_digitaal is False
                 and user.case_notification_channel
                 != NotificationChannelChoice.digital_and_post
             ):
-                update_data["case_notification_channel"] = (
+                user.case_notification_channel = (
                     NotificationChannelChoice.digital_and_post
                 )
+                user.save(update_fields=["case_notification_channel"])
+                changed_fields.append("case_notification_channel")
             else:
                 # This is a guard against the scenario where a deployment is
                 # configured to use an older version of the klanten backend (that
@@ -362,13 +342,30 @@ class eSuiteKlantenService(
                     " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
                 )
 
-        if update_data:
-            _resolve_phonenumber_update(user, update_data)
-            for attr, value in update_data.items():
-                setattr(user, attr, value)
-            user.save(update_fields=update_data.keys())
+        phone_primary = klant.telefoonnummer
+        phone_alternative = klant.telefoonnummer_alternatief
+
+        if phone_primary and phone_primary != user.phonenumber:
+            user.update_phonenumber(phone_primary)
+            changed_fields.append("phonenumber")
+
+        if (
+            phone_alternative
+            and phone_alternative != user.phonenumber_alternative
+            # Skip when alternative equals primary to avoid storing duplicates.
+            and phone_alternative != phone_primary
+        ):
+            DigitalAddress.objects.update_or_create(
+                user=user,
+                type=DigitalAddressType.phone,
+                is_standard_for_type=False,
+                defaults={"value": phone_alternative, "login_type": user.login_type},
+            )
+            changed_fields.append("phonenumber_alternative")
+
+        if changed_fields:
             system_action(
-                f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
+                f"updated user from klant API with fields: {', '.join(sorted(changed_fields))}",
                 content_object=user,
             )
 
@@ -1361,6 +1358,7 @@ class OpenKlant2Service(
             adressen=adressen,
         )
 
+    @transaction.atomic
     def update_user_from_partij(self, partij_uuid: str, user: User):
         update_data = {}
 
@@ -1373,15 +1371,10 @@ class OpenKlant2Service(
             if not User.objects.filter(email__iexact=email).exists():
                 update_data["email"] = email
 
-        if phone_adressen := self.filter_digitale_addressen_for_partij(
+        phone_adressen = self.filter_digitale_addressen_for_partij(
             partij_uuid, soort_digital_adres="telefoonnummer", adressen=adressen
-        ):
-            for adres in phone_adressen:
-                if adres["isStandaardAdres"]:
-                    update_data["phonenumber"] = adres["adres"]
-                else:
-                    update_data["phonenumber_alternative"] = adres["adres"]
-
+        )
+        if phone_adressen:
             # we currently only support two phone numbers: primary + secondary
             # the following edge case cannot happen through OIP, but we cannot
             # exclude that it happens through some external service. In this case,
@@ -1392,15 +1385,41 @@ class OpenKlant2Service(
                     partij_uuid=partij_uuid,
                 )
 
-        if update_data:
-            _resolve_phonenumber_update(user, update_data)
-            for attr, value in update_data.items():
-                setattr(user, attr, value)
-            user.save(update_fields=update_data.keys())
-            system_action(
-                f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
-                content_object=user,
+            primary_value = next(
+                (a["adres"] for a in phone_adressen if a["isStandaardAdres"]), None
             )
+            if primary_value:
+                update_data["phonenumber"] = primary_value
+                alternative_value = next(
+                    (a["adres"] for a in phone_adressen if not a["isStandaardAdres"]),
+                    None,
+                )
+                # Skip alternative when it equals the primary to avoid
+                # violating unique_digital_address_per_user_type_value.
+                if alternative_value and alternative_value != primary_value:
+                    update_data["phonenumber_alternative"] = alternative_value
+
+        if not update_data:
+            return
+
+        if email := update_data.get("email"):
+            user.update_email(email)
+
+        if phonenumber := update_data.get("phonenumber"):
+            user.update_phonenumber(phonenumber)
+
+        if alternative := update_data.get("phonenumber_alternative"):
+            DigitalAddress.objects.update_or_create(
+                user=user,
+                type=DigitalAddressType.phone,
+                is_standard_for_type=False,
+                defaults={"value": alternative, "login_type": user.login_type},
+            )
+
+        system_action(
+            f"updated user from klant API with fields: {', '.join(sorted(update_data.keys()))}",
+            content_object=user,
+        )
 
     def update_partij_from_user_data(
         self,

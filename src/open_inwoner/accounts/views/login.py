@@ -348,15 +348,14 @@ class AddPhoneNumberWizardView(LogMixin, SessionWizardView):
 
     def done(self, form_list, **kwargs):
         phonenumber = self.get_cleaned_data_for_step("phonenumber")["phonenumber_1"]
-        self.user_cache.phonenumber = phonenumber
+
+        self.user_cache.update_phonenumber(phonenumber)
 
         self.request.user = self.user_cache
         self.log_change(
             self.user_cache,
             "Telefoonnummer gewijzigd: {}".format(phonenumber),
         )
-
-        self.user_cache.save()
 
         # security check complete, log the user in
         auth_login(self.request, self.user_cache)
