@@ -27,7 +27,9 @@ signer = TimestampSigner()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestSMSVerificationLogin(WebTest):
     def setUp(self):
-        self.user = UserFactory(email="ex@example.com", password="secret")
+        self.user = UserFactory(
+            email="ex@example.com", password="secret", phonenumber="0612345678"
+        )
 
         self.config = SiteConfiguration.get_solo()
         self.config.login_2fa_sms = True
@@ -202,7 +204,11 @@ class TestSMSVerificationLogin(WebTest):
 
             # check a new user can log in
             frozen_time.tick(delta=datetime.timedelta(minutes=-1))
-            other_user = UserFactory(email="ex2@example.com", password="secret2")
+            other_user = UserFactory(
+                email="ex2@example.com",
+                password="secret2",
+                phonenumber="0687654321",
+            )
 
             response = self.app.get(reverse("login"))
             login_form = response.forms["login-form"]
@@ -384,7 +390,7 @@ class TestSMSVerificationLogin(WebTest):
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_by_adding_phone_number_succeeds(self, mock_gateway_send):
         self.user.phonenumber = ""
-        self.user.save()
+        self.user.save(update_fields=["phonenumber"])
 
         response = self.app.get(reverse("login"))
         mock_gateway_send.assert_not_called()
@@ -422,7 +428,7 @@ class TestSMSVerificationLogin(WebTest):
     @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_fails_with_different_phonenumbers(self, mock_gateway_send):
         self.user.phonenumber = ""
-        self.user.save()
+        self.user.save(update_fields=["phonenumber"])
 
         response = self.app.get(reverse("login"))
         mock_gateway_send.assert_not_called()
