@@ -128,27 +128,6 @@ class UserTests(TestCase):
         user.clear_plan_contact_new_count()
         self.assertEqual(0, user.get_plan_contact_new_count())
 
-    def test_phonenumber_alternative_requires_primary_phonenumber(self):
-        user = UserFactory(phonenumber="")
-
-        with self.assertRaises(IntegrityError):
-            user.phonenumber_alternative = "0612345678"
-            user.save()
-
-    def test_phonenumber_alternative_differs_from_non_empty_primary_phonenumber(self):
-        user = UserFactory(phonenumber="612345678")
-
-        with self.assertRaises(IntegrityError):
-            user.phonenumber_alternative = user.phonenumber
-            user.save()
-
-    def test_allow_both_phonenumbers_empty(self):
-        user = UserFactory()
-
-        user.phonenumber = ""
-        user.phonenumber_alternative = ""
-        user.save()
-
     def test_eherkenning_user_requires_kvk(self):
         with self.assertRaises(IntegrityError):
             UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="")

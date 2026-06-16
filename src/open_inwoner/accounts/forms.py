@@ -114,7 +114,6 @@ class CustomRegistrationForm(RegistrationForm):
             "infix",
             "last_name",
             "phonenumber",
-            "phonenumber_alternative",
             "password1",
             "password2",
             "invite",
@@ -123,11 +122,9 @@ class CustomRegistrationForm(RegistrationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # make phonenumber required when 2fa-sms login is enabled
         config = SiteConfiguration.get_solo()
         if not config.login_2fa_sms:
             del self.fields["phonenumber"]
-            del self.fields["phonenumber_alternative"]
         else:
             self.fields["phonenumber"].required = True
 
@@ -139,7 +136,6 @@ class BaseUserForm(forms.ModelForm):
             "first_name",
             "email",
             "phonenumber",
-            "phonenumber_alternative",
             "image",
             "cropping",
         )
@@ -165,7 +161,6 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "last_name",
             "email",
             "phonenumber",
-            "phonenumber_alternative",
             "street",
             "housenumber",
             "postcode",

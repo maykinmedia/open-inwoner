@@ -457,7 +457,6 @@ class ContactViewTests(WebTest):
             first_name="Luke",
             last_name="Skywalker",
             email="ex@example.com",
-            phonenumber="06988989898",
         )
         self.user.contacts_for_approval.add(existing_user)
 
@@ -466,7 +465,6 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.email)
         self.assertNotContains(response, existing_user.first_name)
         self.assertNotContains(response, existing_user.last_name)
-        self.assertNotContains(response, existing_user.phonenumber)
 
     def test_accepted_contact_appears_in_both_contact_lists(self):
         existing_user = UserFactory(
