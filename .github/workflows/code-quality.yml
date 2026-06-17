@@ -122,7 +122,7 @@ jobs:
         run: pip install commitizen==4.16.3
       - name: Check commit messages
         run: |
-          cz check --rev-range origin/${GITHUB_BASE_REF}..${{ github.sha }}
+          cz check --rev-range origin/${GITHUB_BASE_REF}..${{ github.event.pull_request.head.sha }}
 
   zizmor:
     name: GitHub Actions Security Analysis with zizmor 🌈
