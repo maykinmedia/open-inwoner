@@ -87,7 +87,6 @@ COPY ./bin/celery_beat.sh /celery_beat.sh
 COPY ./bin/celery_monitor.sh /celery_monitor.sh
 COPY ./bin/setup_configuration.sh /setup_configuration.sh
 RUN mkdir /app/log /app/media /app/private_media /app/tmp
-COPY ./bin/check_celery_worker_liveness.py ./bin/
 
 # prevent writing to the container layer, which would degrade performance.
 # This also serves as a hint for the intended volumes.
@@ -97,6 +96,7 @@ VOLUME ["/app/log", "/app/media", "/app/private_media"]
 COPY --from=backend-build /usr/local/lib/python3.13 /usr/local/lib/python3.13
 COPY --from=backend-build /usr/local/bin/uwsgi /usr/local/bin/uwsgi
 COPY --from=backend-build /usr/local/bin/celery /usr/local/bin/celery
+COPY --from=backend-build /usr/local/bin/maykin-common /usr/local/bin/maykin-common
 
 # copy frontend build statics
 COPY --from=frontend-build /app/src/open_inwoner/static /app/src/open_inwoner/static

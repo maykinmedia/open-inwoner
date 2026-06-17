@@ -177,11 +177,11 @@ services:
     environment: *x-app-env
     command: /celery_worker.sh
     healthcheck:
-      test: ['CMD', 'python', '/app/bin/check_celery_worker_liveness.py']
+      test: ['CMD', 'maykin-common', 'worker-health-check', '--skip-ping']
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s
     volumes: *web_volumes
     depends_on:
       web:
@@ -206,11 +206,11 @@ services:
       CELERY_WORKER_CONCURRENCY: ${CELERY_WORKER_CONCURRENCY:-10}
     command: /celery_worker.sh
     healthcheck:
-      test: ['CMD', 'python', '/app/bin/check_celery_worker_liveness.py']
+      test: ['CMD', 'maykin-common', 'worker-health-check', '--skip-ping']
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s
     volumes: *web_volumes
     depends_on:
       web:
@@ -225,6 +225,20 @@ services:
     image: maykinmedia/open-inwoner:${TAG:-latest}
     environment: *x-app-env
     command: /celery_beat.sh
+    healthcheck:
+      test:
+        - CMD
+        - maykin-common
+        - beat-health-check
+        - --max-age
+        - '1200'
+      interval: 300s
+      timeout: 5s
+      retries: 3
+      # The liveness file is written only when beat publishes a task. The most
+      # frequent static task fires every 15 minutes, so allow that full window
+      # before health check failures start counting against the container.
+      start_period: 900s
     depends_on:
       - celery
     networks:

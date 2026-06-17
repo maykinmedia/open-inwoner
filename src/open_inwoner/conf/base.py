@@ -388,6 +388,7 @@ INSTALLED_APPS = [
     "custom_migrations",
     "objectsapiclient",
     *default_health_check_apps,
+    "maykin_common.health_checks.celery",
     "maykin_config_checks",
     # Project applications.
     "open_inwoner.core",
