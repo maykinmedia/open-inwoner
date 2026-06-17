@@ -461,7 +461,7 @@ class EditProfileView(
         update_data = {
             api_name: user_form_data[local_name]
             for api_name, local_name in field_mapping.items()
-            if user_form_data.get(local_name)
+            if local_name in user_form_data
         }
 
         try:

@@ -302,77 +302,99 @@ class eSuiteKlantenService(
         response_data = self.client.parse_json(response)
         return self.client.factory(Klant, response_data)
 
-    @transaction.atomic
     def update_user_from_klant(self, klant: Klant, user: User):
         changed_fields: list[str] = []
 
-        if (
-            klant.emailadres
-            and klant.emailadres != user.email
-            and (not User.objects.filter(email__iexact=klant.emailadres).exists())
-        ):
-            user.update_email(klant.emailadres)
-            changed_fields.append("email")
-
-        config = SiteConfiguration.get_solo()
-        if config.enable_notification_channel_choice:
+        with transaction.atomic():
             if (
-                klant.toestemming_zaak_notificaties_alleen_digitaal is True
-                and user.case_notification_channel
-                != NotificationChannelChoice.digital_only
+                klant.emailadres
+                and klant.emailadres != user.email
+                and (not User.objects.filter(email__iexact=klant.emailadres).exists())
             ):
-                user.case_notification_channel = NotificationChannelChoice.digital_only
-                user.save(update_fields=["case_notification_channel"])
-                changed_fields.append("case_notification_channel")
-            elif (
-                klant.toestemming_zaak_notificaties_alleen_digitaal is False
-                and user.case_notification_channel
-                != NotificationChannelChoice.digital_and_post
-            ):
-                user.case_notification_channel = (
-                    NotificationChannelChoice.digital_and_post
-                )
-                user.save(update_fields=["case_notification_channel"])
-                changed_fields.append("case_notification_channel")
-            else:
-                # This is a guard against the scenario where a deployment is
-                # configured to use an older version of the klanten backend (that
-                # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
-                # field). In such a scenario, the enable_notification_channel_choice
-                # flag really shouldn't be set until the update has completed, but
-                # we suspect this is rare. But to validate that assumption, we log
-                # an error so we can remedy this in case we're wrong.
-                logger.error(
-                    "SiteConfig.enable_notification_channel_choice should not be set if"
-                    " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
-                )
+                user.update_email(klant.emailadres)
+                changed_fields.append("email")
 
-        phone_primary = klant.telefoonnummer
-        phone_alternative = klant.telefoonnummer_alternatief
+            config = SiteConfiguration.get_solo()
+            if config.enable_notification_channel_choice:
+                if (
+                    klant.toestemming_zaak_notificaties_alleen_digitaal is True
+                    and user.case_notification_channel
+                    != NotificationChannelChoice.digital_only
+                ):
+                    user.case_notification_channel = (
+                        NotificationChannelChoice.digital_only
+                    )
+                    user.save(update_fields=["case_notification_channel"])
+                    changed_fields.append("case_notification_channel")
+                elif (
+                    klant.toestemming_zaak_notificaties_alleen_digitaal is False
+                    and user.case_notification_channel
+                    != NotificationChannelChoice.digital_and_post
+                ):
+                    user.case_notification_channel = (
+                        NotificationChannelChoice.digital_and_post
+                    )
+                    user.save(update_fields=["case_notification_channel"])
+                    changed_fields.append("case_notification_channel")
+                else:
+                    # This is a guard against the scenario where a deployment is
+                    # configured to use an older version of the klanten backend (that
+                    # is, one that lacks the toestemmingZaakNotificatiesAlleenDigitaal
+                    # field). In such a scenario, the enable_notification_channel_choice
+                    # flag really shouldn't be set until the update has completed, but
+                    # we suspect this is rare. But to validate that assumption, we log
+                    # an error so we can remedy this in case we're wrong.
+                    logger.error(
+                        "SiteConfig.enable_notification_channel_choice should not be set if"
+                        " toestemmingZaakNotificatiesAlleenDigitaal is not available from the klanten backend"
+                    )
 
-        if phone_primary and phone_primary != user.phonenumber:
-            user.update_phonenumber(phone_primary)
-            changed_fields.append("phonenumber")
+            phone_primary = klant.telefoonnummer
+            phone_alternative = klant.telefoonnummer_alternatief
 
-        if (
-            phone_alternative
-            and phone_alternative != user.phonenumber_alternative
-            # Skip when alternative equals primary to avoid storing duplicates.
-            and phone_alternative != phone_primary
-        ):
-            DigitalAddress.objects.update_or_create(
-                user=user,
-                type=DigitalAddressType.phone,
-                is_standard_for_type=False,
-                defaults={"value": phone_alternative, "login_type": user.login_type},
+            if phone_primary and phone_primary != user.phonenumber:
+                user.update_phonenumber(phone_primary)
+                changed_fields.append("phonenumber")
+
+            # eSuite supports at most one alternative phone number. Reconcile the
+            # local non-standard phone DA to match: create, replace, or delete.
+            desired_alternative = (
+                phone_alternative
+                if phone_alternative and phone_alternative != phone_primary
+                else ""
             )
-            changed_fields.append("phonenumber_alternative")
+            if desired_alternative != user.phonenumber_alternative:
+                user.digital_addresses.filter(
+                    type=DigitalAddressType.phone, is_standard_for_type=False
+                ).delete()
+                if desired_alternative:
+                    user.digital_addresses.create(
+                        type=DigitalAddressType.phone,
+                        value=desired_alternative,
+                        login_type=user.login_type,
+                        is_standard_for_type=False,
+                    )
+                changed_fields.append("phonenumber_alternative")
 
-        if changed_fields:
-            system_action(
-                f"updated user from klant API with fields: {', '.join(sorted(changed_fields))}",
-                content_object=user,
-            )
+            if changed_fields:
+                system_action(
+                    f"updated user from klant API with fields: {', '.join(sorted(changed_fields))}",
+                    content_object=user,
+                )
+
+        # Push-back: if eSuite has no email, push the local standard email DA there
+        if not klant.emailadres:
+            local_standard_email = user.digital_addresses.filter(
+                type=DigitalAddressType.email, is_standard_for_type=True
+            ).first()
+            if local_standard_email:
+                self.partial_update_klant(
+                    klant, {"emailadres": local_standard_email.value}
+                )
+                system_action(
+                    "pushed standard email to eSuite klant",
+                    content_object=user,
+                )
 
     def partial_update_klant(self, klant: Klant, update_data) -> Klant:
         response = self.client.patch(url=klant.url, json=update_data)
