@@ -491,6 +491,43 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(user.phonenumber, "0612345678")
         self.assertEqual(user.phonenumber_alternative, "0687654321")
 
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
+    def test_brp_user_with_diacritics_in_name_can_submit_edit_profile_form(
+        self, mock_update
+    ):
+        mock_update.return_value = True
+
+        user = DigidUserFactory(
+            first_name="Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
+            infix="Isiah dé Maria de las Mercedes Rosalía",
+            last_name="J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
+        )
+        response = self.app.get(self.url, user=user)
+        form = response.forms["profile-edit"]
+
+        # BrpUserForm does not include name fields for BRP users
+        with self.assertRaises(AssertionError):
+            form["first_name"]
+
+        form["email"] = "updated@example.com"
+        response = form.submit()
+
+        self.assertEqual(response.url, self.return_url)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "updated@example.com")
+        self.assertEqual(
+            user.first_name,
+            "Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
+        )
+        self.assertEqual(user.infix, "Isiah dé Maria de las Mercedes Rosalía")
+        self.assertEqual(
+            user.last_name,
+            "J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
+        )
+
     def test_expected_form_is_rendered(self):
         # regular user
         response = self.app.get(self.url, user=self.user)
