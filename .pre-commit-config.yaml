@@ -32,12 +32,4 @@ repos:
       - id: commitizen
         stages: [commit-msg]
         args:
-          - --allow-abort
-          - --allowed-prefixes
-          - Merge
-          - Revert
-          - Pull request
-          - fixup!
-          - squash!
-          - amend!
           - --commit-msg-file
