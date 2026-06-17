@@ -184,6 +184,8 @@ tag_format = "v$version"
 version_scheme = "semver2"
 version_provider = "pep621"
 update_changelog_on_bump = true
+allow_abort = true
+allowed_prefixes = []
 pre_bump_hooks = [
     "sed -i \"s/releaseDate: '.*'/releaseDate: '$(date +%Y-%m-%d)'/\" publiccode.yaml",
     "uv lock",
