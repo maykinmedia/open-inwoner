@@ -5,6 +5,7 @@ from typing import Any
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -20,12 +21,15 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.brp import BRPData
 from open_inwoner.accounts.choices import (
     ContactTypeChoices,
+    DigitalAddressType,
     LoginTypeChoices,
     StatusChoices,
 )
 from open_inwoner.accounts.forms import (
     BrpUserForm,
     CategoriesForm,
+    EmailDigitalAddressFormSet,
+    PhoneDigitalAddressFormSet,
     UserForm,
     UserNotificationsForm,
 )
@@ -245,38 +249,117 @@ class EditProfileView(
     def get_object(self):
         return self.request.user
 
-    def form_valid(self, form):
+    def _get_digital_address_formset(
+        self, address_type: str, prefix: str, formset_class
+    ):
+        user = self.get_object()
+        kwargs = {
+            "instance": user,
+            "prefix": prefix,
+            "queryset": user.digital_addresses.filter(type=address_type),
+        }
+        if self.request.method == "POST":
+            kwargs["data"] = self.request.POST
+        return formset_class(**kwargs)
+
+    def _get_email_formset(self):
+        return self._get_digital_address_formset(
+            DigitalAddressType.email, "email_addresses", EmailDigitalAddressFormSet
+        )
+
+    def _get_phone_formset(self):
+        return self._get_digital_address_formset(
+            DigitalAddressType.phone, "phone_addresses", PhoneDigitalAddressFormSet
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if "email_formset" not in ctx:
+            ctx["email_formset"] = self._get_email_formset()
+        if "phone_formset" not in ctx:
+            ctx["phone_formset"] = self._get_phone_formset()
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        email_formset = self._get_email_formset()
+        phone_formset = self._get_phone_formset()
+
+        form_ok = form.is_valid()
+        email_ok = email_formset.is_valid()
+        phone_ok = phone_formset.is_valid()
+
+        if form_ok and email_ok and phone_ok:
+            return self.form_valid(form, email_formset, phone_formset)
+        return self.form_invalid(form, email_formset, phone_formset)
+
+    def form_invalid(self, form, email_formset=None, phone_formset=None):
+        return self.render_to_response(
+            self.get_context_data(
+                form=form,
+                email_formset=email_formset or self._get_email_formset(),
+                phone_formset=phone_formset or self._get_phone_formset(),
+            )
+        )
+
+    def form_valid(self, form, email_formset, phone_formset):
         user: User = self.get_object()
 
-        # immediately save form if changes don't require writing to API
-        if not any(
-            key in form.changed_data
-            for key in ("email", "phonenumber", "phonenumber_alternative")
-        ):
+        # Capture current values before any saves for change detection.
+        old_email = user.email
+        old_phonenumber = user.phonenumber
+        old_phonenumber_alternative = user.phonenumber_alternative
+
+        with transaction.atomic():
             form.save()
+            self._save_digital_address_formset(
+                email_formset, user, DigitalAddressType.email
+            )
+            self._save_digital_address_formset(
+                phone_formset, user, DigitalAddressType.phone
+            )
+
+        # Reload to pick up values written by update_email / update_phonenumber.
+        user.refresh_from_db()
+        changed_data = {}
+        if user.email != old_email:
+            changed_data["email"] = user.email
+        if user.phonenumber != old_phonenumber:
+            changed_data["phonenumber"] = user.phonenumber
+        new_alt = user.phonenumber_alternative
+        if new_alt != old_phonenumber_alternative:
+            changed_data["phonenumber_alternative"] = new_alt
+
+        if not changed_data:
             messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
             self.log_profile_modified(user)
             return HttpResponseRedirect(self.get_success_url())
 
-        # write changes to API's; abort saving if write fails
+        # Sync address changes to external APIs.
         klanten_config = KlantenSysteemConfig.get_solo()
         failed_services = []
+
         if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
             try:
-                self.update_klant_via_esuite(
-                    {k: form.cleaned_data[k] for k in form.changed_data}, user
-                )
+                self.update_klant_via_esuite(changed_data, user)
             except Exception:
                 logger.exception("eSuite failed during profile update", user=user)
                 failed_services.append("eSuite")
+
         if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
             try:
                 self.update_klant_via_openklant(
-                    {k: form.cleaned_data[k] for k in form.changed_data}, user
+                    changed_data,
+                    user,
+                    old_email=old_email,
+                    old_phonenumber=old_phonenumber,
+                    old_phonenumber_alternative=old_phonenumber_alternative,
                 )
             except Exception:
                 logger.exception("OpenKlant failed during profile update", user=user)
                 failed_services.append("OpenKlant")
+
         if failed_services:
             messages.error(
                 request=self.request,
@@ -285,25 +368,77 @@ class EditProfileView(
                     "Please try again later"
                 ),
             )
-
-            self.log_profile_update_failed(user, failed_services, form.changed_data)
-
+            self.log_profile_update_failed(
+                user, failed_services, list(changed_data.keys())
+            )
             return HttpResponseRedirect(self.get_success_url())
 
-        form.save()
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_profile_modified(user)
         return HttpResponseRedirect(self.get_success_url())
 
-    def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
+    @staticmethod
+    def _save_digital_address_formset(formset, user, address_type: str) -> None:
         """
-        Update the user `partij` in OpenKlant from `user_form_data`
+        Persist one type's digital address formset.
 
-        If applicable, clean up old contact information in OpenKlant before the update
+        Deletions run first.  Non-standard addresses are saved directly with the
+        correct type/login_type.  The standard address is always written via
+        User.update_email / User.update_phonenumber so that the User field
+        stays in sync.
+        """
+        for form in formset.deleted_forms:
+            if form.instance.pk:
+                form.instance.delete()
 
-        Note: we only delete old contact info that is present in both OpenKlant and OIP;
-              the possibility that other contact info has been added by external sources
-              cannot be excluded
+        standard_value = None
+        non_standard_forms = []
+
+        for form in formset.forms:
+            if form in formset.deleted_forms:
+                continue
+            value = form.cleaned_data.get("value", "")
+            if not value:
+                continue
+            if form.cleaned_data.get("is_standard_for_type"):
+                standard_value = value
+            else:
+                non_standard_forms.append(form)
+
+        for form in non_standard_forms:
+            instance = form.instance
+            instance.user = user
+            instance.type = address_type
+            instance.value = form.cleaned_data["value"]
+            instance.is_standard_for_type = False
+            instance.login_type = user.login_type
+            instance.save()
+
+        if standard_value:
+            if address_type == DigitalAddressType.email:
+                user.update_email(standard_value)
+            else:
+                user.update_phonenumber(standard_value)
+        elif address_type == DigitalAddressType.phone:
+            # Only clear phonenumber when all phone addresses were explicitly removed,
+            # not when the formset was empty/unchanged with no initial forms.
+            has_remaining = bool(standard_value or non_standard_forms)
+            if not has_remaining and formset.initial_form_count() > 0:
+                user.update_phonenumber("")
+
+    def update_klant_via_openklant(
+        self,
+        user_form_data: dict,
+        user: User,
+        old_email: str = "",
+        old_phonenumber: str = "",
+        old_phonenumber_alternative: str = "",
+    ) -> bool:
+        """
+        Update the user `partij` in OpenKlant from `user_form_data`.
+
+        Deletes old digitaal-adres records for any contact detail that changed,
+        then pushes the new values.
         """
         try:
             service = OpenKlant2Service()
@@ -316,19 +451,15 @@ class EditProfileView(
         if partij and not created:
             adressen = service.retrieve_digitale_addressen_for_partij(partij["uuid"])
 
-            # Fetch original user from DB to access old contact info
-            old_user = User.objects.get(pk=user.pk)
-
-            for address_type in ["email", "phonenumber", "phonenumber_alternative"]:
-                old = getattr(old_user, address_type)
-                new = getattr(user, address_type)
-
-                if not old or not new:
+            old_values = {
+                "email": old_email,
+                "phonenumber": old_phonenumber,
+                "phonenumber_alternative": old_phonenumber_alternative,
+            }
+            for address_type, old in old_values.items():
+                new = user_form_data.get(address_type)
+                if not old or not new or old == new:
                     continue
-
-                if old == new:
-                    continue
-
                 try:
                     digitaal_adres = next(
                         obj for obj in adressen if obj["adres"] == old

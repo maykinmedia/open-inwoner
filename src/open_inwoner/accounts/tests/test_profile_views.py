@@ -22,7 +22,12 @@ from open_inwoner.accounts.choices import (
     NotificationChannelChoice,
     StatusChoices,
 )
-from open_inwoner.accounts.forms import BrpUserForm, UserForm
+from open_inwoner.accounts.forms import (
+    BrpUserForm,
+    EmailDigitalAddressFormSet,
+    PhoneDigitalAddressFormSet,
+    UserForm,
+)
 from open_inwoner.accounts.models import User
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
@@ -296,12 +301,52 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.return_url = reverse("profile:detail")
         self.user = UserFactory()
 
+    # -------------------------------------------------------------------------
+    # Helpers
+    # -------------------------------------------------------------------------
+
+    @staticmethod
+    def _da_formset_data(prefix, entries, initial_pks=None):
+        """
+        Build POST data for a DigitalAddress inline formset.
+
+        entries: list of (value, is_standard) tuples for each form row.
+        initial_pks: list of existing DigitalAddress PKs (None for new rows).
+        """
+        initial_pks = initial_pks or [None] * len(entries)
+        initial_count = sum(1 for pk in initial_pks if pk is not None)
+        data = {
+            f"{prefix}-TOTAL_FORMS": str(len(entries)),
+            f"{prefix}-INITIAL_FORMS": str(initial_count),
+            f"{prefix}-MIN_NUM_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "1000",
+        }
+        for i, ((value, is_standard), pk) in enumerate(zip(entries, initial_pks)):
+            if pk is not None:
+                data[f"{prefix}-{i}-id"] = str(pk)
+            if value:
+                data[f"{prefix}-{i}-value"] = value
+            if is_standard:
+                data[f"{prefix}-{i}-is_standard_for_type"] = "on"
+        return data
+
+    def _empty_da_formsets(self):
+        """Management form data for two empty formsets (no initial, no new entries)."""
+        data = {}
+        data.update(self._da_formset_data("email_addresses", []))
+        data.update(self._da_formset_data("phone_addresses", []))
+        return data
+
     def upload_test_image_to_profile_edit_page(self, img_bytes):
         response = self.app.get(self.url, user=self.user, status=200)
         form = response.forms["profile-edit"]
         form["image"] = Upload("test_image.png", img_bytes, "image/png")
         response = form.submit()
         return response
+
+    # -------------------------------------------------------------------------
+    # Basic access / render
+    # -------------------------------------------------------------------------
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -317,25 +362,74 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         followed_response = base_response.follow()
         self.assertEqual(followed_response.status_code, 200)
 
-    def test_save_empty_form_fails(self):
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
-        form["first_name"] = ""
-        form["last_name"] = ""
-        form["email"] = ""
-        form["street"] = ""
-        form["housenumber"] = ""
-        form["postcode"] = ""
-        form["city"] = ""
-        base_response = form.submit()
-        expected_errors = {
-            "email": [
-                _(
-                    'Het verplichte veld "E-mailadres" is niet (goed) ingevuld. Vul het veld in.'
-                )
-            ]
+    def test_expected_form_is_rendered(self):
+        # regular user
+        response = self.app.get(self.url, user=self.user)
+        self.assertEqual(type(response.context["form"]), UserForm)
+
+        # digid-brp user
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+        response = self.app.get(self.url, user=user)
+        self.assertEqual(type(response.context["form"]), BrpUserForm)
+
+    def test_context_contains_da_formsets(self):
+        response = self.app.get(self.url, user=self.user)
+        self.assertIsInstance(
+            response.context["email_formset"], EmailDigitalAddressFormSet
+        )
+        self.assertIsInstance(
+            response.context["phone_formset"], PhoneDigitalAddressFormSet
+        )
+
+    # -------------------------------------------------------------------------
+    # DA formset validation
+    # -------------------------------------------------------------------------
+
+    def test_email_formset_rejects_duplicate_values(self):
+        self.client.force_login(self.user)
+        data = {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
         }
-        self.assertEqual(base_response.context["form"].errors, expected_errors)
+        data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [("dup@example.com", True), ("dup@example.com", False)],
+            )
+        )
+        data.update(self._da_formset_data("phone_addresses", []))
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["email_formset"].is_valid())
+
+    def test_phone_formset_rejects_multiple_standard_entries(self):
+        self.client.force_login(self.user)
+        data = {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+        }
+        data.update(self._da_formset_data("email_addresses", []))
+        data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("0612345678", True), ("0687654321", True)],
+            )
+        )
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["phone_formset"].is_valid())
+
+    # -------------------------------------------------------------------------
+    # Saving address changes
+    # -------------------------------------------------------------------------
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -347,7 +441,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         form = response.forms["profile-edit"]
         form["first_name"] = "First name"
         form["last_name"] = "Last name"
-        form["email"] = "user@example.com"
+        form["email_addresses-0-value"] = "user@example.com"
+        form["email_addresses-0-is_standard_for_type"] = True
+        form["phone_addresses-0-value"] = "0612345678"
+        form["phone_addresses-0-is_standard_for_type"] = True
         form["street"] = "Keizersgracht"
         form["housenumber"] = "17 d"
         form["postcode"] = "1013 RM"
@@ -362,39 +459,45 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(self.user.last_name, "Last name")
         self.assertEqual(self.user.display_name, "First name")
         self.assertEqual(self.user.email, "user@example.com")
+        self.assertEqual(self.user.phonenumber, "0612345678")
         self.assertEqual(self.user.street, "Keizersgracht")
         self.assertEqual(self.user.housenumber, "17 d")
         self.assertEqual(self.user.postcode, "1013 RM")
         self.assertEqual(self.user.city, "Amsterdam")
 
-    def test_name_validation(self):
-        invalid_characters = '<>#/"\\,.:;'
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
+    def test_save_with_primary_and_alternative_phone(self, mock_update):
+        """Two phone DA entries: one standard, one non-standard."""
+        from open_inwoner.accounts.models import DigitalAddress, DigitalAddressType
 
-        response = self.app.get(self.url, user=self.user, status=200)
-        form = response.forms["profile-edit"]
+        mock_update.return_value = True
 
-        for char in invalid_characters:
-            with self.subTest(char=char):
-                form["first_name"] = "test" + char
-                form["infix"] = char + "test"
-                form["last_name"] = "te" + char + "st"
-                form["city"] = "te" + char + "st"
-                form["street"] = "te" + char + "st"
+        data = {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+        }
+        data.update(self._da_formset_data("email_addresses", []))
+        data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("0612345678", True), ("0687654321", False)],
+            )
+        )
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, data=data)
 
-                response = form.submit()
-
-                error_msg = _(
-                    "Please make sure your input contains only valid characters "
-                    "(letters, numbers, apostrophe, dash, space)."
-                )
-                expected_errors = {
-                    "first_name": [error_msg],
-                    "infix": [error_msg],
-                    "last_name": [error_msg],
-                    "city": [error_msg],
-                    "street": [error_msg],
-                }
-                self.assertEqual(response.context["form"].errors, expected_errors)
+        self.assertEqual(response.status_code, 302)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.phonenumber, "0612345678")
+        alt = DigitalAddress.objects.filter(
+            user=self.user,
+            type=DigitalAddressType.phone,
+            is_standard_for_type=False,
+        ).first()
+        self.assertIsNotNone(alt)
+        self.assertEqual(alt.value, "0687654321")
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -404,7 +507,8 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
         response = self.app.get(self.url, user=self.user)
         form = response.forms["profile-edit"]
-        form["email"] = "user@example.com"
+        form["email_addresses-0-value"] = "user@example.com"
+        form["email_addresses-0-is_standard_for_type"] = True
         response = form.submit()
 
         self.user.refresh_from_db()
@@ -420,12 +524,16 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         eherkenning_user = eHerkenningUserFactory()
         response = self.app.get(self.url, user=eherkenning_user)
         form = response.forms["profile-edit"]
-        form["email"] = "user@example.com"
+        form["email_addresses-0-value"] = "user@example.com"
+        form["email_addresses-0-is_standard_for_type"] = True
+        form["phone_addresses-0-value"] = "0612345678"
+        form["phone_addresses-0-is_standard_for_type"] = True
         response = form.submit()
 
         eherkenning_user.refresh_from_db()
         self.assertEqual(response.url, self.return_url)
         self.assertEqual(eherkenning_user.email, "user@example.com")
+        self.assertEqual(eherkenning_user.phonenumber, "0612345678")
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -462,39 +570,54 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         response = self.app.get(self.url, user=user)
         form = response.forms["profile-edit"]
 
-        # check that first_name field is not rendered for digid_brp_user
+        # first_name is not rendered for digid_brp_user
         with self.assertRaises(AssertionError):
             form["first_name"] = "test"
 
-        form["email"] = "user@example.com"
+        form["email_addresses-0-value"] = "user@example.com"
+        form["email_addresses-0-is_standard_for_type"] = True
+        form["phone_addresses-0-value"] = "0612345678"
+        form["phone_addresses-0-is_standard_for_type"] = True
         response = form.submit()
 
         self.assertEqual(response.url, self.return_url)
-
         user.refresh_from_db()
-
         self.assertEqual(user.display_name, "name")
         self.assertEqual(user.email, "user@example.com")
+        self.assertEqual(user.phonenumber, "0612345678")
 
-    def test_expected_form_is_rendered(self):
-        # regular user
-        response = self.app.get(self.url, user=self.user)
-        form = response.context["form"]
+    def test_name_validation(self):
+        invalid_characters = '<>#/"\\,.:;'
 
-        self.assertEqual(type(form), UserForm)
+        response = self.app.get(self.url, user=self.user, status=200)
+        form = response.forms["profile-edit"]
 
-        # digid-brp user
-        user = UserFactory(
-            bsn="999993847",
-            first_name="name",
-            last_name="surname",
-            is_prepopulated=True,
-            login_type=LoginTypeChoices.digid,
-        )
-        response = self.app.get(self.url, user=user)
-        form = response.context["form"]
+        for char in invalid_characters:
+            with self.subTest(char=char):
+                form["first_name"] = "test" + char
+                form["infix"] = char + "test"
+                form["last_name"] = "te" + char + "st"
+                form["city"] = "te" + char + "st"
+                form["street"] = "te" + char + "st"
 
-        self.assertEqual(type(form), BrpUserForm)
+                response = form.submit()
+
+                error_msg = _(
+                    "Please make sure your input contains only valid characters "
+                    "(letters, numbers, apostrophe, dash, space)."
+                )
+                expected_errors = {
+                    "first_name": [error_msg],
+                    "infix": [error_msg],
+                    "last_name": [error_msg],
+                    "city": [error_msg],
+                    "street": [error_msg],
+                }
+                self.assertEqual(response.context["form"].errors, expected_errors)
+
+    # -------------------------------------------------------------------------
+    # Image upload
+    # -------------------------------------------------------------------------
 
     @patch(
         "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
@@ -514,7 +637,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             self.user.image.file
 
         self.user.refresh_from_db()
-
         self.assertIsNotNone(self.user.image.file)
 
     @patch(
@@ -537,7 +659,6 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             self.user.image.file
 
         self.user.refresh_from_db()
-
         self.assertIsNotNone(self.user.image.file)
 
     def test_image_field_is_not_rendered_when_begeleider_and_default_login(self):
@@ -557,6 +678,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertNotIn("image", form.fields.keys())
         self.assertEqual(response.pyquery("#id_image"), [])
 
+    # -------------------------------------------------------------------------
+    # eSuite API sync
+    # -------------------------------------------------------------------------
+
     @requests_mock.Mocker()
     def test_eherkenning_user_updates_klant_api(self, m):
         MockAPIReadPatchData.setUpServices()
@@ -565,21 +690,15 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             with self.subTest(
                 use_rsin_for_innNnpId_query_parameter=use_rsin_for_innNnpId_query_parameter
             ):
-                # NOTE Explicitly creating a new Mocker object here, because for some reason
-                # `m` is overridden somewhere, which causes issues when `MockAPIReadPatchData.install_mocks`
-                # is run for the second time
                 with requests_mock.Mocker() as m:
-                    # kvk must be unique; we construct it dynamically from the subtest parameter
                     eherkenning_kvk = (
                         f"0000000{int(use_rsin_for_innNnpId_query_parameter)}"
                     )
-
                     data = MockAPIReadPatchData(
                         eherkenning_kvk=eherkenning_kvk
                     ).install_mocks_eherkenning(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
-
                     config = ESuiteKlantConfig.get_solo()
                     config.use_rsin_for_innNnpId_query_parameter = (
                         use_rsin_for_innNnpId_query_parameter
@@ -587,16 +706,14 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
                     config.save()
 
                     response = self.app.get(self.url, user=data.eherkenning_user)
-
-                    # reset noise from signals
                     m.reset_mock()
                     self.clearTimelineLogs()
 
                     form = response.forms["profile-edit"]
-                    form["email"] = "new@example.com"
+                    form["email_addresses-0-value"] = "new@example.com"
+                    form["email_addresses-0-is_standard_for_type"] = True
                     form.submit()
 
-                    # user data tested in other cases
                     self.assertTrue(data.matchers[0].called)
                     klant_patch_data = data.matchers[1].request_history[0].json()
                     self.assertEqual(
@@ -616,18 +733,77 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
-
-        # reset noise from signals
         m.reset_mock()
         self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
         form.submit()
 
-        # user data tested in other cases
-
         self.assertFalse(data.matchers[0].called)
         self.assertFalse(data.matchers[1].called)
+
+    @requests_mock.Mocker()
+    def test_modify_phone_and_email_updates_klant_api(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        self.client.force_login(data.user)
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        post_data = {}
+        post_data.update(
+            self._da_formset_data("email_addresses", [("new@example.com", True)])
+        )
+        post_data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("0612345678", True), ("0687654321", False)],
+            )
+        )
+        self.client.post(self.url, data=post_data)
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "emailadres": "new@example.com",
+                "telefoonnummer": "0612345678",
+                "telefoonnummerAlternatief": "0687654321",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: emailadres, telefoonnummer, telefoonnummerAlternatief"
+        )
+
+    @requests_mock.Mocker()
+    def test_modify_phone_updates_klant_api_but_skip_unchanged_email(self, m):
+        MockAPIReadPatchData.setUpServices()
+        data = MockAPIReadPatchData().install_mocks(m)
+
+        response = self.app.get(self.url, user=data.user)
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        form = response.forms["profile-edit"]
+        form["phone_addresses-0-value"] = "0612345678"
+        form["phone_addresses-0-is_standard_for_type"] = True
+        form.submit()
+
+        self.assertTrue(data.matchers[0].called)
+        klant_patch_data = data.matchers[1].request_history[0].json()
+        self.assertEqual(
+            klant_patch_data,
+            {
+                "telefoonnummer": "0612345678",
+            },
+        )
+        self.assertTimelineLog("retrieved klant for user")
+        self.assertTimelineLog(
+            "patched klant from user profile edit with fields: telefoonnummer"
+        )
 
     @requests_mock.Mocker()
     def test_modify_email_updates_klant_api_but_skip_unchanged_phone(self, m):
@@ -635,16 +811,13 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks(m)
 
         response = self.app.get(self.url, user=data.user)
-
-        # reset noise from signals
         m.reset_mock()
         self.clearTimelineLogs()
 
         form = response.forms["profile-edit"]
-        form["email"] = "new@example.com"
+        form["email_addresses-0-value"] = "new@example.com"
+        form["email_addresses-0-is_standard_for_type"] = True
         form.submit()
-
-        # user data tested in other cases
 
         self.assertTrue(data.matchers[0].called)
         klant_patch_data = data.matchers[1].request_history[0].json()
@@ -659,6 +832,10 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             "patched klant from user profile edit with fields: emailadres"
         )
 
+    # -------------------------------------------------------------------------
+    # OpenKlant2 API sync
+    # -------------------------------------------------------------------------
+
     @requests_mock.Mocker()
     def test_update_via_openklant(self, m):
         MockAPIReadPatchData.setUpServices(
@@ -666,40 +843,132 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
         data = MockAPIReadPatchData().install_mocks_openklant(m)
 
-        response = self.app.get(self.url, user=data.digid_user)
-
-        # reset noise from signals
+        self.client.force_login(data.digid_user)
         m.reset_mock()
         self.clearTimelineLogs()
 
-        form = response.forms["profile-edit"]
-        form["email"] = "new@example.com"
-        response = form.submit()
+        post_data = {}
+        post_data.update(
+            self._da_formset_data("email_addresses", [("new@example.com", True)])
+        )
+        post_data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("0612345678", True), ("0687654321", False)],
+            )
+        )
+        response = self.client.post(self.url, data=post_data)
 
         self.assertEqual(response.status_code, 302)
 
         digitale_adressen_requests = [
-            response
-            for response in m.request_history
-            if "digitaleadressen" in response.path
+            req for req in m.request_history if "digitaleadressen" in req.path
         ]
-
         email_requests = [
-            response
-            for response in digitale_adressen_requests
-            if response.method in ["POST"]
-            and response.json()
-            and response.json().get("soortDigitaalAdres") == "email"
+            req
+            for req in digitale_adressen_requests
+            if req.method == "POST" and req.json().get("soortDigitaalAdres") == "email"
         ]
         self.assertEqual(len(email_requests), 1)
+        self.assertEqual(email_requests[0].json()["adres"], "new@example.com")
 
-        email_req = email_requests[0]
-        self.assertEqual(email_req.json()["adres"], "new@example.com")
-        self.assertEqual(email_req.json()["soortDigitaalAdres"], "email")
-        self.assertEqual(
-            email_req.json()["verstrektDoorPartij"],
-            {"uuid": "7260ea01-12c0-4750-8fd1-dfa777818837"},
+        phone_requests = [
+            req
+            for req in digitale_adressen_requests
+            if req.method == "POST"
+            and req.json().get("soortDigitaalAdres") == "telefoonnummer"
+        ]
+        self.assertEqual(len(phone_requests), 2)
+        phone_numbers = [req.json() for req in phone_requests]
+        standard_number = next(n for n in phone_numbers if n["isStandaardAdres"])
+        self.assertEqual(standard_number["adres"], "0612345678")
+        alt_number = next(n for n in phone_numbers if not n["isStandaardAdres"])
+        self.assertEqual(alt_number["adres"], "0687654321")
+
+    @requests_mock.Mocker()
+    def test_update_via_openklant_cleans_up_old_contact_info(self, m):
+        """Old digitaal-adres records in OpenKlant are deleted when the value changes."""
+        from open_inwoner.accounts.models import DigitalAddress, DigitalAddressType
+
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
         )
+        MockAPIReadPatchData().install_mocks_openklant(m)
+
+        User.objects.all().delete()
+        digid_user = DigidUserFactory()
+
+        # Set up existing DA records so the view can detect what changed.
+        old_email_da = DigitalAddress.objects.create(
+            user=digid_user,
+            type=DigitalAddressType.email,
+            value="old@example.com",
+            login_type=digid_user.login_type,
+            is_standard_for_type=True,
+        )
+        digid_user.email = "old@example.com"
+        digid_user.save(update_fields=["email"])
+
+        old_phone_da = DigitalAddress.objects.create(
+            user=digid_user,
+            type=DigitalAddressType.phone,
+            value="0600000000",
+            login_type=digid_user.login_type,
+            is_standard_for_type=True,
+        )
+        digid_user.phonenumber = "0600000000"
+        digid_user.save(update_fields=["phonenumber"])
+
+        old_alt_da = DigitalAddress.objects.create(
+            user=digid_user,
+            type=DigitalAddressType.phone,
+            value="0611111111",
+            login_type=digid_user.login_type,
+            is_standard_for_type=False,
+        )
+
+        delete_email_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/email-uuid-123",
+            status_code=204,
+        )
+        delete_phone_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-uuid-123",
+            status_code=204,
+        )
+        delete_phone_alt_matcher = m.delete(
+            "http://localhost:8338/klantinteracties/api/v1/digitaleadressen/phone-alt-uuid-123",
+            status_code=204,
+        )
+
+        self.client.force_login(digid_user)
+        post_data = {}
+        post_data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [("new@example.com", True)],
+                initial_pks=[old_email_da.pk],
+            )
+        )
+        post_data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("0612345678", True), ("", False), ("0687654321", False)],
+                initial_pks=[old_phone_da.pk, old_alt_da.pk, None],
+            )
+        )
+        post_data["phone_addresses-1-DELETE"] = "on"  # delete old_alt_da
+        response = self.client.post(self.url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(delete_email_matcher.called_once)
+        self.assertTrue(delete_phone_matcher.called_once)
+        self.assertTrue(delete_phone_alt_matcher.called_once)
+        post_requests = [
+            req
+            for req in m.request_history
+            if req.method == "POST" and "digitaleadressen" in req.path
+        ]
+        self.assertEqual(len(post_requests), 3)  # email + 2 phone numbers
 
 
 class TestForm(ErrorMessageMixin, forms.Form):

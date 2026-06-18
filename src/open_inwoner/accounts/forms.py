@@ -6,6 +6,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.forms import BaseInlineFormSet, inlineformset_factory
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
@@ -32,7 +33,7 @@ from .choices import (
     EmptyStatusChoices,
     LoginTypeChoices,
 )
-from .models import Action, Document, Invite, Message, User
+from .models import Action, DigitalAddress, Document, Invite, Message, User
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -134,8 +135,6 @@ class BaseUserForm(forms.ModelForm):
         model = User
         fields = (
             "first_name",
-            "email",
-            "phonenumber",
             "image",
             "cropping",
         )
@@ -159,8 +158,6 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "first_name",
             "infix",
             "last_name",
-            "email",
-            "phonenumber",
             "street",
             "housenumber",
             "postcode",
@@ -172,6 +169,84 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
 
 class BrpUserForm(BaseUserForm):
     pass
+
+
+class DigitalAddressForm(forms.ModelForm):
+    class Meta:
+        model = DigitalAddress
+        fields = ("value", "is_standard_for_type")
+        labels = {"is_standard_for_type": _("Primair")}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["value"].required = False
+        self.fields["is_standard_for_type"].required = False
+
+
+class EmailDigitalAddressForm(DigitalAddressForm):
+    class Meta(DigitalAddressForm.Meta):
+        widgets = {"value": forms.EmailInput()}
+
+
+class PhoneDigitalAddressForm(DigitalAddressForm):
+    class Meta(DigitalAddressForm.Meta):
+        widgets = {"value": forms.TextInput(attrs={"type": "tel"})}
+
+
+class BaseDigitalAddressFormSet(BaseInlineFormSet):
+    """
+    Inline formset for a single DigitalAddress type (email or phone).
+
+    Validates:
+    - No duplicate values within the formset.
+    - Exactly one active entry is marked is_standard_for_type when any entries exist.
+    """
+
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+
+        seen_values = []
+        standard_count = 0
+        active_count = 0
+
+        for form in self.forms:
+            if self._should_delete_form(form):
+                continue
+            value = form.cleaned_data.get("value", "")
+            if not value:
+                continue
+            active_count += 1
+            if value in seen_values:
+                raise forms.ValidationError(_("Duplicate addresses are not allowed."))
+            seen_values.append(value)
+            if form.cleaned_data.get("is_standard_for_type"):
+                standard_count += 1
+
+        if active_count > 0 and standard_count == 0:
+            raise forms.ValidationError(
+                _("At least one address must be marked as primary.")
+            )
+        if standard_count > 1:
+            raise forms.ValidationError(_("Only one address can be marked as primary."))
+
+
+_da_formset_kwargs = dict(
+    formset=BaseDigitalAddressFormSet,
+    fields=("value", "is_standard_for_type"),
+    extra=1,
+    can_delete=True,
+    can_delete_extra=False,
+)
+
+EmailDigitalAddressFormSet = inlineformset_factory(
+    User, DigitalAddress, form=EmailDigitalAddressForm, **_da_formset_kwargs
+)
+
+PhoneDigitalAddressFormSet = inlineformset_factory(
+    User, DigitalAddress, form=PhoneDigitalAddressForm, **_da_formset_kwargs
+)
 
 
 class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):

@@ -311,6 +311,8 @@ class DigitalAddress(models.Model):
 
     def clean(self):
         super().clean()
+        if not self.type:
+            return
         match self.type:
             case DigitalAddressType.email:
                 try:
