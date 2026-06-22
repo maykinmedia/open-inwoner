@@ -27,31 +27,11 @@
 
                     {% with request.user as user %}
                         {% if user.is_eherkenning_user %}
-                            {% for da_form in email_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
-                            {% for da_form in phone_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
+                            {% addition_input email_formset %}
+                            {% addition_input phone_formset %}
                         {% elif user.is_bsn_user_with_brp %}
-                            {% for da_form in email_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
-                            {% for da_form in phone_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
+                            {% addition_input email_formset %}
+                            {% addition_input phone_formset %}
                             {% if user.contact_type == "begeleider" %}
                                 {% input form.image no_help=True %}
                                 {% image_crop form.cropping %}
@@ -60,18 +40,8 @@
                             {% input form.first_name %}
                             {% input form.infix %}
                             {% input form.last_name %}
-                            {% for da_form in email_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
-                            {% for da_form in phone_formset %}
-                                {{ da_form.id }}
-                                {% input da_form.value %}
-                                {% input da_form.is_standard_for_type %}
-                                {% input da_form.DELETE %}
-                            {% endfor %}
+                            {% addition_input email_formset %}
+                            {% addition_input phone_formset %}
                             {% input form.street %}
                             {% input form.housenumber %}
                             {% input form.postcode %}
