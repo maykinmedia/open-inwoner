@@ -310,6 +310,9 @@ class EditProfileView(
         old_phonenumber = user.phonenumber
         old_phonenumber_alternative = user.phonenumber_alternative
 
+        failed_services: list[str] = []
+        changed_data: dict = {}
+
         with transaction.atomic():
             form.save()
             self._save_digital_address_formset(
@@ -319,40 +322,53 @@ class EditProfileView(
                 phone_formset, user, DigitalAddressType.phone
             )
 
-        # Reload to pick up values written by update_email / update_phonenumber.
-        user.refresh_from_db()
-        changed_data = {}
-        if user.email != old_email:
-            changed_data["email"] = user.email
-        if user.phonenumber != old_phonenumber:
-            changed_data["phonenumber"] = user.phonenumber
-        new_alt = user.phonenumber_alternative
-        if new_alt != old_phonenumber_alternative:
-            changed_data["phonenumber_alternative"] = new_alt
+            # Reload to pick up values written by update_email / update_phonenumber.
+            user.refresh_from_db()
+            if user.email != old_email:
+                changed_data["email"] = user.email
+            if user.phonenumber != old_phonenumber:
+                changed_data["phonenumber"] = user.phonenumber
+            new_alt = user.phonenumber_alternative
+            if new_alt != old_phonenumber_alternative:
+                changed_data["phonenumber_alternative"] = new_alt
 
-        if not changed_data:
-            messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
-            self.log_profile_modified(user)
-            return HttpResponseRedirect(self.get_success_url())
+            if changed_data:
+                # Sync address changes to external APIs. API calls run inside
+                # the transaction so that a failure rolls back the DB writes
+                # too, keeping local state consistent with the remote. The
+                # trade-off is holding the DB connection open during the HTTP
+                # calls, which is acceptable at the low concurrency of this
+                # endpoint.
+                klanten_config = KlantenSysteemConfig.get_solo()
 
-        # Sync address changes to external APIs.
-        klanten_config = KlantenSysteemConfig.get_solo()
-        failed_services = []
+                if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
+                    try:
+                        self.update_klant_via_esuite(changed_data, user)
+                    except Exception:
+                        logger.exception(
+                            "eSuite failed during profile update", user=user
+                        )
+                        failed_services.append("eSuite")
 
-        if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
-            try:
-                self.update_klant_via_esuite(changed_data, user)
-            except Exception:
-                logger.exception("eSuite failed during profile update", user=user)
-                failed_services.append("eSuite")
+                if klanten_config.has_api_service_configured(
+                    KlantenServiceType.OPENKLANT2
+                ):
+                    try:
+                        self.update_klant_via_openklant(changed_data, user)
+                    except Exception:
+                        logger.exception(
+                            "OpenKlant failed during profile update", user=user
+                        )
+                        failed_services.append("OpenKlant")
 
-        if klanten_config.has_api_service_configured(KlantenServiceType.OPENKLANT2):
-            try:
-                self.update_klant_via_openklant(changed_data, user)
-            except Exception:
-                logger.exception("OpenKlant failed during profile update", user=user)
-                failed_services.append("OpenKlant")
+                if failed_services:
+                    # Mark for rollback but do not perform any further DB
+                    # operations here — set_rollback(True) blocks all queries
+                    # until the atomic block exits.
+                    transaction.set_rollback(True)
 
+        # All messages, logging, and redirects happen after the transaction has
+        # either committed or rolled back.
         if failed_services:
             messages.error(
                 request=self.request,
