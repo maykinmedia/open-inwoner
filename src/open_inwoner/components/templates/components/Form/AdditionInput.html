@@ -1,0 +1,23 @@
+{% load i18n form_tags icon_tags button_tags %}
+
+<div class="form__control addition-input" data-addition-input data-prefix="{{ formset.prefix }}">
+    <div id="{{ formset.prefix }}-management-form">
+        {{ formset.management_form }}
+    </div>
+
+    {% comment %} {{formset}} {% endcomment %}
+
+    <div id="{{ formset.prefix }}-entries" class="addition-input__entries">
+        {% for entry in entries %}
+            {% include "components/Form/AdditionInputRow.html" %}
+        {% endfor %}
+    </div>
+
+    <template id="{{ formset.prefix }}-empty-row">
+        {% with entry=empty_entry %}
+            {% include "components/Form/AdditionInputRow.html" %}
+        {% endwith %}
+    </template>
+
+    {% button text=add_label icon="add" icon_position="before" secondary=True transparent=True type="button" id=add_btn_id %}
+</div>

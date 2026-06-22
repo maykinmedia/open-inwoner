@@ -1,0 +1,50 @@
+{% load i18n form_tags icon_tags %}
+
+<div class="addition-input__entry" data-addition-input-row>
+    {{ entry.form.id }}
+
+    <label class="label__label" for="{{ entry.form.value.id_for_label }}">
+        {{label}}
+        {% if entry.form.value.required %}<span class="label__label--required"> * </span>{% endif %}
+    </label>
+
+    <div class="addition-input__entry-row">
+        {% field_as_widget entry.form.value "input" "" %}
+
+        {# Persisted rows carry Django's DELETE checkbox (kept hidden, driven by JS); #}
+        {# unsaved rows have none and are simply removed from the DOM. #}
+        {% if entry.form.DELETE %}
+            <span class="addition-input__delete-field">{{ entry.form.DELETE }}</span>
+        {% endif %}
+
+        {# The primary entry is not removable, so one entry always stays checked. #}
+        <button
+            type="button"
+            class="addition-input__delete"
+            data-delete-row
+            aria-label="{% trans "Verwijderen" %}"
+            {% if entry.form.is_standard_for_type.value %}hidden{% endif %}
+        >
+            {% icon "delete" outlined=True %}
+        </button>
+    </div>
+
+    {% if entry.form.value.errors %}
+        {% errors errors=entry.form.value.errors %}
+    {% endif %}
+
+    {% if entry.form.is_standard_for_type %}
+        <div class="radio">
+            <input
+                class="radio__input"
+                type="checkbox"
+                name="{{ entry.form.is_standard_for_type.html_name }}"
+                id="{{ entry.form.is_standard_for_type.id_for_label }}"
+                {% if entry.form.is_standard_for_type.value %}checked="true"{% endif %}
+            />
+            <label class="radio__label" for="{{ entry.form.is_standard_for_type.id_for_label }}">
+                {% trans "Stel in als voorkeur" %}
+            </label>
+        </div>
+    {% endif %}
+</div>
