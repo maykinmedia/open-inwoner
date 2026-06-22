@@ -1661,6 +1661,7 @@ class OpenKlant2Service(
                     continue
                 except OK2NotFound:
                     mapping.delete()
+                    openklant_metrics.outbound_stale_mappings.add(1)
 
             # Backfill: fetch remote list once, then value-match or create
             if remote_adressen is None:
