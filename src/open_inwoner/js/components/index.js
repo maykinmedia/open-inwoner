@@ -48,6 +48,7 @@ import './siteimprove/error-tracking';
 import './siteimprove/tracking';
 import './twofactor-sms';
 import { FileInput } from './form/FileInput';
+import { AdditionInput } from './form/AdditionInput';
 import { ToggleHide } from './card/ToggleHide';
 
 // eval() is problematic with CSP
@@ -70,6 +71,7 @@ const elementWrappers = [
   [AnchorMobile.selector, (elt) => new AnchorMobile(elt)],
   [StatusAccordion.selector, (elt) => new StatusAccordion(elt)],
   [FileInput.selector, (elt) => new FileInput(elt)],
+  [AdditionInput.selector, (elt) => new AdditionInput(elt)],
   [ToggleHide.selector, (elt) => new ToggleHide(elt)],
   [TabPanel.selector, (elt) => new TabPanel(elt)],
   // add more when needed

@@ -337,6 +337,34 @@ def input(field, **kwargs):
     return {**kwargs, "field": field}
 
 
+@register.inclusion_tag("components/Form/AdditionInput.html")
+def addition_input(formset, **kwargs):
+    """
+    Renders a formset as a list of inputs with an "add entry" button.
+
+    Each form in the formset must have a 'value' field. Any additional boolean
+    field (e.g. 'is_standard_for_type') is rendered as-is; JavaScript enforces
+    single-selection behaviour so it behaves like a radio group without requiring
+    any view-side POST translation.
+
+    Usage:
+        {% addition_input email_formset %}
+        {% addition_input phone_formset %}
+    """
+    label = formset.form.base_fields["value"].label
+    entries = [{"form": form} for form in formset.forms]
+
+    return {
+        "label": label,
+        "entries": entries,
+        "empty_entry": {"form": formset.empty_form},
+        "formset": formset,
+        "add_label": _("Voeg %(label)s toe") % {"label": str(label).lower()},
+        "add_btn_id": f"{formset.prefix}-add-btn",
+        **kwargs,
+    }
+
+
 @register.inclusion_tag("components/Form/FileInput.html")
 def file_input(
     files,

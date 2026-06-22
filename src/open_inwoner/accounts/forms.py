@@ -205,6 +205,7 @@ class DigitalAddressForm(forms.ModelForm):
 
 class EmailDigitalAddressForm(DigitalAddressForm):
     class Meta(DigitalAddressForm.Meta):
+        labels = {"value": _("E-mailadres")}
         widgets = {"value": forms.EmailInput()}
 
     def clean_value(self):
@@ -216,6 +217,7 @@ class EmailDigitalAddressForm(DigitalAddressForm):
 
 class PhoneDigitalAddressForm(DigitalAddressForm):
     class Meta(DigitalAddressForm.Meta):
+        labels = {"value": _("Telefoonnummer")}
         widgets = {"value": forms.TextInput(attrs={"type": "tel"})}
 
     def clean_value(self):
@@ -267,7 +269,8 @@ class BaseDigitalAddressFormSet(BaseInlineFormSet):
 _da_formset_kwargs = dict(
     formset=BaseDigitalAddressFormSet,
     fields=("value", "is_standard_for_type"),
-    extra=1,
+    extra=0,
+    min_num=1,
     can_delete=True,
     can_delete_extra=False,
 )

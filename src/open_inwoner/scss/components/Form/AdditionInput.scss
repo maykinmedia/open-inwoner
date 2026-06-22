@@ -1,0 +1,67 @@
+// AdditionInput — repeatable input group (phone numbers, email addresses).
+// Template: components/Form/AdditionInput.html + AdditionInputRow.html
+// Tag:      form_tags.py:addition_input
+.addition-input {
+  &.form__control [class*='icons'] {
+    position: static;
+    right: unset;
+    top: unset;
+    transform: unset;
+  }
+
+  &__entries {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-medium);
+    width: 100%;
+  }
+
+  &__entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-small);
+    padding-bottom: var(--spacing-medium);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  // Input field + delete button on one line.
+  &__entry-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+
+    .input {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  // Django's DELETE checkbox is driven by the delete button, never shown.
+  &__delete-field {
+    display: none;
+  }
+
+  // Trash button to remove an entry.
+  &__delete {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--color-error);
+
+    &[hidden] {
+      display: none;
+    }
+  }
+}
