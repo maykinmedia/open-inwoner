@@ -388,8 +388,8 @@ class EditProfileView(
         # either committed or rolled back.
         if failed_services:
             messages.error(
-                request=self.request,
-                message=_(
+                self.request,
+                _(
                     "Your changes could not be saved due to technical problems. "
                     "Please try again later"
                 ),
@@ -397,7 +397,7 @@ class EditProfileView(
             self.log_profile_update_failed(
                 user, failed_services, list(changed_data.keys())
             )
-            return HttpResponseRedirect(self.get_success_url())
+            return HttpResponseRedirect(reverse("profile:edit"))
 
         messages.success(self.request, _("Uw wijzigingen zijn opgeslagen"))
         self.log_profile_modified(user)
@@ -498,21 +498,19 @@ class EditProfileView(
             logger.warning("eSuiteKlantenService failed to build")
             return False
 
-        if fetch_params := service.get_fetch_parameters(user):
-            try:
-                klant, created = service.get_or_create_klant(
-                    fetch_params=fetch_params, user=user
-                )
-                if klant and not created:
-                    return bool(
-                        service.update_klant_from_user(
-                            klant, user, update_fields=list(update_data.keys())
-                        )
-                    )
-            except (KlantAPIError, requests.RequestException):
-                logger.error("Error updating klant via eSuite")
-                return False
+        fetch_params = service.get_fetch_parameters(user)
+        if not fetch_params:
+            return False
 
+        klant, created = service.get_or_create_klant(
+            fetch_params=fetch_params, user=user
+        )
+        if klant and not created:
+            return bool(
+                service.update_klant_from_user(
+                    klant, user, update_fields=list(update_data.keys())
+                )
+            )
         return bool(klant)
 
     def get_form_class(self):
