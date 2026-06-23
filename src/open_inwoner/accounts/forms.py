@@ -6,6 +6,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.core.validators import validate_email
 from django.forms import BaseInlineFormSet, inlineformset_factory
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
@@ -206,10 +207,22 @@ class EmailDigitalAddressForm(DigitalAddressForm):
     class Meta(DigitalAddressForm.Meta):
         widgets = {"value": forms.EmailInput()}
 
+    def clean_value(self):
+        value = self.cleaned_data.get("value")
+        if value:
+            validate_email(value)
+        return value
+
 
 class PhoneDigitalAddressForm(DigitalAddressForm):
     class Meta(DigitalAddressForm.Meta):
         widgets = {"value": forms.TextInput(attrs={"type": "tel"})}
+
+    def clean_value(self):
+        value = self.cleaned_data.get("value")
+        if value:
+            DutchPhoneNumberValidator()(value)
+        return value
 
 
 class BaseDigitalAddressFormSet(BaseInlineFormSet):
