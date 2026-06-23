@@ -1724,15 +1724,11 @@ class OpenKlant2Service(
 
         return updated_fields
 
-    def delete_remote_digitaal_adres_for_local(self, local_address) -> bool:
-        """Delete the remote digitaal adres corresponding to a local DigitalAddress."""
-        try:
-            mapping = local_address.openklant_mapping
-        except DigitaalAdresOpenKlantMapping.DoesNotExist:
-            return False
-        with contextlib.suppress(OK2NotFound):
-            self.client.digitaal_adres.delete(str(mapping.ok_uuid))
-        return True
+    def delete_remote_digitaal_adressen(self, ok_uuids: Iterable) -> None:
+        """Delete remote digitaal adressen by their OpenKlant UUIDs."""
+        for ok_uuid in ok_uuids:
+            with contextlib.suppress(OK2NotFound):
+                self.client.digitaal_adres.delete(str(ok_uuid))
 
     def _create_klantcontact(
         self,
