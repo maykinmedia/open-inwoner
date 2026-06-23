@@ -1,10 +1,11 @@
+import contextlib
 from collections.abc import Generator
 from datetime import date
 from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -315,6 +316,18 @@ class EditProfileView(
 
         with transaction.atomic():
             form.save()
+
+            # Collect OpenKlant mapping UUIDs for addresses about to be deleted,
+            # before _save_digital_address_formset cascade-deletes the mappings.
+            ok_uuids_to_delete = []
+            for formset in (email_formset, phone_formset):
+                for da_form in formset.deleted_forms:
+                    if da_form.instance.pk:
+                        with contextlib.suppress(ObjectDoesNotExist):
+                            ok_uuids_to_delete.append(
+                                da_form.instance.openklant_mapping.ok_uuid
+                            )
+
             self._save_digital_address_formset(
                 email_formset, user, DigitalAddressType.email
             )
@@ -332,7 +345,7 @@ class EditProfileView(
             if new_alt != old_phonenumber_alternative:
                 changed_data["phonenumber_alternative"] = new_alt
 
-            if changed_data:
+            if changed_data or ok_uuids_to_delete:
                 # Sync address changes to external APIs. API calls run inside
                 # the transaction so that a failure rolls back the DB writes
                 # too, keeping local state consistent with the remote. The
@@ -341,7 +354,9 @@ class EditProfileView(
                 # endpoint.
                 klanten_config = KlantenSysteemConfig.get_solo()
 
-                if klanten_config.has_api_service_configured(KlantenServiceType.ESUITE):
+                if changed_data and klanten_config.has_api_service_configured(
+                    KlantenServiceType.ESUITE
+                ):
                     try:
                         self.update_klant_via_esuite(changed_data, user)
                     except Exception:
@@ -354,7 +369,9 @@ class EditProfileView(
                     KlantenServiceType.OPENKLANT2
                 ):
                     try:
-                        self.update_klant_via_openklant(changed_data, user)
+                        self.update_klant_via_openklant(
+                            changed_data, user, ok_uuids_to_delete
+                        )
                     except Exception:
                         logger.exception(
                             "OpenKlant failed during profile update", user=user
@@ -435,7 +452,12 @@ class EditProfileView(
             if not has_remaining and formset.initial_form_count() > 0:
                 user.update_phonenumber("")
 
-    def update_klant_via_openklant(self, user_form_data: dict, user: User) -> bool:
+    def update_klant_via_openklant(
+        self,
+        user_form_data: dict,
+        user: User,
+        ok_uuids_to_delete: list | None = None,
+    ) -> bool:
         try:
             service = OpenKlant2Service()
         except Exception:
@@ -446,6 +468,12 @@ class EditProfileView(
 
         if not partij:
             return False
+
+        if ok_uuids_to_delete:
+            service.delete_remote_digitaal_adressen(ok_uuids_to_delete)
+
+        if not user_form_data:
+            return True
 
         return service.update_partij_from_user_data(
             partij_uuid=partij["uuid"],
