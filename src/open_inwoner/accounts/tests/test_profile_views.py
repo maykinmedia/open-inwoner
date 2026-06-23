@@ -29,7 +29,7 @@ from open_inwoner.accounts.forms import (
     PhoneDigitalAddressFormSet,
     UserForm,
 )
-from open_inwoner.accounts.models import User
+from open_inwoner.accounts.models import DigitalAddress, User
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
@@ -42,7 +42,10 @@ from open_inwoner.haalcentraal.tests.mixins import HaalCentraalMixin
 from open_inwoner.laposta.models import LapostaConfig
 from open_inwoner.laposta.tests.factories import LapostaListFactory, MemberFactory
 from open_inwoner.openklant.constants import KlantenServiceType
-from open_inwoner.openklant.models import ESuiteKlantConfig
+from open_inwoner.openklant.models import (
+    DigitaalAdresOpenKlantMapping,
+    ESuiteKlantConfig,
+)
 from open_inwoner.openklant.tests.data import MockAPIReadPatchData
 from open_inwoner.openklant.tests.factories import DigitaalAdresOpenKlantMappingFactory
 from open_inwoner.pdc.tests.factories import CategoryFactory
@@ -971,6 +974,126 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             if r.method == "POST" and "digitaleadressen" in r.path
         ]
         self.assertEqual(len(post_requests), 0)
+
+    @requests_mock.Mocker()
+    def test_delete_with_openklant_mapping_sends_remote_delete(self, m):
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
+
+        REMOTE_UUID = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+        email_addr = DigitalAddressFactory(
+            user=data.digid_user,
+            type=DigitalAddressType.email,
+            value=data.digid_user.email,
+            login_type=LoginTypeChoices.digid,
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=email_addr, ok_uuid=REMOTE_UUID
+        )
+        delete_matcher = m.delete(
+            f"http://localhost:8338/klantinteracties/api/v1/digitaleadressen/{REMOTE_UUID}",
+            status_code=204,
+        )
+
+        self.client.force_login(data.digid_user)
+
+        post_data = self._da_formset_data(
+            "email_addresses",
+            [(email_addr.value, True)],
+            initial_pks=[email_addr.pk],
+        )
+        post_data["email_addresses-0-DELETE"] = "on"
+        post_data.update(self._da_formset_data("phone_addresses", []))
+
+        response = self.client.post(self.url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(delete_matcher.called)
+        self.assertFalse(DigitalAddress.objects.filter(pk=email_addr.pk).exists())
+
+    @requests_mock.Mocker()
+    def test_delete_with_openklant_mapping_api_error_rolls_back_local_deletion(self, m):
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
+
+        REMOTE_UUID = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+        email_addr = DigitalAddressFactory(
+            user=data.digid_user,
+            type=DigitalAddressType.email,
+            value=data.digid_user.email,
+            login_type=LoginTypeChoices.digid,
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=email_addr, ok_uuid=REMOTE_UUID
+        )
+
+        self.client.force_login(data.digid_user)
+
+        post_data = {}
+        post_data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [(email_addr.value, True)],
+                initial_pks=[email_addr.pk],
+            )
+        )
+        post_data["email_addresses-0-DELETE"] = "on"
+        post_data.update(self._da_formset_data("phone_addresses", []))
+
+        with patch(
+            "open_inwoner.openklant.services.OpenKlant2Service.delete_remote_digitaal_adressen",
+            side_effect=Exception("remote API unavailable"),
+        ):
+            response = self.client.post(self.url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(DigitalAddress.objects.filter(pk=email_addr.pk).exists())
+        self.assertTrue(
+            DigitaalAdresOpenKlantMapping.objects.filter(
+                digital_address=email_addr
+            ).exists()
+        )
+
+    @requests_mock.Mocker()
+    def test_delete_without_openklant_mapping_no_remote_delete(self, m):
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        user = DigidUserFactory()
+        email_addr = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value=user.email,
+            login_type=LoginTypeChoices.digid,
+            is_standard_for_type=True,
+        )
+        # No DigitaalAdresOpenKlantMapping — nothing to delete remotely.
+
+        self.client.force_login(user)
+
+        post_data = {}
+        post_data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [(email_addr.value, True)],
+                initial_pks=[email_addr.pk],
+            )
+        )
+        post_data["email_addresses-0-DELETE"] = "on"
+        post_data.update(self._da_formset_data("phone_addresses", []))
+
+        response = self.client.post(self.url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        delete_requests = [r for r in m.request_history if r.method == "DELETE"]
+        self.assertEqual(delete_requests, [])
+        self.assertFalse(DigitalAddress.objects.filter(pk=email_addr.pk).exists())
 
 
 class TestForm(ErrorMessageMixin, forms.Form):
