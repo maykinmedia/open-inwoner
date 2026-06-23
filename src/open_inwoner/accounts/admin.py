@@ -15,7 +15,15 @@ from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
 from .forms import GroupAdminForm
-from .models import Action, Document, Invite, Message, OpenIDEIDASConfig, User
+from .models import (
+    Action,
+    DigitalAddress,
+    Document,
+    Invite,
+    Message,
+    OpenIDEIDASConfig,
+    User,
+)
 
 
 class ReadOnlyFileMixin:
@@ -79,6 +87,20 @@ class _UserCreationForm(UserCreationForm):
                 raise ValidationError(_("The user with this email already exists."))
 
 
+class DigitalAddressInline(admin.TabularInline):
+    model = DigitalAddress
+    extra = 0
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(User)
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
@@ -88,6 +110,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "email",
         "first_name",
     )
+    inlines = [DigitalAddressInline]
     fieldsets = (
         (
             None,
