@@ -433,6 +433,42 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context["phone_formset"].is_valid())
 
+    def test_email_formset_rejects_invalid_format(self):
+        self.client.force_login(self.user)
+        data = {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+        }
+        data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [("not-an-email", True)],
+            )
+        )
+        data.update(self._da_formset_data("phone_addresses", []))
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["email_formset"].is_valid())
+
+    def test_phone_formset_rejects_invalid_format(self):
+        self.client.force_login(self.user)
+        data = {
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+        }
+        data.update(self._da_formset_data("email_addresses", []))
+        data.update(
+            self._da_formset_data(
+                "phone_addresses",
+                [("not-a-phone", True)],
+            )
+        )
+
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["phone_formset"].is_valid())
+
     # -------------------------------------------------------------------------
     # Saving address changes
     # -------------------------------------------------------------------------
