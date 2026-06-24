@@ -60,7 +60,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
+        uses: maykinmedia/setup-django-backend@1a27eae04b1ec4d1250ed720e29fefd3508cb4c6 # v1.4.1
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
@@ -195,7 +195,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
+        uses: maykinmedia/setup-django-backend@1a27eae04b1ec4d1250ed720e29fefd3508cb4c6 # v1.4.1
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
@@ -248,7 +248,7 @@ jobs:
           submodules: 'true'
           persist-credentials: false
       - name: Set up backend environment
-        uses: maykinmedia/setup-django-backend@a9abe0987130ed667fa09ce177a5ae0bd153aed1 # v1.3
+        uses: maykinmedia/setup-django-backend@1a27eae04b1ec4d1250ed720e29fefd3508cb4c6 # v1.4.1
         with:
           apt-packages:
             'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev
