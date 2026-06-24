@@ -22,6 +22,7 @@ class NotificationsAPIWebhookTest(TestCase):
             api_type=APITypes.nrc,
             slug="service",
             oas="http://some-api-root/api/v1/schema/openapi.yaml",
+            secret="test-secret",
         )
         cls.config = NotificationsAPIConfig.objects.create(
             notifications_api_service=service
@@ -33,6 +34,7 @@ class NotificationsAPIWebhookTest(TestCase):
             api_type=APITypes.nrc,
             slug="service-other",
             oas="http://other-api-root/api/v1/schema/openapi.yaml",
+            secret="test-secret-other",
         )
         cls.config_other = NotificationsAPIConfig.objects.create(
             notifications_api_service=service_other
