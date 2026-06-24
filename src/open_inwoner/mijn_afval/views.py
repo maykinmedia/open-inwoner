@@ -140,6 +140,7 @@ class _LedigingData(TypedDict):
     tijdstip_tijd: str  # Time formatted as "HH:MM"
     tijdstip_dag: str  # Localized day of the week, e.g., "maandag"
     gewicht: str  # Weight (in kg) as string, e.g., "32,5"
+    kosten: str  # Cost (in euros) as string, e.g., "12,50"
 
 
 class _TableColumn(TypedDict):
@@ -179,10 +180,11 @@ class _ContainerLocationData(TypedDict):
     containers: list[_AfvalContainerData]
 
 
-def _format_number(value: int | float) -> str:
+def _format_number(value: int | float, decimal_places: int | None = None) -> str:
     """Format a number according to the current locale."""
 
-    decimal_places = 0 if isinstance(value, int) else 1
+    if decimal_places is None:
+        decimal_places = 0 if isinstance(value, int) else 1
     return number_format(value, decimal_pos=decimal_places, force_grouping=False)
 
 
@@ -247,6 +249,7 @@ def _convert_period_to_dates(
 def _format_container_for_table(
     ledigingen: list[_LedigingData],
     totaal_gewicht: str,
+    totaal_kosten: str,
     identifier: str,
     type_label: str,
 ) -> _TableData:
@@ -256,6 +259,7 @@ def _format_container_for_table(
     Args:
         ledigingen: List of formatted lediging objects
         totaal_gewicht: Total weight of the container
+        totaal_kosten: Total cost of all ledigingen for this container
         identifier: Container identifier
         type_label: Localized container type label (e.g., "Groente, Fruit en Tuin afval (GFT)")
 
@@ -268,6 +272,7 @@ def _format_container_for_table(
         {"header": _("Datum ophalen"), "key": "date"},
         {"header": _("Tijd ophalen"), "key": "time"},
         {"header": _("Gewicht (kg)"), "key": "weight"},
+        {"header": _("Bedrag (€)"), "key": "kosten"},
     ]
 
     # Transform ledigingen into rows
@@ -277,15 +282,17 @@ def _format_container_for_table(
             "date": f"{lediging['tijdstip_dag']} {lediging['tijdstip_datum']}",
             "time": lediging["tijdstip_tijd"],
             "weight": lediging["gewicht"],
+            "kosten": lediging["kosten"],
         }
         for lediging in ledigingen
     ]
 
     # Footer row
     footer_row: dict = {
-        "date": _("Totaal gewicht"),
+        "date": _("Totaal"),
         "time": "",
         "weight": totaal_gewicht,
+        "kosten": totaal_kosten,
     }
 
     return {
@@ -383,17 +390,20 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
                         "tijdstip_tijd": lediging.geleegd_op.strftime("%H:%M"),
                         "tijdstip_dag": date_format(lediging.geleegd_op, "l"),
                         "gewicht": _format_number(lediging.gewicht),
+                        "kosten": _format_number(lediging.kosten, decimal_places=2),
                     }
                     ledigingen_data.append(lediging_data)
 
             # Format container data
             totaal_gewicht = _format_number(container.totaal_gewicht)
+            totaal_kosten = _format_number(container.totaal_kosten, decimal_places=2)
             afval_type = container.afval_type
 
             # Generate table data
             table_data: _TableData = _format_container_for_table(
                 ledigingen_data,
                 totaal_gewicht,
+                totaal_kosten,
                 container.id,
                 _get_container_type_label(afval_type),
             )
