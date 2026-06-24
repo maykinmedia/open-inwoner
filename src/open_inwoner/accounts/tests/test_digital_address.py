@@ -233,3 +233,22 @@ class DigitalAddressIsStandardTests(TestCase):
             is_standard_for_type=False,
         )
         self.assertIsNotNone(addr.pk)
+
+
+class DigitalAddressOrderingTests(TestCase):
+    def test_standard_address_is_first(self):
+        user = UserFactory()
+        alt = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="alt@example.com",
+            is_standard_for_type=False,
+        )
+        standard = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="standard@example.com",
+            is_standard_for_type=True,
+        )
+        addresses = list(user.digital_addresses.filter(type=DigitalAddressType.email))
+        self.assertEqual(addresses, [standard, alt])

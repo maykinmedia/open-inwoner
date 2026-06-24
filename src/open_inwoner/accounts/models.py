@@ -286,6 +286,7 @@ class DigitalAddress(models.Model):
     class Meta:
         verbose_name = _("Digital address")
         verbose_name_plural = _("Digital addresses")
+        ordering = ["-is_standard_for_type", "created_at"]
         constraints = [
             UniqueConstraint(
                 fields=["value"],

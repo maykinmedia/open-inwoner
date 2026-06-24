@@ -196,6 +196,13 @@ class MyProfileView(
         context["case_page_is_published"] = case_page_is_published()
         context["products_page_is_published"] = products_page_is_published()
 
+        context["email_addresses"] = [
+            da for da in user.digital_addresses.filter(type=DigitalAddressType.email)
+        ]
+        context["phone_addresses"] = [
+            da for da in user.digital_addresses.filter(type=DigitalAddressType.phone)
+        ]
+
         return context
 
     def post(self, request, *args, **kwargs):
