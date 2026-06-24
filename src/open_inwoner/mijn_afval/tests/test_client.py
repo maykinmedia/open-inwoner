@@ -13,7 +13,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_data = {
-            "klant": {"id": "klant-123", "bsn": "123456789", "naam": "Test User"},
+            "klant": {
+                "id": "klant-123",
+                "bsn": "123456789",
+                "naam": "Test User",
+                "totaalKosten": 50.00,
+            },
             "containers": [
                 {
                     "id": "container-1",
@@ -21,10 +26,16 @@ class OpenAfvalClientTest(TestCase):
                     "isVerzamelcontainer": True,
                     "heeftSleutel": True,
                     "totaalGewicht": 600.5,
+                    "totaalKosten": 25.00,
                 }
             ],
             "containerLocaties": [
-                {"id": "bag-1", "adres": "Teststraat 1", "totaalGewicht": 1000.5}
+                {
+                    "id": "bag-1",
+                    "adres": "Teststraat 1",
+                    "totaalGewicht": 1000.5,
+                    "totaalKosten": 50.00,
+                }
             ],
             "ledigingen": [
                 {
@@ -34,6 +45,7 @@ class OpenAfvalClientTest(TestCase):
                     "container": "container-1",
                     "gewicht": 50.5,
                     "geleegdOp": "2024-01-15T10:00:00+01:00",
+                    "kosten": 12.50,
                 }
             ],
         }
@@ -74,7 +86,12 @@ class OpenAfvalClientTest(TestCase):
 
         mock_response = Mock()
         mock_response.json.return_value = {
-            "klant": {"id": "klant-456", "bsn": "987654321", "naam": "Jane Doe"},
+            "klant": {
+                "id": "klant-456",
+                "bsn": "987654321",
+                "naam": "Jane Doe",
+                "totaalKosten": 0.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],
@@ -94,7 +111,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_template = {
-            "klant": {"id": "klant-id", "bsn": "000000000", "naam": "Test User"},
+            "klant": {
+                "id": "klant-id",
+                "bsn": "000000000",
+                "naam": "Test User",
+                "totaalKosten": 0.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],
@@ -120,7 +142,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_data = {
-            "klant": {"id": "klant-123", "bsn": "123456789", "naam": "Test User"},
+            "klant": {
+                "id": "klant-123",
+                "bsn": "123456789",
+                "naam": "Test User",
+                "totaalKosten": 50.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],
@@ -154,7 +181,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_data = {
-            "klant": {"id": "klant-123", "bsn": "123456789", "naam": "Test User"},
+            "klant": {
+                "id": "klant-123",
+                "bsn": "123456789",
+                "naam": "Test User",
+                "totaalKosten": 50.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],
@@ -179,7 +211,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_data = {
-            "klant": {"id": "klant-123", "bsn": "123456789", "naam": "Test User"},
+            "klant": {
+                "id": "klant-123",
+                "bsn": "123456789",
+                "naam": "Test User",
+                "totaalKosten": 50.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],
@@ -200,7 +237,12 @@ class OpenAfvalClientTest(TestCase):
         client = OpenAfvalAPIClient(base_url="https://api.example.com")
 
         mock_response_data = {
-            "klant": {"id": "klant-123", "bsn": "123456789", "naam": "Test User"},
+            "klant": {
+                "id": "klant-123",
+                "bsn": "123456789",
+                "naam": "Test User",
+                "totaalKosten": 50.00,
+            },
             "containers": [],
             "containerLocaties": [],
             "ledigingen": [],

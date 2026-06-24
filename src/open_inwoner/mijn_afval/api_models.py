@@ -14,6 +14,7 @@ class Klant(PydanticModel):
     id: str
     bsn: str
     naam: str
+    totaal_kosten: float
 
 
 class Periode(PydanticModel):
@@ -27,12 +28,14 @@ class AfvalContainer(PydanticModel):
     is_verzamelcontainer: bool
     heeft_sleutel: bool
     totaal_gewicht: float
+    totaal_kosten: float
 
 
 class AfvalContainerLocatie(PydanticModel):
     id: str
     adres: str
     totaal_gewicht: float
+    totaal_kosten: float
 
 
 class AfvalLediging(PydanticModel):
@@ -42,6 +45,7 @@ class AfvalLediging(PydanticModel):
     container: str
     gewicht: float
     geleegd_op: datetime
+    kosten: float
 
 
 class AfvalProfiel(PydanticModel):

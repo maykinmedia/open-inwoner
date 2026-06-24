@@ -19,7 +19,9 @@ from open_inwoner.mijn_afval.views import (
 class ExtractFilterOptionsTest(TestCase):
     def test_extract_filter_options_with_data(self):
         profiel = AfvalProfiel(
-            klant=Klant(id="klant-1", bsn="123456789", naam="Test User"),
+            klant=Klant(
+                id="klant-1", bsn="123456789", naam="Test User", totaal_kosten=0.00
+            ),
             containers=[
                 AfvalContainer(
                     id="container-1",
@@ -27,6 +29,7 @@ class ExtractFilterOptionsTest(TestCase):
                     is_verzamelcontainer=False,
                     heeft_sleutel=True,
                     totaal_gewicht=100.0,
+                    totaal_kosten=11.50,
                 )
             ],
             container_locaties=[
@@ -34,11 +37,13 @@ class ExtractFilterOptionsTest(TestCase):
                     id="loc-1",
                     adres="Dorpsstraat 12 [1234AB AMSTERDAM]",
                     totaal_gewicht=100.0,
+                    totaal_kosten=5.00,
                 ),
                 AfvalContainerLocatie(
                     id="loc-2",
                     adres="Kerkweg 45 B [5678CD UTRECHT]",
                     totaal_gewicht=50.0,
+                    totaal_kosten=6.50,
                 ),
             ],
             ledigingen=[
@@ -49,6 +54,7 @@ class ExtractFilterOptionsTest(TestCase):
                     container="container-1",
                     gewicht=25.0,
                     geleegd_op=datetime(2023, 6, 15, 10, 0, 0),
+                    kosten=5.00,
                 ),
                 AfvalLediging(
                     id="led-2",
@@ -57,6 +63,7 @@ class ExtractFilterOptionsTest(TestCase):
                     container="container-1",
                     gewicht=30.0,
                     geleegd_op=datetime(2025, 3, 20, 14, 30, 0),
+                    kosten=6.50,
                 ),
             ],
         )
@@ -78,13 +85,16 @@ class ExtractFilterOptionsTest(TestCase):
 
     def test_extract_filter_options_no_ledigingen(self):
         profiel = AfvalProfiel(
-            klant=Klant(id="klant-1", bsn="123456789", naam="Test User"),
+            klant=Klant(
+                id="klant-1", bsn="123456789", naam="Test User", totaal_kosten=0.00
+            ),
             containers=[],
             container_locaties=[
                 AfvalContainerLocatie(
                     id="loc-1",
                     adres="Dorpsstraat 12 [1234AB AMSTERDAM]",
                     totaal_gewicht=0.0,
+                    totaal_kosten=0.00,
                 )
             ],
             ledigingen=[],
@@ -97,7 +107,9 @@ class ExtractFilterOptionsTest(TestCase):
 
     def test_extract_filter_options_same_year(self):
         profiel = AfvalProfiel(
-            klant=Klant(id="klant-1", bsn="123456789", naam="Test User"),
+            klant=Klant(
+                id="klant-1", bsn="123456789", naam="Test User", totaal_kosten=0.00
+            ),
             containers=[],
             container_locaties=[],
             ledigingen=[
@@ -108,6 +120,7 @@ class ExtractFilterOptionsTest(TestCase):
                     container="container-1",
                     gewicht=25.0,
                     geleegd_op=datetime(2024, 1, 15, 10, 0, 0),
+                    kosten=5.00,
                 ),
                 AfvalLediging(
                     id="led-2",
@@ -116,6 +129,7 @@ class ExtractFilterOptionsTest(TestCase):
                     container="container-1",
                     gewicht=30.0,
                     geleegd_op=datetime(2024, 12, 20, 14, 30, 0),
+                    kosten=6.50,
                 ),
             ],
         )
