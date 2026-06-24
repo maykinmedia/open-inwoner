@@ -883,7 +883,7 @@ maykin-common[cli, docs, health-checks, otel]==0.19.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-django-prosemirror[images]==0.7.0
+maykin-django-prosemirror[images]==0.8.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
