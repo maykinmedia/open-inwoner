@@ -1,3 +1,45 @@
+2.3.1 (2026-06-10)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.3.1`.
+
+Bugfixes
+--------
+
+* [:gh:`2567`]: Gebruikers die nog niet alle verplichte registratievelden hebben
+  ingevuld, kunnen nu de uitlogbevestigingspagina bereiken. Hierdoor wordt een
+  redirect-loop voorkomen waarbij de middleware deze gebruikers wegstuurde
+  voordat zij konden uitloggen.
+* [:gh:`2569`]: ZGW API-fouten bij het per-zaaktype importeren van gerelateerde
+  types (informatieobjecttype, statustype, resultaattype) worden nu afgevangen.
+  Een fout voor één zaaktype breekt de volledige importrun niet langer af.
+* [:gh:`2574`]: Bij het synchroniseren van gebruikersgegevens vanuit de Klanten
+  API worden telefoonnummerbeperkingen nu correct toegepast.
+* [:gh:`2583`]: SSD-client foutafhandeling hersteld: ``SSDServiceFaultException``
+  wordt nu apart afgevangen zodat het ``meldingen``-attribuut beschikbaar is, en
+  ``SSDClientException`` in de XML-parser ontvangt nu de juiste argumenten.
+* [:gh:`2586`]: In het SSD-basissjabloon werd ``mijn_uitkeringen_text`` per
+  abuis benaderd als HTML-object via ``.html``, terwijl het een ``TextField``
+  is. Dit resulteerde in een lege weergave.
+* [:gh:`2588`]: Het Docker-opstartscript is aangepast zodat systeemchecks
+  (waaronder URL-validatie) pas worden uitgevoerd nadat de databasemigraties
+  voltooid zijn. Dit voorkomt een crash op verse deployments waarbij de
+  ``Site``-tabel nog niet bestaat.
+* [:gh:`2598`]: Een ontbrekende ``PartijIdentificator`` bij een klant in de
+  OpenKlant2-service veroorzaakte een onverwachte fout. Dit wordt nu correct
+  afgehandeld.
+* [:gh:`2544`]: De uitlogbevestigingspagina gebruikt nu een ``<script>``-tag
+  met een CSP-nonce voor de auto-submit in plaats van HTMX-attributen, waardoor
+  de Content Security Policy niet langer wordt geschonden.
+* [:gh:`2581`]: Ontbrekende statusindicatoren bij zaakstatussen worden nu
+  robuuster afgehandeld: ontbrekende ``ZaakTypeConfig`` of
+  ``ZaakTypeStatusTypeConfig`` worden gelogd als waarschuwing, en de opzoeking
+  van statustypes wordt gescopet op de actieve API-groep zodat URL-mismatches
+  niet langer stilletjes ``None`` teruggeven.
+* [:gh:`2600`]: De pagina 'Mijn vragen' gaf een 404-fout wanneer het
+  contactformulier niet was ingeschakeld. Dit is hersteld door de
+  contactformulier-check over te slaan bij de weergave van de vragenlijst.
+
 2.3.0 (2026-05-29)
 ==================
 
