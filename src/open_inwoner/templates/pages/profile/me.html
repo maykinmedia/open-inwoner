@@ -59,22 +59,7 @@
                 <div>{{ user.postcode }} {{ user.city }}</div>
             </div>
         </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "E-mail adres" %}</div>
-            <div class="tabled__item tabled__value tabled__break">
-                {% for da in user.digital_addresses.all %}{% if da.type == "email" %}
-                    <div>{{ da.value }}{% if da.is_standard_for_type %} {% trans "(voorkeur)" %}{% endif %}</div>
-                {% endif %}{% endfor %}
-            </div>
-        </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
-            <div class="tabled__item tabled__value">
-                {% for da in user.digital_addresses.all %}{% if da.type == "phone" %}
-                    <div>{{ da.value }}{% if da.is_standard_for_type %} {% trans "(voorkeur)" %}{% endif %}</div>
-                {% endif %}{% endfor %}
-            </div>
-        </div>
+        {% include "pages/profile/_digital_addresses.html" %}
     </section>
 {% else %}
     {# Personal information #}
@@ -107,22 +92,7 @@
                 <div>{{ user.postcode }} {{ user.city }}</div>
             </div>
         </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "E-mail adres" %}</div>
-            <div class="tabled__item tabled__value tabled__break">
-                {% for da in user.digital_addresses.all %}{% if da.type == "email" %}
-                    <div>{{ da.value }}{% if da.is_standard_for_type %} {% trans "(voorkeur)" %}{% endif %}</div>
-                {% endif %}{% endfor %}
-            </div>
-        </div>
-        <div class="tabled__row tabled__row--blank">
-            <div class="tabled__item tabled__key">{% trans "Telefoonnummer" %}</div>
-            <div class="tabled__item tabled__value">
-                {% for da in user.digital_addresses.all %}{% if da.type == "phone" %}
-                    <div>{{ da.value }}{% if da.is_standard_for_type %} {% trans "(voorkeur)" %}{% endif %}</div>
-                {% endif %}{% endfor %}
-            </div>
-        </div>
+        {% include "pages/profile/_digital_addresses.html" %}
     </section>
 {% endif %}
 
