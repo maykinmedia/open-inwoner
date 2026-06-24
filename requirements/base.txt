@@ -613,7 +613,7 @@ pygments==2.20.0
     #   django-log-outgoing-requests
     #   rich
     #   sphinx
-pyjwt==2.12.1
+pyjwt==2.13.0
     # via
     #   gemma-zds-client
     #   messagebird

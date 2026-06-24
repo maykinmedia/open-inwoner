@@ -1,9 +1,10 @@
 import json
 import os
 
-from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from zgw_consumers.constants import APITypes
 
-from .factories import ServiceFactory
+from open_inwoner.haalcentraal.models import HaalCentraalConfig
+from open_inwoner.openzaak.tests.factories import ServiceFactory
 
 
 class HaalCentraalMixin:
@@ -19,6 +20,7 @@ class HaalCentraalMixin:
         service = ServiceFactory(
             api_root="https://personen/api/brp",
             oas="https://personen/api/schema/openapi.yaml",
+            api_type=APITypes.orc,
         )
         config.service = service
         config.save()
