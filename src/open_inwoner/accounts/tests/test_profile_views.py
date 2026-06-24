@@ -124,22 +124,47 @@ class ProfileViewTests(WebTest):
         "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
     )
     def test_user_information_profile_page(self, m):
+        email_da = DigitalAddressFactory(
+            user=self.user,
+            type=DigitalAddressType.email,
+            value=self.user.email,
+            is_standard_for_type=True,
+        )
+        alt_email_da = DigitalAddressFactory(
+            user=self.user,
+            type=DigitalAddressType.email,
+            value="alt@example.com",
+            is_standard_for_type=False,
+        )
+        phone_da = DigitalAddressFactory(
+            user=self.user,
+            type=DigitalAddressType.phone,
+            value="0612345678",
+            is_standard_for_type=True,
+        )
         response = self.app.get(self.url, user=self.user)
 
         self.assertContains(response, self.user.first_name)
         self.assertContains(response, f"Welkom, {self.user.display_name}")
         self.assertContains(response, f"{self.user.infix} {self.user.last_name}")
-        self.assertContains(response, self.user.email)
         self.assertContains(response, self.user.street)
         self.assertContains(response, self.user.housenumber)
         self.assertContains(response, self.user.city)
+
+        doc = PyQuery(response.content)
+        personal_section = doc.find(".profile-section__personal-info")
+
+        # standard email shown with (voorkeur) marker; alt email shown without
+        self.assertContains(response, f"{email_da.value} (voorkeur)")
+        self.assertNotContains(response, f"{alt_email_da.value} (voorkeur)")
+
+        # phone shown
+        self.assertIn(phone_da.value, personal_section.text())
 
         # check business profile section not displayed
         self.assertNotContains(response, "Bedrijfsgegevens")
 
         # check notification preferences displayed
-        doc = PyQuery(response.content)
-
         notifications_text = doc.find("#profile-notifications")[0].text_content()
         self.assertIn("Mijn Berichten", notifications_text)
 
