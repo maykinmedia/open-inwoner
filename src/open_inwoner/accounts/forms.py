@@ -152,6 +152,7 @@ class BaseUserForm(forms.ModelForm):
         fields = (
             "image",
             "cropping",
+            "preferred_address",
         )
 
     def __init__(self, user, *args, **kwargs):
@@ -163,6 +164,14 @@ class BaseUserForm(forms.ModelForm):
 
         if "first_name" in self.fields:
             self.fields["first_name"].validators.append(CharFieldValidator())
+
+        self.fields["preferred_address"].required = False
+        self.fields["preferred_address"].empty_label = _("Geen voorkeur")
+        self.fields["preferred_address"].queryset = (
+            self.instance.digital_addresses.all()
+            if self.instance.pk
+            else DigitalAddress.objects.none()
+        )
 
 
 class UserForm(ErrorMessageMixin, BaseUserForm):
@@ -184,6 +193,7 @@ class UserForm(ErrorMessageMixin, BaseUserForm):
             "city",
             "image",
             "cropping",
+            "preferred_address",
         )
 
 
