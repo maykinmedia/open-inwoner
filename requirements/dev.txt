@@ -775,7 +775,6 @@ idna==3.16
     #   -r requirements/ci.txt
     #   email-validator
     #   requests
-    #   yarl
 imagesize==2.0.0
     # via
     #   -c requirements/ci.txt
@@ -914,11 +913,6 @@ mozilla-django-oidc-db[setup-configuration]==0.23.0
     #   django-digid-eherkenning
 msgpack==1.1.2
     # via locust
-multidict==6.6.4
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   yarl
 nodeenv==1.9.1
     # via pre-commit
 notifications-api-common==0.2.2
@@ -1129,11 +1123,6 @@ prompt-toolkit==3.0.36
     #   click-repl
     #   commitizen
     #   questionary
-propcache==0.3.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   yarl
 prosemirror==0.5.2
     # via
     #   -c requirements/ci.txt
@@ -1549,12 +1538,11 @@ urllib3==2.7.0
     #   geventhttpclient
     #   requests
     #   sentry-sdk
-    #   vcrpy
 uwsgi==2.0.31
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-vcrpy==7.0.0
+vcrpy==8.2.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1644,11 +1632,6 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-yarl==1.20.1
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   vcrpy
 zgw-consumers==0.38.1
     # via
     #   -c requirements/ci.txt
