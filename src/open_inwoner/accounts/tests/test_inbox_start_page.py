@@ -149,6 +149,35 @@ class InboxPageTests(WebTest):
         self.assertEqual(message.receiver, contact)
         self.assertEqual(message.file, document.file)
 
+    @temp_private_root()
+    def test_get_with_other_users_document_returns_404(self):
+        other_user = UserFactory()
+        document = DocumentFactory.create(owner=other_user)
+        url = furl(self.url).add({"file": document.uuid}).url
+
+        self.app.get(url, status=404)
+
+    @temp_private_root()
+    def test_post_with_other_users_document_init_does_not_attach_file(self):
+        contact = UserFactory()
+        self.user.user_contacts.add(contact)
+        other_user = UserFactory()
+        document = DocumentFactory.create(owner=other_user)
+
+        response = self.app.get(self.url)
+        form = response.forms["start-message-form"]
+        form["receiver"] = str(contact.uuid)
+        form["content"] = "hello"
+        # simulate an attacker injecting another user's document UUID
+        form["file-init"] = str(document.uuid)
+
+        response = form.submit()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Message.objects.count(), 1)
+        message = Message.objects.get()
+        self.assertFalse(message.file)
+
     def test_send_empty_message_with_sharing_disabled(self):
         contact = UserFactory()
         self.user.user_contacts.add(contact)

@@ -675,6 +675,7 @@ class ActionForm(forms.ModelForm):
 
 class MessageFileInputWidget(forms.ClearableFileInput):
     template_name = "utils/widgets/message_file_input.html"
+    user = None  # set by InboxForm.__init__ to enforce ownership
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -695,8 +696,8 @@ class MessageFileInputWidget(forms.ClearableFileInput):
 
         # check if there is initial file
         init_value = forms.TextInput().value_from_datadict(data, files, name + "-init")
-        if init_value:
-            document = Document.objects.filter(uuid=init_value).first()
+        if init_value and self.user is not None:
+            document = Document.objects.filter(uuid=init_value, owner=self.user).first()
             if document:
                 return document.file
 
@@ -740,6 +741,8 @@ class InboxForm(forms.ModelForm):
 
         if not self.config.allow_messages_file_sharing:
             del self.fields["file"]
+        else:
+            self.fields["file"].widget.user = user
 
     def clean(self):
         cleaned_data = super().clean()
