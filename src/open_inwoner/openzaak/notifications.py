@@ -625,7 +625,7 @@ def _get_np_initiator_bsns_from_roles(roles: list[Rol]) -> list[str]:
             role,
             Coalesce(
                 "omschrijving_generiek",
-                "_expand.roltype.omschrijving_generiek",
+                "_expand.zaak.roltype.omschrijving_generiek",
                 default="",
             ),
         )
@@ -657,7 +657,7 @@ def _get_nnp_initiator_nnp_id_from_roles(roles: list[Rol]) -> list[str]:
             role,
             Coalesce(
                 "omschrijving_generiek",
-                "_expand.roltype.omschrijving_generiek",
+                "_expand.zaak.roltype.omschrijving_generiek",
                 default="",
             ),
         )
