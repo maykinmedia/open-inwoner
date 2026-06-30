@@ -230,7 +230,9 @@ class InboxStartView(LogMixin, LoginRequiredMixin, CommonPageMixin, FormView):
         if not document_uuid:
             return
 
-        document = get_object_or_404(Document, uuid=document_uuid)
+        document = get_object_or_404(
+            Document, uuid=document_uuid, owner=self.request.user
+        )
 
         return document.file
 
