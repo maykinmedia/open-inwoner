@@ -135,7 +135,7 @@ class ZakenClient(ZgwAPIClient):
                 )
 
     @cache_result(
-        "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}",
+        "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
         timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_by_bsn(
@@ -179,7 +179,7 @@ class ZakenClient(ZgwAPIClient):
         return self.factory(Zaak, all_data)
 
     @cache_result(
-        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}",
+        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
         timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_for_company(
