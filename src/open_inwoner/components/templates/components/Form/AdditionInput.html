@@ -20,4 +20,8 @@
     </template>
 
     {% button text=add_label icon="add" icon_position="before" secondary=True transparent=True type="button" id=add_btn_id %}
+
+    {% if formset.non_form_errors %}
+        {% errors errors=formset.non_form_errors %}
+    {% endif %}
 </div>
