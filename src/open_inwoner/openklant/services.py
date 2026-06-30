@@ -244,15 +244,12 @@ class eSuiteKlantenService(
     def _retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer=None
     ) -> list[Klant]:
-        params = (
-            {
-                "subjectVestiging__vestigingsNummer": vestigingsnummer,
-            }
-            if vestigingsnummer
-            else {
-                "subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin,
-            }
-        )
+        params = {}
+        if vestigingsnummer:
+            params["subjectVestiging__vestigingsNummer"] = vestigingsnummer
+        if user_kvk_or_rsin:
+            params["subjectNietNatuurlijkPersoon__innNnpId"] = user_kvk_or_rsin
+
         response = self.client.get("klanten", params=params)
         self.client.raise_for_status(response)
         data = self.client.parse_json(response)
@@ -287,15 +284,12 @@ class eSuiteKlantenService(
         if user_bsn:
             payload = payload | {"subjectIdentificatie": {"inpBsn": user_bsn}}
         elif user_kvk_or_rsin:
+            identificatie = {"subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}}
             if vestigingsnummer:
-                payload = payload | {
-                    "subjectIdentificatie": {"vestigingsNummer": vestigingsnummer}
-                }
-
-            else:
-                payload = payload | {
-                    "subjectIdentificatie": {"innNnpId": user_kvk_or_rsin}
-                }
+                identificatie["subjectIdentificatie"]["vestigingsNummer"] = (
+                    vestigingsnummer
+                )
+            payload = payload | identificatie
 
         response = self.client.post("klanten", json=payload)
         self.client.raise_for_status(response)

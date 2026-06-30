@@ -72,13 +72,11 @@ class KlantenClient(KlantAPIClient):
     def retrieve_klanten_for_kvk_or_rsin(
         self, user_kvk_or_rsin: str, *, vestigingsnummer: str | None = None
     ) -> list[Klant]:
-        params = (
-            {
-                "subjectVestiging__vestigingsNummer": vestigingsnummer,
-            }
-            if vestigingsnummer
-            else {"subjectNietNatuurlijkPersoon__innNnpId": user_kvk_or_rsin}
-        )
+        params = {}
+        if vestigingsnummer:
+            params["subjectVestiging__vestigingsNummer"] = vestigingsnummer
+        if user_kvk_or_rsin:
+            params["subjectNietNatuurlijkPersoon__innNnpId"] = user_kvk_or_rsin
         response = self.get("klanten", params=params)
         self.raise_for_status(response)
         raw_json_data = self.parse_json(response)
