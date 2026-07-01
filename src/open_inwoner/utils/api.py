@@ -11,7 +11,9 @@ Object = dict[str, Any]
 
 
 class APIError(Exception):
-    pass
+    def __init__(self, message: str = "", status_code: int | None = None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class BaseAPIClient(APIClient):
@@ -43,8 +45,12 @@ class BaseAPIClient(APIClient):
             response.raise_for_status()
         except requests.HTTPError as exc:
             if response.status_code >= 500:
-                raise self.server_error_type(str(exc)) from exc
-            raise self.client_error_type(str(exc)) from exc
+                raise self.server_error_type(
+                    str(exc), status_code=response.status_code
+                ) from exc
+            raise self.client_error_type(
+                str(exc), status_code=response.status_code
+            ) from exc
 
     def parse_json(self, response) -> dict:
         try:

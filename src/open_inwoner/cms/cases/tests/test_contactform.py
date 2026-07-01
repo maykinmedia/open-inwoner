@@ -408,7 +408,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         }
         KlantContactValidator.validate_python(klantcontact)
         m.get(
-            f"{OPENKLANT2_ROOT}klantcontacten?onderwerpobject__onderwerpobjectidentificatorObjectId=ZAAK-2022-0000000024",
+            f"{OPENKLANT2_ROOT}klantcontacten?onderwerpobject__onderwerpobjectidentificatorObjectId=d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d",
             headers={"Content-Type": "application/json"},
             json={
                 "count": 123,
