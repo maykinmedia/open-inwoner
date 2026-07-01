@@ -90,6 +90,7 @@ from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
+from open_inwoner.utils.url import uuid_from_url
 from open_inwoner.utils.views import LogMixin
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -1865,10 +1866,10 @@ class OpenKlant2Service(
                 "klantcontact": {"uuid": ok2_question.question_kcm_uuid},
                 "wasKlantcontact": None,
                 "onderwerpobjectidentificator": {
-                    "objectId": zaak.identificatie,
-                    "codeObjecttype": "zaak",
+                    "objectId": str(uuid_from_url(zaak.url)),
+                    "codeObjecttype": "zgw-Zaak",
                     "codeRegister": "openzaak",
-                    "codeSoortObjectId": "identificatie",
+                    "codeSoortObjectId": "uuid",
                 },
             }
         )
@@ -2125,27 +2126,14 @@ class OpenKlant2Service(
         onderwerp_object = onderwerp_objecten[0]
 
         # find the unique zaak + relevant api group for the question
-        identificatie = onderwerp_object["onderwerpobjectidentificator"]["objectId"]
-        results = ZGWService().search_zaken(
-            user.identification, zaak_identificatie=identificatie
-        )
+        zaak_uuid = onderwerp_object["onderwerpobjectidentificator"]["objectId"]
+        zaak_with_api_group = ZGWService().get_zaak_by_uuid(zaak_uuid)
 
-        if not results:
+        if not zaak_with_api_group:
             logger.info(
                 "Unable to find matched contactmomenten zaak with OpenKlant2 backend"
             )
             return self._build_question_dto(question_ok2=question, user=user), None
-
-        if len(results) > 1:
-            logger.error(
-                "More than one zaak found for question",
-                question_kcm_uuid=question.question_kcm_uuid,
-            )
-            return self._build_question_dto(question_ok2=question, user=user), None
-
-        zaak_with_api_group = ZaakWithApiGroup(
-            zaak=results[0].zaak, api_group=results[0].api_group
-        )
 
         return (
             self._build_question_dto(question_ok2=question, user=user),
@@ -2206,7 +2194,9 @@ class OpenKlant2Service(
         user: User,
     ) -> list[Question]:
         params: ListKlantContactParams = {
-            "onderwerpobject__onderwerpobjectidentificatorObjectId": zaak.identificatie,
+            "onderwerpobject__onderwerpobjectidentificatorObjectId": str(
+                uuid_from_url(zaak.url)
+            ),
             "expand": ["hadBetrokkenen"],
         }
         klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)

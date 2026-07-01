@@ -3253,10 +3253,10 @@ class TestCaseDetailView(
             "klantcontact": klantcontact,
             "wasKlantcontact": None,
             "onderwerpobjectidentificator": {
-                "objectId": self.zaak["identificatie"],
-                "codeObjecttype": "string",
-                "codeRegister": "string",
-                "codeSoortObjectId": "identificatie",
+                "objectId": self.zaak["uuid"],
+                "codeObjecttype": "zgw-Zaak",
+                "codeRegister": "openzaak",
+                "codeSoortObjectId": "uuid",
             },
         }
         OnderwerpObjectValidator.validate_python(onderwerp_object)

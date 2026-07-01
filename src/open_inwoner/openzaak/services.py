@@ -823,6 +823,60 @@ class ZGWService:
 
         return zaak, api_group
 
+    def get_zaak_by_uuid(self, uuid: str) -> ZaakWithApiGroup | None:
+        config = OpenZaakConfig.get_solo()
+        api_groups = list(ZGWApiGroupConfig.objects.select_related("zrc_service"))
+
+        def fetch(api_group: ZGWApiGroupConfig) -> ZaakWithApiGroup:
+            zaak = self._zaken_client_factory(api_group, config).fetch_single_zaak(uuid)
+            return ZaakWithApiGroup(
+                zaak=zaak, api_group=api_group, type_aanvraag=TypeAanvraag.ZAAK
+            )
+
+        results: list[ZaakWithApiGroup] = []
+
+        with parallel(max_workers=self._max_workers) as executor:
+            future_to_group: dict[concurrent.futures.Future, ZGWApiGroupConfig] = {
+                executor.submit(fetch, group): group for group in api_groups
+            }
+            try:
+                for future in concurrent.futures.as_completed(
+                    future_to_group, timeout=config.case_list_fetch_timeout
+                ):
+                    api_group = future_to_group[future]
+                    try:
+                        results.append(future.result())
+                    except ZgwAPIError as exc:
+                        if exc.status_code == 404:
+                            continue
+                        logger.warning(
+                            "error fetching zaak by uuid",
+                            uuid=uuid,
+                            api_group=api_group.pk,
+                            status_code=exc.status_code,
+                            exc_info=True,
+                        )
+                    except Exception:
+                        logger.warning(
+                            "unexpected error fetching zaak by uuid",
+                            uuid=uuid,
+                            api_group=api_group.pk,
+                            exc_info=True,
+                        )
+            except concurrent.futures.TimeoutError:
+                logger.warning(
+                    "timed out fetching zaak by uuid", uuid=uuid, exc_info=True
+                )
+
+        if len(results) > 1:
+            logger.warning(
+                "zaak found in multiple API groups",
+                uuid=uuid,
+                api_groups=[r.api_group.pk for r in results],
+            )
+
+        return results[0] if results else None
+
     def fetch_zaak_by_url(
         self, zaak_url: str, api_group: ZGWApiGroupConfig
     ) -> Zaak | None:
