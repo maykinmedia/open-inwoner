@@ -85,9 +85,12 @@ beautifulsoup4
 
 # DigidLocal
 
-# Pinned to fix #2125 -- we can't upgrade to the latest django-digid-eherkenning due
-# to it being dependent on the newest version of django-mozilla-django-oidc-db
-git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning[oidc]
+# Fork of 0.25.1 that restores the `replaces` list on the squashed
+# 0001_initial_to_v019 migration (dropped upstream in 0.25.x). Without it, installs
+# that ran the old individual 0001..0016 migrations re-run the squash's CreateModel on
+# upgrade -> DuplicateTable. Once every install has upgraded through a release
+# containing this pin, switch back to a stock PyPI version (>=0.25.2).
+django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@090e315
 mozilla-django-oidc-db[setup-configuration]
 maykin-python3-saml
 pyopenssl
