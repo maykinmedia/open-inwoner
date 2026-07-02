@@ -207,12 +207,14 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
         page.goto(cls.live_reverse("digid:login"))
 
-        page.get_by_text("Met gebruikersnaam en wachtwoord").click()
+        # digid-mock IdP "keuze" page: pick the BSN login tile. The mock login flow
+        # was reworked in django-digid-eherkenning 0.25.0 (the old "password" page
+        # with username/password fields is now a single-BSN page at digid-mock:bsn).
+        page.locator("#authentication_type_account_basis").click()
 
-        page.wait_for_url(cls.live_reverse("digid-mock:password", star=True))
+        page.wait_for_url(cls.live_reverse("digid-mock:bsn", star=True))
 
-        page.get_by_text("DigiD gebruikersnaam", exact=True).fill(user.bsn)
-        page.get_by_text("Wachtwoord", exact=True).fill("whatever")
+        page.locator("input[name='auth_bsn']").fill(user.bsn)
         page.get_by_role("button", name="Inloggen").click()
 
         page.wait_for_url(cls.live_reverse("pages-root"))
