@@ -192,14 +192,12 @@
       "name": "Inlog koppelingen",
       "slug": "auth-koppelingen",
       "models": [
-        ["accounts", "openideidasconfig"],
         ["digid_eherkenning", "digidconfiguration"],
         ["digid_eherkenning", "eherkenningconfiguration"],
-        ["digid_eherkenning_oidc_generics", "digidconfig"],
-        ["digid_eherkenning_oidc_generics", "eherkenningconfig"],
+        ["mozilla_django_oidc_db", "oidcclient"],
+        ["mozilla_django_oidc_db", "oidcprovider"],
         ["haalcentraal", "haalcentraalconfig"],
-        ["kvk", "kvkconfig"],
-        ["mozilla_django_oidc_db", "openidconnectconfig"]
+        ["kvk", "kvkconfig"]
       ]
     }
   },

@@ -73,4 +73,11 @@ class AccountsConfig(AppConfig):
             return
         self._has_run = True
 
+        # Importing this registers our OIDC plugins via the `@register(...)`
+        # decorators. Import the submodule directly (not the `oidc_plugins`
+        # package) since the plugins module itself imports view callables
+        # that in turn need `oidc_plugins.constants` -- routing everything
+        # through the package `__init__` would create an import cycle.
+        from .oidc_plugins import plugins  # noqa: F401
+
         post_migrate.connect(update_admin_index, sender=self)
