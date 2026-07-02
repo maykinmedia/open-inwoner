@@ -1,4 +1,4 @@
-from typing import Literal, NamedTuple, TypedDict, cast
+from typing import NamedTuple, TypedDict
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -6,14 +6,14 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import SuspiciousOperation, ValidationError
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 import structlog
 from axes.backends import AxesBackend
-from digid_eherkenning.oidc.backends import BaseBackend
 from glom import Path, glom
 from mozilla_django_oidc_db.backends import OIDCAuthenticationBackend
-from mozilla_django_oidc_db.config import dynamic_setting
+from mozilla_django_oidc_db.constants import OIDC_ADMIN_CONFIG_IDENTIFIER
+from mozilla_django_oidc_db.registry import register as registry
 from mozilla_django_oidc_db.typing import JSONObject
 from oath import accept_totp
 
@@ -23,7 +23,12 @@ from open_inwoner.utils.hash import generate_email_from_string
 from open_inwoner.utils.views import LogMixin
 
 from .choices import LoginTypeChoices
-from .models import OpenIDDigiDConfig, OpenIDEHerkenningConfig, OpenIDEIDASConfig, User
+from .models import User
+from .oidc_plugins.constants import (
+    OIDC_DIGID_IDENTIFIER,
+    OIDC_EH_IDENTIFIER,
+    OIDC_EIDAS_IDENTIFIER,
+)
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -81,21 +86,19 @@ class CustomAxesBackend(AxesBackend):
 
 
 class CustomOIDCBackend(OIDCAuthenticationBackend):
-    callback_path = reverse_lazy("oidc_authentication_callback")
+    def _check_candidate_backend(self) -> bool:
+        if self.config.identifier != OIDC_ADMIN_CONFIG_IDENTIFIER:
+            return False
 
-    def authenticate(self, request, *args, **kwargs):
-        # Avoid attempting OIDC for a specific variant if we know that that is not the
-        # correct variant being attempted
-        # XXX, TODO, check the config class rather than the path once there's
-        # a single callback URL. We can override ``_check_candidate_backend``.
-        if request and request.path != self.callback_path:
-            return
+        if self.request and SiteConfiguration.get_solo().openid_enabled_for_admin:
+            # oidc_login_next still drives the post-login redirect: the upstream
+            # OIDCAuthenticationCallbackView.success_url reads it from the session.
+            self.request.session["oidc_login_next"] = reverse("admin:index")
 
-        config = SiteConfiguration.get_solo()
-        if request and config.openid_enabled_for_admin:
-            request.session["oidc_login_next"] = reverse("admin:index")
+        return super()._check_candidate_backend()
 
-        return super().authenticate(request, *args, **kwargs)
+    def _extract_username(self, claims: JSONObject) -> str:
+        return registry[OIDC_ADMIN_CONFIG_IDENTIFIER].get_username(claims)
 
     def create_user(self, claims):
         """
@@ -157,13 +160,27 @@ class CustomOIDCBackend(OIDCAuthenticationBackend):
         return self.UserModel.objects.filter(**{"oidc_id__iexact": unique_id})
 
 
-class DigiDOIDCBackend(LogMixin, BaseBackend):
-    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["bsn"]]()
-    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
+class DigiDOIDCBackend(LogMixin, OIDCAuthenticationBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = "bsn"
+    OIP_LOGIN_TYPE = LoginTypeChoices.digid
 
     def _check_candidate_backend(self) -> bool:
-        parent = super()._check_candidate_backend()
-        return parent and self.config_class is OpenIDDigiDConfig
+        # Check the identifier first: only defer to the parent (which validates
+        # the plugin settings and reads `enabled`) when this config is ours.
+        return (
+            self.config.identifier == OIDC_DIGID_IDENTIFIER
+            and super()._check_candidate_backend()
+        )
+
+    def _extract_username(self, claims: JSONObject) -> str:
+        claim_path = self.config.options["identity_settings"]["bsn_claim_path"]
+        return glom(claims, Path(*claim_path), default="")
+
+    def verify_claims(self, claims: JSONObject) -> bool:
+        # The generic backend delegates verify_claims to the plugin, but our
+        # plugins are thin (schema/callback only) and the user logic lives here.
+        # Authentication may proceed iff the BSN claim is present.
+        return bool(self._extract_username(claims))
 
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified subject."""
@@ -196,34 +213,57 @@ class DigiDOIDCBackend(LogMixin, BaseBackend):
 
         return user
 
+    def update_user(self, user: AbstractUser, claims: JSONObject):
+        # BSN doesn't change, nothing to update.
+        return user
+
 
 class KvkEntityInformation(NamedTuple):
     kvk: str
     vestigingsnummer: str | None
 
 
-class EHerkenningOIDCBackend(LogMixin, BaseBackend):
-    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["kvk"]]()
-    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
+class EHerkenningOIDCBackend(LogMixin, OIDCAuthenticationBackend):
+    OIP_UNIQUE_ID_USER_FIELDNAME = "kvk"
+    OIP_LOGIN_TYPE = LoginTypeChoices.eherkenning
 
     def _check_candidate_backend(self) -> bool:
-        parent = super()._check_candidate_backend()
-        return parent and self.config_class is OpenIDEHerkenningConfig
+        return (
+            self.config.identifier == OIDC_EH_IDENTIFIER
+            and super()._check_candidate_backend()
+        )
+
+    def verify_claims(self, claims: JSONObject) -> bool:
+        # See DigiDOIDCBackend.verify_claims. Authentication may proceed iff the
+        # legal subject (KvK/RSIN) claim is present.
+        identity_settings = self.config.options["identity_settings"]
+        legal_subject = glom(
+            claims,
+            Path(*identity_settings["legal_subject_claim_path"]),
+            default=None,
+        )
+        return bool(legal_subject)
 
     def _get_kvk_entity_information_from_claims(
         self, claims: JSONObject
     ) -> KvkEntityInformation | None:
         """Get company vestigingsnummer from OIDC claims & store in session"""
-        eherkenning_config = self.config_class.get_solo()
+        identity_settings = self.config.options["identity_settings"]
 
         vestigingsnummer = glom(
-            claims, Path(*eherkenning_config.branch_number_claim), default=None
+            claims,
+            Path(*identity_settings["branch_number_claim_path"]),
+            default=None,
         )
         kvk_or_rsin = glom(
-            claims, Path(*eherkenning_config.legal_subject_claim), default=None
+            claims,
+            Path(*identity_settings["legal_subject_claim_path"]),
+            default=None,
         )
         identifier_type = glom(
-            claims, Path(*eherkenning_config.identifier_type_claim), default=None
+            claims,
+            Path(*identity_settings["identifier_type_claim_path"]),
+            default=None,
         )
 
         if not kvk_or_rsin:
@@ -313,7 +353,7 @@ class EHerkenningOIDCBackend(LogMixin, BaseBackend):
     def update_user(self, user: AbstractUser, claims: JSONObject):
         self._persist_eherkenning_params_to_session(user)
         self._log_successful_authenticate(user)
-        return super().update_user(user, claims)
+        return user
 
 
 class EIDASClaimValues(TypedDict):
@@ -327,14 +367,23 @@ class EIDASClaimValues(TypedDict):
     family_name: str | None
 
 
-class EIDASOIDCBackend(LogMixin, BaseBackend):
-    OIP_UNIQUE_ID_USER_FIELDNAME = dynamic_setting[Literal["eidas_pseudo_id"]]()
-    OIP_LOGIN_TYPE = dynamic_setting[LoginTypeChoices]()
-    config_class = OpenIDEIDASConfig
-
+class EIDASOIDCBackend(LogMixin, OIDCAuthenticationBackend):
     def _check_candidate_backend(self) -> bool:
-        parent = super()._check_candidate_backend()
-        return parent and self.config_class is OpenIDEIDASConfig
+        return (
+            self.config.identifier == OIDC_EIDAS_IDENTIFIER
+            and super()._check_candidate_backend()
+        )
+
+    def verify_claims(self, claims: JSONObject) -> bool:
+        # See DigiDOIDCBackend.verify_claims. Authentication may proceed iff the
+        # pseudo identifier claim (required for all eIDAS logins) is present.
+        identity_settings = self.config.options["identity_settings"]
+        pseudo_id = glom(
+            claims,
+            Path(*identity_settings["legal_subject_pseudo_identifier_claim_path"]),
+            default=None,
+        )
+        return bool(pseudo_id)
 
     def _extract_eidas_claim_values(self, claims: JSONObject) -> EIDASClaimValues:
         """
@@ -342,37 +391,37 @@ class EIDASOIDCBackend(LogMixin, BaseBackend):
 
         Returns a typed dictionary with all possible claim values (or None if not present).
         """
-        eidas_config = cast(OpenIDEIDASConfig, self.config_class.get_solo())
+        identity_settings = self.config.options["identity_settings"]
 
         return EIDASClaimValues(
             pseudo_id=glom(
                 claims,
-                Path(*eidas_config.pseudo_identifier_claim),
+                Path(*identity_settings["legal_subject_pseudo_identifier_claim_path"]),
                 default=None,
             ),
             bsn=glom(
                 claims,
-                Path(*eidas_config.natural_person_bsn_identifier_claim),
+                Path(*identity_settings["legal_subject_bsn_identifier_claim_path"]),
                 default=None,
             ),
             company_name=glom(
                 claims,
-                Path(*eidas_config.company_name_claim),
+                Path(*identity_settings["company_name_claim_path"]),
                 default=None,
             ),
             legal_entity_id=glom(
                 claims,
-                Path(*eidas_config.legal_entity_identifier_claim),
+                Path(*identity_settings["legal_entity_identifier_claim_path"]),
                 default=None,
             ),
             first_name=glom(
                 claims,
-                Path(*eidas_config.natural_person_first_name_claim),
+                Path(*identity_settings["legal_subject_first_name_claim_path"]),
                 default=None,
             ),
             family_name=glom(
                 claims,
-                Path(*eidas_config.natural_person_family_name_claim),
+                Path(*identity_settings["legal_subject_family_name_claim_path"]),
                 default=None,
             ),
         )

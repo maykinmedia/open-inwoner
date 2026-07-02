@@ -11,19 +11,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import View
 
 import structlog
-from digid_eherkenning.oidc.models import BaseConfig
-from digid_eherkenning.oidc.views import OIDCAuthenticationCallbackView
+from mozilla_django_oidc_db.models import OIDCClient
 from mozilla_django_oidc_db.views import (
     _OIDC_ERROR_SESSION_KEY,
-    AdminCallbackView,
-    OIDCInit,
+    OIDCAuthenticationCallbackView,
+    OIDCAuthenticationRequestInitView,
 )
 
 from open_inwoner.accounts.choices import LoginTypeChoices
-from open_inwoner.accounts.models import (
-    OpenIDDigiDConfig,
-    OpenIDEHerkenningConfig,
-    OpenIDEIDASConfig,
+from open_inwoner.accounts.oidc_plugins.constants import (
+    OIDC_DIGID_IDENTIFIER,
+    OIDC_EH_IDENTIFIER,
+    OIDC_EIDAS_IDENTIFIER,
 )
 
 from .auth import BlockEenmanszaakLoginMixin
@@ -65,16 +64,14 @@ class OIDCFailureView(View):
 
 
 class CallbackView(OIDCAuthenticationCallbackView):
-    expect_django_user = True
-
     failure_url = reverse_lazy("oidc-error")
     generic_error_msg = ""
     error_message_mapping: dict[tuple[str, str], str]
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         try:
             with transaction.atomic():
-                response = super().get(request)
+                response = super().get(request, *args, **kwargs)
         except (IntegrityError, ValidationError):
             logger.exception(
                 "Something went wrong while attempting to authenticate via OIDC",
@@ -102,16 +99,20 @@ class CallbackView(OIDCAuthenticationCallbackView):
 
 
 class OIDCLogoutView(View):
-    config_class: type[BaseConfig] | None = None
+    identifier: str = ""
 
     def get_success_url(self):
         return resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     def get(self, request):
-        if self.config_class is None:
-            raise ImproperlyConfigured("Missing OIDCLogoutView config class")
+        if not self.identifier:
+            raise ImproperlyConfigured("Missing OIDCLogoutView identifier")
 
-        config = self.config_class.get_solo()
+        # Nothing to log out for an anonymous user; skip the IdP round-trip.
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(self.get_success_url())
+
+        config = OIDCClient.objects.resolve(self.identifier)
 
         id_token = request.session.get("oidc_id_token")
         if "oidc_login_next" in request.session:
@@ -121,7 +122,10 @@ class OIDCLogoutView(View):
         auth.logout(request)
 
         # Try to initiate a frontchannel redirect
-        if logout_endpoint := config.oidc_op_logout_endpoint:
+        logout_endpoint = (
+            config.oidc_provider.oidc_op_logout_endpoint if config.oidc_provider else ""
+        )
+        if logout_endpoint:
             if settings.OIDC_FRONTEND_LOGOUT_WITH_HINTS:
                 params = {
                     # The value MUST have been previously registered with the
@@ -155,8 +159,6 @@ class GenericOIDCLogoutView(OIDCLogoutView):
     DigiD/eHerkenning/eIDAS users should use their respective logout endpoints
     which handle SSO logout at the identity provider.
     """
-
-    config_class = None
 
     def get(self, request):
         if request.user.is_authenticated and hasattr(request.user, "login_type"):
@@ -217,17 +219,19 @@ class EHerkenningOIDCAuthenticationCallbackView(
         return settings.LOGIN_URL
 
 
-digid_init = OIDCInit.as_view(config_class=OpenIDDigiDConfig)
+digid_init = OIDCAuthenticationRequestInitView.as_view(identifier=OIDC_DIGID_IDENTIFIER)
 digid_callback = DigiDOIDCAuthenticationCallbackView.as_view()
-digid_logout = OIDCLogoutView.as_view(config_class=OpenIDDigiDConfig)
+digid_logout = OIDCLogoutView.as_view(identifier=OIDC_DIGID_IDENTIFIER)
 
-eherkenning_init = OIDCInit.as_view(config_class=OpenIDEHerkenningConfig)
+eherkenning_init = OIDCAuthenticationRequestInitView.as_view(
+    identifier=OIDC_EH_IDENTIFIER
+)
 eherkenning_callback = EHerkenningOIDCAuthenticationCallbackView.as_view()
-eherkenning_logout = OIDCLogoutView.as_view(config_class=OpenIDEHerkenningConfig)
+eherkenning_logout = OIDCLogoutView.as_view(identifier=OIDC_EH_IDENTIFIER)
 
 
-class EIDASOIDCAuthenticationCallbackView(AdminCallbackView):
-    failure_url = reverse_lazy("oidc-error")
+class EIDASOIDCAuthenticationCallbackView(CallbackView):
+    generic_error_msg = GENERIC_EIDAS_ERROR_MSG
     error_message_mapping = {
         (
             "access_denied",
@@ -235,31 +239,7 @@ class EIDASOIDCAuthenticationCallbackView(AdminCallbackView):
         ): "U heeft het inloggen met eIDAS geannuleerd.",
     }
 
-    def get(self, request):
-        response = super().get(request)
 
-        # Map eIDAS-specific error codes to user-friendly messages.
-        # This is a bit inelegant (we're adding error mapping after the parent's
-        # error handling), but it avoids duplicating the entire error handling
-        # logic from AdminCallbackView. We want consistent error handling behavior
-        # with DigiD/eHerkenning views (which use CallbackView from digid_eherkenning),
-        # but eIDAS uses mozilla_django_oidc_db, so we leverage AdminCallbackView's
-        # existing error handling and just add custom message mapping on top.
-        if error_label := self._map_error(request):
-            request.session[_OIDC_ERROR_SESSION_KEY] = error_label
-
-        return response
-
-    def _map_error(self, request) -> str:
-        if not (error := request.GET.get("error")):
-            return ""
-
-        # Look up the error using both error code and description.
-        error_description = request.GET.get("error_description", "")
-        mapped_error = self.error_message_mapping.get((error, error_description))
-        return mapped_error or str(GENERIC_EIDAS_ERROR_MSG)
-
-
-eidas_init = OIDCInit.as_view(config_class=OpenIDEIDASConfig)
+eidas_init = OIDCAuthenticationRequestInitView.as_view(identifier=OIDC_EIDAS_IDENTIFIER)
 eidas_callback = EIDASOIDCAuthenticationCallbackView.as_view()
-eidas_logout = OIDCLogoutView.as_view(config_class=OpenIDEIDASConfig)
+eidas_logout = OIDCLogoutView.as_view(identifier=OIDC_EIDAS_IDENTIFIER)
