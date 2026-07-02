@@ -13,13 +13,13 @@ import requests
 import structlog
 from django_registration.backends.one_step.views import RegistrationView
 from furl import furl
+from mozilla_django_oidc_db.models import OIDCClient
 
 from open_inwoner.accounts.forms import CustomRegistrationForm, NecessaryUserForm
-from open_inwoner.accounts.models import (
-    Invite,
-    OpenIDDigiDConfig,
-    OpenIDEHerkenningConfig,
-    User,
+from open_inwoner.accounts.models import Invite, User
+from open_inwoner.accounts.oidc_plugins.constants import (
+    OIDC_DIGID_IDENTIFIER,
+    OIDC_EH_IDENTIFIER,
 )
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.mail.verification import send_user_email_verification_mail
@@ -103,8 +103,10 @@ class CustomRegistrationView(RegistrationLogMixin, InviteMixin, RegistrationView
         )
 
         try:
-            config = OpenIDDigiDConfig.get_solo()
-            if config.enabled:
+            digid_oidc_client = OIDCClient.objects.filter(
+                identifier=OIDC_DIGID_IDENTIFIER
+            ).first()
+            if digid_oidc_client and digid_oidc_client.enabled:
                 digid_url = reverse("digid_oidc:init")
             else:
                 digid_url = reverse("digid:login")
@@ -115,8 +117,10 @@ class CustomRegistrationView(RegistrationLogMixin, InviteMixin, RegistrationView
             context["digid_url"] = ""
 
         try:
-            config = OpenIDEHerkenningConfig.get_solo()
-            if config.enabled:
+            eherkenning_oidc_client = OIDCClient.objects.filter(
+                identifier=OIDC_EH_IDENTIFIER
+            ).first()
+            if eherkenning_oidc_client and eherkenning_oidc_client.enabled:
                 eherkenning_url = reverse("eherkenning_oidc:init")
             else:
                 eherkenning_url = reverse("eherkenning:login")

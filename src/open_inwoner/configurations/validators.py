@@ -1,7 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from mozilla_django_oidc_db.models import OpenIDConnectConfig
+from mozilla_django_oidc_db.constants import OIDC_ADMIN_CONFIG_IDENTIFIER
+from mozilla_django_oidc_db.models import OIDCClient
 
 from .choices import OpenIDDisplayChoices
 
@@ -9,9 +10,15 @@ from .choices import OpenIDDisplayChoices
 def validate_oidc_config(value):
     """Prevent display of OIDC login to regular users if `make_users_staff` is true"""
 
-    open_id_config = OpenIDConnectConfig.get_solo()
+    admin_oidc_client = OIDCClient.objects.filter(
+        identifier=OIDC_ADMIN_CONFIG_IDENTIFIER
+    ).first()
+    make_users_staff = bool(
+        admin_oidc_client
+        and admin_oidc_client.options.get("groups_settings", {}).get("make_users_staff")
+    )
 
-    if open_id_config.make_users_staff and value == OpenIDDisplayChoices.regular:
+    if make_users_staff and value == OpenIDDisplayChoices.regular:
         raise ValidationError(
             _(
                 "You cannot select this option if 'Make users staff' is selected "

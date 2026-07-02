@@ -15,18 +15,11 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
-from digid_eherkenning.oidc.models import (
-    BaseConfig,
-    DigiDConfig as _OIDCDigiDConfig,
-    EHerkenningConfig as _OIDCEHerkenningConfig,
-)
 from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
-from mozilla_django_oidc_db.fields import ClaimField, ClaimFieldDefault
 from privates.storages import PrivateMediaFileSystemStorage
 from timeline_logger.models import TimelineLog
 
@@ -59,187 +52,6 @@ from .user_identification import (
 
 if TYPE_CHECKING:
     from open_inwoner.haalcentraal.api_models import BRP2xPersoon, BRP13Persoon
-
-###
-# Configuration
-###
-
-
-class OpenIDDigiDConfig(_OIDCDigiDConfig):
-    """
-    Proxy upstream library configuration model to override Python behaviour.
-    """
-
-    oip_unique_id_user_fieldname = "bsn"
-    oip_login_type = LoginTypeChoices.digid
-
-    class Meta:
-        proxy = True
-
-    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
-    # reader.
-    @classproperty
-    def oidcdb_check_idp_availability(cls):  # noqa: N805
-        return False
-
-    @property
-    def oidc_authentication_callback_url(self):
-        return "digid_oidc:callback"
-
-    def get_callback_view(self):
-        from .views import digid_callback
-
-        return digid_callback
-
-
-class OpenIDEHerkenningConfig(_OIDCEHerkenningConfig):
-    """
-    Proxy upstream library configuration model to override Python behaviour.
-    """
-
-    oip_unique_id_user_fieldname = "kvk"
-    oip_login_type = LoginTypeChoices.eherkenning
-
-    class Meta:
-        proxy = True
-
-    # XXX: enabling this requires the tests/mocks to be updated. exercise left to the
-    # reader.
-    @classproperty
-    def oidcdb_check_idp_availability(cls):  # noqa: N805
-        return False
-
-    @property
-    def oidc_authentication_callback_url(self):
-        return "eherkenning_oidc:callback"
-
-    def get_callback_view(self):
-        from .views import eherkenning_callback
-
-        return eherkenning_callback
-
-
-class OpenIDEIDASConfig(BaseConfig):
-    """
-    eIDAS OIDC configuration model.
-
-    eIDAS (electronic IDentification, Authentication and trust Services) enables
-    European citizens and businesses to use their national eID across EU borders.
-
-    This configuration allows mapping eIDAS attributes for:
-    - Natural persons: BSN identifier, pseudo identifier, first name, family name, date of birth
-    - Legal persons: Legal subject identifier
-
-    The unique identifier is stored in the User.oidc_id field since eIDAS can
-    authenticate different types of entities from various EU member states.
-
-    Follows naming convention from digid_eherkenning.oidc.models (OFEIDASConfig).
-    """
-
-    oip_unique_id_user_fieldname = "eidas_pseudo_id"
-    # oip_login_type = LoginTypeChoices.eidas_person_bsn
-
-    # Common to both natural and legal persons
-    pseudo_identifier_claim = ClaimField(
-        verbose_name=_("Pseudo identifier claim"),
-        default=ClaimFieldDefault("person_pseudo_identifier"),
-        blank=True,
-        help_text=_(
-            "Claim path for PseudoID - unique pseudonymous identifier for natural persons. "
-            "Use this to identify users across authentication sessions when BSN is not available. "
-            "Source: eHerkenning/eIDAS urn:etoegang:1.12:EntityConcernedID:PseudoID"
-        ),
-    )
-
-    # Natural persons
-    ## This may or may not be present, depending on whether the subject has connected
-    ## their BSN to their EIDAS
-    natural_person_bsn_identifier_claim = ClaimField(
-        verbose_name=_("BSN identifier claim"),
-        default=ClaimFieldDefault("person_bsn_identifier"),
-        blank=True,
-        help_text=_(
-            "Claim path for BSN (Burgerservicenummer) - National Identification Number. "
-            "Source: eHerkenning/eIDAS urn:etoegang:1.12:EntityConcernedID:BSN"
-        ),
-    )
-    natural_person_first_name_claim = ClaimField(
-        verbose_name=_("First name claim"),
-        default=ClaimFieldDefault("first_name"),
-        blank=True,
-        help_text=_(
-            "Claim path for first/given name of natural person. Source: eHerkenning/eIDAS"
-        ),
-    )
-
-    natural_person_family_name_claim = ClaimField(
-        verbose_name=_("Family name claim"),
-        default=ClaimFieldDefault("family_name"),
-        blank=True,
-        help_text=_(
-            "Claim path for family name/surname of natural person. Source: eHerkenning/eIDAS"
-        ),
-    )
-
-    natural_person_date_of_birth_claim = ClaimField(
-        verbose_name=_("Date of birth claim"),
-        default=ClaimFieldDefault("birthdate"),
-        blank=True,
-        help_text=_(
-            "Claim path for date of birth in format YYYY-MM-DD. Source: eHerkenning/eIDAS"
-        ),
-    )
-
-    # Legal person (company) claims
-    ## Note this is not pseudonymized, and _separate_ from the psuedo ID
-    legal_entity_identifier_claim = ClaimField(
-        verbose_name=_("Legal entity identifier claim"),
-        default=ClaimFieldDefault("company_identifier"),
-        blank=True,
-        help_text=_(
-            "Claim path for legal entity identifier - additional identifier for legal entities. "
-            "Source: urn:etoegang:1.11:EntityConcernedID:eIDASLegalIdentifier"
-        ),
-    )
-
-    company_name_claim = ClaimField(
-        verbose_name=_("Company name claim"),
-        default=ClaimFieldDefault("company_name"),
-        blank=True,
-        help_text=_(
-            "Claim path for company/organization legal name. Source: eIDAS urn:etoegang:1.12:EntityConcernedID:LegalName"
-        ),
-    )
-
-    # Level of Assurance claim
-    loa_claim = ClaimField(
-        verbose_name=_("Level of Assurance (LoA) claim"),
-        default=ClaimFieldDefault("acr"),
-        blank=True,
-        help_text=_(
-            "Claim path for Level of Assurance (LoA) value. "
-            "Indicates the authentication strength/security level. Source: eIDAS"
-        ),
-    )
-
-    # Natural person attribute claims
-
-    class Meta:
-        verbose_name = _("eIDAS OIDC configuration")
-
-    @classproperty
-    def oidcdb_check_idp_availability(cls):  # noqa: N805
-        return False
-
-    @property
-    def oidc_authentication_callback_url(self):
-        return "eidas_oidc:callback"
-
-    def get_callback_view(self):
-        from .views import eidas_callback
-
-        return eidas_callback
-
 
 ###
 # Content
@@ -824,13 +636,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_logout_url(self) -> str:
         match self.login_type:
             case LoginTypeChoices.digid:
-                return (
-                    reverse("digid_oidc:logout")
-                    if OpenIDDigiDConfig.get_solo().enabled
-                    # Digid no longer supports rp-initiated logout, so we don't worry
-                    # about clearing the DigiD session, and just kill our own session.
-                    else reverse("logout")
-                )
+                return reverse("digid_oidc:logout")
             case LoginTypeChoices.eherkenning:
                 return reverse("eherkenning_oidc:logout")
             case LoginTypeChoices.oidc:
