@@ -1,5 +1,4 @@
 from datetime import date
-from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -164,22 +163,13 @@ class UserTests(TestCase):
         with self.assertRaises(IntegrityError):
             eHerkenningVestigingUserFactory(kvk="12345678", vestiging="")
 
-    @patch("open_inwoner.accounts.models.OpenIDDigiDConfig")
-    def test_get_logout_url_digid_takes_oidc_config_into_account(
-        self, mock_digid_config
-    ):
-        user = UserFactory(login_type=LoginTypeChoices.digid)
-
-        # Test with OIDC enabled
-        mock_digid_config.get_solo.return_value.enabled = True
-        self.assertEqual(user.get_logout_url(), reverse("digid_oidc:logout"))
-
-        # Test with OIDC disabled
-        mock_digid_config.get_solo.return_value.enabled = False
-        self.assertEqual(user.get_logout_url(), reverse("logout"))
-
     def test_get_logout_url_returns_correct_option_for_login_type(self):
         test_cases = [
+            (
+                LoginTypeChoices.digid,
+                {"bsn": "123456782"},
+                reverse("digid_oidc:logout"),
+            ),
             (
                 LoginTypeChoices.eherkenning,
                 {"kvk": "12345678"},
