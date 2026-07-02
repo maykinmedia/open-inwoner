@@ -157,7 +157,6 @@ cryptography==48.0.1
     #   -r requirements/base.txt
     #   django-digid-eherkenning
     #   django-simple-certmanager
-    #   josepy
     #   maykin-python3-saml
     #   mozilla-django-oidc
     #   pyopenssl
@@ -331,7 +330,7 @@ django-csp-reports==1.10.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@8be5292813d58eda2910cd0a535baa39fc566006#egg=django-digid-eherkenning
+django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@090e31589ca2b79b81ff741d851e31dfb7df0e0c
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -469,12 +468,12 @@ django-sessionprofile==1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-digid-eherkenning
-django-setup-configuration==0.9.0
+django-setup-configuration==0.12.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   mozilla-django-oidc-db
-django-simple-certmanager==2.5.0
+django-simple-certmanager==4.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -491,7 +490,6 @@ django-solo==2.2.0
     #   django-digid-eherkenning
     #   django-log-outgoing-requests
     #   django-open-forms-client
-    #   mozilla-django-oidc-db
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
@@ -730,11 +728,6 @@ jinja2==3.1.6
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   sphinx
-josepy==1.13.0
-    # via
-    #   -c requirements/base.txt
-    #   -r requirements/base.txt
-    #   mozilla-django-oidc
 jsonschema==4.1.0
     # via
     #   -c requirements/base.txt
@@ -813,13 +806,12 @@ messagebird==2.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-mozilla-django-oidc==4.0.1
+mozilla-django-oidc==5.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-    #   django-digid-eherkenning
     #   mozilla-django-oidc-db
-mozilla-django-oidc-db[setup-configuration]==0.23.0
+mozilla-django-oidc-db[setup-configuration]==2.0.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1079,13 +1071,13 @@ pyjwt==2.13.0
     #   -r requirements/base.txt
     #   gemma-zds-client
     #   messagebird
+    #   mozilla-django-oidc
     #   zgw-consumers
 pyopenssl==26.2.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
-    #   josepy
     #   webauthn
 pyphen==0.12.0
     # via
@@ -1216,7 +1208,6 @@ setuptools==80.10.2
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-cms
-    #   josepy
 shellingham==1.5.4
     # via
     #   -c requirements/base.txt
