@@ -3,7 +3,10 @@ from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
-from mozilla_django_oidc_db.models import OpenIDConnectConfig
+from mozilla_django_oidc_db.constants import OIDC_ADMIN_CONFIG_IDENTIFIER
+from mozilla_django_oidc_db.models import OIDCClient
+from mozilla_django_oidc_db.tests.factories import OIDCClientFactory
+from mozilla_django_oidc_db.tests.mixins import OIDCMixin
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.choices import OpenIDDisplayChoices
@@ -12,16 +15,18 @@ from open_inwoner.utils.test import ClearCachesMixin
 
 
 @disable_admin_mfa()
-class OIDCConfigTest(ClearCachesMixin, WebTest):
+class OIDCConfigTest(OIDCMixin, ClearCachesMixin, WebTest):
     csrf_checks = False
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
 
-        openid_config = OpenIDConnectConfig.get_solo()
-        openid_config.enabled = True
-        openid_config.save()
+        OIDCClientFactory(
+            identifier=OIDC_ADMIN_CONFIG_IDENTIFIER,
+            enabled=True,
+            with_admin_options=True,
+        )
 
     def test_admin_only_enabled(self):
         """Assert that the OIDC login option is only displayed for login via admin"""
@@ -68,17 +73,17 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
     def test_oidc_config_validation(self):
         """
         Assert that error is displayed on attempt to select OIDC login for regular users
-        if and only if `make_users_staff` is enabled in `OpenIDConnectConfig`.
+        if and only if `make_users_staff` is enabled in the admin OIDC configuration.
         """
 
         self.user = UserFactory(is_superuser=True, is_staff=True)
         self.client.force_login(self.user)
 
+        oidc_client = OIDCClient.objects.get(identifier=OIDC_ADMIN_CONFIG_IDENTIFIER)
+
         # case 1: `make_users_staff` is True
-        openid_config = OpenIDConnectConfig.get_solo()
-        openid_config.enabled = True
-        openid_config.make_users_staff = True
-        openid_config.save()
+        oidc_client.options["groups_settings"]["make_users_staff"] = True
+        oidc_client.save()
 
         url = reverse("admin:configurations_siteconfiguration_change")
         response = self.app.post(
@@ -95,8 +100,8 @@ class OIDCConfigTest(ClearCachesMixin, WebTest):
         self.assertEqual(expected_error_text, error_text)
 
         # case 2: `make_users_staff` is False
-        openid_config.make_users_staff = False
-        openid_config.save()
+        oidc_client.options["groups_settings"]["make_users_staff"] = False
+        oidc_client.save()
 
         response = self.client.post(
             url, user=self.user, data={"openid_display": "regular"}

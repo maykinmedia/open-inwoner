@@ -7,12 +7,13 @@ from django.urls import reverse
 
 from furl import furl
 from mozilla_django_oidc_db.config import store_config
+from mozilla_django_oidc_db.tests.mixins import OIDCMixin
 
 from eherkenning.backends import eHerkenningBackend
 from open_inwoner.accounts.backends import EIDASOIDCBackend
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
-from open_inwoner.accounts.models import OpenIDEIDASConfig, User
+from open_inwoner.accounts.models import User
 from open_inwoner.utils.test import SessionMiddleware
 
 from .factories import (
@@ -20,14 +21,18 @@ from .factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
+from .oidc_factories import OIDCClientFactory
 
 
-class OIDCBackendTestCase(TestCase):
+class OIDCBackendTestCase(OIDCMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
 
         cls.user = UserFactory.create()
+        OIDCClientFactory(with_admin=True)
+        OIDCClientFactory(with_digid=True)
+        OIDCClientFactory(with_eherkenning=True)
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
@@ -223,18 +228,19 @@ class EHerkenningSAMLBackendTestCase(TestCase):
         self.assertTrue(context.is_branch_restricted())
 
 
-class EIDASOIDCBackendTest(TestCase):
+class EIDASOIDCBackendTest(OIDCMixin, TestCase):
     def setUp(self):
-        self.config = OpenIDEIDASConfig.get_solo()
-        self.config.pseudo_identifier_claim = ["pseudo_id"]
-        self.config.natural_person_bsn_identifier_claim = ["bsn"]
-        self.config.natural_person_first_name_claim = ["first_name"]
-        self.config.natural_person_family_name_claim = ["family_name"]
-        self.config.company_name_claim = ["company_name"]
-        self.config.legal_entity_identifier_claim = ["legal_entity"]
-        self.config.save()
+        super().setUp()
+
+        # The with_eidas trait provides identity_settings using these same simple
+        # claim keys (pseudo_id, bsn, first_name, family_name, company_name,
+        # legal_entity), matching the claim payloads sent below.
+        self.oidc_client = OIDCClientFactory(with_eidas=True)
 
         self.backend = EIDASOIDCBackend()
+        # create_user / filter_users_by_claims are normally called after
+        # authenticate() has set the config; set it directly for these unit tests.
+        self.backend.config = self.oidc_client
 
     def test_create_user_with_empty_claims_raises_error(self):
         with self.assertRaises(SuspiciousOperation) as context:
@@ -444,10 +450,20 @@ class EIDASOIDCBackendTest(TestCase):
             self.backend.update_user(user, {"first_name": "John", "family_name": "Doe"})
 
     def test_create_user_with_nested_claim_paths(self):
-        self.config.pseudo_identifier_claim = ["nested", "pseudo", "id"]
-        self.config.natural_person_first_name_claim = ["person", "firstName"]
-        self.config.natural_person_family_name_claim = ["person", "familyName"]
-        self.config.save()
+        identity_settings = self.backend.config.options["identity_settings"]
+        identity_settings["legal_subject_pseudo_identifier_claim_path"] = [
+            "nested",
+            "pseudo",
+            "id",
+        ]
+        identity_settings["legal_subject_first_name_claim_path"] = [
+            "person",
+            "firstName",
+        ]
+        identity_settings["legal_subject_family_name_claim_path"] = [
+            "person",
+            "familyName",
+        ]
 
         claims = {
             "nested": {"pseudo": {"id": "nested-pseudo-id"}},
