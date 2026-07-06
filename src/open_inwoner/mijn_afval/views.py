@@ -388,7 +388,7 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
                     lediging_data: _LedigingData = {
                         "tijdstip_datum": lediging.geleegd_op.strftime("%d-%m-%Y"),
                         "tijdstip_tijd": lediging.geleegd_op.strftime("%H:%M"),
-                        "tijdstip_dag": date_format(lediging.geleegd_op, "l"),
+                        "tijdstip_dag": date_format(lediging.geleegd_op, "D"),
                         "gewicht": _format_number(lediging.gewicht),
                         "kosten": _format_number(lediging.kosten, decimal_places=2),
                     }
