@@ -24,6 +24,7 @@ from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.oidc_plugins.constants import (
     OIDC_DIGID_IDENTIFIER,
     OIDC_EH_IDENTIFIER,
+    OIDC_EIDAS_IDENTIFIER,
 )
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
@@ -43,22 +44,6 @@ from .factories import (
 from .oidc_factories import OIDCClientFactory
 
 User = get_user_model()
-
-
-# XXX: [#2662] the classes still using these placeholders are not yet ported to
-# the OIDCClient architecture and are skipped. Placeholders keep the module
-# importable (the @patch(return_value=Model(...)) decorators construct these at
-# import time).
-class _UnportedConfig:
-    def __init__(self, *args, **kwargs):
-        pass
-
-
-OpenIDEIDASConfig = _UnportedConfig
-
-_UNPORTED_SKIP_REASON = (
-    "test_oidc_views not yet ported to the OIDCClient architecture (2662 upgrade)"
-)
 
 
 def perform_oidc_login(
@@ -2173,8 +2158,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         self.assertEqual(response.status_code, 200)
 
 
-@skip(_UNPORTED_SKIP_REASON)
-class EIDASOIDCFlowTests(WebTest):
+class EIDASOIDCFlowTests(OIDCMixin, WebTest):
     """
     Test the full OIDC authentication flow for eIDAS users.
     """
@@ -2192,16 +2176,21 @@ class EIDASOIDCFlowTests(WebTest):
 
     def setUp(self):
         super().setUp()
-        # Create and configure the eIDAS OIDC config
-        self.config = OpenIDEIDASConfig.get_solo()
-        self.config.enabled = True
-        self.config.pseudo_identifier_claim = ["sub"]
-        self.config.natural_person_bsn_identifier_claim = ["bsn"]
-        self.config.natural_person_first_name_claim = ["given_name"]
-        self.config.natural_person_family_name_claim = ["family_name"]
-        self.config.company_name_claim = ["company_name"]
-        self.config.legal_entity_identifier_claim = ["legal_entity_id"]
-        self.config.save()
+        # Create and configure the eIDAS OIDC client. Claim paths match the claim
+        # keys used by this class's userinfo payloads.
+        self.oidc_client = OIDCClientFactory(
+            with_eidas=True,
+            options={
+                "identity_settings": {
+                    "legal_subject_pseudo_identifier_claim_path": ["sub"],
+                    "legal_subject_bsn_identifier_claim_path": ["bsn"],
+                    "legal_subject_first_name_claim_path": ["given_name"],
+                    "legal_subject_family_name_claim_path": ["family_name"],
+                    "company_name_claim_path": ["company_name"],
+                    "legal_entity_identifier_claim_path": ["legal_entity_id"],
+                }
+            },
+        )
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -2225,7 +2214,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2315,7 +2304,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2379,7 +2368,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2468,7 +2457,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2556,7 +2545,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2615,7 +2604,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2697,7 +2686,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2765,7 +2754,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -2819,8 +2808,9 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
     def test_logout_with_sso_logout_configured(self):
-        self.config.oidc_op_logout_endpoint = "http://localhost:8080/eidas-logout"
-        self.config.save()
+        provider = self.oidc_client.oidc_provider
+        provider.oidc_op_logout_endpoint = "http://localhost:8080/eidas-logout"
+        provider.save()
 
         user = UserFactory.create(
             eidas_pseudo_id="eidas-logout-test",
@@ -2831,7 +2821,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session["oidc_id_token"] = "test-id-token"
@@ -2871,8 +2861,9 @@ class EIDASOIDCFlowTests(WebTest):
         )
 
     def test_logout_without_sso_logout_configured(self):
-        self.config.oidc_op_logout_endpoint = ""
-        self.config.save()
+        provider = self.oidc_client.oidc_provider
+        provider.oidc_op_logout_endpoint = ""
+        provider.save()
 
         user = UserFactory.create(
             eidas_pseudo_id="eidas-logout-no-sso",
@@ -2883,7 +2874,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session["oidc_id_token"] = "test-id-token"
@@ -2920,7 +2911,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
@@ -3001,7 +2992,7 @@ class EIDASOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEIDASConfig",
+                "config_identifier": OIDC_EIDAS_IDENTIFIER,
             }
         }
         session.save()
