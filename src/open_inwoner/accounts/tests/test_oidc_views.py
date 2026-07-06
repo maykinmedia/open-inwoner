@@ -21,6 +21,7 @@ from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
+from open_inwoner.accounts.oidc_plugins.constants import OIDC_DIGID_IDENTIFIER
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
@@ -50,7 +51,6 @@ class _UnportedConfig:
         pass
 
 
-OpenIDDigiDConfig = _UnportedConfig
 OpenIDEHerkenningConfig = _UnportedConfig
 OpenIDEIDASConfig = _UnportedConfig
 
@@ -494,9 +494,8 @@ class OIDCFlowTests(OIDCMixin, TestCase):
                 self.assertEqual(response.status_code, 403)
 
 
-@skip(_UNPORTED_SKIP_REASON)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class DigiDOIDCFlowTests(WebTest):
+class DigiDOIDCFlowTests(OIDCMixin, WebTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -513,19 +512,15 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True, bsn_claim=["sub"]),
-    )
     def test_existing_bsn_creates_no_new_user(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
         mock_brp,
     ):
+        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -544,7 +539,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session.save()
@@ -577,19 +572,15 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True, bsn_claim=["sub"]),
-    )
     def test_new_user_is_created_when_new_bsn(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
         mock_brp,
     ):
+        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {"sub": "000000000"}
         DigidUserFactory.create(bsn="123456782", email="existing_user@example.com")
@@ -597,7 +588,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session.save()
@@ -623,15 +614,11 @@ class DigiDOIDCFlowTests(WebTest):
         self.assertEqual(new_user.email, f"{hashed_bsn}@localhost")
         self.assertEqual(new_user.login_type, LoginTypeChoices.digid)
 
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(
-            id=1, enabled=True, oidc_op_logout_endpoint="http://localhost:8080/logout"
-        ),
-    )
-    def test_frontend_logout_redirects_to_correct_url_with_optional_hints(
-        self, mock_get_solo
-    ):
+    def test_frontend_logout_redirects_to_correct_url_with_optional_hints(self):
+        OIDCClientFactory(
+            with_digid=True,
+            oidc_provider__oidc_op_logout_endpoint="http://localhost:8080/logout",
+        )
         # set up a user with a non existing email address
         user = DigidUserFactory.create(
             bsn="123456782", email="existing_user@example.com"
@@ -647,7 +634,7 @@ class DigiDOIDCFlowTests(WebTest):
                 session["oidc_states"] = {
                     "mock": {
                         "nonce": "nonce",
-                        "config_class": "accounts.OpenIDDigiDConfig",
+                        "config_identifier": OIDC_DIGID_IDENTIFIER,
                     }
                 }
                 session["oidc_id_token"] = "foo"
@@ -677,15 +664,8 @@ class DigiDOIDCFlowTests(WebTest):
                 self.assertNotIn("oidc_id_token", self.client.session)
                 self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(
-            id=1,
-            enabled=True,
-            oidc_op_logout_endpoint=None,
-        ),
-    )
-    def test_logout_without_sso_logout_configured(self, mock_get_solo):
+    def test_logout_without_sso_logout_configured(self):
+        OIDCClientFactory(with_digid=True, oidc_provider__oidc_op_logout_endpoint="")
         # set up a user with a non existing email address
         user = DigidUserFactory.create(
             bsn="123456782", email="existing_user@example.com"
@@ -695,7 +675,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session["oidc_id_token"] = "foo"
@@ -728,18 +708,14 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True),
-    )
     def test_error_first_cleared_after_succesful_login(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_digid=True)
         user = DigidUserFactory.create(bsn="123456782")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -759,7 +735,7 @@ class DigiDOIDCFlowTests(WebTest):
             session["oidc_states"] = {
                 "mock": {
                     "nonce": "nonce",
-                    "config_class": "accounts.OpenIDDigiDConfig",
+                    "config_identifier": OIDC_DIGID_IDENTIFIER,
                 }
             }
             session.save()
@@ -783,18 +759,14 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True),
-    )
     def test_login_error_message_mapped_in_config(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_digid=True)
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -804,7 +776,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session.save()
@@ -840,18 +812,14 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True),
-    )
     def test_login_error_message_not_mapped_in_config(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_digid=True)
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -861,7 +829,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session.save()
@@ -897,18 +865,14 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(id=1, enabled=True),
-    )
     def test_login_validation_error(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_digid=True)
         mock_verify_token.side_effect = ValidationError("Something went wrong")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -919,7 +883,7 @@ class DigiDOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDDigiDConfig",
+                "config_identifier": OIDC_DIGID_IDENTIFIER,
             }
         }
         session.save()
@@ -950,15 +914,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(
-            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
-        ),
-    )
     def test_redirect_after_login_with_registration(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -967,6 +924,10 @@ class DigiDOIDCFlowTests(WebTest):
         """
         Full authentication flow with redirect after successful login and registration
         """
+        OIDCClientFactory(
+            with_digid=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -1020,15 +981,8 @@ class DigiDOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDDigiDConfig.get_solo",
-        return_value=OpenIDDigiDConfig(
-            id=1, enabled=True, oidc_op_authorization_endpoint="http://idp.local/auth"
-        ),
-    )
     def test_redirect_after_login_no_registration(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1037,6 +991,10 @@ class DigiDOIDCFlowTests(WebTest):
         """
         Full authentication flow with redirect after successful login
         """
+        OIDCClientFactory(
+            with_digid=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
         # Create a user that already has a proper email adress, to avoid necessary field
         # registration
         DigidUserFactory.create(bsn="123456782", email="foo@bar.com")
