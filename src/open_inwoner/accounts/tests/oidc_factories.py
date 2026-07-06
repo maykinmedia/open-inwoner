@@ -41,6 +41,31 @@ def _options(identity_settings: dict) -> dict:
     return {"identity_settings": copy.deepcopy(identity_settings)}
 
 
+def _admin_options(*, make_users_staff: bool, first_name_claim: list | None) -> dict:
+    # Built fresh per instance from the factory params below (rather than sharing
+    # a module-level dict), so tests never need to mutate options in place.
+    return {
+        "user_settings": {
+            "claim_mappings": {
+                "username": ["sub"],
+                "email": ["email"],
+                "first_name": list(first_name_claim or []),
+                "last_name": [],
+            },
+            "username_case_sensitive": False,
+            "sensitive_claims": [],
+        },
+        "groups_settings": {
+            "make_users_staff": make_users_staff,
+            "sync": False,
+            "sync_pattern": "*",
+            "default_groups": [],
+            "claim_mapping": [],
+            "superuser_group_names": [],
+        },
+    }
+
+
 class OIDCClientFactory(_OIDCClientFactory):
     """
     Extends the upstream factory with open_inwoner's flow-specific traits.
@@ -58,10 +83,18 @@ class OIDCClientFactory(_OIDCClientFactory):
     """
 
     class Params:
+        # Admin-flow knobs, only meaningful together with ``with_admin``.
+        make_users_staff = True
+        first_name_claim = None
         with_admin = factory.Trait(
             identifier=OIDC_ADMIN_CONFIG_IDENTIFIER,
             enabled=True,
-            with_admin_options=True,
+            options=factory.LazyAttribute(
+                lambda o: _admin_options(
+                    make_users_staff=o.make_users_staff,
+                    first_name_claim=o.first_name_claim,
+                )
+            ),
         )
         with_digid = factory.Trait(
             identifier=OIDC_DIGID_IDENTIFIER,
