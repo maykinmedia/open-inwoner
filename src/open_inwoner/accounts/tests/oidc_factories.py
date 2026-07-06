@@ -14,9 +14,6 @@ from open_inwoner.accounts.oidc_plugins.constants import (
 
 # Default claim paths per flow. These deliberately use the same simple claim
 # keys that the test payloads send, so most tests need no per-field override.
-# Individual tests can still override e.g.
-# ``options__identity_settings__bsn_claim_path=["absent"]``.
-DIGID_IDENTITY_SETTINGS = {"bsn_claim_path": ["bsn"]}
 EHERKENNING_IDENTITY_SETTINGS = {
     "identifier_type_claim_path": ["name_qualifier"],
     "legal_subject_claim_path": ["kvk"],
@@ -72,13 +69,15 @@ class OIDCClientFactory(_OIDCClientFactory):
 
     Inspired by Open Forms' OFOIDCClientFactory. Each trait pins the identifier
     to the matching registered plugin and provides a sensible default options
-    payload. Example:
+    payload. Per-flow knobs (declared as Params) let tests tweak the config
+    without mutating the options dict in place, e.g.:
 
         OIDCClientFactory(with_digid=True)
-        OIDCClientFactory(with_eherkenning=True, enabled=False)
+        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
+        OIDCClientFactory(with_admin=True, make_users_staff=False)
         OIDCClientFactory(
-            with_eidas=True,
-            options__identity_settings__legal_subject_bsn_identifier_claim_path=["x"],
+            with_digid=True,
+            oidc_provider__oidc_op_logout_endpoint="https://idp/logout",
         )
     """
 
@@ -86,6 +85,8 @@ class OIDCClientFactory(_OIDCClientFactory):
         # Admin-flow knobs, only meaningful together with ``with_admin``.
         make_users_staff = True
         first_name_claim = None
+        # DigiD-flow knob, only meaningful together with ``with_digid``.
+        bsn_claim = ["bsn"]
         with_admin = factory.Trait(
             identifier=OIDC_ADMIN_CONFIG_IDENTIFIER,
             enabled=True,
@@ -99,7 +100,9 @@ class OIDCClientFactory(_OIDCClientFactory):
         with_digid = factory.Trait(
             identifier=OIDC_DIGID_IDENTIFIER,
             enabled=True,
-            options=factory.LazyFunction(lambda: _options(DIGID_IDENTITY_SETTINGS)),
+            options=factory.LazyAttribute(
+                lambda o: {"identity_settings": {"bsn_claim_path": list(o.bsn_claim)}}
+            ),
         )
         with_eherkenning = factory.Trait(
             identifier=OIDC_EH_IDENTIFIER,
