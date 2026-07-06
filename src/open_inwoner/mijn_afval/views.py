@@ -260,7 +260,7 @@ def _format_container_for_table(
         ledigingen: List of formatted lediging objects
         totaal_gewicht: Total weight of the container
         totaal_kosten: Total cost of all ledigingen for this container
-        identifier: Container identifier
+        identifier: Public container identifier shown in the heading
         type_label: Localized container type label (e.g., "Groente, Fruit en Tuin afval (GFT)")
 
     Returns:
@@ -404,7 +404,7 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
                 ledigingen_data,
                 totaal_gewicht,
                 totaal_kosten,
-                container.id,
+                container.public_container_id,
                 _get_container_type_label(afval_type),
             )
 

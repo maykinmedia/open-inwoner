@@ -25,6 +25,7 @@ class ExtractFilterOptionsTest(TestCase):
             containers=[
                 AfvalContainer(
                     id="container-1",
+                    public_container_id="PUB-001",
                     afval_type="gft",
                     is_verzamelcontainer=False,
                     heeft_sleutel=True,

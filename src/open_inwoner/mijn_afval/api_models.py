@@ -24,6 +24,7 @@ class Periode(PydanticModel):
 
 class AfvalContainer(PydanticModel):
     id: str
+    public_container_id: str
     afval_type: str
     is_verzamelcontainer: bool
     heeft_sleutel: bool
