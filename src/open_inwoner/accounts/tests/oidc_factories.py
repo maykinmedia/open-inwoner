@@ -14,12 +14,6 @@ from open_inwoner.accounts.oidc_plugins.constants import (
 
 # Default claim paths per flow. These deliberately use the same simple claim
 # keys that the test payloads send, so most tests need no per-field override.
-EHERKENNING_IDENTITY_SETTINGS = {
-    "identifier_type_claim_path": ["name_qualifier"],
-    "legal_subject_claim_path": ["kvk"],
-    "acting_subject_claim_path": ["acting_subject"],
-    "branch_number_claim_path": ["vestigingsnummer"],
-}
 EIDAS_IDENTITY_SETTINGS = {
     "legal_subject_pseudo_identifier_claim_path": ["pseudo_id"],
     "legal_subject_bsn_identifier_claim_path": ["bsn"],
@@ -36,6 +30,20 @@ def _options(identity_settings: dict) -> dict:
     # the shared module-level defaults (DB rows roll back between tests, but
     # in-memory dicts do not).
     return {"identity_settings": copy.deepcopy(identity_settings)}
+
+
+def _eherkenning_options(
+    *, legal_subject_claim: list, branch_number_claim: list
+) -> dict:
+    # Built fresh per instance from the factory params below.
+    return {
+        "identity_settings": {
+            "identifier_type_claim_path": ["name_qualifier"],
+            "legal_subject_claim_path": list(legal_subject_claim),
+            "acting_subject_claim_path": ["acting_subject"],
+            "branch_number_claim_path": list(branch_number_claim),
+        }
+    }
 
 
 def _admin_options(*, make_users_staff: bool, first_name_claim: list | None) -> dict:
@@ -87,6 +95,10 @@ class OIDCClientFactory(_OIDCClientFactory):
         first_name_claim = None
         # DigiD-flow knob, only meaningful together with ``with_digid``.
         bsn_claim = ["bsn"]
+        # eHerkenning-flow knobs, only meaningful together with ``with_eherkenning``.
+        # branch_number default matches the upstream eHerkenning schema default.
+        legal_subject_claim = ["kvk"]
+        branch_number_claim = ["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"]
         with_admin = factory.Trait(
             identifier=OIDC_ADMIN_CONFIG_IDENTIFIER,
             enabled=True,
@@ -107,8 +119,11 @@ class OIDCClientFactory(_OIDCClientFactory):
         with_eherkenning = factory.Trait(
             identifier=OIDC_EH_IDENTIFIER,
             enabled=True,
-            options=factory.LazyFunction(
-                lambda: _options(EHERKENNING_IDENTITY_SETTINGS)
+            options=factory.LazyAttribute(
+                lambda o: _eherkenning_options(
+                    legal_subject_claim=o.legal_subject_claim,
+                    branch_number_claim=o.branch_number_claim,
+                )
             ),
         )
         with_eidas = factory.Trait(

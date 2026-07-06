@@ -21,7 +21,10 @@ from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
-from open_inwoner.accounts.oidc_plugins.constants import OIDC_DIGID_IDENTIFIER
+from open_inwoner.accounts.oidc_plugins.constants import (
+    OIDC_DIGID_IDENTIFIER,
+    OIDC_EH_IDENTIFIER,
+)
 from open_inwoner.accounts.views.auth_oidc import (
     GENERIC_DIGID_ERROR_MSG,
     GENERIC_EHERKENNING_ERROR_MSG,
@@ -51,7 +54,6 @@ class _UnportedConfig:
         pass
 
 
-OpenIDEHerkenningConfig = _UnportedConfig
 OpenIDEIDASConfig = _UnportedConfig
 
 _UNPORTED_SKIP_REASON = (
@@ -1024,9 +1026,8 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         self.assertEqual(profile_response.status_code, 200)
 
 
-@skip(_UNPORTED_SKIP_REASON)
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class eHerkenningOIDCFlowTests(WebTest):
+class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -1041,74 +1042,24 @@ class eHerkenningOIDCFlowTests(WebTest):
         """Users created by tests, excluding CMS infrastructure users."""
         return User.objects.exclude(pk__in=self._infra_user_pks)
 
-    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch("open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo")
-    def test_missing_claims_in_configuration_raises_exception(
-        self,
-        mock_get_solo,
-        mock_get_token,
-        mock_verify_token,
-        mock_store_tokens,
-        mock_get_userinfo,
-        mock_retrieve_rsin_with_kvk,
-        mock_kvk,
-        mock_get_basisprofiel,
-    ):
-        config = OpenIDEHerkenningConfig(id=1, enabled=True)
-
-        for empty_claim in (
-            "branch_number_claim",
-            "identifier_type_claim",
-            "legal_subject_claim",
-        ):
-            with self.subTest(empty_claim):
-                setattr(config, empty_claim, [])
-                config.save()
-                mock_get_solo.return_value = config
-
-                session = self.client.session
-                session["oidc_states"] = {
-                    "mock": {
-                        "nonce": "nonce",
-                        "config_class": "accounts.OpenIDEHerkenningConfig",
-                    }
-                }
-                session.save()
-
-                callback_url = reverse("eherkenning_oidc:callback")
-
-                # Note this is raised by django mozilla oidc db, but it's useful to have
-                # a guard against that behavior changing, because our custom
-                # implementation assumes these claims are configured and does not handle
-                # the case where they're missing (because the base class already does
-                # that).
-                with self.assertRaises(ValueError):
-                    self.client.get(callback_url, {"code": "mock", "state": "mock"})
-
-                self.assertEqual(self.regular_users.count(), 0)
-
-    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
-    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
-    @patch("open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
-    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["sub"]
-        ),
+    @skip(
+        "[#2662] This guarded a ValueError that the old mozilla-django-oidc-db "
+        "raised for an empty claim path. The OIDCClient architecture stores claim "
+        "paths in the options JSON and no longer raises here, so the "
+        "misconfiguration guard needs rethinking before this can be ported."
     )
+    def test_missing_claims_in_configuration_raises_exception(self):
+        pass
+
+    @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel", autospec=True)
+    @patch("open_inwoner.kvk.client.KvKClient.get_all_company_branches")
+    @patch("open_inwoner.accounts.signals.KvKClient.retrieve_rsin_with_kvk")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
+    @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     def test_missing_claim_in_token_redirects_to_error_page(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1117,6 +1068,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_get_userinfo.return_value = {
             "email": "existing_user@example.com",
         }
@@ -1125,7 +1077,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1148,18 +1100,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["sub"],
-            branch_number_claim=["branch"],
-        ),
-    )
     def test_existing_kvk_creates_no_new_user(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1168,6 +1110,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(
+            with_eherkenning=True,
+            legal_subject_claim=["sub"],
+            branch_number_claim=["branch"],
+        )
         mock_kvk.return_value = [
             {"vestigingsnummer": "1234"},
         ]
@@ -1195,7 +1142,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1236,15 +1183,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["sub"]
-        ),
-    )
     def test_new_user_is_created_when_new_kvk(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1252,6 +1192,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1265,7 +1206,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1305,18 +1246,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["sub"],
-            branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
-        ),
-    )
     def test_new_user_is_created_when_existing_kvk_without_vestiging(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1324,6 +1255,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(
+            with_eherkenning=True,
+            legal_subject_claim=["sub"],
+            branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
+        )
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1340,7 +1276,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1386,18 +1322,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["sub"],
-            branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
-        ),
-    )
     def test_existing_user_is_returned_for_already_existing_kvk_and_vestiging(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1405,6 +1331,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(
+            with_eherkenning=True,
+            legal_subject_claim=["sub"],
+            branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
+        )
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1424,7 +1355,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1454,16 +1385,12 @@ class eHerkenningOIDCFlowTests(WebTest):
             ).is_branch_restricted()
         )
 
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
+    def test_logout(self):
+        OIDCClientFactory(
+            with_eherkenning=True,
             legal_subject_claim=["kvk"],
-            oidc_op_logout_endpoint="http://localhost:8080/logout",
-        ),
-    )
-    def test_logout(self, mock_get_solo):
+            oidc_provider__oidc_op_logout_endpoint="http://localhost:8080/logout",
+        )
         # set up a user with a non existing email address
         user = eHerkenningUserFactory.create(
             kvk="12345678", email="existing_user@example.com"
@@ -1473,7 +1400,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session["oidc_id_token"] = "foo"
@@ -1502,16 +1429,12 @@ class eHerkenningOIDCFlowTests(WebTest):
         self.assertNotIn("oidc_id_token", self.client.session)
         self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
+    def test_logout_without_sso_logout_configured(self):
+        OIDCClientFactory(
+            with_eherkenning=True,
             legal_subject_claim=["kvk"],
-            oidc_op_logout_endpoint=None,
-        ),
-    )
-    def test_logout_without_sso_logout_configured(self, mock_get_solo):
+            oidc_provider__oidc_op_logout_endpoint="",
+        )
         # set up a user with a non existing email address
         user = eHerkenningUserFactory.create(
             kvk="12345678", email="existing_user@example.com"
@@ -1521,7 +1444,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session["oidc_id_token"] = "foo"
@@ -1574,16 +1497,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["kvk"]
-        ),
-        autospec=True,
-    )
     def test_error_first_cleared_after_succesful_login(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1592,6 +1507,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1615,7 +1531,7 @@ class eHerkenningOIDCFlowTests(WebTest):
             session["oidc_states"] = {
                 "mock": {
                     "nonce": "nonce",
-                    "config_class": "accounts.OpenIDEHerkenningConfig",
+                    "config_identifier": OIDC_EH_IDENTIFIER,
                 }
             }
             session.save()
@@ -1639,20 +1555,14 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["kvk"]
-        ),
-    )
     def test_login_error_message_mapped_in_config(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1662,7 +1572,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1698,20 +1608,14 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["kvk"]
-        ),
-    )
     def test_login_error_message_not_mapped_in_config(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1721,7 +1625,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1758,21 +1662,15 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["kvk"]
-        ),
-    )
     def test_login_validation_error(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
         mock_get_basisprofiel,
     ):
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_verify_token.side_effect = ValidationError("Something went wrong")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -1786,7 +1684,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1833,16 +1731,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1, enabled=True, legal_subject_claim=["sub"]
-        ),
-        autospec=True,
-    )
     def test_login_as_eenmanszaak_blocked(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -1855,6 +1745,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         to fetch resources using RSIN (from Open Zaak or Open Klant) enabled, we cannot
         let eenmanszaken log in using eHerkenning
         """
+        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_retrieve_rsin_with_kvk.return_value = ""
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Eenmanszaak"}}
@@ -1866,7 +1757,7 @@ class eHerkenningOIDCFlowTests(WebTest):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "accounts.OpenIDEHerkenningConfig",
+                "config_identifier": OIDC_EH_IDENTIFIER,
             }
         }
         session.save()
@@ -1920,19 +1811,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["kvk"],
-            oidc_op_authorization_endpoint="http://idp.local/auth",
-        ),
-        autospec=True,
-    )
     def test_redirect_after_login_with_registration_and_branch_selection(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -2044,19 +1924,8 @@ class eHerkenningOIDCFlowTests(WebTest):
         "mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token",
         autospec=True,
     )
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["kvk"],
-            oidc_op_authorization_endpoint="http://idp.local/auth",
-        ),
-        autospec=True,
-    )
     def test_redirect_after_login_no_registration_with_branch_selection(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -2132,18 +2001,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["kvk"],
-            oidc_op_authorization_endpoint="http://idp.local/auth",
-        ),
-    )
     def test_redirect_after_login_no_registration_and_no_branch_selection(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -2155,6 +2014,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         """
         Full authentication flow with redirect after successful login
         """
+        OIDCClientFactory(
+            with_eherkenning=True,
+            legal_subject_claim=["kvk"],
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
         user = eHerkenningUserFactory.create(kvk="12345678", rsin="123456789")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -2216,18 +2080,8 @@ class eHerkenningOIDCFlowTests(WebTest):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
-    @patch(
-        "open_inwoner.accounts.models.OpenIDEHerkenningConfig.get_solo",
-        return_value=OpenIDEHerkenningConfig(
-            id=1,
-            enabled=True,
-            legal_subject_claim=["kvk"],
-            oidc_op_authorization_endpoint="http://idp.local/auth",
-        ),
-    )
     def test_redirect_after_login_branch_already_selected(
         self,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
@@ -2239,6 +2093,11 @@ class eHerkenningOIDCFlowTests(WebTest):
         """
         KVK branch selection should be skipped
         """
+        OIDCClientFactory(
+            with_eherkenning=True,
+            legal_subject_claim=["kvk"],
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
         user = eHerkenningVestigingUserFactory.create(
             kvk="12345678", rsin="123456789", vestiging="123456789000"
         )
