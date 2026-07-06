@@ -119,18 +119,6 @@ class FullImportResult:
         field(default_factory=list)
     )
 
-    def all_excluded(self) -> list[ExcludedObject]:
-        excluded = []
-        excluded.extend(self.catalogi.excluded)
-        excluded.extend(self.zaaktypen.excluded)
-        for obj in self.informatieobjecttypen:
-            excluded.extend(obj.excluded)
-        for obj in self.statustypen:
-            excluded.extend(obj.excluded)
-        for obj in self.resultaattypen:
-            excluded.extend(obj.excluded)
-        return excluded
-
     def pretty_print(self) -> str:
         """
         Generate a human-readable summary of the import results.
