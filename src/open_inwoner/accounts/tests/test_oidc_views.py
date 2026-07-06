@@ -15,6 +15,8 @@ import requests
 import requests_mock
 from django_webtest import DjangoTestApp, DjangoWebtestResponse, WebTest
 from furl import furl
+from mozilla_django_oidc_db.constants import OIDC_ADMIN_CONFIG_IDENTIFIER
+from mozilla_django_oidc_db.tests.mixins import OIDCMixin
 from pyquery import PyQuery
 
 from open_inwoner.accounts.choices import LoginTypeChoices
@@ -34,19 +36,20 @@ from .factories import (
     eHerkenningUserFactory,
     eHerkenningVestigingUserFactory,
 )
+from .oidc_factories import OIDCClientFactory
 
 User = get_user_model()
 
 
-# XXX: [#2662] not yet ported to the OIDCClient architecture; the config-flow
-# classes below are skipped. Placeholders keep the module importable (the
-# @patch(return_value=Model(...)) decorators construct these at import time).
+# XXX: [#2662] the classes still using these placeholders are not yet ported to
+# the OIDCClient architecture and are skipped. Placeholders keep the module
+# importable (the @patch(return_value=Model(...)) decorators construct these at
+# import time).
 class _UnportedConfig:
     def __init__(self, *args, **kwargs):
         pass
 
 
-OpenIDConnectConfig = _UnportedConfig
 OpenIDDigiDConfig = _UnportedConfig
 OpenIDEHerkenningConfig = _UnportedConfig
 OpenIDEIDASConfig = _UnportedConfig
@@ -102,8 +105,7 @@ def perform_oidc_login(
     return callback_response
 
 
-@skip(_UNPORTED_SKIP_REASON)
-class OIDCFlowTests(TestCase):
+class OIDCFlowTests(OIDCMixin, TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -120,22 +122,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.admin),
     )
     def test_existing_email_updates_admin_user(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -148,7 +146,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -176,22 +174,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_email_updates_regular_user(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True, make_users_staff=False)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -204,7 +198,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -232,27 +226,20 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(
-            id=1,
-            enabled=True,
-            make_users_staff=False,
-            claim_mapping={"first_name": ["first_name"]},
-        ),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_oidc_id_updates_regular_user(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(
+            with_admin=True, make_users_staff=False, first_name_claim=["first_name"]
+        )
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -267,7 +254,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -295,22 +282,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_existing_case_sensitive_email_updates_user(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True, make_users_staff=False)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -325,7 +308,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -355,22 +338,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=True),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.admin),
     )
     def test_new_admin_user_is_created_when_new_email(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True)
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {
             "email": "new_user@example.com",
@@ -381,7 +360,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -409,22 +388,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True, make_users_staff=False),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_new_regular_user_is_created_when_new_email(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True, make_users_staff=False)
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {
             "email": "new_user@example.com",
@@ -435,7 +410,7 @@ class OIDCFlowTests(TestCase):
         session["oidc_states"] = {
             "mock": {
                 "nonce": "nonce",
-                "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
             }
         }
         session.save()
@@ -468,22 +443,18 @@ class OIDCFlowTests(TestCase):
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.verify_token")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_token")
     @patch(
-        "mozilla_django_oidc_db.models.OpenIDConnectConfig.get_solo",
-        return_value=OpenIDConnectConfig(id=1, enabled=True),
-    )
-    @patch(
         "open_inwoner.configurations.models.SiteConfiguration.get_solo",
         return_value=SiteConfiguration(openid_display=OpenIDDisplayChoices.regular),
     )
     def test_error_first_cleared_after_succesful_login(
         self,
         mock_config_get_solo,
-        mock_get_solo,
         mock_get_token,
         mock_verify_token,
         mock_store_tokens,
         mock_get_userinfo,
     ):
+        OIDCClientFactory(with_admin=True)
         mock_get_userinfo.return_value = {
             "email": "nocollision@example.com",
             "sub": "some_username",
@@ -502,7 +473,7 @@ class OIDCFlowTests(TestCase):
             session["oidc_states"] = {
                 "mock": {
                     "nonce": "nonce",
-                    "config_class": "mozilla_django_oidc_db.OpenIDConnectConfig",
+                    "config_identifier": OIDC_ADMIN_CONFIG_IDENTIFIER,
                 }
             }
             session.save()
