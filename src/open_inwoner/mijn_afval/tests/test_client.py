@@ -22,6 +22,7 @@ class OpenAfvalClientTest(TestCase):
             "containers": [
                 {
                     "id": "container-1",
+                    "publicContainerId": "PUB-001",
                     "afvalType": "restafval",
                     "isVerzamelcontainer": True,
                     "heeftSleutel": True,
