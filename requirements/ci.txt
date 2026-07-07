@@ -440,6 +440,7 @@ django-privates==4.0.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-simple-certmanager
+    #   zgw-consumers
 django-redis==5.0.0
     # via
     #   -c requirements/base.txt
@@ -1446,7 +1447,7 @@ xsdata==23.8
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-zgw-consumers==0.38.1
+zgw-consumers==2.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
