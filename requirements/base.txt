@@ -267,7 +267,7 @@ django-phonenumber-field==5.2.0
     # via django-two-factor-auth
 django-polymorphic==3.0.0
     # via django-filer
-django-privates==3.1.1
+django-privates==4.0.3
     # via
     #   -r requirements/base.in
     #   django-simple-certmanager
