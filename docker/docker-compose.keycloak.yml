@@ -1,21 +1,28 @@
-version: '3.4'
-
 services:
   keycloak:
     image: keycloak/keycloak:24.0.1-0
+    # Fixed, resolvable hostname. Keycloak's start-dev XA/datasource init resolves the
+    # container's own hostname; with the random container id it fails with
+    # UnknownHostException ("Failed to obtain JDBC connection"). A stable hostname is
+    # added to the container's /etc/hosts by Docker, so resolution succeeds.
+    hostname: keycloak
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
+      # Belt-and-suspenders: skip the XA transaction path that resolves the hostname.
+      - KC_TRANSACTION_XA_ENABLED=false
     command: start-dev --import-realm
     volumes:
       - ./keycloak/fixtures/realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - 8080:8080
     networks:
-      open-inwoner-dev:
+      openinwoner-dev:
         aliases:
           - keycloak.open-inwoner.local
 
 networks:
-  open-inwoner-dev:
-    name: open-inwoner-dev
+  # Must match the network name in the root docker-compose.yml so the `web`
+  # container can reach Keycloak server-side (OIDC token/userinfo/jwks calls).
+  openinwoner-dev:
+    name: openinwoner-dev
