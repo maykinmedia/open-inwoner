@@ -15,9 +15,3 @@
         {% endfor %}
     </div>
 </div>
-<div class="tabled__row tabled__row--blank">
-    <div class="tabled__item tabled__key">{% trans "Voorkeur digitaal adres" %}</div>
-    <div class="tabled__item tabled__value">
-        {% if user.preferred_address %}{{ user.preferred_address }}{% else %}{% trans "Niet ingesteld" %}{% endif %}
-    </div>
-</div>
