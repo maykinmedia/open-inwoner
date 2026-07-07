@@ -360,6 +360,16 @@ class NecessaryUserForm(ErrorMessageMixin, forms.ModelForm):
             for field_name in ("first_name", "infix", "last_name"):
                 self.fields[field_name].validators.append(CharFieldValidator())
 
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        # A plain ModelForm.save() only writes User.email, but the profile page
+        # and OpenKlant sync read from the DigitalAddress rows. Route the email
+        # through update_email so the standard email DigitalAddress is created
+        # and kept in sync (mirrors the profile edit flow).
+        if commit and user.email:
+            user.update_email(user.email)
+        return user
+
 
 class GroupAdminForm(forms.ModelForm):
     """

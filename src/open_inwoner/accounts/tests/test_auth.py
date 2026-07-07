@@ -15,7 +15,11 @@ from django_webtest import WebTest
 from furl import furl
 from pyquery import PyQuery
 
-from open_inwoner.accounts.choices import LoginTypeChoices, NotificationChannelChoice
+from open_inwoner.accounts.choices import (
+    DigitalAddressType,
+    LoginTypeChoices,
+    NotificationChannelChoice,
+)
 from open_inwoner.accounts.eherkenning_session import EHerkenningSessionContext
 from open_inwoner.accounts.models import (
     OpenIDDigiDConfig,
@@ -1652,6 +1656,31 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(user.email, "john@smith.com")
         self.assertEqual(user.first_name, "John")
         self.assertEqual(user.last_name, "Smith")
+
+    def test_submit_creates_standard_email_digital_address(self):
+        # Regression: the email entered during registration must also be stored
+        # as a standard email DigitalAddress, otherwise it stays empty on the
+        # profile page and is never synced to the OpenKlant digitale adressen.
+        user = UserFactory(
+            first_name="",
+            last_name="",
+            email="test@example.org",
+            login_type=LoginTypeChoices.digid,
+        )
+
+        response = self.app.get(self.url, user=user)
+        form = response.forms["necessary-form"]
+        form["email"] = "john@smith.com"
+        form["first_name"] = "John"
+        form["last_name"] = "Smith"
+        form.submit()
+
+        user.refresh_from_db()
+
+        address = user.digital_addresses.get(
+            type=DigitalAddressType.email, is_standard_for_type=True
+        )
+        self.assertEqual(address.value, "john@smith.com")
 
     def test_submit_with_invite(self):
         user = UserFactory()
