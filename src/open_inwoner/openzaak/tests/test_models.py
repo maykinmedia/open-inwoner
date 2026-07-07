@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.test import generate_oas_component
+from zgw_consumers_oas import generate_oas_component
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import ZaakType

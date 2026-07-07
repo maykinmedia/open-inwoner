@@ -267,7 +267,6 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
             api_root="https://personen/api/brp",
-            oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service
         config.save()
@@ -302,7 +301,6 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
             api_root="https://personen/api/brp",
-            oas="https://personen/api/schema/openapi.yaml",
         )
         config.service = service
         config.save()

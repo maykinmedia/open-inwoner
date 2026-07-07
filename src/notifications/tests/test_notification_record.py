@@ -29,7 +29,6 @@ class NotificationRecordLockManagerTestCase(TransactionTestCase):
             api_root="http://some-api-root/api/v1/",
             api_type=APITypes.nrc,
             slug="service",
-            oas="http://some-api-root/api/v1/schema/openapi.yaml",
         )
         self.config = NotificationsAPIConfig.objects.create(
             notifications_api_service=service
@@ -219,7 +218,6 @@ class NotificationRecordResetForRetryTestCase(TestCase):
             api_root="http://some-api-root/api/v1/",
             api_type=APITypes.nrc,
             slug="service",
-            oas="http://some-api-root/api/v1/schema/openapi.yaml",
         )
         cls.config = NotificationsAPIConfig.objects.create(
             notifications_api_service=service
