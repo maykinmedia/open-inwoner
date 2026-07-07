@@ -29,11 +29,9 @@
                         {% if user.is_eherkenning_user %}
                             {% addition_input email_formset %}
                             {% addition_input phone_formset %}
-                            {% input form.preferred_address %}
                         {% elif user.is_bsn_user_with_brp %}
                             {% addition_input email_formset %}
                             {% addition_input phone_formset %}
-                            {% input form.preferred_address %}
                             {% if user.contact_type == "begeleider" %}
                                 {% input form.image no_help=True %}
                                 {% image_crop form.cropping %}
@@ -44,7 +42,6 @@
                             {% input form.last_name %}
                             {% addition_input email_formset %}
                             {% addition_input phone_formset %}
-                            {% input form.preferred_address %}
                             {% input form.street %}
                             {% input form.housenumber %}
                             {% input form.postcode %}
