@@ -19,7 +19,6 @@ class HaalCentraalMixin:
         config = HaalCentraalConfig.get_solo()
         service = ServiceFactory(
             api_root="https://personen/api/brp",
-            oas="https://personen/api/schema/openapi.yaml",
             api_type=APITypes.orc,
         )
         config.service = service
