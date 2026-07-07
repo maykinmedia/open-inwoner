@@ -1,0 +1,15 @@
+# Convenience entrypoint to bring up the app stack + local Keycloak in ONE command,
+# run from the repo root:
+#
+#     docker compose -f docker-compose.dev.yml up -d
+#
+# Uses `include` (Compose v2.20+) instead of `-f a -f b`. With `include`, each file's
+# relative paths resolve against its OWN directory, so both:
+#   - the root compose's ./docker/setup_configuration mount, and
+#   - the keycloak compose's ./keycloak/fixtures/realm.json mount
+# resolve correctly. A plain `-f a -f b` shares a single project directory and would
+# break one of the two (empty-dir bind mounts). Both services share the explicitly
+# named `openinwoner-dev` network, so the backend can reach Keycloak.
+include:
+  - docker-compose.yml
+  - docker/docker-compose.keycloak.yml

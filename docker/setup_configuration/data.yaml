@@ -1,6 +1,20 @@
 # Admin OIDC
 oidc_db_config_enable: true
 oidc_db_config_admin_auth:
+  # Shared Keycloak test-realm provider for the citizen-facing flows below. Endpoints
+  # match docker/keycloak/fixtures/realm.json (imported into the local Keycloak).
+  providers:
+    - identifier: keycloak-provider
+      oidc_token_use_basic_auth: false
+      oidc_use_nonce: true
+      oidc_nonce_size: 32
+      oidc_state_size: 32
+      endpoint_config:
+        oidc_op_authorization_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/auth
+        oidc_op_token_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/token
+        oidc_op_user_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/userinfo
+        oidc_op_logout_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/logout
+        oidc_op_jwks_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/certs
   items:
     - identifier: admin-oidc
       enabled: True
@@ -11,28 +25,95 @@ oidc_db_config_admin_auth:
         - email
         - profile
       oidc_rp_sign_algo: RS256
-      endpoint_config:
-        oidc_op_authorization_endpoint: https://example.com/realms/test/protocol/openid-connect/auth
-        oidc_op_token_endpoint: https://example.com/realms/test/protocol/openid-connect/token
-        oidc_op_user_endpoint: https://example.com/realms/test/protocol/openid-connect/userinfo
-      username_claim:
-        - sub
-      groups_claim:
-        - roles
-      claim_mapping:
-        first_name:
-          - given_name
-      sync_groups: true
-      sync_groups_glob_pattern: '*'
-      default_groups:
-        - Functioneel beheer
-      make_users_staff: true
-      superuser_group_names:
-        - superuser
-      oidc_use_nonce: true
-      oidc_nonce_size: 32
-      oidc_state_size: 32
+      oidc_provider_identifier: keycloak-provider
       userinfo_claims_source: id_token
+      options:
+        user_settings:
+          claim_mappings:
+            username:
+              - sub
+            first_name:
+              - given_name
+          username_case_sensitive: false
+        groups_settings:
+          make_users_staff: true
+          # Read the `groups` claim (a testid default scope). The realm's `admin`
+          # user is in the `Registreerders` group, so grant superuser on that. Both
+          # name-only and full-path forms are listed because the realm has two
+          # `groups` mappers (full.path=false and full.path=true).
+          claim_mapping:
+            - groups
+          sync: true
+          sync_pattern: '*'
+          superuser_group_names:
+            - Registreerders
+            - /Registreerders
+          default_groups:
+            - Functioneel beheer
+    # DigiD (BSN) via the Keycloak test realm
+    - identifier: oidc-digid
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - bsn
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          bsn_claim_path:
+            - bsn
+    # eHerkenning (legal subject via legalSubjectID; claims live in the `bsn` scope)
+    - identifier: oidc-eherkenning
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - bsn
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          identifier_type_claim_path:
+            - name_qualifier
+          legal_subject_claim_path:
+            - legalSubjectID
+          acting_subject_claim_path:
+            - actingSubjectID
+          branch_number_claim_path:
+            - vestiging
+    # eIDAS (natural person + company, single combined flow)
+    - identifier: oidc-eidas
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - eidas
+        - profile
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          legal_subject_pseudo_identifier_claim_path:
+            - person_pseudo_identifier
+          legal_subject_bsn_identifier_claim_path:
+            - person_bsn_identifier
+          legal_subject_first_name_claim_path:
+            - first_name
+          legal_subject_family_name_claim_path:
+            - family_name
+          legal_subject_date_of_birth_claim_path:
+            - birthdate
+          legal_entity_identifier_claim_path:
+            - company_identifier
+          company_name_claim_path:
+            - company_name
 
 # Setup service connectivity
 zgw_consumers_config_enable: True
