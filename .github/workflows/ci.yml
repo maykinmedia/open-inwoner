@@ -206,19 +206,43 @@ jobs:
           setup-node: 'yes'
           npm-ci-flags: '--legacy-peer-deps'
 
+      # Keycloak backs the `keycloak`-tagged OIDC login tests, which only run
+      # under chromium: the authorization-code flow relies on cross-origin
+      # cookies that Firefox/WebKit/Edge drop by default (see docs/testing.rst).
+      # So we only boot Keycloak on the chromium leg and skip the tag elsewhere.
+      - name: Start Keycloak (imports the test realm)
+        if: matrix.browser == 'chromium'
+        run: |
+          docker compose -f docker/docker-compose.keycloak.yml --project-directory docker up -d
+          echo "Waiting for Keycloak to import the test realm..."
+          for i in $(seq 1 45); do
+            if curl -sf http://localhost:8080/realms/test/.well-known/openid-configuration >/dev/null; then
+              echo "Keycloak is ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "Keycloak did not become ready in time"
+          docker compose -f docker/docker-compose.keycloak.yml --project-directory docker logs
+          exit 1
+
       - name: Install playwright deps
         run: playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run testsuite
         run: |
           python src/manage.py collectstatic --noinput --link
-          src/manage.py test src --tag=e2e
+          if [ "${{ matrix.browser }}" = "chromium" ]; then
+            src/manage.py test src --tag=e2e
+          else
+            src/manage.py test src --tag=e2e --exclude-tag=keycloak
+          fi
         env:
           DJANGO_SETTINGS_MODULE: open_inwoner.conf.ci
           SECRET_KEY: dummy
           DB_USER: postgres
           DB_PASSWORD: ''
           E2E_DRIVER: ${{ matrix.browser }}
+          E2E_KEYCLOAK_REALM_URL: http://localhost:8080/realms/test
           ES_USERNAME: elastic
           ES_PASSWORD: elastic
           OTEL_SDK_DISABLED: true

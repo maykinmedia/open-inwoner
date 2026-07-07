@@ -21,6 +21,7 @@ from cms.plugin_rendering import ContentRenderer
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.plugins import get_plugins
 from django_prosemirror.constants import get_empty_doc
+from djangocms_versioning import versionables
 from djangocms_versioning.constants import DRAFT, PUBLISHED
 from djangocms_versioning.models import Version
 
@@ -65,6 +66,25 @@ def unpublish_page(page, language):
         state=PUBLISHED,
     )
     version.unpublish(user)
+
+
+def reset_versionables_content_type_cache():
+    """
+    Reset djangocms-versioning's memoised ContentType ids.
+
+    ``VersionableItem.content_types`` is a ``@cached_property`` that caches the
+    ContentType pk(s) of each versioned model for the lifetime of the *process*.
+    In a ``TransactionTestCase`` (which ``LiveServerTestCase`` is), the
+    ContentType table is flushed and repopulated between tests, handing out fresh
+    pks each run. The stale cache then no longer matches the ``content_type_id``
+    stored on the ``Version`` rows created in the new test, so
+    ``Version.objects.get_for_content()`` raises ``Version.DoesNotExist``.
+
+    Call this at the start of ``setUp()`` (after the flush, before creating pages)
+    so the cache recomputes against the current ContentType pks.
+    """
+    for versionable in versionables._cms_extension().versionables:
+        versionable.__dict__.pop("content_types", None)
 
 
 logger = structlog.stdlib.get_logger(__name__)
