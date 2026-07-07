@@ -10,7 +10,7 @@ import freezegun
 import requests_mock
 from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
-from privates.storages import PrivateMediaFileSystemStorage
+from privates.storages import private_media_storage
 from privates.test import temp_private_root
 from pyquery import PyQuery
 from webtest import Upload
@@ -241,9 +241,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
             [_("1 item(s) processed in total, with 0 failing row(s).")],
         )
         self.assertFalse(
-            PrivateMediaFileSystemStorage().exists(
-                "zgw_import_dump_2024-08-14-17-50-01.jsonl"
-            ),
+            private_media_storage.exists("zgw_import_dump_2024-08-14-17-50-01.jsonl"),
             msg="File should always be deleted regardless of success or failure",
         )
         self.assertEqual(
@@ -270,7 +268,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
 
         self.assertEqual(m.call_count, 1)
         self.assertEqual(m.call_args[0][0], "zgw_import_dump_2024-08-14-17-50-01.json")
-        self.assertTrue(isinstance(m.call_args[0][1], PrivateMediaFileSystemStorage))
+        self.assertIs(m.call_args[0][1], private_media_storage)
 
         messages = [str(msg) for msg in response.context["messages"]]
         self.assertEqual(
@@ -282,9 +280,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
             ],
         )
         self.assertFalse(
-            PrivateMediaFileSystemStorage().exists(
-                "zgw_import_dump_2024-08-14-17-50-01.json"
-            ),
+            private_media_storage.exists("zgw_import_dump_2024-08-14-17-50-01.json"),
             msg="File should always be deleted regardless of success or failure",
         )
         self.assertEqual(

@@ -1232,9 +1232,33 @@ THUMBNAIL_HIGH_RESOLUTION = True
 IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
 IMAGE_CROPPING_JQUERY_URL = "/static/admin/js/vendor/jquery/jquery.min.js"
 
-SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
-SENDFILE_BACKEND = "django_sendfile.backends.simple"
 PRIVATE_MEDIA_URL = "/private_files/"
+
+SENDFILE_ROOT = PRIVATE_MEDIA_ROOT
+# django-sendfile2 requires SENDFILE_URL; keep it equal to the privates storage base_url.
+SENDFILE_URL = PRIVATE_MEDIA_URL
+SENDFILE_BACKEND = "django_sendfile.backends.simple"
+
+# django-privates 4.x dropped its own PRIVATE_MEDIA_* settings and now resolves its
+# storage from STORAGES["privates"]. We keep PRIVATE_MEDIA_ROOT/URL as the single
+# source of truth (django-sendfile2 still reads SENDFILE_ROOT above) and wire them in
+# here. `default` and `staticfiles` are re-declared with Django's defaults because
+# defining STORAGES replaces the built-in defaults wholesale.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "privates": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": PRIVATE_MEDIA_ROOT,
+            "base_url": PRIVATE_MEDIA_URL,
+        },
+    },
+}
 
 CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_CREDENTIALS = True

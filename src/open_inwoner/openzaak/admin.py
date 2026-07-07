@@ -13,7 +13,7 @@ from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _, ngettext
 
 import structlog
-from privates.storages import PrivateMediaFileSystemStorage
+from privates.storages import private_media_storage
 from solo.admin import SingletonModelAdmin
 
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
@@ -189,7 +189,7 @@ class ZGWImportExportMixin:
         if request.method == "POST":
             form = ImportZGWExportFileForm(request.POST, request.FILES)
             if form.is_valid():
-                storage = PrivateMediaFileSystemStorage()
+                storage = private_media_storage
                 timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
                 target_file_name = f"zgw_import_dump_{timestamp}.json"
                 storage.save(target_file_name, request.FILES["zgw_export_file"])
