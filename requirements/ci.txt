@@ -435,7 +435,7 @@ django-polymorphic==3.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-filer
-django-privates==3.1.1
+django-privates==4.0.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

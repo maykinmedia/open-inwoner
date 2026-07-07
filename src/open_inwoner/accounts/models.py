@@ -21,7 +21,7 @@ from image_cropping import ImageCropField, ImageRatioField
 from localflavor.nl.models import NLBSNField, NLZipCodeField
 from mail_editor.helpers import find_template
 from mozilla_django_oidc_db.models import OIDCClient
-from privates.storages import PrivateMediaFileSystemStorage
+from privates.fields import PrivateMediaFileField
 from timeline_logger.models import TimelineLog
 
 from open_inwoner.accounts.brp import BRPData
@@ -869,9 +869,8 @@ class Document(models.Model):
         max_length=250,
         help_text=_("The name of the document"),
     )
-    file = models.FileField(
+    file = PrivateMediaFileField(
         verbose_name=_("File"),
-        storage=PrivateMediaFileSystemStorage(),
     )
     created_on = models.DateTimeField(
         verbose_name=_("Created on"),
@@ -947,11 +946,10 @@ class Action(models.Model):
         null=True,
         blank=True,
     )
-    file = models.FileField(
+    file = PrivateMediaFileField(
         verbose_name=_("Add a file"),
         null=True,
         blank=True,
-        storage=PrivateMediaFileSystemStorage(),
         help_text=_(
             "The document that is uploaded to the file",
         ),
@@ -1082,11 +1080,10 @@ class Message(models.Model):
             "Boolean shows if the email was sent to the receiver about this message"
         ),
     )
-    file = models.FileField(
+    file = PrivateMediaFileField(
         verbose_name=_("File"),
         blank=True,
         null=True,
-        storage=PrivateMediaFileSystemStorage(),
         help_text=_(
             "The file that is attached to the message",
         ),
