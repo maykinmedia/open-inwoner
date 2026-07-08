@@ -153,8 +153,26 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
 
         for i, context in enumerate(self._traced_contexts):
             suffix = f"_{i}" if i > 0 else ""
-            trace_path = os.path.join(PLAYWRIGHT_TRACE_DIR, f"{test_id}{suffix}.zip")
-            context.tracing.stop(path=trace_path)
+            artifact_base = os.path.join(PLAYWRIGHT_TRACE_DIR, f"{test_id}{suffix}")
+
+            context.tracing.stop(path=f"{artifact_base}.zip")
+
+            # Playwright names recorded videos with a random hash and only
+            # finalizes them once the context is closed (otherwise the .webm is
+            # left as a 0-byte file). Capture the handles, close the context to
+            # flush the videos, then rename them to match the trace so the
+            # artifacts are non-empty and identifiable.
+            videos = [page.video for page in context.pages if page.video]
+            context.close()
+            for j, video in enumerate(videos):
+                video_suffix = f"_{j}" if j > 0 else ""
+                try:
+                    # save_as copies (rather than moves) the recording, so delete
+                    # the original random-hash file afterwards to avoid a duplicate.
+                    video.save_as(f"{artifact_base}{video_suffix}.webm")
+                    video.delete()
+                except Exception:  # best-effort; never fail a test on artifacts
+                    pass
 
         super().tearDown()
 
