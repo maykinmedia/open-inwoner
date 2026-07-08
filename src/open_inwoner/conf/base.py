@@ -490,10 +490,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "open_inwoner.urls"
 
-# Health check
-HEALTH_CHECK = {}
-
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     "django.template.loaders.filesystem.Loader",
