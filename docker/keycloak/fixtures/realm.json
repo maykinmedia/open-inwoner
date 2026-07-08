@@ -566,6 +566,33 @@
       "groups": []
     },
     {
+      "id": "c1ec7a5e-0000-4000-8000-000000000001",
+      "createdTimestamp": 1719999585061,
+      "username": "eherkenning-rechtspersoon",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
+        "legalSubjectID": ["12345678"],
+        "actingSubjectID": ["4B75A0EA107B3D36"],
+        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "eherkenning-rechtspersoon",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
       "id": "144e4721-f065-4db6-a148-c55d1678af3c",
       "createdTimestamp": 1750067637607,
       "username": "eidas-company",

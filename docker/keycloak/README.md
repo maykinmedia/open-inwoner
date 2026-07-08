@@ -36,9 +36,13 @@ http://localhost:8080/. You can now log in with the `admin`/`admin` credentials.
 - `eherkenning-bewindvoering` / `eherkenning-bewindvoering`, has the
   `legalSubjectID` (kvk), `actingSubjectID` (pseudo ID), `representeeBSN`,
   `service_id`, `service_uuid`, and `name_qualifier` attributes (for eHerkenning
-  bewindvoering)
+  bewindvoering) # CLAUDE: Remove this from the docs and the realm json. It
+  confuses things, we don't use bewindvoering. Double check the docs too.
 - `eherkenning-vestiging` / `eherkenning-vestiging`, has the `vestiging`
   attribute plus the attributes from `eherkenning-bewindvoering`.
+- `eherkenning-rechtspersoon` / `eherkenning-rechtspersoon`, a legal entity with
+  the `legalSubjectID` (kvk), `actingSubjectID` and `name_qualifier` attributes
+  but NO `vestiging` claim (for eHerkenning without a branch restriction).
 - `admin` / `admin`, intended to create as django user (can be made staff). The
   email address is `admin@example.com`. Should get the `employeeId` claim (See
   below for how to add the custom claim).
