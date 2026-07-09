@@ -320,7 +320,12 @@ jobs:
       - name: Build the Docker image
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: docker build . --tag $IMAGE_NAME:$RELEASE_VERSION
+          COMMIT_HASH: ${{ github.sha }}
+        run: |
+          docker build . \
+            --tag $IMAGE_NAME:$RELEASE_VERSION \
+            --build-arg RELEASE=$RELEASE_VERSION \
+            --build-arg COMMIT_HASH=$COMMIT_HASH
 
       - name: Log into registry
         if: github.event_name == 'push' # exclude PRs
