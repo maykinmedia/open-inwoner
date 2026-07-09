@@ -473,7 +473,7 @@ django-polymorphic==3.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-filer
-django-privates==3.1.1
+django-privates==4.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -513,7 +513,7 @@ django-setup-configuration==0.9.0
     #   mozilla-django-oidc-db
 django-silk==5.5.0
     # via -r requirements/dev.in
-django-simple-certmanager==2.5.0
+django-simple-certmanager==4.0.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
