@@ -345,7 +345,7 @@ Hier vult u de e-mailadressen van beheerders die dagelijks een samenvatting dien
 12.1.9. OpenID Connect
 ----------------------
 
-Dit is een alternatieve login methode die naast DigiD kan worden ingesteld (zie 10.2). In de algemene configuratie kunt u de login button voor OpenID Connect configureren. Alle andere zaken rond de OpenID Connect configuratie vindt u onder inlog koppelingen (hoofdstuk 10.5 en 10.6).
+Dit is een alternatieve login methode die naast DigiD kan worden ingesteld (zie 10.2). In de algemene configuratie kunt u de login button voor OpenID Connect configureren. Alle andere zaken rond de OpenID Connect configuratie vindt u onder inlog koppelingen (hoofdstuk 10.5); voor deze loginmethode gebruikt u de OIDC client ``admin-oidc``.
 
 **OpenID Connect logo**
 Hier kunt u het logo uploaden van de OpenID connect methode die u wilt gebruiken. Door een logo te uploaden maakt u het voor de gebruiker duidelijker welke login methode er wordt geboden.
@@ -362,7 +362,7 @@ Hier kunt u selecteren welk soort gebruiker er de mogelijkheid moet krijgen om v
 ----------------------
 
 **eHerkenning authenticatie ingeschakeld**
-Hier kunt u aanvinken of u gebruikers de mogelijkheid wilt bieden in te loggen met eHerkenning. Standaard wordt er gebruik gemaakt van de SAML integratie (bij een rechtstreekse aansluiting op een eHerkenning Makelaar). Een OpenID Connect koppeling met eHerkenning kunt u configureren onder inlog koppelingen (zie hoofdstuk 10.6).
+Hier kunt u aanvinken of u gebruikers de mogelijkheid wilt bieden in te loggen met eHerkenning. Standaard wordt er gebruik gemaakt van de SAML integratie (bij een rechtstreekse aansluiting op een eHerkenning Makelaar). Een OpenID Connect koppeling met eHerkenning kunt u configureren onder inlog koppelingen (zie hoofdstuk 10.5).
 
 12.1.11. Analytics
 ------------------
