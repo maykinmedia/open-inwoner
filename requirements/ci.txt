@@ -517,7 +517,6 @@ django-treebeard==4.4
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-cms
-    #   djangocms-attributes-field
 django-two-factor-auth[phonenumberslite, webauthn]==1.16.0
     # via
     #   -c requirements/base.txt
@@ -542,7 +541,7 @@ djangocms-alias==2.0.5
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-djangocms-attributes-field==2.1.0
+djangocms-attributes-field==4.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
