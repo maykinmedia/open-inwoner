@@ -198,6 +198,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         link_selector: str,
         username: str,
         password: str,
+        callback_path: str,
         activate_zakelijk: bool = False,
     ):
         """Log in by visiting the login page and clicking the flow's link.
@@ -205,9 +206,20 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         This exercises the login-page rendering + link wiring, not just the init
         view. A fresh browser context per call keeps Keycloak's SSO session from
         carrying over between flows.
+
+        ``callback_path`` is the URL path Keycloak must redirect the browser back
+        to. For the citizen flows this is the legacy per-provider callback URL:
+        that is the redirect_uri customers have whitelisted in their IdP
+        configuration, and it must not silently change (see
+        LegacyCallbackURLMixin in oidc_plugins.plugins).
         """
         context = self.get_context()
         page = context.new_page()
+
+        # Record the browser's requests so we can assert which callback URL the
+        # IdP redirected to.
+        request_urls: list[str] = []
+        page.on("request", lambda request: request_urls.append(request.url))
 
         page.goto(self.live_reverse("login"))
         if activate_zakelijk:
@@ -223,6 +235,13 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
 
         # Back on our live server (callback + post-login redirect).
         page.wait_for_url(lambda url: url.startswith(self.live_server_url))
+
+        callback_prefix = f"{self.live_server_url}{callback_path}"
+        self.assertTrue(
+            any(url.startswith(callback_prefix) for url in request_urls),
+            f"expected Keycloak to redirect the browser to {callback_prefix}, "
+            f"but no request hit it",
+        )
         return page
 
     def _assert_active_session(self, context, user: User) -> None:
@@ -246,7 +265,10 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
     def test_digid_login(self):
         """DigiD (BSN) via `testuser` -> bsn 111222333, logged in."""
         page = self._login(
-            link_selector=".link--digid", username="testuser", password="testuser"
+            link_selector=".link--digid",
+            username="testuser",
+            password="testuser",
+            callback_path="/digid-oidc/callback/",
         )
 
         user = User.objects.get(login_type=LoginTypeChoices.digid)
@@ -259,6 +281,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             link_selector=".link--eherkenning",
             username="eherkenning-vestiging",
             password="eherkenning-vestiging",
+            callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
 
@@ -277,6 +300,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             link_selector=".link--eherkenning",
             username="eherkenning-rechtspersoon",
             password="eherkenning-rechtspersoon",
+            callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
 
@@ -297,6 +321,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             link_selector=".link--eidas",
             username="eidas-person-pseudo",
             password="eidas-person-pseudo",
+            callback_path="/eidas-oidc/callback/",
         )
 
         user = User.objects.get(login_type=LoginTypeChoices.eidas_person_pseudo_id)
@@ -306,7 +331,12 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
     def test_admin_oidc_login(self):
         """Admin SSO via `admin` -> staff + superuser (Registreerders), logged in."""
         page = self._login(
-            link_selector=".link--oidc", username="admin", password="admin"
+            link_selector=".link--oidc",
+            username="admin",
+            password="admin",
+            # The admin flow always used the generic callback endpoint; only the
+            # citizen flows have legacy per-provider callback URLs.
+            callback_path="/oidc/callback/",
         )
 
         # Fetch by oidc_id (the sub): create_homepage() also makes a staff user,
@@ -331,7 +361,10 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         existing = DigidUserFactory(bsn="111222333")
 
         self._login(
-            link_selector=".link--digid", username="testuser", password="testuser"
+            link_selector=".link--digid",
+            username="testuser",
+            password="testuser",
+            callback_path="/digid-oidc/callback/",
         )
 
         self._assert_reused(existing.pk, bsn="111222333")
@@ -345,6 +378,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             link_selector=".link--eherkenning",
             username="eherkenning-vestiging",
             password="eherkenning-vestiging",
+            callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
 
@@ -360,6 +394,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             link_selector=".link--eidas",
             username="eidas-person-pseudo",
             password="eidas-person-pseudo",
+            callback_path="/eidas-oidc/callback/",
         )
 
         self._assert_reused(existing.pk, eidas_pseudo_id="4B75A0EA107B3D36")
@@ -369,7 +404,12 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             oidc_id=KEYCLOAK_ADMIN_SUB, login_type=LoginTypeChoices.oidc
         )
 
-        self._login(link_selector=".link--oidc", username="admin", password="admin")
+        self._login(
+            link_selector=".link--oidc",
+            username="admin",
+            password="admin",
+            callback_path="/oidc/callback/",
+        )
 
         self._assert_reused(existing.pk, oidc_id=KEYCLOAK_ADMIN_SUB)
         self.assertTrue(User.objects.get(pk=existing.pk).is_superuser)

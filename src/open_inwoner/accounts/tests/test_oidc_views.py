@@ -71,6 +71,12 @@ def perform_oidc_login(
 
     callback_url = reverse(f"{login_type}_oidc:callback")
 
+    # The advertised redirect_uri must be the legacy per-provider callback URL
+    # (see LegacyCallbackURLMixin), and the simulated IdP redirect below must
+    # target that same URL to stay faithful to the real flow.
+    advertised_redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+    assert advertised_redirect_uri == f"http://testserver{callback_url}"
+
     with requests_mock.Mocker() as m:
         callback_url = (
             furl(f"http://testserver{callback_url}")
@@ -493,6 +499,23 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
     @property
     def regular_users(self):
         return User.objects.exclude(pk__in=self._infra_user_pks)
+
+    def test_init_advertises_legacy_callback_url(self):
+        """
+        The redirect_uri sent to the IdP must remain the legacy per-provider
+        callback URL: customers have whitelisted these URLs in their IdP
+        configuration (see LegacyCallbackURLMixin).
+        """
+        OIDCClientFactory(
+            with_digid=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
+
+        init_response = self.app.get(reverse("digid_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/digid-oidc/callback/")
 
     @patch("open_inwoner.accounts.signals._update_user_from_brp")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
@@ -1062,6 +1085,23 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
     def regular_users(self):
         """Users created by tests, excluding CMS infrastructure users."""
         return User.objects.exclude(pk__in=self._infra_user_pks)
+
+    def test_init_advertises_legacy_callback_url(self):
+        """
+        The redirect_uri sent to the IdP must remain the legacy per-provider
+        callback URL: customers have whitelisted these URLs in their IdP
+        configuration (see LegacyCallbackURLMixin).
+        """
+        OIDCClientFactory(
+            with_eherkenning=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
+
+        init_response = self.app.get(reverse("eherkenning_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/eherkenning-oidc/callback/")
 
     @skip(
         "[#2662] This guarded a ValueError that the old mozilla-django-oidc-db "
@@ -2191,6 +2231,18 @@ class EIDASOIDCFlowTests(OIDCMixin, WebTest):
                 }
             },
         )
+
+    def test_init_advertises_legacy_callback_url(self):
+        """
+        The redirect_uri sent to the IdP must remain the legacy per-provider
+        callback URL: customers have whitelisted these URLs in their IdP
+        configuration (see LegacyCallbackURLMixin).
+        """
+        init_response = self.app.get(reverse("eidas_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/eidas-oidc/callback/")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
