@@ -641,7 +641,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         self.assertEqual(created_document, self.informatie_object)
 
         post_body = m.last_request.json()
-        self.assertEqual(post_body["formaat"], file.content_type)
+        # formaat is derived from the filename, not the browser-supplied content_type
+        self.assertEqual(post_body["formaat"], "text/plain")
 
     def test_document_upload_multiple_backends(self, m):
         self._setUpMocks(m)
