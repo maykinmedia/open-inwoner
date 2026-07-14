@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.conf import settings
 from django.http import HttpRequest, HttpResponseBase
 
 from digid_eherkenning.oidc.schemas import (
@@ -30,14 +31,21 @@ class LegacyCallbackURLMixin:
        ``redirect_uri`` because customers have whitelisted them in their identity
        provider configuration, and switching would break logins until every IdP
        whitelist is updated. Once all environments also whitelist
-       ``/oidc/callback/``, remove this mixin and the legacy callback routes in the
-       ``*_urls`` modules.
+       ``/oidc/callback/``, remove this mixin, the ``OIDC_USE_LEGACY_ENDPOINTS``
+       setting and the legacy callback routes in the ``*_urls`` modules.
+
+    Controlled by the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` setting (default
+    ``True``), so the legacy behaviour can be turned off per environment once its
+    IdP whitelist has been updated, ahead of the eventual removal.
     """
 
     legacy_callback_url_name: str
 
     def get_setting(self, attr: str, *args) -> Any:
-        if attr == "OIDC_AUTHENTICATION_CALLBACK_URL":
+        if (
+            attr == "OIDC_AUTHENTICATION_CALLBACK_URL"
+            and settings.OIDC_USE_LEGACY_ENDPOINTS
+        ):
             return self.legacy_callback_url_name
         return super().get_setting(attr, *args)
 

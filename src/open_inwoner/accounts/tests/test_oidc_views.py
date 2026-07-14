@@ -517,6 +517,23 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         redirect_uri = furl(init_response.url).query.params["redirect_uri"]
         self.assertEqual(redirect_uri, "http://testserver/digid-oidc/callback/")
 
+    @override_settings(OIDC_USE_LEGACY_ENDPOINTS=False)
+    def test_init_advertises_generic_callback_url_when_legacy_endpoints_disabled(self):
+        """
+        Setting the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` to False must restore
+        the generic /oidc/callback/ endpoint as the advertised redirect_uri.
+        """
+        OIDCClientFactory(
+            with_digid=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
+
+        init_response = self.app.get(reverse("digid_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/oidc/callback/")
+
     @patch("open_inwoner.accounts.signals._update_user_from_brp")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
@@ -1102,6 +1119,23 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         self.assertEqual(init_response.status_code, 302)
         redirect_uri = furl(init_response.url).query.params["redirect_uri"]
         self.assertEqual(redirect_uri, "http://testserver/eherkenning-oidc/callback/")
+
+    @override_settings(OIDC_USE_LEGACY_ENDPOINTS=False)
+    def test_init_advertises_generic_callback_url_when_legacy_endpoints_disabled(self):
+        """
+        Setting the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` to False must restore
+        the generic /oidc/callback/ endpoint as the advertised redirect_uri.
+        """
+        OIDCClientFactory(
+            with_eherkenning=True,
+            oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
+        )
+
+        init_response = self.app.get(reverse("eherkenning_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/oidc/callback/")
 
     @skip(
         "[#2662] This guarded a ValueError that the old mozilla-django-oidc-db "
@@ -2243,6 +2277,18 @@ class EIDASOIDCFlowTests(OIDCMixin, WebTest):
         self.assertEqual(init_response.status_code, 302)
         redirect_uri = furl(init_response.url).query.params["redirect_uri"]
         self.assertEqual(redirect_uri, "http://testserver/eidas-oidc/callback/")
+
+    @override_settings(OIDC_USE_LEGACY_ENDPOINTS=False)
+    def test_init_advertises_generic_callback_url_when_legacy_endpoints_disabled(self):
+        """
+        Setting the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` to False must restore
+        the generic /oidc/callback/ endpoint as the advertised redirect_uri.
+        """
+        init_response = self.app.get(reverse("eidas_oidc:init"))
+
+        self.assertEqual(init_response.status_code, 302)
+        redirect_uri = furl(init_response.url).query.params["redirect_uri"]
+        self.assertEqual(redirect_uri, "http://testserver/oidc/callback/")
 
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.get_userinfo")
     @patch("mozilla_django_oidc_db.backends.OIDCAuthenticationBackend.store_tokens")
