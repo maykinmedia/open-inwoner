@@ -1620,6 +1620,23 @@ OIDC_AUTHENTICATION_CALLBACK_URL = "oidc_authentication_callback"
 # ID token is required to enable OIDC logout
 OIDC_STORE_ID_TOKEN = True
 
+OIDC_USE_LEGACY_ENDPOINTS = config(
+    "OIDC_USE_LEGACY_ENDPOINTS",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Deprecated: advertise the legacy per-provider OIDC callback URLs "
+            "(e.g. /digid-oidc/callback/) as the redirect_uri sent to the IdP, "
+            "instead of the generic /oidc/callback/ endpoint. Kept for backwards "
+            "compatibility with identity providers that whitelist the legacy "
+            "URLs. Set to False once every IdP whitelist has been updated to "
+            "allow the generic callback endpoint; this setting will be removed "
+            "in a future release."
+        ),
+        group="Security",
+    ),
+)
+
 # Amount of elapsed time before redirecting the user back to the IdP for re-authentication
 OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = config(
     "OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS",
