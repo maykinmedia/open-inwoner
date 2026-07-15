@@ -61,6 +61,14 @@ const Table: AC<ITableProps> = ({
 
   const isEmpty = !data.rows || data.rows.length === 0;
 
+  const getFormattedValue = (value: string = '', columnLabel?: string) => {
+    if (!columnLabel) return value;
+
+    // Haalt de tekst tussen de haakjes uit de titel, bv. '€' uit 'Bedrag (€)'
+    const unit = columnLabel.match(/\(([^)])\)/)?.[1] ?? '';
+    return unit === '€' ? `${unit} ${value}` : `${value} ${unit}`;
+  };
+
   return (
     <TableContainer>
       <UtrechtTable>
@@ -94,13 +102,13 @@ const Table: AC<ITableProps> = ({
             data.rows!.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
                 {/* LOOP 3 (INNER): For each row, iterate over each column to render cells */}
-                {data.columns?.map(({ key }, colIndex) => (
+                {data.columns?.map(({ header, key }, colIndex) => (
                   <TableCell
                     key={`${rowIndex}-${colIndex}`}
                     className={colIndex === 0 ? undefined : 'right'}
                   >
                     {/* Extract the value for this cell using the column key */}
-                    {row[key]}
+                    {getFormattedValue(row[key], header)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -113,19 +121,18 @@ const Table: AC<ITableProps> = ({
           <TableFooter>
             <TableRow>
               {/* LOOP 4: Iterate over columns for footer cells */}
-              {data.columns?.map(({ key }, colIndex) => {
+              {data.columns?.map(({ header, key }, colIndex) => {
                 // Skip cells that are covered by the colspan
                 if (colIndex > 0 && colIndex < colSpanValue) {
                   return null;
                 }
-
                 return (
                   <TableCell
                     key={`footer-${colIndex}`}
                     colSpan={colIndex === 0 ? colSpanValue : undefined}
                     className={colIndex === 0 ? undefined : 'right'}
                   >
-                    {data.footerRow?.[key]}
+                    {getFormattedValue(data.footerRow?.[key], header)}
                   </TableCell>
                 );
               })}
