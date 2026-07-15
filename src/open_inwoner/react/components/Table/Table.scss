@@ -11,10 +11,17 @@
   &__header-cell {
     border-block-end: 2px solid var(--oip-color-gray);
     background-color: var(--utrecht-table-header-background-color);
+
+    &.right {
+      text-align: right;
+    }
   }
 
   &__cell {
     color: var(--oip-color-fg);
+    &.right {
+      text-align: right;
+    }
   }
 
   &__row:hover .utrecht-table__cell {
