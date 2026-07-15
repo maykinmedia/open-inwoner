@@ -70,7 +70,11 @@ const Table: AC<ITableProps> = ({
           <TableRow>
             {/* LOOP 1: Iterate over each column to render table headers */}
             {data.columns?.map(({ header, scope = 'col' }, index) => (
-              <TableHeaderCell key={index} scope={scope}>
+              <TableHeaderCell
+                key={index}
+                scope={scope}
+                className={index === 0 ? undefined : 'right'}
+              >
                 {header}
               </TableHeaderCell>
             ))}
@@ -91,7 +95,10 @@ const Table: AC<ITableProps> = ({
               <TableRow key={rowIndex}>
                 {/* LOOP 3 (INNER): For each row, iterate over each column to render cells */}
                 {data.columns?.map(({ key }, colIndex) => (
-                  <TableCell key={`${rowIndex}-${colIndex}`}>
+                  <TableCell
+                    key={`${rowIndex}-${colIndex}`}
+                    className={colIndex === 0 ? undefined : 'right'}
+                  >
                     {/* Extract the value for this cell using the column key */}
                     {row[key]}
                   </TableCell>
@@ -116,6 +123,7 @@ const Table: AC<ITableProps> = ({
                   <TableCell
                     key={`footer-${colIndex}`}
                     colSpan={colIndex === 0 ? colSpanValue : undefined}
+                    className={colIndex === 0 ? undefined : 'right'}
                   >
                     {data.footerRow?.[key]}
                   </TableCell>
