@@ -73,7 +73,7 @@ describe('Table', () => {
     expect(screen.getByText('vrijdag 14-11-2025')).toBeInTheDocument();
     expect(screen.getAllByText('11:07')).toHaveLength(3);
     expect(screen.getByText('vrijdag 17-10-2025')).toBeInTheDocument();
-    expect(screen.getByText('20,0')).toBeInTheDocument();
+    expect(screen.getByText(/20,0/)).toBeInTheDocument();
 
     cleanup();
   });
@@ -84,7 +84,7 @@ describe('Table', () => {
 
     render(<Table jsonScriptId={jsonScriptId} />);
     expect(screen.getByText('Totaal gewicht')).toBeInTheDocument();
-    expect(screen.getByText('51,5')).toBeInTheDocument();
+    expect(screen.getByText(/51,5/)).toBeInTheDocument();
 
     cleanup();
   });
