@@ -14,7 +14,7 @@ class SecurityTxtRedirectTest(TestCase):
     def test_security_txt_url_redirects_to_configured_url(self):
         config = SiteConfiguration.get_solo()
         config.security_txt_redirect_target = (
-            "https://maykinmedia.nl/.well-known/security.txt"
+            "https://maykin.nl/.well-known/security.txt"
         )
         config.save()
 
@@ -23,9 +23,7 @@ class SecurityTxtRedirectTest(TestCase):
         )
 
         self.assertEqual(resp.status_code, 302, msg="Redirect is temporary")
-        self.assertEqual(
-            resp["Location"], "https://maykinmedia.nl/.well-known/security.txt"
-        )
+        self.assertEqual(resp["Location"], "https://maykin.nl/.well-known/security.txt")
 
     def test_security_txt_url_redirect_disallows_non_safe_methods(self):
         url = reverse("security-txt-redirect")

@@ -9,7 +9,7 @@ url: 'http://github.com/maykinmedia/open-inwoner.git'
 softwareType: standalone
 softwareVersion: 2.4.1
 releaseDate: '2026-07-22'
-logo: 'https://github.com/maykinmedia/open-inwoner/blob/develop/docs/logo.png'
+logo: '.github/assets/open-inwoner-logo.svg'
 platforms:
   - web
   - linux

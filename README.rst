@@ -2,6 +2,9 @@
 Open Inwoner
 ==================
 
+.. image:: .github/assets/open-inwoner-logo.svg
+    :height: 100px
+    :alt: Open Inwoner
 
 :Version: 2.4.1
 :Demo: https://openinwoner.nl
@@ -13,7 +16,7 @@ Open Inwoner
 
 Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
-Ontwikkeld door `Maykin Media B.V.`_ voor Dimpact en de `Open Inwoner`_ gemeenten:
+Ontwikkeld door `Maykin B.V.`_ voor Dimpact en de `Open Inwoner`_ gemeenten:
 Deventer, Enschede, Groningen, Leeuwarden, Hoorn, Zwolle.
 
 
@@ -121,7 +124,7 @@ Full documentation is available at https://docs.openinwoner.nl
 License
 =======
 
-Copyright © Maykin Media, 2026
+Copyright © Maykin, 2026
 
 Licensed under the EUPL_.
 
@@ -156,7 +159,7 @@ References
 
 
 .. _Common Ground: https://commonground.nl/
-.. _Maykin Media B.V.: https://www.maykinmedia.nl
+.. _Maykin B.V.: https://www.maykin.nl
 .. _Open Inwoner: https://openinwoner.nl
 .. _i4Sociaal: https://www.dimpact.nl/i4sociaal
 .. _EUPL: LICENSE.md
