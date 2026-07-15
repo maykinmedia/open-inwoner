@@ -1194,7 +1194,7 @@ SENTRY_DSN = config(
         group="Monitoring",
     ),
 )
-RELEASE = "v2.3.0"  # get_current_version()
+RELEASE = "v2.4.0"  # get_current_version()
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")

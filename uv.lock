@@ -4,5 +4,5 @@ requires-python = ">=3.13, <4"
 
 [[package]]
 name = "open-inwoner"
-version = "2.0.0.dev0"
+version = "2.4.0"
 source = { virtual = "." }
