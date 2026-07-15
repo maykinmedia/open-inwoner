@@ -140,11 +140,11 @@ class TasksPluginTest(TestCase):
         self.assertEqual(len(tasks), 2)
 
         self.assertEqual(tasks[0]["api_source"], "ZGW API")
-        self.assertEqual(tasks[0]["task_url"], "https://maykinmedia.nl")
+        self.assertEqual(tasks[0]["task_url"], "https://maykin.nl")
         self.assertEqual(tasks[0]["status"], "open")
         self.assertEqual(tasks[0]["titel"], "Aanvullende informatie gewenst")
 
-        self.assertEqual(tasks[1]["task_url"], "https://maykinmedia.nl")
+        self.assertEqual(tasks[1]["task_url"], "https://maykin.nl")
         self.assertEqual(tasks[1]["status"], "open")
         self.assertEqual(tasks[1]["titel"], "Aanvullende informatie gewenst")
 

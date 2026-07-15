@@ -1,5 +1,10 @@
 .. _index:
 
+.. image:: ../.github/assets/open-inwoner-logo.svg
+    :height: 100px
+    :alt: Open Inwoner
+    :class: no-scaled-link product-logo
+
 =========================
 Open Inwoner documentatie
 =========================

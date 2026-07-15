@@ -94,21 +94,21 @@ class ESuiteSubmissionData:
 class ESuiteTaskData:
     def __init__(self):
         self.task1 = {
-            "url": "https://maykinmedia.nl",
+            "url": "https://maykin.nl",
             "uuid": "fb72d8db-c3ee-4aa0-96c1-260b202cb208",
             "identificatie": "1234-2023",
             "naam": "Aanvullende informatie gewenst",
             "startdatum": "2023-11-14",
-            "formulierLink": "https://maykinmedia.nl",
+            "formulierLink": "https://maykin.nl",
             "zaakIdentificatie": "6789-2024",
         }
         self.task2 = {
-            "url": "https://maykinmedia.nl",
+            "url": "https://maykin.nl",
             "uuid": "d74f6a5c-297d-43a3-a923-1774164d852d",
             "identificatie": "4321-2023",
             "naam": "Aanvullende informatie gewenst",
             "startdatum": "2023-10-11",
-            "formulierLink": "https://maykinmedia.nl",
+            "formulierLink": "https://maykin.nl",
             "zaakIdentificatie": "9876-2024",
         }
 
