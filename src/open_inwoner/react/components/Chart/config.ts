@@ -31,6 +31,9 @@ export const CHART_STYLES = {
     restafval: getComputedStyle(document.documentElement).getPropertyValue(
       '--color-rest'
     ),
+    fallback: getComputedStyle(document.documentElement).getPropertyValue(
+      '--color-fallback-bar'
+    ),
   },
   padding: {
     chart: {
