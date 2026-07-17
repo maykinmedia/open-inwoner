@@ -7,7 +7,7 @@ export interface AfvalLediging {
 
 export interface AfvalContainer {
   identifier: string;
-  type: 'Restafval' | 'GFT';
+  type: string;
   totaal_gewicht: string;
   ledigingen: AfvalLediging[];
 }
@@ -29,7 +29,7 @@ export interface ChartDataPoint {
 }
 
 export interface ContainerSeries {
-  type: 'GFT' | 'Restafval';
+  type: string;
   address: string;
   containerIndex: number;
   points: ChartDataPoint[];
