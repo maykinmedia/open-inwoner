@@ -54,7 +54,8 @@ class DigitalAddressValueValidationTests(TestCase):
             addr.clean()
 
         self.assertEqual(
-            ctx.exception.message_dict, {"value": ["Enter a valid phone number."]}
+            ctx.exception.message_dict,
+            {"value": ["Voer een geldig telefoonnummer in."]},
         )
 
     def test_clean_accepts_valid_email(self):
@@ -165,7 +166,11 @@ class PreferredAddressTests(TestCase):
             user1.clean()
         self.assertEqual(
             ctx.exception.message_dict,
-            {"preferred_address": ["The preferred address must belong to this user."]},
+            {
+                "preferred_address": [
+                    "Het voorkeursadres moet bij deze gebruiker horen."
+                ]
+            },
         )
 
     def test_clean_allows_preferred_address_belonging_to_same_user(self):
