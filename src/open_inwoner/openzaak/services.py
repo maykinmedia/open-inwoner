@@ -264,6 +264,44 @@ class ZGWService:
         return True, None
 
     @staticmethod
+    def _user_has_required_rol(
+        zaak_url: str,
+        user_identification: UserIdentification,
+        zaken_client: ZakenClient,
+        use_rsin: bool,
+        limit_access_to_role: str,
+    ) -> bool:
+        """
+        Return True if the user may access this zaak based on their rollen.
+
+        The user must hold at least one rol on the zaak, and when
+        `OpenZaakConfig.limit_user_visible_cases_to_role` is configured, at least one
+        of those rollen must match it.
+
+        Note we deliberately do not log `user_identification`, which holds a BSN or KVK
+        number.
+        """
+        rollen = zaken_client.fetch_rollen_for_user(
+            zaak_url, user_identification, use_rsin=use_rsin
+        )
+
+        if not rollen:
+            logger.info("zaak access denied: no rol for zaak", zaak_url=zaak_url)
+            return False
+
+        if limit_access_to_role and not any(
+            rol.omschrijving_generiek == limit_access_to_role for rol in rollen
+        ):
+            logger.info(
+                "zaak access denied: incorrect rol for zaak",
+                zaak_url=zaak_url,
+                required_role=limit_access_to_role,
+            )
+            return False
+
+        return True
+
+    @staticmethod
     def _is_info_object_visible(
         info_object: InformatieObject,
         max_confidentiality_level: str,
@@ -359,12 +397,46 @@ class ZGWService:
     ) -> list[ZaakWithApiGroupZaakTypeResolved]:
         """
         Search for a zaak by zaak_identificatie across all API groups.
-        Returns visible matches.
+
+        Returns matches that are visible and for which the user holds a (sufficiently
+        privileged) rol.
         """
+        config = OpenZaakConfig.get_solo()
+        limit_access_to_role = config.limit_user_visible_cases_to_role
+
         visible_zaken: list[ZaakWithApiGroupZaakTypeResolved] = []
         for zaak_with_group in self.get_raw_zaken(
             user_identification, zaak_identificatie
         ):
+            api_group = zaak_with_group.api_group
+
+            # Check the rol before resolving anything else, mirroring the order in
+            # `check_zaak_access`, so a zaak the user has no claim to never has its
+            # metadata resolved. We cannot rely on the API-level
+            # `rol__omschrijvingGeneriek` filter here: eSuite is known to ignore filter
+            # query params (see Taiga #961 and `ZakenClient.fetch_zaak_roles`).
+            try:
+                if not self._user_has_required_rol(
+                    zaak_with_group.zaak.url,
+                    user_identification,
+                    self._zaken_client_factory(api_group, config),
+                    use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
+                    limit_access_to_role=limit_access_to_role,
+                ):
+                    continue
+            except ZgwAPIError:
+                logger.warning(
+                    "Unable to fetch rollen for search result, excluding it",
+                    zaak_url=zaak_with_group.zaak.url,
+                )
+                continue
+            except Exception:
+                logger.exception(
+                    "Unknown error fetching rollen for search result, excluding it",
+                    zaak_url=zaak_with_group.zaak.url,
+                )
+                continue
+
             try:
                 # TODO: could be done in parallel
                 catalogi_client = self._catalogi_client_factory(
@@ -787,31 +859,18 @@ class ZGWService:
         user_identification: UserIdentification,
         api_group: ZGWApiGroupConfig,
     ) -> tuple[Zaak, ZGWApiGroupConfig] | None:
-        zaken_client = self._zaken_client_factory(api_group)
+        config = OpenZaakConfig.get_solo()
+        zaken_client = self._zaken_client_factory(api_group, config)
 
         zaak = zaken_client.fetch_single_zaak(zaak_id)
 
-        config = OpenZaakConfig.get_solo()
-        limit_access_to_role = config.limit_user_visible_cases_to_role
-
-        rollen = zaken_client.fetch_rollen_for_user(
+        if not self._user_has_required_rol(
             zaak.url,
             user_identification,
+            zaken_client,
             use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
-        )
-
-        if not rollen:
-            logger.info("check_zaak_access: no role for zaak", zaak_url=zaak.url)
-            return None
-
-        if limit_access_to_role and not any(
-            rol.omschrijving_generiek == limit_access_to_role for rol in rollen
+            limit_access_to_role=config.limit_user_visible_cases_to_role,
         ):
-            logger.info(
-                "check_zaak_access: incorrect role for zaak",
-                zaak_url=zaak.url,
-                required_role=limit_access_to_role,
-            )
             return None
 
         catalogi_client = self._catalogi_client_factory(api_group)

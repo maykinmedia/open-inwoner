@@ -17,7 +17,11 @@ from django_webtest import TransactionWebTest
 from furl import furl
 from pyquery import PyQuery
 from timeline_logger.models import TimelineLog
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import (
+    RolOmschrijving,
+    RolTypes,
+    VertrouwelijkheidsAanduidingen,
+)
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import (
@@ -1571,3 +1575,155 @@ class FormulierTest(TransactionWebTest):
             zaken[1]["datum_laatste_wijziging"].strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
             data.submission_2["datumLaatsteWijziging"],
         )
+
+
+@requests_mock.Mocker()
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    MIDDLEWARE=PATCHED_MIDDLEWARE,
+)
+class CaseListSearchAccessTest(ClearCachesMixin, TransactionTestCase):
+    """
+    Searching on an exact zaaknummer must not disclose a zaak the user has no
+    (sufficient) rol on.
+
+    Regression tests for the metadata leak found during triage of #2659: the search
+    box on the case list relied entirely on the API-level `rol__omschrijvingGeneriek`
+    filter, which eSuite is known to ignore.
+    """
+
+    inner_url = reverse_lazy("cases:cases_content")
+    maxDiff = None
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
+
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
+        self.config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
+        self.config.save()
+
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            ztc_service__api_root=CATALOGI_ROOT,
+            form_service=None,
+            fetch_eherkenning_zaken_with_rsin=False,
+        )
+        self.mocks = CaseListMocks(
+            zaken_root=ZAKEN_ROOT,
+            catalogi_root=CATALOGI_ROOT,
+            user=self.user,
+            eherkenning_user=eHerkenningUserFactory.create(
+                kvk="12345678",
+                rsin="123456789",
+                login_type=LoginTypeChoices.eherkenning,
+            ),
+            eherkenning_user_vestiging=None,
+        )
+        self.zaak = self.mocks.zaak1
+        self.search_term = self.zaak["identificatie"]
+
+    def _mock_search(self, m):
+        params = {
+            "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+            "maximaleVertrouwelijkheidaanduiding": (
+                VertrouwelijkheidsAanduidingen.beperkt_openbaar
+            ),
+            "identificatie": self.search_term,
+        }
+        if self.config.limit_user_visible_cases_to_role:
+            params["rol__omschrijvingGeneriek"] = (
+                self.config.limit_user_visible_cases_to_role
+            )
+
+        m.get(
+            furl(f"{ZAKEN_ROOT}zaken").add(params).url,
+            json=paginated_response([self.zaak]),
+        )
+        for resource in [
+            self.mocks.zaaktype,
+            self.mocks.status_type_initial,
+            self.mocks.status_type_finish,
+            self.mocks.status1,
+        ]:
+            m.get(resource["url"], json=resource)
+
+    def _mock_rollen(self, m, omschrijving_generiek: str | None):
+        rollen = []
+        if omschrijving_generiek is not None:
+            rollen.append(
+                generate_oas_component_cached(
+                    "zrc",
+                    "schemas/Rol",
+                    url=f"{ZAKEN_ROOT}rollen/bbbbbbbb-0000-4000-8000-000000000001",
+                    zaak=self.zaak["url"],
+                    omschrijvingGeneriek=omschrijving_generiek,
+                    betrokkeneType=RolTypes.natuurlijk_persoon,
+                    betrokkeneIdentificatie={"inpBsn": self.user.bsn},
+                )
+            )
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response(rollen),
+        )
+
+    def _search(self):
+        self.client.force_login(user=self.user)
+        return self.client.get(
+            f"{self.inner_url}?search={self.search_term}", HTTP_HX_REQUEST="true"
+        )
+
+    def test_search_shows_zaak_when_user_has_matching_rol(self, m):
+        self._mock_search(m)
+        self._mock_rollen(m, RolOmschrijving.initiator)
+
+        response = self._search()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["zaken"]), 1)
+        self.assertEqual(
+            response.context["zaken"][0]["identification"], self.search_term
+        )
+
+    def test_search_hides_zaak_when_rol_does_not_match_limit(self, m):
+        """The reported leak: metadata must not be rendered for a non-initiator."""
+        self._mock_search(m)
+        self._mock_rollen(m, RolOmschrijving.belanghebbende)
+
+        response = self._search()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["zaken"], [])
+        # note the identificatie itself is echoed back in the search input, so we
+        # assert on the metadata that would only appear via a rendered result
+        self.assertNotContains(response, self.zaak["omschrijving"])
+
+    def test_search_hides_zaak_when_user_has_no_rol(self, m):
+        self._mock_search(m)
+        self._mock_rollen(m, None)
+
+        response = self._search()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["zaken"], [])
+        self.assertNotContains(response, self.zaak["omschrijving"])
+
+    def test_search_hides_zaak_when_rollen_fetch_fails(self, m):
+        """Fail closed, and do so inside search_zaken rather than erroring the page."""
+        self._mock_search(m)
+        m.get(f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}", status_code=500)
+
+        response = self._search()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["zaken"], [])
+        self.assertNotContains(response, self.zaak["omschrijving"])
+        # the view swallows unhandled errors into `fetch_error`, so its absence
+        # proves the failure was handled inside `search_zaken`
+        self.assertFalse(response.context.get("fetch_error", False))

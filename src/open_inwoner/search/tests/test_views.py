@@ -9,7 +9,11 @@ from django.utils.translation import gettext as _
 import requests_mock
 from elasticsearch.exceptions import ConnectionTimeout
 from furl import furl
-from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
+from zgw_consumers.api_models.constants import (
+    RolOmschrijving,
+    RolTypes,
+    VertrouwelijkheidsAanduidingen,
+)
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
@@ -22,7 +26,7 @@ from open_inwoner.openzaak.tests.shared import (
     CATALOGI_ROOT,
     ZAKEN_ROOT,
 )
-from open_inwoner.utils.test import paginated_response
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 from .utils import ESMixin
 
@@ -30,7 +34,7 @@ from .utils import ESMixin
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @tag("elastic")
-class TestSearchView(ESMixin, TransactionTestCase):
+class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
@@ -117,6 +121,24 @@ class TestSearchView(ESMixin, TransactionTestCase):
             statustype=self.status_type2["url"],
             datumStatusGezet="2021-03-12",
             statustoelichting="",
+        )
+        self.zaak1_rol = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0000-4000-8000-000000000001",
+            zaak=self.zaak1["url"],
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={"inpBsn": self.user.bsn},
+        )
+        self.zaak2_rol = generate_oas_component_cached(
+            "zrc",
+            "schemas/Rol",
+            url=f"{ZAKEN_ROOT}rollen/aaaaaaaa-0000-4000-8000-000000000002",
+            zaak=self.zaak2["url"],
+            omschrijvingGeneriek=RolOmschrijving.initiator,
+            betrokkeneType=RolTypes.natuurlijk_persoon,
+            betrokkeneIdentificatie={"inpBsn": self.user.bsn},
         )
 
         # objects needed to test how the cache is updated
@@ -217,6 +239,20 @@ class TestSearchView(ESMixin, TransactionTestCase):
             self.status2,
         ]:
             m.get(resource["url"], json=resource)
+
+        # `search_zaken` verifies the user holds a rol on the zaak before returning it.
+        # Note zaak2 is served by the ANOTHER_ZAKEN_ROOT group in the multi-backend
+        # test, and `fetch_zaak_roles` requests /rollen relative to its own base_url,
+        # so both roots need a mock.
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak1['url']}",
+            json=paginated_response([self.zaak1_rol]),
+        )
+        for zaken_root in (ZAKEN_ROOT, ANOTHER_ZAKEN_ROOT):
+            m.get(
+                f"{zaken_root}rollen?zaak={self.zaak2['url']}",
+                json=paginated_response([self.zaak2_rol]),
+            )
 
     def test_search_hidden_from_anonymous_users(self, m):
         config = SiteConfiguration.get_solo()
