@@ -5,7 +5,10 @@ import enum
 import threading
 from collections import defaultdict
 from dataclasses import dataclass
+from datetime import date
 from typing import Generic, TypedDict, TypeVar, cast
+
+from django.utils.functional import cached_property
 
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -109,6 +112,7 @@ class SkipReason(enum.Enum):
     NO_ZAAKTYPE = "no_zaaktype"
     INTERNAL_ZAAKTYPE = "internal_zaaktype"
     CONFIDENTIALITY_TOO_HIGH = "confidentiality_too_high"
+    BEFORE_VISIBLE_FROM_DATE = "before_visible_from_date"
     ZAAKTYPE_RESOLUTION_FAILED = "zaaktype_resolution_failed"
     FULL_RESOLUTION_FAILED = "full_resolution_failed"
     TIMEOUT = "timeout"
@@ -228,8 +232,24 @@ class ZGWService:
             ),
         )
 
-    @staticmethod
-    def _is_zaak_visible(zaak: Zaak) -> tuple[bool, SkipReason | None]:
+    @cached_property
+    def _zaaktype_visible_from_dates(self) -> dict[tuple[str, str], date]:
+        """
+        Map (catalogus url, zaaktype identificatie) to the earliest startdatum a zaak
+        of that zaaktype may have to still be visible. Only zaaktypes with a configured
+        date appear in the map.
+
+        Cached per service instance, which is constructed per request, so changes made
+        by an admin take effect on the next request.
+        """
+        return {
+            (catalogus_url, identificatie): visible_from
+            for catalogus_url, identificatie, visible_from in ZaakTypeConfig.objects.filter(
+                zaken_visible_from__isnull=False
+            ).values_list("catalogus__url", "identificatie", "zaken_visible_from")
+        }
+
+    def _is_zaak_visible(self, zaak: Zaak) -> tuple[bool, SkipReason | None]:
         """Return (True, None) if the zaak should be shown, or (False, reason) if hidden."""
         config = OpenZaakConfig.get_solo()
 
@@ -260,6 +280,23 @@ class ZGWService:
 
         if not is_object_visible(zaak, config.zaak_max_confidentiality):
             return False, SkipReason.CONFIDENTIALITY_TOO_HIGH
+
+        # support both url and resolved dataclass, as in
+        # `ZaakTypeConfigQueryset.filter_catalogus`
+        catalogus = zaak.zaaktype.catalogus
+        catalogus_url = catalogus if isinstance(catalogus, str) else catalogus.url
+
+        visible_from = self._zaaktype_visible_from_dates.get(
+            (catalogus_url, zaak.zaaktype.identificatie)
+        )
+        if visible_from and zaak.startdatum < visible_from:
+            logger.info(
+                "Ignoring zaak as not visible for users: startdatum precedes the "
+                "date configured for its zaaktype",
+                zaak_url=zaak.url,
+                visible_from=visible_from,
+            )
+            return False, SkipReason.BEFORE_VISIBLE_FROM_DATE
 
         return True, None
 

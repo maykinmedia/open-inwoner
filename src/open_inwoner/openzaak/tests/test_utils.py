@@ -182,6 +182,7 @@ class TestUtils(ClearCachesMixin, TestCase):
         self.assertEqual(
             config.zaak_max_confidentiality, VertrouwelijkheidsAanduidingen.openbaar
         )
+        service = ZGWService()
 
         zaak = factory(
             Zaak,
@@ -210,40 +211,40 @@ class TestUtils(ClearCachesMixin, TestCase):
             with self.assertRaisesMessage(
                 ValueError, "expected zaak.zaaktype to be resolved from url to model"
             ):
-                ZGWService._is_zaak_visible(zaak)
+                service._is_zaak_visible(zaak)
 
         # resolve the zaaktype
         zaak.zaaktype = zaaktype
 
         with self.subTest("normal visible without status"):
             self.assertEqual(
-                ZGWService._is_zaak_visible(zaak), (False, SkipReason.NO_STATUS)
+                service._is_zaak_visible(zaak), (False, SkipReason.NO_STATUS)
             )
 
         config.show_cases_without_status = True
         config.save()
 
         with self.subTest("normal visible"):
-            self.assertEqual(ZGWService._is_zaak_visible(zaak), (True, None))
+            self.assertEqual(service._is_zaak_visible(zaak), (True, None))
 
         with self.subTest("invisible when zaaktype intern"):
             zaaktype.indicatie_intern_of_extern = "intern"
             self.assertEqual(
-                ZGWService._is_zaak_visible(zaak), (False, SkipReason.INTERNAL_ZAAKTYPE)
+                service._is_zaak_visible(zaak), (False, SkipReason.INTERNAL_ZAAKTYPE)
             )
 
         with self.subTest("invisible when zaak vertrouwelijkheidaanduiding too high"):
             zaaktype.indicatie_intern_of_extern = "extern"
             zaak.vertrouwelijkheidaanduiding = VertrouwelijkheidsAanduidingen.geheim
             self.assertEqual(
-                ZGWService._is_zaak_visible(zaak),
+                service._is_zaak_visible(zaak),
                 (False, SkipReason.CONFIDENTIALITY_TOO_HIGH),
             )
 
         with self.subTest("invisible when zaaktype not properly resolved"):
             zaak.zaaktype = None
             self.assertEqual(
-                ZGWService._is_zaak_visible(zaak), (False, SkipReason.NO_ZAAKTYPE)
+                service._is_zaak_visible(zaak), (False, SkipReason.NO_ZAAKTYPE)
             )
 
     def test_get_role_name_display(self):

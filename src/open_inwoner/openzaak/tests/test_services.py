@@ -1,10 +1,14 @@
 import threading
+from datetime import date
 from unittest.mock import Mock, patch
 
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 
 import requests_mock as requests_mock_module
 from furl import furl
+from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
     RolTypes,
@@ -12,11 +16,13 @@ from zgw_consumers.api_models.constants import (
 )
 
 from open_inwoner.accounts.user_identification import BSNIdentification
-from open_inwoner.openzaak.api_models import Rol
+from open_inwoner.openzaak.api_models import Rol, Zaak, ZaakType
 from open_inwoner.openzaak.constants import TypeAanvraag, ZaakBetrokkeneRol
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.services import ZaakWithApiGroup, ZGWService
+from open_inwoner.openzaak.services import SkipReason, ZaakWithApiGroup, ZGWService
 from open_inwoner.openzaak.tests.factories import (
+    CatalogusConfigFactory,
+    ZaakTypeConfigFactory,
     ZGWApiGroupConfigFactory,
     generate_rol,
 )
@@ -389,6 +395,141 @@ class UserHasRequiredRolTest(TestCase):
         self.assertFalse(any(_USER_IDENTIFICATION.bsn in msg for msg in cm.output))
 
 
+class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
+    """
+    A zaaktype may configure a date before which its zaken are not shown to users.
+
+    The check lives in `_is_zaak_visible`, the single gate used by the case list,
+    search, the detail page and notifications.
+    """
+
+    def setUp(self):
+        super().setUp()
+        config = OpenZaakConfig.get_solo()
+        config.show_cases_without_status = True
+        config.save()
+
+        self.catalogus = CatalogusConfigFactory(
+            url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a"
+        )
+        self.zaaktype = factory(
+            ZaakType,
+            generate_oas_component_cached(
+                "ztc",
+                "schemas/ZaakType",
+                url=f"{CATALOGI_ROOT}zaaktypen/53340e34-7581-4b04-884f",
+                catalogus=self.catalogus.url,
+                identificatie="ZAAKTYPE-001",
+                indicatieInternOfExtern="extern",
+            ),
+        )
+
+    def _zaak(self, startdatum: date) -> Zaak:
+        zaak = factory(
+            Zaak,
+            generate_oas_component_cached(
+                "zrc",
+                "schemas/Zaak",
+                url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+                zaaktype=self.zaaktype.url,
+                identificatie=_ZAAK_IDENTIFICATIE,
+                startdatum=startdatum.isoformat(),
+                vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            ),
+        )
+        zaak.zaaktype = self.zaaktype
+        zaak.startdatum = startdatum
+        return zaak
+
+    def test_visible_when_no_date_configured(self):
+        ZaakTypeConfigFactory(
+            catalogus=self.catalogus,
+            identificatie=self.zaaktype.identificatie,
+            zaken_visible_from=None,
+        )
+
+        result = ZGWService()._is_zaak_visible(self._zaak(date(2020, 1, 1)))
+
+        self.assertEqual(result, (True, None))
+
+    def test_visible_when_no_zaaktype_config_exists(self):
+        result = ZGWService()._is_zaak_visible(self._zaak(date(2020, 1, 1)))
+
+        self.assertEqual(result, (True, None))
+
+    def test_visible_when_startdatum_on_or_after_configured_date(self):
+        ZaakTypeConfigFactory(
+            catalogus=self.catalogus,
+            identificatie=self.zaaktype.identificatie,
+            zaken_visible_from=date(2026, 5, 1),
+        )
+
+        for startdatum in (date(2026, 5, 1), date(2026, 5, 2), date(2027, 1, 1)):
+            with self.subTest(startdatum=startdatum):
+                result = ZGWService()._is_zaak_visible(self._zaak(startdatum))
+
+                self.assertEqual(result, (True, None))
+
+    def test_invisible_when_startdatum_before_configured_date(self):
+        ZaakTypeConfigFactory(
+            catalogus=self.catalogus,
+            identificatie=self.zaaktype.identificatie,
+            zaken_visible_from=date(2026, 5, 1),
+        )
+
+        for startdatum in (date(2026, 4, 30), date(2020, 1, 1)):
+            with self.subTest(startdatum=startdatum):
+                result = ZGWService()._is_zaak_visible(self._zaak(startdatum))
+
+                self.assertEqual(result, (False, SkipReason.BEFORE_VISIBLE_FROM_DATE))
+
+    def test_date_of_other_zaaktype_does_not_apply(self):
+        ZaakTypeConfigFactory(
+            catalogus=self.catalogus,
+            identificatie="SOME-OTHER-ZAAKTYPE",
+            zaken_visible_from=date(2026, 5, 1),
+        )
+
+        result = ZGWService()._is_zaak_visible(self._zaak(date(2020, 1, 1)))
+
+        self.assertEqual(result, (True, None))
+
+    def test_date_of_same_identificatie_in_other_catalogus_does_not_apply(self):
+        """Zaaktype identificaties are only unique within a catalogus."""
+        ZaakTypeConfigFactory(
+            catalogus=CatalogusConfigFactory(
+                url=f"{CATALOGI_ROOT}catalogussen/8a4b1a2c-0000-0000-0000-000000000000"
+            ),
+            identificatie=self.zaaktype.identificatie,
+            zaken_visible_from=date(2026, 5, 1),
+        )
+
+        result = ZGWService()._is_zaak_visible(self._zaak(date(2020, 1, 1)))
+
+        self.assertEqual(result, (True, None))
+
+    def test_reads_configuration_only_once_per_service_instance(self):
+        """The case list checks every zaak, so the lookup must not be an N+1."""
+        ZaakTypeConfigFactory(
+            catalogus=self.catalogus,
+            identificatie=self.zaaktype.identificatie,
+            zaken_visible_from=date(2026, 5, 1),
+        )
+        service = ZGWService()
+        zaken = [self._zaak(date(2020, 1, 1)) for _ in range(5)]
+
+        with CaptureQueriesContext(connection) as ctx:
+            for zaak in zaken:
+                service._is_zaak_visible(zaak)
+
+        zaaktype_config_queries = [
+            query
+            for query in ctx.captured_queries
+            if "openzaak_zaaktypeconfig" in query["sql"]
+        ]
+        self.assertEqual(len(zaaktype_config_queries), 1)
+
+
 @requests_mock_module.Mocker()
 class SearchZakenAccessTest(ClearCachesMixin, TestCase):
     """
@@ -566,3 +707,35 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
 
         requested = [req.url for req in m.request_history]
         self.assertNotIn(self.zaaktype["url"], requested)
+
+    def _configure_visible_from(self, visible_from: date):
+        return ZaakTypeConfigFactory(
+            catalogus=CatalogusConfigFactory(url=self.zaaktype["catalogus"]),
+            identificatie=self.zaaktype["identificatie"],
+            zaken_visible_from=visible_from,
+        )
+
+    def test_excludes_zaak_older_than_zaaktype_visible_from_date(self, m):
+        """Searching on an exact zaaknummer must not bypass the visibility date."""
+        self._configure_visible_from(date(2026, 5, 1))
+        self.zaak["startdatum"] = "2026-04-30"
+
+        self._mock_zaken_search(m, [self.zaak])
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        self._mock_rollen(m, [self._rol_component(RolOmschrijving.initiator)])
+
+        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+
+        self.assertEqual(results, [])
+
+    def test_returns_zaak_on_or_after_zaaktype_visible_from_date(self, m):
+        self._configure_visible_from(date(2026, 5, 1))
+        self.zaak["startdatum"] = "2026-05-01"
+
+        self._mock_zaken_search(m, [self.zaak])
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        self._mock_rollen(m, [self._rol_component(RolOmschrijving.initiator)])
+
+        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+
+        self.assertEqual(len(results), 1)

@@ -2246,6 +2246,48 @@ class TestCaseDetailView(
 
             self.assertEqual(response.status_code, 404)
 
+    def test_no_access_when_zaak_precedes_zaaktype_visible_from_date(self, m):
+        """
+        A zaak hidden from the case list must also be unreachable by direct URL,
+        even for a user who does hold the required rol.
+        """
+        ZaakTypeConfigFactory.create(
+            catalogus=CatalogusConfigFactory.create(
+                url=self.zaaktype["catalogus"], service=self.api_group.ztc_service
+            ),
+            identificatie=self.zaaktype["identificatie"],
+            # self.zaak has startdatum 2022-01-02
+            zaken_visible_from=datetime.date(2022, 1, 3),
+        )
+        self.client.force_login(user=self.user)
+
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role]),
+        )
+
+        response = self.client.get(self.case_detail_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_access_when_zaak_on_zaaktype_visible_from_date(self, m):
+        """The boundary is inclusive, so the same zaak stays reachable on the date."""
+        ZaakTypeConfigFactory.create(
+            catalogus=CatalogusConfigFactory.create(
+                url=self.zaaktype["catalogus"], service=self.api_group.ztc_service
+            ),
+            identificatie=self.zaaktype["identificatie"],
+            zaken_visible_from=datetime.date(2022, 1, 2),
+        )
+        self.client.force_login(user=self.user)
+        self._setUpMocks(m)
+
+        response = self.client.get(self.case_detail_url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_no_access_if_fetch_eherkenning_zaken_with_rsin_and_user_has_no_rsin(
         self, m
     ):

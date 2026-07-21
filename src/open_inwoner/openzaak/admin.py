@@ -497,6 +497,7 @@ class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
         "external_document_upload_url",
         "description",
         "relevante_zaakperiode",
+        "zaken_visible_from",
     ]
     readonly_fields = [
         "found_in_api",

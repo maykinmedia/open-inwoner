@@ -182,6 +182,7 @@ class ZaakTypeConfigExportTest(TestCase):
                     "contact_form_enabled": False,
                     "contact_subject_code": "",
                     "relevante_zaakperiode": None,
+                    "zaken_visible_from": None,
                 },
             },
             {
@@ -267,6 +268,7 @@ class TestCatalogusExport(TestCase):
                     "contact_form_enabled": False,
                     "contact_subject_code": "",
                     "relevante_zaakperiode": None,
+                    "zaken_visible_from": None,
                 },
             },
             {
@@ -323,9 +325,9 @@ class TestCatalogusExport(TestCase):
             "\n",
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.1.maykinmedia.nl", "domein": "DM-1", "rsin": "123456789", "service": ["service-1"]}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null, "zaken_visible_from": null}}',
             "\n",
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["DM-1", "123456789"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.1.maykinmedia.nl\\"]", "catalogus": ["DM-1", "123456789"], "identificatie": "ztc-id-a-1", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null, "zaken_visible_from": null}}',
             "\n",
             '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "https://foo.0.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[\\"a1591906-3368-470a-a957-4b8634c275a1\\"]", "document_upload_enabled": false, "document_notification_enabled": false}}',
             "\n",
@@ -349,7 +351,7 @@ class TestCatalogusImport(TestCase):
         self.storage = InMemoryStorage()
         self.json_lines = [
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://bar.maykinmedia.nl", "domein": "DM-0", "rsin": "123456789", "service": ["service-0"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://bar.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://bar.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": true, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null, "zaken_visible_from": null}}',
             '{"model": "openzaak.zaaktypeinformatieobjecttypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "informatieobjecttype_url": "https://bar.maykinmedia.nl", "omschrijving": "informatieobject", "zaaktype_uuids": "[]", "document_upload_enabled": true, "document_notification_enabled": true}}',
             '{"model": "openzaak.zaaktypestatustypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "statustype_url": "https://bar.maykinmedia.nl", "omschrijving": "status omschrijving", "statustekst": "statustekst nieuw", "zaaktype_uuids": "[]", "status_indicator": "", "status_indicator_text": "", "document_upload_description": null, "description": null, "notify_status_change": true, "action_required": false, "document_upload_enabled": true, "call_to_action_url": "", "call_to_action_text": "", "case_link_text": ""}}',
             '{"model": "openzaak.zaaktyperesultaattypeconfig", "fields": {"zaaktype_config": ["ztc-id-a-0", "DM-0", "123456789"], "resultaattype_url": "https://bar.maykinmedia.nl", "omschrijving": "resultaat", "zaaktype_uuids": "[]", "description": "description new"}}',
@@ -613,7 +615,7 @@ class TestCatalogusImport(TestCase):
         )
         import_lines = [
             '{"model": "openzaak.catalogusconfig", "fields": {"url": "https://foo.0.maykinmedia.nl", "domein": "BAR", "rsin": "987654321", "service": ["service-0"]}}',
-            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null}}',
+            '{"model": "openzaak.zaaktypeconfig", "fields": {"urls": "[\\"https://foo.0.maykinmedia.nl\\"]", "catalogus": ["DM-0", "123456789"], "identificatie": "ztc-id-a-0", "omschrijving": "zaaktypeconfig", "notify_status_changes": false, "description": "", "external_document_upload_url": "", "document_upload_enabled": false, "contact_form_enabled": false, "contact_subject_code": "", "relevante_zaakperiode": null, "zaken_visible_from": null}}',
         ]
         import_line = "\n".join(import_lines)
 
