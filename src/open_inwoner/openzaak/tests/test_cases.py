@@ -1727,3 +1727,111 @@ class CaseListSearchAccessTest(ClearCachesMixin, TransactionTestCase):
         # the view swallows unhandled errors into `fetch_error`, so its absence
         # proves the failure was handled inside `search_zaken`
         self.assertFalse(response.context.get("fetch_error", False))
+
+
+@requests_mock.Mocker()
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    MIDDLEWARE=PATCHED_MIDDLEWARE,
+)
+class CaseListVisibleFromDateTest(ClearCachesMixin, TransactionTestCase):
+    """
+    A zaaktype may configure a date before which its zaken are hidden from users.
+
+    Filtering happens server-side in `_is_zaak_visible`, so older zaken are absent
+    from the case list rather than merely hidden in the template.
+    """
+
+    inner_url = reverse_lazy("cases:cases_content")
+    maxDiff = None
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
+
+        self.config = OpenZaakConfig.get_solo()
+        self.config.zaak_max_confidentiality = (
+            VertrouwelijkheidsAanduidingen.beperkt_openbaar
+        )
+        self.config.save()
+
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            ztc_service__api_root=CATALOGI_ROOT,
+            form_service=None,
+            fetch_eherkenning_zaken_with_rsin=False,
+        )
+        self.mocks = CaseListMocks(
+            zaken_root=ZAKEN_ROOT,
+            catalogi_root=CATALOGI_ROOT,
+            user=self.user,
+            eherkenning_user=eHerkenningUserFactory.create(
+                kvk="12345678",
+                rsin="123456789",
+                login_type=LoginTypeChoices.eherkenning,
+            ),
+            eherkenning_user_vestiging=eHerkenningVestigingUserFactory.create(
+                kvk="12345678",
+                rsin="123456789",
+                vestiging="987654321",
+                login_type=LoginTypeChoices.eherkenning,
+            ),
+        )
+
+    def _get_case_list(self, m):
+        self.mocks._setUpMocks(m)
+        self.client.force_login(user=self.user)
+        return self.client.get(self.inner_url, HTTP_HX_REQUEST="true")
+
+    @staticmethod
+    def _identifications(response) -> set[str]:
+        return {zaak["identification"] for zaak in response.context["zaken"]}
+
+    def test_all_zaken_shown_when_no_date_configured(self, m):
+        """Scenario 1: without a date the existing behaviour is unchanged."""
+        self.assertIsNone(self.mocks.zaaktype_config1.zaken_visible_from)
+
+        response = self._get_case_list(m)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self._identifications(response),
+            {
+                self.mocks.zaak1["identificatie"],
+                self.mocks.zaak2["identificatie"],
+                self.mocks.zaak3["identificatie"],
+                self.mocks.zaak_result["identificatie"],
+            },
+        )
+
+    def test_only_zaken_on_or_after_configured_date_are_shown(self, m):
+        """Scenarios 2 and 3: the date splits the same set of zaken."""
+        # zaak1=2022-01-02 and zaak2=2022-01-12 are on or after the date,
+        # zaak3=2021-07-26 and zaak_result=2020-01-01 precede it
+        self.mocks.zaaktype_config1.zaken_visible_from = datetime.date(2022, 1, 2)
+        self.mocks.zaaktype_config1.save()
+
+        response = self._get_case_list(m)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self._identifications(response),
+            {
+                self.mocks.zaak1["identificatie"],
+                self.mocks.zaak2["identificatie"],
+            },
+        )
+        self.assertNotContains(response, self.mocks.zaak3["omschrijving"])
+        self.assertNotContains(response, self.mocks.zaak_result["omschrijving"])
+
+    def test_no_zaken_shown_when_date_is_after_all_zaken(self, m):
+        self.mocks.zaaktype_config1.zaken_visible_from = datetime.date(2030, 1, 1)
+        self.mocks.zaaktype_config1.save()
+
+        response = self._get_case_list(m)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["zaken"], [])

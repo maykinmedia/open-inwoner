@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import patch
 from uuid import UUID
 
@@ -524,6 +525,58 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         self.assertIn(f"{root}zaaktypen/zt-001-v1", existing_ztc.urls)
         self.assertIn(zaaktype_url_v2, existing_ztc.urls)
         self.assertEqual(len(existing_ztc.urls), 2)
+
+    def test_import_zaaktype_configs_preserves_zaken_visible_from(self, m):
+        """
+        Locally configured visibility must survive a re-import of the zaaktype,
+        which the afhandelcomponent updates independently.
+        """
+        root = self.roots[0]
+        api_group = self.api_groups[0]
+
+        catalogus_url = f"{root}catalogussen/1234-5678"
+        catalogus = CatalogusConfigFactory.create(
+            url=catalogus_url,
+            domein="TEST",
+            rsin="12345",
+            service=api_group.ztc_service,
+        )
+        existing_ztc = ZaakTypeConfig.objects.create(
+            identificatie="ZAAK-001",
+            omschrijving="Old Description",
+            catalogus=catalogus,
+            urls=[f"{root}zaaktypen/zt-001-v1"],
+            zaken_visible_from=date(2026, 5, 1),
+        )
+
+        m.get(
+            f"{root}zaaktypen",
+            json=paginated_response(
+                [
+                    generate_oas_component_cached(
+                        "ztc",
+                        "schemas/ZaakType",
+                        url=f"{root}zaaktypen/zt-001-v2",
+                        identificatie="ZAAK-001",
+                        omschrijving="Updated Description",
+                        catalogus=catalogus_url,
+                        indicatieInternOfExtern="extern",
+                        informatieobjecttypen=[],
+                        statustypen=[],
+                        resultaattypen=[],
+                    )
+                ]
+            ),
+        )
+
+        importer = ZGWCatalogusImporter(api_group)
+        result = importer.import_zaaktype_configs()
+
+        self.assertEqual(len(result.updated), 1)
+        existing_ztc.refresh_from_db()
+        # the API-sourced field is updated, the locally configured one is not
+        self.assertEqual(existing_ztc.omschrijving, "Updated Description")
+        self.assertEqual(existing_ztc.zaken_visible_from, date(2026, 5, 1))
 
     def test_import_zaaktype_configs_no_changes_no_save(self, m):
         """Test that when data hasn't changed, no save occurs (optimization)"""

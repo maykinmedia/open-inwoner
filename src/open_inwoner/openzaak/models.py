@@ -723,6 +723,16 @@ class ZaakTypeConfig(models.Model):
         ),
     )
 
+    zaken_visible_from = models.DateField(
+        verbose_name=_("Show cases from date"),
+        blank=True,
+        null=True,
+        help_text=_(
+            "Only cases of this zaaktype with a startdatum on or after this date are "
+            "shown to users. Leave empty to show all cases."
+        ),
+    )
+
     objects = ZaakTypeConfigQueryset.as_manager()
 
     class Meta:
