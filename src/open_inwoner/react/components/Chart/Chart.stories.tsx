@@ -110,6 +110,15 @@ export const Interactive: Story = {
     period: 'month',
   },
 };
+export const UnknownContainerType: Story = {
+  name: 'With unknown container type',
+  args: {
+    data: data.map((x) => ({
+      ...x,
+      containers: [{ ...x.containers[0], type: 'Glas' }, ...x.containers],
+    })),
+  },
+};
 
 // ============================================
 // Web Component

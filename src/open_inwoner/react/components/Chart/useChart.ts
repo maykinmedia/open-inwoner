@@ -221,15 +221,26 @@ export class BarChartBuilder {
     return base;
   }
 
-  private getColor(type: 'GFT' | 'Restafval', containerIndex: number): string {
-    const baseColor =
-      type === 'GFT' ? CHART_STYLES.colors.gft : CHART_STYLES.colors.restafval;
+  private isColorDefined(
+    type: string
+  ): type is keyof typeof CHART_STYLES.colors {
+    return Object.keys(CHART_STYLES.colors).includes(type);
+  }
+
+  private getColor(type: string, containerIndex: number): string {
+    let color = CHART_STYLES.colors.fallback;
+    const loweredType = type.toLowerCase();
+    if (this.isColorDefined(loweredType))
+      color = CHART_STYLES.colors[loweredType];
+    else
+      console.debug(
+        `Chart color for ${type} is not defined so we are falling back to a neutral color ${color}`
+      );
+
     const opacity = Math.max(0.4, 1 - containerIndex * 0.15);
-    return (
-      baseColor +
-      Math.round(opacity * 255)
-        .toString(16)
-        .padStart(2, '0')
-    );
+    const alpha = Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, '0');
+    return color + alpha;
   }
 }
