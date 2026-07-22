@@ -1,3 +1,14 @@
+2.4.1 (2026-07-22)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.1`.
+
+Bugfixes
+--------
+
+* ``maykin-common`` bijgewerkt naar ``0.20.1``; dit verhelpt 500-fouten
+  bij healthchecks op Kubernetes.
+
 2.4.0 (2026-07-20)
 ==================
 
