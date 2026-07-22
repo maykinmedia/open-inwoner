@@ -449,7 +449,7 @@ markupsafe==3.0.3
     # via jinja2
 maykin-2fa==1.0.2
     # via -r requirements/base.in
-maykin-common[cli, docs, health-checks, otel]==0.19.0
+maykin-common[cli, docs, health-checks, otel]==0.20.1
     # via -r requirements/base.in
 maykin-django-prosemirror[images]==0.8.0
     # via -r requirements/base.in
