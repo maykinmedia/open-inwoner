@@ -10230,6 +10230,45 @@ msgstr "De virusscan gaf een onverwachte status terug."
 #~ "Uw melding(en) konden vanwege technische problemen niet worden opgehaald. "
 #~ "Neem contact op met de gemeente."
 
+# Overrides for django-cms's bundled "nl" translations (cms/locale/nl/LC_MESSAGES/django.po),
+# which contain German text instead of Dutch for these msgids (upstream bug, still present
+# in django-cms 4.1.11). These msgids do not occur in our own source, so a plain
+# `makemessages --all` will mark them obsolete (`#~`) again -- if that happens, move them
+# back above the `#~` block.
+#: cms/admin/forms.py
+msgid "Whether this page can be embedded in other pages or websites."
+msgstr "Of deze pagina kan worden weergegeven binnen andere pagina's of websites."
+
+#: cms/admin/forms.py
+msgid ""
+"You cannot have two pages with the same slug at the same page level. Please "
+"alter the slug of one of the pages before trying to move again."
+msgstr ""
+"U kunt niet twee pagina's met dezelfde slug op hetzelfde paginaniveau "
+"hebben. Wijzig de slug van een van de pagina's voordat u opnieuw probeert "
+"te verplaatsen."
+
+#: cms/models/pagemodel.py
+msgid "No available title"
+msgstr "Geen titel beschikbaar"
+
+#: cms/templates/admin/cms/page/delete_confirmation.html
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Weet u zeker dat u het object \"%(escaped_object)s\" (%(object_name)s) wilt "
+"verwijderen? De volgende gerelateerde items worden ook verwijderd:"
+
+#: cms/templates/admin/cms/page/delete_confirmation.html
+msgid "Yes, I’m sure"
+msgstr "Ja, ik weet het zeker"
+
+#: cms/templates/admin/cms/page/delete_confirmation.html
+msgid "No, take me back"
+msgstr "Nee, ga terug"
+
 #~ msgid "Ander telefoonnummer"
 #~ msgstr "Ander telefoonnummer"
 
