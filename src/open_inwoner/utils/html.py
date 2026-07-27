@@ -4,6 +4,35 @@ from django.utils.translation import gettext as _
 import markdown
 from bs4 import BeautifulSoup
 
+ALLOWED_URL_SCHEMES = ("http://", "https://", "mailto:", "tel:")
+
+
+def is_safe_url(url: str) -> bool:
+    """Return True if url is relative/fragment or uses an allowed scheme.
+
+    Blocks javascript:, data:, vbscript: and other script-executing schemes
+    that can be entered as a link target in the prosemirror rich text editor.
+    """
+    if not url:
+        return False
+    url = url.strip()
+    if url.startswith(("/", "#", "?")):
+        return True
+    return url.lower().startswith(ALLOWED_URL_SCHEMES)
+
+
+def sanitize_html(html: str) -> str:
+    """Strip unsafe anchor hrefs (e.g. javascript:) from a prosemirror HTML string."""
+    if not html:
+        return html
+    soup = BeautifulSoup(html, "html.parser")
+    for element in soup.find_all("a"):
+        href = element.attrs.get("href")
+        if href is not None and not is_safe_url(href):
+            del element.attrs["href"]
+    return str(soup)
+
+
 CLASS_ADDERS = [
     ("h1", "utrecht-heading-1"),
     ("h2", "utrecht-heading-2"),
@@ -47,6 +76,7 @@ def get_rendered_content(content) -> str:
             # treat as empty content
             return ""
 
+    html = sanitize_html(html)
     soup = BeautifulSoup(html, "html.parser")
 
     for tag, class_name in CLASS_ADDERS:
@@ -96,6 +126,7 @@ def get_product_rendered_content(product):
         # ProsemirrorModelField - use .html property
         html = product.content.html
 
+    html = sanitize_html(html)
     soup = BeautifulSoup(html, "html.parser")
 
     for tag, class_name in CLASS_ADDERS:

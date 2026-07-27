@@ -9,6 +9,7 @@ from open_inwoner.pdc.models.product import (
     ProductFile,
     ProductLocation,
 )
+from open_inwoner.utils.html import sanitize_html
 
 
 class FilerImageSerializer(serializers.ModelSerializer):
@@ -68,7 +69,7 @@ class Questionserializer(serializers.ModelSerializer):
     def get_answer(self, obj):
         if obj.answer:
             try:
-                return obj.answer.html
+                return sanitize_html(obj.answer.html)
             except Exception:
                 return None
         return None
@@ -87,7 +88,7 @@ class SmallCategorySerializer(serializers.HyperlinkedModelSerializer):
     def get_description(self, obj):
         if obj.description:
             try:
-                return obj.description.html
+                return sanitize_html(obj.description.html)
             except Exception:
                 return None
         return None
@@ -119,7 +120,7 @@ class CategoryWithChildSerializer(serializers.ModelSerializer):
     def get_description(self, obj):
         if obj.description:
             try:
-                return obj.description.html
+                return sanitize_html(obj.description.html)
             except Exception:
                 return None
         return None
@@ -213,7 +214,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_content(self, obj):
         if obj.content:
             try:
-                return obj.content.html
+                return sanitize_html(obj.content.html)
             except Exception:
                 return None
         return None
