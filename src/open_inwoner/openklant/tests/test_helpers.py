@@ -5,7 +5,6 @@ import requests_mock
 from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.openklant.wrap import get_kcm_answer_mapping
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 
@@ -28,8 +27,8 @@ class KlantHelperTest(ClearCachesMixin, DisableRequestLogMixin, TestCase):
         with self.subTest(
             "running the first time will create KlantContactMomentAnswer"
         ):
-            mapping = get_kcm_answer_mapping(
-                [kcm.contactmoment for kcm in kcms], data.user
+            mapping = KlantContactMomentAnswer.objects.get_or_create_mapping(
+                data.user, [kcm.contactmoment.url for kcm in kcms]
             )
 
             self.assertEqual(KlantContactMomentAnswer.objects.count(), 2)
@@ -53,8 +52,8 @@ class KlantHelperTest(ClearCachesMixin, DisableRequestLogMixin, TestCase):
             self.assertEqual(kcm_answers[0].is_seen, False)
 
         with self.subTest("running function again will ignore existing entries"):
-            mapping = get_kcm_answer_mapping(
-                [kcm.contactmoment for kcm in kcms], data.user
+            mapping = KlantContactMomentAnswer.objects.get_or_create_mapping(
+                data.user, [kcm.contactmoment.url for kcm in kcms]
             )
 
             self.assertEqual(KlantContactMomentAnswer.objects.count(), 2)
