@@ -19,7 +19,14 @@ from open_inwoner.accounts.user_identification import BSNIdentification
 from open_inwoner.openzaak.api_models import Rol, Zaak, ZaakType
 from open_inwoner.openzaak.constants import TypeAanvraag, ZaakBetrokkeneRol
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.services import SkipReason, ZaakWithApiGroup, ZGWService
+from open_inwoner.openzaak.services import (
+    FormulierenResult,
+    SkippedZaak,
+    SkipReason,
+    ZaakWithApiGroup,
+    ZakenResult,
+    ZGWService,
+)
 from open_inwoner.openzaak.tests.factories import (
     CatalogusConfigFactory,
     ZaakTypeConfigFactory,
@@ -97,7 +104,9 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 release.set()
                 timer.cancel()
 
-        self.assertEqual(result, [])
+        self.assertEqual(result.zaken, [])
+        self.assertTrue(result.raw_fetch_timed_out)
+        self.assertTrue(result.has_timeouts)
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
@@ -125,6 +134,8 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 timer.cancel()
 
         self.assertEqual(result.zaken, [])
+        self.assertTrue(result.raw_fetch_timed_out)
+        self.assertTrue(result.has_timeouts)
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_formulieren_logs_timeout_warning(self):
@@ -151,10 +162,151 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 release.set()
                 timer.cancel()
 
-        self.assertEqual(result, [])
+        self.assertEqual(result.formulieren, [])
+        self.assertTrue(result.timed_out)
         self.assertTrue(
             any("Timeout while fetching formulieren" in msg for msg in cm.output)
         )
+
+    def test_search_zaken_propagates_raw_fetch_timeout(self):
+        release = threading.Event()
+        timer = threading.Timer(0.05, release.set)
+
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
+        ):
+            timer.start()
+            try:
+                result = self.service.search_zaken(
+                    _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+                )
+            finally:
+                release.set()
+                timer.cancel()
+
+        self.assertEqual(result.zaken, [])
+        self.assertTrue(result.raw_fetch_timed_out)
+        self.assertTrue(result.has_timeouts)
+
+    def _make_zaak_with_group(self, uuid: str) -> ZaakWithApiGroup:
+        zaak = factory(
+            Zaak,
+            generate_oas_component_cached(
+                "zrc",
+                "schemas/Zaak",
+                url=f"{ZAKEN_ROOT}zaken/{uuid}",
+                zaaktype=f"{CATALOGI_ROOT}zaaktypen/{uuid}",
+                startdatum="2024-01-02",
+                einddatum=None,
+                status=f"{ZAKEN_ROOT}statussen/{uuid}",
+                resultaat=None,
+            ),
+        )
+        return ZaakWithApiGroup(
+            zaak=zaak, api_group=self.api_group, type_aanvraag=TypeAanvraag.ZAAK
+        )
+
+    def test_get_visible_zaken_records_timeout_skips_for_zaaktype_stage(self):
+        """The raw fetch succeeds, but resolving zaaktypen runs out of budget."""
+        zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        release = threading.Event()
+        timer = threading.Timer(0.05, release.set)
+
+        timeouts = {**_TINY_TIMEOUTS, "get_raw_zaken": 5}
+
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                return_value=[zaak_with_group],
+            ),
+            patch.object(
+                self.service,
+                "_resolve_zaak_type",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=timeouts
+            ),
+        ):
+            timer.start()
+            try:
+                result = self.service.get_visible_zaken(_USER_IDENTIFICATION)
+            finally:
+                release.set()
+                timer.cancel()
+
+        self.assertEqual(result.zaken, [])
+        self.assertFalse(result.raw_fetch_timed_out)
+        self.assertEqual(
+            [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
+        )
+        self.assertTrue(result.has_timeouts)
+
+    def test_fully_resolve_zaken_records_timeout_skips(self):
+        zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        release = threading.Event()
+        timer = threading.Timer(0.05, release.set)
+
+        with (
+            patch.object(
+                self.service,
+                "_resolve_resultaat_and_resultaat_type",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                self.service,
+                "_resolve_status_and_status_type",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
+        ):
+            timer.start()
+            try:
+                result = self.service.fully_resolve_zaken([zaak_with_group])
+            finally:
+                release.set()
+                timer.cancel()
+
+        self.assertEqual(result.zaken, [])
+        self.assertEqual(
+            [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
+        )
+        self.assertTrue(result.has_timeouts)
+
+    def test_has_timeouts_is_false_without_timeouts(self):
+        """Legitimate exclusions must not trigger the partial-results banner."""
+        empty = ZakenResult(zaken=[], skipped=[])
+        self.assertFalse(empty.has_timeouts)
+
+        non_timeout_skips = ZakenResult(
+            zaken=[],
+            skipped=[
+                SkippedZaak(
+                    zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+                    reason=reason,
+                    api_group=self.api_group,
+                )
+                for reason in (
+                    SkipReason.CONFIDENTIALITY_TOO_HIGH,
+                    SkipReason.INTERNAL_ZAAKTYPE,
+                    SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
+                    SkipReason.FULL_RESOLUTION_FAILED,
+                )
+            ],
+        )
+        self.assertFalse(non_timeout_skips.has_timeouts)
+
+        self.assertFalse(FormulierenResult(formulieren=[]).timed_out)
 
 
 _ZAAK_UUID = "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
@@ -619,7 +771,9 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [self._rol_component(RolOmschrijving.initiator)])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].zaak.identificatie, _ZAAK_IDENTIFICATIE)
@@ -630,7 +784,9 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(results, [])
 
@@ -651,7 +807,7 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
 
                 results = self.service.search_zaken(
                     _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
-                )
+                ).zaken
 
                 self.assertEqual(results, [])
 
@@ -664,7 +820,9 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [self._rol_component(RolOmschrijving.belanghebbende)])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(len(results), 1)
 
@@ -677,7 +835,9 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(results, [])
 
@@ -690,7 +850,7 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         with self.assertLogs("open_inwoner.openzaak.services", level="WARNING") as cm:
             results = self.service.search_zaken(
                 _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
-            )
+            ).zaken
 
         self.assertEqual(results, [])
         self.assertTrue(
@@ -724,7 +884,9 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [self._rol_component(RolOmschrijving.initiator)])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(results, [])
 
@@ -736,6 +898,8 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         self._mock_rollen(m, [self._rol_component(RolOmschrijving.initiator)])
 
-        results = self.service.search_zaken(_USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE)
+        results = self.service.search_zaken(
+            _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+        ).zaken
 
         self.assertEqual(len(results), 1)

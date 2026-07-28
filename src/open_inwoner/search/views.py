@@ -88,14 +88,15 @@ class SearchView(
             results = ZGWService().search_zaken(
                 user_identification, zaak_identificatie=query
             )
+            zaken = results.zaken
 
             # TODO: We should simply return multiple cases in the search results,
             # rather than redirect. For now, we maintain the existing behavior
             # by returning and redirect to the first case found, if any.
-            if len(results) > 1:
+            if len(zaken) > 1:
                 logger.error("found multiple cases for a single set of search params")
 
-            for zaak_with_group in results:
+            for zaak_with_group in zaken:
                 return HttpResponseRedirect(
                     reverse(
                         "cases:case_detail",

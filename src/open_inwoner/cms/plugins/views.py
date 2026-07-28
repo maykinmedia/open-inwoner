@@ -78,13 +78,15 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             "We're experiencing technical difficulties. Some results may be missing from your cases."
         )
         try:
-            formulieren: Sequence[UniformCase] | None = case_service.get_formulieren(
-                user_identification
-            )
+            formulieren_result = case_service.get_formulieren(user_identification)
         except Exception:
             logger.error("Failed to retrieve formulieren", user=request.user)
-            formulieren = None
+            formulieren: Sequence[UniformCase] | None = None
             msg = partial_error_msg
+        else:
+            formulieren = formulieren_result.formulieren
+            if formulieren_result.timed_out:
+                msg = partial_error_msg
         try:
             all_visible_zaken = case_service.get_visible_zaken(
                 user_identification
