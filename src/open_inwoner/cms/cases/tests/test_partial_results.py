@@ -10,6 +10,7 @@ from pyquery import PyQuery
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.cms.cases.views.cases import InnerCaseListView
+from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import (
     FormulierenResult,
     SkippedZaak,
@@ -227,6 +228,13 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
         self.assertNotIn("retry=", href)
 
     def test_auto_retry_url_preserves_multi_valued_status_filter(self):
+        # The dummy zaken below cannot survive status filtering, so make the
+        # assumption explicit that the filter (and hence the frequency counting
+        # over the zaken) stays disabled: this test is about URL parameters only.
+        config = OpenZaakConfig.get_solo()
+        config.zaken_filter_enabled = False
+        config.save()
+
         # enough zaken for page 2 to exist, so the retry survives pagination
         self._patch_service(
             visible_result=ZakenResult(

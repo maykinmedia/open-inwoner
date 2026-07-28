@@ -107,6 +107,18 @@ class SearchView(
                     )
                 )
 
+            # No exact match, but the lookup was incomplete: the case may exist
+            # and simply not have been fetched in time.
+            if results.has_timeouts:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    _(
+                        "Not all of your cases could be checked. If you were "
+                        "looking for a specific case, please try again later."
+                    ),
+                )
+
         # perform search
         try:
             response = multi_search(query, filters=data)

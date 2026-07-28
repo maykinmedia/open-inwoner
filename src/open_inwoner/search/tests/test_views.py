@@ -18,6 +18,7 @@ from zgw_consumers.api_models.constants import (
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.services import ZakenResult
 from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
@@ -413,6 +414,28 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
                 },
             ),
         )
+
+    @patch("open_inwoner.search.views.ZGWService")
+    def test_search_warns_when_case_lookup_times_out(
+        self, request_mocker, mock_service
+    ):
+        mock_service.return_value.search_zaken.return_value = ZakenResult(
+            zaken=[], skipped=[], raw_fetch_timed_out=True
+        )
+
+        self.client.force_login(self.user)
+        params = urlencode({"query": "ZAAK-2022-0000000001"}, doseq=True)
+        response = self.client.get(f"{reverse('search:search')}?{params}")
+
+        # No redirect: the case was not found, but the lookup was incomplete
+        self.assertEqual(response.status_code, 200)
+
+        messages = list(get_messages(response.wsgi_request))
+        expected = _(
+            "Not all of your cases could be checked. If you were "
+            "looking for a specific case, please try again later."
+        )
+        self.assertIn(expected, [str(message) for message in messages])
 
     @patch("open_inwoner.search.views.multi_search")
     def test_search_shows_error_on_connection_timeout(
