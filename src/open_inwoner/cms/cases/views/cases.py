@@ -93,6 +93,13 @@ class InnerCaseListView(
     template_name = "pages/cases/list_inner.html"
     paginate_by = 9
 
+    # When the backend is slow and the cache is cold, part of the case list is
+    # dropped by the per-stage timeouts. Timed-out fetches are not cancelled, so
+    # they keep running and populate the cache; retrying therefore converges.
+    MAX_AUTO_RETRIES = 2
+    AUTO_RETRY_DELAY_S = 5
+    RETRY_PARAM = "retry"
+
     def page_title(self):
         return _("Mijn zaken")
 
@@ -117,19 +124,25 @@ class InnerCaseListView(
 
         all_visible_zaken = []
         formulieren = []
+        partial_results = False
 
         search = self.request.GET.get("search", "").strip()
         if search and self.request.user.is_authenticated and user_identification:
-            all_visible_zaken = case_service.search_zaken(
+            search_result = case_service.search_zaken(
                 user_identification, zaak_identificatie=search
             )
+            all_visible_zaken = search_result.zaken
+            partial_results = search_result.has_timeouts
         else:
-            formulieren: Sequence[UniformCase] = case_service.get_formulieren(
-                user_identification
+            formulieren_result = case_service.get_formulieren(user_identification)
+            formulieren: Sequence[UniformCase] = formulieren_result.formulieren
+
+            visible_result = case_service.get_visible_zaken(user_identification)
+            all_visible_zaken = visible_result.zaken
+
+            partial_results = (
+                formulieren_result.timed_out or visible_result.has_timeouts
             )
-            all_visible_zaken = case_service.get_visible_zaken(
-                user_identification
-            ).zaken
 
         if config.zaken_filter_enabled:
             case_status_frequencies = _get_zaak_status_frequencies(
@@ -172,9 +185,11 @@ class InnerCaseListView(
         formulieren_page = formulieren[combined_start:combined_end]
         zaak_start = max(0, combined_start - formulieren_count)
         zaak_end = max(0, combined_end - formulieren_count)
-        zaak_page = case_service.fully_resolve_zaken(
+        resolved_result = case_service.fully_resolve_zaken(
             all_visible_zaken[zaak_start:zaak_end]
-        ).zaken
+        )
+        zaak_page = resolved_result.zaken
+        partial_results = partial_results or resolved_result.has_timeouts
 
         page_items = [*formulieren_page, *zaak_page]
         combined_total = formulieren_count + len(all_visible_zaken)
@@ -190,6 +205,46 @@ class InnerCaseListView(
         context["title_text"] = config.title_text
         context["zaak_identificatie_label"] = config.zaak_identificatie_label
 
+        context.update(self._get_retry_context(partial_results))
+
         self.log_case_list_accessed(zaken_dicts)
+
+        return context
+
+    def _get_retry_context(self, partial_results: bool) -> dict:
+        """Build the context for the partial-results banner and auto-retry.
+
+        While retries remain, the template renders an element that re-requests
+        the inner view with an incremented counter. Once they are exhausted the
+        user gets a manual retry link back to the outer page, which starts a
+        fresh cycle.
+        """
+        context: dict = {"partial_results": partial_results}
+
+        if not partial_results:
+            return context
+
+        try:
+            retry_count = int(self.request.GET.get(self.RETRY_PARAM, 0))
+        except (TypeError, ValueError):
+            retry_count = 0
+        retry_count = max(0, min(retry_count, self.MAX_AUTO_RETRIES))
+
+        # Preserves filters and search; note this also carries `page`, so a retry
+        # re-renders the page the user is on.
+        params = self.request.GET.copy()
+
+        if retry_count < self.MAX_AUTO_RETRIES:
+            params[self.RETRY_PARAM] = retry_count + 1
+            context["auto_retry_url"] = (
+                f"{reverse('cases:cases_content')}?{params.urlencode()}"
+            )
+            context["auto_retry_delay"] = self.AUTO_RETRY_DELAY_S
+        else:
+            params.pop(self.RETRY_PARAM, None)
+            query = params.urlencode()
+            context["manual_retry_url"] = (
+                f"{reverse('cases:index')}?{query}" if query else reverse("cases:index")
+            )
 
         return context

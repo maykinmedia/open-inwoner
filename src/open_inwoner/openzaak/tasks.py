@@ -139,7 +139,7 @@ def warm_cache_for_user(
     service = ZGWService()
 
     # get_raw_zaken handles multi-group concurrency and timeouts; populates fetch_zaken_by_bsn cache
-    raw_zaken = service.get_raw_zaken(identification)
+    raw_zaken = service.get_raw_zaken(identification).zaken
     if not raw_zaken:
         logger.info("Finished ZGW cache warm-up: no zaken found")
         return

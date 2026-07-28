@@ -55,7 +55,7 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
         if not user_identification:
             return self
 
-        raw_zaken = ZGWService().get_raw_zaken(user_identification)
+        raw_zaken = ZGWService().get_raw_zaken(user_identification).zaken
         cases = [z.zaak for z in raw_zaken]
         return self.filter_by_zaken(cases)
 
