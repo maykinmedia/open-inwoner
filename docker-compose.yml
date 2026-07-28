@@ -24,6 +24,7 @@ x-app-env: &x-app-env
   CACHE_AXES: redis:6379/0
   CACHE_OIDC: redis:6379/0
   CACHE_PORTALOCKER: redis:6379/0
+  # Consumed by the `celery-low-latency` service below; see docs/installation/celery.rst
   CACHE_SEEDING_QUEUE: low-latency
   CELERY_BROKER_URL: redis://redis:6379/0
   CELERY_RESULT_BACKEND: redis://redis:6379/0

@@ -1505,8 +1505,14 @@ CACHE_SEEDING_QUEUE = config(
     default="celery",
     documentation=DocumentationParams(
         help_text=(
-            "Celery queue for cache-seeding tasks. "
-            "Point this to a dedicated high-priority queue to keep warm-up latency low."
+            "Celery queue for cache-seeding tasks. Defaults to the built-in queue, "
+            "so no extra infrastructure is needed. In production, point this to a "
+            "dedicated high-priority queue (for example `low-latency`) so warm-up "
+            "tasks are not held up behind long-running background work. "
+            "Note that a worker must actually consume the configured queue: Celery "
+            "accepts messages for an unconsumed queue without error, and the tasks "
+            "then accumulate forever while case lists stay slow. Verify with "
+            "`celery -A open_inwoner.celery inspect active_queues`."
         ),
         group="Celery",
     ),
