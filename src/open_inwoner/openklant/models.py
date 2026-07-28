@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from django_jsonform.models.fields import ArrayField
@@ -176,7 +176,49 @@ class ContactFormSubject(OrderedModel):
         return self.subject
 
 
+class KlantContactMomentAnswerManager(models.Manager):
+    def get_or_create_mapping(
+        self, user, urls: list[str]
+    ) -> dict[str, "KlantContactMomentAnswer"]:
+        """Return the seen-state rows for `urls`, creating any that do not exist yet.
+
+        Both the eSuite and the OpenKlant2 question listings need this for a whole
+        page at a time; resolving it per question costs a query and possibly an
+        insert per row.
+        """
+        if not urls:
+            return {}
+
+        answers = {
+            answer.contactmoment_url: answer
+            for answer in self.filter(user=user, contactmoment_url__in=urls)
+        }
+
+        if missing := [url for url in urls if url not in answers]:
+            with transaction.atomic():
+                self.bulk_create(
+                    [self.model(user=user, contactmoment_url=url) for url in missing],
+                    # A concurrent request may have created the same rows between
+                    # the query above and this insert; the unique constraint on
+                    # (user, contactmoment_url) makes that a no-op instead of an
+                    # IntegrityError.
+                    ignore_conflicts=True,
+                )
+            # `ignore_conflicts` leaves the created objects without a primary key,
+            # so the rows have to be read back.
+            answers.update(
+                {
+                    answer.contactmoment_url: answer
+                    for answer in self.filter(user=user, contactmoment_url__in=missing)
+                }
+            )
+
+        return answers
+
+
 class KlantContactMomentAnswer(models.Model):
+    objects = KlantContactMomentAnswerManager()
+
     user = models.ForeignKey(
         "accounts.User",
         verbose_name=_("User"),

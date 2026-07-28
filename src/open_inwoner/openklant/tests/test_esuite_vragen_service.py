@@ -2,7 +2,9 @@ import threading
 from datetime import datetime
 from unittest.mock import patch
 
+from django.db import connection
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 
 import requests_mock
 
@@ -110,6 +112,64 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
+
+    def test_list_questions_resolves_per_page_lookups_once(self, m):
+        """The per-page lookups must not be resolved once per contactmoment.
+
+        Asserting per table rather than a total: the total also covers config reads
+        that do not scale with the number of contactmomenten, which would make this
+        brittle without saying anything about the behaviour under test.
+
+        The kanaal exclusion is lifted so both mocked contactmomenten reach
+        `_build_question_dto`, which is where the per-row queries used to happen.
+        """
+        klanten_config = ESuiteKlantConfig.get_solo()
+        klanten_config.exclude_contactmoment_kanalen = []
+        klanten_config.save()
+
+        data = MockAPIReadData().install_mocks(m)
+
+        with CaptureQueriesContext(connection) as captured:
+            result = self.service.list_questions({"user_bsn": data.user.bsn}, data.user)
+
+        self.assertEqual(len(result.questions), 2)
+
+        def queries_touching(table: str) -> list[str]:
+            return [q["sql"] for q in captured.captured_queries if table in q["sql"]]
+
+        self.assertEqual(
+            len(queries_touching("openklant_contactformsubject")),
+            1,
+            msg="subject mapping should be resolved once for the whole page",
+        )
+        # One SELECT to find existing rows, one INSERT, one SELECT to read them back.
+        self.assertEqual(
+            len(queries_touching("openklant_klantcontactmomentanswer")),
+            3,
+            msg="answer mapping should be resolved once for the whole page",
+        )
+
+    def test_subject_mapping_prefers_the_first_subject_for_a_code(self, m):
+        """Several OIP subjects may share one e-suite code; the first by order wins."""
+        data = MockAPIReadData().install_mocks(m)
+        ContactFormSubject.objects.create(
+            subject="duplicate_subject",
+            esuite_subject_code=self.contactformsubject.esuite_subject_code,
+            esuite_config=ESuiteKlantConfig.get_solo(),
+        )
+        # A subject for an unrelated code, ordered first, must not be picked up.
+        unrelated = ContactFormSubject.objects.create(
+            subject="unrelated_subject",
+            esuite_subject_code="some_other_code",
+            esuite_config=ESuiteKlantConfig.get_solo(),
+        )
+        unrelated.top()
+
+        result = self.service.list_questions({"user_bsn": data.user.bsn}, data.user)
+
+        self.assertEqual(
+            result.questions[0]["subject"], self.contactformsubject.subject
+        )
 
     def test_unresolvable_contactmoment_is_reported_as_skipped(self, m):
         """A contactmoment that cannot be retrieved must not cost the whole page."""
