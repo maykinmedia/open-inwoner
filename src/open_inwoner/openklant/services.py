@@ -44,6 +44,7 @@ from openklant_client.types.resources.klant_contact import (
     KlantContact,
     ListKlantContactParams,
 )
+from openklant_client.types.resources.onderwerp_object import OnderwerpObject
 from openklant_client.types.resources.partij import (
     CreatePartijPersoonData,
     PartialUpdatePartijData,
@@ -147,6 +148,19 @@ class Question(TypedDict):
 
 
 QuestionValidator = TypeAdapter(Question)
+
+
+# The klantinteracties API supports these filters, but the pinned open-klant-client
+# (0.4.0) does not declare them yet. The TypedDicts are annotations only, so the
+# parameters reach the wire regardless; these subclasses just keep type checking
+# honest. See the `hadBetrokkene__wasPartij__uuid` and `klantcontact__uuid` filters in
+# https://github.com/maykinmedia/open-klant/blob/master/src/openklant/components/klantinteracties/openapi.yaml
+class PartijFilteredKlantContactParams(ListKlantContactParams, total=False):
+    hadBetrokkene__wasPartij__uuid: str
+
+
+class KlantContactFilteredOnderwerpObjectParams(TypedDict, total=False):
+    klantcontact__uuid: str
 
 
 @dataclass
@@ -2124,11 +2138,7 @@ class OpenKlant2Service(
     def klantcontacten_for_partij(
         self, partij_uuid: str, *, kanaal: str | None = None
     ) -> Iterable[KlantContact]:
-        # There is currently no good way to filter the klantcontacten by a
-        # Partij (see https://github.com/maykinmedia/open-klant/issues/256). So
-        # unfortunately, we have to fetch all rows and do the filtering client
-        # side.
-        params: ListKlantContactParams = {
+        params: PartijFilteredKlantContactParams = {
             "expand": [
                 "leiddeTotInterneTaken",
                 "gingOverOnderwerpobjecten",
@@ -2136,6 +2146,9 @@ class OpenKlant2Service(
                 "hadBetrokkenen.wasPartij",
             ],
             "kanaal": kanaal or self.config.mijn_vragen_kanaal,
+            # Without this the listing returns every klantcontact on the kanaal, for
+            # every partij, and the caller throws away all but one user's.
+            "hadBetrokkene__wasPartij__uuid": partij_uuid,
         }
         klantcontacten = self.client.klant_contact.list_iter(params=params)
 
@@ -2173,7 +2186,63 @@ class OpenKlant2Service(
                 )
                 return False
 
-        return filter(_has_initiator, filter(_has_partij_uuid, klantcontacten))
+        # TODO: once we can assume every deployment is past the version that ignores
+        # hadBetrokkene__wasPartij__uuid, this local filter and its foreign-row logging
+        # can be deleted.
+        def _filtered() -> Iterable[KlantContact]:
+            """Apply the partij check locally as well as server side.
+
+            An OpenKlant that predates `hadBetrokkene__wasPartij__uuid` ignores the
+            unknown query parameter and returns every klantcontact rather than
+            rejecting the request. Dropping this check would therefore not raise, it
+            would show one user another user's questions. Anything discarded here
+            means the server-side filter did not take effect.
+            """
+            foreign = 0
+            for row in klantcontacten:
+                if not _has_partij_uuid(row):
+                    foreign += 1
+                    continue
+                if _has_initiator(row):
+                    yield row
+
+            if foreign:
+                logger.error(
+                    "Server-side partij filter was not applied; klantcontacten for "
+                    "other partijen were returned and discarded locally",
+                    partij_uuid=partij_uuid,
+                    discarded=foreign,
+                )
+
+        return _filtered()
+
+    def _expanded_onderwerp_objecten(
+        self, klantcontact: KlantContact
+    ) -> list[OnderwerpObject]:
+        """Return a klantcontact's onderwerpobjecten as full resources.
+
+        `klantcontacten_for_partij` asks for `gingOverOnderwerpobjecten` to be
+        expanded, so the resources are already in the response and retrieving them
+        individually would cost a request per onderwerpobject.
+        """
+        refs = klantcontact.get("gingOverOnderwerpobjecten") or []
+        expanded = glom.glom(
+            klantcontact,
+            glom.Coalesce("_expand.gingOverOnderwerpobjecten", default=[]),
+        )
+
+        if refs and not expanded:
+            # The listing was not expanded after all. Falling back keeps answers from
+            # being misread as questions, at the cost of the requests we set out to
+            # avoid, so it is worth knowing about.
+            logger.warning(
+                "Klantcontact onderwerpobjecten were not expanded; retrieving them "
+                "individually",
+                klantcontact_uuid=klantcontact.get("uuid"),
+            )
+            return [self.client.onderwerp_object.retrieve(ref["uuid"]) for ref in refs]
+
+        return expanded
 
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         """
@@ -2208,15 +2277,12 @@ class OpenKlant2Service(
                 klantcontact
             )
 
-            if onderwerp_objecten := klantcontact["gingOverOnderwerpobjecten"]:
+            if onderwerp_objecten := self._expanded_onderwerp_objecten(klantcontact):
                 # Determine if the klantcontact is an answer by checking `wasKlantcontact` in
                 # the related onderwerp_object; otherwise, treat it as question
 
                 # Collect all answers for a question by checking all onderwerp_objecten
-                for oo_ref in onderwerp_objecten:
-                    answer_onderwerp_object = self.client.onderwerp_object.retrieve(
-                        oo_ref["uuid"]
-                    )
+                for answer_onderwerp_object in onderwerp_objecten:
                     if not answer_onderwerp_object["wasKlantcontact"]:
                         # Treat as question
                         question_uuids.append(klantcontact["uuid"])
@@ -2306,9 +2372,17 @@ class OpenKlant2Service(
             return (None, None)
 
         # fetch onderwerp_object linked to klantcontact
+        onderwerp_object_params: KlantContactFilteredOnderwerpObjectParams = {
+            "klantcontact__uuid": question.question_kcm_uuid
+        }
         onderwerp_objecten = [
             obj
-            for obj in self.client.onderwerp_object.list()["results"]
+            for obj in self.client.onderwerp_object.list(
+                params=onderwerp_object_params
+            )["results"]
+            # Retained as a cross-check on the server-side filter: an OpenKlant that
+            # predates `klantcontact__uuid` ignores it and returns everything, and
+            # only the first page at that.
             if obj["klantcontact"]
             and obj["klantcontact"]["uuid"] == question.question_kcm_uuid
         ]
@@ -2343,18 +2417,66 @@ class OpenKlant2Service(
         questions_ok2: list[OpenKlant2Question],
         user: User,
     ) -> list[Question]:
+        answer_metadata = self._answer_metadata_for_questions(questions_ok2, user)
         return [
-            self._build_question_dto(question, user=user) for question in questions_ok2
+            self._build_question_dto(
+                question, user=user, answer_metadata=answer_metadata.get(question.url)
+            )
+            for question in questions_ok2
         ]
+
+    @staticmethod
+    def _answer_metadata_for_questions(
+        questions_ok2: list[OpenKlant2Question],
+        user: User,
+    ) -> dict[str, KlantContactMomentAnswer]:
+        """Fetch the local seen/answer state for a batch of questions in one go.
+
+        Resolving this per question costs a query (and possibly an insert) per row,
+        and the list view renders dozens at a time.
+        """
+        urls = [question.url for question in questions_ok2]
+        answers = {
+            answer.contactmoment_url: answer
+            for answer in KlantContactMomentAnswer.objects.filter(
+                user=user, contactmoment_url__in=urls
+            )
+        }
+
+        if missing := [url for url in urls if url not in answers]:
+            with transaction.atomic():
+                KlantContactMomentAnswer.objects.bulk_create(
+                    [
+                        KlantContactMomentAnswer(user=user, contactmoment_url=url)
+                        for url in missing
+                    ],
+                    # A concurrent request may have created the same rows; the unique
+                    # constraint on (user, contactmoment_url) makes that a no-op.
+                    ignore_conflicts=True,
+                )
+            # `ignore_conflicts` leaves the created objects without a primary key, so
+            # the rows have to be read back.
+            answers.update(
+                {
+                    answer.contactmoment_url: answer
+                    for answer in KlantContactMomentAnswer.objects.filter(
+                        user=user, contactmoment_url__in=missing
+                    )
+                }
+            )
+
+        return answers
 
     def _build_question_dto(
         self,
         question_ok2: OpenKlant2Question,
         user: User,
+        answer_metadata: KlantContactMomentAnswer | None = None,
     ) -> Question:
-        answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
-            user=user, contactmoment_url=question_ok2.url
-        )
+        if answer_metadata is None:
+            answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
+                user=user, contactmoment_url=question_ok2.url
+            )
         answer_text = question_ok2.answer.answer if question_ok2.answer else None
 
         return QuestionValidator.validate_python(
