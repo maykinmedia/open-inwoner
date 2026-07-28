@@ -1,5 +1,7 @@
+import concurrent.futures
 import contextlib
 import datetime
+import enum
 import re
 import uuid
 from dataclasses import dataclass
@@ -52,6 +54,7 @@ from openklant_client.types.resources.partij_identificator import PartijIdentifi
 from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
 from typing_extensions import TypedDict
 from zgw_consumers.client import build_client as build_zgw_client
+from zgw_consumers.concurrent import parallel
 from zgw_consumers.models.services import Service as ServiceConfig
 from zgw_consumers.utils import pagination_helper
 
@@ -68,7 +71,12 @@ from open_inwoner.openklant.api_models import (
     KlantWritePayload,
     ObjectContactMoment,
 )
-from open_inwoner.openklant.clients import KlantAPIClient
+from open_inwoner.openklant.clients import (
+    ContactmomentenClient,
+    KlantAPIClient,
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
@@ -81,8 +89,6 @@ from open_inwoner.openklant.models import (
 from open_inwoner.openklant.types import InboundOpenklantSyncResult
 from open_inwoner.openklant.wrap import (
     contactmoment_has_new_answer,
-    fetch_klantcontactmoment,
-    fetch_klantcontactmomenten,
     get_kcm_answer_mapping,
 )
 from open_inwoner.openzaak.api_models import Zaak
@@ -141,6 +147,14 @@ class Question(TypedDict):
 
 
 QuestionValidator = TypeAdapter(Question)
+
+
+@dataclass
+class QuestionsResult:
+    questions: list[Question]
+    # Set when the backing data could not be retrieved in full, so callers can tell
+    # the user they are looking at less than they have.
+    is_incomplete: bool = False
 
 
 class KlantenService(Protocol):
@@ -447,6 +461,41 @@ class eSuiteKlantenService(
         return klant
 
 
+# Contactmoment resolution is IO-bound, so the worker count is not tied to CPU count.
+# Kept modest to avoid hammering eSuite, which is the constrained side.
+_DEFAULT_CONTACTMOMENT_WORKERS = 8
+
+
+class KlantContactMomentSkipReason(enum.Enum):
+    RESOLUTION_FAILED = "resolution_failed"
+    TIMEOUT = "timeout"
+
+
+@dataclass
+class SkippedKlantContactMoment:
+    kcm_url: str
+    reason: KlantContactMomentSkipReason
+
+
+@dataclass
+class KlantContactMomentenResult:
+    klantcontactmomenten: list[KlantContactMoment]
+    skipped: list[SkippedKlantContactMoment]
+    # Set when the klantcontactmomenten list call itself failed, so `skipped` cannot
+    # enumerate what is missing: without that response we do not know the urls.
+    list_fetch_failed: bool = False
+
+    @property
+    def is_incomplete(self) -> bool:
+        """Whether results are incomplete in a way that is worth reporting.
+
+        A contactmoment that timed out may well resolve on a later attempt, and a
+        failed list call hides an unknown number of entries. Both mean the user is
+        looking at less than they have.
+        """
+        return self.list_fetch_failed or bool(self.skipped)
+
+
 class eSuiteVragenService(KlantenService):
     config: ESuiteKlantConfig
 
@@ -587,25 +636,115 @@ class eSuiteVragenService(KlantenService):
     #
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
-    ) -> list[KlantContactMoment]:
-        response = self.client.get(
-            "klantcontactmomenten",
-            params={"klant": klant.url},
+    ) -> KlantContactMomentenResult:
+        """List a klant's klantcontactmomenten and resolve their contactmomenten."""
+        client = build_contactmomenten_client()
+        if client is None:
+            return KlantContactMomentenResult(
+                klantcontactmomenten=[], skipped=[], list_fetch_failed=True
+            )
+
+        kcms = client.list_klantcontactmomenten_for_klant(klant)
+        return self._resolve_contactmomenten(kcms)
+
+    def _resolve_contactmomenten(
+        self, kcms: list[KlantContactMoment]
+    ) -> KlantContactMomentenResult:
+        """Replace each klantcontactmoment's contactmoment URL with the full resource.
+
+        eSuite offers no bulk endpoint, so every contactmoment costs its own request.
+        Doing that sequentially dominates the response time of the "Mijn vragen"
+        pages, so the requests are spread over a pool of workers instead, following
+        the same per-item submit + `as_completed(timeout=...)` pattern `ZGWService`
+        uses for resolving zaken in parallel.
+
+        Contactmomenten that cannot be retrieved are reported as skipped rather than
+        failing the whole page: an incomplete list the user is warned about beats no
+        list at all.
+        """
+        if not kcms:
+            return KlantContactMomentenResult(klantcontactmomenten=[], skipped=[])
+
+        max_workers = (
+            self.config.contactmoment_num_workers or _DEFAULT_CONTACTMOMENT_WORKERS
         )
-        self.client.raise_for_status(response)
-        data = self.client.parse_json(response)
-        all_data = list(pagination_helper(self.client, data))
-        klanten_contact_moments = self.client.factory(KlantContactMoment, all_data)
 
-        # resolve linked resources
-        for kcm in klanten_contact_moments:
-            if not kcm.klant == klant.url:
-                raise ValueError("klantcontactmoment not linked to klant")
+        future_to_kcm: dict[concurrent.futures.Future, KlantContactMoment] = {}
+        remaining: dict[int, int] = {}
+        failed_ids: set[int] = set()
 
-            kcm.klant = klant
-            kcm.contactmoment = self.retrieve_contactmoment(kcm.contactmoment)
+        # Each worker gets its own client because requests.Session is not
+        # thread-safe. Built here rather than inside the worker: building one reads
+        # the config from the database, and a worker thread cannot see rows written
+        # by an as yet uncommitted transaction on the calling thread.
+        with parallel(max_workers=max_workers) as executor:
+            for kcm in kcms:
+                remaining[id(kcm)] = 1
+                future = executor.submit(
+                    self._resolve_single_contactmoment,
+                    kcm,
+                    build_contactmomenten_client(),
+                )
+                future_to_kcm[future] = kcm
 
-        return klanten_contact_moments
+            try:
+                for future in concurrent.futures.as_completed(
+                    future_to_kcm, timeout=self.config.contactmoment_fetch_timeout
+                ):
+                    kcm = future_to_kcm[future]
+                    remaining[id(kcm)] -= 1
+                    try:
+                        future.result()
+                    except Exception:
+                        failed_ids.add(id(kcm))
+            except concurrent.futures.TimeoutError:
+                logger.warning("Timed out resolving contactmomenten", exc_info=True)
+
+        resolved: list[KlantContactMoment] = []
+        skipped: list[SkippedKlantContactMoment] = []
+        for kcm in kcms:
+            kid = id(kcm)
+            if remaining[kid] != 0:
+                skipped.append(
+                    SkippedKlantContactMoment(
+                        kcm_url=kcm.contactmoment,
+                        reason=KlantContactMomentSkipReason.TIMEOUT,
+                    )
+                )
+            elif kid in failed_ids:
+                skipped.append(
+                    SkippedKlantContactMoment(
+                        kcm_url=kcm.contactmoment,
+                        reason=KlantContactMomentSkipReason.RESOLUTION_FAILED,
+                    )
+                )
+            else:
+                resolved.append(kcm)
+
+        return KlantContactMomentenResult(
+            klantcontactmomenten=resolved, skipped=skipped
+        )
+
+    @staticmethod
+    def _resolve_single_contactmoment(
+        kcm: KlantContactMoment, client: ContactmomentenClient | None
+    ) -> None:
+        """Resolve one klantcontactmoment's contactmoment url in a worker thread.
+
+        Runs no queries of its own: the client is built by the caller.
+        """
+        if client is None:
+            raise KlantAPIError("No contactmomenten client configured")
+
+        contactmoment_url = kcm.contactmoment
+        try:
+            kcm.contactmoment = client.retrieve_contactmoment(contactmoment_url)
+        except Exception:
+            logger.exception(
+                "Failed to resolve contactmoment",
+                contactmoment_url=contactmoment_url,
+            )
+            raise
 
     @staticmethod
     def _get_kcm_subject(
@@ -697,8 +836,40 @@ class eSuiteVragenService(KlantenService):
         user_bsn: str | None = None,
         user_kvk_or_rsin: str | None = None,
         vestigingsnummer: str | None = None,
-    ) -> list[KlantContactMoment]:
-        return fetch_klantcontactmomenten(user_bsn, user_kvk_or_rsin, vestigingsnummer)
+    ) -> KlantContactMomentenResult:
+        if not user_bsn and not user_kvk_or_rsin:
+            return KlantContactMomentenResult(klantcontactmomenten=[], skipped=[])
+
+        klanten_client = build_klanten_client()
+        if klanten_client is None:
+            return KlantContactMomentenResult(
+                klantcontactmomenten=[], skipped=[], list_fetch_failed=True
+            )
+
+        if user_bsn:
+            klanten = klanten_client.retrieve_klanten_for_bsn(user_bsn)
+        else:
+            klanten = klanten_client.retrieve_klanten_for_kvk_or_rsin(
+                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+            )
+
+        kcms: list[KlantContactMoment] = []
+        skipped: list[SkippedKlantContactMoment] = []
+        list_fetch_failed = False
+        for klant in klanten:
+            result = self.retrieve_klantcontactmomenten_for_klant(klant)
+            kcms.extend(result.klantcontactmomenten)
+            skipped.extend(result.skipped)
+            list_fetch_failed = list_fetch_failed or result.list_fetch_failed
+
+        # combine sorting for moments of all klanten for a bsn
+        kcms.sort(key=lambda kcm: kcm.contactmoment.registratiedatum, reverse=True)
+
+        return KlantContactMomentenResult(
+            klantcontactmomenten=kcms,
+            skipped=skipped,
+            list_fetch_failed=list_fetch_failed,
+        )
 
     def fetch_klantcontactmoment(
         self,
@@ -707,14 +878,29 @@ class eSuiteVragenService(KlantenService):
         user_kvk_or_rsin: str | None = None,
         vestigingsnummer: str | None = None,
     ) -> KlantContactMoment | None:
-        return fetch_klantcontactmoment(
-            kcm_uuid, user_bsn, user_kvk_or_rsin, vestigingsnummer
+        if not user_bsn and not user_kvk_or_rsin:
+            return None
+
+        # use the list query because eSuite doesn't have all proper resources
+        # see git history before this change for the original single resource version
+        result = self.fetch_klantcontactmomenten(
+            user_bsn=user_bsn,
+            user_kvk_or_rsin=user_kvk_or_rsin,
+            vestigingsnummer=vestigingsnummer,
         )
+
+        # try to grab the specific KCM
+        for kcm in result.klantcontactmomenten:
+            if kcm_uuid == str(kcm.uuid):
+                return kcm
+
+        return None
 
     def list_questions(
         self, fetch_params: FetchParameters, user: User
-    ) -> Iterable[Question]:
-        kcms = self.fetch_klantcontactmomenten(**fetch_params)
+    ) -> QuestionsResult:
+        result = self.fetch_klantcontactmomenten(**fetch_params)
+        kcms = result.klantcontactmomenten
 
         klant_config = ESuiteKlantConfig.get_solo()
         if exclude_range := klant_config.exclude_contactmoment_kanalen:
@@ -733,7 +919,9 @@ class eSuiteVragenService(KlantenService):
             )
             for kcm in kcms
         ]
-        return contactmomenten
+        return QuestionsResult(
+            questions=contactmomenten, is_incomplete=result.is_incomplete
+        )
 
     def retrieve_question(
         self, fetch_params: FetchParameters, question_uuid: str, user: User
@@ -772,7 +960,11 @@ class eSuiteVragenService(KlantenService):
     def list_questions_for_zaak(self, zaak: Zaak, user: User) -> list[Question]:
         # fetch klantcontactmomenten for filtering
         fetch_params = self.get_fetch_parameters(user)
-        klantcontactmomenten = self.fetch_klantcontactmomenten(**fetch_params)
+        # Only used to filter the zaak's contactmomenten down to the user's own; an
+        # incomplete fetch can hide a question here, which the caller cannot express.
+        klantcontactmomenten = self.fetch_klantcontactmomenten(
+            **fetch_params
+        ).klantcontactmomenten
         relevant_contactmomenten_urls = {
             kcm.contactmoment.url for kcm in klantcontactmomenten
         }
@@ -2081,14 +2273,16 @@ class OpenKlant2Service(
 
     def list_questions(
         self, fetch_params: FetchParameters, user: User
-    ) -> list[Question]:
+    ) -> QuestionsResult:
         partij, _ = self.get_or_create_partij_for_user(user)
         if not partij:
             # Will be logged by get_or_create_partij_for_user
-            return []
+            return QuestionsResult(questions=[])
 
+        # Questions arrive in a single listing, so there is no partial-failure case
+        # here the way there is for the eSuite fan-out.
         questions = self.questions_for_partij(partij_uuid=partij["uuid"])
-        return self._build_question_dtos(questions, user)
+        return QuestionsResult(questions=self._build_question_dtos(questions, user))
 
     def retrieve_question(
         self,

@@ -1,4 +1,4 @@
-from typing import Iterable, Protocol
+from typing import Protocol
 
 from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
@@ -25,6 +25,7 @@ from open_inwoner.openklant.services import (
     KlantenService,
     OpenKlant2Service,
     Question,
+    QuestionsResult,
     QuestionValidator,
     ZaakWithApiGroup,
     eSuiteKlantenService,
@@ -72,7 +73,7 @@ class VragenService(Protocol):
         self,
         fetch_params: FetchParameters,
         user: User,
-    ) -> Iterable[Question]: ...
+    ) -> QuestionsResult: ...
 
     def retrieve_question(
         self,
@@ -156,11 +157,14 @@ class KlantContactMomentListView(
                 continue
 
             try:
-                service_questions = service.list_questions(
+                service_result = service.list_questions(
                     self.get_fetch_params(service),
                     user=self.request.user,
                 )
-                questions.extend(service_questions)
+                questions.extend(service_result.questions)
+                # One render spans both backends, so incompleteness in either means
+                # the combined list is incomplete.
+                fetch_error = fetch_error or service_result.is_incomplete
             except KlantAPIError:
                 fetch_error = True
                 logger.error(
@@ -357,7 +361,9 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
         fetch_params = klanten_service.get_fetch_parameters(self.request.user)
 
         klant = klanten_service.retrieve_klant(**fetch_params)
-        kcms = vragen_service.retrieve_klantcontactmomenten_for_klant(klant)
+        kcms = vragen_service.retrieve_klantcontactmomenten_for_klant(
+            klant
+        ).klantcontactmomenten
 
         if not kcms:
             raise Http404

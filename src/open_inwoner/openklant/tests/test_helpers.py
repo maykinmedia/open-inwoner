@@ -3,11 +3,9 @@ from django.test import TestCase
 import requests_mock
 
 from open_inwoner.openklant.models import KlantContactMomentAnswer
+from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmomenten,
-    get_kcm_answer_mapping,
-)
+from open_inwoner.openklant.wrap import get_kcm_answer_mapping
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 
@@ -21,7 +19,11 @@ class KlantHelperTest(ClearCachesMixin, DisableRequestLogMixin, TestCase):
     def test_get_kcm_answer_mapping(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        kcms = fetch_klantcontactmomenten(user_bsn=data.user.bsn)
+        kcms = (
+            eSuiteVragenService()
+            .fetch_klantcontactmomenten(user_bsn=data.user.bsn)
+            .klantcontactmomenten
+        )
 
         with self.subTest(
             "running the first time will create KlantContactMomentAnswer"

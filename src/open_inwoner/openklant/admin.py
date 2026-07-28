@@ -89,6 +89,15 @@ class ESuiteKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                 ],
             },
         ),
+        (
+            _("Performance"),
+            {
+                "fields": [
+                    "contactmoment_num_workers",
+                    "contactmoment_fetch_timeout",
+                ],
+            },
+        ),
     ]
 
 
