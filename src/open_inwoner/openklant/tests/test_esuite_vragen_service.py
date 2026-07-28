@@ -1,13 +1,22 @@
+import threading
 from datetime import datetime
+from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.openklant.clients import (
+    build_contactmomenten_client,
+    build_klanten_client,
+)
 from open_inwoner.openklant.constants import KlantenServiceType, Status
 from open_inwoner.openklant.models import ContactFormSubject, ESuiteKlantConfig
-from open_inwoner.openklant.services import eSuiteVragenService
+from open_inwoner.openklant.services import (
+    KlantContactMomentSkipReason,
+    eSuiteVragenService,
+)
 from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.url import uuid_from_url
 
@@ -79,7 +88,7 @@ class eSuiteVragenServiceTestCase(TestCase):
                 config.use_rsin_for_innNnpId_query_parameter = use_rsin
                 config.save()
 
-                questions = list(self.service.list_questions(params, user))
+                questions = self.service.list_questions(params, user).questions
 
                 self.assertEqual(len(questions), 1)
                 self.assertEqual(
@@ -101,6 +110,99 @@ class eSuiteVragenServiceTestCase(TestCase):
                     },
                 )
                 m.reset_mock()
+
+    def test_unresolvable_contactmoment_is_reported_as_skipped(self, m):
+        """A contactmoment that cannot be retrieved must not cost the whole page."""
+        data = MockAPIReadData().install_mocks(m)
+        # Registered last, so it takes precedence over the mock install_mocks set up.
+        m.get(data.contactmoment_intern["url"], status_code=500)
+
+        result = self.service.fetch_klantcontactmomenten(user_bsn=data.user.bsn)
+
+        self.assertEqual(len(result.klantcontactmomenten), 1)
+        self.assertEqual(
+            str(result.klantcontactmomenten[0].uuid), data.klant_contactmoment["uuid"]
+        )
+        self.assertEqual(len(result.skipped), 1)
+        self.assertEqual(result.skipped[0].kcm_url, data.contactmoment_intern["url"])
+        self.assertEqual(
+            result.skipped[0].reason,
+            KlantContactMomentSkipReason.RESOLUTION_FAILED,
+        )
+        self.assertTrue(result.is_incomplete)
+
+    def test_incompleteness_propagates_to_list_questions(self, m):
+        data = MockAPIReadData().install_mocks(m)
+        m.get(data.contactmoment_intern["url"], status_code=500)
+
+        result = self.service.list_questions({"user_bsn": data.user.bsn}, data.user)
+
+        # The intern contactmoment is excluded by kanaal anyway, so the question list
+        # is unchanged; the point is that the failure is still reported.
+        self.assertEqual(len(result.questions), 1)
+        self.assertTrue(result.is_incomplete)
+
+    def test_resolution_stops_at_the_deadline(self, m):
+        """An exhausted time budget leaves the rest unresolved rather than hanging.
+
+        Blocks the resolve call with a threading.Event rather than relying on a
+        tiny timeout racing real (mocked, near-instant) HTTP calls: with those,
+        whether as_completed(timeout=0) sees anything as "already done" depends on
+        thread scheduling, not the code under test. A timer releases the block so
+        the still-pending futures can complete once `parallel`'s `__exit__` waits
+        for them, instead of hanging the test.
+
+        The release must not fire until *after* as_completed's initial "already
+        finished" snapshot, or the (still-unresolved) kcm looks like a clean
+        success instead of a timeout. Submitting the futures does real work
+        (building a client per kcm), so a short margin here raced that submission
+        under CI load and was flaky; this margin is generous on purpose.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        config = ESuiteKlantConfig.get_solo()
+        config.contactmoment_fetch_timeout = 0
+        config.save()
+
+        release = threading.Event()
+        timer = threading.Timer(1, release.set)
+
+        def _blocking_resolve(kcm, client):
+            release.wait(timeout=10)
+
+        with patch.object(
+            eSuiteVragenService,
+            "_resolve_single_contactmoment",
+            side_effect=_blocking_resolve,
+        ):
+            timer.start()
+            try:
+                result = eSuiteVragenService().fetch_klantcontactmomenten(
+                    user_bsn=data.user.bsn
+                )
+            finally:
+                release.set()
+                timer.cancel()
+
+        self.assertEqual(result.klantcontactmomenten, [])
+        self.assertEqual(len(result.skipped), 2)
+        self.assertEqual(
+            {skipped.reason for skipped in result.skipped},
+            {KlantContactMomentSkipReason.TIMEOUT},
+        )
+        self.assertTrue(result.is_incomplete)
+
+    def test_listing_klantcontactmomenten_does_not_resolve_contactmomenten(self, m):
+        """The client lists; fanning the resolution out is the service's job."""
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+        m.reset_mock()
+
+        kcms = build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant)
+
+        self.assertEqual(len(kcms), 2)
+        for kcm in kcms:
+            self.assertIsInstance(kcm.contactmoment, str)
+        self.assertEqual(len(m.request_history), 1)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)

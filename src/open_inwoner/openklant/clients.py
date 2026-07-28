@@ -187,9 +187,14 @@ class ContactmomentenClient(KlantAPIClient):
     #
     # klantcontactmomenten
     #
-    def retrieve_klantcontactmomenten_for_klant(
+    def list_klantcontactmomenten_for_klant(
         self, klant: Klant
     ) -> list[KlantContactMoment]:
+        """List a klant's klantcontactmomenten, leaving `contactmoment` as a URL.
+
+        Resolving those URLs is orchestrated by `eSuiteVragenService`, which fans the
+        requests out over a worker pool.
+        """
         response = self.get(
             "klantcontactmomenten",
             params={"klant": klant.url},
@@ -199,13 +204,11 @@ class ContactmomentenClient(KlantAPIClient):
         all_data = list(pagination_helper(self, data))
         klanten_contact_moments = self.factory(KlantContactMoment, all_data)
 
-        # resolve linked resources
         for kcm in klanten_contact_moments:
             if not kcm.klant == klant.url:
                 raise ValueError("klantcontactmoment not linked to klant")
 
             kcm.klant = klant
-            kcm.contactmoment = self.retrieve_contactmoment(kcm.contactmoment)
 
         return klanten_contact_moments
 
