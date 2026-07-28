@@ -88,12 +88,15 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             if formulieren_result.timed_out:
                 msg = partial_error_msg
         try:
-            all_visible_zaken = case_service.get_visible_zaken(
-                user_identification
-            ).zaken
+            visible_result = case_service.get_visible_zaken(user_identification)
         except Exception:
             logger.error("Failed to retrieve zaken", user=request.user)
             all_visible_zaken = None
+            msg = partial_error_msg
+        else:
+            all_visible_zaken = visible_result.zaken
+            if visible_result.has_timeouts:
+                msg = partial_error_msg
 
         if formulieren is None and all_visible_zaken is None:
             context = {
@@ -108,9 +111,12 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
         # Formulieren fill the first slots; only fully-resolve as many zaken as needed.
         formulieren_to_show = (formulieren or [])[:num_zaken]
         zaak_limit = max(0, num_zaken - len(formulieren_to_show))
-        zaken_page = case_service.fully_resolve_zaken(
+        resolved_result = case_service.fully_resolve_zaken(
             (all_visible_zaken or [])[:zaak_limit]
-        ).zaken
+        )
+        zaken_page = resolved_result.zaken
+        if resolved_result.has_timeouts:
+            msg = partial_error_msg
         zaken_dicts = [
             zaak.process_data() for zaak in [*formulieren_to_show, *zaken_page]
         ]

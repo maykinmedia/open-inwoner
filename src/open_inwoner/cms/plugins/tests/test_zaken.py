@@ -13,7 +13,12 @@ from open_inwoner.cms.plugins.models.zaken import MAX_CASES_DEFAULT
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
-from open_inwoner.openzaak.services import FormulierenResult, ZakenResult
+from open_inwoner.openzaak.services import (
+    FormulierenResult,
+    SkippedZaak,
+    SkipReason,
+    ZakenResult,
+)
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZGWApiGroupConfigFactory,
@@ -289,6 +294,131 @@ class CMSZakenPluginTest(TestCase):
         error_slot = pyquery.find('[slot="error"]')
         self.assertEqual(len(error_slot), 1)
         self.assertIn("technisch probleem", error_slot.text().lower())
+
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
+    )
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_formulieren")
+    def test_htmx_content_endpoint_partial_failure_zaken(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        # Cases fail
+        mock_visible_zaken.side_effect = Exception("Cases API error")
+
+        # formulieren succeed
+        mock_submission = MagicMock()
+        mock_submission.process_data.return_value = {
+            "uuid": "submission-uuid-1",
+            "identification": "SUBMISSION-001",
+            "naam": "Test formulier",
+            "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.FORMULIER.value,
+            "vervolg_link": "https://example.com/formulier/123",
+        }
+        mock_formulieren.return_value = FormulierenResult(formulieren=[mock_submission])
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+
+        # Should render the formulieren that were retrieved
+        self.assertEqual(len(pyquery.find("oip-home-plugin-card")), 1)
+
+        # Should have error message in slot
+        error_slot = pyquery.find('[slot="error"]')
+        self.assertEqual(len(error_slot), 1)
+
+    @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken",
+        side_effect=lambda zaken: ZakenResult(zaken=zaken, skipped=[]),
+    )
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
+        return_value=FormulierenResult(formulieren=[]),
+    )
+    def test_htmx_content_endpoint_visible_zaken_timeout_shows_partial_message(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        mock_zaak = MagicMock()
+        mock_zaak.process_data.return_value = {
+            "uuid": "test-uuid-123",
+            "identification": "ZAAK-001",
+            "naam": "Test zaak",
+            "api_group": api_group,
+            "type_aanvraag": TypeAanvraag.ZAAK.value,
+        }
+        mock_visible_zaken.return_value = ZakenResult(
+            zaken=[mock_zaak], skipped=[], raw_fetch_timed_out=True
+        )
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+
+        # The zaken that made it in time are shown, with the partial message
+        self.assertEqual(len(pyquery.find("oip-home-plugin-card")), 1)
+        self.assertEqual(len(pyquery.find('[slot="error"]')), 1)
+
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken",
+        return_value=ZakenResult(zaken=[], skipped=[]),
+    )
+    @patch("open_inwoner.cms.plugins.views.ZGWService.fully_resolve_zaken")
+    @patch(
+        "open_inwoner.cms.plugins.views.ZGWService.get_formulieren",
+        return_value=FormulierenResult(formulieren=[]),
+    )
+    def test_htmx_content_endpoint_resolve_timeout_shows_partial_message(
+        self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
+    ):
+        api_group = ZGWApiGroupConfigFactory()
+
+        mock_fully_resolve.return_value = ZakenResult(
+            zaken=[],
+            skipped=[
+                SkippedZaak(
+                    zaak_url=f"{ZAKEN_ROOT}zaken/1234",
+                    reason=SkipReason.TIMEOUT,
+                    api_group=api_group,
+                )
+            ],
+        )
+
+        plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
+
+        url = reverse(
+            "cms_plugins:zaken_content", kwargs={"plugin_id": plugin_model.pk}
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(url, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        pyquery = PyQuery(response.content.decode("utf-8"))
+        self.assertEqual(len(pyquery.find('[slot="error"]')), 1)
 
     @patch("open_inwoner.cms.plugins.views.ZGWService.get_visible_zaken")
     @patch(
