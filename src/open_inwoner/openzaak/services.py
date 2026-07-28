@@ -121,13 +121,28 @@ class SkippedZaak:
     api_group: ZGWApiGroupConfig
 
 
-_ZaakT = TypeVar("_ZaakT", bound=ZaakWithApiGroupZaakTypeResolved)
+_ZaakT = TypeVar("_ZaakT", bound=ZaakWithApiGroup)
 
 
 @dataclass
 class ZakenResult(Generic[_ZaakT]):
     zaken: list[_ZaakT]
     skipped: list[SkippedZaak]
+    # Set when a whole-stage timeout dropped zaken whose URLs are unknown (the raw
+    # fetch stage), so `skipped` cannot enumerate them.
+    raw_fetch_timed_out: bool = False
+
+    @property
+    def has_timeouts(self) -> bool:
+        """Whether results are incomplete because of a timeout.
+
+        Only timeouts count: zaken excluded for confidentiality, an internal
+        zaaktype or a failed resolution are legitimately absent and retrying
+        will not bring them back.
+        """
+        return self.raw_fetch_timed_out or any(
+            skipped.reason == SkipReason.TIMEOUT for skipped in self.skipped
+        )
 
 
 @dataclass(frozen=True)
@@ -149,6 +164,13 @@ class FormulierWithApiGroup:
 
     def __hash__(self):
         return hash((self.identification, self.api_group.pk))
+
+
+@dataclass
+class FormulierenResult:
+    formulieren: list[FormulierWithApiGroup]
+    # Set when the fetch stage timed out, so the list may be incomplete.
+    timed_out: bool = False
 
 
 class Timeouts(TypedDict):
@@ -352,7 +374,7 @@ class ZGWService:
         self,
         user_identification: UserIdentification,
         zaak_identificatie: str | None = None,
-    ) -> list[ZaakWithApiGroup]:
+    ) -> ZakenResult[ZaakWithApiGroup]:
         """Fetch zaken without resolution. For PDC and cache seeding."""
 
         # Each thread gets its own zaken client because requests.Session is not
@@ -365,6 +387,7 @@ class ZGWService:
         )
 
         fetched_zaken: list[ZaakWithApiGroup] = []
+        raw_fetch_timed_out = False
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
                 executor.submit(
@@ -389,12 +412,17 @@ class ZGWService:
             # TODO: add OTEL metrics
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken", exc_info=True)
+                raw_fetch_timed_out = True
 
-        return fetched_zaken
+        return ZakenResult(
+            zaken=fetched_zaken,
+            skipped=[],
+            raw_fetch_timed_out=raw_fetch_timed_out,
+        )
 
     def search_zaken(
         self, user_identification: UserIdentification, zaak_identificatie: str
-    ) -> list[ZaakWithApiGroupZaakTypeResolved]:
+    ) -> ZakenResult[ZaakWithApiGroupZaakTypeResolved]:
         """
         Search for a zaak by zaak_identificatie across all API groups.
 
@@ -404,10 +432,10 @@ class ZGWService:
         config = OpenZaakConfig.get_solo()
         limit_access_to_role = config.limit_user_visible_cases_to_role
 
+        raw_result = self.get_raw_zaken(user_identification, zaak_identificatie)
+
         visible_zaken: list[ZaakWithApiGroupZaakTypeResolved] = []
-        for zaak_with_group in self.get_raw_zaken(
-            user_identification, zaak_identificatie
-        ):
+        for zaak_with_group in raw_result.zaken:
             api_group = zaak_with_group.api_group
 
             # Check the rol before resolving anything else, mirroring the order in
@@ -465,9 +493,17 @@ class ZGWService:
                     )
                 )
 
-        return visible_zaken
+        # Rol and zaaktype exclusions above are not timeouts, so they are not
+        # reported as skipped; only the raw fetch stage can time out here.
+        return ZakenResult(
+            zaken=visible_zaken,
+            skipped=[],
+            raw_fetch_timed_out=raw_result.raw_fetch_timed_out,
+        )
 
-    def get_visible_zaken(self, user_identification: UserIdentification) -> ZakenResult:
+    def get_visible_zaken(
+        self, user_identification: UserIdentification
+    ) -> ZakenResult[ZaakWithApiGroupZaakTypeResolved]:
         """
         Fetch all visible zaken with only zaaktype resolved (status/resultaat
         left as raw URLs). This is cheap because zaaktype lookups are cached and
@@ -492,6 +528,7 @@ class ZGWService:
         )
 
         fetched_zaken: list[ZaakWithApiGroup] = []
+        raw_fetch_timed_out = False
         with parallel(max_workers=self._max_workers) as executor:
             futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = [
                 executor.submit(
@@ -514,6 +551,7 @@ class ZGWService:
                         logger.exception("Error fetching raw zaken for group")
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken for group", exc_info=True)
+                raw_fetch_timed_out = True
 
         fetched_zaken.sort(
             key=lambda c: (
@@ -595,6 +633,7 @@ class ZGWService:
                 if id(z) in visible_ids
             ],
             skipped=skipped,
+            raw_fetch_timed_out=raw_fetch_timed_out,
         )
 
     def fully_resolve_zaken(
@@ -807,9 +846,9 @@ class ZGWService:
 
     def get_formulieren(
         self, user_identification: UserIdentification | None
-    ) -> list[FormulierWithApiGroup]:
+    ) -> FormulierenResult:
         if not user_identification:
-            return []
+            return FormulierenResult(formulieren=[])
 
         config = OpenZaakConfig.get_solo()
         timeouts = self._case_list_stage_timeouts(config)
@@ -821,6 +860,7 @@ class ZGWService:
         )
 
         subs_with_api_group: list[FormulierWithApiGroup] = []
+        timed_out = False
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
                 executor.submit(
@@ -842,12 +882,13 @@ class ZGWService:
             # TODO: add OTEL metrics
             except concurrent.futures.TimeoutError:
                 logger.warning("Timeout while fetching formulieren")
+                timed_out = True
 
         subs_with_api_group.sort(
             key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
         )
 
-        return subs_with_api_group
+        return FormulierenResult(formulieren=subs_with_api_group, timed_out=timed_out)
 
     # -------------------------------------------------------------------------
     # Zaak detail

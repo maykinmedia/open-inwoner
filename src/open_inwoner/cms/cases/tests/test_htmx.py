@@ -23,6 +23,7 @@ from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfi
 from open_inwoner.openklant.services import eSuiteVragenService
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, KLANTEN_ROOT
 from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.services import FormulierenResult
 from open_inwoner.openzaak.tests.factories import (
     ServiceFactory,
     ZaakTypeConfigFactory,
@@ -675,7 +676,9 @@ class CasesPlaywrightTests(
             MockService.return_value.get_visible_zaken.side_effect = RuntimeError(
                 "API error"
             )
-            MockService.return_value.get_formulieren.return_value = []
+            MockService.return_value.get_formulieren.return_value = FormulierenResult(
+                formulieren=[]
+            )
 
             context = self.get_context(storage_state=self.user_login_state)
             page = context.new_page()

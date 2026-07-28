@@ -1,4 +1,4 @@
-{% load link_tags button_tags i18n grid_tags icon_tags list_tags pagination_tags utils form_tags %}
+{% load link_tags button_tags i18n grid_tags icon_tags list_tags notification_tags pagination_tags utils form_tags %}
 
 {% if fetch_error %}
     <nl-paragraph>{% trans "Er is iets misgegaan bij het ophalen van uw zaken. Ververs de pagina of probeer het later opnieuw." %}</nl-paragraph>
@@ -6,6 +6,19 @@
 
 <h1 class="utrecht-heading-1" id="cases">{{ page_title }} ({{ paginator.count }})</h1>
 <nl-paragraph>{{ title_text }}</nl-paragraph>
+
+{% if partial_results %}
+    {% if auto_retry_url %}
+        {% notification type="warning" title=_("Nog niet alle zaken zijn opgehaald") message=_("Het ophalen van uw zaken duurt langer dan verwacht. We proberen het automatisch opnieuw.") %}
+        {# Re-requests this view with an incremented retry counter; the backend fetches that timed out keep running and warm the cache, so the retry converges. #}
+        <div class="cases__auto-retry"
+             hx-get="{{ auto_retry_url }}"
+             hx-trigger="load delay:{{ auto_retry_delay }}s"
+             hx-target="#cases-content"></div>
+    {% else %}
+        {% notification type="warning" title=_("Niet alle zaken konden worden opgehaald") message=_("Een deel van uw zaken kon niet worden opgehaald. Probeer het opnieuw of kom later terug.") action=manual_retry_url action_text=_("Opnieuw proberen") closable=True %}
+    {% endif %}
+{% endif %}
 
 {% if filter_form_enabled %}
 <div class="filter-bar__backdrop" id="filterBarBackdrop">
