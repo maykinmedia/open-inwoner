@@ -20,4 +20,5 @@ Open Inwoner can be installed and run in several ways:
     development
     docker-compose
     ansible
+    celery
     health_checks
