@@ -103,6 +103,27 @@ class ESuiteKlantConfig(SingletonModel):
         ),
     )
 
+    contactmoment_num_workers = models.PositiveIntegerField(
+        verbose_name=_("Contactmoment worker threads"),
+        null=True,
+        blank=True,
+        default=None,
+        help_text=_(
+            "Maximum number of worker threads used to retrieve contactmomenten in "
+            "parallel for the 'Mijn vragen' pages. Leave empty to use the default."
+        ),
+    )
+    contactmoment_fetch_timeout = models.PositiveIntegerField(
+        verbose_name=_("Contactmoment fetch timeout (seconds)"),
+        default=15,
+        help_text=_(
+            "Total time budget in seconds for retrieving contactmomenten for the "
+            "'Mijn vragen' pages. Contactmomenten still outstanding when the budget "
+            "runs out are reported as missing rather than delaying the page further. "
+            "Set slightly below the overall HTTP response timeout of the server."
+        ),
+    )
+
     register_api_required_fields = (
         "contactmomenten_service",
         "klanten_service",
