@@ -8,12 +8,12 @@ from open_inwoner.accounts.tests.factories import (
     eHerkenningVestigingUserFactory,
 )
 from open_inwoner.openklant.api_models import KlantContactMoment
-from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
-from open_inwoner.openklant.tests.data import MockAPIReadData
-from open_inwoner.openklant.wrap import (
-    fetch_klantcontactmoment,
-    fetch_klantcontactmomenten,
+from open_inwoner.openklant.services import (
+    OpenKlant2Service,
+    eSuiteKlantenService,
+    eSuiteVragenService,
 )
+from open_inwoner.openklant.tests.data import MockAPIReadData
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 
 from .factories import ESuiteConfigFactory, OpenKlant2ConfigFactory
@@ -29,16 +29,23 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmomenten_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        res = fetch_klantcontactmomenten(user_bsn=data.user.bsn)
+        result = eSuiteVragenService().fetch_klantcontactmomenten(
+            user_bsn=data.user.bsn
+        )
 
-        self.assertNotEqual(res, list())
-        self.assertIsInstance(res[0], KlantContactMoment)
-        self.assertEqual(str(res[0].uuid), data.klant_contactmoment["uuid"])
+        self.assertNotEqual(result.klantcontactmomenten, list())
+        self.assertIsInstance(result.klantcontactmomenten[0], KlantContactMoment)
+        self.assertEqual(
+            str(result.klantcontactmomenten[0].uuid),
+            data.klant_contactmoment["uuid"],
+        )
+        self.assertEqual(result.skipped, [])
+        self.assertFalse(result.is_incomplete)
 
     def test_fetch_klantcontactmoment_for_bsn(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        kcm = fetch_klantcontactmoment(
+        kcm = eSuiteVragenService().fetch_klantcontactmoment(
             data.klant_contactmoment["uuid"], user_bsn=data.user.bsn
         )
 
@@ -49,16 +56,21 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
     def test_fetch_klantcontactmomenten_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        res = fetch_klantcontactmomenten(user_kvk_or_rsin=data.eherkenning_user.kvk)
+        result = eSuiteVragenService().fetch_klantcontactmomenten(
+            user_kvk_or_rsin=data.eherkenning_user.kvk
+        )
 
-        self.assertNotEqual(res, list())
-        self.assertIsInstance(res[0], KlantContactMoment)
-        self.assertEqual(str(res[0].uuid), data.klant_contactmoment2["uuid"])
+        self.assertNotEqual(result.klantcontactmomenten, list())
+        self.assertIsInstance(result.klantcontactmomenten[0], KlantContactMoment)
+        self.assertEqual(
+            str(result.klantcontactmomenten[0].uuid),
+            data.klant_contactmoment2["uuid"],
+        )
 
     def test_fetch_klantcontactmoment_for_kvk(self, m):
         data = MockAPIReadData().install_mocks(m)
 
-        kcm = fetch_klantcontactmoment(
+        kcm = eSuiteVragenService().fetch_klantcontactmoment(
             data.klant_contactmoment2["uuid"],
             user_kvk_or_rsin=data.eherkenning_user.kvk,
         )

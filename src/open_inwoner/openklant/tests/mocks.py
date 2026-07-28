@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from open_inwoner.openklant.constants import KlantenServiceType
-from open_inwoner.openklant.services import OpenKlant2Question
+from open_inwoner.openklant.services import OpenKlant2Question, QuestionsResult
 
 
 class MockOpenKlant2Service:
@@ -16,7 +16,7 @@ class MockOpenKlant2Service:
         return {"uuid": "0d150ff9-0924-46f6-8ef9-17fee9e54d23"}, False
 
     def list_questions(self, fetch_params=None, user=None):
-        return [self.retrieve_question()[0]]
+        return QuestionsResult(questions=[self.retrieve_question()[0]])
 
     def retrieve_question(
         self, fetch_params=None, question_uuid="", user=None, new_answer_available=False
