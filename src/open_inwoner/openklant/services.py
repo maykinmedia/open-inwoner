@@ -88,10 +88,7 @@ from open_inwoner.openklant.models import (
     OpenKlant2Config,
 )
 from open_inwoner.openklant.types import InboundOpenklantSyncResult
-from open_inwoner.openklant.wrap import (
-    contactmoment_has_new_answer,
-    get_kcm_answer_mapping,
-)
+from open_inwoner.openklant.wrap import contactmoment_has_new_answer
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
@@ -761,8 +758,37 @@ class eSuiteVragenService(KlantenService):
             raise
 
     @staticmethod
+    def _get_subject_mapping() -> dict[str, str]:
+        """Map every e-suite subject code to its configured OIP subject.
+
+        Built once per listing; resolving it per contactmoment costs a query per row.
+        Where several OIP subjects share an e-suite code the first by `order` wins,
+        matching the ordering on `ContactFormSubject`.
+        """
+        mapping: dict[str, str] = {}
+        duplicated_codes: set[str] = set()
+
+        for code, subject in ContactFormSubject.objects.exclude(
+            esuite_subject_code__isnull=True
+        ).values_list("esuite_subject_code", "subject"):
+            if code in mapping:
+                duplicated_codes.add(code)
+                continue
+            mapping[code] = subject
+
+        if duplicated_codes:
+            logger.warning(
+                "Multiple OIP subjects mapped to the same e-suite subject code; "
+                "using the first one",
+                esuite_subject_codes=sorted(duplicated_codes),
+            )
+
+        return mapping
+
+    @staticmethod
     def _get_kcm_subject(
         kcm: KlantContactMoment,
+        subject_mapping: dict[str, str],
     ) -> str | None:
         """
         Determine the subject (`onderwerp`) of a `KlantContactMoment.contactmoment`:
@@ -773,26 +799,14 @@ class eSuiteVragenService(KlantenService):
         """
         esuite_subject_code = getattr(kcm.contactmoment, "onderwerp", "")
 
-        try:
-            subject = ContactFormSubject.objects.get(
-                esuite_subject_code=esuite_subject_code
-            )
-        except ContactFormSubject.MultipleObjectsReturned as exc:
-            logger.warning(
-                "Multiple OIP subjects mapped to the same e-suite subject code for contactmoment; using the first one",
-                contactmoment_url=kcm.contactmoment.url,
-                exc_info=True,
-            )
-            return ContactFormSubject.objects.first().subject
-        except ContactFormSubject.DoesNotExist as exc:
-            logger.warning(
-                "Could not determine OIP subject for contactmoment; falling back on e-suite subject code ('onderwerp')",
-                contactmoment_url=kcm.contactmoment.url,
-                exc_info=True,
-            )
-            return esuite_subject_code
+        if (subject := subject_mapping.get(esuite_subject_code)) is not None:
+            return subject
 
-        return subject.subject
+        logger.warning(
+            "Could not determine OIP subject for contactmoment; falling back on e-suite subject code ('onderwerp')",
+            contactmoment_url=kcm.contactmoment.url,
+        )
+        return esuite_subject_code
 
     def contactmoment_has_new_answer(
         self,
@@ -809,15 +823,21 @@ class eSuiteVragenService(KlantenService):
         contactmomenten: list[ContactMoment],
         user: User,
     ) -> dict[str, KlantContactMomentAnswer]:
-        return get_kcm_answer_mapping(contactmomenten, user)
+        return KlantContactMomentAnswer.objects.get_or_create_mapping(
+            user, [contactmoment.url for contactmoment in contactmomenten]
+        )
 
     def _build_question_dto(
         self,
         kcm: KlantContactMoment,
         local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+        subject_mapping: dict[str, str] | None = None,
     ) -> Question:
         if isinstance(kcm.contactmoment, str):
             raise ValueError("Received unresolved contactmoment")
+
+        if subject_mapping is None:
+            subject_mapping = self._get_subject_mapping()
 
         question_data = {
             "identification": kcm.contactmoment.identificatie,
@@ -830,7 +850,7 @@ class eSuiteVragenService(KlantenService):
             ),
             "api_source_url": kcm.contactmoment.url,
             "api_source_uuid": kcm.contactmoment.uuid,
-            "subject": self._get_kcm_subject(kcm) or "",
+            "subject": self._get_kcm_subject(kcm, subject_mapping) or "",
             "question_text": kcm.contactmoment.tekst,
             "answer_text": kcm.contactmoment.antwoord,
             "registered_date": datetime.datetime.fromisoformat(
@@ -924,12 +944,18 @@ class eSuiteVragenService(KlantenService):
                 if glom.glom(item, "contactmoment.kanaal") not in exclude_range
             ]
 
+        # Both mappings cover the whole page, so they are resolved once here rather
+        # than per contactmoment.
+        local_kcm_mapping = self.get_kcm_answer_mapping(
+            [kcm.contactmoment for kcm in kcms], user
+        )
+        subject_mapping = self._get_subject_mapping()
+
         contactmomenten = [
             self._build_question_dto(
                 kcm,
-                local_kcm_mapping=self.get_kcm_answer_mapping(
-                    [kcm.contactmoment for kcm in kcms], user
-                ),
+                local_kcm_mapping=local_kcm_mapping,
+                subject_mapping=subject_mapping,
             )
             for kcm in kcms
         ]
@@ -1000,7 +1026,7 @@ class eSuiteVragenService(KlantenService):
                 if glom.glom(item, "kanaal") not in exclude_range
             ]
 
-        kcm_answer_mapping = get_kcm_answer_mapping(contactmomenten, user)
+        kcm_answer_mapping = self.get_kcm_answer_mapping(contactmomenten, user)
         questions: list[Question] = []
         for contactmoment in contactmomenten:
             new_answer_available = contactmoment_has_new_answer(
@@ -2417,55 +2443,15 @@ class OpenKlant2Service(
         questions_ok2: list[OpenKlant2Question],
         user: User,
     ) -> list[Question]:
-        answer_metadata = self._answer_metadata_for_questions(questions_ok2, user)
+        answer_metadata = KlantContactMomentAnswer.objects.get_or_create_mapping(
+            user, [question.url for question in questions_ok2]
+        )
         return [
             self._build_question_dto(
                 question, user=user, answer_metadata=answer_metadata.get(question.url)
             )
             for question in questions_ok2
         ]
-
-    @staticmethod
-    def _answer_metadata_for_questions(
-        questions_ok2: list[OpenKlant2Question],
-        user: User,
-    ) -> dict[str, KlantContactMomentAnswer]:
-        """Fetch the local seen/answer state for a batch of questions in one go.
-
-        Resolving this per question costs a query (and possibly an insert) per row,
-        and the list view renders dozens at a time.
-        """
-        urls = [question.url for question in questions_ok2]
-        answers = {
-            answer.contactmoment_url: answer
-            for answer in KlantContactMomentAnswer.objects.filter(
-                user=user, contactmoment_url__in=urls
-            )
-        }
-
-        if missing := [url for url in urls if url not in answers]:
-            with transaction.atomic():
-                KlantContactMomentAnswer.objects.bulk_create(
-                    [
-                        KlantContactMomentAnswer(user=user, contactmoment_url=url)
-                        for url in missing
-                    ],
-                    # A concurrent request may have created the same rows; the unique
-                    # constraint on (user, contactmoment_url) makes that a no-op.
-                    ignore_conflicts=True,
-                )
-            # `ignore_conflicts` leaves the created objects without a primary key, so
-            # the rows have to be read back.
-            answers.update(
-                {
-                    answer.contactmoment_url: answer
-                    for answer in KlantContactMomentAnswer.objects.filter(
-                        user=user, contactmoment_url__in=missing
-                    )
-                }
-            )
-
-        return answers
 
     def _build_question_dto(
         self,
