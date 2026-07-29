@@ -4,6 +4,7 @@ from zgw_consumers.utils import pagination_helper
 
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.utils.api import BaseAPIClient
+from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
     ContactMoment,
@@ -91,6 +92,12 @@ class KlantenClient(KlantAPIClient):
 
 
 class ContactmomentenClient(KlantAPIClient):
+    cache_timeout: int
+
+    def __init__(self, *args, cache_timeout: int | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cache_timeout = cache_timeout or 0
+
     #
     # contactmomenten
     #
@@ -120,6 +127,10 @@ class ContactmomentenClient(KlantAPIClient):
 
         return contactmoment
 
+    @cache_result(
+        "{self.base_url}:contactmoment:{url}",
+        timeout=lambda self: self.cache_timeout,
+    )
     def retrieve_contactmoment(self, url) -> ContactMoment:
         response = self.get(url)
         self.raise_for_status(response)
@@ -239,7 +250,10 @@ def _build_open_klant_client(type_) -> BaseAPIClient | None:
     if client_class := services_to_client_mapping.get(type_):
         service = getattr(config, f"{type_}_service")
         if service:
-            client = build_client(service, client_factory=client_class)
+            client_kwargs = {}
+            if type_ == "contactmomenten":
+                client_kwargs["cache_timeout"] = config.contactmoment_cache_timeout
+            client = build_client(service, client_factory=client_class, **client_kwargs)
             return client
 
     logger.warning("no service defined for type", service_type=type_)
