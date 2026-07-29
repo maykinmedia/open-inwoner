@@ -358,6 +358,9 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
             user=request.user,
         )
 
+        if not question_dto:
+            raise Http404
+
         return question_dto.get("api_source_uuid")
 
     def _get_klantcontactmoment_esuite(self, request, *args, **kwargs):
@@ -375,7 +378,8 @@ class KlantContactMomentRedirectView(KlantContactMomentAccessMixin, View):
 
         contactmoment_uuid = kwargs["uuid"]
         kcm = next(
-            kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid
+            (kcm for kcm in kcms if str(kcm.contactmoment.uuid) == contactmoment_uuid),
+            None,
         )
 
         if not kcm:
