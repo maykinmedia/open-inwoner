@@ -13,6 +13,7 @@ from django_webtest import TransactionWebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
 from zgw_consumers.api_models.base import factory
+from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.signals import update_user_on_login
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
@@ -24,11 +25,13 @@ from open_inwoner.openklant.models import (
     ESuiteKlantConfig,
     KlantContactMomentAnswer,
     KlantenSysteemConfig,
+    OpenKlant2Config,
 )
 from open_inwoner.openklant.services import eSuiteVragenService
-from open_inwoner.openklant.tests.data import MockAPIReadData
+from open_inwoner.openklant.tests.data import OPENKLANT2_ROOT, MockAPIReadData
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
+from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin, DisableRequestLogMixin
 from open_inwoner.utils.url import uuid_from_url
 
@@ -1035,6 +1038,14 @@ class ContactMomentViewsTestCase(
         to OpenKlant2 should not permanently accuse its own list of being incomplete
         because an eSuite service nobody uses anymore stopped responding.
         """
+        # ContactFormView.__init__ (a base of the list view) builds a real,
+        # unmocked OpenKlant2Service for whichever backend is primary.
+        openklant2_config = OpenKlant2Config.get_solo()
+        openklant2_config.service = ServiceFactory(
+            api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
+        )
+        openklant2_config.save()
+
         self.config.primary_backend = KlantenServiceType.OPENKLANT2.value
         self.config.save()
 

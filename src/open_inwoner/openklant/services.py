@@ -7,6 +7,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import timedelta
 from typing import (
+    Callable,
     Iterable,
     Literal,
     NotRequired,
@@ -18,6 +19,7 @@ from typing import (
 )
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 from django.urls import reverse
@@ -92,6 +94,7 @@ from open_inwoner.openklant.types import InboundOpenklantSyncResult
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
 from open_inwoner.utils.url import uuid_from_url
@@ -1360,6 +1363,41 @@ class OpenKlant2Service(
 
         return None
 
+    def _partij_uuid_cache_key(self, user: User) -> str:
+        # The bsn/kvk is hashed rather than used directly: cache keys turn up in
+        # logs and monitoring, and these identify a citizen.
+        identity = create_sha256_hash(
+            f"{user.bsn}|{user.kvk}|{user.vestiging}", salt=settings.SECRET_KEY
+        )
+        return f"{self.config.service.api_root}:partij_uuid:{identity}"
+
+    def resolve_partij_uuid(
+        self, user: User, lookup: Callable[[], Partij | None]
+    ) -> str | None:
+        """Resolve a user's partij uuid, remembering it between requests.
+
+        Every klantinteracties page starts by resolving the user's partij, and that
+        costs a request before any of the work the page is actually for. The mapping
+        from a user to their partij does not change once it exists, so it is worth
+        caching, but only the uuid is: the partij representation is written back to
+        from the profile pages, and serving a stale copy of it would risk patching
+        over a change the user just made.
+
+        A miss (or a disabled cache) falls through to `lookup`, which is what decides
+        whether a missing partij should be created.
+        """
+        key = self._partij_uuid_cache_key(user)
+        if cached := cache.get(key):
+            return cached
+
+        if not (partij := lookup()):
+            # Not cached: a partij that does not exist yet is precisely the case the
+            # next request should retry rather than take our word for.
+            return None
+
+        cache.set(key, partij["uuid"], self.config.partij_cache_timeout or 0)
+        return partij["uuid"]
+
     def get_or_create_partij_for_user(self, user: User) -> tuple[Partij | None, bool]:
         partij = None
         created = False
@@ -2435,14 +2473,16 @@ class OpenKlant2Service(
     def list_questions(
         self, fetch_params: FetchParameters, user: User
     ) -> QuestionsResult:
-        partij, _ = self.get_or_create_partij_for_user(user)
-        if not partij:
+        partij_uuid = self.resolve_partij_uuid(
+            user, lambda: self.get_or_create_partij_for_user(user)[0]
+        )
+        if not partij_uuid:
             # Will be logged by get_or_create_partij_for_user
             return QuestionsResult(questions=[])
 
         # Questions arrive in a single listing, so there is no partial-failure case
         # here the way there is for the eSuite fan-out.
-        questions = self.questions_for_partij(partij_uuid=partij["uuid"])
+        questions = self.questions_for_partij(partij_uuid=partij_uuid)
         return QuestionsResult(questions=self._build_question_dtos(questions, user))
 
     def retrieve_question(
@@ -2451,15 +2491,18 @@ class OpenKlant2Service(
         question_uuid: str,
         user: User,
     ) -> tuple[Question | None, ZaakWithApiGroup | None]:
-        if bsn := fetch_params.get("user_bsn"):
-            partij = self.find_persoon_for_bsn(str(bsn))
-        elif kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
-            partij = self.find_organisatie_for_kvk_and_vestiging(kvk=kvk_or_rsin)
+        def _lookup() -> Partij | None:
+            if bsn := fetch_params.get("user_bsn"):
+                return self.find_persoon_for_bsn(str(bsn))
+            if kvk_or_rsin := fetch_params.get("user_kvk_or_rsin"):
+                return self.find_organisatie_for_kvk_and_vestiging(kvk=kvk_or_rsin)
+            return None
 
-        if not partij:
+        partij_uuid = self.resolve_partij_uuid(user, _lookup)
+        if not partij_uuid:
             return (None, None)
 
-        all_questions = self.questions_for_partij(partij_uuid=partij["uuid"])
+        all_questions = self.questions_for_partij(partij_uuid=partij_uuid)
         question = next(
             (q for q in all_questions if q.question_kcm_uuid == question_uuid), None
         )
