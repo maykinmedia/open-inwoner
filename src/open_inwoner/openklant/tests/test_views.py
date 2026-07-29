@@ -1038,3 +1038,30 @@ class ContactMomentViewsTestCase(
             return_value=(None, None),
         ):
             self.app.get(redirect_url, user=self.user, status=404)
+
+    def test_contactmoment_list_shows_no_banner_when_complete(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        data = MockAPIReadData().install_mocks(m)
+        list_url = reverse("cases:contactmoment_list")
+
+        response = self.app.get(list_url, user=data.user)
+
+        self.assertFalse(response.context["partial_results"])
+        self.assertEqual(len(response.pyquery.find(".notification--warning")), 0)
+
+    def test_contactmoment_list_shows_partial_results_banner(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """A resolution failure must surface a retry banner, not just a bare message."""
+        data = MockAPIReadData().install_mocks(m)
+        m.get(data.contactmoment["url"], status_code=500)
+        list_url = reverse("cases:contactmoment_list")
+
+        response = self.app.get(list_url, user=data.user)
+
+        self.assertTrue(response.context["partial_results"])
+        banner = response.pyquery.find(".notification--warning")
+        self.assertEqual(len(banner), 1)
+        retry_link = banner.find("a")
+        self.assertEqual(retry_link.attr("href"), list_url)
