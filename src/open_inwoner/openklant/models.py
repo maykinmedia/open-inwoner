@@ -304,6 +304,19 @@ class OpenKlant2Config(SingletonModel):
         ),
     )
 
+    partij_cache_timeout = models.PositiveIntegerField(
+        verbose_name=_("Partij cache timeout (seconds)"),
+        null=True,
+        blank=True,
+        default=60 * 5,
+        help_text=_(
+            "How long (in seconds) the partij belonging to a user is remembered. "
+            "Every klantinteracties page starts by resolving this, so caching it "
+            "saves a request per page view. Only the identifier is cached, not the "
+            "partij data itself. Leave empty to disable caching."
+        ),
+    )
+
     register_api_required_fields = ("service",)
 
     @property
