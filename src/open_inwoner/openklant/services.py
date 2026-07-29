@@ -75,6 +75,7 @@ from open_inwoner.openklant.api_models import (
 from open_inwoner.openklant.clients import (
     ContactmomentenClient,
     KlantAPIClient,
+    KlantenClient,
     build_contactmomenten_client,
     build_klanten_client,
 )
@@ -645,6 +646,26 @@ class eSuiteVragenService(KlantenService):
     #
     # klantcontactmomenten
     #
+    @staticmethod
+    def _list_klantcontactmomenten_for_klant(
+        client: ContactmomentenClient, klant: Klant
+    ) -> tuple[list[KlantContactMoment], bool]:
+        """List one klant's klantcontactmomenten, reporting failure instead of raising.
+
+        Shared by the full resolve (`fetch_klantcontactmomenten`) and the detail-page
+        lookup (`fetch_klantcontactmoment`): both need the unresolved listing before
+        deciding what, if anything, to resolve. Caught broadly rather than just
+        `KlantAPIError`: a data-invariant `ValueError` (mismatched klant) means this
+        klant's listing failed just as much as an HTTP error would.
+        """
+        try:
+            return client.list_klantcontactmomenten_for_klant(klant), False
+        except Exception:
+            logger.exception(
+                "Failed to list klantcontactmomenten for klant", klant_url=klant.url
+            )
+            return [], True
+
     def retrieve_klantcontactmomenten_for_klant(
         self, klant: Klant
     ) -> KlantContactMomentenResult:
@@ -655,8 +676,11 @@ class eSuiteVragenService(KlantenService):
                 klantcontactmomenten=[], skipped=[], list_fetch_failed=True
             )
 
-        kcms = client.list_klantcontactmomenten_for_klant(klant)
-        return self._resolve_contactmomenten(kcms)
+        kcms, list_failed = self._list_klantcontactmomenten_for_klant(client, klant)
+        result = self._resolve_contactmomenten(kcms)
+        if list_failed:
+            result.list_fetch_failed = True
+        return result
 
     def _resolve_contactmomenten(
         self, kcms: list[KlantContactMoment]
@@ -865,6 +889,19 @@ class eSuiteVragenService(KlantenService):
         }
         return QuestionValidator.validate_python(question_data)
 
+    @staticmethod
+    def _retrieve_klanten(
+        klanten_client: KlantenClient,
+        user_bsn: str | None,
+        user_kvk_or_rsin: str | None,
+        vestigingsnummer: str | None,
+    ) -> list[Klant]:
+        if user_bsn:
+            return klanten_client.retrieve_klanten_for_bsn(user_bsn)
+        return klanten_client.retrieve_klanten_for_kvk_or_rsin(
+            user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
+        )
+
     def fetch_klantcontactmomenten(
         self,
         user_bsn: str | None = None,
@@ -880,12 +917,9 @@ class eSuiteVragenService(KlantenService):
                 klantcontactmomenten=[], skipped=[], list_fetch_failed=True
             )
 
-        if user_bsn:
-            klanten = klanten_client.retrieve_klanten_for_bsn(user_bsn)
-        else:
-            klanten = klanten_client.retrieve_klanten_for_kvk_or_rsin(
-                user_kvk_or_rsin, vestigingsnummer=vestigingsnummer
-            )
+        klanten = self._retrieve_klanten(
+            klanten_client, user_bsn, user_kvk_or_rsin, vestigingsnummer
+        )
 
         kcms: list[KlantContactMoment] = []
         skipped: list[SkippedKlantContactMoment] = []
@@ -912,20 +946,41 @@ class eSuiteVragenService(KlantenService):
         user_kvk_or_rsin: str | None = None,
         vestigingsnummer: str | None = None,
     ) -> KlantContactMoment | None:
+        """Retrieve a single klantcontactmoment, resolving only its own contactmoment.
+
+        The list variant resolves every klantcontactmoment for the user because it
+        needs to show them all; this one only needs one, so it lists (cheap: one
+        request per klant, no resolution) and resolves the single match instead of
+        reusing `fetch_klantcontactmomenten`.
+        """
         if not user_bsn and not user_kvk_or_rsin:
             return None
 
-        # use the list query because eSuite doesn't have all proper resources
-        # see git history before this change for the original single resource version
-        result = self.fetch_klantcontactmomenten(
-            user_bsn=user_bsn,
-            user_kvk_or_rsin=user_kvk_or_rsin,
-            vestigingsnummer=vestigingsnummer,
+        klanten_client = build_klanten_client()
+        contactmomenten_client = build_contactmomenten_client()
+        if klanten_client is None or contactmomenten_client is None:
+            return None
+
+        klanten = self._retrieve_klanten(
+            klanten_client, user_bsn, user_kvk_or_rsin, vestigingsnummer
         )
 
-        # try to grab the specific KCM
-        for kcm in result.klantcontactmomenten:
-            if kcm_uuid == str(kcm.uuid):
+        for klant in klanten:
+            kcms, _ = self._list_klantcontactmomenten_for_klant(
+                contactmomenten_client, klant
+            )
+            for kcm in kcms:
+                if kcm_uuid != str(kcm.uuid):
+                    continue
+                try:
+                    kcm.contactmoment = contactmomenten_client.retrieve_contactmoment(
+                        kcm.contactmoment
+                    )
+                except KlantAPIError:
+                    logger.exception(
+                        "Failed to resolve contactmoment", kcm_uuid=kcm_uuid
+                    )
+                    return None
                 return kcm
 
         return None
