@@ -89,7 +89,6 @@ from open_inwoner.openklant.models import (
     OpenKlant2Config,
 )
 from open_inwoner.openklant.types import InboundOpenklantSyncResult
-from open_inwoner.openklant.wrap import contactmoment_has_new_answer
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
@@ -111,6 +110,23 @@ def _normalize_phone(phone: str) -> str:
 
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
+
+
+def contactmoment_has_new_answer(
+    contactmoment: ContactMoment,
+    local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
+) -> bool:
+    is_new = instance_is_new(
+        contactmoment,
+        "registratiedatum",
+        timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
+    )
+    if local_kcm_mapping:
+        is_seen = getattr(local_kcm_mapping.get(contactmoment.url), "is_seen", False)
+    else:
+        # In the detail view, this is automatically true
+        is_seen = True
+    return bool(contactmoment.antwoord) and is_new and not is_seen
 
 
 class BsnFetchParam(TypedDict):
