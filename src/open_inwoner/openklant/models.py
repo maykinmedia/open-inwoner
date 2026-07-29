@@ -123,6 +123,18 @@ class ESuiteKlantConfig(SingletonModel):
             "Set slightly below the overall HTTP response timeout of the server."
         ),
     )
+    contactmoment_cache_timeout = models.PositiveIntegerField(
+        verbose_name=_("Contactmoment cache timeout (seconds)"),
+        null=True,
+        blank=True,
+        default=60 * 5,
+        help_text=_(
+            "How long (in seconds) a resolved contactmoment is cached. Since a "
+            "contactmoment can gain an answer after it was first cached, this is how "
+            "long an answer can take to appear after it was actually given. Leave "
+            "empty to disable caching."
+        ),
+    )
 
     register_api_required_fields = (
         "contactmomenten_service",
