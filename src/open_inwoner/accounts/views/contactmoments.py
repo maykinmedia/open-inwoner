@@ -21,6 +21,7 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantContactMomentAnswer, KlantenSysteemConfig
 from open_inwoner.openklant.services import (
+    FetchParameters,
     KlantenService,
     OpenKlant2Service,
     Question,
@@ -31,7 +32,6 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openklant.views.contactform import ContactFormView
-from open_inwoner.openklant.wrap import FetchParameters
 from open_inwoner.utils.mixins import PaginationMixin
 from open_inwoner.utils.views import CommonPageMixin
 
