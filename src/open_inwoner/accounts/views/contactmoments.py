@@ -148,6 +148,9 @@ class KlantContactMomentListView(
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
+        siteconfig = SiteConfiguration.get_solo()
+        klanten_config = KlantenSysteemConfig.get_solo()
+
         questions = []
         fetch_error = False
         for service_type in KlantenServiceType:
@@ -155,23 +158,32 @@ class KlantContactMomentListView(
             if not service:
                 continue
 
+            # Both backends are queried, because an instance that migrated to
+            # OpenKlant2 still has its history in the eSuite. Only the primary
+            # backend decides whether the user is told the list is incomplete: a
+            # leftover secondary backend that no longer answers would otherwise put
+            # a permanent banner in front of a list that is in fact complete.
+            reports_incompleteness = (
+                service_type.value == klanten_config.primary_backend
+            )
+
             try:
                 service_result = service.list_questions(
                     self.get_fetch_params(service),
                     user=self.request.user,
                 )
                 questions.extend(service_result.questions)
-                # One render spans both backends, so incompleteness in either means
-                # the combined list is incomplete.
-                fetch_error = fetch_error or service_result.is_incomplete
+                fetch_error = fetch_error or (
+                    reports_incompleteness and service_result.is_incomplete
+                )
             except KlantAPIError:
-                fetch_error = True
+                fetch_error = fetch_error or reports_incompleteness
                 logger.error(
                     "Error fetching questions for service",
                     service_type=service_type.value,
                 )
             except Exception:
-                fetch_error = True
+                fetch_error = fetch_error or reports_incompleteness
                 logger.exception(
                     "Unkown error fetching questions with Klant service",
                     service_type=service_type.value,
@@ -184,8 +196,6 @@ class KlantContactMomentListView(
         paginator_dict = self.paginate_with_context(questions)
         ctx.update(paginator_dict)
 
-        siteconfig = SiteConfiguration.get_solo()
-        klanten_config = KlantenSysteemConfig.get_solo()
         ctx["contactmoment_contact_form_enabled"] = (
             siteconfig.contactmoment_contact_form_enabled
             and klanten_config.contact_registration_enabled
