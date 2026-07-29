@@ -1236,7 +1236,14 @@ class OpenKlant2Service(
                 else mijn_vragen_actor
             )
 
-    def find_partij_for_params(self, params: PartijListParams):
+    def find_partij_for_params(self, params: PartijListParams) -> Partij | None:
+        """Find a single partij, using only the listing.
+
+        The listing already returns the full partij representation, so retrieving it
+        again by uuid costs a second request for a response we already have. No caller
+        reads the partij's `_expand`, which is the only thing the retrieval could add,
+        and this lookup sits in front of every klantinteracties page.
+        """
         resp = self.client.partij.list(params=params)
 
         if (count := resp["count"]) > 0:
@@ -1244,16 +1251,7 @@ class OpenKlant2Service(
                 # TODO: Is this a use-case? The API seems to allow this
                 logger.error("Multiple personen found in Openklant2 for a single BSN")
 
-            return self.client.partij.retrieve(
-                resp["results"][0]["uuid"],
-                params={
-                    "expand": [
-                        "digitaleAdressen",
-                        "betrokkenen",
-                        "betrokkenen.hadKlantcontact",
-                    ]
-                },
-            )
+            return resp["results"][0]
 
         return None
 
