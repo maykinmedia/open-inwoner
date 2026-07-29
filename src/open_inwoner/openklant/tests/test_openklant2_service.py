@@ -475,16 +475,19 @@ class GetOrCreatePartijForUserTestCase(TestCase):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
 
+        # The listing returns the full partij representation, which is why the
+        # lookup does not retrieve it again.
         mock_client.partij.list.return_value = {
             "count": 1,
-            "results": [{"uuid": "existing-uuid"}],
-        }
-        mock_client.partij.retrieve.return_value = {
-            "uuid": "existing-uuid",
-            "soortPartij": "persoon",
-            "partijIdentificatie": {
-                "contactnaam": {"voornaam": "John", "achternaam": "Doe"}
-            },
+            "results": [
+                {
+                    "uuid": "existing-uuid",
+                    "soortPartij": "persoon",
+                    "partijIdentificatie": {
+                        "contactnaam": {"voornaam": "John", "achternaam": "Doe"}
+                    },
+                }
+            ],
         }
 
         service = OpenKlant2Service(config=self.config)
@@ -494,6 +497,10 @@ class GetOrCreatePartijForUserTestCase(TestCase):
 
         self.assertFalse(created, "Should retrieve existing partij, not create new")
         self.assertEqual(partij["uuid"], "existing-uuid")
+        self.assertEqual(
+            partij["partijIdentificatie"]["contactnaam"]["voornaam"], "John"
+        )
+        mock_client.partij.retrieve.assert_not_called()
 
         # Verify searched by BSN
         mock_client.partij.list.assert_called_once()
@@ -569,6 +576,55 @@ class GetOrCreatePartijForUserTestCase(TestCase):
             call_data,
             "Should not include identificatoren when user has no BSN",
         )
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class FindPartijForParamsTestCase(TestCase):
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+
+    def test_partij_is_taken_from_the_listing_without_a_second_request(
+        self, mock_client_class
+    ):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.partij.list.return_value = {
+            "count": 1,
+            "results": [{"uuid": "partij-uuid", "soortPartij": "persoon"}],
+        }
+
+        service = OpenKlant2Service(config=self.config)
+
+        partij = service.find_persoon_for_bsn("123456789")
+
+        self.assertEqual(partij, {"uuid": "partij-uuid", "soortPartij": "persoon"})
+        self.assertEqual(mock_client.partij.list.call_count, 1)
+        mock_client.partij.retrieve.assert_not_called()
+
+    def test_returns_none_when_no_partij_matches(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.partij.list.return_value = {"count": 0, "results": []}
+
+        service = OpenKlant2Service(config=self.config)
+
+        self.assertIsNone(service.find_persoon_for_bsn("123456789"))
+        mock_client.partij.retrieve.assert_not_called()
+
+    def test_first_partij_is_used_when_several_match(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.partij.list.return_value = {
+            "count": 2,
+            "results": [{"uuid": "first-uuid"}, {"uuid": "second-uuid"}],
+        }
+
+        service = OpenKlant2Service(config=self.config)
+
+        with self.assertLogs("open_inwoner.openklant.services", level="ERROR"):
+            partij = service.find_persoon_for_bsn("123456789")
+
+        self.assertEqual(partij["uuid"], "first-uuid")
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
