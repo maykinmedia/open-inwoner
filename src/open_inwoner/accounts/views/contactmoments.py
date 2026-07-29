@@ -1,6 +1,5 @@
 from typing import Protocol
 
-from django.contrib import messages
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponseRedirect
@@ -178,11 +177,7 @@ class KlantContactMomentListView(
                     service_type=service_type.value,
                 )
 
-        if fetch_error:
-            messages.error(
-                self.request,
-                _("Something went wrong. You might not see all of your questions."),
-            )
+        ctx["partial_results"] = fetch_error
 
         questions.sort(key=lambda q: q["registered_date"], reverse=True)
 
