@@ -19,7 +19,7 @@ from open_inwoner.openklant.services import (
     KlantContactMomentSkipReason,
     eSuiteVragenService,
 )
-from open_inwoner.openklant.tests.data import MockAPIReadData
+from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, MockAPIReadData
 from open_inwoner.utils.url import uuid_from_url
 
 
@@ -263,6 +263,70 @@ class eSuiteVragenServiceTestCase(TestCase):
         for kcm in kcms:
             self.assertIsInstance(kcm.contactmoment, str)
         self.assertEqual(len(m.request_history), 1)
+
+    def test_fetch_klantcontactmoment_resolves_only_the_matching_contactmoment(self, m):
+        """The detail page must not pay for resolving every klantcontactmoment.
+
+        `data.user` has two klantcontactmomenten (`klant_contactmoment` and the
+        interne one); only the requested one's contactmoment should be retrieved.
+        """
+        data = MockAPIReadData().install_mocks(m)
+
+        kcm = self.service.fetch_klantcontactmoment(
+            data.klant_contactmoment["uuid"], user_bsn=data.user.bsn
+        )
+
+        self.assertIsNotNone(kcm)
+        self.assertEqual(kcm.contactmoment.url, data.contactmoment["url"])
+        resolved_contactmoment_requests = [
+            req
+            for req in m.request_history
+            if req.url == data.contactmoment["url"]
+            or req.url == data.contactmoment_intern["url"]
+        ]
+        self.assertEqual(len(resolved_contactmoment_requests), 1)
+        self.assertEqual(
+            resolved_contactmoment_requests[0].url, data.contactmoment["url"]
+        )
+
+    def test_fetch_klantcontactmoment_returns_none_when_not_found(self, m):
+        data = MockAPIReadData().install_mocks(m)
+
+        kcm = self.service.fetch_klantcontactmoment(
+            "00000000-0000-0000-0000-000000000000", user_bsn=data.user.bsn
+        )
+
+        self.assertIsNone(kcm)
+
+    def test_fetch_klantcontactmoment_returns_none_when_resolution_fails(self, m):
+        data = MockAPIReadData().install_mocks(m)
+        m.get(data.contactmoment["url"], status_code=500)
+
+        kcm = self.service.fetch_klantcontactmoment(
+            data.klant_contactmoment["uuid"], user_bsn=data.user.bsn
+        )
+
+        self.assertIsNone(kcm)
+
+    def test_retrieve_klantcontactmomenten_for_klant_reports_list_failure(self, m):
+        """A failing list call must be reported, not raised.
+
+        Otherwise one klant's failure (e.g. one vestiging of a multi-vestiging KVK)
+        would abort every klant already processed in the same request.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten?klant={data.klant_bsn['url']}",
+            status_code=500,
+        )
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+
+        result = self.service.retrieve_klantcontactmomenten_for_klant(klant)
+
+        self.assertEqual(result.klantcontactmomenten, [])
+        self.assertEqual(result.skipped, [])
+        self.assertTrue(result.list_fetch_failed)
+        self.assertTrue(result.is_incomplete)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)
