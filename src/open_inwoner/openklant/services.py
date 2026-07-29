@@ -2106,8 +2106,10 @@ class OpenKlant2Service(
 
         all_questions = self.questions_for_partij(partij_uuid=partij["uuid"])
         question = next(
-            q for q in all_questions if q.question_kcm_uuid == question_uuid
+            (q for q in all_questions if q.question_kcm_uuid == question_uuid), None
         )
+        if not question:
+            return (None, None)
 
         # fetch onderwerp_object linked to klantcontact
         onderwerp_objecten = [
