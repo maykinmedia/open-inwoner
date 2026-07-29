@@ -21,6 +21,7 @@ from open_inwoner.openklant.tests.factories import (
     DigitaalAdresOpenKlantMappingFactory,
     OpenKlant2ConfigFactory,
 )
+from open_inwoner.utils.test import ClearCachesMixin
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
@@ -625,6 +626,81 @@ class FindPartijForParamsTestCase(TestCase):
             partij = service.find_persoon_for_bsn("123456789")
 
         self.assertEqual(partij["uuid"], "first-uuid")
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
+class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.config = OpenKlant2ConfigFactory()
+
+    def _mock_client(self, mock_client_class, uuid="partij-uuid"):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.partij.list.return_value = {
+            "count": 1,
+            "results": [{"uuid": uuid}],
+        }
+        return mock_client
+
+    def _resolve(self, user):
+        service = OpenKlant2Service(config=self.config)
+        return service.resolve_partij_uuid(
+            user, lambda: service.get_partij_for_user(user)
+        )
+
+    def test_second_lookup_is_served_from_cache(self, mock_client_class):
+        mock_client = self._mock_client(mock_client_class)
+        user = DigidUserFactory(bsn="123456789")
+
+        self.assertEqual(self._resolve(user), "partij-uuid")
+        self.assertEqual(self._resolve(user), "partij-uuid")
+
+        self.assertEqual(mock_client.partij.list.call_count, 1)
+
+    def test_lookup_is_repeated_when_caching_is_disabled(self, mock_client_class):
+        mock_client = self._mock_client(mock_client_class)
+        self.config.partij_cache_timeout = None
+        self.config.save()
+        user = DigidUserFactory(bsn="123456789")
+
+        self.assertEqual(self._resolve(user), "partij-uuid")
+        self.assertEqual(self._resolve(user), "partij-uuid")
+
+        self.assertEqual(mock_client.partij.list.call_count, 2)
+
+    def test_missing_partij_is_not_cached(self, mock_client_class):
+        mock_client = self._mock_client(mock_client_class)
+        mock_client.partij.list.return_value = {"count": 0, "results": []}
+        user = DigidUserFactory(bsn="123456789")
+
+        self.assertIsNone(self._resolve(user))
+
+        mock_client.partij.list.return_value = {
+            "count": 1,
+            "results": [{"uuid": "created-later"}],
+        }
+        self.assertEqual(self._resolve(user), "created-later")
+
+    def test_users_do_not_share_a_cache_entry(self, mock_client_class):
+        mock_client = self._mock_client(mock_client_class, uuid="first-partij")
+        first = DigidUserFactory(bsn="123456789")
+        second = DigidUserFactory(bsn="987654321")
+
+        self.assertEqual(self._resolve(first), "first-partij")
+
+        mock_client.partij.list.return_value = {
+            "count": 1,
+            "results": [{"uuid": "second-partij"}],
+        }
+        self.assertEqual(self._resolve(second), "second-partij")
+
+    def test_bsn_does_not_appear_in_the_cache_key(self, mock_client_class):
+        self._mock_client(mock_client_class)
+        user = DigidUserFactory(bsn="123456789")
+        service = OpenKlant2Service(config=self.config)
+
+        self.assertNotIn("123456789", service._partij_uuid_cache_key(user))
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")

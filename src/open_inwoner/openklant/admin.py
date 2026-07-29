@@ -153,6 +153,14 @@ class OpenKlant2ConfigAdmin(SingletonModelAdmin):
                 ]
             },
         ),
+        (
+            _("Performance"),
+            {
+                "fields": [
+                    "partij_cache_timeout",
+                ],
+            },
+        ),
     ]
 
 
