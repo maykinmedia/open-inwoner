@@ -1112,6 +1112,48 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
 
+    def test_retrieve_question_returns_none_when_uuid_not_found(
+        self, mock_client_class
+    ):
+        """A question_uuid absent from the partij's questions must 404, not crash.
+
+        `next()` without a default previously raised `StopIteration` here, which the
+        view's exception handling does not catch.
+        """
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+
+        question_kc = {
+            "uuid": "q-uuid-1",
+            "inhoud": "What was the question?",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-02T14:00:00Z",
+            "url": "http://example.com/question/1",
+            "gingOverOnderwerpobjecten": [],
+        }
+
+        with (
+            patch.object(
+                service, "find_persoon_for_bsn", return_value={"uuid": "partij-uuid"}
+            ),
+            patch.object(
+                service, "klantcontacten_for_partij", return_value=[question_kc]
+            ),
+        ):
+            result = service.retrieve_question(
+                fetch_params={"user_bsn": "123456789"},
+                question_uuid="nonexistent-uuid",
+                user=user,
+            )
+
+        self.assertEqual(result, (None, None))
+
 
 class NormalizeHelpersTestCase(TestCase):
     def test_normalize(self):
