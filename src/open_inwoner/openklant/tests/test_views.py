@@ -998,3 +998,70 @@ class ContactMomentViewsTestCase(
                     self.assertContains(response, "question-form")
                 else:
                     self.assertNotContains(response, "question-form")
+
+    def test_kcm_redirect_404s_for_unknown_esuite_contactmoment(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """An unmatched contactmoment uuid must 404, not crash the redirect."""
+        data = MockAPIReadData().install_mocks(m)
+        redirect_url = reverse(
+            "cases:kcm_redirect",
+            kwargs={
+                "api_service": KlantenServiceType.ESUITE.value,
+                "uuid": "00000000-0000-0000-0000-000000000000",
+            },
+        )
+
+        self.app.get(redirect_url, user=data.user, status=404)
+
+    def test_kcm_redirect_404s_for_unknown_openklant2_question(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """Same guarantee on the OpenKlant2 side, where retrieve_question can
+        legitimately return (None, None) for an unmatched question_uuid.
+
+        Patched on just this test: `MockOpenKlant2Service` is instantiated once at
+        class-decoration time and shared across every test in this class, so
+        overwriting the attribute directly would leak into unrelated tests.
+        """
+        redirect_url = reverse(
+            "cases:kcm_redirect",
+            kwargs={
+                "api_service": KlantenServiceType.OPENKLANT2.value,
+                "uuid": "00000000-0000-0000-0000-000000000000",
+            },
+        )
+
+        with patch.object(
+            mock_openklant2_service.return_value,
+            "retrieve_question",
+            return_value=(None, None),
+        ):
+            self.app.get(redirect_url, user=self.user, status=404)
+
+    def test_contactmoment_list_shows_no_banner_when_complete(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        data = MockAPIReadData().install_mocks(m)
+        list_url = reverse("cases:contactmoment_list")
+
+        response = self.app.get(list_url, user=data.user)
+
+        self.assertFalse(response.context["partial_results"])
+        self.assertEqual(len(response.pyquery.find(".notification--warning")), 0)
+
+    def test_contactmoment_list_shows_partial_results_banner(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """A resolution failure must surface a retry banner, not just a bare message."""
+        data = MockAPIReadData().install_mocks(m)
+        m.get(data.contactmoment["url"], status_code=500)
+        list_url = reverse("cases:contactmoment_list")
+
+        response = self.app.get(list_url, user=data.user)
+
+        self.assertTrue(response.context["partial_results"])
+        banner = response.pyquery.find(".notification--warning")
+        self.assertEqual(len(banner), 1)
+        retry_link = banner.find("a")
+        self.assertEqual(retry_link.attr("href"), list_url)
