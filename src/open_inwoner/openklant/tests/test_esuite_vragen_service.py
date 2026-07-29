@@ -20,12 +20,13 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, MockAPIReadData
+from open_inwoner.utils.test import ClearCachesMixin
 from open_inwoner.utils.url import uuid_from_url
 
 
 @requests_mock.Mocker()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
-class eSuiteVragenServiceTestCase(TestCase):
+class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
     maxDiff = None
 
     def setUp(self):
@@ -327,6 +328,39 @@ class eSuiteVragenServiceTestCase(TestCase):
         self.assertEqual(result.skipped, [])
         self.assertTrue(result.list_fetch_failed)
         self.assertTrue(result.is_incomplete)
+
+    def test_retrieve_contactmoment_is_cached(self, m):
+        """A resolved contactmoment must not be fetched again within the TTL.
+
+        The same url is requested repeatedly across "Mijn vragen" page loads and
+        the detail page, so caching it is where the real savings are.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        client = build_contactmomenten_client()
+
+        first = client.retrieve_contactmoment(data.contactmoment["url"])
+        second = client.retrieve_contactmoment(data.contactmoment["url"])
+
+        self.assertEqual(first, second)
+        contactmoment_requests = [
+            req for req in m.request_history if req.url == data.contactmoment["url"]
+        ]
+        self.assertEqual(len(contactmoment_requests), 1)
+
+    def test_retrieve_contactmoment_caching_disabled_when_timeout_is_none(self, m):
+        config = ESuiteKlantConfig.get_solo()
+        config.contactmoment_cache_timeout = None
+        config.save()
+        data = MockAPIReadData().install_mocks(m)
+        client = build_contactmomenten_client()
+
+        client.retrieve_contactmoment(data.contactmoment["url"])
+        client.retrieve_contactmoment(data.contactmoment["url"])
+
+        contactmoment_requests = [
+            req for req in m.request_history if req.url == data.contactmoment["url"]
+        ]
+        self.assertEqual(len(contactmoment_requests), 2)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)
