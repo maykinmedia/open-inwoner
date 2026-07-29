@@ -1,5 +1,5 @@
 {% extends 'master.html' %}
-{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags pagination_tags utils static %}
+{% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags notification_tags pagination_tags utils static %}
 
 {% block sidebar_content %}
     {% include "components/Sidenav/Sidenav.html" %}
@@ -7,6 +7,10 @@
 
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ paginator.count }})</h1>
+
+    {% if partial_results %}
+        {% notification type="warning" title=_("Niet alle vragen konden worden opgehaald") message=_("Een deel van uw vragen kon niet worden opgehaald. Probeer het opnieuw of kom later terug.") action=request.get_full_path action_text=_("Opnieuw proberen") closable=True %}
+    {% endif %}
 
     {% if contactmoment_contact_form_enabled %}
     {# title + scroll down button #}
