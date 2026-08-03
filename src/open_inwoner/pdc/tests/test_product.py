@@ -460,4 +460,4 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         cta_button.click()
         new_page = context.wait_for_event("page")
 
-        self.assertEqual(new_page.url, "https://www.example.com/")
+        expect(new_page).to_have_url("https://www.example.com/")
