@@ -35,7 +35,6 @@
 
   // Link content
   .external-link {
-    position: relative;
     display: var(--oip-external-link-display);
     flex-direction: var(--oip-external-link-flex-direction);
     align-items: center;
@@ -101,8 +100,9 @@
       margin-inline-start: var(--oip-external-link-content-margin-inline-start);
       margin-inline-end: var(--oip-external-link-content-margin-inline-end);
 
-      // Width minus floating arrow icon-width
-      width: calc(100% - var(--spacing-mega));
+      // Fill the row next to the arrow icon instead of reserving fixed space for it
+      flex: 1 1 auto;
+      min-width: 0;
 
       p {
         color: var(--oip-external-link-content-color);
@@ -117,10 +117,10 @@
     }
 
     &__arrow {
-      position: absolute;
-      bottom: 28px;
-      right: 24px;
+      display: flex;
+      flex-shrink: 0;
       color: var(--oip-external-link-arrow-icon-color);
+      // Push icon to the relative end of the flex row (per design-token spec)
       margin-inline-start: var(
         --oip-external-link-arrow-icon-margin-inline-start
       );
