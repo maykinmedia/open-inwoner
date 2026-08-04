@@ -1336,10 +1336,12 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         ):
             questions = service.questions_for_partij("partij-uuid")
 
-        self.assertEqual(len(questions), 2)
+        self.assertEqual(len(questions), 3)
 
-        # q1 (inhoud=None) is skipped entirely
-        self.assertFalse(any(q.question_kcm_uuid == "q-uuid-1" for q in questions))
+        # q1 (inhoud=None) is kept as an empty question: dropping it would take any
+        # reactions to it along with it
+        q1 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-1")
+        self.assertEqual(q1.question, "")
 
         # q2 is present but its answer (inhoud=None) is skipped
         q2 = next(q for q in questions if q.question_kcm_uuid == "q-uuid-2")
@@ -1351,6 +1353,159 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(q3.question, "Question 3?")
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
+
+    def _make_klantcontact(
+        self,
+        uuid,
+        inhoud,
+        plaatsgevonden_op,
+        parent_uuid=None,
+        onderwerp_objecten=None,
+    ):
+        """Build an expanded klantcontact, optionally replying to `parent_uuid`."""
+        if onderwerp_objecten is None:
+            onderwerp_objecten = [
+                {
+                    "uuid": f"oo-{uuid}",
+                    "klantcontact": {"uuid": uuid},
+                    "wasKlantcontact": (
+                        {"uuid": parent_uuid} if parent_uuid is not None else None
+                    ),
+                }
+            ]
+        return {
+            "uuid": uuid,
+            "inhoud": inhoud,
+            "onderwerp": "Philosophy",
+            "kanaal": "telefoon",
+            "taal": "nld",
+            "nummer": uuid,
+            "plaatsgevondenOp": plaatsgevonden_op,
+            "url": f"http://example.com/{uuid}",
+            "gingOverOnderwerpobjecten": [
+                {"uuid": oo["uuid"]} for oo in onderwerp_objecten
+            ],
+            "_expand": {"gingOverOnderwerpobjecten": onderwerp_objecten},
+        }
+
+    def test_questions_for_partij_resolves_chained_reactions(self, mock_client_class):
+        """An external service can link each reaction to the previous one."""
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        reaction_1 = self._make_klantcontact(
+            "r1", "First reaction", "2024-10-02T10:00:00Z", parent_uuid="q1"
+        )
+        reaction_2 = self._make_klantcontact(
+            "r2", "Second reaction", "2024-10-03T10:00:00Z", parent_uuid="r1"
+        )
+        reaction_3 = self._make_klantcontact(
+            "r3", "Third reaction", "2024-10-04T10:00:00Z", parent_uuid="r2"
+        )
+
+        with patch.object(
+            service,
+            "klantcontacten_for_partij",
+            return_value=[question, reaction_1, reaction_2, reaction_3],
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q1")
+        self.assertEqual(
+            {answer.answer_kcm_uuid for answer in questions[0].answers},
+            {"r1", "r2", "r3"},
+        )
+        # The newest reaction supersedes the earlier ones without losing them
+        self.assertEqual(questions[0].answer.answer, "Third reaction")
+        mock_client.onderwerp_object.retrieve.assert_not_called()
+
+    def test_reaction_with_zaak_onderwerpobject_is_not_a_question(
+        self, mock_client_class
+    ):
+        """A reaction can reference a zaak alongside the klantcontact it replies to."""
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        reaction = self._make_klantcontact(
+            "r1",
+            "Reaction",
+            "2024-10-02T10:00:00Z",
+            onderwerp_objecten=[
+                # The zaak link comes first, so stopping at the first onderwerpobject
+                # without a `wasKlantcontact` would read this reaction as a question.
+                {
+                    "uuid": "oo-zaak",
+                    "klantcontact": {"uuid": "r1"},
+                    "wasKlantcontact": None,
+                },
+                {
+                    "uuid": "oo-r1",
+                    "klantcontact": {"uuid": "r1"},
+                    "wasKlantcontact": {"uuid": "q1"},
+                },
+            ],
+        )
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question, reaction]
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q1")
+        self.assertEqual(questions[0].answer.answer, "Reaction")
+
+    def test_reaction_with_missing_parent_is_not_shown_as_question(
+        self, mock_client_class
+    ):
+        """An unreachable parent must not turn the employee's reply into a question."""
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        orphan = self._make_klantcontact(
+            "r1", "Reaction", "2024-10-02T10:00:00Z", parent_uuid="not-in-the-listing"
+        )
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question, orphan]
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(questions[0].question_kcm_uuid, "q1")
+        self.assertEqual(questions[0].answers, [])
+
+    def test_questions_for_partij_terminates_on_cyclical_chain(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        service = OpenKlant2Service(config=self.config)
+
+        # a -> b -> a: every klantcontact replies to another, so there is no root
+        # and nothing to show, but resolving must still terminate.
+        node_a = self._make_klantcontact(
+            "a", "A", "2024-10-01T10:00:00Z", parent_uuid="b"
+        )
+        node_b = self._make_klantcontact(
+            "b", "B", "2024-10-02T10:00:00Z", parent_uuid="a"
+        )
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[node_a, node_b]
+        ):
+            questions = service.questions_for_partij("partij-uuid")
+
+        self.assertEqual(questions, [])
 
     def test_retrieve_question_returns_none_when_uuid_not_found(
         self, mock_client_class
