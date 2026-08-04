@@ -139,10 +139,25 @@ def warm_cache_for_user(
     service = ZGWService()
 
     # get_raw_zaken handles multi-group concurrency and timeouts; populates fetch_zaken_by_bsn cache
-    raw_zaken = service.get_raw_zaken(identification).zaken
+    raw_result = service.get_raw_zaken(identification)
+    raw_zaken = raw_result.zaken
+
     if not raw_zaken:
-        logger.info("Finished ZGW cache warm-up: no zaken found")
+        if raw_result.is_incomplete:
+            logger.warning(
+                "Finished ZGW cache warm-up: raw zaken fetch was incomplete, "
+                "unable to determine whether zaken exist"
+            )
+        else:
+            logger.info("Finished ZGW cache warm-up: no zaken found")
         return
+
+    if raw_result.is_incomplete:
+        logger.warning(
+            "Raw zaken fetch was incomplete during ZGW cache warm-up; "
+            "some zaken may not have been found",
+            zaken_found=len(raw_zaken),
+        )
 
     # Each thread gets its own zaken client because requests.Session is not
     # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.

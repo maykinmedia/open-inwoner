@@ -11,8 +11,9 @@ from zgw_consumers.api_models.constants import VertrouwelijkheidsAanduidingen
 from open_inwoner.accounts.tests.factories import DigidUserFactory
 from open_inwoner.accounts.user_identification import BSNIdentification
 from open_inwoner.openzaak.api_models import Zaak
+from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.openzaak.services import ZaakWithApiGroup, ZakenResult, ZGWService
 from open_inwoner.openzaak.tasks import _warm_single_zaak, warm_cache_for_user
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
@@ -229,4 +230,88 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
             len(m.request_history),
             calls_after_login,
             "client methods made HTTP requests that should have been cached after login",
+        )
+
+
+class WarmCacheForUserIncompleteFetchLoggingTests(ClearCachesMixin, TestCase):
+    """
+    A raw fetch that timed out or errored for some/all groups must be visible
+    in the logs: silently proceeding as if nothing was wrong would hide the
+    exact kind of failure #2735 was about.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            ztc_service__api_root=CATALOGI_ROOT,
+        )
+
+    def test_warns_when_incomplete_raw_fetch_finds_no_zaken(self):
+        with (
+            patch.object(
+                ZGWService,
+                "get_raw_zaken",
+                return_value=ZakenResult(
+                    zaken=[], skipped=[], raw_fetch_incomplete=True
+                ),
+            ),
+            self.assertLogs("open_inwoner.openzaak.tasks", level="WARNING") as cm,
+        ):
+            warm_cache_for_user.run(user_bsn=BSN)
+
+        self.assertTrue(
+            any("unable to determine whether zaken exist" in msg for msg in cm.output)
+        )
+
+    def test_logs_info_when_complete_raw_fetch_finds_no_zaken(self):
+        with (
+            patch.object(
+                ZGWService,
+                "get_raw_zaken",
+                return_value=ZakenResult(zaken=[], skipped=[]),
+            ),
+            self.assertLogs("open_inwoner.openzaak.tasks", level="INFO") as cm,
+        ):
+            warm_cache_for_user.run(user_bsn=BSN)
+
+        self.assertTrue(any("no zaken found" in msg for msg in cm.output))
+        self.assertFalse(any(msg.startswith("WARNING") for msg in cm.output))
+
+    @requests_mock_module.Mocker()
+    def test_warns_but_still_warms_cache_when_raw_fetch_is_partially_incomplete(
+        self, m
+    ):
+        """
+        Zaken that WERE fetched must not be discarded just because some
+        other group in the same fetch timed out or errored.
+        """
+        zaak_dict = _make_zaak_dict(ZAAK_URL, ZAAK_UUID, STATUS_URL)
+        status_dict = _make_status_dict(STATUS_URL, ZAAK_URL)
+        _register_zaak_resources(m, zaak_dict, status_dict)
+
+        zaak = zgw_factory(Zaak, zaak_dict)
+        zaak_with_group = ZaakWithApiGroup(
+            zaak=zaak, api_group=self.api_group, type_aanvraag=TypeAanvraag.ZAAK
+        )
+
+        with (
+            patch.object(
+                ZGWService,
+                "get_raw_zaken",
+                return_value=ZakenResult(
+                    zaken=[zaak_with_group], skipped=[], raw_fetch_incomplete=True
+                ),
+            ),
+            self.assertLogs("open_inwoner.openzaak.tasks", level="WARNING") as cm,
+        ):
+            warm_cache_for_user.run(user_bsn=BSN)
+
+        self.assertTrue(
+            any("some zaken may not have been found" in msg for msg in cm.output)
+        )
+        self.assertGreater(
+            len(m.request_history),
+            0,
+            "the zaak that was fetched should still have been warmed",
         )
