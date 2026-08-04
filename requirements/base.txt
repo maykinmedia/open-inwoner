@@ -82,7 +82,7 @@ confusable-homoglyphs==3.2.0
     # via django-registration
 cron-descriptor==1.4.3
     # via django-celery-beat
-cryptography==48.0.1
+cryptography==50.0.0
     # via
     #   django-digid-eherkenning
     #   django-simple-certmanager
@@ -568,7 +568,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==12.2.0
+pillow==12.3.0
     # via
     #   -r requirements/base.in
     #   easy-thumbnails
@@ -613,7 +613,7 @@ pyjwt==2.13.0
     #   messagebird
     #   mozilla-django-oidc
     #   zgw-consumers
-pyopenssl==26.2.0
+pyopenssl==26.4.0
     # via
     #   -r requirements/base.in
     #   webauthn

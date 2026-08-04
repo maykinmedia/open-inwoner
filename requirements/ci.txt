@@ -151,7 +151,7 @@ cron-descriptor==1.4.3
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-celery-beat
-cryptography==48.0.1
+cryptography==50.0.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -989,7 +989,7 @@ phonenumberslite==8.13.29
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   django-two-factor-auth
-pillow==12.2.0
+pillow==12.3.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1073,7 +1073,7 @@ pyjwt==2.13.0
     #   messagebird
     #   mozilla-django-oidc
     #   zgw-consumers
-pyopenssl==26.2.0
+pyopenssl==26.4.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
