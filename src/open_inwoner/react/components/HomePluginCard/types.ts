@@ -39,6 +39,4 @@ export type SamenwerkingCardOptions = DefaultCard & {
  * Union of all valid card type combinations
  */
 export type HomepageCardTypes =
-  | ZaakCardOptions
-  | AppointmentCardOptions
-  | SamenwerkingCardOptions;
+  ZaakCardOptions | AppointmentCardOptions | SamenwerkingCardOptions;
