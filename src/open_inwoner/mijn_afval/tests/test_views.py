@@ -77,9 +77,10 @@ class ExtractFilterOptionsTest(TestCase):
         self.assertIn("Kerkweg 45 B, 5678 CD, Utrecht", options["addresses"])
 
         # Verify afval types
-        self.assertEqual(len(options["afval_types"]), 2)
+        self.assertEqual(len(options["afval_types"]), 3)
         self.assertEqual(options["afval_types"][0]["value"], "gft")
         self.assertEqual(options["afval_types"][1]["value"], "restafval")
+        self.assertEqual(options["afval_types"][2]["value"], "med")
 
         # Verify year range calculated from ledigingen
         self.assertListEqual(options["periode"], [2025, 2023])

@@ -165,7 +165,7 @@ class _AfvalContainerData(TypedDict):
     """Formatted container data for template/JavaScript consumption."""
 
     identifier: str
-    type: str  # "gft" or "restafval"
+    type: str  # "gft", "restafval", or "med"
     totaal_gewicht: str
     ledigingen: list[_LedigingData]
     table_data: _TableData  # Table component data dict
@@ -191,12 +191,15 @@ def _format_number(value: int | float, decimal_places: int | None = None) -> str
 def _get_container_type_label(container_type: str) -> str:
     """Get the localized label for a container type."""
 
-    if container_type == "gft":
-        return _("Groente, Fruit en Tuin afval (GFT)")
-    elif container_type == "restafval":
-        return _("Restafval")
-    else:
-        return container_type
+    match container_type:
+        case "gft":
+            return _("Groente, Fruit en Tuin afval (GFT)")
+        case "restafval":
+            return _("Restafval")
+        case "med":
+            return _("Medisch afval")
+        case _:
+            return container_type
 
 
 def _format_address(address: str) -> str:
@@ -331,6 +334,7 @@ def _extract_filter_options(profiel: AfvalProfiel) -> dict:
     afval_types = [
         {"value": "gft", "label": _("Groente, Fruit en Tuin afval (GFT)")},
         {"value": "restafval", "label": _("Restafval")},
+        {"value": "med", "label": _("Medisch afval")},
     ]
 
     # Calculate year range from ledigingen
