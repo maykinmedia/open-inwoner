@@ -129,7 +129,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_banner_and_retry_on_raw_fetch_timeout(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get()
@@ -177,7 +177,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_banner_and_retry_on_search_timeout(self):
         self._patch_service(
-            search_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            search_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(search="ZAAK-2022-0000000024")
@@ -190,7 +190,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_retry_counter_increments(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(retry=1)
@@ -201,7 +201,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_exhausted_retries_show_manual_retry_link(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(retry=InnerCaseListView.MAX_AUTO_RETRIES)
@@ -215,7 +215,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_manual_retry_link_preserves_filters_and_drops_retry_param(self):
         self._patch_service(
-            search_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            search_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(
@@ -240,7 +240,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
             visible_result=ZakenResult(
                 zaken=[object() for _ in range(12)],
                 skipped=[],
-                raw_fetch_timed_out=True,
+                raw_fetch_incomplete=True,
             )
         )
 
@@ -262,7 +262,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_garbage_retry_param_is_treated_as_first_attempt(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(retry="not-a-number")
@@ -271,7 +271,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_out_of_range_retry_param_is_clamped_to_maximum(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(retry=99)
@@ -282,7 +282,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
 
     def test_negative_retry_param_is_treated_as_first_attempt(self):
         self._patch_service(
-            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_timed_out=True)
+            visible_result=ZakenResult(zaken=[], skipped=[], raw_fetch_incomplete=True)
         )
 
         doc = self._get(retry=-5)

@@ -363,7 +363,7 @@ class CMSZakenPluginTest(TestCase):
             "type_aanvraag": TypeAanvraag.ZAAK.value,
         }
         mock_visible_zaken.return_value = ZakenResult(
-            zaken=[mock_zaak], skipped=[], raw_fetch_timed_out=True
+            zaken=[mock_zaak], skipped=[], raw_fetch_incomplete=True
         )
 
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
