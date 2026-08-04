@@ -1915,7 +1915,8 @@ class KlantcontactenForPartijTestCase(TestCase):
 
         self.assertEqual(result, [])
 
-    def test_non_initiator_is_excluded(self, mock_client_class):
+    def test_non_initiator_is_included(self, mock_client_class):
+        """A reaction registered by an employee has the partij as a non-initiator."""
         mock_client = Mock()
         mock_client_class.return_value = mock_client
         kc = self._make_kc("kc-1", partij_uuid=self.PARTIJ_UUID, initiator=False)
@@ -1924,7 +1925,20 @@ class KlantcontactenForPartijTestCase(TestCase):
         service = OpenKlant2Service(config=self.config)
         result = list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
 
-        self.assertEqual(result, [])
+        self.assertEqual(result, [kc])
+
+    def test_listing_is_not_filtered_on_kanaal(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.klant_contact.list_iter.return_value = iter([])
+
+        service = OpenKlant2Service(config=self.config)
+        list(service.klantcontacten_for_partij(self.PARTIJ_UUID))
+
+        params = mock_client.klant_contact.list_iter.call_args[1]["params"]
+        self.assertNotIn("kanaal", params)
+        self.assertEqual(params["hadBetrokkene__wasPartij__uuid"], self.PARTIJ_UUID)
+        self.assertEqual(params["pageSize"], 500)
 
     def test_missing_expand_key_is_excluded_without_exception(self, mock_client_class):
         mock_client = Mock()

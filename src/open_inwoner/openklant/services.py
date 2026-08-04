@@ -170,6 +170,14 @@ class Question(TypedDict):
 QuestionValidator = TypeAdapter(Question)
 
 
+# `pageSize` is a global pagination parameter that the pinned open-klant-client does
+# not declare on any of its list params types. The TypedDict is an annotation only, so
+# the parameter reaches the wire regardless; this subclass just keeps type checking
+# honest.
+class PagedKlantContactParams(ListKlantContactParams, total=False):
+    pageSize: int
+
+
 @dataclass
 class QuestionsResult:
     questions: list[Question]
@@ -485,6 +493,12 @@ class eSuiteKlantenService(
 # Contactmoment resolution is IO-bound, so the worker count is not tied to CPU count.
 # Kept modest to avoid hammering eSuite, which is the constrained side.
 _DEFAULT_CONTACTMOMENT_WORKERS = 8
+
+# The klantinteracties API returns 100 rows per page by default and accepts at
+# most 500. Without a kanaal filter this listing spans every interaction the
+# partij was a betrokkene on, across all channels and all time, so the default
+# page size is easier to exceed than it used to be.
+_KLANTCONTACTEN_PAGE_SIZE = 500
 
 
 class KlantContactMomentSkipReason(enum.Enum):
@@ -2314,20 +2328,19 @@ class OpenKlant2Service(
 
         return OpenKlant2Answer.from_klantcontact(answer_klantcontact)
 
-    def klantcontacten_for_partij(
-        self, partij_uuid: str, *, kanaal: str | None = None
-    ) -> Iterable[KlantContact]:
-        params: ListKlantContactParams = {
+    def klantcontacten_for_partij(self, partij_uuid: str) -> Iterable[KlantContact]:
+        """List every klantcontact the partij was a betrokkene on."""
+        params: PagedKlantContactParams = {
             "expand": [
                 "leiddeTotInterneTaken",
                 "gingOverOnderwerpobjecten",
                 "hadBetrokkenen",
                 "hadBetrokkenen.wasPartij",
             ],
-            "kanaal": kanaal or self.config.mijn_vragen_kanaal,
-            # Without this the listing returns every klantcontact on the kanaal, for
-            # every partij, and the caller throws away all but one user's.
+            # Without this the listing returns every klantcontact there is, for every
+            # partij, and the caller throws away all but one user's.
             "hadBetrokkene__wasPartij__uuid": partij_uuid,
+            "pageSize": _KLANTCONTACTEN_PAGE_SIZE,
         }
         klantcontacten = self.client.klant_contact.list_iter(params=params)
 
@@ -2344,23 +2357,6 @@ class OpenKlant2Service(
             except glom.GlomError:
                 logger.warning(
                     "klantcontact_partij_filter_error",
-                    klantcontact_uuid=row.get("uuid"),
-                )
-                return False
-
-        def _has_initiator(row) -> bool:
-            try:
-                initiators = glom.glom(
-                    row,
-                    (
-                        glom.Coalesce("_expand.hadBetrokkenen", default=[]),
-                        ["initiator"],
-                    ),
-                )
-                return True in initiators
-            except glom.GlomError:
-                logger.warning(
-                    "klantcontact_initiator_filter_error",
                     klantcontact_uuid=row.get("uuid"),
                 )
                 return False
@@ -2382,8 +2378,7 @@ class OpenKlant2Service(
                 if not _has_partij_uuid(row):
                     foreign += 1
                     continue
-                if _has_initiator(row):
-                    yield row
+                yield row
 
             if foreign:
                 logger.error(
@@ -2449,9 +2444,7 @@ class OpenKlant2Service(
         question_uuids = []
         klantcontact_uuid_to_klantcontact_object = {}
 
-        for klantcontact in self.klantcontacten_for_partij(
-            partij_uuid, kanaal=self.config.mijn_vragen_kanaal
-        ):
+        for klantcontact in self.klantcontacten_for_partij(partij_uuid):
             klantcontact_uuid_to_klantcontact_object[klantcontact["uuid"]] = (
                 klantcontact
             )

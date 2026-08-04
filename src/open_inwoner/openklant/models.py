@@ -289,7 +289,9 @@ class OpenKlant2Config(SingletonModel):
         default="",
         blank=True,
         help_text=_(
-            "Het kanaal waaronder nieuwe vragen als Klantcontact object zullen worden aangemaakt"
+            "Het kanaal waaronder nieuwe vragen als Klantcontact object zullen worden "
+            "aangemaakt. Dit kanaal wordt alleen gebruikt bij het aanmaken van vragen: "
+            "het ophalen van vragen en reacties is niet beperkt tot dit kanaal."
         ),
     )
     mijn_vragen_organisatie_naam = models.CharField(
