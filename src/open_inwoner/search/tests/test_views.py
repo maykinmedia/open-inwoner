@@ -254,6 +254,18 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
                 f"{zaken_root}rollen?zaak={self.zaak2['url']}",
                 json=paginated_response([self.zaak2_rol]),
             )
+        m.get(
+            furl(f"{ZAKEN_ROOT}zaken")
+            .add(
+                {
+                    "rol__betrokkeneIdentificatie__natuurlijkPersoon__inpBsn": self.user.bsn,
+                    "maximaleVertrouwelijkheidaanduiding": VertrouwelijkheidsAanduidingen.beperkt_openbaar,
+                    "identificatie": "stuff",
+                }
+            )
+            .url,
+            json=paginated_response([]),
+        )
 
     def test_search_hidden_from_anonymous_users(self, m):
         config = SiteConfiguration.get_solo()
@@ -420,7 +432,7 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
         self, request_mocker, mock_service
     ):
         mock_service.return_value.search_zaken.return_value = ZakenResult(
-            zaken=[], skipped=[], raw_fetch_timed_out=True
+            zaken=[], skipped=[], raw_fetch_incomplete=True
         )
 
         self.client.force_login(self.user)
@@ -441,6 +453,7 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
     def test_search_shows_error_on_connection_timeout(
         self, request_mocker, mock_search
     ):
+        self._setUpMocks(request_mocker)
         mock_search.side_effect = ConnectionTimeout(message="Connection was timed out.")
         self.client.force_login(self.user)
         params = urlencode({"query": "stuff"}, doseq=True)

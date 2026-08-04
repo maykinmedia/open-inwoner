@@ -5,7 +5,7 @@ import enum
 import threading
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Generic, TypedDict, TypeVar, cast
+from typing import Generic, Self, TypedDict, TypeVar, cast
 
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -113,6 +113,13 @@ class SkipReason(enum.Enum):
     FULL_RESOLUTION_FAILED = "full_resolution_failed"
     TIMEOUT = "timeout"
 
+    @classmethod
+    def transient_reasons(cls) -> frozenset[Self]:
+        """Zaken skipped for these reasons may show up on retry"""
+        return frozenset(
+            {cls.TIMEOUT, cls.FULL_RESOLUTION_FAILED, cls.ZAAKTYPE_RESOLUTION_FAILED}
+        )
+
 
 @dataclass
 class SkippedZaak:
@@ -128,20 +135,19 @@ _ZaakT = TypeVar("_ZaakT", bound=ZaakWithApiGroup)
 class ZakenResult(Generic[_ZaakT]):
     zaken: list[_ZaakT]
     skipped: list[SkippedZaak]
-    # Set when a whole-stage timeout dropped zaken whose URLs are unknown (the raw
-    # fetch stage), so `skipped` cannot enumerate them.
-    raw_fetch_timed_out: bool = False
+    # Set when a whole-stage timeout or fetch error dropped zaken whose URLs are
+    # unknown (the raw fetch stage), so `skipped` cannot enumerate them.
+    raw_fetch_incomplete: bool = False
 
     @property
-    def has_timeouts(self) -> bool:
-        """Whether results are incomplete because of a timeout.
+    def is_incomplete(self) -> bool:
+        """Whether results are incomplete because of a timeout or fetch/resolve error.
 
-        Only timeouts count: zaken excluded for confidentiality, an internal
-        zaaktype or a failed resolution are legitimately absent and retrying
-        will not bring them back.
+        Zaken excluded for confidentiality or an internal zaaktype are
+        legitimately absent and retrying will not bring them back.
         """
-        return self.raw_fetch_timed_out or any(
-            skipped.reason == SkipReason.TIMEOUT for skipped in self.skipped
+        return self.raw_fetch_incomplete or any(
+            skipped.reason in SkipReason.transient_reasons() for skipped in self.skipped
         )
 
 
@@ -387,7 +393,7 @@ class ZGWService:
         )
 
         fetched_zaken: list[ZaakWithApiGroup] = []
-        raw_fetch_timed_out = False
+        raw_fetch_incomplete = False
         with parallel(max_workers=self._max_workers) as executor:
             futures = [
                 executor.submit(
@@ -409,15 +415,16 @@ class ZGWService:
                         fetched_zaken.extend(task.result())
                     except BaseException:
                         logger.exception("Error fetching raw zaken for group")
+                        raw_fetch_incomplete = True
             # TODO: add OTEL metrics
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken", exc_info=True)
-                raw_fetch_timed_out = True
+                raw_fetch_incomplete = True
 
         return ZakenResult(
             zaken=fetched_zaken,
             skipped=[],
-            raw_fetch_timed_out=raw_fetch_timed_out,
+            raw_fetch_incomplete=raw_fetch_incomplete,
         )
 
     def search_zaken(
@@ -493,12 +500,12 @@ class ZGWService:
                     )
                 )
 
-        # Rol and zaaktype exclusions above are not timeouts, so they are not
-        # reported as skipped; only the raw fetch stage can time out here.
+        # Rol and zaaktype exclusions above are not fetch failures, so they are
+        # not reported as skipped; only the raw fetch stage can fail here.
         return ZakenResult(
             zaken=visible_zaken,
             skipped=[],
-            raw_fetch_timed_out=raw_result.raw_fetch_timed_out,
+            raw_fetch_incomplete=raw_result.raw_fetch_incomplete,
         )
 
     def get_visible_zaken(
@@ -528,7 +535,7 @@ class ZGWService:
         )
 
         fetched_zaken: list[ZaakWithApiGroup] = []
-        raw_fetch_timed_out = False
+        raw_fetch_incomplete = False
         with parallel(max_workers=self._max_workers) as executor:
             futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = [
                 executor.submit(
@@ -549,9 +556,10 @@ class ZGWService:
                         fetched_zaken.extend(task.result())
                     except BaseException:
                         logger.exception("Error fetching raw zaken for group")
+                        raw_fetch_incomplete = True
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out fetching raw zaken for group", exc_info=True)
-                raw_fetch_timed_out = True
+                raw_fetch_incomplete = True
 
         fetched_zaken.sort(
             key=lambda c: (
@@ -633,7 +641,7 @@ class ZGWService:
                 if id(z) in visible_ids
             ],
             skipped=skipped,
-            raw_fetch_timed_out=raw_fetch_timed_out,
+            raw_fetch_incomplete=raw_fetch_incomplete,
         )
 
     def fully_resolve_zaken(

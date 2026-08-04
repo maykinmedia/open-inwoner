@@ -132,7 +132,7 @@ class InnerCaseListView(
                 user_identification, zaak_identificatie=search
             )
             all_visible_zaken = search_result.zaken
-            partial_results = search_result.has_timeouts
+            partial_results = search_result.is_incomplete
         else:
             formulieren_result = case_service.get_formulieren(user_identification)
             formulieren: Sequence[UniformCase] = formulieren_result.formulieren
@@ -141,7 +141,7 @@ class InnerCaseListView(
             all_visible_zaken = visible_result.zaken
 
             partial_results = (
-                formulieren_result.timed_out or visible_result.has_timeouts
+                formulieren_result.timed_out or visible_result.is_incomplete
             )
 
         if config.zaken_filter_enabled:
@@ -189,7 +189,7 @@ class InnerCaseListView(
             all_visible_zaken[zaak_start:zaak_end]
         )
         zaak_page = resolved_result.zaken
-        partial_results = partial_results or resolved_result.has_timeouts
+        partial_results = partial_results or resolved_result.is_incomplete
 
         page_items = [*formulieren_page, *zaak_page]
         combined_total = formulieren_count + len(all_visible_zaken)

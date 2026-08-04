@@ -95,7 +95,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             msg = partial_error_msg
         else:
             all_visible_zaken = visible_result.zaken
-            if visible_result.has_timeouts:
+            if visible_result.is_incomplete:
                 msg = partial_error_msg
 
         if formulieren is None and all_visible_zaken is None:
@@ -115,7 +115,7 @@ class ZakenPluginContentView(RequiresHtmxMixin, CaseLogMixin, View):
             (all_visible_zaken or [])[:zaak_limit]
         )
         zaken_page = resolved_result.zaken
-        if resolved_result.has_timeouts:
+        if resolved_result.is_incomplete:
             msg = partial_error_msg
         zaken_dicts = [
             zaak.process_data() for zaak in [*formulieren_to_show, *zaken_page]
