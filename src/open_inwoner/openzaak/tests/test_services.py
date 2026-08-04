@@ -51,7 +51,7 @@ _TINY_TIMEOUTS = {
 }
 
 
-class TimeoutHandlingTests(ClearCachesMixin, TestCase):
+class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     """
     Verify that the timeout on as_completed() fires while futures are still
     pending (i.e. as_completed runs INSIDE the with parallel() block).
@@ -105,8 +105,8 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 timer.cancel()
 
         self.assertEqual(result.zaken, [])
-        self.assertTrue(result.raw_fetch_timed_out)
-        self.assertTrue(result.has_timeouts)
+        self.assertTrue(result.raw_fetch_incomplete)
+        self.assertTrue(result.is_incomplete)
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
@@ -134,8 +134,8 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 timer.cancel()
 
         self.assertEqual(result.zaken, [])
-        self.assertTrue(result.raw_fetch_timed_out)
-        self.assertTrue(result.has_timeouts)
+        self.assertTrue(result.raw_fetch_incomplete)
+        self.assertTrue(result.is_incomplete)
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_formulieren_logs_timeout_warning(self):
@@ -192,8 +192,8 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 timer.cancel()
 
         self.assertEqual(result.zaken, [])
-        self.assertTrue(result.raw_fetch_timed_out)
-        self.assertTrue(result.has_timeouts)
+        self.assertTrue(result.raw_fetch_incomplete)
+        self.assertTrue(result.is_incomplete)
 
     def _make_zaak_with_group(self, uuid: str) -> ZaakWithApiGroup:
         zaak = factory(
@@ -244,11 +244,11 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
                 timer.cancel()
 
         self.assertEqual(result.zaken, [])
-        self.assertFalse(result.raw_fetch_timed_out)
+        self.assertFalse(result.raw_fetch_incomplete)
         self.assertEqual(
             [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
         )
-        self.assertTrue(result.has_timeouts)
+        self.assertTrue(result.is_incomplete)
 
     def test_fully_resolve_zaken_records_timeout_skips(self):
         zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
@@ -281,32 +281,52 @@ class TimeoutHandlingTests(ClearCachesMixin, TestCase):
         self.assertEqual(
             [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
         )
-        self.assertTrue(result.has_timeouts)
+        self.assertTrue(result.is_incomplete)
 
-    def test_has_timeouts_is_false_without_timeouts(self):
-        """Legitimate exclusions must not trigger the partial-results banner."""
-        empty = ZakenResult(zaken=[], skipped=[])
-        self.assertFalse(empty.has_timeouts)
+    def test_is_incomplete_is_false_for_legitimate_exclusions(self):
+        """Permanent exclusions must not trigger the partial-results banner"""
 
-        non_timeout_skips = ZakenResult(
-            zaken=[],
-            skipped=[
-                SkippedZaak(
-                    zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
-                    reason=reason,
-                    api_group=self.api_group,
+        for reason in (
+            SkipReason.NO_STATUS,
+            SkipReason.NO_ZAAKTYPE,
+            SkipReason.CONFIDENTIALITY_TOO_HIGH,
+            SkipReason.INTERNAL_ZAAKTYPE,
+            SkipReason.BEFORE_VISIBLE_FROM_DATE,
+        ):
+            with self.subTest(reason=reason):
+                result = ZakenResult(
+                    zaken=[],
+                    skipped=[
+                        SkippedZaak(
+                            zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+                            reason=reason,
+                            api_group=self.api_group,
+                        )
+                    ],
                 )
-                for reason in (
-                    SkipReason.CONFIDENTIALITY_TOO_HIGH,
-                    SkipReason.INTERNAL_ZAAKTYPE,
-                    SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
-                    SkipReason.FULL_RESOLUTION_FAILED,
-                )
-            ],
-        )
-        self.assertFalse(non_timeout_skips.has_timeouts)
+                self.assertFalse(result.is_incomplete)
+                self.assertFalse(FormulierenResult(formulieren=[]).timed_out)
 
-        self.assertFalse(FormulierenResult(formulieren=[]).timed_out)
+    def test_is_incomplete_is_true_for_transient_errors(self):
+        """Resolution failures are counted as transient fetch errors"""
+
+        for reason in (
+            SkipReason.TIMEOUT,
+            SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
+            SkipReason.FULL_RESOLUTION_FAILED,
+        ):
+            with self.subTest(reason=reason):
+                result = ZakenResult(
+                    zaken=[],
+                    skipped=[
+                        SkippedZaak(
+                            zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+                            reason=reason,
+                            api_group=self.api_group,
+                        )
+                    ],
+                )
+                self.assertTrue(result.is_incomplete, msg=f"reason={reason}")
 
 
 _ZAAK_UUID = "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
