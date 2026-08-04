@@ -3329,7 +3329,7 @@ class TestCaseDetailView(
             json=persoon,
         )
         m.get(
-            "https://klanten.nl/api/v1/klantcontacten?expand=leiddeTotInterneTaken%2CgingOverOnderwerpobjecten%2ChadBetrokkenen%2ChadBetrokkenen.wasPartij&kanaal=",
+            "https://klanten.nl/api/v1/klantcontacten?expand=leiddeTotInterneTaken%2CgingOverOnderwerpobjecten%2ChadBetrokkenen%2ChadBetrokkenen.wasPartij",
             headers={"Content-Type": "application/json"},
             json={
                 "count": 1,

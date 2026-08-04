@@ -4,7 +4,7 @@ import datetime
 import enum
 import re
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import (
     Callable,
@@ -1236,11 +1236,11 @@ class OpenKlant2Question(BaseModel):
     def from_klantcontact_and_answers(
         cls, klantcontact: KlantContact, answers: list[OpenKlant2Answer] | None = None
     ) -> Self:
-        if klantcontact["inhoud"] is None:
-            raise ValueError("Klantcontact did not contain any content in `inhoud`")
-
         return cls(
-            question=klantcontact["inhoud"],
+            # `inhoud` is nullable, and a klantcontact registered by an employee can
+            # come in without it. Refusing to build the question would take its
+            # reactions with it, so an empty question beats no question at all.
+            question=klantcontact["inhoud"] or "",
             question_kcm_uuid=klantcontact["uuid"],
             onderwerp=klantcontact["onderwerp"],
             kanaal=klantcontact["kanaal"],
@@ -1257,6 +1257,63 @@ class OpenKlant2Question(BaseModel):
     def answer(self) -> OpenKlant2Answer | None:
         """Return the newest/latest answer (first in the sorted list), or None if no answers."""
         return self.answers[0] if self.answers else None
+
+
+@dataclass
+class ConversationGraph:
+    """Klantcontacten linked into conversations by their onderwerpobjecten.
+
+    A reaction is registered as a klantcontact whose onderwerpobject points at the
+    klantcontact it replies to. An external service may point it at the previous
+    reaction rather than at the original question, so a conversation is a chain and
+    the question is its root.
+    """
+
+    nodes: dict[str, KlantContact] = field(default_factory=dict)
+    parent_of: dict[str, str] = field(default_factory=dict)
+    children_of: dict[str, list[str]] = field(default_factory=dict)
+
+    @property
+    def root_uuids(self) -> list[str]:
+        """The klantcontacten that reply to nothing, in the order they came in."""
+        return [
+            klantcontact_uuid
+            for klantcontact_uuid in self.nodes
+            if klantcontact_uuid not in self.parent_of
+        ]
+
+    @property
+    def orphan_uuids(self) -> list[str]:
+        """Klantcontacten whose parent is missing, so their root is unknown."""
+        return [
+            klantcontact_uuid
+            for klantcontact_uuid, parent_uuid in self.parent_of.items()
+            if parent_uuid not in self.nodes
+        ]
+
+    def descendants(self, root_uuid: str) -> list[str]:
+        """Every klantcontact replying to the root, directly or via a reaction.
+
+        The visited set is what makes this terminate: a klantcontact is collected at
+        most once, so a chain that refers back to itself ends the walk rather than
+        looping.
+        """
+        seen = {root_uuid}
+        collected: list[str] = []
+        frontier = [root_uuid]
+
+        while frontier:
+            next_frontier = []
+            for klantcontact_uuid in frontier:
+                for child_uuid in self.children_of.get(klantcontact_uuid, []):
+                    if child_uuid in seen:
+                        continue
+                    seen.add(child_uuid)
+                    collected.append(child_uuid)
+                    next_frontier.append(child_uuid)
+            frontier = next_frontier
+
+        return collected
 
 
 class OpenKlant2Service(
@@ -2418,96 +2475,110 @@ class OpenKlant2Service(
 
         return expanded
 
-    def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
+    def _parent_klantcontact_uuid(self, klantcontact: KlantContact) -> str | None:
+        """Return the klantcontact this one replies to, if it replies to one.
+
+        A klantcontact can carry several onderwerpobjecten, of which only the ones
+        with a `wasKlantcontact` link it to another klantcontact; the rest tie it to
+        a zaak. Any such link makes it a reaction, so a reaction that also references
+        a zaak is not mistaken for a question.
         """
-        Retrieve all questions for a partij (party/user) along with their answers.
+        parent_uuids = [
+            onderwerp_object["wasKlantcontact"]["uuid"]
+            for onderwerp_object in self._expanded_onderwerp_objecten(klantcontact)
+            if onderwerp_object.get("wasKlantcontact")
+        ]
 
-        Each question can have multiple answers, which are automatically sorted by
-        the OpenKlant2Question field validator in descending order (newest first).
+        if not parent_uuids:
+            return None
 
-        Args:
-            partij_uuid: The UUID of the partij to retrieve questions for
-
-        Returns:
-            A list of OpenKlant2Question objects, each containing:
-            - The question details (klantcontact without wasKlantcontact reference)
-            - All answers (klantcontacten with wasKlantcontact reference to the question)
-            - Answers are automatically sorted newest-first by the field validator
-
-        Note:
-            Questions are distinguished from answers by checking the onderwerpobject's
-            wasKlantcontact field. If wasKlantcontact is null/empty, it's a question.
-            If wasKlantcontact references another klantcontact, it's an answer to that question.
-        """
-        # Map question UUID to list of answer UUIDs
-        answers_for_klantcontact_uuid: dict[str, list[str]] = {}
-        question_uuids = []
-        klantcontact_uuid_to_klantcontact_object = {}
-
-        for klantcontact in self.klantcontacten_for_partij(partij_uuid):
-            klantcontact_uuid_to_klantcontact_object[klantcontact["uuid"]] = (
-                klantcontact
+        if len(parent_uuids) > 1:
+            # Allowed by the data model, but no known registration produces it, so
+            # picking the first is a guess worth knowing about.
+            logger.warning(
+                "Klantcontact replies to more than one klantcontact; using the first",
+                klantcontact_uuid=klantcontact["uuid"],
             )
 
-            if onderwerp_objecten := self._expanded_onderwerp_objecten(klantcontact):
-                # Determine if the klantcontact is an answer by checking `wasKlantcontact` in
-                # the related onderwerp_object; otherwise, treat it as question
+        return parent_uuids[0]
 
-                # Collect all answers for a question by checking all onderwerp_objecten
-                for answer_onderwerp_object in onderwerp_objecten:
-                    if not answer_onderwerp_object["wasKlantcontact"]:
-                        # Treat as question
-                        question_uuids.append(klantcontact["uuid"])
-                        break
-                    else:
-                        # Treat as answer
-                        question_uuid = answer_onderwerp_object["wasKlantcontact"][
-                            "uuid"
-                        ]
-                        if question_uuid not in answers_for_klantcontact_uuid:
-                            answers_for_klantcontact_uuid[question_uuid] = []
-                        answers_for_klantcontact_uuid[question_uuid].append(
-                            klantcontact["uuid"]
-                        )
-            else:
-                # No onderwerp object, so we treat this klantcontact as a question
-                question_uuids.append(klantcontact["uuid"])
+    def _build_conversation_graph(
+        self, klantcontacten: Iterable[KlantContact]
+    ) -> ConversationGraph:
+        graph = ConversationGraph()
 
-        question_objs: list[OpenKlant2Question] = []
-        for question_uuid in question_uuids:
-            question = klantcontact_uuid_to_klantcontact_object[question_uuid]
+        for klantcontact in klantcontacten:
+            klantcontact_uuid = klantcontact["uuid"]
+            graph.nodes[klantcontact_uuid] = klantcontact
 
-            # Get all answers for this question
-            answer_uuids = answers_for_klantcontact_uuid.get(question_uuid, [])
-            answer_objs = []
-            for answer_uuid in answer_uuids:
-                answer = klantcontact_uuid_to_klantcontact_object[answer_uuid]
-                try:
-                    answer_objs.append(OpenKlant2Answer.from_klantcontact(answer))
-                except ValueError:
-                    logger.warning("OpenKlant2Answer without content (inhoud)")
-                except (KeyError, TypeError):
-                    logger.exception(
-                        "Unexpected error creating OpenKlant2Answer for klantcontact",
-                        answer_uuid=answer["uuid"],
-                    )
+            if parent_uuid := self._parent_klantcontact_uuid(klantcontact):
+                graph.parent_of[klantcontact_uuid] = parent_uuid
+                graph.children_of.setdefault(parent_uuid, []).append(klantcontact_uuid)
 
+        return graph
+
+    def _answers_for_root(
+        self, graph: ConversationGraph, root_uuid: str
+    ) -> list[OpenKlant2Answer]:
+        answers = []
+
+        for answer_uuid in graph.descendants(root_uuid):
             try:
-                question_objs.append(
-                    OpenKlant2Question.from_klantcontact_and_answers(
-                        question, answer_objs
-                    )
+                answers.append(
+                    OpenKlant2Answer.from_klantcontact(graph.nodes[answer_uuid])
                 )
             except ValueError:
-                logger.warning("OpenKlant2Question without content (inhoud)")
+                logger.warning(
+                    "OpenKlant2Answer without content (inhoud)",
+                    answer_uuid=answer_uuid,
+                )
+            except (KeyError, TypeError):
+                logger.exception(
+                    "Unexpected error creating OpenKlant2Answer for klantcontact",
+                    answer_uuid=answer_uuid,
+                )
+
+        return answers
+
+    def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
+        """Retrieve a partij's questions, each with the reactions that followed it.
+
+        A question is a klantcontact that replies to nothing. Everything replying to
+        it becomes one of its answers, whether it replies to the question directly or
+        to an earlier reaction: `OpenKlant2Question` sorts those newest-first and its
+        `answer` property is the most recent one, so a later reaction supersedes an
+        earlier one without either being lost here.
+        """
+        graph = self._build_conversation_graph(
+            self.klantcontacten_for_partij(partij_uuid)
+        )
+
+        if orphan_uuids := graph.orphan_uuids:
+            # The parent was not in the listing, which leaves the reaction with no
+            # question to belong to. Showing it as a question of its own would
+            # present the employee's reply as something the citizen asked.
+            logger.warning(
+                "Klantcontacten reply to a klantcontact that was not returned and "
+                "are therefore not shown",
+                klantcontact_uuids=orphan_uuids,
+            )
+
+        questions: list[OpenKlant2Question] = []
+        for root_uuid in graph.root_uuids:
+            try:
+                questions.append(
+                    OpenKlant2Question.from_klantcontact_and_answers(
+                        graph.nodes[root_uuid], self._answers_for_root(graph, root_uuid)
+                    )
+                )
             except (KeyError, TypeError):
                 logger.exception(
                     "Unexpected error creating OpenKlant2Question for klantcontact",
-                    question_uuid=question["uuid"],
+                    question_uuid=root_uuid,
                 )
 
-        question_objs.sort(key=lambda o: o.plaatsgevonden_op)
-        return question_objs
+        questions.sort(key=lambda question: question.plaatsgevonden_op)
+        return questions
 
     def list_questions(
         self, fetch_params: FetchParameters, user: User
