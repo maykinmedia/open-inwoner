@@ -198,28 +198,34 @@ class ContactmomentenClient(KlantAPIClient):
     #
     # klantcontactmomenten
     #
+    @cache_result(
+        "{self.base_url}:klantcontactmomenten:{klant_url}:{max_requests}",
+        timeout=lambda self: self.cache_timeout,
+    )
     def list_klantcontactmomenten_for_klant(
-        self, klant: Klant
+        self, klant_url: str, max_requests: int | None = None
     ) -> list[KlantContactMoment]:
         """List a klant's klantcontactmomenten, leaving `contactmoment` as a URL.
 
         Resolving those URLs is orchestrated by `eSuiteVragenService`, which fans the
-        requests out over a worker pool.
+        requests out over a worker pool. `klant` is left as the plain url too: nothing
+        reads it back as an object, only the invariant check below compares against it.
+
+        :param max_requests: caps the number of pagination requests followed, so a
+        klant with a long history has a bounded worst case (e.g. during cache warm-up).
         """
         response = self.get(
             "klantcontactmomenten",
-            params={"klant": klant.url},
+            params={"klant": klant_url},
         )
         self.raise_for_status(response)
         data = self.parse_json(response)
-        all_data = list(pagination_helper(self, data))
+        all_data = list(pagination_helper(self, data, max_requests=max_requests))
         klanten_contact_moments = self.factory(KlantContactMoment, all_data)
 
         for kcm in klanten_contact_moments:
-            if not kcm.klant == klant.url:
+            if not kcm.klant == klant_url:
                 raise ValueError("klantcontactmoment not linked to klant")
-
-            kcm.klant = klant
 
         return klanten_contact_moments
 
