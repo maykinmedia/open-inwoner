@@ -129,10 +129,12 @@ class ESuiteKlantConfig(SingletonModel):
         blank=True,
         default=60 * 5,
         help_text=_(
-            "How long (in seconds) a resolved contactmoment is cached. Since a "
+            "How long (in seconds) contactmoment data is cached: both a klant's list "
+            "of klantcontactmomenten and each resolved contactmoment. Since a "
             "contactmoment can gain an answer after it was first cached, this is how "
-            "long an answer can take to appear after it was actually given. Leave "
-            "empty to disable caching."
+            "long an answer can take to appear after it was actually given. A "
+            "question asked through this site always appears immediately regardless. "
+            "Leave empty to disable caching."
         ),
     )
 
