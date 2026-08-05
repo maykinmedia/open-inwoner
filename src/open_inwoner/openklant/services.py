@@ -496,6 +496,13 @@ class eSuiteKlantenService(
 # Kept modest to avoid hammering eSuite, which is the constrained side.
 _DEFAULT_CONTACTMOMENT_WORKERS = 8
 
+# Bounds the number of pagination requests a klantcontactmomenten listing follows.
+# Applied to every caller (page views and the login cache warm-up alike), not just
+# the warm-up: the listing is cached per (klant, max_requests) pair, so a warm-up
+# capped differently from the page view it is meant to serve would populate a cache
+# entry the page view never reads, warming nothing.
+_DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS = 5
+
 
 class KlantContactMomentSkipReason(enum.Enum):
     RESOLUTION_FAILED = "resolution_failed"
@@ -679,14 +686,22 @@ class eSuiteVragenService(KlantenService):
     ) -> tuple[list[KlantContactMoment], bool]:
         """List one klant's klantcontactmomenten, reporting failure instead of raising.
 
-        Shared by the full resolve (`fetch_klantcontactmomenten`) and the detail-page
-        lookup (`fetch_klantcontactmoment`): both need the unresolved listing before
-        deciding what, if anything, to resolve. Caught broadly rather than just
-        `KlantAPIError`: a data-invariant `ValueError` (mismatched klant) means this
-        klant's listing failed just as much as an HTTP error would.
+        Shared by the full resolve (`fetch_klantcontactmomenten`), the detail-page
+        lookup (`fetch_klantcontactmoment`), and the login cache warm-up: all three
+        need the unresolved listing before deciding what, if anything, to resolve, and
+        all three must request it with the same `max_requests` so they share one
+        cache entry. Caught broadly rather than just `KlantAPIError`: a
+        data-invariant `ValueError` (mismatched klant) means this klant's listing
+        failed just as much as an HTTP error would.
         """
         try:
-            return client.list_klantcontactmomenten_for_klant(klant.url), False
+            return (
+                client.list_klantcontactmomenten_for_klant(
+                    klant.url,
+                    max_requests=_DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
+                ),
+                False,
+            )
         except Exception:
             logger.exception(
                 "Failed to list klantcontactmomenten for klant", klant_url=klant.url
@@ -1011,6 +1026,34 @@ class eSuiteVragenService(KlantenService):
                 return kcm
 
         return None
+
+    def warm_klantcontactmomenten_cache(
+        self,
+        user_bsn: str | None = None,
+        user_kvk_or_rsin: str | None = None,
+        vestigingsnummer: str | None = None,
+    ) -> None:
+        """Populate the klantcontactmomenten listing cache for a user's klant(en).
+
+        Called from the login cache warm-up task, off the request cycle, so that by
+        the time the user opens "Mijn vragen" the listing is already cached.
+        Deliberately does not resolve any contactmoment: a page view bounds itself to
+        one page's worth of resolutions, but a warm-up has no such boundary, so
+        resolving here would turn one login into one request per question ever asked.
+        """
+        if not user_bsn and not user_kvk_or_rsin:
+            return
+
+        klanten_client = build_klanten_client()
+        contactmomenten_client = build_contactmomenten_client()
+        if klanten_client is None or contactmomenten_client is None:
+            return
+
+        klanten = self._retrieve_klanten(
+            klanten_client, user_bsn, user_kvk_or_rsin, vestigingsnummer
+        )
+        for klant in klanten:
+            self._list_klantcontactmomenten_for_klant(contactmomenten_client, klant)
 
     def list_questions(
         self, fetch_params: FetchParameters, user: User
