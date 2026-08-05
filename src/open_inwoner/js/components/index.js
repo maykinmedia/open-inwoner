@@ -19,6 +19,7 @@ import { CreateGumshoe } from './anchor-menu/anchor-menu';
 import './autocomplete-search';
 import './autocomplete';
 import './autosumbit';
+import { BfcacheReloader } from './bfcache-reload';
 import './cases';
 import './spinner';
 import { DisableContactFormButton } from './form/DisableContactFormButton';
@@ -114,6 +115,8 @@ function wrapComponentsOf(targetElement) {
 }
 
 htmx.onLoad(wrapComponentsOf);
+
+new BfcacheReloader();
 
 if (typeof htmx.on !== 'function') {
   console.error('HTMX not properly initialized at start!');
