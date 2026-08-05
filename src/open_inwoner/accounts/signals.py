@@ -30,6 +30,7 @@ from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
+from open_inwoner.openklant.tasks import warm_klantcontactmomenten_cache_for_user
 from open_inwoner.openzaak.tasks import warm_cache_for_user
 from open_inwoner.utils.logentry import system_action, user_action
 
@@ -293,6 +294,25 @@ def warm_zgw_cache_on_login(
                 )
     except Exception:
         logger.warning("Failed to dispatch ZGW cache warm-up task", exc_info=True)
+
+
+@receiver(user_logged_in, dispatch_uid="user_logged_in.warm_klantcontactmomenten_cache")
+def warm_klantcontactmomenten_cache_on_login(
+    sender: type[User], request: HttpRequest | None, user: User, **kwargs
+) -> None:
+    try:
+        config = KlantenSysteemConfig.get_solo()
+        if config.primary_backend != KlantenServiceType.ESUITE.value:
+            return
+
+        warm_klantcontactmomenten_cache_for_user.apply_async(
+            kwargs={"user_id": user.pk}, queue=settings.CACHE_SEEDING_QUEUE
+        )
+    except Exception:
+        logger.warning(
+            "Failed to dispatch klantcontactmomenten cache warm-up task",
+            exc_info=True,
+        )
 
 
 @receiver(user_logged_out, dispatch_uid="user_logged_out.increment_counter")
