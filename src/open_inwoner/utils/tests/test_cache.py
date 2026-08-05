@@ -330,6 +330,67 @@ class CacheBehaviorTest(DjangoTestCase):
 
         timeout_func.assert_called_once_with()
 
+    def test_cache_key_returns_the_key_a_call_would_use(self):
+        class TestClass:
+            foo = "bar"
+
+            @cache("alpha:{self.foo}:bravo:{baz}")
+            def method(self, baz: int):
+                pass
+
+        instance = TestClass()
+
+        self.assertEqual(instance.method.cache_key(instance, 5), "alpha:'bar':bravo:5")
+
+    def test_cache_key_does_not_call_the_function_or_touch_the_cache(self):
+        m = mock.Mock()
+
+        @cache("key:{x}")
+        def func(x):
+            m(x)
+            return x
+
+        func.cache_key(42)
+
+        m.assert_not_called()
+        self.assertEqual(caches["default"].get("key:42"), None)
+
+    def test_invalidate_removes_the_cached_value(self):
+        m = mock.Mock(side_effect=lambda x: x)
+
+        @cache("key:{x}")
+        def func(x):
+            return m(x)
+
+        func(42)  # miss, caches
+        func(42)  # hit
+        self.assertEqual(m.call_count, 1)
+
+        func.invalidate(42)
+
+        func(42)  # miss again after invalidation
+        self.assertEqual(m.call_count, 2)
+
+    def test_invalidate_on_a_method_matches_the_calling_instance(self):
+        m = mock.Mock(side_effect=lambda x: x)
+
+        class TestClass:
+            foo = "bar"
+
+            @cache("alpha:{self.foo}:bravo:{x}")
+            def method(self, x):
+                return m(x)
+
+        instance = TestClass()
+        instance.method(5)  # miss, caches
+        instance.method(5)  # hit
+        self.assertEqual(m.call_count, 1)
+
+        TestClass.method.invalidate(instance, 5)
+
+        instance.method(5)  # miss again after invalidation
+        self.assertEqual(m.call_count, 2)
+
     def test_none_and_empty_string_produce_different_cache_keys(self):
         m = mock.Mock(side_effect=lambda x: f"result:{x}")
 

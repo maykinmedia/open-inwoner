@@ -100,17 +100,16 @@ def cache(
         if argspec.kwonlydefaults:
             defaults.update(argspec.kwonlydefaults)
 
-        @wraps(func)
-        def wrapped(*args, **kwargs) -> RT:
-            match timeout:
-                case int():
-                    resolved_timeout = timeout
-                case _ if callable(timeout):
-                    resolved_timeout = timeout(*args[:1])
+        def resolve_cache_key(*args, **kwargs) -> str:
+            """Compute the cache key a call would use, without calling or caching.
 
-            key_kwargs = defaults.copy()
+            Exposed as `<decorated>.cache_key` so callers that mutate the underlying
+            resource (e.g. creating a record the cached listing would include) can
+            invalidate the exact entry instead of guessing at the key format.
+            """
+            template_values = defaults.copy()
             named_args = dict(zip(argspec.args, args), **kwargs)
-            key_kwargs.update(**named_args)
+            template_values.update(**named_args)
 
             if argspec.varkw:
                 var_kwargs = {
@@ -118,7 +117,7 @@ def cache(
                     for key, value in named_args.items()
                     if key not in argspec.args
                 }
-                key_kwargs[argspec.varkw] = var_kwargs
+                template_values[argspec.varkw] = var_kwargs
 
             (
                 cache_key_with_attr_placeholders,
@@ -133,7 +132,9 @@ def cache(
                 bound_instance = args[0]
                 for mapped_attr, original_attr in attr_mapping.items():
                     try:
-                        key_kwargs[mapped_attr] = getattr(bound_instance, original_attr)
+                        template_values[mapped_attr] = getattr(
+                            bound_instance, original_attr
+                        )
                     except AttributeError as exc:
                         exc.add_note(
                             f"Attribute `{original_attr}` does not exist on bound instance"
@@ -142,8 +143,18 @@ def cache(
 
             # Use repr() for all values to ensure distinct cache keys
             # (e.g., None vs "None", "" vs None, etc.)
-            formatted_key_kwargs = {k: repr(v) for k, v in key_kwargs.items()}
-            cache_key = cache_key_with_attr_placeholders.format(**formatted_key_kwargs)
+            formatted_template_values = {k: repr(v) for k, v in template_values.items()}
+            return cache_key_with_attr_placeholders.format(**formatted_template_values)
+
+        @wraps(func)
+        def wrapped(*args, **kwargs) -> RT:
+            match timeout:
+                case int():
+                    resolved_timeout = timeout
+                case _ if callable(timeout):
+                    resolved_timeout = timeout(*args[:1])
+
+            cache_key = resolve_cache_key(*args, **kwargs)
             logger.debug("Resolved cache_key `%s` to `%s`", key, cache_key)
 
             _cache: BaseCache = caches[alias]
@@ -159,6 +170,14 @@ def cache(
             _cache.set(cache_key, result, timeout=resolved_timeout)
 
             return result
+
+        def invalidate(*args, **kwargs) -> None:
+            """Delete the cache entry a call with these arguments would use."""
+            _cache: BaseCache = caches[alias]
+            _cache.delete(resolve_cache_key(*args, **kwargs))
+
+        wrapped.cache_key = resolve_cache_key
+        wrapped.invalidate = invalidate
 
         return wrapped
 
