@@ -258,7 +258,9 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
         klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
         m.reset_mock()
 
-        kcms = build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant)
+        kcms = build_contactmomenten_client().list_klantcontactmomenten_for_klant(
+            klant.url
+        )
 
         self.assertEqual(len(kcms), 2)
         for kcm in kcms:
@@ -361,6 +363,92 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
             req for req in m.request_history if req.url == data.contactmoment["url"]
         ]
         self.assertEqual(len(contactmoment_requests), 2)
+
+    def test_list_klantcontactmomenten_for_klant_is_cached(self, m):
+        """A klant's klantcontactmomenten listing must not be re-fetched within the TTL.
+
+        "Mijn vragen" re-lists on every page load, so caching the listing (not just
+        each resolved contactmoment) removes another request per view.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+        client = build_contactmomenten_client()
+
+        first = client.list_klantcontactmomenten_for_klant(klant.url)
+        second = client.list_klantcontactmomenten_for_klant(klant.url)
+
+        self.assertEqual(first, second)
+        listing_requests = [
+            req
+            for req in m.request_history
+            if req.method == "GET"
+            and req.url.startswith(f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten")
+        ]
+        self.assertEqual(len(listing_requests), 1)
+
+    def test_list_klantcontactmomenten_for_klant_caching_disabled_when_timeout_is_none(
+        self, m
+    ):
+        config = ESuiteKlantConfig.get_solo()
+        config.contactmoment_cache_timeout = None
+        config.save()
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+        client = build_contactmomenten_client()
+
+        client.list_klantcontactmomenten_for_klant(klant.url)
+        client.list_klantcontactmomenten_for_klant(klant.url)
+
+        listing_requests = [
+            req
+            for req in m.request_history
+            if req.method == "GET"
+            and req.url.startswith(f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten")
+        ]
+        self.assertEqual(len(listing_requests), 2)
+
+    def test_create_contactmoment_invalidates_the_klant_listing_cache(self, m):
+        """A question asked through this site must appear on the very next page load.
+
+        The contact form is embedded on "Mijn vragen" itself, and its success
+        redirect lands straight back there, so a stale listing cache would hide the
+        question just asked.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+        build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant.url)
+
+        m.post(
+            f"{CONTACTMOMENTEN_ROOT}contactmomenten",
+            json=data.contactmoment,
+            status_code=201,
+        )
+        m.post(
+            f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten",
+            json=data.klant_contactmoment,
+            status_code=201,
+        )
+
+        self.service.create_contactmoment(
+            {
+                "bronorganisatie": "123456789",
+                "tekst": "hello?",
+                "onderwerp": "test",
+                "type": "test",
+                "kanaal": "test",
+            },
+            klant=klant,
+        )
+
+        build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant.url)
+
+        listing_requests = [
+            req
+            for req in m.request_history
+            if req.method == "GET"
+            and req.url.startswith(f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten")
+        ]
+        self.assertEqual(len(listing_requests), 2)
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)

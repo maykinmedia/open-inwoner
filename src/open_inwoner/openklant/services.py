@@ -583,6 +583,14 @@ class eSuiteVragenService(KlantenService):
             )
             self.client.raise_for_status(response)
 
+            # The contact form's own success redirect lands back on "Mijn vragen",
+            # so the klant's cached klantcontactmomenten listing must not serve the
+            # snapshot from before this question existed.
+            if contactmomenten_client := build_contactmomenten_client():
+                contactmomenten_client.list_klantcontactmomenten_for_klant.invalidate(
+                    contactmomenten_client, klant.url
+                )
+
         return contactmoment
 
     #
@@ -678,7 +686,7 @@ class eSuiteVragenService(KlantenService):
         klant's listing failed just as much as an HTTP error would.
         """
         try:
-            return client.list_klantcontactmomenten_for_klant(klant), False
+            return client.list_klantcontactmomenten_for_klant(klant.url), False
         except Exception:
             logger.exception(
                 "Failed to list klantcontactmomenten for klant", klant_url=klant.url
