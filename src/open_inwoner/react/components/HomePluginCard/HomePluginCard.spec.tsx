@@ -32,4 +32,18 @@ describe('HomePluginCardItem', () => {
     render(<HomePluginCard title="TEST" detailUrl="/" identificatie="101" />);
     expect(screen.getByText('TEST')).toBeInTheDocument();
   });
+
+  it('renders as a link when a detailUrl is provided', () => {
+    render(
+      <HomePluginCard title="TEST" detailUrl="/some-url" identificatie="101" />
+    );
+    const link = screen.getByText('TEST').closest('a');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/some-url');
+  });
+
+  it('renders as a non-interactive card when detailUrl is empty (e.g. a formulier without a vervolg_link)', () => {
+    render(<HomePluginCard title="TEST" detailUrl="" identificatie="101" />);
+    expect(screen.getByText('TEST').closest('a')).not.toBeInTheDocument();
+  });
 });
