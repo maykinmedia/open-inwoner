@@ -52,7 +52,6 @@ def collect_notifications_about_expiring_plans() -> list[dict]:
                 .filter(Q(created_by=receiver) | Q(plan_contacts=receiver))
                 .values_list("id", flat=True),
             ),
-            object_type=Plan,
         )
         for receiver in receivers
     ]

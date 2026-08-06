@@ -2,6 +2,11 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from kombu.utils.json import dumps as celery_dumps
+
+from open_inwoner.accounts.notifications.messages.notify import (
+    collect_notifications_about_messages,
+)
 from open_inwoner.accounts.tasks import schedule_user_notifications
 from open_inwoner.configurations.models import SiteConfiguration
 
@@ -11,6 +16,16 @@ from .factories import MessageFactory, UserFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class MessagesNotificationTest(TestCase):
+    def test_collected_notifications_are_json_serializable(self):
+        # regression test for #2765
+        user = UserFactory.create()
+        sender = UserFactory.create()
+        MessageFactory.create(receiver=user, sender=sender)
+
+        notifications = collect_notifications_about_messages()
+
+        celery_dumps(notifications)
+
     def test_send_emails_about_messages(self):
         jack = UserFactory.create(first_name="Jack")
         jill = UserFactory.create(first_name="Jill")

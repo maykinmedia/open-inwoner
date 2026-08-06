@@ -5,6 +5,11 @@ from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
+from kombu.utils.json import dumps as celery_dumps
+
+from open_inwoner.accounts.notifications.plans.notify import (
+    collect_notifications_about_expiring_plans,
+)
 from open_inwoner.accounts.tasks import schedule_user_notifications
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
@@ -15,6 +20,15 @@ from open_inwoner.plans.tests.factories import PlanFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ExpiringPlansNotificationTest(TestCase):
+    def test_collected_notifications_are_json_serializable(self):
+        # regression test for #2765
+        harry = UserFactory(first_name="Harry")
+        PlanFactory(end_date=date.today(), created_by=harry, title="Harry's plan")
+
+        notifications = collect_notifications_about_expiring_plans()
+
+        celery_dumps(notifications)
+
     def test_send_emails_about_expiring_plans(self):
         harry = UserFactory(first_name="Harry")
         sally = UserFactory(first_name="Sally")

@@ -36,7 +36,6 @@ def collect_notifications_about_messages() -> list[dict]:
                     sent=False,
                 ).values_list("id", flat=True)
             ),
-            object_type=Message,
         )
         for receiver in receivers
     ]
