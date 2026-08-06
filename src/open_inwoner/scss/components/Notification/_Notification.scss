@@ -111,5 +111,12 @@
     & * {
       margin: 0;
     }
+
+    // `& * { margin: 0 }` above cancels the usual heading/paragraph + .button
+    // spacing (see Button.scss), so the notification's action button needs
+    // its own margin to not sit flush against the message text above it.
+    .button {
+      margin-block-start: var(--spacing-large);
+    }
   }
 }
