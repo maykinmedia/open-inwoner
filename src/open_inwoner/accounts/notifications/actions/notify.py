@@ -38,7 +38,6 @@ def collect_notifications_about_expiring_actions() -> list[dict]:
                     end_date=today,
                 ).values_list("id", flat=True)
             ),
-            object_type=Action,
         )
         for receiver in receivers
     ]
