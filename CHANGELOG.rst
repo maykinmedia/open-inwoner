@@ -1,3 +1,58 @@
+2.4.2 (2026-08-10)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.2`.
+
+Bugfixes
+--------
+
+* [:gh:`2735`]: Onvolledige zakenlijsten (door een timeout of fetch-/ resolutiefout bij
+  het ophalen) worden nu herkend en gemeld in plaats van stilzwijgend als 'geen zaken'
+  getoond. De zakenlijst, de zaken-plugin en de zoekfunctie tonen bij een onvolledig
+  resultaat een waarschuwing en proberen automatisch opnieuw zaken op te halen, met een
+  handmatige retry-link als dat niet lukt.
+* [:gh:`2728`]: Links in ProseMirror-tekstvelden (bijv. FAQ-antwoorden,
+  categorie- en productbeschrijvingen) staan nu alleen nog http(s)-, mailto-,
+  tel- of relatieve/fragment-URL's toe bij het renderen.
+* [:gh:`2623`]: Het vraagveld in het admin-overzicht van
+  ``QuestionnaireStepAdmin`` wordt nu correct geëscaped.
+* [:gh:`2745`]: Een homepage-plugin met ``hx-trigger="load"`` (zoals 'Mijn
+  Zaken') kon na terug/vooruit-navigatie via de back/forward cache (bfcache)
+  blijven hangen op de laadanimatie, omdat het ``load``-event dan niet
+  opnieuw afgaat. De pagina wordt nu automatisch herladen wanneer dit
+  gebeurt.
+* [:gh:`2745`]: Een formulierkaart op de homepage zonder vervolglink
+  herlaadde de pagina bij een klik (leeg ``href``). Deze wordt nu als
+  niet-interactief weergegeven.
+* [:gh:`2765`]: Taakparameters voor de notificatie-collectors (in de context
+  van plannen/acties) bevatten een niet-serialiseerbaar argument, wat in
+  productie een fout gaf maar in tests onopgemerkt bleef. Hersteld.
+* [:gh:`2764`]: De geconfigureerde service-timeout wordt nu ook toegepast op
+  de OpenKlant2-client; voorheen werd geen timeout doorgegeven aan
+  verzoeken.
+* [:gh:`2740`]: Ruimte tussen de kop en het statuslabel in de filterpopup
+  hersteld.
+* [:gh:`2733`]: Enkele CMS-beheerteksten (bijv. bij het verwijderen van een
+  pagina) werden door een upstream vertaalfout in ``django-cms`` in het Duits
+  weergegeven i.p.v. het Nederlands. Deze teksten worden nu lokaal
+  overschreven met de juiste Nederlandse vertaling.
+* [:gh:`2736`]: Een niet-gevonden vraag- of contactmoment-uuid gaf een
+  500-fout in plaats van een 404 bij het doorverwijzen vanuit een
+  klantcontactmoment-notificatie en bij het opzoeken van een vraag in
+  OpenKlant.
+
+Onderhoud
+---------
+
+* [:gh:`2759`]: ``Django`` bijgewerkt naar versie ``5.2.17``.
+* [:gh:`2731`]: ``leaflet`` bijgewerkt naar versie ``1.9.4`` (voorheen
+  ``1.7.1``); de verouderde, ongebruikte vendored ``_leaflet.scss`` is
+  verwijderd.
+* ``cryptography`` bijgewerkt naar versie ``50.0.0``, ``pillow`` naar
+  ``12.3.0`` en ``pyopenssl`` naar ``26.4.0``.
+* Frontend dependencies bijgewerkt, o.a. ``vitest``, ``immutable`` en ``shell-quote``.
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.9.0``.
+
 2.4.1 (2026-07-22)
 ==================
 
