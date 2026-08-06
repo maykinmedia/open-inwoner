@@ -921,7 +921,9 @@ class OpenKlant2Service(
             raise ImproperlyConfigured("No openklant2 Service object configured")
 
         self.client = OpenKlantClient(
-            base_url=self.config.service.api_root, token=self.config.service.secret
+            base_url=self.config.service.api_root,
+            token=self.config.service.secret,
+            request_kwargs={"timeout": self.config.service.timeout},
         )
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
