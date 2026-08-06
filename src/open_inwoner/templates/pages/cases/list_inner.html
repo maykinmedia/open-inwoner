@@ -16,7 +16,10 @@
              hx-trigger="load delay:{{ auto_retry_delay }}s"
              hx-target="#cases-content"></div>
     {% else %}
-        {% notification type="warning" title=_("Niet alle zaken konden worden opgehaald") message=_("Een deel van uw zaken kon niet worden opgehaald. Probeer het opnieuw of kom later terug.") action=manual_retry_url action_text=_("Opnieuw proberen") closable=True %}
+        {# Wrapped so htmx:load fires on this div (not the notification itself), letting wrapComponentsOf's querySelectorAll find the notification as a descendant and wire up its close button. #}
+        <div class="cases__notification">
+            {% notification type="warning" title=_("Niet alle zaken konden worden opgehaald") message=_("Een deel van uw zaken kon niet worden opgehaald. Probeer het opnieuw of kom later terug.") action=manual_retry_url action_text=_("Opnieuw proberen") closable=True %}
+        </div>
     {% endif %}
 {% endif %}
 
