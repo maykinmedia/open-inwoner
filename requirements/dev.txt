@@ -1558,7 +1558,7 @@ wcwidth==0.2.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   prompt-toolkit
-weasyprint==68.1
+weasyprint==69.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt

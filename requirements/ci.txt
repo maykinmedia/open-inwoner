@@ -1398,7 +1398,7 @@ wcwidth==0.2.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   prompt-toolkit
-weasyprint==68.1
+weasyprint==69.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
