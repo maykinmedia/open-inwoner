@@ -203,26 +203,20 @@ class RenderableTag:
     def get_args(self, tag_args: dict) -> str:
         """
         Returns a str with variable assignments in a format suitable for template rendering.
-        Values in args may not be directly passed but might also refer to template_context_<key>. The variable may then
-        be provided by `get_template_context()` and passed to the Template (provided by `get_template`) by `render()`.
+
+        Values are never interpolated into the template source directly: they are always
+        passed by reference to a `template_context_<key>` variable, provided by
+        `get_template_context()`. This avoids constructing the template from untrusted
+        input (which could otherwise allow template injection), since only the argument
+        *names*, not the (potentially user-controlled) values, end up in the template
+        string.
 
         Args:
             tag_args: a dict containing a key+value mapping of every argument that should be passed to the tag.
 
         Returns: A str with variable assignments in a format suitable for template rendering
         """
-        args_list = []
-
-        for k, v in tag_args.items():
-            if isinstance(v, (int, float)):
-                args_list.append(f"{k}={v}")
-                continue
-            elif isinstance(v, (str,)):
-                args_list.append(f'{k}="{v}"')
-                continue
-            args_list.append(f"{k}=template_context_{k}")
-
-        return " ".join(args_list)
+        return " ".join(f"{k}=template_context_{k}" for k in tag_args)
 
     def get_template_context(self, tag_args: dict) -> dict:
         """
@@ -233,18 +227,4 @@ class RenderableTag:
         Returns: A dict representing the template context.
 
         """
-        template_context = {}
-
-        for k, v in tag_args.items():
-            if isinstance(
-                v,
-                (
-                    str,
-                    int,
-                    float,
-                ),
-            ):
-                continue
-            template_context[f"template_context_{k}"] = v
-
-        return template_context
+        return {f"template_context_{k}": v for k, v in tag_args.items()}
