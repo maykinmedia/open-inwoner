@@ -83,3 +83,23 @@ class RenderableTagTests(TestCase):
         </div>
         """
         self.assertHTMLEqual(actual, expected)
+
+    def test_string_argument_value_cannot_inject_template_syntax(self):
+        """
+        Regression test for CodeQL alert #60 (py/template-injection).
+
+        A string value passed as a tag argument must never be interpolated into
+        the constructed template source: it should only ever reach the template
+        engine as inert context data, even when it contains characters that look
+        like template syntax. Otherwise a value like the one below could break
+        out of its quoted literal and inject an arbitrary tag call.
+        """
+        tag = RenderableTag("testing_tags", "inclusion_test_tag")
+        payload = 'foo" %}{% simple_test_tag %}'
+
+        actual = tag.render({"content": payload})
+
+        # the injected tag must not have been executed
+        self.assertNotIn("I'm a simple tag!", actual)
+        # the payload is rendered verbatim (escaped) as the tag's own content
+        self.assertIn("foo&quot; %}{% simple_test_tag %}", actual)
