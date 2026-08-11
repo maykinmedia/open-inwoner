@@ -244,7 +244,7 @@ class Rol(ZGWModel):
     roltype: Union[str, RolType]
     omschrijving: str
     omschrijving_generiek: str
-    roltoelichting: str
+    roltoelichting: Optional[str] = ""
     indicatie_machtiging: Optional[str] = ""
     registratiedatum: Optional[datetime] = None
     betrokkene: Optional[str] = ""
