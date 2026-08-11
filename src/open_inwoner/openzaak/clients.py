@@ -658,18 +658,23 @@ class DocumentenClient(ZgwAPIClient):
 
 
 class FormulierenClient(ZgwAPIClient):
+    max_requests: int
+
+    def __init__(self, *args, max_requests: int | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # `pagination_helper` treats 0 the same as None: no cap at all. Falling back
+        # on the setting keeps an unconfigured or zeroed client from following every
+        # page of a user's inzendingen.
+        self.max_requests = max_requests or settings.ZGW_MAX_REQUESTS
+
     def fetch_formulieren(
         self,
         user_identification: UserIdentification,
         use_rsin: bool = True,
-        max_requests: int | None = None,
     ) -> list[Formulier]:
         match user_identification:
             case BSNIdentification():
-                return self.fetch_formulieren_by_bsn(
-                    user_identification.bsn,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
-                )
+                return self.fetch_formulieren_by_bsn(user_identification.bsn)
             case KVKIdentification():
                 if use_rsin:
                     # forms service does not support RSIN; skip when group is configured for RSIN
@@ -682,36 +687,26 @@ class FormulierenClient(ZgwAPIClient):
                 return self.fetch_formulieren_by_kvk(
                     user_identification.kvk,
                     vestigingsnummer=user_identification.vestigingsnummer,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                 )
             case _:
                 raise TypeError(
                     f"Unexpected identity type: {type(user_identification)}"
                 )
 
-    def fetch_formulieren_by_bsn(
-        self,
-        user_bsn: str,
-        max_requests: int | None = None,
-    ) -> list[Formulier]:
+    def fetch_formulieren_by_bsn(self, user_bsn: str) -> list[Formulier]:
         response = self.get(
             "openstaande-inzendingen",
             params={"bsn": user_bsn},
         )
         self.raise_for_status(response)
         data = self.parse_json(response)
-        all_data = list(
-            pagination_helper(
-                self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
-            )
-        )
+        all_data = list(pagination_helper(self, data, max_requests=self.max_requests))
         return self.factory(Formulier, all_data)
 
     def fetch_formulieren_by_kvk(
         self,
         user_kvk: str,
         vestigingsnummer: str | None,
-        max_requests: int | None = None,
     ) -> list[Formulier]:
         request_params = {"kvk": user_kvk}
         if vestigingsnummer:
@@ -723,11 +718,7 @@ class FormulierenClient(ZgwAPIClient):
         )
         self.raise_for_status(response)
         data = self.parse_json(response)
-        all_data = list(
-            pagination_helper(
-                self, data, max_requests=max_requests or settings.ZGW_MAX_REQUESTS
-            )
-        )
+        all_data = list(pagination_helper(self, data, max_requests=self.max_requests))
         return self.factory(Formulier, all_data)
 
     def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
