@@ -185,7 +185,7 @@ class ZakenClient(ZgwAPIClient):
         return self.factory(Zaak, all_data)
 
     @cache_result(
-        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{self.max_requests}:{zaak_identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
+        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{self.max_requests}:{zaak_identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}:{self.use_openzaak_120_params}",
         timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_for_company(
@@ -198,7 +198,9 @@ class ZakenClient(ZgwAPIClient):
         retrieve zaken for particular company with allowed confidentiality level
 
         See `fetch_zaken_by_bsn` for why the pagination bound is client state rather
-        than an argument.
+        than an argument. `use_openzaak_120_params` is in the cache key for a related
+        reason: it decides which query parameter names are sent, so entries collected
+        under one style must not be served after an admin switches to the other.
 
         :param kvk_or_rsin: - used to filter the zaken by a KVK number or RSIN (configured via OpenZaakConfig)
         :param zaak_identificatie: - used to filter the zaken by a unique Zaak identification number
