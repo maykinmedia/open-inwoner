@@ -1,7 +1,6 @@
 from urllib.parse import quote
 
 from django.conf import settings
-from django.core.cache import cache
 
 import structlog
 
@@ -34,6 +33,26 @@ class LapostaClient(BaseAPIClient):
     client_error_type = LapostaAPIClientError
     server_error_type = LapostaAPIServerError
     invalid_json_error_type = LapostaAPIInvalidJSONError
+
+    list_ids: list[str]
+
+    def __init__(self, *args, list_ids: list[str] | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The lists a subscription lookup covers, from
+        # `LapostaConfig.limit_list_selection_to`. Client state rather than an
+        # argument so that the lookup and its invalidation agree on the cache key:
+        # the subscribe/unsubscribe calls know an email address but have no reason
+        # to know which lists some other caller asked about.
+        self.list_ids = list_ids or []
+
+    @property
+    def _list_ids_key(self) -> str:
+        """`list_ids` rendered for a cache key.
+
+        Joined rather than interpolated as a list: the decorator `repr()`s values,
+        and a list's repr contains spaces, which are not valid in a memcached key.
+        """
+        return ",".join(self.list_ids)
 
     @cache_result("laposta_lists", timeout=settings.CACHE_LAPOSTA_API_TIMEOUT)
     def get_lists(self) -> list[LapostaList]:
@@ -68,9 +87,9 @@ class LapostaClient(BaseAPIClient):
         self.raise_for_status(response)
         data = self.parse_json(response)
 
-        # Ensure the current subscriptions for this email address are fetched again after
-        # this API call
-        cache.delete(f"laposta_list_subscriptions:{user_data.email}")
+        # Ensure the current subscriptions for this email address are fetched again
+        # after this API call
+        self.get_subscriptions_for_email.invalidate(self, user_data.email)
 
         return Member(**data["member"])
 
@@ -90,18 +109,24 @@ class LapostaClient(BaseAPIClient):
         self.raise_for_status(response)
         data = self.parse_json(response)
 
-        # Ensure the current subscriptions for this email address are fetched again after
-        # this API call
-        cache.delete(f"laposta_list_subscriptions:{email}")
+        # Ensure the current subscriptions for this email address are fetched again
+        # after this API call
+        self.get_subscriptions_for_email.invalidate(self, email)
 
         return Member(**data["member"])
 
     @cache_result(
-        "laposta_list_subscriptions:{email}", timeout=settings.CACHE_LAPOSTA_API_TIMEOUT
+        "laposta_list_subscriptions:{self._list_ids_key}:{email}",
+        timeout=settings.CACHE_LAPOSTA_API_TIMEOUT,
     )
-    def get_subscriptions_for_email(self, list_ids: list[str], email: str) -> list[str]:
+    def get_subscriptions_for_email(self, email: str) -> list[str]:
+        """Return which of the client's lists this email is subscribed to.
+
+        The lists are part of the cache key, so narrowing or widening the configured
+        selection cannot serve an answer collected for a different one.
+        """
         subscribed_to = []
-        for list_id in list_ids:
+        for list_id in self.list_ids:
             response = self.get(
                 f"member/{quote_email(email)}", params={"list_id": list_id}
             )
@@ -113,4 +138,6 @@ class LapostaClient(BaseAPIClient):
 def create_laposta_client() -> LapostaClient | None:
     config = LapostaConfig.get_solo()
     if config.api_root:
-        return LapostaClient.configure_from(config)
+        return LapostaClient.configure_from(
+            config, list_ids=config.limit_list_selection_to
+        )
