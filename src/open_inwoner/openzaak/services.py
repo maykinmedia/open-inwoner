@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import concurrent.futures
+import contextlib
 import enum
 import threading
 from collections import defaultdict
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Generic, Self, TypedDict, TypeVar, cast
+from typing import Generic, NoReturn, Self, TypedDict, TypeVar, cast
 
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
@@ -109,22 +111,59 @@ class SkipReason(enum.Enum):
     NO_ZAAKTYPE = "no_zaaktype"
     INTERNAL_ZAAKTYPE = "internal_zaaktype"
     CONFIDENTIALITY_TOO_HIGH = "confidentiality_too_high"
+    ROL_RESOLUTION_FAILED = "rol_resolution_failed"
     ZAAKTYPE_RESOLUTION_FAILED = "zaaktype_resolution_failed"
-    FULL_RESOLUTION_FAILED = "full_resolution_failed"
+    STATUS_RESOLUTION_FAILED = "status_resolution_failed"
+    STATUSTYPE_RESOLUTION_FAILED = "statustype_resolution_failed"
+    RESULTAAT_RESOLUTION_FAILED = "resultaat_resolution_failed"
+    RESULTAATTYPE_RESOLUTION_FAILED = "resultaattype_resolution_failed"
+    RESOLUTION_FAILED = "resolution_failed"
     TIMEOUT = "timeout"
+
+    @classmethod
+    def resolution_failures(cls) -> frozenset[Self]:
+        """Reasons for a ZGW entity of the zaak failing to resolve.
+
+        Each entity fetched while building the case list gets its own reason;
+        `RESOLUTION_FAILED` is the fallback for a failure that could not be
+        attributed to a specific entity.
+        """
+        return frozenset(
+            {
+                cls.ROL_RESOLUTION_FAILED,
+                cls.ZAAKTYPE_RESOLUTION_FAILED,
+                cls.STATUS_RESOLUTION_FAILED,
+                cls.STATUSTYPE_RESOLUTION_FAILED,
+                cls.RESULTAAT_RESOLUTION_FAILED,
+                cls.RESULTAATTYPE_RESOLUTION_FAILED,
+                cls.RESOLUTION_FAILED,
+            }
+        )
 
     @classmethod
     def transient_reasons(cls) -> frozenset[Self]:
         """Zaken skipped for these reasons may show up on retry"""
-        return frozenset(
-            {cls.TIMEOUT, cls.FULL_RESOLUTION_FAILED, cls.ZAAKTYPE_RESOLUTION_FAILED}
-        )
+        return cls.resolution_failures() | {cls.TIMEOUT}
+
+
+class ZaakResolutionError(ResolveCaseException):
+    """A ZGW entity associated with a zaak could not be resolved.
+
+    Carries the `SkipReason` naming that entity, so callers can report which part
+    of the zaak failed instead of a blanket resolution failure.
+    """
+
+    def __init__(self, reason: SkipReason, message: str = ""):
+        super().__init__(message or reason.value)
+        self.reason = reason
 
 
 @dataclass
 class SkippedZaak:
     zaak_url: str
-    reason: SkipReason
+    # A zaak has several resolution steps, each of which can fail on its own, so a
+    # single zaak can be skipped for more than one reason
+    reasons: frozenset[SkipReason]
     api_group: ZGWApiGroupConfig
 
 
@@ -147,7 +186,8 @@ class ZakenResult(Generic[_ZaakT]):
         legitimately absent and retrying will not bring them back.
         """
         return self.raw_fetch_incomplete or any(
-            skipped.reason in SkipReason.transient_reasons() for skipped in self.skipped
+            not skipped.reasons.isdisjoint(SkipReason.transient_reasons())
+            for skipped in self.skipped
         )
 
 
@@ -442,52 +482,42 @@ class ZGWService:
         raw_result = self.get_raw_zaken(user_identification, zaak_identificatie)
 
         visible_zaken: list[ZaakWithApiGroupZaakTypeResolved] = []
+        skipped: list[SkippedZaak] = []
         for zaak_with_group in raw_result.zaken:
             api_group = zaak_with_group.api_group
 
-            # Check the rol before resolving anything else, mirroring the order in
-            # `check_zaak_access`, so a zaak the user has no claim to never has its
-            # metadata resolved. We cannot rely on the API-level
-            # `rol__omschrijvingGeneriek` filter here: eSuite is known to ignore filter
-            # query params (see Taiga #961 and `ZakenClient.fetch_zaak_roles`).
             try:
-                if not self._user_has_required_rol(
-                    zaak_with_group.zaak.url,
-                    user_identification,
-                    self._zaken_client_factory(api_group, config),
-                    use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
-                    limit_access_to_role=limit_access_to_role,
+                # Check the rol before resolving anything else, mirroring the order in
+                # `check_zaak_access`, so a zaak the user has no claim to never has its
+                # metadata resolved. We cannot rely on the API-level
+                # `rol__omschrijvingGeneriek` filter here: eSuite is known to ignore
+                # filter query params (see Taiga #961 and
+                # `ZakenClient.fetch_zaak_roles`).
+                with self._report_failure(
+                    SkipReason.ROL_RESOLUTION_FAILED, zaak_with_group
                 ):
+                    has_required_rol = self._user_has_required_rol(
+                        zaak_with_group.zaak.url,
+                        user_identification,
+                        self._zaken_client_factory(api_group, config),
+                        use_rsin=api_group.fetch_eherkenning_zaken_with_rsin,
+                        limit_access_to_role=limit_access_to_role,
+                    )
+                if not has_required_rol:
                     continue
-            except ZgwAPIError:
-                logger.warning(
-                    "Unable to fetch rollen for search result, excluding it",
-                    zaak_url=zaak_with_group.zaak.url,
-                )
-                continue
-            except Exception:
-                logger.exception(
-                    "Unknown error fetching rollen for search result, excluding it",
-                    zaak_url=zaak_with_group.zaak.url,
-                )
-                continue
 
-            try:
                 # TODO: could be done in parallel
-                catalogi_client = self._catalogi_client_factory(
-                    zaak_with_group.api_group
-                )
+                catalogi_client = self._catalogi_client_factory(api_group)
                 self._resolve_zaak_type(zaak_with_group, catalogi_client)
-            except (ZgwAPIError, ResolveCaseException):
-                logger.warning(
-                    "Unable to resolve zaaktype for search result",
-                    zaak_url=zaak_with_group.zaak.url,
-                )
-                continue
-            except Exception:
-                logger.exception(
-                    "Unkown error resolving zaak type",
-                    zaak_url=zaak_with_group.zaak.url,
+            except Exception as exc:
+                skipped.append(
+                    SkippedZaak(
+                        zaak_url=zaak_with_group.zaak.url,
+                        reasons=frozenset(
+                            {self._skip_reason_for(exc, zaak_with_group)}
+                        ),
+                        api_group=api_group,
+                    )
                 )
                 continue
 
@@ -500,11 +530,12 @@ class ZGWService:
                     )
                 )
 
-        # Rol and zaaktype exclusions above are not fetch failures, so they are
-        # not reported as skipped; only the raw fetch stage can fail here.
+        # A match dropped because the user holds no rol on it, or because it is not
+        # visible, is legitimately absent and not reported as skipped. Only failures
+        # to resolve are, so that the search page can report incomplete results.
         return ZakenResult(
             zaken=visible_zaken,
-            skipped=[],
+            skipped=skipped,
             raw_fetch_incomplete=raw_result.raw_fetch_incomplete,
         )
 
@@ -590,15 +621,14 @@ class ZGWService:
                     processed_ids.add(id(zaak_with_group))
                     try:
                         future.result()
-                    except Exception:
-                        logger.warning(
-                            "Culling zaak %s because zaaktype resolution failed",
-                            zaak_with_group.identification,
-                        )
+                    except Exception as exc:
+                        # `_skip_reason_for` reports which entity failed to resolve
                         skipped.append(
                             SkippedZaak(
                                 zaak_url=zaak_with_group.zaak.url,
-                                reason=SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
+                                reasons=frozenset(
+                                    {self._skip_reason_for(exc, zaak_with_group)}
+                                ),
                                 api_group=zaak_with_group.api_group,
                             )
                         )
@@ -616,7 +646,7 @@ class ZGWService:
                         skipped.append(
                             SkippedZaak(
                                 zaak_url=zaak_with_group.zaak.url,
-                                reason=skip_reason,
+                                reasons=frozenset({skip_reason}),
                                 api_group=zaak_with_group.api_group,
                             )
                         )
@@ -625,7 +655,7 @@ class ZGWService:
                 skipped.extend(
                     SkippedZaak(
                         zaak_url=z.zaak.url,
-                        reason=SkipReason.TIMEOUT,
+                        reasons=frozenset({SkipReason.TIMEOUT}),
                         api_group=z.api_group,
                     )
                     for z in future_to_zaak.values()
@@ -659,7 +689,7 @@ class ZGWService:
             concurrent.futures.Future, ZaakWithApiGroupZaakTypeResolved
         ] = {}
         remaining: dict[int, int] = {}
-        failed_ids: set[int] = set()
+        failure_reasons: dict[int, set[SkipReason]] = defaultdict(set)
 
         # Each thread gets its own zaken client because requests.Session is not
         # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
@@ -696,8 +726,10 @@ class ZGWService:
                     remaining[id(zaak_with_group)] -= 1
                     try:
                         future.result()
-                    except Exception:
-                        failed_ids.add(id(zaak_with_group))
+                    except Exception as exc:
+                        failure_reasons[id(zaak_with_group)].add(
+                            self._skip_reason_for(exc, zaak_with_group)
+                        )
             except concurrent.futures.TimeoutError:
                 logger.warning("Timed out resolving zaken", exc_info=True)
 
@@ -705,19 +737,16 @@ class ZGWService:
         skipped: list[SkippedZaak] = []
         for zaak_with_group in zaken:
             zid = id(zaak_with_group)
+            reasons = set(failure_reasons.get(zid, ()))
             if remaining[zid] != 0:
+                # Steps that were still pending when the stage timed out. Any step
+                # that did fail keeps its own reason alongside this one.
+                reasons.add(SkipReason.TIMEOUT)
+            if reasons:
                 skipped.append(
                     SkippedZaak(
                         zaak_url=zaak_with_group.zaak.url,
-                        reason=SkipReason.TIMEOUT,
-                        api_group=zaak_with_group.api_group,
-                    )
-                )
-            elif zid in failed_ids:
-                skipped.append(
-                    SkippedZaak(
-                        zaak_url=zaak_with_group.zaak.url,
-                        reason=SkipReason.FULL_RESOLUTION_FAILED,
+                        reasons=frozenset(reasons),
                         api_group=zaak_with_group.api_group,
                     )
                 )
@@ -727,6 +756,59 @@ class ZGWService:
                 )
 
         return ZakenResult(zaken=fully_resolved, skipped=skipped)
+
+    @staticmethod
+    def _fail_resolution(
+        reason: SkipReason,
+        zaak_with_group: ZaakWithApiGroup,
+        cause: BaseException | None = None,
+        detail: str = "",
+    ) -> NoReturn:
+        """Log a resolution failure where it happens and tag it with `reason`.
+
+        Callers of the resolvers only see the `SkipReason`, so the underlying
+        error has to be reported here or it is lost.
+        """
+        logger.error(
+            "Failed to resolve ZGW entity for zaak",
+            zaak_url=zaak_with_group.zaak.url,
+            api_group=str(zaak_with_group.api_group),
+            skip_reason=reason.value,
+            detail=detail,
+            exc_info=cause,
+        )
+        raise ZaakResolutionError(reason, detail) from cause
+
+    @contextlib.contextmanager
+    def _report_failure(
+        self, reason: SkipReason, zaak_with_group: ZaakWithApiGroup
+    ) -> Iterator[None]:
+        """Attribute any failure of a single resolution step to `reason`."""
+        try:
+            yield
+        except Exception as exc:
+            self._fail_resolution(reason, zaak_with_group, cause=exc)
+
+    @staticmethod
+    def _skip_reason_for(
+        exc: BaseException, zaak_with_group: ZaakWithApiGroup
+    ) -> SkipReason:
+        """Map a failed resolution future to the reason its zaak is skipped.
+
+        The resolvers log and tag their own failures; anything else is unexpected
+        and logged here, so that no dropped zaak goes unexplained.
+        """
+        if isinstance(exc, ZaakResolutionError):
+            return exc.reason
+
+        logger.error(
+            "Failed to resolve zaak for unexpected reason",
+            zaak_url=zaak_with_group.zaak.url,
+            api_group=str(zaak_with_group.api_group),
+            skip_reason=SkipReason.RESOLUTION_FAILED.value,
+            exc_info=exc,
+        )
+        return SkipReason.RESOLUTION_FAILED
 
     def _resolve_zaak_type(
         self,
@@ -740,7 +822,12 @@ class ZGWService:
             )
             return
 
-        zaaktype = catalogi_client.fetch_single_zaaktype(zaak_with_group.zaak.zaaktype)
+        with self._report_failure(
+            SkipReason.ZAAKTYPE_RESOLUTION_FAILED, zaak_with_group
+        ):
+            zaaktype = catalogi_client.fetch_single_zaaktype(
+                zaak_with_group.zaak.zaaktype
+            )
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.zaaktype = zaaktype
@@ -755,13 +842,22 @@ class ZGWService:
             return
 
         if not isinstance(zaak_with_group.zaak.status, str):
-            raise ResolveCaseException(
-                f"`case.status` for case {zaak_with_group.zaak.identificatie} "
-                f"is not a str but {type(zaak_with_group.zaak.status)}"
+            self._fail_resolution(
+                SkipReason.STATUS_RESOLUTION_FAILED,
+                zaak_with_group,
+                detail=(
+                    f"`case.status` for case {zaak_with_group.zaak.identificatie} "
+                    f"is not a str but {type(zaak_with_group.zaak.status)}"
+                ),
             )
 
-        status = zaken_client.fetch_single_status(zaak_with_group.zaak.status)
-        status_type = catalogi_client.fetch_single_status_type(status.statustype)
+        with self._report_failure(SkipReason.STATUS_RESOLUTION_FAILED, zaak_with_group):
+            status = zaken_client.fetch_single_status(zaak_with_group.zaak.status)
+
+        with self._report_failure(
+            SkipReason.STATUSTYPE_RESOLUTION_FAILED, zaak_with_group
+        ):
+            status_type = catalogi_client.fetch_single_status_type(status.statustype)
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.status = status
@@ -777,15 +873,26 @@ class ZGWService:
             return
 
         if not isinstance(zaak_with_group.zaak.resultaat, str):
-            raise ResolveCaseException(
-                f"`case.resultaat` for case {zaak_with_group.zaak.identificatie} "
-                f"is not a str but {type(zaak_with_group.zaak.resultaat)}"
+            self._fail_resolution(
+                SkipReason.RESULTAAT_RESOLUTION_FAILED,
+                zaak_with_group,
+                detail=(
+                    f"`case.resultaat` for case {zaak_with_group.zaak.identificatie} "
+                    f"is not a str but {type(zaak_with_group.zaak.resultaat)}"
+                ),
             )
 
-        resultaat = zaken_client.fetch_single_result(zaak_with_group.zaak.resultaat)
-        resultaattype = catalogi_client.fetch_single_resultaat_type(
-            resultaat.resultaattype
-        )
+        with self._report_failure(
+            SkipReason.RESULTAAT_RESOLUTION_FAILED, zaak_with_group
+        ):
+            resultaat = zaken_client.fetch_single_result(zaak_with_group.zaak.resultaat)
+
+        with self._report_failure(
+            SkipReason.RESULTAATTYPE_RESOLUTION_FAILED, zaak_with_group
+        ):
+            resultaattype = catalogi_client.fetch_single_resultaat_type(
+                resultaat.resultaattype
+            )
 
         with self._zaak_update_lock:
             zaak_with_group.zaak.resultaat = resultaat

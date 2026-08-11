@@ -79,8 +79,10 @@ class FetchCasesCheck(
             service = ZGWService()
             result = service.get_visible_zaken(BSNIdentification(bsn=bsn))
             count = len(result.zaken)
-            skipped = dict(Counter(s.reason.value for s in result.skipped))
-            not_visible_count = sum(skipped.values())
+            # A zaak can be skipped for more than one reason, so the breakdown
+            # counts reasons and may add up to more than the number of zaken
+            skipped = dict(Counter(r.value for s in result.skipped for r in s.reasons))
+            not_visible_count = len(result.skipped)
 
             by_group = {}
             for z in result.zaken:
@@ -97,9 +99,10 @@ class FetchCasesCheck(
                     {"total_visible": 0, "total_not_visible": 0, "not_visible": {}},
                 )
                 by_group[name]["total_not_visible"] += 1
-                by_group[name]["not_visible"][s.reason.value] = (
-                    by_group[name]["not_visible"].get(s.reason.value, 0) + 1
-                )
+                for reason in s.reasons:
+                    by_group[name]["not_visible"][reason.value] = (
+                        by_group[name]["not_visible"].get(reason.value, 0) + 1
+                    )
 
             extra = {
                 "total": count + not_visible_count,
