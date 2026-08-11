@@ -14,6 +14,7 @@ from .api_models import (
     KlantContactRol,
     ObjectContactMoment,
 )
+from .constants import DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS
 from .exceptions import (
     KlantAPIClientError,
     KlantAPIDataError,
@@ -203,7 +204,9 @@ class ContactmomentenClient(KlantAPIClient):
         timeout=lambda self: self.cache_timeout,
     )
     def list_klantcontactmomenten_for_klant(
-        self, klant_url: str, max_requests: int | None = None
+        self,
+        klant_url: str,
+        max_requests: int | None = DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
     ) -> list[KlantContactMoment]:
         """List a klant's klantcontactmomenten, leaving `contactmoment` as a URL.
 
@@ -213,6 +216,9 @@ class ContactmomentenClient(KlantAPIClient):
 
         :param max_requests: caps the number of pagination requests followed, so a
         klant with a long history has a bounded worst case (e.g. during cache warm-up).
+        The cache key varies on it, so every caller has to resolve it to the same
+        value or they stop sharing an entry. That includes `invalidate()`, which has
+        no listing to cap and so can only fall back on this default.
         """
         response = self.get(
             "klantcontactmomenten",
