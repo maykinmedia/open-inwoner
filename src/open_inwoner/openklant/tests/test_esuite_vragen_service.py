@@ -407,6 +407,35 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
         ]
         self.assertEqual(len(listing_requests), 2)
 
+    def test_pagination_bound_comes_from_the_configuration(self, m):
+        """The admin setting has to reach the client that does the listing."""
+        config = ESuiteKlantConfig.get_solo()
+        config.contactmoment_max_requests = 3
+        config.save()
+
+        self.assertEqual(build_contactmomenten_client().max_requests, 3)
+
+    def test_pagination_bound_is_part_of_the_listing_cache_key(self, m):
+        """Raising the bound must not serve a listing collected under the old one.
+
+        The cached listing is only as complete as the bound it was collected with, so
+        an operator raising it has to get a deeper listing rather than the truncated
+        entry that is already there.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+
+        shallow = build_contactmomenten_client()
+        config = ESuiteKlantConfig.get_solo()
+        config.contactmoment_max_requests = shallow.max_requests + 1
+        config.save()
+        deeper = build_contactmomenten_client()
+
+        self.assertNotEqual(
+            shallow.list_klantcontactmomenten_for_klant.cache_key(shallow, klant.url),
+            deeper.list_klantcontactmomenten_for_klant.cache_key(deeper, klant.url),
+        )
+
     def test_create_contactmoment_invalidates_the_klant_listing_cache(self, m):
         """A question asked through this site must appear on the very next page load.
 

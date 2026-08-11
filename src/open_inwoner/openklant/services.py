@@ -496,13 +496,6 @@ class eSuiteKlantenService(
 # Kept modest to avoid hammering eSuite, which is the constrained side.
 _DEFAULT_CONTACTMOMENT_WORKERS = 8
 
-# Bounds the number of pagination requests a klantcontactmomenten listing follows.
-# Applied to every caller (page views and the login cache warm-up alike), not just
-# the warm-up: the listing is cached per (klant, max_requests) pair, so a warm-up
-# capped differently from the page view it is meant to serve would populate a cache
-# entry the page view never reads, warming nothing.
-_DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS = 5
-
 
 class KlantContactMomentSkipReason(enum.Enum):
     RESOLUTION_FAILED = "resolution_failed"
@@ -689,17 +682,14 @@ class eSuiteVragenService(KlantenService):
         Shared by the full resolve (`fetch_klantcontactmomenten`), the detail-page
         lookup (`fetch_klantcontactmoment`), and the login cache warm-up: all three
         need the unresolved listing before deciding what, if anything, to resolve, and
-        all three must request it with the same `max_requests` so they share one
-        cache entry. Caught broadly rather than just `KlantAPIError`: a
-        data-invariant `ValueError` (mismatched klant) means this klant's listing
-        failed just as much as an HTTP error would.
+        all three share one cache entry because the pagination bound lives on the
+        client rather than being passed per call. Caught broadly rather than just
+        `KlantAPIError`: a data-invariant `ValueError` (mismatched klant) means this
+        klant's listing failed just as much as an HTTP error would.
         """
         try:
             return (
-                client.list_klantcontactmomenten_for_klant(
-                    klant.url,
-                    max_requests=_DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
-                ),
+                client.list_klantcontactmomenten_for_klant(klant.url),
                 False,
             )
         except Exception:
