@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 
 import requests_mock as requests_mock_module
 from zgw_consumers.api_models.base import factory as zgw_factory
@@ -146,9 +146,9 @@ class ZgwCachingUnitTest(ClearCachesMixin, TestCase):
     @requests_mock_module.Mocker()
     def test_zaken_list_cached_with_correct_key(self, m):
         """
-        Verify that fetch_zaken_by_bsn is cached using the same max_requests value
-        that get_zaken (called by the case list view) passes through fetch_zaken.
-        A second call with the same arguments must make no new HTTP requests.
+        Verify that a second fetch_zaken_by_bsn with the same arguments makes no new
+        HTTP requests. The pagination bound is client state rather than an argument,
+        so there is nothing a caller could pass that would move it to another key.
         """
         zaak_dict = _make_zaak_dict(ZAAK_URL, ZAAK_UUID, STATUS_URL)
         m.get(
@@ -159,14 +159,31 @@ class ZgwCachingUnitTest(ClearCachesMixin, TestCase):
         )
 
         zaken_client = ZGWService._zaken_client_factory(self.api_group)
-        zaken_client.fetch_zaken_by_bsn(BSN, max_requests=settings.ZGW_MAX_REQUESTS)
+        zaken_client.fetch_zaken_by_bsn(BSN)
 
         calls_after_first = len(m.request_history)
         self.assertGreater(calls_after_first, 0)
 
-        zaken_client.fetch_zaken_by_bsn(BSN, max_requests=settings.ZGW_MAX_REQUESTS)
+        zaken_client.fetch_zaken_by_bsn(BSN)
 
         self.assertEqual(len(m.request_history), calls_after_first)
+
+    @requests_mock_module.Mocker()
+    def test_pagination_bound_is_part_of_the_zaken_cache_key(self, m):
+        """Raising the bound must not serve a listing collected under the old one.
+
+        The cached listing is only as complete as the bound it was collected with, so
+        an operator raising `ZGW_MAX_REQUESTS` has to get a deeper listing rather than
+        the truncated entry that is already there.
+        """
+        shallow = ZGWService._zaken_client_factory(self.api_group)
+        with override_settings(ZGW_MAX_REQUESTS=settings.ZGW_MAX_REQUESTS + 1):
+            deeper = ZGWService._zaken_client_factory(self.api_group)
+
+        self.assertNotEqual(
+            shallow.fetch_zaken_by_bsn.cache_key(shallow, BSN),
+            deeper.fetch_zaken_by_bsn.cache_key(deeper, BSN),
+        )
 
 
 class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
@@ -221,7 +238,7 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
         zaken_client = ZGWService._zaken_client_factory(self.api_group)
         catalogi_client = ZGWService._catalogi_client_factory(self.api_group)
 
-        zaken_client.fetch_zaken_by_bsn(BSN, max_requests=settings.ZGW_MAX_REQUESTS)
+        zaken_client.fetch_zaken_by_bsn(BSN)
         status = zaken_client.fetch_single_status(STATUS_URL)
         catalogi_client.fetch_single_zaaktype(ZAAKTYPE_URL)
         catalogi_client.fetch_single_status_type(status.statustype)
