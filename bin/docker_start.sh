@@ -20,6 +20,9 @@ ${SCRIPTPATH}/wait_for_db.sh
 # fixtures_dir=${FIXTURES_DIR:-/app/fixtures}
 
 # Apply database migrations
+>&2 echo "Apply cms4_migration"
+python src/manage.py cms4_migration --skip-checks
+
 >&2 echo "Apply database migrations"
 python src/manage.py migrate --skip-checks
 
