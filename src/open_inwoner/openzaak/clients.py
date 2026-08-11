@@ -49,6 +49,7 @@ from .api_models import (
     ZaakType,
 )
 from .models import OpenZaakConfig
+from .utils import omschrijving_generiek_matches
 
 CRS_HEADERS = {"Content-Crs": "EPSG:4326", "Accept-Crs": "EPSG:4326"}
 
@@ -346,7 +347,13 @@ class ZakenClient(ZgwAPIClient):
 
         # Taiga #961 process eSuite response to apply ignored filter query
         if role_desc_generic:
-            roles = [r for r in roles if r.omschrijving_generiek == role_desc_generic]
+            roles = [
+                r
+                for r in roles
+                if omschrijving_generiek_matches(
+                    r.omschrijving_generiek, role_desc_generic
+                )
+            ]
 
         return roles
 
