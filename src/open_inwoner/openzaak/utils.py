@@ -33,6 +33,17 @@ def is_object_visible(obj, max_confidentiality_level: str) -> bool:
     return True
 
 
+def omschrijving_generiek_matches(omschrijving_generiek: str, *others: str) -> bool:
+    """
+    WORKAROUND: compare `Rol.omschrijving_generiek` case-insensitively.
+
+    Per the ZGW standard `omschrijvingGeneriek` is a lowercase enum value, but some
+    vendors (e.g. Decos) don't comply and send it capitalized. Remove this
+    workaround once the vendor fixes their casing.
+    """
+    return omschrijving_generiek.casefold() in {o.casefold() for o in others}
+
+
 def get_role_name_display(rol: Rol) -> str:
     """
     best effort to get a presentable display string from a role

@@ -32,6 +32,7 @@ from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.openzaak.utils import (
     get_zaak_type_config,
     get_zaak_type_info_object_type_config,
+    omschrijving_generiek_matches,
 )
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import system_action as log_system_action
@@ -648,7 +649,9 @@ def _get_np_initiator_bsns_from_roles(
     )
 
     for role in roles:
-        if role.omschrijving_generiek not in allowed_rollen:
+        if not omschrijving_generiek_matches(
+            role.omschrijving_generiek, *allowed_rollen
+        ):
             continue
         if role.betrokkene_type != RolTypes.natuurlijk_persoon:
             continue
@@ -679,7 +682,9 @@ def _get_nnp_initiator_nnp_id_from_roles(
     )
 
     for role in roles:
-        if role.omschrijving_generiek not in allowed_rollen:
+        if not omschrijving_generiek_matches(
+            role.omschrijving_generiek, *allowed_rollen
+        ):
             continue
         if role.betrokkene_type != RolTypes.niet_natuurlijk_persoon:
             continue
