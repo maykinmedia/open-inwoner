@@ -13,7 +13,11 @@ from open_inwoner.openklant.clients import (
     build_contactmomenten_client,
     build_klanten_client,
 )
-from open_inwoner.openklant.constants import KlantenServiceType, Status
+from open_inwoner.openklant.constants import (
+    DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
+    KlantenServiceType,
+    Status,
+)
 from open_inwoner.openklant.models import ContactFormSubject, ESuiteKlantConfig
 from open_inwoner.openklant.services import (
     KlantContactMomentSkipReason,
@@ -413,10 +417,17 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
         The contact form is embedded on "Mijn vragen" itself, and its success
         redirect lands straight back there, so a stale listing cache would hide the
         question just asked.
+
+        Primes and reads the cache through `_list_klantcontactmomenten_for_klant`,
+        the helper every production caller goes through, rather than calling the
+        client directly: the key varies on `max_requests`, so a test that lists with
+        a different one passes against an entry no page view ever reads.
         """
         data = MockAPIReadData().install_mocks(m)
         klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
-        build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant.url)
+        self.service._list_klantcontactmomenten_for_klant(
+            build_contactmomenten_client(), klant
+        )
 
         m.post(
             f"{CONTACTMOMENTEN_ROOT}contactmomenten",
@@ -440,7 +451,9 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
             klant=klant,
         )
 
-        build_contactmomenten_client().list_klantcontactmomenten_for_klant(klant.url)
+        self.service._list_klantcontactmomenten_for_klant(
+            build_contactmomenten_client(), klant
+        )
 
         listing_requests = [
             req
@@ -449,6 +462,27 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
             and req.url.startswith(f"{CONTACTMOMENTEN_ROOT}klantcontactmomenten")
         ]
         self.assertEqual(len(listing_requests), 2)
+
+    def test_invalidation_targets_the_key_the_listing_is_cached_under(self, m):
+        """The invalidation and the listing must agree on the whole cache key.
+
+        `invalidate()` cannot know a caller's `max_requests`, so it fills in the
+        parameter default. A listing capped at anything else would be cached under a
+        key the invalidation never deletes, and the failure is silent: the question
+        just asked simply stays missing until the entry expires.
+        """
+        data = MockAPIReadData().install_mocks(m)
+        klant = build_klanten_client().retrieve_klant(user_bsn=data.user.bsn)
+        client = build_contactmomenten_client()
+
+        self.assertEqual(
+            client.list_klantcontactmomenten_for_klant.cache_key(
+                client,
+                klant.url,
+                max_requests=DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
+            ),
+            client.list_klantcontactmomenten_for_klant.cache_key(client, klant.url),
+        )
 
     def test_retrieve_question_returns_expected_result(self, m):
         data = MockAPIReadData().install_mocks(m)
