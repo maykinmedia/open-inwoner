@@ -50,7 +50,7 @@ class NewsletterSubscriptionForm(forms.Form):
                 initial_data = request.POST.getlist("newsletters")
             else:
                 initial_data = laposta_client.get_subscriptions_for_email(
-                    limited_to, request.user.verified_email
+                    request.user.verified_email
                 )
 
             self.fields["newsletters"].initial = initial_data
@@ -75,9 +75,8 @@ class NewsletterSubscriptionForm(forms.Form):
             custom_fields={"toestemming": "Ja, ik wil de nieuwsbrief ontvangen"},
             options=None,
         )
-        limited_to = LapostaConfig.get_solo().limit_list_selection_to
         existing_subscriptions = set(
-            client.get_subscriptions_for_email(limited_to, user.verified_email)
+            client.get_subscriptions_for_email(user.verified_email)
         )
         for list_id in newsletters:
             if list_id in existing_subscriptions:
