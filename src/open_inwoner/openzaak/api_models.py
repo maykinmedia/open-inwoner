@@ -208,7 +208,6 @@ class InformatieObject(ZGWModel):
     titel: str
     vertrouwelijkheidaanduiding: str
     auteur: str
-    status: str
     formaat: str
     taal: str
     versie: int
@@ -221,6 +220,7 @@ class InformatieObject(ZGWModel):
     locked: bool
     # bestandsdelen: List[str]
     beschrijving: Optional[str] = ""
+    status: Optional[str] = ""
     link: Optional[str] = ""
     ontvangstdatum: Optional[str] = ""
     verzenddatum: Optional[str] = ""
