@@ -212,7 +212,7 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
 
     warm_cache_for_user.delay is patched to call the underlying run() directly,
     bypassing QueueOnce (which requires Redis) while still exercising the full
-    task body. Threads spawned by parallel() make no DB queries (clients are
+    task body. Threads spawned by TimedParallel make no DB queries (clients are
     pre-built in the main thread), so TestCase is sufficient.
     """
 

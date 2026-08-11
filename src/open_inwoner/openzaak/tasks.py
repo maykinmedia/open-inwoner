@@ -1,4 +1,3 @@
-import concurrent.futures
 import io
 
 from django.conf import settings
@@ -7,7 +6,6 @@ from django.core.management import call_command
 import structlog
 from celery_once import QueueOnce
 from zgw_consumers.api_models.base import factory
-from zgw_consumers.concurrent import parallel
 
 from notifications.exceptions import (
     NotificationAlreadyProcessedError,
@@ -31,6 +29,7 @@ from open_inwoner.openzaak.metrics import (
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.notifications import handle_zaken_notification
 from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.utils.concurrency import TimedParallel
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -163,7 +162,7 @@ def warm_cache_for_user(
     # thread-safe. Pre-fetch OpenZaakConfig to avoid additional DB calls.
     config = OpenZaakConfig.get_solo()
 
-    with parallel(max_workers=10) as executor:
+    with TimedParallel(max_workers=10, name="warm_cache_for_user") as executor:
         futures = {
             executor.submit(
                 _warm_single_zaak,
@@ -175,25 +174,24 @@ def warm_cache_for_user(
             ): zaak_with_group
             for zaak_with_group in raw_zaken
         }
-        done, timed_out = concurrent.futures.wait(
-            futures, timeout=settings.ZGW_CACHE_WARMUP_TIMEOUT
+        result = executor.as_completed(
+            futures, cancel_after=settings.ZGW_CACHE_WARMUP_TIMEOUT
         )
+        for future in result:
+            if exc := future.exception():
+                zaak_with_group = futures[future]
+                logger.warning(
+                    "ZGW cache warm-up failed for zaak",
+                    zaak_url=zaak_with_group.zaak.url,
+                    exc_info=exc,
+                )
 
-    for future in timed_out:
+    for future in result.cancelled_futures:
         zaak_with_group = futures[future]
         logger.warning(
             "ZGW cache warm-up timed out for zaak",
             zaak_url=zaak_with_group.zaak.url,
         )
-
-    for future in done:
-        if exc := future.exception():
-            zaak_with_group = futures[future]
-            logger.warning(
-                "ZGW cache warm-up failed for zaak",
-                zaak_url=zaak_with_group.zaak.url,
-                exc_info=exc,
-            )
 
     logger.info("Finished ZGW cache warm-up")
 

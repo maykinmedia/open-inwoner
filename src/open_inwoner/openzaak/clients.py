@@ -13,7 +13,6 @@ from requests import Response
 from zgw_consumers.api_models.catalogi import Catalogus
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
 from zgw_consumers.client import build_client
-from zgw_consumers.concurrent import parallel
 from zgw_consumers.constants import APITypes
 from zgw_consumers.models import Service
 from zgw_consumers.service import pagination_helper
@@ -33,6 +32,7 @@ from open_inwoner.openzaak.exceptions import (
     ZgwAPIServerError,
 )
 from open_inwoner.utils.api import BaseAPIClient
+from open_inwoner.utils.concurrency import TimedParallel
 from open_inwoner.utils.decorators import cache as cache_result
 
 from .api_models import (
@@ -801,7 +801,7 @@ class MultiZgwClientProxy:
         if not all(hasattr(client, method) for client in self.clients):
             raise AttributeError(f"Method `{method}` does not exist on the clients")
 
-        with parallel() as executor:
+        with TimedParallel(name=f"multi_zgw_client_proxy.{method}") as executor:
             futures_mapping: Mapping[concurrent.futures.Future, TClient] = {}
             for client in self.clients:
                 future = executor.submit(
@@ -814,7 +814,10 @@ class MultiZgwClientProxy:
                 futures_mapping[future] = client
 
             responses: list[ZgwClientResponse] = []
-            for task in concurrent.futures.as_completed(futures_mapping.keys()):
+            # No timeout: this proxy is used for admin/diagnostic calls
+            # where waiting for every client to finish is the intended
+            # behaviour.
+            for task in executor.as_completed(futures_mapping.keys()):
                 result: Any | None = None
                 exception: Exception | None = None
                 try:
