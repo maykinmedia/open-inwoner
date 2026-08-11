@@ -80,6 +80,7 @@ class ZakenClient(ZgwAPIClient):
     zaak_max_confidentiality: str
     limit_user_visible_cases_to_role: str | None
     cache_zaken_timeout: int
+    max_requests: int
 
     def __init__(
         self,
@@ -89,6 +90,7 @@ class ZakenClient(ZgwAPIClient):
         zaak_max_confidentiality: str,
         limit_user_visible_cases_to_role: str | None = None,
         cache_zaken_timeout: int | None = None,
+        max_requests: int | None = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -97,19 +99,21 @@ class ZakenClient(ZgwAPIClient):
         self.zaak_max_confidentiality = zaak_max_confidentiality
         self.limit_user_visible_cases_to_role = limit_user_visible_cases_to_role
         self.cache_zaken_timeout = cache_zaken_timeout or 0
+        # `pagination_helper` treats 0 the same as None: no cap at all. Falling back
+        # on the setting keeps an unconfigured or zeroed client from following every
+        # page of a user's zaken.
+        self.max_requests = max_requests or settings.ZGW_MAX_REQUESTS
 
     def fetch_zaken(
         self,
         user_identification: UserIdentification,
         use_rsin: bool = True,
-        max_requests: int | None = None,
         identificatie: str | None = None,
     ) -> list[Zaak]:
         match user_identification:
             case BSNIdentification():
                 return self.fetch_zaken_by_bsn(
                     user_identification.bsn,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                     identificatie=identificatie,
                 )
             case KVKIdentification():
@@ -126,7 +130,6 @@ class ZakenClient(ZgwAPIClient):
                 return self.fetch_zaken_for_company(
                     kvk_or_rsin=kvk_or_rsin,
                     vestigingsnummer=user_identification.vestigingsnummer,
-                    max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
                     zaak_identificatie=identificatie,
                 )
             case _:
@@ -135,19 +138,22 @@ class ZakenClient(ZgwAPIClient):
                 )
 
     @cache_result(
-        "{self.base_url}:zaken:{user_bsn}:{max_requests}:{identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
+        "{self.base_url}:zaken:{user_bsn}:{self.max_requests}:{identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
         timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_by_bsn(
         self,
         user_bsn: str,
-        max_requests: int | None = None,
         identificatie: str | None = None,
     ) -> list[Zaak]:
         """
         retrieve zaken for particular user with allowed confidentiality level
 
-        :param:max_requests - used to limit the number of requests to list_zaken resource.
+        The pagination bound is `self.max_requests` rather than an argument, so that
+        every caller of a given client necessarily agrees on it. The cache key varies
+        on it, and callers that disagreed would land in separate entries: the login
+        warm-up would populate one no page view reads.
+
         :param:identificatie - used to filter the zaken by a specific identification
         """
         params = {
@@ -172,28 +178,29 @@ class ZakenClient(ZgwAPIClient):
             pagination_helper(
                 self,
                 data,
-                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                max_requests=self.max_requests,
                 headers=CRS_HEADERS,
             )
         )
         return self.factory(Zaak, all_data)
 
     @cache_result(
-        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{max_requests}:{zaak_identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
+        "{self.base_url}:zaken:{kvk_or_rsin}:{vestigingsnummer}:{self.max_requests}:{zaak_identificatie}:{self.zaak_max_confidentiality}:{self.limit_user_visible_cases_to_role}",
         timeout=lambda self: self.cache_zaken_timeout,
     )
     def fetch_zaken_for_company(
         self,
         kvk_or_rsin: str | None = None,
-        max_requests: int | None = None,
         zaak_identificatie: str | None = None,
         vestigingsnummer: str | None = None,
     ) -> list[Zaak]:
         """
         retrieve zaken for particular company with allowed confidentiality level
 
+        See `fetch_zaken_by_bsn` for why the pagination bound is client state rather
+        than an argument.
+
         :param kvk_or_rsin: - used to filter the zaken by a KVK number or RSIN (configured via OpenZaakConfig)
-        :param max_requests: - used to limit the number of requests to list_zaken resource.
         :param zaak_identificatie: - used to filter the zaken by a unique Zaak identification number
         :param vestigingsnummer: - used to filter the zaken by a vestigingsnummer
         """
@@ -245,7 +252,7 @@ class ZakenClient(ZgwAPIClient):
             pagination_helper(
                 self,
                 data,
-                max_requests=max_requests or settings.ZGW_MAX_REQUESTS,
+                max_requests=self.max_requests,
                 headers=CRS_HEADERS,
             )
         )
