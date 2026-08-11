@@ -1,3 +1,17 @@
+2.4.3 (2026-08-11)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.3`.
+
+Nieuwe features
+---------------
+
+* [:gh:`2736`]: De 'Mijn vragen'-pagina's zijn versneld door contactmomenten
+  parallel op te halen (eSuite), klantcontacten server-side te filteren op
+  partij (OpenKlant) en listings/resolved contactmomenten/partij-uuid te
+  cachen; een onvolledig resultaat toont nu een waarschuwingsbanner met
+  retry-link in plaats van alleen een foutmelding.
+
 2.4.2 (2026-08-10)
 ==================
 
