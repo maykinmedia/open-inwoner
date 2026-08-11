@@ -1,4 +1,5 @@
 from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -17,6 +18,15 @@ class SendMockNotificationCommandTestCase(TestCase):
             secret="test-secret",
             channels=["zaken"],
         )
+
+        # The command posts through the real webhook, which hands the record to a
+        # Celery worker. These tests are about what the command sends and what the
+        # webhook accepts, so the dispatch is stubbed out: without it they need a
+        # live broker to leave records PENDING, and with CELERY_TASK_ALWAYS_EAGER
+        # the task runs inline and moves them straight past PENDING instead.
+        patcher = patch("open_inwoner.openzaak.api.views.process_zaken_notification")
+        self.mock_task = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_default_sends_five_valid_and_two_malformed(self):
         call_command("send_mock_notification", stdout=StringIO())
