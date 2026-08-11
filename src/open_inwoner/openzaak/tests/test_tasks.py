@@ -185,6 +185,26 @@ class ZgwCachingUnitTest(ClearCachesMixin, TestCase):
             deeper.fetch_zaken_by_bsn.cache_key(deeper, BSN),
         )
 
+    @requests_mock_module.Mocker()
+    def test_openzaak_120_params_are_part_of_the_company_cache_key(self, m):
+        """Switching parameter style must not serve entries from the other style.
+
+        `use_openzaak_120_params` decides which rol query parameters are sent, so the
+        two styles are different questions and can return different zaken.
+        """
+        self.api_group.fetch_eherkenning_zaken_with_openzaak_120_params = False
+        self.api_group.save()
+        legacy = ZGWService._zaken_client_factory(self.api_group)
+
+        self.api_group.fetch_eherkenning_zaken_with_openzaak_120_params = True
+        self.api_group.save()
+        current = ZGWService._zaken_client_factory(self.api_group)
+
+        self.assertNotEqual(
+            legacy.fetch_zaken_for_company.cache_key(legacy, kvk_or_rsin="12345678"),
+            current.fetch_zaken_for_company.cache_key(current, kvk_or_rsin="12345678"),
+        )
+
 
 class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
     """
