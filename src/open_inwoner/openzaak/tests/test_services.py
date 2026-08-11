@@ -18,12 +18,15 @@ from zgw_consumers.api_models.constants import (
 from open_inwoner.accounts.user_identification import BSNIdentification
 from open_inwoner.openzaak.api_models import Rol, Zaak, ZaakType
 from open_inwoner.openzaak.constants import TypeAanvraag, ZaakBetrokkeneRol
+from open_inwoner.openzaak.exceptions import ZgwAPIError
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import (
     FormulierenResult,
     SkippedZaak,
     SkipReason,
+    ZaakResolutionError,
     ZaakWithApiGroup,
+    ZaakWithApiGroupZaakTypeResolved,
     ZakenResult,
     ZGWService,
 )
@@ -246,7 +249,8 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         self.assertEqual(result.zaken, [])
         self.assertFalse(result.raw_fetch_incomplete)
         self.assertEqual(
-            [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
+            [skipped.reasons for skipped in result.skipped],
+            [frozenset({SkipReason.TIMEOUT})],
         )
         self.assertTrue(result.is_incomplete)
 
@@ -279,7 +283,45 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
 
         self.assertEqual(result.zaken, [])
         self.assertEqual(
-            [skipped.reason for skipped in result.skipped], [SkipReason.TIMEOUT]
+            [skipped.reasons for skipped in result.skipped],
+            [frozenset({SkipReason.TIMEOUT})],
+        )
+        self.assertTrue(result.is_incomplete)
+
+    def test_fully_resolve_zaken_keeps_failures_alongside_the_timeout(self):
+        """A step that failed before the stage ran out of budget keeps its reason"""
+        zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        release = threading.Event()
+        timer = threading.Timer(0.05, release.set)
+
+        with (
+            patch.object(
+                self.service,
+                "_resolve_resultaat_and_resultaat_type",
+                side_effect=ZaakResolutionError(
+                    SkipReason.RESULTAAT_RESOLUTION_FAILED, "kapot"
+                ),
+            ),
+            patch.object(
+                self.service,
+                "_resolve_status_and_status_type",
+                side_effect=self._make_blocking_fetch(release),
+            ),
+            patch.object(
+                ZGWService, "_case_list_stage_timeouts", return_value=_TINY_TIMEOUTS
+            ),
+        ):
+            timer.start()
+            try:
+                result = self.service.fully_resolve_zaken([zaak_with_group])
+            finally:
+                release.set()
+                timer.cancel()
+
+        self.assertEqual(result.zaken, [])
+        self.assertEqual(
+            [skipped.reasons for skipped in result.skipped],
+            [frozenset({SkipReason.TIMEOUT, SkipReason.RESULTAAT_RESOLUTION_FAILED})],
         )
         self.assertTrue(result.is_incomplete)
 
@@ -299,7 +341,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
                     skipped=[
                         SkippedZaak(
                             zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
-                            reason=reason,
+                            reasons=frozenset({reason}),
                             api_group=self.api_group,
                         )
                     ],
@@ -310,18 +352,19 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     def test_is_incomplete_is_true_for_transient_errors(self):
         """Resolution failures are counted as transient fetch errors"""
 
-        for reason in (
-            SkipReason.TIMEOUT,
-            SkipReason.ZAAKTYPE_RESOLUTION_FAILED,
-            SkipReason.FULL_RESOLUTION_FAILED,
-        ):
+        self.assertEqual(
+            SkipReason.transient_reasons(),
+            SkipReason.resolution_failures() | {SkipReason.TIMEOUT},
+        )
+
+        for reason in SkipReason.transient_reasons():
             with self.subTest(reason=reason):
                 result = ZakenResult(
                     zaken=[],
                     skipped=[
                         SkippedZaak(
                             zaak_url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
-                            reason=reason,
+                            reasons=frozenset({reason}),
                             api_group=self.api_group,
                         )
                     ],
@@ -331,6 +374,205 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
 
 _ZAAK_UUID = "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
 _ZAAK_IDENTIFICATIE = "ZAAK-2022-0000000024"
+
+_RESOLUTION_FAILURE_LOG = "Failed to resolve ZGW entity for zaak"
+_UNEXPECTED_FAILURE_LOG = "Failed to resolve zaak for unexpected reason"
+
+
+class ResolutionFailureTest(ClearCachesMixin, TestCase):
+    """Every ZGW entity that fails to resolve is reported and logged on its own."""
+
+    def setUp(self):
+        super().setUp()
+        self.api_group = ZGWApiGroupConfigFactory()
+        self.service = ZGWService()
+        self.zaken_client = Mock()
+        self.catalogi_client = Mock()
+
+    def _make_zaak(self, **overrides) -> ZaakWithApiGroupZaakTypeResolved:
+        fields = {
+            "url": f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+            "identificatie": _ZAAK_IDENTIFICATIE,
+            "zaaktype": f"{CATALOGI_ROOT}zaaktypen/{_ZAAK_UUID}",
+            "startdatum": "2024-01-02",
+            "einddatum": None,
+            "status": f"{ZAKEN_ROOT}statussen/{_ZAAK_UUID}",
+            "resultaat": f"{ZAKEN_ROOT}resultaten/{_ZAAK_UUID}",
+            **overrides,
+        }
+        zaak = factory(
+            Zaak,
+            generate_oas_component_cached("zrc", "schemas/Zaak", **fields),
+        )
+        return ZaakWithApiGroupZaakTypeResolved(
+            zaak=zaak, api_group=self.api_group, type_aanvraag=TypeAanvraag.ZAAK
+        )
+
+    def _fully_resolve(self, zaak_with_group) -> ZakenResult:
+        with (
+            patch.object(
+                self.service, "_zaken_client_factory", return_value=self.zaken_client
+            ),
+            patch.object(
+                self.service,
+                "_catalogi_client_factory",
+                return_value=self.catalogi_client,
+            ),
+        ):
+            return self.service.fully_resolve_zaken([zaak_with_group])
+
+    def _assert_skipped_with_reasons(self, result: ZakenResult, *reasons: SkipReason):
+        self.assertEqual(result.zaken, [])
+        self.assertEqual(
+            [skipped.reasons for skipped in result.skipped], [frozenset(reasons)]
+        )
+        self.assertTrue(result.is_incomplete)
+
+    def test_status_fetch_failure_is_attributed_to_the_status(self):
+        # only the status is resolved, so the resultaat cannot muddy the result
+        zaak_with_group = self._make_zaak(resultaat=None)
+        self.zaken_client.fetch_single_status.side_effect = ZgwAPIError("kapot")
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm:
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(result, SkipReason.STATUS_RESOLUTION_FAILED)
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_statustype_fetch_failure_is_attributed_to_the_statustype(self):
+        zaak_with_group = self._make_zaak(resultaat=None)
+        self.catalogi_client.fetch_single_status_type.side_effect = ZgwAPIError("kapot")
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm:
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(
+            result, SkipReason.STATUSTYPE_RESOLUTION_FAILED
+        )
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_resultaat_fetch_failure_is_attributed_to_the_resultaat(self):
+        zaak_with_group = self._make_zaak(status=None)
+        self.zaken_client.fetch_single_result.side_effect = ZgwAPIError("kapot")
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm:
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(
+            result, SkipReason.RESULTAAT_RESOLUTION_FAILED
+        )
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_resultaattype_fetch_failure_is_attributed_to_the_resultaattype(self):
+        zaak_with_group = self._make_zaak(status=None)
+        self.catalogi_client.fetch_single_resultaat_type.side_effect = ZgwAPIError(
+            "kapot"
+        )
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm:
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(
+            result, SkipReason.RESULTAATTYPE_RESOLUTION_FAILED
+        )
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_zaak_failing_several_steps_reports_every_reason(self):
+        """A zaak is skipped once, but keeps the reason of every step that failed"""
+        zaak_with_group = self._make_zaak()
+        self.zaken_client.fetch_single_status.side_effect = ZgwAPIError("kapot")
+        self.zaken_client.fetch_single_result.side_effect = ZgwAPIError("kapot")
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR"):
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(
+            result,
+            SkipReason.STATUS_RESOLUTION_FAILED,
+            SkipReason.RESULTAAT_RESOLUTION_FAILED,
+        )
+
+    def test_unexpected_failure_falls_back_to_the_generic_reason(self):
+        zaak_with_group = self._make_zaak(resultaat=None)
+
+        with (
+            patch.object(
+                self.service,
+                "_resolve_status_and_status_type",
+                side_effect=RuntimeError("kapot"),
+            ),
+            self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm,
+        ):
+            result = self._fully_resolve(zaak_with_group)
+
+        self._assert_skipped_with_reasons(result, SkipReason.RESOLUTION_FAILED)
+        self.assertTrue(any(_UNEXPECTED_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_zaaktype_fetch_failure_is_attributed_to_the_zaaktype(self):
+        zaak_with_group = self._make_zaak()
+        self.catalogi_client.fetch_single_zaaktype.side_effect = ZgwAPIError("kapot")
+
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                return_value=[zaak_with_group],
+            ),
+            patch.object(
+                self.service,
+                "_catalogi_client_factory",
+                return_value=self.catalogi_client,
+            ),
+            self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm,
+        ):
+            result = self.service.get_visible_zaken(_USER_IDENTIFICATION)
+
+        self._assert_skipped_with_reasons(result, SkipReason.ZAAKTYPE_RESOLUTION_FAILED)
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_rol_fetch_failure_in_search_is_attributed_to_the_rol(self):
+        """A match dropped because its rollen are unavailable makes results partial"""
+        zaak_with_group = self._make_zaak()
+
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                return_value=[zaak_with_group],
+            ),
+            patch.object(
+                self.service,
+                "_user_has_required_rol",
+                side_effect=ZgwAPIError("kapot"),
+            ),
+            self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm,
+        ):
+            result = self.service.search_zaken(
+                _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+            )
+
+        self._assert_skipped_with_reasons(result, SkipReason.ROL_RESOLUTION_FAILED)
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
+
+    def test_search_result_without_rol_is_not_reported_as_skipped(self):
+        """Permanent exclusions must not trigger the partial-results banner"""
+        zaak_with_group = self._make_zaak()
+
+        with (
+            patch.object(
+                self.service,
+                "_get_raw_zaken_for_api_group",
+                return_value=[zaak_with_group],
+            ),
+            patch.object(self.service, "_user_has_required_rol", return_value=False),
+        ):
+            result = self.service.search_zaken(
+                _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
+            )
+
+        self.assertEqual(result.zaken, [])
+        self.assertEqual(result.skipped, [])
+        self.assertFalse(result.is_incomplete)
 
 
 @requests_mock_module.Mocker()
@@ -867,15 +1109,19 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         m.get(self.zaaktype["url"], json=self.zaaktype)
         m.get(f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}", status_code=500)
 
-        with self.assertLogs("open_inwoner.openzaak.services", level="WARNING") as cm:
-            results = self.service.search_zaken(
+        with self.assertLogs("open_inwoner.openzaak.services", level="ERROR") as cm:
+            result = self.service.search_zaken(
                 _USER_IDENTIFICATION, _ZAAK_IDENTIFICATIE
-            ).zaken
+            )
 
-        self.assertEqual(results, [])
-        self.assertTrue(
-            any("Unable to fetch rollen for search result" in msg for msg in cm.output)
+        self.assertEqual(result.zaken, [])
+        self.assertEqual(
+            [skipped.reasons for skipped in result.skipped],
+            [frozenset({SkipReason.ROL_RESOLUTION_FAILED})],
         )
+        # the user searched for a zaak that exists, so tell them results are partial
+        self.assertTrue(result.is_incomplete)
+        self.assertTrue(any(_RESOLUTION_FAILURE_LOG in msg for msg in cm.output))
 
     def test_does_not_resolve_zaaktype_when_rol_check_fails(self, m):
         """No metadata is resolved for a zaak the user has no claim to."""

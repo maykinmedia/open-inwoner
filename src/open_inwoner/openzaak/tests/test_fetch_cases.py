@@ -59,17 +59,17 @@ class FetchCasesCheckTests(TestCase):
         skipped = [
             SkippedZaak(
                 zaak_url="https://api/zaak/1",
-                reason=SkipReason.CONFIDENTIALITY_TOO_HIGH,
+                reasons=frozenset({SkipReason.CONFIDENTIALITY_TOO_HIGH}),
                 api_group=api_group,
             ),
             SkippedZaak(
                 zaak_url="https://api/zaak/2",
-                reason=SkipReason.CONFIDENTIALITY_TOO_HIGH,
+                reasons=frozenset({SkipReason.CONFIDENTIALITY_TOO_HIGH}),
                 api_group=api_group,
             ),
             SkippedZaak(
                 zaak_url="https://api/zaak/3",
-                reason=SkipReason.NO_STATUS,
+                reasons=frozenset({SkipReason.NO_STATUS}),
                 api_group=api_group,
             ),
         ]
@@ -99,12 +99,12 @@ class FetchCasesCheckTests(TestCase):
         skipped = [
             SkippedZaak(
                 zaak_url="https://api/zaak/1",
-                reason=SkipReason.CONFIDENTIALITY_TOO_HIGH,
+                reasons=frozenset({SkipReason.CONFIDENTIALITY_TOO_HIGH}),
                 api_group=group_a,
             ),
             SkippedZaak(
                 zaak_url="https://api/zaak/2",
-                reason=SkipReason.NO_STATUS,
+                reasons=frozenset({SkipReason.NO_STATUS}),
                 api_group=group_b,
             ),
         ]
