@@ -46,30 +46,41 @@ from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
 _USER_IDENTIFICATION = BSNIdentification(bsn="900222086")
 
+# 1ms deadlines against a 50ms release were flaky under CI load - narrow
+# enough to occasionally be swallowed entirely by OS scheduling jitter,
+# regardless of the 50x ratio between them. These values match the ones
+# proven reliable in open_inwoner.utils.tests.test_concurrency.
+_TINY_TIMEOUT = 0.01
+_RELEASE_DELAY = 0.1
+
 _TINY_TIMEOUTS = {
-    "get_raw_zaken": 0.001,
-    "get_visible_zaken": 0.001,
-    "fully_resolve_zaken": 0.001,
-    "get_formulieren": 0.001,
+    "get_raw_zaken": _TINY_TIMEOUT,
+    "get_visible_zaken": _TINY_TIMEOUT,
+    "fully_resolve_zaken": _TINY_TIMEOUT,
+    "get_formulieren": _TINY_TIMEOUT,
 }
 
 
 class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     """
-    Verify that the timeout on as_completed() fires while futures are still
-    pending (i.e. as_completed runs INSIDE the with parallel() block).
+    Verify that a still-in-flight fetch is correctly reflected in the
+    result, whether it's genuinely abandoned or merely running late.
 
-    With the old code structure, as_completed was called OUTSIDE the parallel
-    block. parallel.__exit__ calls shutdown(wait=True), which drains all futures
-    before as_completed ever runs. This means no natural TimeoutError could fire
-    and the warning was never logged.
+    TimedParallel distinguishes two outcomes once a per-stage timeout
+    elapses: a task that hasn't started yet is cancelled outright and will
+    never produce a result, while a task that's already running is still
+    awaited - shutdown(wait=True) blocks for it regardless, so its actual
+    outcome is used instead of being discarded. A single submitted task is
+    therefore *not* a reliable way to exercise "genuinely timed out" (it
+    almost always ends up already running by the time the tiny timeout
+    below elapses): tests use a single worker with two work items instead,
+    so at least one is always genuinely abandoned regardless of which of
+    the two happens to start first.
 
-    Each test blocks a fetch with a threading.Event and sets a 1 ms timeout.
-    A timer releases the event after 50 ms so shutdown(wait=True) does not hang.
-    With the old code the timeout fires too late (all futures already done) and
-    assertLogs finds no warning -> test fails.  With the new code the timeout
-    fires after 1 ms while the future is still blocked → warning is logged ->
-    test passes.
+    Each test blocks a fetch with a threading.Event and sets a tiny
+    (`_TINY_TIMEOUT`) deadline. A timer releases the event after
+    `_RELEASE_DELAY` so shutdown(wait=True) doesn't hang waiting for the
+    one that's still running.
     """
 
     def setUp(self):
@@ -84,8 +95,13 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         return fetch
 
     def test_get_raw_zaken_logs_timeout_warning(self):
+        # A second API group + a single worker guarantees at least one
+        # group's fetch is still queued (never started) when the timeout
+        # elapses, regardless of which of the two the sole worker picks up.
+        ZGWApiGroupConfigFactory()
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
 
         with (
             patch.object(
@@ -113,8 +129,10 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
+        ZGWApiGroupConfigFactory()
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
 
         with (
             patch.object(
@@ -142,8 +160,10 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         self.assertTrue(any("Timed out fetching raw zaken" in msg for msg in cm.output))
 
     def test_get_formulieren_logs_timeout_warning(self):
+        ZGWApiGroupConfigFactory()
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
 
         with (
             patch.object(
@@ -172,8 +192,10 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         )
 
     def test_search_zaken_propagates_raw_fetch_timeout(self):
+        ZGWApiGroupConfigFactory()
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
 
         with (
             patch.object(
@@ -217,10 +239,25 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         )
 
     def test_get_visible_zaken_records_timeout_skips_for_zaaktype_stage(self):
-        """The raw fetch succeeds, but resolving zaaktypen runs out of budget."""
-        zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        """
+        The raw fetch succeeds, but resolving zaaktypen runs out of budget.
+
+        With a single worker and two zaken to resolve, one is always still
+        queued (never started) when the deadline hits and is genuinely
+        abandoned -> SkipReason.TIMEOUT. The other is already running and
+        is awaited instead of discarded; it's made to fail once it does
+        complete (rather than succeed) so the outcome doesn't depend on
+        which of the two "wins" the race for the single worker.
+        """
+        zaak_a = self._make_zaak_with_group(_ZAAK_UUID)
+        zaak_b = self._make_zaak_with_group(_ANOTHER_ZAAK_UUID)
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
+
+        def blocking_then_failing_with_reason(*args, **kwargs):
+            release.wait(timeout=5)
+            raise ZaakResolutionError(SkipReason.ZAAKTYPE_RESOLUTION_FAILED, "kapot")
 
         timeouts = {**_TINY_TIMEOUTS, "get_raw_zaken": 5}
 
@@ -228,12 +265,12 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
             patch.object(
                 self.service,
                 "_get_raw_zaken_for_api_group",
-                return_value=[zaak_with_group],
+                return_value=[zaak_a, zaak_b],
             ),
             patch.object(
                 self.service,
                 "_resolve_zaak_type",
-                side_effect=self._make_blocking_fetch(release),
+                side_effect=blocking_then_failing_with_reason,
             ),
             patch.object(
                 ZGWService, "_case_list_stage_timeouts", return_value=timeouts
@@ -249,15 +286,28 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         self.assertEqual(result.zaken, [])
         self.assertFalse(result.raw_fetch_incomplete)
         self.assertEqual(
-            [skipped.reasons for skipped in result.skipped],
-            [frozenset({SkipReason.TIMEOUT})],
+            sorted(
+                reason.value for skipped in result.skipped for reason in skipped.reasons
+            ),
+            sorted(
+                [SkipReason.TIMEOUT.value, SkipReason.ZAAKTYPE_RESOLUTION_FAILED.value]
+            ),
         )
         self.assertTrue(result.is_incomplete)
 
     def test_fully_resolve_zaken_records_timeout_skips(self):
-        zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        """
+        With a single worker and two zaken (each needing two resolution
+        calls), at most one resolution call can be running when the
+        deadline hits - so every zaak has at least one call that's still
+        queued and genuinely abandoned, and both end up skipped as timed
+        out regardless of which call happens to be the one running.
+        """
+        zaak_a = self._make_zaak_with_group(_ZAAK_UUID)
+        zaak_b = self._make_zaak_with_group(_ANOTHER_ZAAK_UUID)
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
 
         with (
             patch.object(
@@ -276,7 +326,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         ):
             timer.start()
             try:
-                result = self.service.fully_resolve_zaken([zaak_with_group])
+                result = self.service.fully_resolve_zaken([zaak_a, zaak_b])
             finally:
                 release.set()
                 timer.cancel()
@@ -284,23 +334,38 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         self.assertEqual(result.zaken, [])
         self.assertEqual(
             [skipped.reasons for skipped in result.skipped],
-            [frozenset({SkipReason.TIMEOUT})],
+            [frozenset({SkipReason.TIMEOUT}), frozenset({SkipReason.TIMEOUT})],
         )
         self.assertTrue(result.is_incomplete)
 
     def test_fully_resolve_zaken_keeps_failures_alongside_the_timeout(self):
-        """A step that failed before the stage ran out of budget keeps its reason"""
+        """
+        A step that's already running when the stage runs out of budget is
+        awaited and its real (here: failing) outcome is used; a step that
+        never got a worker at all is genuinely abandoned. When both apply
+        to the same zaak, it keeps both reasons.
+
+        A single worker guarantees the deterministic split: the resultaat
+        step is always the one submitted first, so it's the one that
+        starts running (and fails once released); the status step is
+        submitted right behind it and can only ever be genuinely queued,
+        since the sole worker stays busy with the resultaat step for the
+        entire 50ms until release fires - long past the 1ms deadline.
+        """
         zaak_with_group = self._make_zaak_with_group(_ZAAK_UUID)
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
+
+        def blocking_then_failing_with_reason(*args, **kwargs):
+            release.wait(timeout=5)
+            raise ZaakResolutionError(SkipReason.RESULTAAT_RESOLUTION_FAILED, "kapot")
 
         with (
             patch.object(
                 self.service,
                 "_resolve_resultaat_and_resultaat_type",
-                side_effect=ZaakResolutionError(
-                    SkipReason.RESULTAAT_RESOLUTION_FAILED, "kapot"
-                ),
+                side_effect=blocking_then_failing_with_reason,
             ),
             patch.object(
                 self.service,
@@ -373,6 +438,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
 
 
 _ZAAK_UUID = "d8bbdeb7-770f-4ca9-b1ea-77b4730bf67d"
+_ANOTHER_ZAAK_UUID = "5e3d0f4c-6b21-4b4e-9c47-3a3d9d7e5b2f"
 _ZAAK_IDENTIFICATIE = "ZAAK-2022-0000000024"
 
 _RESOLUTION_FAILURE_LOG = "Failed to resolve ZGW entity for zaak"
@@ -654,13 +720,24 @@ class GetZaakByUuidTests(ClearCachesMixin, TestCase):
         )
 
     def test_logs_warning_on_timeout(self, m):
+        """
+        With a single worker, two configured API groups guarantee at least
+        one group's fetch is still queued (never started) when the
+        deadline hits, regardless of which of the two the sole worker
+        picks up. The one that does get to run is made to fail once
+        released rather than "succeed" with a meaningless value, so the
+        overall result is None either way.
+        """
+        self.service._max_workers = 1
         release = threading.Event()
-        timer = threading.Timer(0.05, release.set)
+        timer = threading.Timer(_RELEASE_DELAY, release.set)
+
+        def blocking_then_failing(*args, **kwargs):
+            release.wait(timeout=5)
+            raise RuntimeError("boom")
 
         mock_client = Mock()
-        mock_client.fetch_single_zaak.side_effect = lambda *a, **kw: release.wait(
-            timeout=5
-        )
+        mock_client.fetch_single_zaak.side_effect = blocking_then_failing
 
         with (
             patch.object(
@@ -668,7 +745,7 @@ class GetZaakByUuidTests(ClearCachesMixin, TestCase):
             ),
             patch(
                 "open_inwoner.openzaak.services.OpenZaakConfig.get_solo",
-                return_value=Mock(case_list_fetch_timeout=0.001),
+                return_value=Mock(case_list_fetch_timeout=_TINY_TIMEOUT),
             ),
         ):
             timer.start()

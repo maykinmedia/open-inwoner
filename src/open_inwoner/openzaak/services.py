@@ -14,7 +14,6 @@ from django.utils.functional import cached_property
 
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
-from zgw_consumers.concurrent import parallel
 
 from open_inwoner.accounts.user_identification import (
     BSNIdentification,
@@ -52,6 +51,7 @@ from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_object_visible,
 )
+from open_inwoner.utils.concurrency import TimedParallel
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -252,6 +252,16 @@ class ZGWService:
 
         The total budget is a global setting because all groups participate in every
         stage under a single concurrent timeout. The fractions must sum to 1.
+
+        These are independent per-stage ceilings, not fractions of one
+        continuously ticking deadline shared across the whole request: each
+        stage builds its own `TimedParallel` with its own clock (see that
+        class's docstring for exactly when it starts), and the stages run
+        sequentially. A stage that finishes well under its share does not
+        donate the leftover time to the next one - so `case_list_fetch_timeout`
+        is a soft target for the sum of the stages, not a hard cap actually
+        enforced on the request as a whole; worst case, the call can approach
+        the sum of all four budgets.
         """
         config = config or OpenZaakConfig.get_solo()
 
@@ -472,7 +482,9 @@ class ZGWService:
 
         fetched_zaken: list[ZaakWithApiGroup] = []
         raw_fetch_incomplete = False
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="get_raw_zaken"
+        ) as executor:
             futures = [
                 executor.submit(
                     self._get_raw_zaken_for_api_group,
@@ -484,20 +496,19 @@ class ZGWService:
                 )
                 for group in all_api_groups
             ]
-            try:
-                for task in concurrent.futures.as_completed(
-                    futures,
-                    timeout=timeouts["get_raw_zaken"],
-                ):
-                    try:
-                        fetched_zaken.extend(task.result())
-                    except BaseException:
-                        logger.exception("Error fetching raw zaken for group")
-                        raw_fetch_incomplete = True
-            # TODO: add OTEL metrics
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timed out fetching raw zaken", exc_info=True)
-                raw_fetch_incomplete = True
+            result = executor.as_completed(
+                futures, cancel_after=timeouts["get_raw_zaken"]
+            )
+            for task in result:
+                try:
+                    fetched_zaken.extend(task.result())
+                except BaseException:
+                    logger.exception("Error fetching raw zaken for group")
+                    raw_fetch_incomplete = True
+
+        if result.timed_out:
+            logger.warning("Timed out fetching raw zaken")
+            raw_fetch_incomplete = True
 
         return ZakenResult(
             zaken=fetched_zaken,
@@ -605,7 +616,9 @@ class ZGWService:
 
         fetched_zaken: list[ZaakWithApiGroup] = []
         raw_fetch_incomplete = False
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="get_visible_zaken.raw_fetch"
+        ) as executor:
             futures: list[concurrent.futures.Future[list[ZaakWithApiGroup]]] = [
                 executor.submit(
                     self._get_raw_zaken_for_api_group,
@@ -616,19 +629,19 @@ class ZGWService:
                 )
                 for group in all_api_groups
             ]
-            try:
-                for task in concurrent.futures.as_completed(
-                    futures,
-                    timeout=timeouts["get_raw_zaken"],
-                ):
-                    try:
-                        fetched_zaken.extend(task.result())
-                    except BaseException:
-                        logger.exception("Error fetching raw zaken for group")
-                        raw_fetch_incomplete = True
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timed out fetching raw zaken for group", exc_info=True)
-                raw_fetch_incomplete = True
+            result = executor.as_completed(
+                futures, cancel_after=timeouts["get_raw_zaken"]
+            )
+            for task in result:
+                try:
+                    fetched_zaken.extend(task.result())
+                except BaseException:
+                    logger.exception("Error fetching raw zaken for group")
+                    raw_fetch_incomplete = True
+
+        if result.timed_out:
+            logger.warning("Timed out fetching raw zaken for group")
+            raw_fetch_incomplete = True
 
         fetched_zaken.sort(
             key=lambda c: (
@@ -640,9 +653,10 @@ class ZGWService:
 
         future_to_zaak: dict[concurrent.futures.Future, ZaakWithApiGroup] = {}
         visible_ids: set[int] = set()
-        processed_ids: set[int] = set()
         skipped: list[SkippedZaak] = []
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="get_visible_zaken.resolve_zaaktype"
+        ) as executor:
             for zaak_with_group in fetched_zaken:
                 f = executor.submit(
                     self._resolve_zaak_type,
@@ -650,55 +664,52 @@ class ZGWService:
                     self._catalogi_client_factory(zaak_with_group.api_group),
                 )
                 future_to_zaak[f] = zaak_with_group
-            try:
-                for future in concurrent.futures.as_completed(
-                    future_to_zaak,
-                    timeout=timeouts["get_visible_zaken"],
-                ):
-                    zaak_with_group = future_to_zaak[future]
-                    processed_ids.add(id(zaak_with_group))
-                    try:
-                        future.result()
-                    except Exception as exc:
-                        # `_skip_reason_for` reports which entity failed to resolve
-                        skipped.append(
-                            SkippedZaak(
-                                zaak_url=zaak_with_group.zaak.url,
-                                reasons=frozenset(
-                                    {self._skip_reason_for(exc, zaak_with_group)}
-                                ),
-                                api_group=zaak_with_group.api_group,
-                            )
+            result = executor.as_completed(
+                future_to_zaak, cancel_after=timeouts["get_visible_zaken"]
+            )
+            for future in result:
+                zaak_with_group = future_to_zaak[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    # `_skip_reason_for` reports which entity failed to resolve
+                    skipped.append(
+                        SkippedZaak(
+                            zaak_url=zaak_with_group.zaak.url,
+                            reasons=frozenset(
+                                {self._skip_reason_for(exc, zaak_with_group)}
+                            ),
+                            api_group=zaak_with_group.api_group,
                         )
-                        continue
-                    is_visible, skip_reason = self._is_zaak_visible(
-                        zaak_with_group.zaak
                     )
-                    if is_visible:
-                        visible_ids.add(id(zaak_with_group))
-                    else:
-                        logger.debug(
-                            "Culling zaak %s because it is invisible",
-                            zaak_with_group.identification,
-                        )
-                        skipped.append(
-                            SkippedZaak(
-                                zaak_url=zaak_with_group.zaak.url,
-                                reasons=frozenset({skip_reason}),
-                                api_group=zaak_with_group.api_group,
-                            )
-                        )
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timed out resolving zaaktypes", exc_info=True)
-                skipped.extend(
-                    SkippedZaak(
-                        zaak_url=z.zaak.url,
-                        reasons=frozenset({SkipReason.TIMEOUT}),
-                        api_group=z.api_group,
+                    continue
+                is_visible, skip_reason = self._is_zaak_visible(zaak_with_group.zaak)
+                if is_visible:
+                    visible_ids.add(id(zaak_with_group))
+                else:
+                    logger.debug(
+                        "Culling zaak %s because it is invisible",
+                        zaak_with_group.identification,
                     )
-                    for z in future_to_zaak.values()
-                    if id(z) not in processed_ids
+                    skipped.append(
+                        SkippedZaak(
+                            zaak_url=zaak_with_group.zaak.url,
+                            reasons=frozenset({skip_reason}),
+                            api_group=zaak_with_group.api_group,
+                        )
+                    )
+
+        if result.timed_out:
+            logger.warning("Timed out resolving zaaktypes")
+            skipped.extend(
+                SkippedZaak(
+                    zaak_url=zaak_with_group.zaak.url,
+                    reasons=frozenset({SkipReason.TIMEOUT}),
+                    api_group=zaak_with_group.api_group,
                 )
+                for future, zaak_with_group in future_to_zaak.items()
+                if future in result.timed_out_futures
+            )
 
         return ZakenResult(
             zaken=[
@@ -726,7 +737,6 @@ class ZGWService:
         future_to_zaak: dict[
             concurrent.futures.Future, ZaakWithApiGroupZaakTypeResolved
         ] = {}
-        remaining: dict[int, int] = {}
         failure_reasons: dict[int, set[SkipReason]] = defaultdict(set)
 
         # Each thread gets its own zaken client because requests.Session is not
@@ -734,10 +744,10 @@ class ZGWService:
         config = OpenZaakConfig.get_solo()
         timeouts = self._case_list_stage_timeouts(config)
 
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="fully_resolve_zaken"
+        ) as executor:
             for zaak_with_group in zaken:
-                zid = id(zaak_with_group)
-                remaining[zid] = 1
                 group = zaak_with_group.api_group
                 f = executor.submit(
                     self._resolve_resultaat_and_resultaat_type,
@@ -754,31 +764,33 @@ class ZGWService:
                         self._catalogi_client_factory(group),
                     )
                     future_to_zaak[f] = zaak_with_group
-                    remaining[zid] += 1
-            try:
-                for future in concurrent.futures.as_completed(
-                    future_to_zaak,
-                    timeout=timeouts["fully_resolve_zaken"],
-                ):
-                    zaak_with_group = future_to_zaak[future]
-                    remaining[id(zaak_with_group)] -= 1
-                    try:
-                        future.result()
-                    except Exception as exc:
-                        failure_reasons[id(zaak_with_group)].add(
-                            self._skip_reason_for(exc, zaak_with_group)
-                        )
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timed out resolving zaken", exc_info=True)
+            result = executor.as_completed(
+                future_to_zaak, cancel_after=timeouts["fully_resolve_zaken"]
+            )
+            for future in result:
+                zaak_with_group = future_to_zaak[future]
+                try:
+                    future.result()
+                except Exception as exc:
+                    failure_reasons[id(zaak_with_group)].add(
+                        self._skip_reason_for(exc, zaak_with_group)
+                    )
+
+        if result.timed_out:
+            logger.warning("Timed out resolving zaken")
+        timed_out_ids = {
+            id(future_to_zaak[future]) for future in result.timed_out_futures
+        }
 
         fully_resolved: list[ZaakWithApiGroupFullyResolved] = []
         skipped: list[SkippedZaak] = []
         for zaak_with_group in zaken:
             zid = id(zaak_with_group)
             reasons = set(failure_reasons.get(zid, ()))
-            if remaining[zid] != 0:
-                # Steps that were still pending when the stage timed out. Any step
-                # that did fail keeps its own reason alongside this one.
+            if zid in timed_out_ids:
+                # Steps that were still queued (never started) when the stage
+                # timed out. Any step that did fail keeps its own reason
+                # alongside this one.
                 reasons.add(SkipReason.TIMEOUT)
             if reasons:
                 skipped.append(
@@ -1013,35 +1025,34 @@ class ZGWService:
         )
 
         subs_with_api_group: list[FormulierWithApiGroup] = []
-        timed_out = False
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="get_formulieren"
+        ) as executor:
             futures = [
                 executor.submit(
                     self._get_formulieren_for_api_group, group, user_identification
                 )
                 for group in all_api_groups
             ]
-            try:
-                for task in concurrent.futures.as_completed(
-                    futures,
-                    timeout=timeouts["get_formulieren"],
-                ):
-                    try:
-                        subs_with_api_group.extend(task.result())
-                    except BaseException:
-                        logger.exception(
-                            "Error fetching and pre-processing formulieren"
-                        )
-            # TODO: add OTEL metrics
-            except concurrent.futures.TimeoutError:
-                logger.warning("Timeout while fetching formulieren")
-                timed_out = True
+            result = executor.as_completed(
+                futures, cancel_after=timeouts["get_formulieren"]
+            )
+            for task in result:
+                try:
+                    subs_with_api_group.extend(task.result())
+                except BaseException:
+                    logger.exception("Error fetching and pre-processing formulieren")
+
+        if result.timed_out:
+            logger.warning("Timeout while fetching formulieren")
 
         subs_with_api_group.sort(
             key=lambda sub: sub.formulier.datum_laatste_wijziging, reverse=True
         )
 
-        return FormulierenResult(formulieren=subs_with_api_group, timed_out=timed_out)
+        return FormulierenResult(
+            formulieren=subs_with_api_group, timed_out=result.timed_out
+        )
 
     # -------------------------------------------------------------------------
     # Zaak detail
@@ -1088,38 +1099,39 @@ class ZGWService:
 
         results: list[ZaakWithApiGroup] = []
 
-        with parallel(max_workers=self._max_workers) as executor:
+        with TimedParallel(
+            max_workers=self._max_workers, name="get_zaak_by_uuid"
+        ) as executor:
             future_to_group: dict[concurrent.futures.Future, ZGWApiGroupConfig] = {
                 executor.submit(fetch, group): group for group in api_groups
             }
-            try:
-                for future in concurrent.futures.as_completed(
-                    future_to_group, timeout=config.case_list_fetch_timeout
-                ):
-                    api_group = future_to_group[future]
-                    try:
-                        results.append(future.result())
-                    except ZgwAPIError as exc:
-                        if exc.status_code == 404:
-                            continue
-                        logger.warning(
-                            "error fetching zaak by uuid",
-                            uuid=uuid,
-                            api_group=api_group.pk,
-                            status_code=exc.status_code,
-                            exc_info=True,
-                        )
-                    except Exception:
-                        logger.warning(
-                            "unexpected error fetching zaak by uuid",
-                            uuid=uuid,
-                            api_group=api_group.pk,
-                            exc_info=True,
-                        )
-            except concurrent.futures.TimeoutError:
-                logger.warning(
-                    "timed out fetching zaak by uuid", uuid=uuid, exc_info=True
-                )
+            result = executor.as_completed(
+                future_to_group, cancel_after=config.case_list_fetch_timeout
+            )
+            for future in result:
+                api_group = future_to_group[future]
+                try:
+                    results.append(future.result())
+                except ZgwAPIError as exc:
+                    if exc.status_code == 404:
+                        continue
+                    logger.warning(
+                        "error fetching zaak by uuid",
+                        uuid=uuid,
+                        api_group=api_group.pk,
+                        status_code=exc.status_code,
+                        exc_info=True,
+                    )
+                except Exception:
+                    logger.warning(
+                        "unexpected error fetching zaak by uuid",
+                        uuid=uuid,
+                        api_group=api_group.pk,
+                        exc_info=True,
+                    )
+
+        if result.timed_out:
+            logger.warning("timed out fetching zaak by uuid", uuid=uuid)
 
         if len(results) > 1:
             logger.warning(
