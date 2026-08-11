@@ -14,6 +14,7 @@ from .api_models import (
     KlantContactRol,
     ObjectContactMoment,
 )
+from .constants import DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS
 from .exceptions import (
     KlantAPIClientError,
     KlantAPIDataError,
@@ -93,10 +94,21 @@ class KlantenClient(KlantAPIClient):
 
 class ContactmomentenClient(KlantAPIClient):
     cache_timeout: int
+    max_requests: int
 
-    def __init__(self, *args, cache_timeout: int | None = None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        cache_timeout: int | None = None,
+        max_requests: int | None = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.cache_timeout = cache_timeout or 0
+        # `pagination_helper` treats 0 the same as None: no cap at all. Falling back
+        # on the default keeps an unconfigured or zeroed client from following a
+        # klant's entire history.
+        self.max_requests = max_requests or DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS
 
     #
     # contactmomenten
@@ -199,11 +211,11 @@ class ContactmomentenClient(KlantAPIClient):
     # klantcontactmomenten
     #
     @cache_result(
-        "{self.base_url}:klantcontactmomenten:{klant_url}:{max_requests}",
+        "{self.base_url}:klantcontactmomenten:{klant_url}:{self.max_requests}",
         timeout=lambda self: self.cache_timeout,
     )
     def list_klantcontactmomenten_for_klant(
-        self, klant_url: str, max_requests: int | None = None
+        self, klant_url: str
     ) -> list[KlantContactMoment]:
         """List a klant's klantcontactmomenten, leaving `contactmoment` as a URL.
 
@@ -211,8 +223,11 @@ class ContactmomentenClient(KlantAPIClient):
         requests out over a worker pool. `klant` is left as the plain url too: nothing
         reads it back as an object, only the invariant check below compares against it.
 
-        :param max_requests: caps the number of pagination requests followed, so a
-        klant with a long history has a bounded worst case (e.g. during cache warm-up).
+        The pagination bound is `self.max_requests` rather than an argument, so that
+        every caller of a given client necessarily agrees on it. The cache key varies
+        on it, and callers that disagreed would land in separate entries: a warm-up
+        would populate one no page view reads, and `invalidate()` (which has no
+        arguments to go on beyond the klant) would clear one nobody wrote.
         """
         response = self.get(
             "klantcontactmomenten",
@@ -220,7 +235,7 @@ class ContactmomentenClient(KlantAPIClient):
         )
         self.raise_for_status(response)
         data = self.parse_json(response)
-        all_data = list(pagination_helper(self, data, max_requests=max_requests))
+        all_data = list(pagination_helper(self, data, max_requests=self.max_requests))
         klanten_contact_moments = self.factory(KlantContactMoment, all_data)
 
         for kcm in klanten_contact_moments:
@@ -259,6 +274,7 @@ def _build_open_klant_client(type_) -> BaseAPIClient | None:
             client_kwargs = {}
             if type_ == "contactmomenten":
                 client_kwargs["cache_timeout"] = config.contactmoment_cache_timeout
+                client_kwargs["max_requests"] = config.contactmoment_max_requests
             client = build_client(service, client_factory=client_class, **client_kwargs)
             return client
 
