@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
@@ -9,7 +10,10 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.utils.validators import validate_array_contents_non_empty
 
-from .constants import KlantenServiceType
+from .constants import (
+    DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
+    KlantenServiceType,
+)
 
 
 class ESuiteKlantConfigManager(models.Manager):
@@ -135,6 +139,18 @@ class ESuiteKlantConfig(SingletonModel):
             "long an answer can take to appear after it was actually given. A "
             "question asked through this site always appears immediately regardless. "
             "Leave empty to disable caching."
+        ),
+    )
+    contactmoment_max_requests = models.PositiveIntegerField(
+        verbose_name=_("Contactmoment pagination requests"),
+        default=DEFAULT_KLANTCONTACTMOMENTEN_MAX_REQUESTS,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "How many further pages of a klant's klantcontactmomenten are retrieved "
+            "after the first one, so that a klant with a long history has a bounded "
+            "worst case. A klant with more klantcontactmomenten than fit in these "
+            "pages sees only the most recent ones. Raising this raises the cost of "
+            "every 'Mijn vragen' page view and of the cache warm-up on login."
         ),
     )
 

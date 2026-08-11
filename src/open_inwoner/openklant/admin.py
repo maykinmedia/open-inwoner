@@ -96,6 +96,7 @@ class ESuiteKlantConfigAdmin(OrderedInlineModelAdminMixin, SingletonModelAdmin):
                     "contactmoment_num_workers",
                     "contactmoment_fetch_timeout",
                     "contactmoment_cache_timeout",
+                    "contactmoment_max_requests",
                 ],
             },
         ),

@@ -48,9 +48,8 @@ class KlantContactMomentenCachingIntegrationTest(ClearCachesMixin, TestCase):
         calls_after_login = len(m.request_history)
         self.assertGreater(calls_after_login, 0, "no HTTP calls made during warm-up")
 
-        # Go through the same service call "Mijn vragen" itself uses, rather than
-        # the client directly: the listing cache is keyed on max_requests too, so a
-        # mismatched value here would silently miss the entry the warm-up populated.
+        # Go through the same service call "Mijn vragen" itself uses, so that a hit
+        # here means the page really is served from what the warm-up populated.
         eSuiteVragenService().fetch_klantcontactmomenten(user_bsn=data.user.bsn)
 
         listing_requests = [
