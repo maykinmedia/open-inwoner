@@ -291,8 +291,6 @@ jobs:
   # Docker
   #
   docker:
-    needs: tests
-
     name: Build (and push) Docker image
     runs-on: ubuntu-26.04
     permissions:
