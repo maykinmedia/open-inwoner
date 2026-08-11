@@ -401,7 +401,7 @@ class CMSZakenPluginTest(TestCase):
             skipped=[
                 SkippedZaak(
                     zaak_url=f"{ZAKEN_ROOT}zaken/1234",
-                    reason=SkipReason.TIMEOUT,
+                    reasons=frozenset({SkipReason.TIMEOUT}),
                     api_group=api_group,
                 )
             ],

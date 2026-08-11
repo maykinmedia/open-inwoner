@@ -84,7 +84,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
     def _timeout_skip(self) -> SkippedZaak:
         return SkippedZaak(
             zaak_url="http://zaken.nl/api/v1/zaken/1234",
-            reason=SkipReason.TIMEOUT,
+            reasons=frozenset({SkipReason.TIMEOUT}),
             api_group=self.api_group,
         )
 
@@ -115,7 +115,7 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
                 skipped=[
                     SkippedZaak(
                         zaak_url="http://zaken.nl/api/v1/zaken/1234",
-                        reason=SkipReason.CONFIDENTIALITY_TOO_HIGH,
+                        reasons=frozenset({SkipReason.CONFIDENTIALITY_TOO_HIGH}),
                         api_group=self.api_group,
                     )
                 ],
