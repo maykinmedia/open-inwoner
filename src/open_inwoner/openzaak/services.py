@@ -47,6 +47,7 @@ from open_inwoner.openzaak.models import (
 from open_inwoner.openzaak.utils import (
     get_role_name_display,
     is_object_visible,
+    omschrijving_generiek_matches,
 )
 from open_inwoner.utils.concurrency import TimedParallel
 
@@ -368,7 +369,10 @@ class ZGWService:
             return False
 
         if limit_access_to_role and not any(
-            rol.omschrijving_generiek == limit_access_to_role for rol in rollen
+            omschrijving_generiek_matches(
+                rol.omschrijving_generiek, limit_access_to_role
+            )
+            for rol in rollen
         ):
             logger.info(
                 "zaak access denied: incorrect rol for zaak",
