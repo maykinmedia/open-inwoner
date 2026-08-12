@@ -72,11 +72,16 @@ class OuterCaseListView(
 
         statuses = self.request.GET.getlist("status")
         search = self.request.GET.get("search", "")
+        page = self.request.GET.get(InnerCaseListView.page_kwarg, "")
 
         f_url = furl(reverse("cases:cases_content"))
         f_url.args.addlist("status", statuses)
         if search:
             f_url.args["search"] = search
+        # The pagination links push `page` into the location bar, so reloading or
+        # sharing the URL has to load that same page in the inner view.
+        if page:
+            f_url.args[InnerCaseListView.page_kwarg] = page
 
         context["hxget"] = f_url.url
         return context

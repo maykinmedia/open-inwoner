@@ -165,6 +165,53 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
         self.assertListEqual(response.context.get("zaken"), [])
 
 
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class OuterCaseListHxGetTests(ClearCachesMixin, TransactionWebTest):
+    """The outer view has to forward the filter/search/page params to the inner view.
+
+    The pagination links push `page` into the location bar, so a reload of the
+    outer page must trigger an htmx request for that same page.
+    """
+
+    outer_url = reverse_lazy("cases:index")
+
+    def setUp(self):
+        super().setUp()
+
+        ZGWApiGroupConfigFactory(
+            ztc_service__api_root=CATALOGI_ROOT,
+            zrc_service__api_root=ZAKEN_ROOT,
+            form_service=None,
+        )
+        self.user = UserFactory(
+            login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
+        )
+
+    def _get_hxget_args(self, query: str = "") -> dict:
+        url = f"{self.outer_url}?{query}" if query else self.outer_url
+        response = self.app.get(url, user=self.user)
+        return dict(furl(response.context["hxget"]).args)
+
+    def test_page_is_forwarded_to_inner_view(self):
+        args = self._get_hxget_args("page=5")
+
+        self.assertEqual(args["page"], "5")
+
+    def test_page_is_omitted_when_not_requested(self):
+        args = self._get_hxget_args()
+
+        self.assertNotIn("page", args)
+
+    def test_page_is_forwarded_alongside_search_and_status(self):
+        args = self._get_hxget_args(
+            f"page=3&search=ZAAK-01&status={CaseFilterFormOption.ZAAK_OPEN.value}"
+        )
+
+        self.assertEqual(args["page"], "3")
+        self.assertEqual(args["search"], "ZAAK-01")
+        self.assertEqual(args["status"], CaseFilterFormOption.ZAAK_OPEN.value)
+
+
 class CaseListMocks:
     def __init__(
         self,

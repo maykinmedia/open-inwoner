@@ -12,6 +12,8 @@
                 href="?{% querystring key='page' value=page_obj.previous_page_number %}"
                 {% if hxget %}
                     hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.previous_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                    {# push the outer URL, not the htmx one: reloading must re-render the full page on the same page number #}
+                    hx-push-url="?{% querystring key='page' value=page_obj.previous_page_number %}"
                 {% endif %}>
                 {% icon icon="west" %}
             </a>
@@ -28,6 +30,7 @@
                         href="?{% querystring key='page' value=i %}"
                         {% if hxget %}
                             hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                            hx-push-url="?{% querystring key='page' value=i %}"
                         {% endif %}
                     >
                         {{ i }}
@@ -38,6 +41,7 @@
                             href="?{% querystring key='page' value=i %}"
                             {% if hxget %}
                                 hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                                hx-push-url="?{% querystring key='page' value=i %}"
                             {% endif %}
                         >
                             {{ i }}
@@ -57,6 +61,7 @@
                             href="?{% querystring key='page' value=i %}"
                             {% if hxget %}
                                 hx-get="{{ hxget }}?{% querystring key='page' value=i %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                                hx-push-url="?{% querystring key='page' value=i %}"
                             {% endif %}
                         >
                             {{ i }}
@@ -71,6 +76,7 @@
                 href="?{% querystring key='page' value=page_obj.next_page_number %}"
                 {% if hxget %}
                     hx-get="{{ hxget }}?{% querystring key='page' value=page_obj.next_page_number %}" hx-trigger="click" hx-target="{{ hxtarget }}"
+                    hx-push-url="?{% querystring key='page' value=page_obj.next_page_number %}"
                 {% endif %}
             >
                 {% icon icon="east" %}
