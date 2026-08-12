@@ -46,7 +46,10 @@ from openklant_client.types.resources.klant_contact import (
     KlantContact,
     ListKlantContactParams,
 )
-from openklant_client.types.resources.onderwerp_object import OnderwerpObject
+from openklant_client.types.resources.onderwerp_object import (
+    OnderwerpObject,
+    OnderwerpobjectIdentificatorListParams,
+)
 from openklant_client.types.resources.partij import (
     CreatePartijPersoonData,
     PartialUpdatePartijData,
@@ -165,19 +168,6 @@ class Question(TypedDict):
 
 
 QuestionValidator = TypeAdapter(Question)
-
-
-# The klantinteracties API supports these filters, but the pinned open-klant-client
-# (0.4.0) does not declare them yet. The TypedDicts are annotations only, so the
-# parameters reach the wire regardless; these subclasses just keep type checking
-# honest. See the `hadBetrokkene__wasPartij__uuid` and `klantcontact__uuid` filters in
-# https://github.com/maykinmedia/open-klant/blob/master/src/openklant/components/klantinteracties/openapi.yaml
-class PartijFilteredKlantContactParams(ListKlantContactParams, total=False):
-    hadBetrokkene__wasPartij__uuid: str
-
-
-class KlantContactFilteredOnderwerpObjectParams(TypedDict, total=False):
-    klantcontact__uuid: str
 
 
 @dataclass
@@ -2312,7 +2302,7 @@ class OpenKlant2Service(
     def klantcontacten_for_partij(
         self, partij_uuid: str, *, kanaal: str | None = None
     ) -> Iterable[KlantContact]:
-        params: PartijFilteredKlantContactParams = {
+        params: ListKlantContactParams = {
             "expand": [
                 "leiddeTotInterneTaken",
                 "gingOverOnderwerpobjecten",
@@ -2551,7 +2541,7 @@ class OpenKlant2Service(
             return (None, None)
 
         # fetch onderwerp_object linked to klantcontact
-        onderwerp_object_params: KlantContactFilteredOnderwerpObjectParams = {
+        onderwerp_object_params: OnderwerpobjectIdentificatorListParams = {
             "klantcontact__uuid": question.question_kcm_uuid
         }
         onderwerp_objecten = [
