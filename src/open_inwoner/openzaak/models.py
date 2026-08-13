@@ -425,6 +425,7 @@ class OpenZaakConfig(SingletonModel):
             choices=InformatieObjectStatus.choices,
         ),
         default=default_document_visible_statuses,
+        blank=True,
         verbose_name=_("Visible document statuses"),
         help_text=_(
             "Select which document statuses are visible to users. "
