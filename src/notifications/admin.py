@@ -50,6 +50,7 @@ class NotificationRecordAdmin(admin.ModelAdmin):
     search_fields = (
         "kanaal",
         "processing_error",
+        "payload",
     )
     readonly_fields = (
         "id",
