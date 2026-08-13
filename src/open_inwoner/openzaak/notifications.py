@@ -447,12 +447,12 @@ def _check_status_history(
             zaak_url=zaak.url,
         )
 
-    if len(status_history) == 1:
-        return NotificationProcessingResult.ignore(
-            "ignored notification: skip initial status notification for zaak",
-            resource=resource,
-            zaak_url=zaak.url,
-        )
+    # if len(status_history) == 1:
+    #     return NotificationProcessingResult.ignore(
+    #         "ignored notification: skip initial status notification for zaak",
+    #         resource=resource,
+    #         zaak_url=zaak.url,
+    #     )
 
     return NotificationProcessingResult.ok(status_history)
 
