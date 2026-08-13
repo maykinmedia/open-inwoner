@@ -17,6 +17,7 @@ from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import ResultaatType
+from open_inwoner.openzaak.models import OpenZaakConfig
 
 from .factories import (
     CatalogusConfigFactory,
@@ -408,3 +409,33 @@ class TestZaakTypeConfigImportAdmin(WebTest):
         )
 
         self.assertEqual(response.status_code, 403)
+
+
+@disable_admin_mfa()
+class TestOpenZaakConfigAdmin(WebTest):
+    def setUp(self):
+        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.form = self.app.get(
+            reverse("admin:openzaak_openzaakconfig_change"), user=self.user
+        ).forms["openzaakconfig_form"]
+        # django-jsonform requires JS to work properly and with Webtest the default
+        # value for ArrayFields is an empty string, causing it to crash when trying to
+        # parse that value as JSON
+        self.form["allowed_file_extensions"] = json.dumps(
+            OpenZaakConfig.get_solo().allowed_file_extensions
+        )
+
+    def test_document_visible_statuses_can_be_saved_as_empty_list(self):
+        """An empty `document_visible_statuses` is valid and means all statuses
+        are visible (see `test_utils.test_is_info_object_visible_custom_statuses`),
+        so the admin form must allow saving it as such."""
+        config = OpenZaakConfig.get_solo()
+        self.assertNotEqual(config.document_visible_statuses, [])
+
+        self.form["document_visible_statuses"] = "[]"
+        response = self.form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        config.refresh_from_db()
+        self.assertEqual(config.document_visible_statuses, [])
