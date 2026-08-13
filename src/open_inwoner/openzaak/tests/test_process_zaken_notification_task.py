@@ -17,6 +17,7 @@ from notifications.models import (
     Subscription,
 )
 from open_inwoner.configurations.models import SiteConfiguration
+from open_inwoner.openzaak.notifications import NotificationProcessingResult
 from open_inwoner.openzaak.tasks import process_zaken_notification
 
 
@@ -72,6 +73,38 @@ class ProcessZakenNotificationTaskTestCase(TestCase):
         self.assertEqual(record.status, ProcessingStatus.SUCCESS)
         self.assertIsNotNone(record.last_processed_at)
         mock_handle.assert_called_once()
+
+    @patch("open_inwoner.openzaak.tasks.handle_zaken_notification", autospec=True)
+    def test_process_notification_records_outcome_message(self, mock_handle):
+        """Test that the outcome message from handle_zaken_notification is stored
+        on the record as `processing_output`, e.g. why a notification was ignored"""
+        mock_handle.return_value = NotificationProcessingResult.ignore(
+            "ignored notification: zaak not visible after applying website "
+            "visibility filter",
+            resource="status",
+            zaak_url="http://example.com/zaak/1",
+        )
+
+        payload = {
+            "kanaal": "zaken",
+            "resource": "zaak",
+            "resourceUrl": "http://example.com/zaak/1",
+            "hoofdObject": "http://example.com/zaak/1",
+            "actie": "create",
+            "aanmaakdatum": "2023-01-11T15:09:59.116815Z",
+        }
+        record = NotificationRecord.objects.create(
+            subscription=self.subscription,
+            payload=payload,
+            kanaal="zaken",
+            status=ProcessingStatus.PENDING,
+        )
+
+        process_zaken_notification(record.pk)
+
+        record.refresh_from_db()
+        self.assertEqual(record.status, ProcessingStatus.SUCCESS)
+        self.assertEqual(record.processing_output, str(mock_handle.return_value))
 
     @patch("open_inwoner.openzaak.tasks.handle_zaken_notification", autospec=True)
     def test_process_notification_when_disabled(self, mock_handle):
