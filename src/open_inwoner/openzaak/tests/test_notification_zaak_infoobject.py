@@ -163,17 +163,19 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
     def test_zio_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
         notification = NotificationFactory(resource="not_status")
 
-        handle_zaken_notification(notification)
+        outcome = handle_zaken_notification(notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("resource is not one of the expected resources", str(outcome))
 
     def test_zio_bails_when_no_roles_found_for_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["case_roles"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve rollen for zaak", str(outcome))
 
     def test_handle_zaak_zio_notifications_with_betrokkene_type_flag(
         self, m, mock_handle: Mock
@@ -267,9 +269,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("zaak not visible", str(outcome))
 
     def test_zio_bails_when_case_not_visible_because_internal_case(
         self, m, mock_handle: Mock
