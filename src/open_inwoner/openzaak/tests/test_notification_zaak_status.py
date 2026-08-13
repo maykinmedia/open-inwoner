@@ -152,17 +152,19 @@ class StatusNotificationHandlerTestCase(
     def test_status_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
         notification = NotificationFactory(resource="not_status")
 
-        handle_zaken_notification(notification)
+        outcome = handle_zaken_notification(notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("resource is not one of the expected resources", str(outcome))
 
     def test_status_bails_when_no_roles_found_for_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["case_roles"])
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve rollen for zaak", str(outcome))
 
     def test_handle_zaak_status_notifications_with_betrokkene_type_flag(
         self, m, mock_handle: Mock
@@ -285,9 +287,10 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["status_history"])
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve status_history for zaak", str(outcome))
 
     def test_status_bails_when_status_history_is_single_initial_item(
         self, m, mock_handle: Mock
@@ -296,17 +299,19 @@ class StatusNotificationHandlerTestCase(
         data.status_history = [data.status_initial]
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("skip initial status notification for zaak", str(outcome))
 
     def test_status_bails_when_cannot_fetch_status_type(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["status_type_final"])
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve status_type for zaak", str(outcome))
 
     def test_status_bails_when_status_type_not_marked_as_informeren(
         self, m, mock_handle: Mock
@@ -315,9 +320,10 @@ class StatusNotificationHandlerTestCase(
         data.status_type_final["informeren"] = False
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("status_type.informeren is false", str(outcome))
 
     def test_status_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
