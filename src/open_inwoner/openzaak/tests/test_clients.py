@@ -110,6 +110,15 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                     [self.api_groups[0]],
                 )
 
+    def test_with_forms_service_excludes_groups_without_a_form_service(self):
+        with_form = ZGWApiGroupConfigFactory()
+        without_form = ZGWApiGroupConfigFactory(form_service=None)
+
+        result = list(ZGWApiGroupConfig.objects.with_forms_service())
+
+        self.assertIn(with_form, result)
+        self.assertNotIn(without_form, result)
+
     def test_filter_by_root_url_overlap(self):
         for root, api_group_field in (
             ("http://some.forms.nl", "form_service"),

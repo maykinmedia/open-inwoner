@@ -168,6 +168,20 @@ class ZGWApiGroupConfigQuerySet(models.QuerySet):
                     "ZakenClient, DocumentenClient, FormulierenClient, CatalogiClient"
                 )
 
+    def with_forms_service(self):
+        """Groups with a Form API configured, ready to build a client from.
+
+        `form_service` is nullable, so `ZGWService._formulieren_client_factory`
+        is only safe for groups coming from this queryset. Building a client
+        also dereferences the service's certificate FKs, so those are fetched
+        here: without them, every client built costs two extra queries.
+        """
+        return self.filter(form_service__isnull=False).select_related(
+            "form_service",
+            "form_service__server_certificate",
+            "form_service__client_certificate",
+        )
+
     def filter_by_url_root_overlap(self, url: str):
         filtered_group_ids = set()
         for group in self.all():
@@ -284,13 +298,6 @@ class ZGWApiGroupConfig(models.Model):
         null=True,
         blank=True,
     )
-
-    @property
-    def forms_client(self):
-        from .clients import FormulierenClient
-
-        if self.form_service:
-            return cast(FormulierenClient, self._build_client_from_attr("form_service"))
 
     # backend-specific flags
     fetch_eherkenning_zaken_with_rsin = models.BooleanField(
