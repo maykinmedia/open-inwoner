@@ -443,8 +443,6 @@ markdown==3.10.2
     # via -r requirements/base.in
 markdown-it-py==4.0.0
     # via rich
-markuppy==1.14
-    # via tablib
 markupsafe==3.0.3
     # via jinja2
 maykin-2fa==1.0.2
@@ -736,7 +734,7 @@ svglib==1.5.1
     # via
     #   django-filer
     #   easy-thumbnails
-tablib[html, ods, xls, xlsx, yaml]==3.1.0
+tablib[html, ods, xls, xlsx, yaml]==3.10.0
     # via django-import-export
 tinycss2==1.5.1
     # via
