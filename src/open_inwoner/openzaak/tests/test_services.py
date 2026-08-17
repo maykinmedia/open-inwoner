@@ -61,6 +61,14 @@ _TINY_TIMEOUTS = {
 }
 
 
+class FormulierenClientFactoryTest(ClearCachesMixin, TestCase):
+    def test_raises_for_a_group_without_a_form_service(self):
+        group = ZGWApiGroupConfigFactory(form_service=None)
+
+        with self.assertRaises(ValueError):
+            ZGWService._formulieren_client_factory(group)
+
+
 class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     """
     Verify that a still-in-flight fetch is correctly reflected in the

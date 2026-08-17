@@ -35,6 +35,7 @@ from open_inwoner.openzaak.api_models import (
 from open_inwoner.openzaak.clients import (
     CatalogiClient,
     DocumentenClient,
+    FormulierenClient,
     ZakenClient,
     build_zgw_client_from_service,
 )
@@ -309,6 +310,21 @@ class ZGWService:
                 group.drc_service,
                 cache_zaken_timeout=group.cache_zaken_timeout,
             ),
+        )
+
+    @staticmethod
+    def _formulieren_client_factory(group: ZGWApiGroupConfig) -> FormulierenClient:
+        """Caller must guarantee `group.form_service` is set (it is nullable).
+
+        Select groups with `ZGWApiGroupConfigQuerySet.with_forms_service()`.
+        Checking here anyway names the group that is misconfigured, instead of
+        failing with an `AttributeError` on `None` from inside `build_client`.
+        """
+        if group.form_service is None:
+            raise ValueError(f"{group} has no `form_service`")
+
+        return cast(
+            FormulierenClient, build_zgw_client_from_service(group.form_service)
         )
 
     @cached_property
@@ -993,18 +1009,18 @@ class ZGWService:
     # -------------------------------------------------------------------------
 
     def _get_formulieren_for_api_group(
-        self, group: ZGWApiGroupConfig, user_identification: UserIdentification
+        self,
+        group: ZGWApiGroupConfig,
+        user_identification: UserIdentification,
+        formulieren_client: FormulierenClient,
     ) -> list[FormulierWithApiGroup]:
-        if not group.forms_client:
-            raise ValueError(f"{group} has no `forms_client`")
-
         return [
             FormulierWithApiGroup(
                 formulier=formulier,
                 api_group=group,
                 type_aanvraag=TypeAanvraag.FORMULIER,
             )
-            for formulier in group.forms_client.fetch_formulieren(
+            for formulier in formulieren_client.fetch_formulieren(
                 user_identification, use_rsin=group.fetch_eherkenning_zaken_with_rsin
             )
         ]
@@ -1018,11 +1034,7 @@ class ZGWService:
         config = OpenZaakConfig.get_solo()
         timeouts = self._case_list_stage_timeouts(config)
 
-        all_api_groups = list(
-            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
-                "form_service",
-            )
-        )
+        all_api_groups = list(ZGWApiGroupConfig.objects.with_forms_service())
 
         subs_with_api_group: list[FormulierWithApiGroup] = []
         with TimedParallel(
@@ -1030,7 +1042,10 @@ class ZGWService:
         ) as executor:
             futures = [
                 executor.submit(
-                    self._get_formulieren_for_api_group, group, user_identification
+                    self._get_formulieren_for_api_group,
+                    group,
+                    user_identification,
+                    self._formulieren_client_factory(group),
                 )
                 for group in all_api_groups
             ]
@@ -1431,15 +1446,12 @@ class ZGWService:
     # -------------------------------------------------------------------------
 
     def fetch_open_tasks(self, bsn: str) -> list[OpenstaandeTaak]:
-        all_api_groups = list(
-            ZGWApiGroupConfig.objects.filter(form_service__isnull=False).select_related(
-                "form_service"
-            )
-        )
+        all_api_groups = list(ZGWApiGroupConfig.objects.with_forms_service())
         tasks = []
         for group in all_api_groups:
             try:
-                tasks.extend(group.forms_client.fetch_open_tasks(bsn=bsn))
+                client = self._formulieren_client_factory(group)
+                tasks.extend(client.fetch_open_tasks(bsn=bsn))
             except ZgwAPIError:
                 logger.exception(
                     "Error fetching open tasks from ZGW API", api_group=str(group)
