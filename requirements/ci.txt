@@ -1290,7 +1290,7 @@ sphinxcontrib-serializinghtml==2.0.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   sphinx
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
