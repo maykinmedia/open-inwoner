@@ -726,7 +726,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via django
 structlog==25.4.0
     # via django-structlog

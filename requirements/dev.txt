@@ -1434,7 +1434,7 @@ sphinxcontrib-serializinghtml==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   sphinx
-sqlparse==0.5.5
+sqlparse==0.6.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
