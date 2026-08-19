@@ -179,3 +179,26 @@ class ZGWConfigurationTests(TestCase):
         self.assertEqual(
             config.form_services.get().api_root, "http://an/updated/root/form"
         )
+
+    def test_rerun_overwrites_an_existing_api_groups_admin_edit(self):
+        """
+        Simulates an admin editing an existing api group's
+        `fetch_eherkenning_zaken_with_rsin` after it was bootstrapped:
+        re-running the step, with the same services, overwrites that edit
+        rather than leaving the pre-existing row as is.
+        """
+        execute_single_step(
+            OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_FULL
+        )
+        api_group = ZGWApiGroupConfig.objects.get()
+        self.assertFalse(api_group.fetch_eherkenning_zaken_with_rsin)
+        api_group.fetch_eherkenning_zaken_with_rsin = True
+        api_group.save()
+
+        execute_single_step(
+            OpenZaakConfigurationStep, yaml_source=ZGW_API_STEP_YAML_FULL
+        )
+
+        self.assertEqual(ZGWApiGroupConfig.objects.count(), 1)
+        api_group.refresh_from_db()
+        self.assertFalse(api_group.fetch_eherkenning_zaken_with_rsin)

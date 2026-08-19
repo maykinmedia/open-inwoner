@@ -88,17 +88,20 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
                     f"step have been created:\n{str(exc)}"
                 ) from exc
 
-            ZGWApiGroupConfig.objects.get_or_create(
+            zgw_api_group, _ = ZGWApiGroupConfig.objects.get_or_create(
                 open_zaak_config=config,
                 zrc_service=zrc_service,
                 ztc_service=ztc_service,
                 drc_service=drc_service,
                 form_service=form_service,
-                defaults={
-                    "name": "Auto-configured by django-setup-configuration",
-                    "fetch_eherkenning_zaken_with_rsin": api_group.fetch_eherkenning_zaken_with_rsin,
-                },
             )
+            # overwritten on every run, not just on creation, so an admin edit
+            # to an existing api group doesn't survive a re-run
+            zgw_api_group.name = "Auto-configured by django-setup-configuration"
+            zgw_api_group.fetch_eherkenning_zaken_with_rsin = (
+                api_group.fetch_eherkenning_zaken_with_rsin
+            )
+            zgw_api_group.save()
 
         general_settings = model.model_dump(exclude={"api_groups"})
         for field, val in general_settings.items():
