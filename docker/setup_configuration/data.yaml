@@ -115,6 +115,15 @@ oidc_db_config_admin_auth:
           company_name_claim_path:
             - company_name
 
+# Site configuration
+#
+# Every field this step manages is overwritten on every run, using its
+# default when this file doesn't set it, so admin edits do not survive a
+# re-run.
+site_config_enable: true
+site_config:
+  name: Open Inwoner Lokaal
+
 # Setup service connectivity
 zgw_consumers_config_enable: True
 zgw_consumers:

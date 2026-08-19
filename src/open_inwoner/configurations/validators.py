@@ -1,4 +1,7 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+from django.urls import resolve
+from django.urls.exceptions import Resolver404
 from django.utils.translation import gettext_lazy as _
 
 from mozilla_django_oidc_db.constants import OIDC_ADMIN_CONFIG_IDENTIFIER
@@ -25,6 +28,23 @@ def validate_oidc_config(value):
                 "in the OpenID Connect configuration."
             )
         )
+
+
+def validate_redirect_to(value):
+    """Ensure `redirect_to` is either a resolvable path or a valid URL"""
+    if not value:
+        return
+
+    if value.startswith("/"):
+        try:
+            resolve(value)
+        except Resolver404:
+            raise ValidationError(_("The entered path is invalid.")) from None
+    else:
+        try:
+            URLValidator()(value)
+        except ValidationError:
+            raise ValidationError(_("The entered url is invalid.")) from None
 
 
 def validate_javascript_file(file):

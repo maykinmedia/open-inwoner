@@ -1,0 +1,89 @@
+site_config_enable: true
+site_config:
+  name: Test Municipality
+  primary_color: '#112233'
+  secondary_color: '#445566'
+  accent_color: '#778899'
+  primary_font_color: '#4B4B4B'
+  secondary_font_color: '#4B4B4B'
+  accent_font_color: '#FFFFFF'
+  warning_banner_enabled: true
+  warning_banner_text: <p>Let op, dit is een testbanner.</p>
+  warning_banner_background_color: '#AABBCC'
+  warning_banner_font_color: '#001122'
+  login_show: false
+  login_allow_registration: true
+  login_2fa_sms: true
+  login_text: <p>Log in met uw DigiD account.</p>
+  enable_eherkenning_for_eenmanszaak: true
+  registration_text: Registreer hier uw account.
+  home_welcome_title: Welkom bij de testgemeente
+  home_welcome_intro: Dit is de introductietekst op de homepage.
+  home_theme_title: Testonderwerpen
+  home_theme_intro: Introductie voor onderwerpen.
+  theme_title: Onderwerpenpagina
+  theme_intro: Introductie voor de onderwerpenpagina.
+  home_map_title: Kaart testtitel
+  home_map_intro: Introductie voor de kaart.
+  home_questionnaire_title: Testvragenlijst
+  home_questionnaire_intro: Introductie voor de vragenlijst.
+  home_product_finder_title: Testproductzoeker
+  home_product_finder_intro: Introductie voor de productzoeker.
+  select_questionnaire_title: Kies uw testvragenlijst
+  select_questionnaire_intro: Introductie voor de keuzevragenlijst.
+  plans_intro: Introductie voor plannen.
+  plans_no_plans_message: U heeft nog geen testplan.
+  plans_edit_message: Bewerk hier uw testplan.
+  footer_logo_title: Testfooterlogo
+  footer_logo_url: https://example.org/footer
+  home_help_text: Testhelptekst voor de homepage.
+  theme_help_text: Testhelptekst voor onderwerpen.
+  product_help_text: Testhelptekst voor producten.
+  account_help_text: Testhelptekst voor het profiel.
+  questionnaire_help_text: Testhelptekst voor de vragenlijst.
+  plan_help_text: Testhelptekst voor plannen.
+  search_enabled: false
+  hide_search_from_anonymous_users: true
+  search_help_text: Testhelptekst voor zoeken.
+  search_zero_results_text: <p>Geen testresultaten gevonden.</p>
+  include_cms_pages_in_search_index: true
+  search_filter_categories: false
+  search_filter_tags: false
+  search_filter_organizations: false
+  enable_notification_channel_choice: true
+  notifications_cases_enabled: false
+  notifications_messages_enabled: false
+  notifications_plans_enabled: false
+  notifications_actions_enabled: false
+  recipients_email_digest:
+    - digest-one@example.org
+    - digest-two@example.org
+  email_verification_required: true
+  email_verification_message: Bevestig uw e-mailadres via {email}.
+  contact_phonenumber: '0612345678'
+  contact_page: https://example.org/contact
+  gtm_code: GTM-TEST123
+  ga_code: G-TEST123
+  matomo_url: matomo.example.org
+  matomo_site_id: 7
+  siteimprove_id: '1234567'
+  cookie_info_text: Testcookietekst.
+  cookie_link_text: Lees ons testcookiebeleid.
+  cookie_link_url: /pages/testcookiebeleid/
+  kcm_survey_link_text: Doe mee aan ons testonderzoek
+  kcm_survey_link_url: https://example.org/survey
+  openid_connect_login_text: Login met test-OpenID
+  openid_display: regular
+  redirect_to: /accounts/login/
+  allow_messages_file_sharing: false
+  hide_categories_from_anonymous_users: true
+  display_social: false
+  extra_css: 'body { color: red; }'
+  eherkenning_enabled: true
+  contactmoment_contact_form_enabled: false
+  enable_crawler_indexing: false
+  security_txt_redirect_target: https://example.org/.well-known/security.txt
+  enable_virus_scan: true
+  clamav_host: clamav.internal
+  clamav_port: 4000
+  clamav_timeout: 45.5
