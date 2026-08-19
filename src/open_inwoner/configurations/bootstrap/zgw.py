@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 from django_setup_configuration import ConfigurationModel, DjangoModelRef
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
@@ -102,5 +104,10 @@ class OpenZaakConfigurationStep(BaseConfigurationStep):
         for field, val in general_settings.items():
             setattr(config, field, val)
 
-        config.full_clean()
-        config.save()
+        try:
+            config.full_clean()
+            config.save()
+        except ValidationError as exc:
+            raise ConfigurationRunFailed(
+                f"Something went wrong while saving OpenZaakConfig: {exc}"
+            ) from exc
