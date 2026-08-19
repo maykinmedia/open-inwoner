@@ -175,5 +175,5 @@ class KlantenSysteemConfigurationStep(
             config.save()
         except ValidationError as exc:
             raise ConfigurationRunFailed(
-                "Unable to validate and save ESuiteKlantConfig"
+                "Unable to validate and save OpenKlant2Config"
             ) from exc
