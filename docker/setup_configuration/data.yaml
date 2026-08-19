@@ -124,6 +124,14 @@ site_config_enable: true
 site_config:
   name: Open Inwoner Lokaal
 
+# DigiD via SAML - disabled locally, since this docker-compose stack has no
+# certificate or real identity provider to configure it against.
+digid_saml_config_enable: false
+
+# eHerkenning/eIDAS via SAML - disabled locally, for the same reason as DigiD
+# above.
+eherkenning_saml_config_enable: false
+
 # Setup service connectivity
 zgw_consumers_config_enable: True
 zgw_consumers:
