@@ -1377,10 +1377,8 @@ class OpenKlant2Service(
         Reading the service configuration is what keeps this on the calling thread: a
         worker cannot see rows written by an as yet uncommitted transaction here.
         """
-        return OpenKlantClient(
-            base_url=self.config.service.api_root,
-            token=self.config.service.secret,
-            request_kwargs={"timeout": self.config.service.timeout},
+        return build_zgw_client(
+            service=self.config.service, client_factory=OpenKlantClient
         )
 
     def find_partij_for_params(self, params: PartijListParams) -> Partij | None:
