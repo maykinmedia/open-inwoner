@@ -5,6 +5,9 @@ from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
 
+from zgw_consumers.client import APIKeyAuth
+from zgw_consumers.constants import AuthTypes
+
 from open_inwoner.accounts.choices import DigitalAddressType
 from open_inwoner.accounts.models import DigitalAddress
 from open_inwoner.accounts.tests.factories import (
@@ -21,6 +24,7 @@ from open_inwoner.openklant.services import (
     _normalize_email,
     _normalize_phone,
 )
+from open_inwoner.openklant.tests.data import OPENKLANT2_ROOT
 from open_inwoner.openklant.tests.factories import (
     DigitaalAdresOpenKlantMappingFactory,
     OpenKlant2ConfigFactory,
@@ -29,10 +33,39 @@ from open_inwoner.openklant.tests.test_conversations import (
     make_klantcontact,
     make_not_found,
 )
+from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.test import ClearCachesMixin
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+class OpenKlant2ServiceClientAuthTestCase(TestCase):
+    """
+    Regression test: OpenKlant2Service.__init__ used to read the Service's
+    `secret` field directly as a bearer token, which only matches
+    `auth_type=zgw`. A Service configured with `auth_type=api_key` (the type
+    actually used for Open Klant's static DRF token in
+    docker/setup_configuration/data.yaml) has its credential in
+    `header_key`/`header_value` instead, so `secret` was empty and no
+    Authorization header was ever sent at all.
+    """
+
+    def test_client_uses_header_value_for_api_key_auth_type(self):
+        service = ServiceFactory(
+            api_root=OPENKLANT2_ROOT,
+            auth_type=AuthTypes.api_key,
+            header_key="Authorization",
+            header_value="Token abc123",
+        )
+        config = OpenKlant2ConfigFactory(service=service)
+
+        openklant_service = OpenKlant2Service(config)
+
+        auth = openklant_service.client.auth
+        self.assertIsInstance(auth, APIKeyAuth)
+        self.assertEqual(auth.header, "Authorization")
+        self.assertEqual(auth.key, "Token abc123")
+
+
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class UpdateUserFromPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
@@ -522,7 +555,7 @@ class UpdateUserFromPartijTestCase(TestCase):
         self.assertIsNone(user.preferred_address)
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class CreateKlantcontactTestCase(TestCase):
     def setUp(self):
         self.config = OpenKlant2ConfigFactory()
@@ -583,7 +616,7 @@ class CreateKlantcontactTestCase(TestCase):
         self.assertEqual(result["uuid"], "kc-uuid")
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class GetOrCreatePartijForUserTestCase(TestCase):
     def setUp(self):
         self.config = OpenKlant2ConfigFactory()
@@ -695,7 +728,7 @@ class GetOrCreatePartijForUserTestCase(TestCase):
         )
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class FindPartijForParamsTestCase(TestCase):
     def setUp(self):
         self.config = OpenKlant2ConfigFactory()
@@ -744,7 +777,7 @@ class FindPartijForParamsTestCase(TestCase):
         self.assertEqual(partij["uuid"], "first-uuid")
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
@@ -819,7 +852,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
         self.assertNotIn("123456789", service._partij_uuid_cache_key(user))
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
@@ -1867,7 +1900,7 @@ def _make_digitaal_adres(adres, soort, is_standaard=True, uuid_str="addr-uuid"):
     }
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class GetOrCreateDigitaalAdresNormalizationTestCase(TestCase):
     """Deduplication must survive formatting differences in stored vs incoming values."""
 
@@ -2054,7 +2087,7 @@ class GetOrCreateDigitaalAdresNormalizationTestCase(TestCase):
         self.assertEqual(result, patched)
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class UpdatePartijFromUserDataTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
@@ -2321,7 +2354,7 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         self.assertEqual(result, ["digitaleAddresen.telefoonnummer"])
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class ListQuestionsForZaakTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
     ZAAK_UUID = "6d3f2b1a-0c4e-4f8a-9b7c-1e2d3f4a5b6c"
@@ -2404,7 +2437,7 @@ class ListQuestionsForZaakTestCase(TestCase):
         )
 
 
-@patch("open_inwoner.openklant.services.OpenKlantClient")
+@patch("open_inwoner.openklant.services.build_zgw_client")
 class KlantcontactenForPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
