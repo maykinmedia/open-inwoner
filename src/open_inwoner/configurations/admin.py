@@ -7,9 +7,6 @@ from django.contrib.sites.admin import SiteAdmin
 from django.contrib.sites.models import Site
 from django.core import exceptions
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
-from django.urls import resolve
-from django.urls.exceptions import Resolver404
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
 
@@ -102,24 +99,6 @@ class SiteConfigurationAdminForm(forms.ModelForm):
             )
 
         return custom_javascript
-
-    def clean_redirect_to(self):
-        redirect_to = self.cleaned_data["redirect_to"]
-
-        if redirect_to:
-            if redirect_to.startswith("/"):
-                try:
-                    resolve(redirect_to)
-                except Resolver404:
-                    raise ValidationError(_("The entered path is invalid.")) from None
-            else:
-                validate_url = URLValidator()
-                try:
-                    validate_url(redirect_to)
-                except exceptions.ValidationError:
-                    raise ValidationError(_("The entered url is invalid.")) from None
-
-        return redirect_to
 
     def clean(self):
         cleaned_data = super().clean()

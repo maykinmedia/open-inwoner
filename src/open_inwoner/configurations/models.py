@@ -26,7 +26,11 @@ from open_inwoner.utils.validators import (
 )
 
 from .choices import ColorTypeChoices, CustomFontName, OpenIDDisplayChoices
-from .validators import validate_javascript_file, validate_oidc_config
+from .validators import (
+    validate_javascript_file,
+    validate_oidc_config,
+    validate_redirect_to,
+)
 
 
 class SiteConfiguration(SingletonModel):
@@ -629,6 +633,7 @@ class SiteConfiguration(SingletonModel):
             "Path example: '/accounts/login/', "
             "Url example: 'https://www.example.com'"
         ),
+        validators=[validate_redirect_to],
     )
     allow_messages_file_sharing = models.BooleanField(
         verbose_name=_("Allow messages file sharing"),

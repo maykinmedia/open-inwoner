@@ -1,0 +1,4 @@
+site_config_enable: true
+site_config:
+  name: Test Municipality
+  redirect_to: not a valid url
