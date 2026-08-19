@@ -145,9 +145,14 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - db
-      - redis
-      - prepare-volumes
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      prepare-volumes:
+        condition: service_completed_successfully
+      web-init:
+        condition: service_completed_successfully
     networks:
       - openinwoner-dev
 
@@ -156,8 +161,21 @@ services:
     container_name: open-inwoner-web-init
     ports: []
     command: /setup_configuration.sh
+    # the inherited healthcheck probes the webserver, which this one-shot
+    # container never starts
+    healthcheck:
+      disable: true
     volumes:
       - ./docker/setup_configuration:/app/setup_configuration
+    # Override depends_on to prevent a circular dependency: web-init inherits
+    # *web-service which would otherwise include web-init itself.
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      prepare-volumes:
+        condition: service_completed_successfully
 
   nginx:
     image: nginx
