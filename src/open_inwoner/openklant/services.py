@@ -1257,10 +1257,14 @@ class OpenKlant2Service(
         if not self.config.service:
             raise ImproperlyConfigured("No openklant2 Service object configured")
 
-        self.client = OpenKlantClient(
-            base_url=self.config.service.api_root,
-            token=self.config.service.secret,
-            request_kwargs={"timeout": self.config.service.timeout},
+        # `Service.secret` is for the `zgw`/`oauth2_client_credentials` auth
+        # types (JSON Web Token / OAuth2 client secret); for the `api_key`
+        # auth type this service actually uses, the credential lives in
+        # `header_key`/`header_value` instead. `build_zgw_client` already
+        # knows how to turn any of those into the right auth for the
+        # underlying request, same as every other client in this module.
+        self.client = build_zgw_client(
+            service=self.config.service, client_factory=OpenKlantClient
         )
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
