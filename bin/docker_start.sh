@@ -2,7 +2,7 @@
 
 set -ex
 
-OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-web}"
+export OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-web}"
 
 # Figure out abspath of this script
 SCRIPT=$(readlink -f "$0")
