@@ -6,7 +6,7 @@ fi
 
 set -e
 
-OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-celery-worker}"
+export OTEL_SERVICE_NAME="${OTEL_SERVICE_NAME:-openinwoner-celery-worker}"
 
 LOGLEVEL=${CELERY_LOGLEVEL:-INFO}
 CONCURRENCY=${CELERY_WORKER_CONCURRENCY:-4}
