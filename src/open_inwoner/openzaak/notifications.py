@@ -37,7 +37,7 @@ from open_inwoner.openzaak.utils import (
     omschrijving_generiek_matches,
 )
 from open_inwoner.userfeed import hooks
-from open_inwoner.utils.url import build_absolute_url
+from open_inwoner.utils.url import build_absolute_url, uuid_from_url
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -355,6 +355,8 @@ def _handle_zaakinformatieobject_notification(
             resource=r,
             info_type_omschrijving=ztiotc.omschrijving,
             informatieobjecttype=info_object.informatieobjecttype,
+            informatieobjecttype_uuid=ztiotc.informatieobjecttype_uuid(),
+            info_type_config_id=ztiotc.id,
             zaak_url=zaak.url,
         )
 
@@ -554,6 +556,8 @@ def _check_zaaktype_config(
                 "'notify_status_changes' is False",
                 resource=resource,
                 zaaktype_identificatie=zaak.zaaktype.identificatie,
+                zaaktype_uuid=zaak.zaaktype.uuid,
+                zaaktype_config_id=ztc.id,
                 zaak_url=zaak.url,
             )
     elif not ztc:
@@ -593,6 +597,8 @@ def _check_statustype_config(
             "ignored notification: 'notify_status_change' is False for the status "
             "type configuration of the status of this zaak",
             resource=resource,
+            statustype_uuid=uuid_from_url(statustype_url),
+            statustype_config_id=statustype_config.id,
             zaak_url=zaak.url,
         )
 
