@@ -73,10 +73,11 @@ export UWSGI_POST_BUFFERING=${UWSGI_POST_BUFFERING:-8192}
 export UWSGI_BUFFER_SIZE=${UWSGI_BUFFER_SIZE:-65535}
 
 # Start Server
+#
+# Avoid --lazy-apps as it breaks our otel setup hooks
 >&2 echo "Starting server"
 exec uwsgi \
     --show-config \
     --strict \
-    --lazy-apps \
     --static-map /static=/app/static \
     --static-map /media=/app/media
