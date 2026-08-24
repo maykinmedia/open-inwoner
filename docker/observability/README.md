@@ -16,8 +16,12 @@ From the root of the repository:
 
 ```bash
 docker compose up -d
-docker compose -f docker/docker-compose.observability.yml up
+bin/start_observability.sh
 ```
+
+(the second command is a thin wrapper around
+`docker compose -f docker/docker-compose.observability.yml up` -- see that
+script for why it's not called directly)
 
 You can now navigate to:
 
@@ -71,4 +75,7 @@ The `maykin_common.otel` module takes care of setting everything up, just make
 sure to set the environment variable `OTEL_SDK_DISABLED=false` in development
 (it's disabled by default).
 
-The collector ingests the traces and prints them out to stdout.
+The collector ingests the traces and exports them to Grafana Tempo, queryable
+from Grafana's "Tempo" datasource (or via trace-ID links from Loki logs
+containing a `trace_id` field, wired up as a derived field -- see
+`grafana/datasources/ds.yml`).
