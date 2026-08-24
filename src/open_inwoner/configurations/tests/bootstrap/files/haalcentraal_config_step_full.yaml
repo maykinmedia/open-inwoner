@@ -1,0 +1,9 @@
+haalcentraal_config_enable: true
+haalcentraal_config:
+  service_identifier: brp-service
+  brp_version: '2.3'
+  headers:
+    - key: x-origin-oin
+      value: '00000001234567890000'
+    - key: x-doelbinding
+      value: BRPACT-Totaal
