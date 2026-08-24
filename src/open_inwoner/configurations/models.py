@@ -41,17 +41,17 @@ class SiteConfiguration(SingletonModel):
     )
     primary_color = ColorField(
         verbose_name=_("Primary color"),
-        default="#FFFFFF",
+        default="#154273",
         help_text=_("The primary color of the municipality's site"),
     )
     secondary_color = ColorField(
         verbose_name=_("Secondary color"),
-        default="#0000FF",
+        default="#C2410C",
         help_text=_("The secondary color of the municipality's site"),
     )
     accent_color = ColorField(
         verbose_name=_("Accent color"),
-        default="#FF0000",
+        default="#76D2B6",
         help_text=_("The accent color of the municipality's site"),
     )
     primary_font_color = models.CharField(
