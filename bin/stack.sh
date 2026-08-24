@@ -36,8 +36,14 @@ cd "$REPO_ROOT"
 # satellite files use paths relative to the repository root instead, which
 # works fine alongside `include:` since they're passed as plain `-f` files.
 # See docker-compose.dev.yml's header comment for the full reasoning.
+#
+# `--project-directory .` pins that repository-root resolution explicitly,
+# rather than relying on `docker-compose.dev.yml` happening to be the first
+# `-f` file (Compose otherwise derives the project directory from whichever
+# file is listed first).
 COMPOSE=(
     docker compose
+    --project-directory .
     -f docker-compose.dev.yml
     -f docker/docker-compose.open-zaak.yml
     -f docker/docker-compose.objects-apis.yml
