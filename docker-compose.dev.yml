@@ -8,8 +8,10 @@
 #   - the root compose's ./docker/setup_configuration mount, and
 #   - the keycloak compose's ./keycloak/fixtures/realm.json mount
 # resolve correctly. A plain `-f a -f b` shares a single project directory and would
-# break one of the two (empty-dir bind mounts). Both services share the explicitly
-# named `openinwoner-dev` network, so the backend can reach Keycloak.
+# break one of the two (empty-dir bind mounts). Both services attach to the same
+# external `open-inwoner-dev` network, so the backend can reach Keycloak; run
+# `bin/ensure_dev_network.sh` once before using this file (see
+# docs/installation/docker-compose.rst).
 include:
   - docker-compose.yml
   - docker/docker-compose.keycloak.yml

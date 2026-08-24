@@ -11,7 +11,6 @@
 # Before deploying to production, please review the environment configuration reference:
 # https://open-inwoner.readthedocs.io/
 #
-version: '3.4'
 
 x-app-env: &x-app-env
   LOG_STDOUT: 'true'
@@ -33,6 +32,10 @@ x-app-env: &x-app-env
   ES_USERNAME: ${ES_USERNAME:-elastic}
   ES_PASSWORD: ${ES_PASSWORD:-elastic}
   OIDC_FRONTEND_LOGOUT_WITH_HINTS: 'true'
+  # Routed to the `mailpit` service below; view sent mail at http://localhost:8025/
+  EMAIL_HOST: mailpit
+  EMAIL_PORT: '1025'
+  EMAIL_USE_TLS: 'False'
   # Needed for Celery Flower to match the TIME_ZONE configured in the
   # settings used by workers and beat containers.
   TZ: Europe/Amsterdam
@@ -59,7 +62,14 @@ x-app-env: &x-app-env
   OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED:-true}
   OTEL_RESOURCE_ATTRIBUTES: oip.target=docker-compose
   OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL:-60000}
-  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4317} # gRPC
+  # Not host-overridable via ${...:-}: "otel-collector" is this compose
+  # network's own internal DNS name for the sibling container started by
+  # docker/docker-compose.observability.yml. A stray OTEL_EXPORTER_OTLP_ENDPOINT
+  # already set in the invoking shell (e.g. from local non-Docker OTel
+  # testing) would otherwise silently win over this default, since Compose
+  # resolves ${VAR:-default} against its own invocation environment first --
+  # pointing every container at some unrelated/nonexistent endpoint instead.
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317 # gRPC
   # otel:supersecret, escape spaces and = with percent encoding
   OTEL_EXPORTER_OTLP_HEADERS: Authorization=Basic b3RlbDpzdXBlcnNlY3JldA==
   OTEL_EXPORTER_OTLP_METRICS_INSECURE: ${OTEL_EXPORTER_OTLP_METRICS_INSECURE:-true}
@@ -77,7 +87,7 @@ services:
       - ./docker-initdb.d/:/docker-entrypoint-initdb.d
       - db:/var/lib/postgresql/data
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
@@ -92,7 +102,7 @@ services:
       - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
       - xpack.security.enabled=true
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
@@ -102,16 +112,35 @@ services:
     image: redis:6
     command: ['redis-server', '--appendonly', 'yes']
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
     volumes:
       - data:/data
 
+  mailpit:
+    image: axllent/mailpit
+    environment:
+      - MP_MAX_MESSAGES=5000
+      - MP_DATABASE=/data/mailpit.db
+      # Local dev only: accept any (or no) SMTP credentials so app-side
+      # EMAIL_HOST_USER/EMAIL_HOST_PASSWORD can stay unset.
+      - MP_SMTP_AUTH_ACCEPT_ANY=1
+      - MP_SMTP_AUTH_ALLOW_INSECURE=1
+    volumes:
+      - mailpit_data:/data
+    ports:
+      - 8025:8025 # web UI
+      - 1025:1025 # SMTP
+    networks:
+      - open-inwoner-dev
+
   prepare-volumes:
     image: busybox
-    command: /bin/chown -R 1000 /private-media /srv/static
+    command:
+      /bin/chown -R 1000 /private-media /srv/static /setup-configuration-state
     volumes:
       - private_media:/private-media
       - static:/srv/static
+      - setup_configuration_state:/setup-configuration-state
 
   web: &web-service
     build: &web_build
@@ -149,12 +178,14 @@ services:
         condition: service_started
       redis:
         condition: service_started
+      mailpit:
+        condition: service_started
       prepare-volumes:
         condition: service_completed_successfully
       web-init:
         condition: service_completed_successfully
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   web-init:
     <<: *web-service
@@ -167,6 +198,10 @@ services:
       disable: true
     volumes:
       - ./docker/setup_configuration:/app/setup_configuration
+      # Marker directory `/setup_configuration.sh` uses to only run
+      # `setup_configuration` once per database, instead of on every
+      # `docker compose up`/restart -- see that script for why.
+      - setup_configuration_state:/var/lib/open-inwoner/setup-configuration
     # Override depends_on to prevent a circular dependency: web-init inherits
     # *web-service which would otherwise include web-init itself.
     depends_on:
@@ -188,7 +223,7 @@ services:
     depends_on:
       - web
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   celery:
     build: *web_build
@@ -203,18 +238,12 @@ services:
       start_period: 30s
     volumes: *web_volumes
     depends_on:
-      web:
-        # This health check condition is needed because Celery Beat will
-        # try to convert the CELERY_BEAT_SCHEDULE into database entries. For
-        # this, migrations need to be finished. If Celery tasks were still
-        # pending, the database also needs to be ready for Celery itself. We
-        # therefore have the health check here, and make Celery beat and
-        # monitor containers depend on the celery container.
-        condition: service_healthy
+      web-init:
+        condition: service_completed_successfully
       redis:
         condition: service_started
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   celery-low-latency:
     build: *web_build
@@ -232,12 +261,12 @@ services:
       start_period: 30s
     volumes: *web_volumes
     depends_on:
-      web:
-        condition: service_healthy
+      web-init:
+        condition: service_completed_successfully
       redis:
         condition: service_started
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   celery-beat:
     build: *web_build
@@ -261,7 +290,7 @@ services:
     depends_on:
       - celery
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   celery-monitor:
     build: *web_build
@@ -271,7 +300,7 @@ services:
     depends_on:
       - celery
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   clamav:
     image: clamav/clamav:stable
@@ -280,7 +309,7 @@ services:
     ports:
       - '3310:3310'
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
     # The daemon needs a writable directory to store virus definitions
     volumes:
       - clamav_data:/var/lib/clamav
@@ -306,7 +335,19 @@ volumes:
   es_data:
   frontend_node_modules:
   clamav_data:
+  setup_configuration_state:
+  mailpit_data:
 
 networks:
-  openinwoner-dev:
-    name: openinwoner-dev
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file: every compose file under docker/ (open-zaak, objects-apis,
+  # hc-brp-mock, openklant, keycloak, observability) that also joins this
+  # network attaches via `external: true` too. With several files declaring
+  # the same network, whichever one gets merged last would otherwise decide
+  # whether Compose tries to (re)create it -- which previously caused
+  # "network ... not found" races when combining multiple `-f`/`include:`
+  # files. A single external network sidesteps that entirely. Run
+  # `bin/ensure_dev_network.sh` before bringing up any stack for the first
+  # time, or just use `bin/stack.sh up`. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true

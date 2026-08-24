@@ -1,218 +1,344 @@
 [
   {
+    "model": "klantinteracties.partij",
+    "pk": 1,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "uuid": "4bf35628-d6fd-4815-9a76-e55c275986b9",
+      "voorkeurs_digitaal_adres": 1,
+      "voorkeurs_rekeningnummer": null,
+      "nummer": "0000000001",
+      "interne_notitie": "",
+      "soort_partij": "persoon",
+      "indicatie_geheimhouding": null,
+      "voorkeurstaal": "nld",
+      "indicatie_actief": true
+    }
+  },
+  {
+    "model": "klantinteracties.partij",
+    "pk": 2,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "uuid": "3411535c-7c5e-4c05-b34d-52a60607dd8c",
+      "voorkeurs_digitaal_adres": null,
+      "voorkeurs_rekeningnummer": null,
+      "nummer": "0000000002",
+      "interne_notitie": "",
+      "soort_partij": "organisatie",
+      "indicatie_geheimhouding": null,
+      "voorkeurstaal": "nld",
+      "indicatie_actief": true
+    }
+  },
+  {
+    "model": "klantinteracties.partij",
+    "pk": 3,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "uuid": "2ea9b4fc-3c66-45dc-8adc-4737bbda7782",
+      "voorkeurs_digitaal_adres": null,
+      "voorkeurs_rekeningnummer": null,
+      "nummer": "0000000003",
+      "interne_notitie": "",
+      "soort_partij": "organisatie",
+      "indicatie_geheimhouding": null,
+      "voorkeurstaal": "nld",
+      "indicatie_actief": true
+    }
+  },
+  {
+    "model": "klantinteracties.organisatie",
+    "pk": 1,
+    "fields": {
+      "partij": 2,
+      "naam": "Maykin Media"
+    }
+  },
+  {
+    "model": "klantinteracties.organisatie",
+    "pk": 2,
+    "fields": {
+      "partij": 3,
+      "naam": "Maykin Media Amsterdam"
+    }
+  },
+  {
+    "model": "klantinteracties.persoon",
+    "pk": 1,
+    "fields": {
+      "contactnaam_voorletters": "J",
+      "contactnaam_voornaam": "John",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "Smith",
+      "partij": 1
+    }
+  },
+  {
+    "model": "klantinteracties.partijidentificator",
+    "pk": 1,
+    "fields": {
+      "uuid": "50eea111-6836-4f0b-877e-c0b0ed577d8b",
+      "sub_identificator_van": null,
+      "partij": 1,
+      "andere_partij_identificator": "",
+      "partij_identificator_code_objecttype": "natuurlijk_persoon",
+      "partij_identificator_code_soort_object_id": "bsn",
+      "partij_identificator_object_id": "123456782",
+      "partij_identificator_code_register": "brp"
+    }
+  },
+  {
+    "model": "klantinteracties.partijidentificator",
+    "pk": 2,
+    "fields": {
+      "uuid": "e6aebb92-0050-4d12-bfc3-415aa4473bc5",
+      "sub_identificator_van": null,
+      "partij": 2,
+      "andere_partij_identificator": "",
+      "partij_identificator_code_objecttype": "niet_natuurlijk_persoon",
+      "partij_identificator_code_soort_object_id": "kvk_nummer",
+      "partij_identificator_object_id": "12345678",
+      "partij_identificator_code_register": "hr"
+    }
+  },
+  {
+    "model": "klantinteracties.partijidentificator",
+    "pk": 3,
+    "fields": {
+      "uuid": "7e951874-82fa-4ce4-954a-212aeb81ffd9",
+      "sub_identificator_van": null,
+      "partij": 3,
+      "andere_partij_identificator": "",
+      "partij_identificator_code_objecttype": "vestiging",
+      "partij_identificator_code_soort_object_id": "vestigingsnummer",
+      "partij_identificator_object_id": "123456791201",
+      "partij_identificator_code_register": "hr"
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 1,
+    "fields": {
+      "uuid": "e5455329-526c-4614-9687-ad3f87d156f3",
+      "partij": 1,
+      "betrokkene": null,
+      "soort_digitaal_adres": "email",
+      "is_standaard_adres": true,
+      "adres": "john.smith@gmail.com",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 2,
+    "fields": {
+      "uuid": "1a7308a4-f52b-4e3c-9bcf-2f402617422c",
+      "partij": 1,
+      "betrokkene": null,
+      "soort_digitaal_adres": "email",
+      "is_standaard_adres": false,
+      "adres": "devilkiller@example.org",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 3,
+    "fields": {
+      "uuid": "3d8d396f-7af5-4ab4-b414-60b1a1bcd341",
+      "partij": 1,
+      "betrokkene": null,
+      "soort_digitaal_adres": "email",
+      "is_standaard_adres": false,
+      "adres": "someemail@example.org",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 4,
+    "fields": {
+      "uuid": "9cc8ef7a-ceea-4e92-adc4-4486958d38ca",
+      "partij": 1,
+      "betrokkene": null,
+      "soort_digitaal_adres": "telefoonnummer",
+      "is_standaard_adres": true,
+      "adres": "0612345678",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 5,
+    "fields": {
+      "uuid": "1817f1d5-2e3f-4569-9a8c-8b224a7f388c",
+      "partij": 1,
+      "betrokkene": null,
+      "soort_digitaal_adres": "telefoonnummer",
+      "is_standaard_adres": false,
+      "adres": "0687654321",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 6,
+    "fields": {
+      "uuid": "6b0099b5-85ac-4f13-b138-26e123debe51",
+      "partij": 2,
+      "betrokkene": null,
+      "soort_digitaal_adres": "email",
+      "is_standaard_adres": true,
+      "adres": "maykinmail@test.com",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 7,
+    "fields": {
+      "uuid": "4597f52a-0885-4f57-ab24-f1480c253d1b",
+      "partij": 3,
+      "betrokkene": null,
+      "soort_digitaal_adres": "telefoonnummer",
+      "is_standaard_adres": true,
+      "adres": "0612345679",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 8,
+    "fields": {
+      "uuid": "4c476feb-f5a1-46b4-b803-3044edc266d8",
+      "partij": 3,
+      "betrokkene": null,
+      "soort_digitaal_adres": "email",
+      "is_standaard_adres": true,
+      "adres": "maykinmailvestiging@test.com",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.digitaaladres",
+    "pk": 9,
+    "fields": {
+      "uuid": "66089cf4-fe6b-45c8-b618-4c9d46790b16",
+      "partij": 2,
+      "betrokkene": null,
+      "soort_digitaal_adres": "telefoonnummer",
+      "is_standaard_adres": true,
+      "adres": "0612345678",
+      "omschrijving": "",
+      "referentie": "",
+      "verificatie_datum": null
+    }
+  },
+  {
+    "model": "token.tokenauth",
+    "pk": 1,
+    "fields": {
+      "identifier": "test-token",
+      "token": "9b17346dbb9493f967e6653bbcdb03ac2f7009fa",
+      "contact_person": "John Smith",
+      "email": "john.smith@example.org",
+      "organization": "",
+      "last_modified": "2025-10-24T18:59:19.383Z",
+      "created": "2025-10-24T18:59:19.383Z",
+      "application": "",
+      "administration": ""
+    }
+  },
+  {
     "model": "accounts.user",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$260000$Pebw2i9eDUNBPOaJQ0UAZL$iouKg/mE5u9im6u1WW3CziS7eYOFqLX8jaO2jHYvhqg=",
-      "last_login": "2023-12-14T13:47:22.165Z",
+      "password": "pbkdf2_sha256$1000000$XymCZ3jfG526ZKdmcX2hMw$dd4+txbydv9bIRcTF3+5SA3jli3o5pGVVpYjj6PlVIw=",
+      "last_login": "2025-12-22T17:06:44.657Z",
       "is_superuser": true,
       "username": "admin",
       "first_name": "",
       "last_name": "",
-      "email": "",
+      "email": "admin@example.org",
       "is_staff": true,
       "is_active": true,
-      "date_joined": "2023-12-14T13:47:20.049Z",
+      "date_joined": "2025-10-31T15:05:16.816Z",
       "groups": [],
       "user_permissions": []
-    }
-  },
-  {
-    "model": "vng_api_common.jwtsecret",
-    "pk": 1,
-    "fields": {
-      "identifier": "open_inwoner",
-      "secret": "open_inwoner_secret"
-    }
-  },
-  {
-    "model": "vng_api_common.jwtsecret",
-    "pk": 2,
-    "fields": {
-      "identifier": "openklant",
-      "secret": "openklant_secret"
-    }
-  },
-  {
-    "model": "vng_api_common.apicredential",
-    "pk": 1,
-    "fields": {
-      "api_root": "http://openklant.local:8001/klanten/api/v1/",
-      "label": "Klanten [self]",
-      "client_id": "openklant",
-      "secret": "openklant_secret",
-      "user_id": "Open Klant",
-      "user_representation": "Open Klant"
-    }
-  },
-  {
-    "model": "authorizations.applicatie",
-    "pk": 1,
-    "fields": {
-      "uuid": "eea9b6bc-cc33-4ea7-bcbc-37ac589f1acc",
-      "client_ids": "[\"open_inwoner\"]",
-      "label": "Open Inwoner",
-      "heeft_alle_autorisaties": true
-    }
-  },
-  {
-    "model": "authorizations.applicatie",
-    "pk": 2,
-    "fields": {
-      "uuid": "abecbe3d-3a8e-494f-9560-0e3ac93654a2",
-      "client_ids": "[\"openklant\"]",
-      "label": "Open Klant [self]",
-      "heeft_alle_autorisaties": true
-    }
-  },
-  {
-    "model": "klanten.klant",
-    "pk": 1,
-    "fields": {
-      "uuid": "00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
-      "bronorganisatie": "000000000",
-      "klantnummer": "12345",
-      "bedrijfsnaam": "",
-      "website_url": "",
-      "voornaam": "",
-      "voorvoegsel_achternaam": "",
-      "achternaam": "",
-      "functie": "",
-      "telefoonnummer": "",
-      "emailadres": "",
-      "subject": "",
-      "subject_type": "niet_natuurlijk_persoon",
-      "aanmaakkanaal": "",
-      "geverifieerd": true
-    }
-  },
-  {
-    "model": "klanten.klant",
-    "pk": 2,
-    "fields": {
-      "uuid": "f21f35fc-d8f0-4a8f-979b-8d725f713817",
-      "bronorganisatie": "000000000",
-      "klantnummer": "54321",
-      "bedrijfsnaam": "",
-      "website_url": "",
-      "voornaam": "",
-      "voorvoegsel_achternaam": "",
-      "achternaam": "",
-      "functie": "",
-      "telefoonnummer": "",
-      "emailadres": "",
-      "subject": "",
-      "subject_type": "vestiging",
-      "aanmaakkanaal": "",
-      "geverifieerd": true
-    }
-  },
-  {
-    "model": "klanten.nietnatuurlijkpersoon",
-    "pk": 1,
-    "fields": {
-      "klant": 1,
-      "inn_nnp_id": "857587973",
-      "ann_identificatie": "",
-      "statutaire_naam": "",
-      "inn_rechtsvorm": "",
-      "bezoekadres": ""
-    }
-  },
-  {
-    "model": "klanten.vestiging",
-    "pk": 1,
-    "fields": {
-      "klant": 2,
-      "vestigings_nummer": "000037178598",
-      "handelsnaam": ["Test Value"]
-    }
-  },
-  {
-    "model": "contactmomenten.contactmoment",
-    "pk": 1,
-    "fields": {
-      "uuid": "9047c5be-885d-47ef-94ca-1c61c7a6480c",
-      "bronorganisatie": "000000000",
-      "registratiedatum": "2023-12-14T11:59:55Z",
-      "tekst": "Alleen zichtbaar voor hoofdvestiging",
-      "voorkeurskanaal": "",
-      "voorkeurstaal": "",
-      "kanaal": "email",
-      "initiatiefnemer": "",
-      "medewerker": "",
-      "onderwerp_links": "[]",
-      "vorig_contactmoment": null
-    }
-  },
-  {
-    "model": "contactmomenten.contactmoment",
-    "pk": 2,
-    "fields": {
-      "uuid": "2032bf57-216a-4438-bd4a-529c1b2c1191",
-      "bronorganisatie": "000000000",
-      "registratiedatum": "2023-12-14T11:59:55Z",
-      "tekst": "Zichtbaar voor vestiging en hoofdvestiging",
-      "voorkeurskanaal": "",
-      "voorkeurstaal": "",
-      "kanaal": "email",
-      "initiatiefnemer": "",
-      "medewerker": "",
-      "onderwerp_links": "[]",
-      "vorig_contactmoment": null
-    }
-  },
-  {
-    "model": "contactmomenten.klantcontactmoment",
-    "pk": 1,
-    "fields": {
-      "uuid": "8dd23721-a7ab-4d04-a73b-572235ff43cd",
-      "contactmoment": 2,
-      "klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
-      "rol": "belanghebbende",
-      "gelezen": false
-    }
-  },
-  {
-    "model": "contactmomenten.klantcontactmoment",
-    "pk": 2,
-    "fields": {
-      "uuid": "8045f566-75a8-49ae-b4ab-e8f090a08ce5",
-      "contactmoment": 2,
-      "klant": "http://openklant.local:8001/klanten/api/v1/klanten/f21f35fc-d8f0-4a8f-979b-8d725f713817",
-      "rol": "belanghebbende",
-      "gelezen": false
-    }
-  },
-  {
-    "model": "contactmomenten.klantcontactmoment",
-    "pk": 3,
-    "fields": {
-      "uuid": "88a39300-2a4f-49e9-bc90-525aa654d8a5",
-      "contactmoment": 1,
-      "klant": "http://openklant.local:8001/klanten/api/v1/klanten/00e82ffb-e98a-4967-b8c1-232bf3c8c3a9",
-      "rol": "belanghebbende",
-      "gelezen": false
-    }
-  },
-  {
-    "model": "contactmomenten.objectcontactmoment",
-    "pk": 1,
-    "fields": {
-      "uuid": "63b894b5-6a7e-49d0-a77f-84c4f3039b6a",
-      "contactmoment": 1,
-      "object": "https://test.openzaak.nl/zaken/api/v1/zaken/7fcf77fc-08a1-4a27-9e0e-28c91e4a3034",
-      "object_type": "zaak"
-    }
-  },
-  {
-    "model": "contactmomenten.objectcontactmoment",
-    "pk": 2,
-    "fields": {
-      "uuid": "2869d347-cc92-4e87-b4da-8f5eb34e7e4e",
-      "contactmoment": 2,
-      "object": "https://test.openzaak.nl/zaken/api/v1/zaken/6f9fb6a2-6d4b-4a58-8df5-407ffa9550a7",
-      "object_type": "zaak"
     }
   }
 ]

@@ -16,13 +16,27 @@ services:
       - ./keycloak/fixtures/realm.json:/opt/keycloak/data/import/realm.json
     ports:
       - 8080:8080
+    # No /health endpoint without KC_HEALTH_ENABLED, so fall back to a plain
+    # TCP check -- good enough to know the HTTP listener (and thus the
+    # imported realm) is actually up, e.g. before `bin/stack.sh up`'s
+    # `--wait` lets web-init try to reach it for OIDC discovery.
+    healthcheck:
+      test: ['CMD-SHELL', "bash -c '</dev/tcp/localhost/8080' 2>/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     networks:
-      openinwoner-dev:
+      open-inwoner-dev:
         aliases:
           - keycloak.open-inwoner.local
+          - keycloak.internal
 
 networks:
   # Must match the network name in the root docker-compose.yml so the `web`
   # container can reach Keycloak server-side (OIDC token/userinfo/jwks calls).
-  openinwoner-dev:
-    name: openinwoner-dev
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true

@@ -1,0 +1,98 @@
+services:
+  openzaak-redis:
+    image: redis:7
+    command: ['redis-server', '--appendonly', 'yes']
+    networks:
+      open-inwoner-dev:
+
+  openzaak-db:
+    image: postgis/postgis:${PG_VERSION:-14-master}
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./docker/open-zaak/docker-init-open-zaak-db/:/docker-entrypoint-initdb.d
+      - openzaak-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      open-inwoner-dev:
+
+  openzaak-web:
+    image: openzaak/open-zaak:${OPENZAAK_VERSION:-1.27.4}
+    environment: &openzaak_web_env
+      - DJANGO_SETTINGS_MODULE=openzaak.conf.docker
+      - SECRET_KEY=${SECRET_KEY:-fgv=c0hz&tl*8*3m3893@m+1pstrvidc9e^5@fpspmg%cy$15d}
+      - ALLOWED_HOSTS=*
+      - DB_NAME=openzaak
+      - DB_USER=openzaak
+      - DB_HOST=openzaak-db
+      - IS_HTTPS=no
+      - CACHE_DEFAULT=openzaak-redis:6379/0
+      - CACHE_AXES=openzaak-redis:6379/0
+      - SUBPATH=${SUBPATH:-/}
+      - OPENZAAK_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - OPENZAAK_SUPERUSER_EMAIL=admin@localhost
+      - DISABLE_2FA=yes
+      - CELERY_BROKER_URL=redis://openzaak-redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://openzaak-redis:6379/1
+      - NOTIFICATIONS_DISABLED=true
+      - JWT_EXPIRY=99999999999
+      - JWT_LEEWAY=99999999999
+      - CELERY_WORKER_CONCURRENCY=${CELERY_WORKER_CONCURRENCY:-2}
+      # Same OTel setup as the main app (docker-compose.yml's x-app-env) --
+      # open-zaak is built on the same `open_api_framework`/`maykin_common`
+      # base, so it exports to the same collector. OTEL_SDK_DISABLED
+      # defaults to true; bin/stack.sh up flips it for the whole stack.
+      - OTEL_SDK_DISABLED=${OTEL_SDK_DISABLED:-true}
+      - OTEL_SERVICE_NAME=openzaak
+      # Not host-overridable via ${...:-} -- see docker-compose.yml's
+      # x-app-env for why.
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic b3RlbDpzdXBlcnNlY3JldA==
+      - OTEL_EXPORTER_OTLP_METRICS_INSECURE=${OTEL_EXPORTER_OTLP_METRICS_INSECURE:-true}
+      - OTEL_RESOURCE_ATTRIBUTES=oip.target=docker-compose
+    ports:
+      - 8002:8000
+    volumes: &openzaak_web_volumes
+      - ./docker/open-zaak/fixtures/:/app/fixtures
+      - openzaak-media:/app/media
+      - openzaak-private-media:/app/private-media
+    depends_on:
+      openzaak-db:
+        condition: service_healthy
+      openzaak-redis:
+        condition: service_started
+    networks:
+      open-inwoner-dev:
+        aliases:
+          - openzaak.local
+          - openzaak.internal
+
+  openzaak-celery:
+    image: openzaak/open-zaak:${OPENZAAK_VERSION:-1.27.4}
+    environment: *openzaak_web_env
+    volumes: *openzaak_web_volumes
+    command: /celery_worker.sh
+    depends_on:
+      openzaak-db:
+        condition: service_healthy
+      openzaak-redis:
+        condition: service_started
+    networks:
+      open-inwoner-dev:
+
+volumes:
+  openzaak-db:
+  openzaak-media:
+  openzaak-private-media:
+
+networks:
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true
