@@ -30,6 +30,7 @@ local.py
 /env/
 /media/
 /private_media/
+/tempo-data/
 /static/
 /mail/
 /log/*.log*

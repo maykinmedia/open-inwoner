@@ -7,7 +7,9 @@ services:
     image: grafana/loki:latest
     ports:
       - '3100:3100'
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./docker/observability/loki/local-config.yml:/etc/loki/local-config.yml
     networks:
       - openinwoner-dev
 
@@ -16,7 +18,7 @@ services:
     ports:
       - '9090:9090'
     volumes:
-      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-tsdb:/prometheus
     networks:
       - openinwoner-dev
@@ -29,9 +31,38 @@ services:
       # production is NOT recommended due to security concerns
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # custom config file to scrape container logs
-      - ./observability/promtail/config.yml:/etc/promtail/config.yml
+      - ./docker/observability/promtail/config.yml:/etc/promtail/config.yml
       - promtail-logs:/var/log
     command: -config.file=/etc/promtail/config.yml
+    networks:
+      - openinwoner-dev
+
+  # one-shot: Tempo's container runs as uid 10001, so the bind-mounted
+  # ./tempo-data needs to be chowned to it before Tempo itself starts
+  tempo-init:
+    image: busybox:latest
+    user: root
+    entrypoint:
+      - 'chown'
+      - '10001:10001'
+      - '/var/tempo'
+    volumes:
+      - ./tempo-data:/var/tempo
+    networks:
+      - open-inwoner-dev
+
+  # traces backend, queried by Grafana's Tempo datasource
+  tempo:
+    image: grafana/tempo:2.10.0
+    command: --config.file=/etc/tempo.yml
+    volumes:
+      - ./docker/observability/tempo/tempo.yml:/etc/tempo.yml
+      - ./tempo-data:/var/tempo
+    ports:
+      - '3200:3200'
+    depends_on:
+      tempo-init:
+        condition: service_completed_successfully
     networks:
       - openinwoner-dev
 
@@ -40,7 +71,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.131.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
-      - ./observability/otel/otel-collector-config.yml:/etc/otel-collector-config.yaml
+      - ./docker/observability/otel/otel-collector-config.yml:/etc/otel-collector-config.yaml
     ports:
       - 4317:4317
       - 4318:4318
@@ -52,7 +83,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./docker/observability/grafana/datasources:/etc/grafana/provisioning/datasources
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true

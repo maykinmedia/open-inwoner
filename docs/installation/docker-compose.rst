@@ -84,3 +84,9 @@ To test the OpenTelemetry setup and view metrics in Grafana:
 The observability stack includes monitoring and metrics collection for the application
 performance and behavior. The easiest way to see if this is working is to navigate to
 the "Drilldown > Metrics" item in the left menu and filter by the ``otel_`` prefix.
+
+Traces go to Grafana Tempo (the ``tempo`` service, queryable from Grafana's
+"Tempo" datasource) and application/container logs go to Loki via Promtail --
+see ``docker/observability/README.md`` for sample LogQL queries and how the
+two are linked (a log line's ``trace_id`` field becomes a clickable link to
+its trace).
