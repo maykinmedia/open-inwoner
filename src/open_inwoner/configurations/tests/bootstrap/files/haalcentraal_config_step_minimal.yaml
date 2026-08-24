@@ -1,0 +1,3 @@
+haalcentraal_config_enable: true
+haalcentraal_config:
+  service_identifier: brp-service
