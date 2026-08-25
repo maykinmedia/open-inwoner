@@ -447,6 +447,14 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         )
 
         context = self.get_context()
+
+        # stub the external link so the test doesn't depend on real network
+        # access / the target site being reachable
+        context.route(
+            "https://www.example.com/**",
+            lambda route: route.fulfill(status=200, content_type="text/html", body=""),
+        )
+
         page = context.new_page()
 
         page.goto(
@@ -460,4 +468,4 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         cta_button.click()
         new_page = context.wait_for_event("page")
 
-        self.assertEqual(new_page.url, "https://www.example.com/")
+        expect(new_page).to_have_url("https://www.example.com/")
