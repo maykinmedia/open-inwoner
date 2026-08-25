@@ -101,6 +101,20 @@ services:
       # side, you must create that user in Elasticsearch manually.
       - ELASTIC_PASSWORD=${ES_PASSWORD:-elastic}
       - xpack.security.enabled=true
+    healthcheck:
+      # -u needs the *effective* credentials, matching ELASTIC_PASSWORD
+      # above (which itself follows ES_PASSWORD, same as x-app-env's
+      # ES_USERNAME/ES_PASSWORD the app connects with).
+      test:
+        [
+          'CMD-SHELL',
+          'curl -sf -u elastic:${ES_PASSWORD:-elastic}
+          http://localhost:9200/_cluster/health || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     networks:
       - open-inwoner-dev
     volumes:
@@ -181,6 +195,8 @@ services:
         condition: service_started
       mailpit:
         condition: service_started
+      elasticsearch:
+        condition: service_healthy
       prepare-volumes:
         condition: service_completed_successfully
       web-init:
@@ -210,6 +226,8 @@ services:
         condition: service_started
       redis:
         condition: service_started
+      elasticsearch:
+        condition: service_healthy
       prepare-volumes:
         condition: service_completed_successfully
 
