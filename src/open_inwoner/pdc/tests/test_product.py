@@ -447,6 +447,14 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
         )
 
         context = self.get_context()
+
+        # stub the external link so the test doesn't depend on real network
+        # access / the target site being reachable
+        context.route(
+            "https://www.example.com/**",
+            lambda route: route.fulfill(status=200, content_type="text/html", body=""),
+        )
+
         page = context.new_page()
 
         page.goto(
