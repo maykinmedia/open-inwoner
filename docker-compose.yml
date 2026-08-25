@@ -284,10 +284,12 @@ services:
       interval: 300s
       timeout: 5s
       retries: 3
-      # The liveness file is written only when beat publishes a task. The most
-      # frequent static task fires every 15 minutes, so allow that full window
-      # before health check failures start counting against the container.
-      start_period: 900s
+      # The liveness file is written whenever beat publishes a task -- the
+      # "Beat health sentinel" entry in CELERY_BEAT_SCHEDULE (conf/base.py)
+      # exists purely to make that happen every minute, so this only needs
+      # to cover process startup plus one tick, not the much longer gaps
+      # between the real periodic tasks.
+      start_period: 120s
     depends_on:
       - celery
     networks:
