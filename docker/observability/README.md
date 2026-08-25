@@ -67,6 +67,13 @@ sure to set the environment variable `OTEL_SDK_DISABLED=false` in development
 The collector ingests the metrics, and they are then scraped by Prometheus.
 They're also printend to stdout.
 
+A pre-provisioned Grafana dashboard ("Open Inwoner metrics") visualizes all of
+the application-defined metrics (see `open_inwoner/*/metrics.py` and
+`open_inwoner/utils/metrics.py`) -- it's loaded automatically from
+`grafana/dashboards/open-inwoner-metrics.json` and shows up in Grafana's
+dashboard list. Regenerate/edit it by hand or export changes made in the UI
+back into that file (Dashboard settings -> JSON Model).
+
 ## Traces
 
 Traces can be sent using OTLP to the collector at http://localhost:4317 (gRPC).
