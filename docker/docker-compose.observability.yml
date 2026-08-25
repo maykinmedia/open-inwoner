@@ -84,6 +84,7 @@ services:
     image: grafana/grafana:latest
     volumes:
       - ./docker/observability/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./docker/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true

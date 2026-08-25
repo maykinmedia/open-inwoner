@@ -1,0 +1,1801 @@
+{
+  "id": null,
+  "uid": "open-inwoner-metrics",
+  "title": "Open Inwoner metrics",
+  "description": "Application metrics defined in open_inwoner (accounts, cases, openzaak webhooks, openklant sync, concurrency utils), exported via OpenTelemetry -> otel-collector -> Prometheus. Counters are sum()-aggregated and gauges max()-aggregated across resource instances (app worker processes each report independently, so raw queries double-count/duplicate).",
+  "tags": [
+    "open-inwoner",
+    "otel"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 3,
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0,
+        "label": "Datasource"
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Overview",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total users",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "max(otel_oip_accounts_user_count{scope=\"global\", type=\"all\", login_type=\"\"})",
+          "refId": "A",
+          "legendFormat": "Total"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Staff users",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "max(otel_oip_accounts_user_count{type=\"staff\"})",
+          "refId": "A",
+          "legendFormat": "Staff"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Superuser users",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "max(otel_oip_accounts_user_count{type=\"superuser\"})",
+          "refId": "A",
+          "legendFormat": "Superuser"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Users by login type",
+      "description": "oip.accounts.user_count broken down by login_type attribute. Uses max() across resource instances (app workers each report the same DB-derived value independently) instead of sum(), to avoid inflating the count.",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "max by (login_type) (otel_oip_accounts_user_count{type=\"all\", login_type!=\"\"})",
+          "refId": "A",
+          "legendFormat": "{{login_type}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "row",
+      "title": "Authentication",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "panels": []
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Login attempts",
+      "description": "oip.auth.logins vs oip.auth.login_failures, summed across workers",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_auth_logins_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Successful logins"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_auth_login_failures_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Failed logins"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Logouts & lockouts",
+      "description": "oip.auth.logouts and oip.auth.user_lockouts, summed across workers",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_auth_logouts_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Logouts"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_auth_user_lockouts_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Lockouts"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "row",
+      "title": "Registration",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "panels": []
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Invites accepted",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 23
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_registration_invites_accepted_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Invites accepted"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Necessary fields completions",
+      "description": "oip.registration.necessary_fields_completions by has_invite attribute",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 23
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (has_invite) (rate(otel_oip_registration_necessary_fields_completions_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "has_invite={{has_invite}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Email verification",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 23
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_registration_email_verification_requests_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Requested"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (success) (rate(otel_oip_registration_email_verification_completions_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Completed (success={{success}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "row",
+      "title": "Profile",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Profile updates",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_accounts_profile_updates_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Profile updates"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Profile update failures by service",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (failed_services) (rate(otel_oip_profile_update_failures_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{failed_services}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Category, newsletter & notification preference updates",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_profile_categories_updates_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Interest categories"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (success) (rate(otel_oip_profile_newsletter_updates_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Newsletter (success={{success}})"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_profile_notifications_updates_total[$__rate_interval]))",
+          "refId": "C",
+          "legendFormat": "Notification preferences"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Account deletions & BRP data requests",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_profile_deletions_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Account deletions"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_profile_brp_data_requests_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "BRP data requests"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": "row",
+      "title": "Contactmomenten",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "panels": []
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "List & detail views",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 49
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_contactmoments_list_views_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "List views"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_contactmoments_detail_views_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Detail views"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Registrations by channel",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 49
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, success) (rate(otel_oip_contactmoments_registrations_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} (success={{success}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "type": "row",
+      "title": "Cases (zaken)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 57
+      },
+      "panels": []
+    },
+    {
+      "id": 22,
+      "type": "timeseries",
+      "title": "List & detail views",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 58
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_cases_list_views_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "List views"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_cases_detail_views_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Detail views"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "type": "timeseries",
+      "title": "Document downloads & uploads",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 58
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_cases_document_downloads_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Downloads"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_cases_document_uploads_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Uploads"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "type": "timeseries",
+      "title": "Contact form registrations by channel",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, success) (rate(otel_oip_cases_contact_form_registrations_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} (success={{success}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "type": "row",
+      "title": "Webhooks & notifications",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 74
+      },
+      "panels": []
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "Notifications received by channel/result",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 75
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, result) (rate(otel_oip_webhooks_notifications_received_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} / {{result}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 27,
+      "type": "timeseries",
+      "title": "Notifications processed by channel/resource",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 75
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, resource) (rate(otel_oip_webhooks_notifications_processed_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} / {{resource}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "type": "timeseries",
+      "title": "Notification emails sent by type",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 83
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (notification_type, template_name) (rate(otel_oip_webhooks_notification_emails_sent_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{notification_type}} ({{template_name}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 29,
+      "type": "timeseries",
+      "title": "Processing failures by reason",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 83
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, reason) (rate(otel_oip_webhooks_processing_failures_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} / {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "type": "timeseries",
+      "title": "Processing skipped by reason",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 83
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (channel, reason) (rate(otel_oip_webhooks_processing_skipped_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{channel}} / {{reason}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 31,
+      "type": "row",
+      "title": "OpenKlant sync",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 91
+      },
+      "panels": []
+    },
+    {
+      "id": 32,
+      "type": "timeseries",
+      "title": "Email address conflicts & pushback",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 92
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_openklant_email_address_conflicts_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Address conflicts (inbound)"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (backend) (rate(otel_oip_openklant_email_pushback_total[$__rate_interval]))",
+          "refId": "B",
+          "legendFormat": "Pushback ({{backend}})"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 33,
+      "type": "timeseries",
+      "title": "Inbound sync address operations",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 92
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (operation) (rate(otel_oip_openklant_inbound_sync_address_operations_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{operation}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "Outbound stale mappings",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 100
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(otel_oip_openklant_outbound_stale_mappings_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "Stale mappings"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "type": "row",
+      "title": "Concurrency (TimedParallel)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 108
+      },
+      "panels": []
+    },
+    {
+      "id": 36,
+      "type": "timeseries",
+      "title": "Futures by outcome",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 109
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (name, outcome) (rate(otel_oip_concurrency_timed_parallel_futures_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{name}} / {{outcome}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 37,
+      "type": "timeseries",
+      "title": "Calls by outcome",
+      "description": "",
+      "datasource": {
+        "type": "datasource",
+        "uid": "${datasource}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 109
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (name, outcome) (rate(otel_oip_concurrency_timed_parallel_calls_total[$__rate_interval]))",
+          "refId": "A",
+          "legendFormat": "{{name}} / {{outcome}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    }
+  ]
+}
