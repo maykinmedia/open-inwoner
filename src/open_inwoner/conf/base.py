@@ -1167,6 +1167,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "notifications.tasks.prune_notification_records",
         "schedule": crontab(hour=3, minute=0),
     },
+    "Beat health sentinel": {
+        "task": "open_inwoner.celery.beat_health_sentinel",
+        "schedule": crontab(minute="*"),
+    },
 }
 
 # Only ACK when the task has been executed. This prevents tasks from getting lost, with

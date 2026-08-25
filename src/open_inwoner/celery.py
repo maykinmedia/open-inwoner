@@ -85,3 +85,18 @@ app.steps["worker"].add(EventLoopProbe)
 def trigger_exception():
     """Trigger an exception for debugging purposes."""
     return 1 / 0
+
+
+@app.task(ignore_result=True)
+def beat_health_sentinel():
+    """
+    No-op task scheduled at a high frequency purely so celery-beat has
+    something to publish regularly.
+
+    ``maykin_common.health_checks.celery.probes.on_beat_task_published``
+    touches beat's liveness file whenever *any* scheduled task is published,
+    so without this, that file is only touched as often as the
+    least-frequent real periodic task in CELERY_BEAT_SCHEDULE fires --
+    leaving beat's healthcheck unable to pass for that long after every
+    (re)start.
+    """
