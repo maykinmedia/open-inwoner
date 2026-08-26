@@ -21,6 +21,13 @@ class Status(models.TextChoices):
             return str(value).replace("_", " ").title()
 
 
+class InterneTaakStatus(models.TextChoices):
+    """The states the klantinteracties API defines for an interne taak."""
+
+    te_verwerken = "te_verwerken", _("Te verwerken")
+    verwerkt = "verwerkt", _("Verwerkt")
+
+
 class KlantenServiceType(enum.Enum):
     ESUITE = "esuite"
     OPENKLANT2 = "openklant2"
