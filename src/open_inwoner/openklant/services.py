@@ -2936,10 +2936,14 @@ class OpenKlant2Service(
             # Will be logged by get_or_create_partij_for_user
             return QuestionsResult(questions=[])
 
-        # Questions arrive in a single listing, so there is no partial-failure case
-        # here the way there is for the eSuite fan-out.
-        questions = self.questions_for_partij(partij_uuid=partij_uuid)
-        return QuestionsResult(questions=self._build_question_dtos(questions, user))
+        # The listing arrives in one request, but the reactions it cannot return do
+        # not: completing a conversation can time out or fail, and then the citizen
+        # is looking at fewer reactions than they have.
+        questions, is_incomplete = self._resolve_questions_for_partij(partij_uuid)
+        return QuestionsResult(
+            questions=self._build_question_dtos(questions, user),
+            is_incomplete=is_incomplete,
+        )
 
     def retrieve_question(
         self,
