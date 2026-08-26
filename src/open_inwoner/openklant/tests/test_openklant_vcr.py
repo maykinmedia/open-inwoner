@@ -330,8 +330,10 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
             }
         )
 
+        # Requests made off the calling thread bypass VCR, so they are neither
+        # recorded nor replayed. One worker keeps the walk on this thread.
         self.openklant2_config = OpenKlant2ConfigFactory(
-            mijn_vragen_actor=self.designated_actor["uuid"]
+            mijn_vragen_actor=self.designated_actor["uuid"], vragen_num_workers=1
         )
         self.service = OpenKlant2Service(config=self.openklant2_config)
         self.user = DigidUserFactory()
@@ -408,8 +410,14 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
                     persoon["uuid"], rq.question_kcm_uuid, "The answer is 42"
                 )
 
-        questions = self.service.questions_for_partij(self.een_persoon["uuid"])
+        questions, is_incomplete = self.service._resolve_questions_for_partij(
+            self.een_persoon["uuid"]
+        )
 
+        # Completing a conversation swallows its failures so that the page still
+        # renders, which without this assertion would let a cassette that does not
+        # cover those requests pass while the walk quietly fell over.
+        self.assertFalse(is_incomplete)
         self.assertEqual(
             len(questions), 2, msg="Only the user's questions should be returned"
         )

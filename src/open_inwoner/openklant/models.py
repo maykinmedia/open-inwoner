@@ -337,6 +337,41 @@ class OpenKlant2Config(SingletonModel):
         ),
     )
 
+    vragen_num_workers = models.PositiveIntegerField(
+        verbose_name=_("Vragen worker threads"),
+        null=True,
+        blank=True,
+        default=None,
+        help_text=_(
+            "How many reactions are looked up at the same time while building the "
+            "'Mijn vragen' pages. A higher number makes those pages faster but asks "
+            "more of the Klanten API at once. Leave empty to use the default."
+        ),
+    )
+    vragen_fetch_timeout = models.PositiveIntegerField(
+        verbose_name=_("Vragen fetch timeout (seconds)"),
+        default=15,
+        validators=[MinValueValidator(1)],
+        help_text=_(
+            "How long looking up reactions for the 'Mijn vragen' pages may take in "
+            "total. Whatever is not found within this time is left out, and the user "
+            "is told the overview is incomplete and offered a retry, rather than "
+            "kept waiting. Keep this below the time limit of the web server."
+        ),
+    )
+    vragen_cache_timeout = models.PositiveIntegerField(
+        verbose_name=_("Vragen cache timeout (seconds)"),
+        null=True,
+        blank=True,
+        default=60 * 5,
+        help_text=_(
+            "How long a user's questions and reactions are remembered, so that not "
+            "every page view has to look them up again. A reaction registered "
+            "elsewhere can take this long to show up; anything done through this "
+            "site appears immediately. Leave empty to disable caching."
+        ),
+    )
+
     register_api_required_fields = ("service",)
 
     @property

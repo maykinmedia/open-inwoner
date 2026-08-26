@@ -3,17 +3,20 @@ import contextlib
 import datetime
 import enum
 import re
+import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import (
     Callable,
+    Collection,
     Iterable,
     Literal,
     NotRequired,
     Protocol,
     Self,
     Sequence,
+    TypeVar,
     assert_never,
     cast,
 )
@@ -97,6 +100,7 @@ from open_inwoner.openklant.types import InboundOpenklantSyncResult
 from open_inwoner.openzaak.api_models import Zaak
 from open_inwoner.openzaak.models import ZGWApiGroupConfig
 from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.utils.concurrency import TimedParallel
 from open_inwoner.utils.hash import create_sha256_hash
 from open_inwoner.utils.logentry import system_action
 from open_inwoner.utils.time import instance_is_new
@@ -104,6 +108,8 @@ from open_inwoner.utils.url import uuid_from_url
 from open_inwoner.utils.views import LogMixin
 
 logger = structlog.stdlib.get_logger(__name__)
+
+T = TypeVar("T")
 
 
 def _normalize_phone(phone: str) -> str:
@@ -170,11 +176,22 @@ class Question(TypedDict):
 QuestionValidator = TypeAdapter(Question)
 
 
-# `pageSize` is a global pagination parameter that the pinned open-klant-client does
-# not declare on any of its list params types. The TypedDict is an annotation only, so
-# the parameter reaches the wire regardless; this subclass just keeps type checking
-# honest.
+# The pinned open-klant-client declares neither `pageSize`, which is a global
+# pagination parameter rather than a per-resource filter, nor the `wasKlantcontact__uuid`
+# filter on `/onderwerpobjecten`. It does declare that endpoint's `klantcontact__uuid`,
+# but that is the opposite direction: it selects the onderwerpobjecten belonging to a
+# klantcontact, where the walk needs the ones pointing at it. The TypedDicts are
+# annotations only, so the parameters reach the wire regardless; these subclasses just
+# keep type checking honest.
 class PagedKlantContactParams(ListKlantContactParams, total=False):
+    pageSize: int
+
+
+class WasKlantContactOnderwerpObjectParams(
+    OnderwerpobjectIdentificatorListParams, total=False
+):
+    wasKlantcontact__uuid: str
+    page: int
     pageSize: int
 
 
@@ -499,6 +516,34 @@ _DEFAULT_CONTACTMOMENT_WORKERS = 8
 # partij was a betrokkene on, across all channels and all time, so the default
 # page size is easier to exceed than it used to be.
 _KLANTCONTACTEN_PAGE_SIZE = 500
+
+# The listing and the individual retrievals have to expand the same relations: a
+# klantcontact fetched to complete a conversation is merged into the same graph as the
+# listing's rows, and anything missing from its `_expand` would cost a request per
+# klantcontact to fetch back.
+_CONVERSATION_EXPAND: list[
+    Literal[
+        "gingOverOnderwerpobjecten",
+        "hadBetrokkenen",
+        "hadBetrokkenen.wasPartij",
+        "leiddeTotInterneTaken",
+    ]
+] = [
+    "leiddeTotInterneTaken",
+    "gingOverOnderwerpobjecten",
+    "hadBetrokkenen",
+    "hadBetrokkenen.wasPartij",
+]
+
+# Completing a conversation is IO-bound, so the worker count is not tied to CPU count.
+# Kept modest: this fans out over one klantinteracties API, which is the constrained
+# side.
+_DEFAULT_VRAGEN_WORKERS = 8
+
+# Onderwerpobjecten are asked for one klantcontact at a time, so the maximum page size
+# normally makes the answer a single request. Every page is still followed: a
+# conversation must not lose its newest replies to a page boundary.
+_ONDERWERP_OBJECTEN_PAGE_SIZE = 500
 
 
 class KlantContactMomentSkipReason(enum.Enum):
@@ -1291,6 +1336,32 @@ class ConversationGraph:
             if parent_uuid not in self.nodes
         ]
 
+    @property
+    def missing_parent_uuids(self) -> set[str]:
+        """The klantcontacten replied to that the graph does not have."""
+        return {
+            parent_uuid
+            for parent_uuid in self.parent_of.values()
+            if parent_uuid not in self.nodes
+        }
+
+    def add(self, klantcontact: KlantContact, parent_uuid: str | None) -> None:
+        """Add a klantcontact, leaving one already in the graph alone.
+
+        The repair and walk passes can arrive at a klantcontact the listing already
+        returned; adding it again would list it among its parent's children twice, and
+        so report the same reaction twice.
+        """
+        klantcontact_uuid = klantcontact["uuid"]
+        if klantcontact_uuid in self.nodes:
+            return
+
+        self.nodes[klantcontact_uuid] = klantcontact
+
+        if parent_uuid:
+            self.parent_of[klantcontact_uuid] = parent_uuid
+            self.children_of.setdefault(parent_uuid, []).append(klantcontact_uuid)
+
     def descendants(self, root_uuid: str) -> list[str]:
         """Every klantcontact replying to the root, directly or via a reaction.
 
@@ -1328,11 +1399,7 @@ class OpenKlant2Service(
         if not self.config.service:
             raise ImproperlyConfigured("No openklant2 Service object configured")
 
-        self.client = OpenKlantClient(
-            base_url=self.config.service.api_root,
-            token=self.config.service.secret,
-            request_kwargs={"timeout": self.config.service.timeout},
-        )
+        self.client = self.build_client()
 
         if mijn_vragen_actor := getattr(config, "mijn_vragen_actor", None):
             self.mijn_vragen_actor = (
@@ -1340,6 +1407,20 @@ class OpenKlant2Service(
                 if isinstance(mijn_vragen_actor, str)
                 else mijn_vragen_actor
             )
+
+    def build_client(self) -> OpenKlantClient:
+        """Build a client for the configured service.
+
+        Called once per worker by the conversation walk as well as here, because
+        `requests.Session` is not thread safe and a worker cannot share `self.client`.
+        Reading the service configuration is what keeps this on the calling thread: a
+        worker cannot see rows written by an as yet uncommitted transaction here.
+        """
+        return OpenKlantClient(
+            base_url=self.config.service.api_root,
+            token=self.config.service.secret,
+            request_kwargs={"timeout": self.config.service.timeout},
+        )
 
     def find_partij_for_params(self, params: PartijListParams) -> Partij | None:
         """Find a single partij, using only the listing.
@@ -2263,6 +2344,7 @@ class OpenKlant2Service(
             contactnaam=None,
         )
         self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
+        self.invalidate_questions_cache(partij_uuid)
 
         return OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
 
@@ -2338,6 +2420,11 @@ class OpenKlant2Service(
             )
         )
 
+        # `create_question_for_partij` already did this, but the onderwerpobject that
+        # ties the question to the zaak is written after it, and a page view in
+        # between would have cached the question without it.
+        self.invalidate_questions_cache(partij_uuid)
+
         return ok2_question
 
     def create_answer(
@@ -2383,17 +2470,14 @@ class OpenKlant2Service(
             }
         )
 
+        self.invalidate_questions_cache(partij_uuid)
+
         return OpenKlant2Answer.from_klantcontact(answer_klantcontact)
 
     def klantcontacten_for_partij(self, partij_uuid: str) -> Iterable[KlantContact]:
         """List every klantcontact the partij was a betrokkene on."""
         params: PagedKlantContactParams = {
-            "expand": [
-                "leiddeTotInterneTaken",
-                "gingOverOnderwerpobjecten",
-                "hadBetrokkenen",
-                "hadBetrokkenen.wasPartij",
-            ],
+            "expand": _CONVERSATION_EXPAND,
             # Without this the listing returns every klantcontact there is, for every
             # partij, and the caller throws away all but one user's.
             "hadBetrokkene__wasPartij__uuid": partij_uuid,
@@ -2502,20 +2586,247 @@ class OpenKlant2Service(
 
         return parent_uuids[0]
 
+    def _merge_into_graph(
+        self, graph: ConversationGraph, klantcontacten: Iterable[KlantContact]
+    ) -> None:
+        for klantcontact in klantcontacten:
+            graph.add(klantcontact, self._parent_klantcontact_uuid(klantcontact))
+
     def _build_conversation_graph(
         self, klantcontacten: Iterable[KlantContact]
     ) -> ConversationGraph:
         graph = ConversationGraph()
-
-        for klantcontact in klantcontacten:
-            klantcontact_uuid = klantcontact["uuid"]
-            graph.nodes[klantcontact_uuid] = klantcontact
-
-            if parent_uuid := self._parent_klantcontact_uuid(klantcontact):
-                graph.parent_of[klantcontact_uuid] = parent_uuid
-                graph.children_of.setdefault(parent_uuid, []).append(klantcontact_uuid)
-
+        self._merge_into_graph(graph, klantcontacten)
         return graph
+
+    def _fetch_in_parallel(
+        self,
+        uuids: Collection[str],
+        fetch: Callable[[str, OpenKlantClient], T],
+        deadline: float,
+        name: str,
+    ) -> tuple[list[T], bool]:
+        """Run `fetch` for every uuid in parallel, and say whether all of them ran.
+
+        Each worker gets its own client, built here rather than in the worker:
+        `requests.Session` is not thread safe, and building one reads configuration
+        that a worker thread cannot see uncommitted writes to.
+
+        Whatever does not finish inside the remaining budget is reported rather than
+        raised, so the caller can show the conversation in part and say so.
+        """
+        budget = deadline - time.monotonic()
+        if not uuids or budget <= 0:
+            return [], not uuids
+
+        fetched: list[T] = []
+        complete = True
+        max_workers = self.config.vragen_num_workers or _DEFAULT_VRAGEN_WORKERS
+
+        if max_workers == 1:
+            # A pool of one would add a thread and a hand-off for no concurrency at
+            # all. Running here also keeps the requests on the calling thread, which
+            # is what lets the VCR tests record and replay them.
+            client = self.build_client()
+            for klantcontact_uuid in uuids:
+                if time.monotonic() >= deadline:
+                    logger.warning(
+                        "Ran out of time completing conversations", name=name
+                    )
+                    return fetched, False
+                try:
+                    fetched.append(fetch(klantcontact_uuid, client))
+                except Exception:
+                    logger.exception(
+                        "Failed to fetch part of a conversation",
+                        klantcontact_uuid=klantcontact_uuid,
+                    )
+                    complete = False
+
+            return fetched, complete
+
+        with TimedParallel(max_workers=max_workers, name=name) as executor:
+            future_to_uuid = {
+                executor.submit(
+                    fetch, klantcontact_uuid, self.build_client()
+                ): klantcontact_uuid
+                for klantcontact_uuid in uuids
+            }
+            outcome = executor.as_completed(future_to_uuid, cancel_after=budget)
+            for future in outcome:
+                try:
+                    fetched.append(future.result())
+                except BaseException:
+                    logger.exception(
+                        "Failed to fetch part of a conversation",
+                        klantcontact_uuid=future_to_uuid[future],
+                    )
+                    complete = False
+
+        if outcome.has_cancelled_futures:
+            logger.warning(
+                "Ran out of time completing conversations",
+                name=name,
+                cancelled=len(outcome.cancelled_futures),
+            )
+            complete = False
+
+        return fetched, complete
+
+    def _retrieve_klantcontacten(
+        self, uuids: Collection[str], deadline: float
+    ) -> tuple[list[KlantContact], bool]:
+        """Retrieve klantcontacten by uuid, expanded the way the listing expands them.
+
+        `retrieve` takes the same `expand`, so one fetched here is ready to merge into
+        the graph and costs no follow-up request for its onderwerpobjecten or interne
+        taken.
+        """
+
+        def _retrieve(
+            klantcontact_uuid: str, client: OpenKlantClient
+        ) -> KlantContact | None:
+            try:
+                return client.klant_contact.retrieve(
+                    klantcontact_uuid, params={"expand": _CONVERSATION_EXPAND}
+                )
+            except OK2NotFound:
+                # Something points at a klantcontact that is not there. There is
+                # nothing to fetch and retrying next page view would not help, so this
+                # is as complete as the conversation gets, not an incomplete result.
+                logger.warning(
+                    "Klantcontact refers to a klantcontact that does not exist",
+                    klantcontact_uuid=klantcontact_uuid,
+                )
+                return None
+
+        retrieved, complete = self._fetch_in_parallel(
+            uuids, _retrieve, deadline, name="retrieve_klantcontacten"
+        )
+        return [
+            klantcontact for klantcontact in retrieved if klantcontact is not None
+        ], complete
+
+    def _reply_uuids_for(
+        self, uuids: Collection[str], deadline: float
+    ) -> tuple[set[str], bool]:
+        """Ask which klantcontacten reply to each of these.
+
+        `/klantcontacten` cannot express "everything replying to X", so this goes the
+        long way round, through the onderwerpobjecten that carry the link.
+        """
+
+        def _replies(klantcontact_uuid: str, client: OpenKlantClient) -> list[str]:
+            reply_uuids: list[str] = []
+            page = 1
+
+            # The pinned client has no iterator for this resource, and stopping at the
+            # first page would drop the tail of a long conversation, which is where
+            # its newest replies are.
+            while True:
+                params: WasKlantContactOnderwerpObjectParams = {
+                    "wasKlantcontact__uuid": klantcontact_uuid,
+                    "pageSize": _ONDERWERP_OBJECTEN_PAGE_SIZE,
+                    "page": page,
+                }
+                response = client.onderwerp_object.list(params=params)
+                reply_uuids.extend(
+                    onderwerp_object["klantcontact"]["uuid"]
+                    for onderwerp_object in response["results"]
+                    if onderwerp_object.get("klantcontact")
+                )
+
+                if not response.get("next"):
+                    return reply_uuids
+
+                page += 1
+
+        replies, complete = self._fetch_in_parallel(
+            uuids, _replies, deadline, name="reply_uuids_for_klantcontacten"
+        )
+        return {
+            reply_uuid for reply_uuids in replies for reply_uuid in reply_uuids
+        }, complete
+
+    def _repair_missing_parents(
+        self, graph: ConversationGraph, deadline: float
+    ) -> bool:
+        """Retrieve the klantcontacten replied to that the listing did not return.
+
+        This is the reaction hidden mid-chain: a later reaction points at it, which is
+        how we know it exists, so it costs a retrieval only when it actually occurs. A
+        repaired klantcontact can itself reply to one we do not have, hence the loop;
+        `attempted` is what ends it, by giving each uuid a single try.
+        """
+        attempted: set[str] = set()
+
+        while missing := graph.missing_parent_uuids - attempted:
+            attempted |= missing
+            klantcontacten, complete = self._retrieve_klantcontacten(missing, deadline)
+            self._merge_into_graph(graph, klantcontacten)
+
+            if not complete:
+                return False
+
+        return True
+
+    def _walk_for_hidden_replies(
+        self, graph: ConversationGraph, deadline: float
+    ) -> bool:
+        """Discover the klantcontacten that reply to ones we have but are not listed.
+
+        This is the reaction at the end of a chain: nothing points at it, so asking is
+        the only way to learn that it exists. That makes it the recurring cost of the
+        whole exercise, a request per known klantcontact, and also the reason the
+        exercise is worth it, because the newest reaction is the one the citizen is
+        waiting for.
+
+        Walking from every klantcontact rather than only from the ends of chains is
+        deliberate: answers written here link straight to the question, so a
+        conversation can be a star rather than a chain, and a klantcontact with known
+        replies can still have an unknown one.
+        """
+        frontier = set(graph.nodes)
+
+        while frontier:
+            reply_uuids, listed = self._reply_uuids_for(frontier, deadline)
+            hidden = reply_uuids - graph.nodes.keys()
+
+            if not hidden:
+                return listed
+
+            klantcontacten, retrieved = self._retrieve_klantcontacten(hidden, deadline)
+            self._merge_into_graph(graph, klantcontacten)
+
+            if not (listed and retrieved):
+                return False
+
+            # Only what we just discovered can have replies we have not asked about,
+            # so a klantcontact enters the frontier at most once. That is what ends
+            # this loop: the work is linear in the size of the conversation, and the
+            # budget bounds it in time.
+            frontier = {klantcontact["uuid"] for klantcontact in klantcontacten}
+
+        return True
+
+    def _complete_conversation_graph(self, graph: ConversationGraph) -> bool:
+        """Fetch the klantcontacten the partij-filtered listing cannot return.
+
+        A reaction registered without the citizen as a betrokkene is not in that
+        listing, and no filter on `/klantcontacten` can bring it in. Two passes cover
+        the two shapes that leaves: `_repair_missing_parents` works backwards from
+        reactions pointing at a klantcontact we do not have, `_walk_for_hidden_replies`
+        forwards from the klantcontacten we do.
+
+        Both draw on one budget, so the passes cannot spend it twice over. Returns
+        whether the conversations could be completed within it.
+        """
+        deadline = time.monotonic() + self.config.vragen_fetch_timeout
+
+        repaired = self._repair_missing_parents(graph, deadline)
+        walked = self._walk_for_hidden_replies(graph, deadline)
+
+        return repaired and walked
 
     def _answers_for_root(
         self, graph: ConversationGraph, root_uuid: str
@@ -2540,6 +2851,19 @@ class OpenKlant2Service(
 
         return answers
 
+    def _questions_cache_key(self, partij_uuid: str) -> str:
+        return f"{self.config.service.api_root}:questions:{partij_uuid}"
+
+    def invalidate_questions_cache(self, partij_uuid: str) -> None:
+        """Forget a partij's questions after writing one of their own.
+
+        What is cached is the whole resolved listing rather than its parts, so without
+        this a question or answer registered here would not show up until the entry
+        expired. Staleness for reactions registered elsewhere stays bounded by the
+        timeout instead, which is the tradeoff its help text describes.
+        """
+        cache.delete(self._questions_cache_key(partij_uuid))
+
     def questions_for_partij(self, partij_uuid: str) -> list[OpenKlant2Question]:
         """Retrieve a partij's questions, each with the reactions that followed it.
 
@@ -2549,9 +2873,27 @@ class OpenKlant2Service(
         `answer` property is the most recent one, so a later reaction supersedes an
         earlier one without either being lost here.
         """
+        questions, _ = self._resolve_questions_for_partij(partij_uuid)
+        return questions
+
+    def _resolve_questions_for_partij(
+        self, partij_uuid: str
+    ) -> tuple[list[OpenKlant2Question], bool]:
+        """Resolve a partij's conversations, and say whether any of them fell short.
+
+        Completing them costs a request per klantcontact, and the detail page resolves
+        the same conversations the list page just did, so the outcome is cached. Only a
+        complete one is: an incomplete result is what the user is invited to retry, and
+        serving that from the cache would make the retry a no-op.
+        """
+        cache_key = self._questions_cache_key(partij_uuid)
+        if (cached := cache.get(cache_key)) is not None:
+            return cached, False
+
         graph = self._build_conversation_graph(
             self.klantcontacten_for_partij(partij_uuid)
         )
+        is_complete = self._complete_conversation_graph(graph)
 
         if orphan_uuids := graph.orphan_uuids:
             # The parent was not in the listing, which leaves the reaction with no
@@ -2578,7 +2920,11 @@ class OpenKlant2Service(
                 )
 
         questions.sort(key=lambda question: question.plaatsgevonden_op)
-        return questions
+
+        if is_complete and (timeout := self.config.vragen_cache_timeout):
+            cache.set(cache_key, questions, timeout)
+
+        return questions, not is_complete
 
     def list_questions(
         self, fetch_params: FetchParameters, user: User
