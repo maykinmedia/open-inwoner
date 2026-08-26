@@ -1,0 +1,31 @@
+services:
+  personen-mock:
+    image: ghcr.io/brp-api/personen-mock:2.3.0-latest
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://+:5010
+    ports:
+      - '5010:5010'
+    # No documented health endpoint for this image, so fall back to a plain
+    # TCP check (same approach as docker/docker-compose.keycloak.yml, which
+    # has the same problem) -- good enough to know the ASP.NET listener is
+    # actually accepting connections, e.g. before `bin/stack.sh up`'s
+    # `--wait` lets web-init try to reach it.
+    healthcheck:
+      test: ['CMD-SHELL', "bash -c '</dev/tcp/localhost/5010' 2>/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks:
+      open-inwoner-dev:
+        aliases:
+          - hc-brp.local
+          - hc-brp.internal
+
+networks:
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true
