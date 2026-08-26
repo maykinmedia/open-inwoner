@@ -1753,6 +1753,30 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
 
         self.assertEqual(listing.call_count, 2)
 
+    def test_list_questions_reports_an_incomplete_resolution(self, mock_client_class):
+        """The flag has to reach QuestionsResult, which is what raises the banner."""
+        # A real uuid: unlike the graph tests, this one reaches the DTO builder,
+        # which validates it.
+        question = self._make_klantcontact(
+            "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
+            "Question?",
+            "2024-10-01T10:00:00Z",
+        )
+        mock_client = self._mock_conversation_client(mock_client_class)
+        mock_client.onderwerp_object.list.side_effect = OSError("connection reset")
+
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(service, "klantcontacten_for_partij", return_value=[question]),
+        ):
+            result = service.list_questions({}, user)
+
+        self.assertTrue(result.is_incomplete)
+        self.assertEqual(len(result.questions), 1)
+
     def test_retrieve_question_returns_none_when_uuid_not_found(
         self, mock_client_class
     ):

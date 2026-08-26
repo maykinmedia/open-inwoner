@@ -27,7 +27,7 @@ from open_inwoner.openklant.models import (
     KlantenSysteemConfig,
     OpenKlant2Config,
 )
-from open_inwoner.openklant.services import eSuiteVragenService
+from open_inwoner.openklant.services import QuestionsResult, eSuiteVragenService
 from open_inwoner.openklant.tests.data import OPENKLANT2_ROOT, MockAPIReadData
 from open_inwoner.openklant.tests.mocks import MockOpenKlant2Service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
@@ -1056,6 +1056,39 @@ class ContactMomentViewsTestCase(
 
         self.assertFalse(response.context["partial_results"])
         self.assertEqual(len(response.pyquery.find(".notification--warning")), 0)
+
+    def test_contactmoment_list_shows_banner_when_openklant2_is_incomplete(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """A conversation the walk could not complete must reach the banner.
+
+        The reactions the klantcontacten listing cannot return are fetched
+        separately, and that can time out. When OpenKlant2 is the primary backend,
+        the user has to be told the list is short rather than shown it as final.
+        """
+        openklant2_config = OpenKlant2Config.get_solo()
+        openklant2_config.service = ServiceFactory(
+            api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
+        )
+        openklant2_config.save()
+
+        self.config.primary_backend = KlantenServiceType.OPENKLANT2.value
+        self.config.save()
+
+        data = MockAPIReadData().install_mocks(m)
+
+        # Patched on the class, not on the instance: the decorator builds one
+        # MockOpenKlant2Service and shares it with every test in this case.
+        with patch.object(
+            MockOpenKlant2Service,
+            "list_questions",
+            return_value=QuestionsResult(questions=[], is_incomplete=True),
+        ):
+            response = self.app.get(reverse("cases:contactmoment_list"), user=data.user)
+
+        self.assertTrue(response.context["partial_results"])
+        banner = response.pyquery.find(".notification--warning")
+        self.assertEqual(len(banner), 1)
 
     def test_kcm_redirect_404s_for_unknown_esuite_contactmoment(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
