@@ -11,7 +11,7 @@ services:
     volumes:
       - ./docker/observability/loki/local-config.yml:/etc/loki/local-config.yml
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   prometheus:
     image: prom/prometheus:latest
@@ -21,7 +21,7 @@ services:
       - ./docker/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-tsdb:/prometheus
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   # log scraping from container output
   promtail:
@@ -35,7 +35,7 @@ services:
       - promtail-logs:/var/log
     command: -config.file=/etc/promtail/config.yml
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   # one-shot: Tempo's container runs as uid 10001, so the bind-mounted
   # ./tempo-data needs to be chowned to it before Tempo itself starts
@@ -64,7 +64,7 @@ services:
       tempo-init:
         condition: service_completed_successfully
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   # open telemetry collector, receives metrics from the application instance(s)
   otel-collector:
@@ -77,7 +77,7 @@ services:
       - 4318:4318
       - 8889:8889
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
   # dashboard tool, visualizes telemetry. queries loki and prometheus
   grafana:
@@ -92,12 +92,15 @@ services:
     ports:
       - '3000:3000'
     networks:
-      - openinwoner-dev
+      - open-inwoner-dev
 
 volumes:
   promtail-logs:
   prometheus-tsdb:
 
 networks:
-  openinwoner-dev:
-    name: openinwoner-dev
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true

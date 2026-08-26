@@ -1,0 +1,406 @@
+[
+  {
+    "model": "openzaak.zgwapigroupconfig",
+    "pk": 1,
+    "fields": {
+      "open_zaak_config": 1,
+      "name": "Auto-configured by django-setup-configuration",
+      "zrc_service": ["zaken-test"],
+      "drc_service": ["documenten-test"],
+      "ztc_service": ["catalogi-test"],
+      "form_service": null,
+      "fetch_eherkenning_zaken_with_rsin": true,
+      "fetch_eherkenning_zaken_with_openzaak_120_params": false,
+      "fetch_rollen_with_betrokkene_type": false,
+      "cache_zaken_timeout": 300,
+      "cache_catalogi_timeout": 86400,
+      "klant_backend": "openklant2"
+    }
+  },
+  {
+    "model": "openzaak.openzaakconfig",
+    "pk": 1,
+    "fields": {
+      "zaak_max_confidentiality": "openbaar",
+      "document_max_confidentiality": "vertrouwelijk",
+      "document_visible_statuses": "[\"definitief\", \"gearchiveerd\"]",
+      "max_upload_size": 50,
+      "allowed_file_extensions": "[\".pdf\", \".txt\"]",
+      "skip_notification_statustype_informeren": false,
+      "reformat_esuite_zaak_identificatie": true,
+      "derive_zaak_titel_from": "zaaktype_omschrijving",
+      "order_statuses_by_date_set": false,
+      "limit_user_visible_cases_to_role": "",
+      "show_cases_without_status": false,
+      "title_text": "title text from setup configuration",
+      "enable_categories_filtering_with_zaken": true,
+      "action_required_deadline_days": 1874,
+      "notification_frequency_limit": 900,
+      "zaken_filter_enabled": true,
+      "zaak_identificatie_label": "Zaaknummer",
+      "zaak_start_date_label": "Zaak ingediend op",
+      "zaak_end_date_label": "Besluit genomen op",
+      "zaak_expected_end_date_label": "U ontvangt een besluit vóór",
+      "case_list_num_workers": null,
+      "case_list_fetch_timeout": 25
+    }
+  },
+  {
+    "model": "openzaak.catalogusconfig",
+    "pk": 1,
+    "fields": {
+      "url": "http://openzaak.internal:8000/catalogi/api/v1/catalogussen/989f65bb-4a6b-405c-a2c9-0859a0079734",
+      "domein": "SEEDD",
+      "rsin": "000000000",
+      "service": ["catalogi-test"],
+      "found_in_api": true
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeconfig",
+    "pk": 1,
+    "fields": {
+      "urls": "[\"http://openzaak.internal:8000/catalogi/api/v1/zaaktypen/5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "catalogus": 1,
+      "identificatie": "SEED-GEEN-INFORMEREN",
+      "omschrijving": "Zichtbare zaak, maar zonder statuswijzigingsmails",
+      "found_in_api": true,
+      "notify_status_changes": false,
+      "description": "",
+      "external_document_upload_url": "",
+      "document_upload_enabled": false,
+      "contact_form_enabled": false,
+      "contact_subject_code": "",
+      "relevante_zaakperiode": null,
+      "zaken_visible_from": null
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeconfig",
+    "pk": 2,
+    "fields": {
+      "urls": "[\"http://openzaak.internal:8000/catalogi/api/v1/zaaktypen/7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "catalogus": 1,
+      "identificatie": "SEED-VERTROUWELIJK",
+      "omschrijving": "Onzichtbare zaak (te vertrouwelijk)",
+      "found_in_api": true,
+      "notify_status_changes": false,
+      "description": "",
+      "external_document_upload_url": "",
+      "document_upload_enabled": false,
+      "contact_form_enabled": false,
+      "contact_subject_code": "",
+      "relevante_zaakperiode": null,
+      "zaken_visible_from": null
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeconfig",
+    "pk": 3,
+    "fields": {
+      "urls": "[\"http://openzaak.internal:8000/catalogi/api/v1/zaaktypen/b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "catalogus": 1,
+      "identificatie": "SEED-VISIBLE",
+      "omschrijving": "Zichtbare zaak (baseline)",
+      "found_in_api": true,
+      "notify_status_changes": false,
+      "description": "",
+      "external_document_upload_url": "",
+      "document_upload_enabled": false,
+      "contact_form_enabled": false,
+      "contact_subject_code": "",
+      "relevante_zaakperiode": null,
+      "zaken_visible_from": null
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 1,
+    "fields": {
+      "zaaktype_config": 1,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/5ee7c218-df73-47e0-8ac5-7b7c5bf2aa47",
+      "omschrijving": "Seed: openbaar document",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 2,
+    "fields": {
+      "zaaktype_config": 1,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/47dd205f-b6e3-4b03-8600-0e06a1497985",
+      "omschrijving": "Seed: zaakvertrouwelijk document",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 3,
+    "fields": {
+      "zaaktype_config": 2,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/5ee7c218-df73-47e0-8ac5-7b7c5bf2aa47",
+      "omschrijving": "Seed: openbaar document",
+      "zaaktype_uuids": "[\"7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 4,
+    "fields": {
+      "zaaktype_config": 2,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/47dd205f-b6e3-4b03-8600-0e06a1497985",
+      "omschrijving": "Seed: zaakvertrouwelijk document",
+      "zaaktype_uuids": "[\"7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 5,
+    "fields": {
+      "zaaktype_config": 3,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/5ee7c218-df73-47e0-8ac5-7b7c5bf2aa47",
+      "omschrijving": "Seed: openbaar document",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypeinformatieobjecttypeconfig",
+    "pk": 6,
+    "fields": {
+      "zaaktype_config": 3,
+      "informatieobjecttype_url": "http://openzaak.internal:8000/catalogi/api/v1/informatieobjecttypen/47dd205f-b6e3-4b03-8600-0e06a1497985",
+      "omschrijving": "Seed: zaakvertrouwelijk document",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "document_upload_enabled": false,
+      "document_notification_enabled": false
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 1,
+    "fields": {
+      "zaaktype_config": 1,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/36eeb245-3ccf-4c94-b120-da7ba0b128a8",
+      "omschrijving": "Afgerond",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 2,
+    "fields": {
+      "zaaktype_config": 1,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/fdfae4a9-100b-40d2-812a-73d57560706b",
+      "omschrijving": "In behandeling",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 3,
+    "fields": {
+      "zaaktype_config": 1,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/527cb16a-f66e-480d-970b-6efaafb622f3",
+      "omschrijving": "Ontvangen",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 4,
+    "fields": {
+      "zaaktype_config": 2,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/71d92bdb-ddaa-468c-819d-04f19b883c2d",
+      "omschrijving": "Afgerond",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 5,
+    "fields": {
+      "zaaktype_config": 2,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/a9c7e2fb-e400-44a9-b357-d0fdde2baa56",
+      "omschrijving": "Ontvangen",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 6,
+    "fields": {
+      "zaaktype_config": 3,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/8f229b54-211e-4fcf-9356-ab8f234e0a41",
+      "omschrijving": "Afgerond",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 7,
+    "fields": {
+      "zaaktype_config": 3,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/75cb0a4d-aa07-4096-8e86-1643a0ccea9e",
+      "omschrijving": "In behandeling",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktypestatustypeconfig",
+    "pk": 8,
+    "fields": {
+      "zaaktype_config": 3,
+      "statustype_url": "http://openzaak.internal:8000/catalogi/api/v1/statustypen/615f3b6f-cb3f-4ece-a449-aaf70ddfcd09",
+      "omschrijving": "Ontvangen",
+      "statustekst": "",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "status_indicator": "",
+      "status_indicator_text": "",
+      "document_upload_description": null,
+      "description": null,
+      "notify_status_change": true,
+      "action_required": false,
+      "document_upload_enabled": true,
+      "call_to_action_url": "",
+      "call_to_action_text": "",
+      "case_link_text": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktyperesultaattypeconfig",
+    "pk": 1,
+    "fields": {
+      "zaaktype_config": 1,
+      "resultaattype_url": "http://openzaak.internal:8000/catalogi/api/v1/resultaattypen/435f395a-79c1-4cbc-991f-6efb276e99b1",
+      "omschrijving": "Afgehandeld",
+      "zaaktype_uuids": "[\"5169d708-c410-4d7a-9bb3-46086fb8bbca\"]",
+      "found_in_api": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktyperesultaattypeconfig",
+    "pk": 2,
+    "fields": {
+      "zaaktype_config": 2,
+      "resultaattype_url": "http://openzaak.internal:8000/catalogi/api/v1/resultaattypen/5372b639-56a2-4522-a19b-5b719ccec9d1",
+      "omschrijving": "Afgehandeld",
+      "zaaktype_uuids": "[\"7c87ba34-650e-4526-b010-ab95f2696f11\"]",
+      "found_in_api": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "openzaak.zaaktyperesultaattypeconfig",
+    "pk": 3,
+    "fields": {
+      "zaaktype_config": 3,
+      "resultaattype_url": "http://openzaak.internal:8000/catalogi/api/v1/resultaattypen/215530c5-68b5-4a6c-bf19-adf1c6671080",
+      "omschrijving": "Afgehandeld",
+      "zaaktype_uuids": "[\"b2b79ffc-ca4a-4d0c-bb5b-056390e657d3\"]",
+      "found_in_api": true,
+      "description": ""
+    }
+  }
+]

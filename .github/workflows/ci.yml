@@ -11,6 +11,9 @@ on:
   workflow_dispatch:
 
 env:
+  # Must match the `web` service's `image:` in docker-compose.yml -- that's
+  # what `bin/stack.sh up` actually builds and tags, and what the docker commands
+  # below reference.
   IMAGE_NAME: maykinmedia/open-inwoner
 
 permissions: {}
@@ -213,6 +216,7 @@ jobs:
       - name: Start Keycloak (imports the test realm)
         if: matrix.browser == 'chromium'
         run: |
+          bin/ensure_dev_network.sh
           docker compose -f docker/docker-compose.keycloak.yml --project-directory docker up -d
           echo "Waiting for Keycloak to import the test realm..."
           for i in $(seq 1 45); do
@@ -258,6 +262,108 @@ jobs:
           retention-days: 7
 
   #
+  # Full application stack
+  #
+  full-app-stack-test:
+    name: Full Docker application stack
+    runs-on: maykin-runner # Many containers, much resources
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.vars.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set tag
+        id: vars
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${GITHUB_REF}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name (if present at all)
+          [[ "${GITHUB_REF}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "develop" ] && VERSION=latest
+
+          echo ::set-output name=tag::${VERSION}
+
+      # `bin/stack.sh up` always runs `docker compose build web`. We use
+      # TAG/COMMIT_HASH to ensure that build produces exactly the image the
+      # `docker` job will push, tagged the same way, so this is the only build:
+      # no separate/duplicate build later.
+      - name: Bring up the full stack
+        env:
+          TAG: ${{ steps.vars.outputs.tag }}
+          COMMIT_HASH: ${{ github.sha }}
+        run: bin/stack.sh up
+
+      - name: Wait for the app containers to come up healthy
+        run: |
+          # $2 = "healthy" to require a passing healthcheck, "running" to
+          # just require the container hasn't crashed.
+          wait_for() {
+            local service="$1" want="$2" cid status
+            for i in $(seq 1 60); do
+              cid=$(bin/stack.sh ps -q "$service")
+              if [ -n "$cid" ]; then
+                status=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$cid")
+                echo "$service: $status"
+                [ "$status" = "$want" ] && return 0
+                case "$status" in exited | restarting)
+                  echo "$service crashed (status: $status)" >&2
+                  return 1
+                  ;;
+                esac
+              fi
+              sleep 5
+            done
+            echo "$service never reached '$want'" >&2
+            return 1
+          }
+
+          # web, celery, celery-low-latency and celery-beat all have fast
+          # healthchecks -- celery-beat's via the "Beat health sentinel"
+          # periodic task (conf/base.py), which keeps its liveness file
+          # fresh every minute. Wait for a real "healthy" on all four.
+          wait_for web healthy
+          wait_for celery healthy
+          wait_for celery-low-latency healthy
+          wait_for celery-beat healthy
+
+          # celery-monitor has no healthcheck at all, so it can only ever
+          # report "running" (docker inspect never returns a Health.Status
+          # for it) -- just needs to still be running, not crashed.
+          wait_for celery-monitor running
+
+      - name: Save the image for the docker job to push
+        env:
+          TAG: ${{ steps.vars.outputs.tag }}
+        run: docker save "$IMAGE_NAME:$TAG" | gzip > open-inwoner-image.tar.gz
+
+      - name: Upload the image
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: docker-image
+          path: open-inwoner-image.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Dump service status and logs on failure
+        if: failure()
+        run: |
+          bin/stack.sh ps
+          bin/stack.sh logs --no-color --tail=200
+
+      - name: Tear down
+        if: always()
+        run: bin/stack.sh down -v
+
+  #
   # Docs
   #
   docs:
@@ -292,49 +398,32 @@ jobs:
   # Docker
   #
   docker:
-    needs: tests
+    needs: [tests, full-app-stack-test]
+    if: github.event_name == 'push'
 
-    name: Build (and push) Docker image
+    name: Push Docker image
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
+    env:
+      TAG: ${{ needs.full-app-stack-test.outputs.tag }}
+
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      # The image itself was already built (and proven healthy), so nothing
+      # here rebuilds it.
+      - name: Download the image built by full-app-stack-test
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          persist-credentials: false
-      - name: Set tag
-        id: vars
-        run: |
-          # Strip git ref prefix from version
-          VERSION=$(echo "${GITHUB_REF}" | sed -e 's,.*/\(.*\),\1,')
+          name: docker-image
 
-          # Strip "v" prefix from tag name (if present at all)
-          [[ "${GITHUB_REF}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "develop" ] && VERSION=latest
-
-          echo ::set-output name=tag::${VERSION}
-
-      - name: Build the Docker image
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-          COMMIT_HASH: ${{ github.sha }}
-        run: |
-          docker build . \
-            --tag $IMAGE_NAME:$RELEASE_VERSION \
-            --build-arg RELEASE=$RELEASE_VERSION \
-            --build-arg COMMIT_HASH=$COMMIT_HASH
+      - name: Load the image
+        run: gunzip -c open-inwoner-image.tar.gz | docker load
 
       - name: Log into registry
-        if: github.event_name == 'push' # exclude PRs
         run:
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{
           secrets.DOCKER_USERNAME }} --password-stdin
 
       - name: Push the Docker image
-        if: github.event_name == 'push' # exclude PRs
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: docker push $IMAGE_NAME:$RELEASE_VERSION
+        run: docker push "$IMAGE_NAME:$TAG"

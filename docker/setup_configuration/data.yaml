@@ -123,6 +123,12 @@ oidc_db_config_admin_auth:
 site_config_enable: true
 site_config:
   name: Open Inwoner Lokaal
+  email_verification_required: false
+  # Matches the `clamav` service in docker-compose.yml (host/port are
+  # already its defaults; set explicitly here for clarity).
+  enable_virus_scan: true
+  clamav_host: clamav
+  clamav_port: 3310
 
 # DigiD via SAML - disabled locally, since this docker-compose stack has no
 # certificate or real identity provider to configure it against.
@@ -138,51 +144,70 @@ zgw_consumers:
   services:
     - identifier: zaken-test
       label: Open Zaak - Zaken API
-      api_root: http://localhost:8003/zaken/api/v1/
+      api_root: http://openzaak.internal:8000/zaken/api/v1/
       api_type: zrc
       auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      client_id: test_client_id
+      secret: test_secret_key
     - identifier: documenten-test
       label: Open Zaak - Documenten API
-      api_root: http://localhost:8003/documenten/api/v1/
+      api_root: http://openzaak.internal:8000/documenten/api/v1/
       api_type: drc
       auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      client_id: test_client_id
+      secret: test_secret_key
     - identifier: catalogi-test
       label: Open Zaak - Catalogi API
-      api_root: http://localhost:8003/catalogi/api/v1/
+      api_root: http://openzaak.internal:8000/catalogi/api/v1/
       api_type: ztc
       auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      client_id: test_client_id
+      secret: test_secret_key
     - identifier: besluiten-test
       label: Open Zaak - Besluiten API
-      api_root: http://localhost:8003/besluiten/api/v1/
+      api_root: http://openzaak.internal:8000/besluiten/api/v1/
       api_type: brc
       auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      client_id: test_client_id
+      secret: test_secret_key
     - identifier: selectielijst
       label: Open Zaak (public) - Selectielijst API
       api_root: https://selectielijst.openzaak.nl/api/v1/
       api_type: orc
       auth_type: no_auth
     - identifier: klanten-test
-      label: eSuite klanten API
-      api_root: http://localhost:8003/klanten/api/v1/
+      label: Open Klant - Klantinteracties API
+      api_root: http://openklant.internal:8000/klantinteracties/api/v1/
       api_type: kc
-      auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
     - identifier: contactmomenten-test
-      label: eSuite contactmomemnten API
-      api_root: http://localhost:8003/contactmomenten/api/v1/
+      label: Open Klant - Contactmomenten API
+      api_root: http://openklant.internal:8000/contactmomenten/api/v1/
       api_type: cmc
-      auth_type: zgw
-      client_id: test-vcr
-      secret: test-vcr
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
+    - identifier: objecttypen-test
+      label: Objecttypen API
+      api_root: http://objecttypes.internal:8000/api/v2/
+      api_type: orc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 171be5abaf41e7856b423ad513df1ef8f867ff48
+    - identifier: objecten-test
+      label: Objecten API
+      api_root: http://objects.internal:8000/api/v2/
+      api_type: orc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 7657474c3d75f56ae0abd0d1bf7994b09964dca9
+    - identifier: brp-personen-mock
+      label: Haal Centraal BRP (personen-mock)
+      api_root: http://hc-brp.internal:5010/haalcentraal/api/brp/
+      api_type: orc
+      auth_type: no_auth
 
 # Openzaak
 openzaak_config_enable: true
@@ -207,13 +232,17 @@ openzaak_config:
       catalogi_api_identifier: catalogi-test
       fetch_eherkenning_zaken_with_rsin: true
 
+# Haal Centraal BRP (personen-mock)
+haalcentraal_config_enable: true
+haalcentraal_config:
+  service_identifier: brp-personen-mock
+
 # KlantenSysteem (consolidated OpenKlant/eSuite and OpenKlant2 configuration)
 klantensysteem_config_enable: true
 klantensysteem_config:
-  primary_backend: esuite
+  primary_backend: openklant2
   register_contact_via_api: true
   register_contact_email: admin@oip.org
-  send_email_confirmation: false
   openklant2_config:
     service_identifier: klanten-test
     mijn_vragen_kanaal: formulier
@@ -226,7 +255,9 @@ klantensysteem_config:
 sites_config_enable: true
 sites_config:
   items:
-    - domain: test-site
+    # Used for absolute links built outside a request context, e.g. in mail
+    # templates (see build_absolute_url()). Matches CSRF_TRUSTED_ORIGINS.
+    - domain: localhost:9000
       name: The Django Sites default
 
 # CMS pages

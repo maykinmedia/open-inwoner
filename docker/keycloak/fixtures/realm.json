@@ -7,8 +7,8 @@
   "refreshTokenMaxReuse": 0,
   "accessTokenLifespan": 300,
   "accessTokenLifespanForImplicitFlow": 900,
-  "ssoSessionIdleTimeout": 1800,
-  "ssoSessionMaxLifespan": 36000,
+  "ssoSessionIdleTimeout": 60,
+  "ssoSessionMaxLifespan": 300,
   "ssoSessionIdleTimeoutRememberMe": 0,
   "ssoSessionMaxLifespanRememberMe": 0,
   "offlineSessionIdleTimeout": 2592000,
@@ -1079,9 +1079,11 @@
       "redirectUris": [
         "http://testserver/*",
         "http://127.0.0.1:8000/*",
-        "http://localhost:8000/*"
+        "http://localhost:8000/*",
+        "http://127.0.0.1:9000/*",
+        "http://localhost:9000/*"
       ],
-      "webOrigins": ["http://127.0.0.1:8000"],
+      "webOrigins": ["http://127.0.0.1:8000", "http://localhost:9000"],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -1144,9 +1146,11 @@
         "http://testserver/*",
         "http://127.0.0.1:8000/*",
         "http://example.com/*",
-        "http://localhost:8000/*"
+        "http://localhost:8000/*",
+        "http://127.0.0.1:9000/*",
+        "http://localhost:9000/*"
       ],
-      "webOrigins": ["http://127.0.0.1:8000"],
+      "webOrigins": ["http://127.0.0.1:8000", "http://localhost:9000"],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
