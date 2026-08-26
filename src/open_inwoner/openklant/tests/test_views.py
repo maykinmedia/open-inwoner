@@ -1057,6 +1057,51 @@ class ContactMomentViewsTestCase(
         self.assertFalse(response.context["partial_results"])
         self.assertEqual(len(response.pyquery.find(".notification--warning")), 0)
 
+    def test_contactmoment_list_and_detail_show_afgehandeld(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """A question whose interne taak is done reads as Afgehandeld on both pages."""
+        data = MockAPIReadData().install_mocks(m)
+        question, _zaak = MockOpenKlant2Service().retrieve_question()
+        afgehandeld = {**question, "status": str(Status.afgehandeld.label)}
+
+        with (
+            patch.object(
+                MockOpenKlant2Service,
+                "list_questions",
+                return_value=QuestionsResult(questions=[afgehandeld]),
+            ),
+            patch.object(
+                MockOpenKlant2Service,
+                "retrieve_question",
+                return_value=(afgehandeld, None),
+            ),
+        ):
+            list_response = self.app.get(
+                reverse("cases:contactmoment_list"), user=data.user
+            )
+            detail_response = self.app.get(
+                reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": KlantenServiceType.OPENKLANT2.value,
+                        "kcm_uuid": str(afgehandeld["api_source_uuid"]),
+                    },
+                ),
+                user=data.user,
+            )
+
+        # Checked on the row rather than in the page text: the eSuite question in the
+        # mock data is afgehandeld too, so searching the whole list would pass either
+        # way. The detail page shows this question alone, so its text is unambiguous.
+        openklant2_row = next(
+            question
+            for question in list_response.context["page_obj"].object_list
+            if question["api_service"] == KlantenServiceType.OPENKLANT2
+        )
+        self.assertEqual(openklant2_row["status"], str(Status.afgehandeld.label))
+        self.assertIn(str(Status.afgehandeld.label), detail_response.text)
+
     def test_contactmoment_list_shows_banner_when_openklant2_is_incomplete(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):

@@ -87,7 +87,11 @@ from open_inwoner.openklant.clients import (
     build_contactmomenten_client,
     build_klanten_client,
 )
-from open_inwoner.openklant.constants import KlantenServiceType, Status
+from open_inwoner.openklant.constants import (
+    InterneTaakStatus,
+    KlantenServiceType,
+    Status,
+)
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
     ContactFormSubject,
@@ -1254,6 +1258,10 @@ class OpenKlant2Question(BaseModel):
     # List of answers, sorted by datetime (newest first)
     answers: list[OpenKlant2Answer] = []
 
+    # The status of every interne taak on the question and its reactions, which is
+    # what says whether the municipality considers the question dealt with.
+    interne_taak_statuses: tuple[str, ...] = ()
+
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
 
     @field_validator("answers")
@@ -1279,9 +1287,13 @@ class OpenKlant2Question(BaseModel):
 
     @classmethod
     def from_klantcontact_and_answers(
-        cls, klantcontact: KlantContact, answers: list[OpenKlant2Answer] | None = None
+        cls,
+        klantcontact: KlantContact,
+        answers: list[OpenKlant2Answer] | None = None,
+        interne_taak_statuses: tuple[str, ...] = (),
     ) -> Self:
         return cls(
+            interne_taak_statuses=interne_taak_statuses,
             # `inhoud` is nullable, and a klantcontact registered by an employee can
             # come in without it. Refusing to build the question would take its
             # reactions with it, so an empty question beats no question at all.
@@ -1302,6 +1314,25 @@ class OpenKlant2Question(BaseModel):
     def answer(self) -> OpenKlant2Answer | None:
         """Return the newest/latest answer (first in the sorted list), or None if no answers."""
         return self.answers[0] if self.answers else None
+
+    @property
+    def is_afgehandeld(self) -> bool:
+        """Whether every interne taak this conversation raised has been dealt with.
+
+        At least one taak has to exist: a question nobody ever raised a taak for is
+        not thereby finished. And every one of them has to be done, so that a
+        question does not read as finished while a follow-up taak for a tussenbericht
+        is still open.
+
+        Tested for `verwerkt` rather than against `te_verwerken`, which is the same
+        thing today because those are the only two statuses. Should a third appear,
+        this errs towards leaving a question open rather than telling a citizen their
+        question is closed when it is not.
+        """
+        return bool(self.interne_taak_statuses) and all(
+            status == InterneTaakStatus.verwerkt
+            for status in self.interne_taak_statuses
+        )
 
 
 @dataclass
@@ -2323,7 +2354,7 @@ class OpenKlant2Service(
                 "aanleidinggevendKlantcontact": {"uuid": klantcontact_uuid},
                 "toelichting": "Beantwoorden vraag",
                 "gevraagdeHandeling": "Vraag beantwoorden in aanleiding gevend klant contact",
-                "status": "te_verwerken",
+                "status": InterneTaakStatus.te_verwerken.value,
                 "toegewezenAanActor": {"uuid": str(self.config.mijn_vragen_actor)},
             }
         )
@@ -2828,12 +2859,36 @@ class OpenKlant2Service(
 
         return repaired and walked
 
-    def _answers_for_root(
-        self, graph: ConversationGraph, root_uuid: str
+    def _interne_taak_statuses(
+        self, graph: ConversationGraph, klantcontact_uuids: Iterable[str]
+    ) -> tuple[str, ...]:
+        """The status of every interne taak raised by these klantcontacten.
+
+        Read off the raw klantcontacten rather than off the answers built from them,
+        because a reaction without `inhoud` is dropped from the answers while its
+        taak still counts.
+        """
+        statuses: list[str] = []
+
+        for klantcontact_uuid in klantcontact_uuids:
+            interne_taken = glom.glom(
+                graph.nodes[klantcontact_uuid],
+                glom.Coalesce("_expand.leiddeTotInterneTaken", default=[]),
+            )
+            statuses.extend(
+                interne_taak["status"]
+                for interne_taak in interne_taken
+                if interne_taak.get("status")
+            )
+
+        return tuple(statuses)
+
+    def _answers_from(
+        self, graph: ConversationGraph, answer_uuids: Iterable[str]
     ) -> list[OpenKlant2Answer]:
         answers = []
 
-        for answer_uuid in graph.descendants(root_uuid):
+        for answer_uuid in answer_uuids:
             try:
                 answers.append(
                     OpenKlant2Answer.from_klantcontact(graph.nodes[answer_uuid])
@@ -2907,10 +2962,15 @@ class OpenKlant2Service(
 
         questions: list[OpenKlant2Question] = []
         for root_uuid in graph.root_uuids:
+            reaction_uuids = graph.descendants(root_uuid)
             try:
                 questions.append(
                     OpenKlant2Question.from_klantcontact_and_answers(
-                        graph.nodes[root_uuid], self._answers_for_root(graph, root_uuid)
+                        graph.nodes[root_uuid],
+                        self._answers_from(graph, reaction_uuids),
+                        interne_taak_statuses=self._interne_taak_statuses(
+                            graph, [root_uuid, *reaction_uuids]
+                        ),
                     )
                 )
             except (KeyError, TypeError):
@@ -3037,6 +3097,16 @@ class OpenKlant2Service(
             )
         answer_text = question_ok2.answer.answer if question_ok2.answer else None
 
+        # Afgehandeld outranks Beantwoord: it is the more informative end state, and a
+        # question can be finished without answer text, which "Onbeantwoord" would
+        # otherwise report forever. The answer, if there is one, is shown either way.
+        if question_ok2.is_afgehandeld:
+            status = str(Status.afgehandeld.label)
+        elif answer_text is not None:
+            status = "Beantwoord"
+        else:
+            status = "Onbeantwoord"
+
         return QuestionValidator.validate_python(
             {
                 "identification": question_ok2.nummer,
@@ -3046,7 +3116,7 @@ class OpenKlant2Service(
                 "question_text": question_ok2.question,
                 "answer_text": answer_text,
                 "registered_date": question_ok2.plaatsgevonden_op,
-                "status": "Beantwoord" if answer_text is not None else "Onbeantwoord",
+                "status": status,
                 "channel": question_ok2.kanaal,
                 "case_detail_url": getattr(question_ok2, "zaak_url", None),
                 "new_answer_available": self._has_new_answer_available(

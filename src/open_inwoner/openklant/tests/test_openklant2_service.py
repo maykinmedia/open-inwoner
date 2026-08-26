@@ -12,6 +12,7 @@ from open_inwoner.accounts.tests.factories import (
     DigitalAddressFactory,
     UserFactory,
 )
+from open_inwoner.openklant.constants import Status
 from open_inwoner.openklant.services import (
     OpenKlant2Answer,
     OpenKlant2Question,
@@ -1420,6 +1421,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         plaatsgevonden_op,
         parent_uuid=None,
         onderwerp_objecten=None,
+        interne_taak_statuses=(),
     ):
         """Build an expanded klantcontact, optionally replying to `parent_uuid`."""
         if onderwerp_objecten is None:
@@ -1444,7 +1446,13 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             "gingOverOnderwerpobjecten": [
                 {"uuid": oo["uuid"]} for oo in onderwerp_objecten
             ],
-            "_expand": {"gingOverOnderwerpobjecten": onderwerp_objecten},
+            "_expand": {
+                "gingOverOnderwerpobjecten": onderwerp_objecten,
+                "leiddeTotInterneTaken": [
+                    {"uuid": f"taak-{uuid}-{index}", "status": status}
+                    for index, status in enumerate(interne_taak_statuses)
+                ],
+            },
         }
 
     def test_questions_for_partij_resolves_chained_reactions(self, mock_client_class):
@@ -1752,6 +1760,118 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             service.questions_for_partij("partij")
 
         self.assertEqual(listing.call_count, 2)
+
+    def _resolve_one_question(self, mock_client_class, klantcontacten):
+        # Resolutions are cached per partij, and these are complete ones, so a caller
+        # running several cases against the same partij would keep getting the first.
+        self.clear_caches()
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=klantcontacten
+        ):
+            questions, _ = service._resolve_questions_for_partij("partij")
+
+        self.assertEqual(len(questions), 1)
+        return questions[0]
+
+    def test_afgehandeld_requires_every_interne_taak_to_be_done(
+        self, mock_client_class
+    ):
+        cases = [
+            ("no taak at all", (), (), False),
+            ("the only taak is open", ("te_verwerken",), (), False),
+            ("the only taak is done", ("verwerkt",), (), True),
+            ("a follow-up taak is still open", ("verwerkt",), ("te_verwerken",), False),
+            ("question and reaction both done", ("verwerkt",), ("verwerkt",), True),
+            ("only the reaction raised a taak", (), ("verwerkt",), True),
+        ]
+
+        for label, question_statuses, reaction_statuses, expected in cases:
+            with self.subTest(label):
+                question = self._make_klantcontact(
+                    "q1",
+                    "Question?",
+                    "2024-10-01T10:00:00Z",
+                    interne_taak_statuses=question_statuses,
+                )
+                reaction = self._make_klantcontact(
+                    "r1",
+                    "Reaction",
+                    "2024-10-02T10:00:00Z",
+                    parent_uuid="q1",
+                    interne_taak_statuses=reaction_statuses,
+                )
+                resolved = self._resolve_one_question(
+                    mock_client_class, [question, reaction]
+                )
+
+                self.assertEqual(resolved.is_afgehandeld, expected)
+
+    def test_a_reaction_without_content_still_counts_towards_afgehandeld(
+        self, mock_client_class
+    ):
+        """Its taak says the question was dealt with, even with nothing to display."""
+        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        reaction = self._make_klantcontact(
+            "r1",
+            None,
+            "2024-10-02T10:00:00Z",
+            parent_uuid="q1",
+            interne_taak_statuses=("verwerkt",),
+        )
+
+        resolved = self._resolve_one_question(mock_client_class, [question, reaction])
+
+        self.assertEqual(resolved.answers, [])
+        self.assertTrue(resolved.is_afgehandeld)
+
+    def test_afgehandeld_outranks_beantwoord_in_the_dto(self, mock_client_class):
+        question = self._make_klantcontact(
+            "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
+            "Question?",
+            "2024-10-01T10:00:00Z",
+            interne_taak_statuses=("verwerkt",),
+        )
+        reaction = self._make_klantcontact(
+            "8c2d1e55-4b6a-4f2c-9d31-7e0a4b5c6d90",
+            "Reaction",
+            "2024-10-02T10:00:00Z",
+            parent_uuid="3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
+        )
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(
+                service, "klantcontacten_for_partij", return_value=[question, reaction]
+            ),
+        ):
+            result = service.list_questions({}, user)
+
+        self.assertEqual(result.questions[0]["status"], str(Status.afgehandeld.label))
+        self.assertEqual(result.questions[0]["answer_text"], "Reaction")
+
+    def test_a_question_without_a_taak_keeps_the_answer_based_status(
+        self, mock_client_class
+    ):
+        question = self._make_klantcontact(
+            "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80", "Question?", "2024-10-01T10:00:00Z"
+        )
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(service, "klantcontacten_for_partij", return_value=[question]),
+        ):
+            result = service.list_questions({}, user)
+
+        self.assertEqual(result.questions[0]["status"], "Onbeantwoord")
 
     def test_list_questions_reports_an_incomplete_resolution(self, mock_client_class):
         """The flag has to reach QuestionsResult, which is what raises the banner."""
