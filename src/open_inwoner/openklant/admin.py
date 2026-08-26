@@ -159,6 +159,9 @@ class OpenKlant2ConfigAdmin(SingletonModelAdmin):
             {
                 "fields": [
                     "partij_cache_timeout",
+                    "vragen_num_workers",
+                    "vragen_fetch_timeout",
+                    "vragen_cache_timeout",
                 ],
             },
         ),
