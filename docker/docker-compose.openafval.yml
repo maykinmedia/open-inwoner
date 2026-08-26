@@ -1,0 +1,126 @@
+# Open Afval (https://github.com/maykinmedia/open-afval) -- "public trash
+# tracking API made for Open Inwoner". Vanilla Django, no PostGIS/Celery worker
+# needed (see that repo's own docker-compose.yml/dotenv.example/INSTALL.rst).
+#
+# Redis IS needed despite that repo's own reference compose leaving it out:
+# open-afval is built on the shared `open_api_framework` base settings (same
+# as Open Zaak/Open Klant), which:
+# - hardcodes cache-backed sessions (SESSION_ENGINE =
+#   django.contrib.sessions.backends.cache) against a CACHE_DEFAULT Redis
+#   location that defaults to `localhost:6379/0` -- unreachable from inside
+#   this container. That cache's `IGNORE_EXCEPTIONS: True` means a missing
+#   Redis fails silently instead of raising, surfacing later as "Unable to
+#   create a new session key" on first login attempt.
+# - defaults CELERY_BROKER_URL/CELERY_RESULT_BACKEND to that same
+#   unreachable `localhost:6379/1`, and NOTIFICATIONS_DISABLED to `False`
+#   (i.e. notifications enabled, hitting a Notificaties API this satellite
+#   doesn't have) -- both pointed at/disabled here pre-emptively, matching
+#   how docker-compose.openklant.yml already defends against the exact same
+#   shared-base defaults.
+
+services:
+  openafval-redis:
+    image: redis:7
+    command: ['redis-server', '--appendonly', 'yes']
+    networks:
+      open-inwoner-dev:
+
+  openafval-db:
+    # Plain postgres, not postgis/postgis: open-afval doesn't use any spatial
+    # extensions. Note the dedicated OPENAFVAL_PG_VERSION -- the shared
+    # PG_VERSION used elsewhere in this repo is a postgis/postgis tag
+    # (e.g. "14-master"), which isn't a valid tag for the plain postgres image.
+    image: postgres:${OPENAFVAL_PG_VERSION:-17}
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./docker/openafval/docker-init-openafval-db/:/docker-entrypoint-initdb.d
+      - openafval-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      open-inwoner-dev:
+
+  openafval-web:
+    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    environment: &openafval_web_env
+      - DJANGO_SETTINGS_MODULE=openafval.conf.docker
+      # Literal `$` in the default must be escaped as `$$`, or Compose tries to
+      # substitute `$s(8...`/`$hyrvhmdi...`/`$e` as further variables.
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-$$s(8&ko1oc4vx#kck18c9$$hyrvhmdi%knbnz@*_tpll#&dp!$$e}
+      - DB_HOST=openafval-db
+      # Hardcoded, not `${DB_NAME:-openafval}`: this db is fully self-contained
+      # (openafval-db's init script always creates a database literally named
+      # "openafval", regardless of any env var), and DB_NAME/DB_USER are also
+      # used by the main app's own (unrelated) database -- reusing those
+      # generic names here means a value set for that one leaks in here too,
+      # silently pointing this service at a database that doesn't exist.
+      - DB_NAME=openafval
+      - DB_USER=openafval
+      # No DB_PASSWORD: openafval-db uses POSTGRES_HOST_AUTH_METHOD=trust, so
+      # none is required (same as the open-zaak/objects-apis satellites).
+      - ALLOWED_HOSTS=*
+      - CACHE_DEFAULT=openafval-redis:6379/0
+      - CACHE_AXES=openafval-redis:6379/0
+      - CELERY_BROKER_URL=redis://openafval-redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://openafval-redis:6379/1
+      - NOTIFICATIONS_DISABLED=1
+      # Same shared `open_api_framework` base as open-zaak/objects-apis (see
+      # DISABLE_2FA=true there); local dev only.
+      - DISABLE_2FA=true
+      # Same OTel setup as the main app (docker-compose.yml's x-app-env) --
+      # open-afval is built on the same shared base, so it exports to the
+      # same collector. OTEL_SDK_DISABLED defaults to true; bin/stack.sh up
+      # flips it for the whole stack.
+      - OTEL_SDK_DISABLED=${OTEL_SDK_DISABLED:-true}
+      - OTEL_SERVICE_NAME=openafval
+      # Not host-overridable via ${...:-} -- see docker-compose.yml's
+      # x-app-env for why.
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic b3RlbDpzdXBlcnNlY3JldA==
+      - OTEL_EXPORTER_OTLP_METRICS_INSECURE=${OTEL_EXPORTER_OTLP_METRICS_INSECURE:-true}
+      - OTEL_RESOURCE_ATTRIBUTES=oip.target=docker-compose
+    ports:
+      - 8339:8000
+    depends_on:
+      openafval-db:
+        condition: service_healthy
+      openafval-redis:
+        condition: service_started
+    healthcheck:
+      test: ['CMD-SHELL', "bash -c '</dev/tcp/localhost/8000' 2>/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+    networks:
+      open-inwoner-dev:
+        aliases:
+          - openafval.local
+          - openafval.internal
+
+  openafval-seed:
+    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    environment: *openafval_web_env
+    command: python src/manage.py loaddata --ignorenonexistent /fixtures/db.json
+    volumes:
+      - ./docker/openafval/fixtures:/fixtures:ro
+    depends_on:
+      openafval-web:
+        condition: service_healthy
+    networks:
+      open-inwoner-dev:
+    restart: 'no'
+
+networks:
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true
+
+volumes:
+  openafval-db:
