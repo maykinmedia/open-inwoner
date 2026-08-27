@@ -1789,17 +1789,16 @@ class OpenKlant2Service(
                 ).select_related("digital_address")
             }
 
-            # Phase 1: reconcile local DigitalAddress rows against the remote list.
-            # - UUID known -> update value in place
-            # - UUID unknown -> create new address + mapping
-            # - UUID gone -> delete local address (CASCADE removes the mapping)
-            #
             # Track flat field values that lose their DA so we can restore the
             # invariant (user.email/phonenumber always has a matching DA) below.
             orphaned_flat_values: set[tuple[DigitalAddressType, str]] = set()
-            for ok_uuid in list(local_by_uuid):
-                if ok_uuid not in remote_uuids:
-                    deleted_da = local_by_uuid.pop(ok_uuid)
+
+            # Phase 1: reconcile local DigitalAddress rows against the remote list.
+
+            # - UUID gone -> delete local address (CASCADE removes the mapping)
+            for local_ok_uuid in list(local_by_uuid):
+                if local_ok_uuid not in remote_uuids:
+                    deleted_da = local_by_uuid.pop(local_ok_uuid)
                     for da_type, flat_value in (
                         (DigitalAddressType.email, user.email),
                         (DigitalAddressType.phone, user.phonenumber),
@@ -1813,7 +1812,7 @@ class OpenKlant2Service(
                     result.addresses_deleted += 1
 
             for remote_adres in remote_adressen:
-                ok_uuid = remote_adres["uuid"]
+                remote_ok_uuid = remote_adres["uuid"]
                 value = remote_adres["adres"]
                 digital_address_type = (
                     DigitalAddressType.email
@@ -1821,7 +1820,8 @@ class OpenKlant2Service(
                     else DigitalAddressType.phone
                 )
 
-                local_address = local_by_uuid.get(ok_uuid)
+                # - UUID known -> update value in place
+                local_address = local_by_uuid.get(remote_ok_uuid)
                 if local_address is not None:
                     if local_address.value != value:
                         local_address.value = value
@@ -1829,6 +1829,7 @@ class OpenKlant2Service(
                         result.addresses_updated += 1
                     continue
 
+                # UUID unknown -> create new address + mapping, unless the email is owned by another user
                 if (
                     digital_address_type == DigitalAddressType.email
                     and User.objects.filter(email__iexact=value)
@@ -1838,7 +1839,7 @@ class OpenKlant2Service(
                     logger.debug(
                         "skipping remote email address: already owned by another user",
                         partij_uuid=partij_uuid,
-                        adres_uuid=ok_uuid,
+                        adres_uuid=remote_ok_uuid,
                     )
                     result.email_conflicts_skipped += 1
                     continue
@@ -1849,11 +1850,14 @@ class OpenKlant2Service(
                     login_type=user.login_type,
                 )
                 DigitaalAdresOpenKlantMapping.objects.create(
-                    digital_address=local_address, ok_uuid=ok_uuid
+                    digital_address=local_address, ok_uuid=remote_ok_uuid
                 )
-                local_by_uuid[ok_uuid] = local_address
+                local_by_uuid[remote_ok_uuid] = local_address
                 result.addresses_created += 1
 
+            # Phase 2: sync is_standard_for_type from remote isStandaardAdres.
+            # Only acts when remote explicitly designates a standard; if remote
+            # has no standard for a type the local flag is left unchanged.
             remote_standard_uuid_by_type = {
                 DigitalAddressType.email: next(
                     (
@@ -1874,9 +1878,6 @@ class OpenKlant2Service(
                 ),
             }
 
-            # Phase 2: sync is_standard_for_type from remote isStandaardAdres.
-            # Only acts when remote explicitly designates a standard; if remote
-            # has no standard for a type the local flag is left unchanged.
             for (
                 digital_address_type,
                 standard_uuid,
