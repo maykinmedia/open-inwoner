@@ -58,6 +58,7 @@ class NotificationRecordAdmin(admin.ModelAdmin):
         "kanaal",
         "received_at",
         "updated_at",
+        "is_valid",
         "last_processed_at",
         "process_started_at",
         "processing_error",
