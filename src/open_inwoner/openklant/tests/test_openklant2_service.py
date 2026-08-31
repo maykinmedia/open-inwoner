@@ -1,6 +1,7 @@
 import datetime
 from unittest.mock import Mock, call, patch
 
+from django.core.cache import cache
 from django.test import TestCase
 from django.utils import timezone
 
@@ -1418,6 +1419,39 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             service.questions_for_partij("partij")
             self.assertEqual(listing.call_count, 3)
 
+    def test_questions_cached_in_older_shape_are_discarded(self, mock_client_class):
+        """An entry written before a field was added must not reach a reader.
+
+        The cache holds what the code before the deploy wrote, so a field added since
+        is missing from it. Rebuilding the question is what says so, and the entry is
+        then resolved afresh rather than served short of a field.
+        """
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        self._mock_conversation_client(mock_client_class)
+
+        service = OpenKlant2Service(config=self.config)
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question]
+        ) as listing:
+            service.questions_for_partij("partij")
+
+            cache_key = service._questions_cache_key("partij")
+            cache.set(
+                cache_key,
+                [
+                    {
+                        field: value
+                        for field, value in entry.items()
+                        if field != "nummer"
+                    }
+                    for entry in cache.get(cache_key)
+                ],
+            )
+            questions = service.questions_for_partij("partij")
+
+        self.assertEqual(listing.call_count, 2)
+        self.assertEqual([question.nummer for question in questions], ["q1"])
+
     def test_asking_a_question_forgets_the_cached_listing(self, mock_client_class):
         question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
         self._mock_conversation_client(mock_client_class)
@@ -1673,6 +1707,96 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
 
         self.assertTrue(result.is_incomplete)
         self.assertEqual(len(result.questions), 1)
+
+    def test_zaak_is_read_off_the_question_without_a_request(self, mock_client_class):
+        """The listing expands the onderwerpobjecten, so the zaak link is already there."""
+        zaak_uuid = "7c4d2e75-1d71-4a4e-8daa-4f5b8a9c0d13"
+        question = make_klantcontact(
+            "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
+            "Question?",
+            "2024-10-01T10:00:00Z",
+            onderwerp_objecten=[
+                {
+                    "uuid": "oo-zaak",
+                    "klantcontact": {"uuid": "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80"},
+                    "onderwerpobjectidentificator": {"objectId": zaak_uuid},
+                }
+            ],
+        )
+        mock_client = self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question]
+        ):
+            questions = service.questions_for_partij("partij")
+
+        self.assertEqual(questions[0].zaak_uuid, zaak_uuid)
+        # The walk asks `/onderwerpobjecten` for what replies to a klantcontact. What
+        # must be gone is the opposite question, the one the detail page used to ask:
+        # which onderwerpobjecten belong to it.
+        asked = [
+            call.kwargs["params"]
+            for call in mock_client.onderwerp_object.list.call_args_list
+        ]
+        self.assertTrue(all("klantcontact__uuid" not in params for params in asked))
+
+    def test_a_question_referencing_two_objects_has_no_zaak(self, mock_client_class):
+        """Which object it belongs to is ambiguous, so none beats guessing."""
+        question = make_klantcontact(
+            "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
+            "Question?",
+            "2024-10-01T10:00:00Z",
+            onderwerp_objecten=[
+                {
+                    "uuid": "oo-one",
+                    "onderwerpobjectidentificator": {"objectId": "zaak-one"},
+                },
+                {
+                    "uuid": "oo-two",
+                    "onderwerpobjectidentificator": {"objectId": "zaak-two"},
+                },
+            ],
+        )
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question]
+        ):
+            questions = service.questions_for_partij("partij")
+
+        self.assertIsNone(questions[0].zaak_uuid)
+
+    def test_unexpanded_onderwerpobjecten_are_retrieved_once_for_all_readers(
+        self, mock_client_class
+    ):
+        """The parent link and the zaak link read the same onderwerpobjecten.
+
+        A server that ignores `expand` makes them be retrieved; doing that per reader
+        would pay for the same request twice.
+        """
+        question_uuid = "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80"
+        question = make_klantcontact(question_uuid, "Question?", "2024-10-01T10:00:00Z")
+        # As an OpenKlant that ignored `expand` would have returned it: the references
+        # are there, the resources they point at are not.
+        del question["_expand"]["gingOverOnderwerpobjecten"]
+        [ref] = question["gingOverOnderwerpobjecten"]
+
+        mock_client = self._mock_conversation_client(mock_client_class)
+        mock_client.onderwerp_object.retrieve.return_value = {
+            "uuid": ref["uuid"],
+            "onderwerpobjectidentificator": {"objectId": "zaak-uuid"},
+        }
+        service = OpenKlant2Service(config=self.config)
+
+        with patch.object(
+            service, "klantcontacten_for_partij", return_value=[question]
+        ):
+            questions = service.questions_for_partij("partij")
+
+        self.assertEqual(questions[0].zaak_uuid, "zaak-uuid")
+        mock_client.onderwerp_object.retrieve.assert_called_once_with(ref["uuid"])
 
     def test_retrieve_question_returns_none_when_uuid_not_found(
         self, mock_client_class

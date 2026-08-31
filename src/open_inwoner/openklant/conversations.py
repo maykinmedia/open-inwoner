@@ -105,6 +105,37 @@ def parent_klantcontact_uuid(
     return parent_uuids[0]
 
 
+def referenced_object_id(
+    klantcontact: KlantContact, onderwerp_objecten: Iterable[OnderwerpObject]
+) -> str | None:
+    """Return the record in another register this klantcontact was registered against.
+
+    The counterpart of `parent_klantcontact_uuid`: the same onderwerpobjecten tie a
+    klantcontact to another klantcontact through `wasKlantcontact`, and to a record
+    elsewhere through `onderwerpobjectidentificator`, which in practice is a zaak.
+
+    More than one leaves it ambiguous which record the question belongs to, so none
+    is returned rather than a guess.
+    """
+    object_ids = [
+        onderwerp_object["onderwerpobjectidentificator"]["objectId"]
+        for onderwerp_object in onderwerp_objecten
+        if onderwerp_object.get("onderwerpobjectidentificator")
+    ]
+
+    if not object_ids:
+        return None
+
+    if len(object_ids) > 1:
+        logger.error(
+            "Klantcontact was registered against more than one object",
+            klantcontact_uuid=klantcontact["uuid"],
+        )
+        return None
+
+    return object_ids[0]
+
+
 def parent_uuid_from_expand(klantcontact: KlantContact) -> str | None:
     """Read the parent off the klantcontact alone, issuing no requests."""
     return parent_klantcontact_uuid(
