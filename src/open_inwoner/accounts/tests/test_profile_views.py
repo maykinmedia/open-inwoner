@@ -1037,6 +1037,61 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(len(post_requests), 0)
 
     @requests_mock.Mocker()
+    def test_new_non_standard_address_is_pushed_even_without_flat_field_change(self, m):
+        """
+        Adding a second, non-standard email address doesn't touch
+        user.email/phonenumber, so `changed_data` stays empty -- but
+        update_partij_from_user_data pushes every local address regardless,
+        and must still be called.
+
+        The existing standard address is deliberately left without an
+        OpenKlant mapping (unlike test_update_via_openklant_patches_when_
+        mapping_exists), so both addresses go through the same backfill path
+        already exercised by test_update_via_openklant.
+        """
+        MockAPIReadPatchData.setUpServices(
+            klanten_service_type=KlantenServiceType.OPENKLANT2
+        )
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
+
+        email_addr = DigitalAddressFactory(
+            user=data.digid_user,
+            type=DigitalAddressType.email,
+            value=data.digid_user.email,
+            login_type=LoginTypeChoices.digid,
+            is_standard_for_type=True,
+        )
+        # No DigitaalAdresOpenKlantMapping -- never synced to OpenKlant yet.
+
+        self.client.force_login(data.digid_user)
+        m.reset_mock()
+        self.clearTimelineLogs()
+
+        post_data = {}
+        post_data.update(
+            self._da_formset_data(
+                "email_addresses",
+                [(email_addr.value, True), ("new-alt@example.com", False)],
+                initial_pks=[email_addr.pk, None],
+            )
+        )
+        post_data.update(self._da_formset_data("phone_addresses", []))
+
+        response = self.client.post(self.url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        new_address_posts = [
+            r
+            for r in m.request_history
+            if r.method == "POST"
+            and "digitaleadressen" in r.path
+            and r.json().get("adres") == "new-alt@example.com"
+        ]
+        self.assertEqual(len(new_address_posts), 1)
+        self.assertFalse(new_address_posts[0].json()["isStandaardAdres"])
+
+    @requests_mock.Mocker()
     def test_delete_with_openklant_mapping_sends_remote_delete(self, m):
         MockAPIReadPatchData.setUpServices(
             klanten_service_type=KlantenServiceType.OPENKLANT2
@@ -1123,10 +1178,17 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
 
     @requests_mock.Mocker()
     def test_delete_without_openklant_mapping_no_remote_delete(self, m):
+        """
+        Deleting an address that was never synced to OpenKlant still runs
+        update_partij_from_user_data (it pushes the user's current digital
+        addresses regardless of what changed), so this needs the same
+        OpenKlant mocks as the other push tests, not just KlantenSysteemConfig.
+        """
         MockAPIReadPatchData.setUpServices(
             klanten_service_type=KlantenServiceType.OPENKLANT2
         )
-        user = DigidUserFactory()
+        data = MockAPIReadPatchData().install_mocks_openklant(m)
+        user = data.digid_user
         email_addr = DigitalAddressFactory(
             user=user,
             type=DigitalAddressType.email,

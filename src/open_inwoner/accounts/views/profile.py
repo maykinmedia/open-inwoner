@@ -318,6 +318,16 @@ class EditProfileView(
         old_phonenumber = user.phonenumber
         old_phonenumber_alternative = user.phonenumber_alternative
 
+        # Per-row snapshot so we can tell, after saving, whether any digital
+        # address was added/edited/removed -- changed_data below only tracks
+        # the flat email/phonenumber fields and misses that entirely.
+        pre_save_address_values = {
+            da.pk: da.value
+            for da in user.digital_addresses.filter(
+                type__in=(DigitalAddressType.email, DigitalAddressType.phone)
+            )
+        }
+
         failed_services: list[str] = []
         changed_data: dict = {}
 
@@ -352,7 +362,22 @@ class EditProfileView(
             if new_alt != old_phonenumber_alternative:
                 changed_data["phonenumber_alternative"] = new_alt
 
-            if changed_data or ok_uuids_to_delete:
+            post_save_address_values = {
+                da.pk: da.value
+                for da in user.digital_addresses.filter(
+                    type__in=(DigitalAddressType.email, DigitalAddressType.phone)
+                )
+            }
+            # True for anything a plain email/phonenumber diff would miss: a
+            # newly added address, or an edit to one that isn't the standard
+            # (so it never touches user.email/phonenumber). changed_data only
+            # tracks the flat fields, but update_partij_from_user_data pushes
+            # every local address, standard or not -- so it must fire here too.
+            digital_addresses_changed = (
+                post_save_address_values != pre_save_address_values
+            )
+
+            if changed_data or ok_uuids_to_delete or digital_addresses_changed:
                 # Sync address changes to external APIs. API calls run inside
                 # the transaction so that a failure rolls back the DB writes
                 # too, keeping local state consistent with the remote. The
@@ -376,9 +401,7 @@ class EditProfileView(
                     KlantenServiceType.OPENKLANT2
                 ):
                     try:
-                        self.update_klant_via_openklant(
-                            changed_data, user, ok_uuids_to_delete
-                        )
+                        self.update_klant_via_openklant(user, ok_uuids_to_delete)
                     except Exception:
                         logger.exception(
                             "OpenKlant failed during profile update", user=user
@@ -461,7 +484,6 @@ class EditProfileView(
 
     def update_klant_via_openklant(
         self,
-        user_form_data: dict,
         user: User,
         ok_uuids_to_delete: list | None = None,
     ) -> bool:
@@ -479,9 +501,9 @@ class EditProfileView(
         if ok_uuids_to_delete:
             service.delete_remote_digitaal_adressen(ok_uuids_to_delete)
 
-        if not user_form_data:
-            return True
-
+        # Pushes every local digital address, not just ones reflected in a
+        # particular changed field -- the caller decides whether anything
+        # worth pushing changed at all, this always pushes once called.
         return service.update_partij_from_user_data(
             partij_uuid=partij["uuid"],
             user=user,
