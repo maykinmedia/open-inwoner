@@ -95,6 +95,7 @@ from open_inwoner.openklant.conversations import (
     OpenKlantConversationFetcher,
     expanded_onderwerp_objecten,
     parent_klantcontact_uuid,
+    parent_uuid_from_expand,
 )
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
@@ -2776,7 +2777,9 @@ class OpenKlant2Service(
             "onderwerpobject__onderwerpobjectidentificatorObjectId": str(
                 uuid_from_url(zaak.url)
             ),
-            "expand": ["hadBetrokkenen"],
+            # `gingOverOnderwerpobjecten` is what tells a question from a reaction
+            # below; without it every row here would read as a question.
+            "expand": ["hadBetrokkenen", "gingOverOnderwerpobjecten"],
         }
         klantcontacten_for_zaak = self.client.klant_contact.list_iter(params=params)
         if not (partij := self.get_partij_for_user(user)):
@@ -2798,14 +2801,19 @@ class OpenKlant2Service(
 
             return False
 
-        # only show questions initiated by the current user
-        klantcontacten_for_initiator = filter(
-            partij_is_initiator,
-            klantcontacten_for_zaak,
-        )
+        # Only the questions this citizen asked about the zaak. The initiator check
+        # keeps out a reaction written by the municipality; the reply check keeps out
+        # one registered against the zaak as well as against the klantcontact it
+        # replies to, which would otherwise be listed as something the citizen asked.
+        questions_by_partij = [
+            klantcontact
+            for klantcontact in klantcontacten_for_zaak
+            if partij_is_initiator(klantcontact)
+            and parent_uuid_from_expand(klantcontact) is None
+        ]
 
         questions = [
             OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
-            for klantcontact in klantcontacten_for_initiator
+            for klantcontact in questions_by_partij
         ]
         return self._build_question_dtos(questions_ok2=questions, user=user)

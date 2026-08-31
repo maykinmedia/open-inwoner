@@ -2095,6 +2095,89 @@ class UpdatePartijFromUserDataTestCase(TestCase):
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
+class ListQuestionsForZaakTestCase(TestCase):
+    PARTIJ_UUID = "partij-uuid-1234"
+    ZAAK_UUID = "6d3f2b1a-0c4e-4f8a-9b7c-1e2d3f4a5b6c"
+
+    def setUp(self):
+        self.config = OpenKlant2ConfigFactory()
+        self.user = UserFactory()
+        self.zaak = Mock(url=f"http://zaken.nl/api/v1/zaken/{self.ZAAK_UUID}")
+
+    def _make_kc(self, uuid, *, initiator=True, parent_uuid=None):
+        """A klantcontact on the zaak, optionally replying to another one."""
+        klantcontact = make_klantcontact(
+            uuid, "Question?", "2024-10-01T10:00:00Z", parent_uuid=parent_uuid
+        )
+        klantcontact["_expand"]["hadBetrokkenen"] = [
+            {"initiator": initiator, "wasPartij": {"uuid": self.PARTIJ_UUID}}
+        ]
+        return klantcontact
+
+    def _list_questions(self, mock_client_class, klantcontacten):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        mock_client.klant_contact.list_iter.return_value = iter(klantcontacten)
+
+        service = OpenKlant2Service(config=self.config)
+        with patch.object(
+            service, "get_partij_for_user", return_value={"uuid": self.PARTIJ_UUID}
+        ):
+            questions = service.list_questions_for_zaak(self.zaak, self.user)
+
+        return mock_client, [str(question["api_source_uuid"]) for question in questions]
+
+    def test_question_by_citizen_is_listed(self, mock_client_class):
+        question_uuid = "11111111-1111-1111-1111-111111111111"
+
+        _, listed = self._list_questions(
+            mock_client_class, [self._make_kc(question_uuid)]
+        )
+
+        self.assertEqual(listed, [question_uuid])
+
+    def test_reaction_on_zaak_is_not_listed_as_question(self, mock_client_class):
+        """A reaction can carry the zaak identificator alongside its `wasKlantcontact`.
+
+        Registered with the citizen as initiator it passes that check, so without the
+        reply check it would be shown as something the citizen asked.
+        """
+        question_uuid = "11111111-1111-1111-1111-111111111111"
+        reaction_uuid = "22222222-2222-2222-2222-222222222222"
+
+        _, listed = self._list_questions(
+            mock_client_class,
+            [
+                self._make_kc(question_uuid),
+                self._make_kc(reaction_uuid, parent_uuid=question_uuid),
+            ],
+        )
+
+        self.assertEqual(listed, [question_uuid])
+
+    def test_klantcontact_not_initiated_by_citizen_is_not_listed(
+        self, mock_client_class
+    ):
+        _, listed = self._list_questions(
+            mock_client_class,
+            [self._make_kc("11111111-1111-1111-1111-111111111111", initiator=False)],
+        )
+
+        self.assertEqual(listed, [])
+
+    def test_listing_expands_needed_onderwerpobjecten(self, mock_client_class):
+        """Without the expand every row would read as a question."""
+        mock_client, _ = self._list_questions(mock_client_class, [])
+
+        params = mock_client.klant_contact.list_iter.call_args.kwargs["params"]
+        self.assertIn("gingOverOnderwerpobjecten", params["expand"])
+        self.assertEqual(
+            params["onderwerpobject__onderwerpobjectidentificatorObjectId"],
+            self.ZAAK_UUID,
+        )
+
+
+@patch("open_inwoner.openklant.services.OpenKlantClient")
 class KlantcontactenForPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
