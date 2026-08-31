@@ -3,8 +3,6 @@ from unittest.mock import Mock, call, patch
 
 from django.test import TestCase
 
-from openklant_client.exceptions import NotFound as OK2NotFound
-
 from open_inwoner.accounts.choices import DigitalAddressType
 from open_inwoner.accounts.models import DigitalAddress
 from open_inwoner.accounts.tests.factories import (
@@ -24,22 +22,11 @@ from open_inwoner.openklant.tests.factories import (
     DigitaalAdresOpenKlantMappingFactory,
     OpenKlant2ConfigFactory,
 )
+from open_inwoner.openklant.tests.test_conversations import (
+    make_klantcontact,
+    make_not_found,
+)
 from open_inwoner.utils.test import ClearCachesMixin
-
-
-def _make_not_found() -> OK2NotFound:
-    """The exception the client raises for a klantcontact that is not there."""
-    return OK2NotFound(
-        Mock(),
-        {
-            "type": "",
-            "code": "not_found",
-            "title": "Niet gevonden.",
-            "status": 404,
-            "detail": "",
-            "instance": "",
-        },
-    )
 
 
 @patch("open_inwoner.openklant.services.OpenKlantClient")
@@ -1373,308 +1360,28 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
 
-    def _mock_conversation_client(
-        self, mock_client_class, *, replies=None, retrievable=None
-    ):
-        """Build a client for the repair and walk passes.
+    def _mock_conversation_client(self, mock_client_class):
+        """Build a client for which the listing already returned the conversation.
 
-        `replies` maps a klantcontact uuid to the uuids replying to it, `retrievable`
-        maps a uuid to the klantcontact to return for it. A uuid in neither gets no
-        replies and names nothing that can be retrieved, which is the ordinary case:
-        the listing already returned the whole conversation.
+        Nothing replies to any klantcontact and no uuid names one that can be
+        retrieved, so the repair and walk passes find nothing to add. What they do
+        with what they find is settled in `test_conversations.py`, against the
+        fetcher and a stand-in for it rather than through a mocked client.
         """
-        replies = replies or {}
-        retrievable = retrievable or {}
-
         mock_client = Mock()
         mock_client_class.return_value = mock_client
 
-        def _list_onderwerp_objecten(*, params):
-            parent_uuid = params["wasKlantcontact__uuid"]
-            return {
-                "next": None,
-                "results": [
-                    {
-                        "uuid": f"oo-{reply_uuid}",
-                        "klantcontact": {"uuid": reply_uuid},
-                        "wasKlantcontact": {"uuid": parent_uuid},
-                    }
-                    for reply_uuid in replies.get(parent_uuid, [])
-                ],
-            }
-
-        def _retrieve_klantcontact(klantcontact_uuid, *, params=None):
-            try:
-                return retrievable[klantcontact_uuid]
-            except KeyError:
-                raise _make_not_found() from None
-
-        mock_client.onderwerp_object.list.side_effect = _list_onderwerp_objecten
-        mock_client.klant_contact.retrieve.side_effect = _retrieve_klantcontact
+        mock_client.onderwerp_object.list_iter.return_value = []
+        mock_client.klant_contact.retrieve.side_effect = make_not_found()
 
         return mock_client
-
-    def _make_klantcontact(
-        self,
-        uuid,
-        inhoud,
-        plaatsgevonden_op,
-        parent_uuid=None,
-        onderwerp_objecten=None,
-        interne_taak_statuses=(),
-    ):
-        """Build an expanded klantcontact, optionally replying to `parent_uuid`."""
-        if onderwerp_objecten is None:
-            onderwerp_objecten = [
-                {
-                    "uuid": f"oo-{uuid}",
-                    "klantcontact": {"uuid": uuid},
-                    "wasKlantcontact": (
-                        {"uuid": parent_uuid} if parent_uuid is not None else None
-                    ),
-                }
-            ]
-        return {
-            "uuid": uuid,
-            "inhoud": inhoud,
-            "onderwerp": "Philosophy",
-            "kanaal": "telefoon",
-            "taal": "nld",
-            "nummer": uuid,
-            "plaatsgevondenOp": plaatsgevonden_op,
-            "url": f"http://example.com/{uuid}",
-            "gingOverOnderwerpobjecten": [
-                {"uuid": oo["uuid"]} for oo in onderwerp_objecten
-            ],
-            "_expand": {
-                "gingOverOnderwerpobjecten": onderwerp_objecten,
-                "leiddeTotInterneTaken": [
-                    {"uuid": f"taak-{uuid}-{index}", "status": status}
-                    for index, status in enumerate(interne_taak_statuses)
-                ],
-            },
-        }
-
-    def test_questions_for_partij_resolves_chained_reactions(self, mock_client_class):
-        """An external service can link each reaction to the previous one."""
-        mock_client = self._mock_conversation_client(mock_client_class)
-
-        service = OpenKlant2Service(config=self.config)
-
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        reaction_1 = self._make_klantcontact(
-            "r1", "First reaction", "2024-10-02T10:00:00Z", parent_uuid="q1"
-        )
-        reaction_2 = self._make_klantcontact(
-            "r2", "Second reaction", "2024-10-03T10:00:00Z", parent_uuid="r1"
-        )
-        reaction_3 = self._make_klantcontact(
-            "r3", "Third reaction", "2024-10-04T10:00:00Z", parent_uuid="r2"
-        )
-
-        with patch.object(
-            service,
-            "klantcontacten_for_partij",
-            return_value=[question, reaction_1, reaction_2, reaction_3],
-        ):
-            questions = service.questions_for_partij("partij-uuid")
-
-        self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].question_kcm_uuid, "q1")
-        self.assertEqual(
-            {answer.answer_kcm_uuid for answer in questions[0].answers},
-            {"r1", "r2", "r3"},
-        )
-        # The newest reaction supersedes the earlier ones without losing them
-        self.assertEqual(questions[0].answer.answer, "Third reaction")
-        mock_client.onderwerp_object.retrieve.assert_not_called()
-
-    def test_reaction_with_zaak_onderwerpobject_is_not_a_question(
-        self, mock_client_class
-    ):
-        """A reaction can reference a zaak alongside the klantcontact it replies to."""
-        self._mock_conversation_client(mock_client_class)
-
-        service = OpenKlant2Service(config=self.config)
-
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        reaction = self._make_klantcontact(
-            "r1",
-            "Reaction",
-            "2024-10-02T10:00:00Z",
-            onderwerp_objecten=[
-                # The zaak link comes first, so stopping at the first onderwerpobject
-                # without a `wasKlantcontact` would read this reaction as a question.
-                {
-                    "uuid": "oo-zaak",
-                    "klantcontact": {"uuid": "r1"},
-                    "wasKlantcontact": None,
-                },
-                {
-                    "uuid": "oo-r1",
-                    "klantcontact": {"uuid": "r1"},
-                    "wasKlantcontact": {"uuid": "q1"},
-                },
-            ],
-        )
-
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question, reaction]
-        ):
-            questions = service.questions_for_partij("partij-uuid")
-
-        self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].question_kcm_uuid, "q1")
-        self.assertEqual(questions[0].answer.answer, "Reaction")
-
-    def test_reaction_with_missing_parent_is_not_shown_as_question(
-        self, mock_client_class
-    ):
-        """An unreachable parent must not turn the employee's reply into a question."""
-        self._mock_conversation_client(mock_client_class)
-
-        service = OpenKlant2Service(config=self.config)
-
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        orphan = self._make_klantcontact(
-            "r1", "Reaction", "2024-10-02T10:00:00Z", parent_uuid="not-in-the-listing"
-        )
-
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question, orphan]
-        ):
-            questions = service.questions_for_partij("partij-uuid")
-
-        self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].question_kcm_uuid, "q1")
-        self.assertEqual(questions[0].answers, [])
-
-    def test_questions_for_partij_terminates_on_cyclical_chain(self, mock_client_class):
-        self._mock_conversation_client(mock_client_class)
-
-        service = OpenKlant2Service(config=self.config)
-
-        # a -> b -> a: every klantcontact replies to another, so there is no root
-        # and nothing to show, but resolving must still terminate.
-        node_a = self._make_klantcontact(
-            "a", "A", "2024-10-01T10:00:00Z", parent_uuid="b"
-        )
-        node_b = self._make_klantcontact(
-            "b", "B", "2024-10-02T10:00:00Z", parent_uuid="a"
-        )
-
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[node_a, node_b]
-        ):
-            questions = service.questions_for_partij("partij-uuid")
-
-        self.assertEqual(questions, [])
-
-    def test_walk_finds_a_reaction_the_listing_could_not_return(
-        self, mock_client_class
-    ):
-        """The newest reaction can carry no partij-betrokkene, so only asking finds it."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        hidden = self._make_klantcontact(
-            "r1", "Hidden reaction", "2024-10-02T10:00:00Z", parent_uuid="q1"
-        )
-        self._mock_conversation_client(
-            mock_client_class,
-            replies={"q1": ["r1"]},
-            retrievable={"r1": hidden},
-        )
-
-        service = OpenKlant2Service(config=self.config)
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question]
-        ):
-            questions, is_incomplete = service._resolve_questions_for_partij("partij")
-
-        self.assertFalse(is_incomplete)
-        self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].answer.answer, "Hidden reaction")
-
-    def test_walk_follows_a_run_of_consecutive_hidden_reactions(
-        self, mock_client_class
-    ):
-        """A hidden reaction can be replied to by another hidden one, without limit."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        hidden = {
-            f"r{depth}": self._make_klantcontact(
-                f"r{depth}",
-                f"Reaction {depth}",
-                f"2024-10-{depth + 1:02d}T10:00:00Z",
-                parent_uuid="q1" if depth == 1 else f"r{depth - 1}",
-            )
-            for depth in range(1, 13)
-        }
-        self._mock_conversation_client(
-            mock_client_class,
-            replies={"q1": ["r1"], **{f"r{d}": [f"r{d + 1}"] for d in range(1, 12)}},
-            retrievable=hidden,
-        )
-
-        service = OpenKlant2Service(config=self.config)
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question]
-        ):
-            questions, is_incomplete = service._resolve_questions_for_partij("partij")
-
-        self.assertFalse(is_incomplete)
-        self.assertEqual(len(questions[0].answers), 12)
-        self.assertEqual(questions[0].answer.answer, "Reaction 12")
-
-    def test_repair_retrieves_a_parent_the_listing_skipped(self, mock_client_class):
-        """A visible reaction can reply to one that is missing from the listing."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        missing = self._make_klantcontact(
-            "r1", "Middle reaction", "2024-10-02T10:00:00Z", parent_uuid="q1"
-        )
-        visible = self._make_klantcontact(
-            "r2", "Last reaction", "2024-10-03T10:00:00Z", parent_uuid="r1"
-        )
-        mock_client = self._mock_conversation_client(
-            mock_client_class, retrievable={"r1": missing}
-        )
-
-        service = OpenKlant2Service(config=self.config)
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question, visible]
-        ):
-            questions, is_incomplete = service._resolve_questions_for_partij("partij")
-
-        self.assertFalse(is_incomplete)
-        self.assertEqual(len(questions), 1)
-        self.assertEqual(
-            {answer.answer_kcm_uuid for answer in questions[0].answers}, {"r1", "r2"}
-        )
-        mock_client.klant_contact.retrieve.assert_called_once()
-
-    def test_a_parent_that_does_not_exist_is_not_an_incomplete_result(
-        self, mock_client_class
-    ):
-        """Retrying would not conjure it up, so this is as complete as it gets."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        orphan = self._make_klantcontact(
-            "r1", "Reaction", "2024-10-02T10:00:00Z", parent_uuid="gone"
-        )
-        self._mock_conversation_client(mock_client_class)
-
-        service = OpenKlant2Service(config=self.config)
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question, orphan]
-        ):
-            questions, is_incomplete = service._resolve_questions_for_partij("partij")
-
-        self.assertFalse(is_incomplete)
-        self.assertEqual([question.question_kcm_uuid for question in questions], ["q1"])
 
     def test_a_failed_walk_yields_the_questions_and_reports_incomplete(
         self, mock_client_class
     ):
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
         mock_client = self._mock_conversation_client(mock_client_class)
-        mock_client.onderwerp_object.list.side_effect = OSError("connection reset")
+        mock_client.onderwerp_object.list_iter.side_effect = OSError("connection reset")
 
         service = OpenKlant2Service(config=self.config)
         with patch.object(
@@ -1685,45 +1392,10 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         self.assertTrue(is_incomplete)
         self.assertEqual([question.question_kcm_uuid for question in questions], ["q1"])
 
-    def test_replies_beyond_the_first_page_are_still_found(self, mock_client_class):
-        """A page boundary must not cut a conversation short."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        reaction = self._make_klantcontact(
-            "r1", "Reaction", "2024-10-02T10:00:00Z", parent_uuid="q1"
-        )
-        mock_client = self._mock_conversation_client(
-            mock_client_class, retrievable={"r1": reaction}
-        )
-        pages = {
-            1: {"next": "http://example.com/onderwerpobjecten?page=2", "results": []},
-            2: {
-                "next": None,
-                "results": [
-                    {
-                        "uuid": "oo-r1",
-                        "klantcontact": {"uuid": "r1"},
-                        "wasKlantcontact": {"uuid": "q1"},
-                    }
-                ],
-            },
-        }
-        mock_client.onderwerp_object.list.side_effect = lambda *, params: pages[
-            params["page"]
-        ]
-
-        service = OpenKlant2Service(config=self.config)
-        with patch.object(
-            service, "klantcontacten_for_partij", return_value=[question]
-        ):
-            questions, is_incomplete = service._resolve_questions_for_partij("partij")
-
-        self.assertFalse(is_incomplete)
-        self.assertEqual(questions[0].answer.answer, "Reaction")
-
     def test_a_complete_result_is_cached_and_an_incomplete_one_is_not(
         self, mock_client_class
     ):
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
         mock_client = self._mock_conversation_client(mock_client_class)
 
         service = OpenKlant2Service(config=self.config)
@@ -1737,13 +1409,15 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             # An incomplete result is what the user is asked to retry, so serving it
             # from the cache would make the retry a no-op.
             service.invalidate_questions_cache("partij")
-            mock_client.onderwerp_object.list.side_effect = OSError("connection reset")
+            mock_client.onderwerp_object.list_iter.side_effect = OSError(
+                "connection reset"
+            )
             service.questions_for_partij("partij")
             service.questions_for_partij("partij")
             self.assertEqual(listing.call_count, 3)
 
     def test_asking_a_question_forgets_the_cached_listing(self, mock_client_class):
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
         self._mock_conversation_client(mock_client_class)
 
         service = OpenKlant2Service(config=self.config)
@@ -1790,13 +1464,13 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
 
         for label, question_statuses, reaction_statuses, expected in cases:
             with self.subTest(label):
-                question = self._make_klantcontact(
+                question = make_klantcontact(
                     "q1",
                     "Question?",
                     "2024-10-01T10:00:00Z",
                     interne_taak_statuses=question_statuses,
                 )
-                reaction = self._make_klantcontact(
+                reaction = make_klantcontact(
                     "r1",
                     "Reaction",
                     "2024-10-02T10:00:00Z",
@@ -1813,8 +1487,8 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         self, mock_client_class
     ):
         """Its taak says the question was dealt with, even with nothing to display."""
-        question = self._make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
-        reaction = self._make_klantcontact(
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        reaction = make_klantcontact(
             "r1",
             None,
             "2024-10-02T10:00:00Z",
@@ -1828,13 +1502,13 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         self.assertTrue(resolved.is_afgehandeld)
 
     def test_afgehandeld_outranks_beantwoord_in_the_dto(self, mock_client_class):
-        question = self._make_klantcontact(
+        question = make_klantcontact(
             "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
             "Question?",
             "2024-10-01T10:00:00Z",
             interne_taak_statuses=("verwerkt",),
         )
-        reaction = self._make_klantcontact(
+        reaction = make_klantcontact(
             "8c2d1e55-4b6a-4f2c-9d31-7e0a4b5c6d90",
             "Reaction",
             "2024-10-02T10:00:00Z",
@@ -1858,7 +1532,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
     def test_a_question_without_a_taak_keeps_the_answer_based_status(
         self, mock_client_class
     ):
-        question = self._make_klantcontact(
+        question = make_klantcontact(
             "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80", "Question?", "2024-10-01T10:00:00Z"
         )
         self._mock_conversation_client(mock_client_class)
@@ -1877,13 +1551,13 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         """The flag has to reach QuestionsResult, which is what raises the banner."""
         # A real uuid: unlike the graph tests, this one reaches the DTO builder,
         # which validates it.
-        question = self._make_klantcontact(
+        question = make_klantcontact(
             "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80",
             "Question?",
             "2024-10-01T10:00:00Z",
         )
         mock_client = self._mock_conversation_client(mock_client_class)
-        mock_client.onderwerp_object.list.side_effect = OSError("connection reset")
+        mock_client.onderwerp_object.list_iter.side_effect = OSError("connection reset")
 
         service = OpenKlant2Service(config=self.config)
         user = UserFactory()
