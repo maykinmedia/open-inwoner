@@ -182,6 +182,12 @@ zgw_consumers:
       auth_type: api_key
       header_key: Authorization
       header_value: Token 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
+      # OpenKlant2Service (services.py) builds its client straight from
+      # `service.secret` as the raw token, not from header_key/header_value
+      # (those are only honoured by the generic zgw_consumers auth used for
+      # the eSuite services below) -- without this, no Authorization header
+      # is sent at all and every klantinteracties call 401s.
+      secret: 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
     - identifier: contactmomenten-test
       label: Open Klant - Contactmomenten API
       api_root: http://openklant.internal:8000/contactmomenten/api/v1/
