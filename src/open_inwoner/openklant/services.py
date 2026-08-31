@@ -48,7 +48,6 @@ from openklant_client.types.resources.klant_contact import (
 )
 from openklant_client.types.resources.onderwerp_object import (
     OnderwerpObject,
-    OnderwerpobjectIdentificatorListParams,
 )
 from openklant_client.types.resources.partij import (
     CreatePartijPersoonData,
@@ -57,7 +56,13 @@ from openklant_client.types.resources.partij import (
     PartijListParams,
 )
 from openklant_client.types.resources.partij_identificator import PartijIdentificator
-from pydantic import BaseModel, ConfigDict, TypeAdapter, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    TypeAdapter,
+    ValidationError,
+    field_validator,
+)
 from typing_extensions import TypedDict
 from zgw_consumers.client import build_client as build_zgw_client
 from zgw_consumers.concurrent import parallel
@@ -96,6 +101,7 @@ from open_inwoner.openklant.conversations import (
     expanded_onderwerp_objecten,
     parent_klantcontact_uuid,
     parent_uuid_from_expand,
+    referenced_object_id,
 )
 from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import (
@@ -1263,6 +1269,10 @@ class OpenKlant2Question(BaseModel):
     # what says whether the municipality considers the question dealt with.
     interne_taak_statuses: tuple[str, ...] = ()
 
+    # The zaak the question was asked about, read off the onderwerpobjecten the
+    # listing already expanded, so the detail page needs no request of its own.
+    zaak_uuid: str | None = None
+
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
 
     @field_validator("answers")
@@ -1292,9 +1302,11 @@ class OpenKlant2Question(BaseModel):
         klantcontact: KlantContact,
         answers: list[OpenKlant2Answer] | None = None,
         interne_taak_statuses: tuple[str, ...] = (),
+        zaak_uuid: str | None = None,
     ) -> Self:
         return cls(
             interne_taak_statuses=interne_taak_statuses,
+            zaak_uuid=zaak_uuid,
             # `inhoud` is nullable, and a klantcontact registered by an employee can
             # come in without it. Refusing to build the question would take its
             # reactions with it, so an empty question beats no question at all.
@@ -2501,16 +2513,23 @@ class OpenKlant2Service(
                 "individually",
                 klantcontact_uuid=klantcontact.get("uuid"),
             )
-            return [self.client.onderwerp_object.retrieve(ref["uuid"]) for ref in refs]
+            expanded = [
+                self.client.onderwerp_object.retrieve(ref["uuid"]) for ref in refs
+            ]
+            # Store the retrieved onderwerpobjecten on the klantcontact, so the next
+            # reader finds them there instead of retrieving them again.
+            klantcontact.setdefault("_expand", {})["gingOverOnderwerpobjecten"] = (
+                expanded
+            )
 
         return expanded
 
     def _parent_klantcontact_uuid(self, klantcontact: KlantContact) -> str | None:
         """Return the klantcontact this one replies to, if it replies to one.
 
-        Passed to the resolver in place of its own reader, which goes by `_expand`
-        alone, because this one can fall back to retrieving the onderwerpobjecten a
-        server left unexpanded.
+        Passed to `ConversationGraph.build` in place of its default reader, which goes
+        by `_expand` alone, because this one can fall back to retrieving the
+        onderwerpobjecten a server left unexpanded.
         """
         return parent_klantcontact_uuid(
             klantcontact, self._expanded_onderwerp_objecten(klantcontact)
@@ -2551,6 +2570,12 @@ class OpenKlant2Service(
             )
 
         return tuple(statuses)
+
+    def _zaak_uuid_for(self, klantcontact: KlantContact) -> str | None:
+        """The zaak a question was asked about, if it was asked about one."""
+        return referenced_object_id(
+            klantcontact, self._expanded_onderwerp_objecten(klantcontact)
+        )
 
     def _answers_from(
         self, graph: ConversationGraph, answer_uuids: Iterable[str]
@@ -2612,7 +2637,14 @@ class OpenKlant2Service(
         """
         cache_key = self._questions_cache_key(partij_uuid)
         if (cached := cache.get(cache_key)) is not None:
-            return cached, False
+            try:
+                return [
+                    OpenKlant2Question.model_validate(question) for question in cached
+                ], False
+            except ValidationError:
+                # An entry written before a deploy that changed the question model
+                logger.info("Discarding questions cached in an older shape")
+                cache.delete(cache_key)
 
         graph, is_complete = ConversationGraph.build(
             self.klantcontacten_for_partij(partij_uuid),
@@ -2641,6 +2673,7 @@ class OpenKlant2Service(
                         interne_taak_statuses=self._interne_taak_statuses(
                             graph, [root_uuid, *reaction_uuids]
                         ),
+                        zaak_uuid=self._zaak_uuid_for(graph.nodes[root_uuid]),
                     )
                 )
             except (KeyError, TypeError):
@@ -2652,7 +2685,11 @@ class OpenKlant2Service(
         questions.sort(key=lambda question: question.plaatsgevonden_op)
 
         if is_complete and (timeout := self.config.vragen_cache_timeout):
-            cache.set(cache_key, questions, timeout)
+            cache.set(
+                cache_key,
+                [question.model_dump() for question in questions],
+                timeout,
+            )
 
         return questions, not is_complete
 
@@ -2699,35 +2736,12 @@ class OpenKlant2Service(
         if not question:
             return (None, None)
 
-        # fetch onderwerp_object linked to klantcontact
-        onderwerp_object_params: OnderwerpobjectIdentificatorListParams = {
-            "klantcontact__uuid": question.question_kcm_uuid
-        }
-        onderwerp_objecten = [
-            obj
-            for obj in self.client.onderwerp_object.list(
-                params=onderwerp_object_params
-            )["results"]
-            # Retained as a cross-check on the server-side filter: an OpenKlant that
-            # predates `klantcontact__uuid` ignores it and returns everything, and
-            # only the first page at that.
-            if obj["klantcontact"]
-            and obj["klantcontact"]["uuid"] == question.question_kcm_uuid
-        ]
-        if not onderwerp_objecten:
-            return self._build_question_dto(question_ok2=question, user=user), None
-        if len(onderwerp_objecten) > 1:
-            logger.error(
-                "More than one onderwerp_object found for question",
-                question_uuid=question.question_kcm_uuid,
-            )
+        # The listing expands the onderwerpobjecten, so the zaak the question was
+        # asked about is already on it and costs no request here.
+        if not question.zaak_uuid:
             return self._build_question_dto(question_ok2=question, user=user), None
 
-        onderwerp_object = onderwerp_objecten[0]
-
-        # find the unique zaak + relevant api group for the question
-        zaak_uuid = onderwerp_object["onderwerpobjectidentificator"]["objectId"]
-        zaak_with_api_group = ZGWService().get_zaak_by_uuid(zaak_uuid)
+        zaak_with_api_group = ZGWService().get_zaak_by_uuid(question.zaak_uuid)
 
         if not zaak_with_api_group:
             logger.info(
