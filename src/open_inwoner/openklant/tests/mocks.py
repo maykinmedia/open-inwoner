@@ -28,7 +28,15 @@ class MockOpenKlant2Service:
                 "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
                 "subject": "openklant2_subject",
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",

@@ -2,6 +2,7 @@ import datetime
 from unittest.mock import Mock, call, patch
 
 from django.test import TestCase
+from django.utils import timezone
 
 from open_inwoner.accounts.choices import DigitalAddressType
 from open_inwoner.accounts.models import DigitalAddress
@@ -11,6 +12,7 @@ from open_inwoner.accounts.tests.factories import (
     UserFactory,
 )
 from open_inwoner.openklant.constants import Status
+from open_inwoner.openklant.models import KlantContactMomentAnswer
 from open_inwoner.openklant.services import (
     OpenKlant2Answer,
     OpenKlant2Question,
@@ -1527,7 +1529,9 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             result = service.list_questions({}, user)
 
         self.assertEqual(result.questions[0]["status"], str(Status.afgehandeld.label))
-        self.assertEqual(result.questions[0]["answer_text"], "Reaction")
+        self.assertEqual(
+            [answer["text"] for answer in result.questions[0]["answers"]], ["Reaction"]
+        )
 
     def test_a_question_without_a_taak_keeps_the_answer_based_status(
         self, mock_client_class
@@ -1546,6 +1550,105 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
             result = service.list_questions({}, user)
 
         self.assertEqual(result.questions[0]["status"], "Onbeantwoord")
+
+    def test_every_answer_reaches_the_dto_newest_first(self, mock_client_class):
+        """The detail page shows the conversation, not only its most recent reply."""
+        question_uuid = "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80"
+        question = make_klantcontact(question_uuid, "Question?", "2024-10-01T10:00:00Z")
+        older = make_klantcontact(
+            "4a2d0c53-9b5f-4e2c-8b88-2d3f6e7a8b91",
+            "We need two more weeks",
+            "2024-10-02T10:00:00Z",
+            parent_uuid=question_uuid,
+        )
+        newest = make_klantcontact(
+            "5b3e1d64-0c60-4f3d-9c99-3e4a7f8b9c02",
+            "Here is the answer",
+            "2024-10-03T10:00:00Z",
+            parent_uuid="4a2d0c53-9b5f-4e2c-8b88-2d3f6e7a8b91",
+        )
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(
+                service,
+                "klantcontacten_for_partij",
+                return_value=[question, older, newest],
+            ),
+        ):
+            result = service.list_questions({}, UserFactory())
+
+        self.assertEqual(
+            [answer["text"] for answer in result.questions[0]["answers"]],
+            ["Here is the answer", "We need two more weeks"],
+        )
+
+    def test_a_later_answer_is_new_although_an_earlier_one_was_read(
+        self, mock_client_class
+    ):
+        """The badge used to fire once per question, so a tussenbericht went unnoticed."""
+        question_uuid = "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80"
+        older_uuid = "4a2d0c53-9b5f-4e2c-8b88-2d3f6e7a8b91"
+        newest_uuid = "5b3e1d64-0c60-4f3d-9c99-3e4a7f8b9c02"
+        question = make_klantcontact(question_uuid, "Question?", "2024-10-01T10:00:00Z")
+        klantcontacten = [
+            question,
+            make_klantcontact(
+                older_uuid, "Older", timezone.now().isoformat(), question_uuid
+            ),
+            make_klantcontact(
+                newest_uuid, "Newest", timezone.now().isoformat(), older_uuid
+            ),
+        ]
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+        KlantContactMomentAnswer.objects.create(
+            user=user,
+            contactmoment_url=question["url"],
+            last_seen_answer_uuid=older_uuid,
+        )
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(
+                service, "klantcontacten_for_partij", return_value=klantcontacten
+            ),
+        ):
+            result = service.list_questions({}, user)
+
+        self.assertTrue(result.questions[0]["new_answer_available"])
+
+    def test_the_newest_answer_once_read_is_not_new_again(self, mock_client_class):
+        question_uuid = "3f1c9b42-8a4e-4d1b-9a77-1c2e5d6f7a80"
+        newest_uuid = "5b3e1d64-0c60-4f3d-9c99-3e4a7f8b9c02"
+        question = make_klantcontact(question_uuid, "Question?", "2024-10-01T10:00:00Z")
+        klantcontacten = [
+            question,
+            make_klantcontact(
+                newest_uuid, "Newest", timezone.now().isoformat(), question_uuid
+            ),
+        ]
+        self._mock_conversation_client(mock_client_class)
+        service = OpenKlant2Service(config=self.config)
+        user = UserFactory()
+        KlantContactMomentAnswer.objects.create(
+            user=user,
+            contactmoment_url=question["url"],
+            last_seen_answer_uuid=newest_uuid,
+        )
+
+        with (
+            patch.object(service, "resolve_partij_uuid", return_value="partij"),
+            patch.object(
+                service, "klantcontacten_for_partij", return_value=klantcontacten
+            ),
+        ):
+            result = service.list_questions({}, user)
+
+        self.assertFalse(result.questions[0]["new_answer_available"])
 
     def test_list_questions_reports_an_incomplete_resolution(self, mock_client_class):
         """The flag has to reach QuestionsResult, which is what raises the banner."""

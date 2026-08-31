@@ -102,7 +102,13 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
                         "api_source_uuid": uuid_from_url(expected_contactmoment["url"]),
                         "subject": self.contactformsubject.subject,
                         "question_text": expected_contactmoment["tekst"],
-                        "answer_text": expected_contactmoment["antwoord"],
+                        "answers": [
+                            {
+                                "text": expected_contactmoment["antwoord"],
+                                "uuid": uuid_from_url(expected_contactmoment["url"]),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),
@@ -538,7 +544,13 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
                         "api_source_uuid": uuid_from_url(expected_contactmoment["url"]),
                         "subject": self.contactformsubject.subject,
                         "question_text": expected_contactmoment["tekst"],
-                        "answer_text": expected_contactmoment["antwoord"],
+                        "answers": [
+                            {
+                                "text": expected_contactmoment["antwoord"],
+                                "uuid": uuid_from_url(expected_contactmoment["url"]),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             expected_contactmoment["registratiedatum"]
                         ),

@@ -49,7 +49,7 @@ class KlantHelperTest(ClearCachesMixin, DisableRequestLogMixin, TestCase):
             self.assertEqual(
                 kcm_answers[1].contactmoment_url, kcms[1].contactmoment.url
             )
-            self.assertEqual(kcm_answers[0].is_seen, False)
+            self.assertIsNone(kcm_answers[0].last_seen_answer_uuid)
 
         with self.subTest("running function again will ignore existing entries"):
             mapping = KlantContactMomentAnswer.objects.get_or_create_mapping(

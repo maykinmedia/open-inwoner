@@ -111,8 +111,7 @@ class KlantContactMomentAnswerAdmin(admin.ModelAdmin):
         "user__email",
         "contactmoment_url",
     ]
-    list_filter = ["is_seen"]
-    list_display = ["user", "contactmoment_url", "is_seen"]
+    list_display = ["user", "contactmoment_url", "last_seen_answer_uuid"]
 
 
 #
