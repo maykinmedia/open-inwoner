@@ -83,7 +83,17 @@ def make_question_from_contactmoment(
             "api_source_uuid": uuid_from_url(contact_moment_data["url"]),
             "subject": contact_moment_data["onderwerp"],
             "question_text": contact_moment_data["tekst"],
-            "answer_text": contact_moment_data["antwoord"],
+            "answers": (
+                [
+                    {
+                        "text": contact_moment_data["antwoord"],
+                        "uuid": uuid_from_url(contact_moment_data["url"]),
+                        "registered_date": None,
+                    }
+                ]
+                if contact_moment_data["antwoord"]
+                else []
+            ),
             "registered_date": datetime.datetime.fromisoformat(
                 contact_moment_data["registratiedatum"]
             ),

@@ -307,8 +307,13 @@ class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBase
         local_kcm, created = KlantContactMomentAnswer.objects.get_or_create(  # noqa
             user=self.request.user, contactmoment_url=question["api_source_url"]
         )
-        if not local_kcm.is_seen:
-            local_kcm.is_seen = True
+        # Record which answer was read, not merely that the question was opened: a
+        # later answer has to show as new even though the citizen has been here before.
+        newest_answer_uuid = (
+            question["answers"][0]["uuid"] if question["answers"] else None
+        )
+        if local_kcm.last_seen_answer_uuid != newest_answer_uuid:
+            local_kcm.last_seen_answer_uuid = newest_answer_uuid
             local_kcm.save()
 
         self.log_contactmoment_detail_accessed(

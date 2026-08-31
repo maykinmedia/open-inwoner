@@ -261,10 +261,15 @@ class KlantContactMomentAnswer(models.Model):
     contactmoment_url = models.URLField(
         verbose_name=_("ContactMoment URL"), max_length=1000
     )
-    is_seen = models.BooleanField(
-        verbose_name=_("Is seen"),
-        help_text=_("Whether or not the user has seen the answer"),
-        default=False,
+    last_seen_answer_uuid = models.UUIDField(
+        verbose_name=_("Last seen answer"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "The most recent answer the user has seen. A question can collect several "
+            "answers over time, so recording which one was seen is what makes a later "
+            "answer show as new. Empty until the user opens a question that has one."
+        ),
     )
 
     class Meta:

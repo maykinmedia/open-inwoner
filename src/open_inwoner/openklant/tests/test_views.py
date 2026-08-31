@@ -118,7 +118,15 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
                 "subject": "openklant2_subject",
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
@@ -135,7 +143,13 @@ class ContactMomentViewsTestCase(
                 "subject": self.contactformsubject.subject,
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "status": str(Status.afgehandeld.label),
                 "channel": cm_data["kanaal"],
                 "new_answer_available": False,
@@ -200,7 +214,6 @@ class ContactMomentViewsTestCase(
                 contactmoment_url=uuid_from_url(
                     data.klant_contactmoment["contactmoment"]
                 ),
-                is_seen=False,
             )
         }
 
@@ -234,7 +247,15 @@ class ContactMomentViewsTestCase(
                 "subject": "openklant2_subject",
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "status": "Onbekend",
                 "channel": "email",
                 "new_answer_available": False,
@@ -249,7 +270,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": str(Status.afgehandeld.label),
                 "channel": cm_data["kanaal"],
@@ -320,7 +347,17 @@ class ContactMomentViewsTestCase(
                         ),
                         "subject": "openklant2_subject",
                         "question_text": "hello?",
-                        "answer_text": "no",
+                        "answers": [
+                            {
+                                "text": "no",
+                                "uuid": uuid.UUID(
+                                    "aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"
+                                ),
+                                "registered_date": datetime.fromisoformat(
+                                    "2024-01-02T12:00:00Z"
+                                ),
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             "2024-01-01T12:00:00Z"
                         ),
@@ -338,7 +375,13 @@ class ContactMomentViewsTestCase(
                         "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
                         "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
+                        "answers": [
+                            {
+                                "text": cm_data["antwoord"],
+                                "uuid": uuid_from_url(cm_data["url"]),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
@@ -392,7 +435,17 @@ class ContactMomentViewsTestCase(
                         ),
                         "subject": "openklant2_subject",
                         "question_text": "hello?",
-                        "answer_text": "no",
+                        "answers": [
+                            {
+                                "text": "no",
+                                "uuid": uuid.UUID(
+                                    "aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"
+                                ),
+                                "registered_date": datetime.fromisoformat(
+                                    "2024-01-02T12:00:00Z"
+                                ),
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             "2024-01-01T12:00:00Z"
                         ),
@@ -412,7 +465,15 @@ class ContactMomentViewsTestCase(
                         ),
                         "subject": self.contactformsubject.subject,
                         "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
+                        "answers": [
+                            {
+                                "text": cm_data["antwoord"],
+                                "uuid": uuid.UUID(
+                                    "aaaaaaaa-aaaa-aaaa-aaaa-eeeeeeeeeeee"
+                                ),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
@@ -471,7 +532,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": Status.afgehandeld.label,
                 "channel": cm_data["kanaal"],
@@ -502,7 +569,15 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
                 "subject": "openklant2_subject",
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
@@ -539,7 +614,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": Status.afgehandeld.label,
                 "channel": cm_data["kanaal"],
@@ -574,7 +655,12 @@ class ContactMomentViewsTestCase(
         )
 
         self.assertEqual(kcm_local.user, data.user)
-        self.assertEqual(kcm_local.is_seen, True)
+        # Viewing the question records which answer was read. eSuite holds one answer
+        # per contactmoment, so that is the contactmoment's own uuid.
+        self.assertEqual(
+            kcm_local.last_seen_answer_uuid,
+            uuid_from_url(data.klant_contactmoment["contactmoment"]),
+        )
 
     def test_contactmoment_detail_bsn_with_zaak_reformat_esuite_id(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
@@ -607,7 +693,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": Status.afgehandeld.label,
                 "channel": cm_data["kanaal"],
@@ -679,7 +771,15 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
                 "subject": "openklant2_subject",
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
@@ -695,7 +795,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.subject,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": Status.afgehandeld.label,
                 "channel": cm_data["kanaal"],
@@ -743,7 +849,15 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-cccccccccccc"),
                 "subject": "openklant2_subject",
                 "question_text": "hello?",
-                "answer_text": "no",
+                "answers": [
+                    {
+                        "text": "no",
+                        "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-dddddddddddd"),
+                        "registered_date": datetime.fromisoformat(
+                            "2024-01-02T12:00:00Z"
+                        ),
+                    }
+                ],
                 "registered_date": datetime.fromisoformat("2024-01-01T12:00:00Z"),
                 "status": "Onbekend",
                 "channel": "email",
@@ -759,7 +873,13 @@ class ContactMomentViewsTestCase(
                 "api_source_uuid": uuid_from_url(cm_data["url"]),
                 "subject": self.contactformsubject.esuite_subject_code,
                 "question_text": cm_data["tekst"],
-                "answer_text": cm_data["antwoord"],
+                "answers": [
+                    {
+                        "text": cm_data["antwoord"],
+                        "uuid": uuid_from_url(cm_data["url"]),
+                        "registered_date": None,
+                    }
+                ],
                 "registered_date": datetime.fromisoformat(cm_data["registratiedatum"]),
                 "status": Status.afgehandeld.label,
                 "channel": cm_data["kanaal"],
@@ -807,7 +927,13 @@ class ContactMomentViewsTestCase(
                         "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
                         "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
+                        "answers": [
+                            {
+                                "text": cm_data["antwoord"],
+                                "uuid": uuid_from_url(cm_data["url"]),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
@@ -853,7 +979,13 @@ class ContactMomentViewsTestCase(
                         "api_source_uuid": uuid_from_url(cm_data["url"]),
                         "subject": self.contactformsubject.subject,
                         "question_text": cm_data["tekst"],
-                        "answer_text": cm_data["antwoord"],
+                        "answers": [
+                            {
+                                "text": cm_data["antwoord"],
+                                "uuid": uuid_from_url(cm_data["url"]),
+                                "registered_date": None,
+                            }
+                        ],
                         "registered_date": datetime.fromisoformat(
                             cm_data["registratiedatum"]
                         ),
@@ -1101,6 +1233,102 @@ class ContactMomentViewsTestCase(
         )
         self.assertEqual(openklant2_row["status"], str(Status.afgehandeld.label))
         self.assertIn(str(Status.afgehandeld.label), detail_response.text)
+
+    def test_detail_shows_every_answer_oldest_first(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """A tussenbericht adds to what was said before rather than replacing it."""
+        data = MockAPIReadData().install_mocks(m)
+        question, _zaak = MockOpenKlant2Service().retrieve_question()
+        conversation = {
+            **question,
+            "answers": [
+                {
+                    "text": "Here is the answer you waited for",
+                    "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-222222222222"),
+                    "registered_date": datetime.fromisoformat("2024-01-03T12:00:00Z"),
+                },
+                {
+                    "text": "We need two more weeks",
+                    "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-111111111111"),
+                    "registered_date": datetime.fromisoformat("2024-01-02T12:00:00Z"),
+                },
+            ],
+        }
+
+        with patch.object(
+            MockOpenKlant2Service,
+            "retrieve_question",
+            return_value=(conversation, None),
+        ):
+            response = self.app.get(
+                reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": KlantenServiceType.OPENKLANT2.value,
+                        "kcm_uuid": str(conversation["api_source_uuid"]),
+                    },
+                ),
+                user=data.user,
+            )
+
+        self.assertIn("We need two more weeks", response.text)
+        self.assertIn("Here is the answer you waited for", response.text)
+        # Oldest first, so the conversation reads through in the order it happened.
+        self.assertLess(
+            response.text.index("We need two more weeks"),
+            response.text.index("Here is the answer you waited for"),
+        )
+
+    def test_detail_view_records_the_newest_answer_as_seen(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        """The badge has to fire again for a later answer, so which one was read is
+        what gets recorded, not merely that the question was opened."""
+        data = MockAPIReadData().install_mocks(m)
+        question, _zaak = MockOpenKlant2Service().retrieve_question()
+        newest_uuid = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-222222222222")
+        conversation = {
+            **question,
+            "answers": [
+                {
+                    "text": "Newest",
+                    "uuid": newest_uuid,
+                    "registered_date": datetime.fromisoformat("2024-01-03T12:00:00Z"),
+                },
+                {
+                    "text": "Older",
+                    "uuid": uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-111111111111"),
+                    "registered_date": datetime.fromisoformat("2024-01-02T12:00:00Z"),
+                },
+            ],
+        }
+        KlantContactMomentAnswer.objects.create(
+            user=data.user,
+            contactmoment_url=conversation["api_source_url"],
+            last_seen_answer_uuid=uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-111111111111"),
+        )
+
+        with patch.object(
+            MockOpenKlant2Service,
+            "retrieve_question",
+            return_value=(conversation, None),
+        ):
+            self.app.get(
+                reverse(
+                    "cases:contactmoment_detail",
+                    kwargs={
+                        "api_service": KlantenServiceType.OPENKLANT2.value,
+                        "kcm_uuid": str(conversation["api_source_uuid"]),
+                    },
+                ),
+                user=data.user,
+            )
+
+        local_kcm = KlantContactMomentAnswer.objects.get(
+            user=data.user, contactmoment_url=conversation["api_source_url"]
+        )
+        self.assertEqual(local_kcm.last_seen_answer_uuid, newest_uuid)
 
     def test_contactmoment_list_shows_banner_when_openklant2_is_incomplete(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping

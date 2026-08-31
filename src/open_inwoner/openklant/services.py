@@ -130,6 +130,24 @@ def _normalize_email(email: str) -> str:
     return email.strip().lower()
 
 
+def esuite_answers(contactmoment: ContactMoment) -> list["Answer"]:
+    """The answers on an eSuite contactmoment, of which there is at most one.
+
+    eSuite records the answer in a single `antwoord` field, so unlike OpenKlant2 it
+    cannot hold a conversation. The list keeps the two backends on one shape.
+    """
+    if not contactmoment.antwoord:
+        return []
+
+    return [
+        {
+            "text": contactmoment.antwoord,
+            "uuid": contactmoment.uuid,
+            "registered_date": None,
+        }
+    ]
+
+
 def contactmoment_has_new_answer(
     contactmoment: ContactMoment,
     local_kcm_mapping: dict[str, KlantContactMomentAnswer] | None = None,
@@ -140,11 +158,17 @@ def contactmoment_has_new_answer(
         timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
     )
     if local_kcm_mapping:
-        is_seen = getattr(local_kcm_mapping.get(contactmoment.url), "is_seen", False)
+        last_seen = getattr(
+            local_kcm_mapping.get(contactmoment.url), "last_seen_answer_uuid", None
+        )
+        # eSuite holds one answer per contactmoment, so having seen that contactmoment
+        # is having seen its answer. The comparison is the same one the Klanten API
+        # backend makes, where a question can collect several answers.
+        already_seen = str(last_seen) == str(contactmoment.uuid)
     else:
         # In the detail view, this is automatically true
-        is_seen = True
-    return bool(contactmoment.antwoord) and is_new and not is_seen
+        already_seen = True
+    return bool(contactmoment.antwoord) and is_new and not already_seen
 
 
 class BsnFetchParam(TypedDict):
@@ -165,13 +189,27 @@ class ZaakWithApiGroup:
     api_group: ZGWApiGroupConfig
 
 
+class Answer(TypedDict):
+    text: str
+    # What identifies this answer, and so what says whether the citizen has already
+    # read it: the klantcontact it was registered as for the Klanten API, and the
+    # contactmoment it belongs to for eSuite, which holds exactly one answer per
+    # contactmoment and gives it no identity of its own.
+    uuid: uuid.UUID
+    # None for eSuite, whose `antwoord` carries no date of its own.
+    registered_date: datetime.datetime | None
+
+
 class Question(TypedDict):
     identification: str
     api_source_url: str  # points to contactmoment or klantcontact url
     api_source_uuid: uuid.UUID  # points to contactmoment or klantcontact uuid
     subject: str
     question_text: str
-    answer_text: str | None
+    # Every answer the question collected, newest first. A conversation can run to
+    # several: a tussenbericht adds to what the municipality said before rather than
+    # replacing it, so showing only the most recent would hide the substantive reply.
+    answers: list[Answer]
     registered_date: datetime.datetime
     status: str
     channel: str
@@ -924,7 +962,7 @@ class eSuiteVragenService(KlantenService):
             "api_source_uuid": kcm.contactmoment.uuid,
             "subject": self._get_kcm_subject(kcm, subject_mapping) or "",
             "question_text": kcm.contactmoment.tekst,
-            "answer_text": kcm.contactmoment.antwoord,
+            "answers": esuite_answers(kcm.contactmoment),
             "registered_date": datetime.datetime.fromisoformat(
                 kcm.contactmoment.registratiedatum.isoformat()
             ),
@@ -1171,7 +1209,7 @@ class eSuiteVragenService(KlantenService):
                     zaak_detail_url=zaak.url,
                     subject=contactmoment.onderwerp,
                     question_text=contactmoment.tekst,
-                    answer_text=contactmoment.antwoord,
+                    answers=esuite_answers(contactmoment),
                     registered_date=contactmoment.registratiedatum,
                     status=contactmoment.status,
                     channel=contactmoment.kanaal,
@@ -2727,14 +2765,23 @@ class OpenKlant2Service(
             answer_metadata, _ = KlantContactMomentAnswer.objects.get_or_create(
                 user=user, contactmoment_url=question_ok2.url
             )
-        answer_text = question_ok2.answer.answer if question_ok2.answer else None
+        # Newest first, the order `OpenKlant2Question` keeps them in. The detail page
+        # reverses it to read the conversation through.
+        answers: list[Answer] = [
+            {
+                "text": answer.answer,
+                "uuid": answer.answer_kcm_uuid,
+                "registered_date": answer.plaatsgevonden_op,
+            }
+            for answer in question_ok2.answers
+        ]
 
         # Afgehandeld outranks Beantwoord: it is the more informative end state, and a
         # question can be finished without answer text, which "Onbeantwoord" would
-        # otherwise report forever. The answer, if there is one, is shown either way.
+        # otherwise report forever. The answers, if any, are shown either way.
         if question_ok2.is_afgehandeld:
             status = str(Status.afgehandeld.label)
-        elif answer_text is not None:
+        elif answers:
             status = "Beantwoord"
         else:
             status = "Onbeantwoord"
@@ -2746,7 +2793,7 @@ class OpenKlant2Service(
                 "api_source_uuid": str(question_ok2.question_kcm_uuid),
                 "subject": question_ok2.onderwerp,
                 "question_text": question_ok2.question,
-                "answer_text": answer_text,
+                "answers": answers,
                 "registered_date": question_ok2.plaatsgevonden_op,
                 "status": status,
                 "channel": question_ok2.kanaal,
@@ -2761,12 +2808,23 @@ class OpenKlant2Service(
     def _has_new_answer_available(
         self, question: OpenKlant2Question, answer: KlantContactMomentAnswer
     ) -> bool:
+        """Whether the newest answer is one the citizen has not read yet.
+
+        Compared by uuid rather than by a flag saying the question has been opened: a
+        question collects answers over time, and a tussenbericht that arrives after
+        the citizen last looked is new to them even though an earlier answer was not.
+        """
+        if not (newest := question.answer):
+            return False
+
         answer_is_recent = instance_is_new(
-            question.answer,
+            newest,
             "plaatsgevonden_op",
             timedelta(days=settings.CONTACTMOMENT_NEW_DAYS),
         )
-        return answer_is_recent and not answer.is_seen
+        already_seen = str(answer.last_seen_answer_uuid) == newest.answer_kcm_uuid
+
+        return answer_is_recent and not already_seen
 
     def list_questions_for_zaak(
         self,

@@ -18,12 +18,21 @@
                         <nl-paragraph>{{ question.question_text }}</nl-paragraph>
                     </div>
                     <div>
-                        <h2 class="utrecht-heading-3 contactmoment__heading">{% trans "Antwoord" %}</h2>
-                        {% if question.answer_text %}
-                            <nl-paragraph>{{ question.answer_text }}</nl-paragraph>
-                        {% else %}
+                        <h2 class="utrecht-heading-3 contactmoment__heading">{% if question.answers|length > 1 %}{% trans "Antwoorden" %}{% else %}{% trans "Antwoord" %}{% endif %}</h2>
+                        {% comment %}
+                            Reversed because the answers arrive newest first, and a
+                            conversation reads through from the oldest reply.
+                        {% endcomment %}
+                        {% for answer in question.answers reversed %}
+                            <div class="contactmoment__answer">
+                                {% if answer.registered_date %}
+                                    <span class="card__caption card__text--small"><span>{% trans "Beantwoord op" %}:</span><span class="card__text--dark">{{ answer.registered_date|date }}</span></span>
+                                {% endif %}
+                                <nl-paragraph>{{ answer.text }}</nl-paragraph>
+                            </div>
+                        {% empty %}
                             <nl-paragraph>{% trans "Nog geen antwoord beschijkbaar" %}</nl-paragraph>
-                        {% endif %}
+                        {% endfor %}
                     </div>
                     <div>
                         <a href="{{ origin.url }}" id="origin_link" class="button button--primary contactmoment__actions">
