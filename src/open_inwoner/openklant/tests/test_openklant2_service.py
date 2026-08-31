@@ -155,6 +155,114 @@ class UpdateUserFromPartijTestCase(TestCase):
         self.assertEqual(user.email, "keep@example.com")
         self.assertEqual(result.orphaned_addresses_restored, 1)
 
+    def test_orphaned_restore_does_not_duplicate_new_remote_standard(
+        self, mock_client_class
+    ):
+        """
+        Regression test for #2793: if the DA backing the old standard email
+        is deleted (its UUID vanished from the remote list) in the same sync
+        run where remote designates a *different* address as the new
+        standard, the orphan-restore step must not also mark the recreated
+        old value as standard -- that would create two
+        is_standard_for_type=True rows for (user, email) and violate
+        unique_standard_digital_address_per_user_type.
+        """
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+        new_remote_uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd"
+        mock_client.digitaal_adres.list.return_value = self._list_response(
+            [
+                self._make_adres(
+                    new_remote_uuid,
+                    "email",
+                    "new@example.com",
+                    is_standaard=True,
+                ),
+            ]
+        )
+
+        user = DigidUserFactory(email="old@example.com")
+        address = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="old@example.com",
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=address,
+            ok_uuid="44444444-4444-4444-4444-444444444444",
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_user_from_partij(self._partij(), user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "new@example.com")
+        self.assertEqual(result.orphaned_addresses_restored, 0)
+
+        standard_addresses = user.digital_addresses.filter(
+            type=DigitalAddressType.email, is_standard_for_type=True
+        )
+        self.assertEqual(standard_addresses.count(), 1)
+        self.assertEqual(standard_addresses.get().value, "new@example.com")
+
+    def test_orphaned_restore_runs_when_remote_standard_is_owned_by_other_user(
+        self, mock_client_class
+    ):
+        """
+        Regression test for #2793 (PR follow-up): remote can designate a
+        standard address that isn't actually applied locally -- e.g. because
+        it's an email already owned by a different user, so Phase 1 skips
+        creating it and it's never added to local_by_uuid. Phase 2/3 then
+        correctly no-op for that type (nothing local to promote/sync to), but
+        the orphan-restore guard must not mistake remote_standard_uuid_by_type
+        being non-None for "already handled" -- it must still restore the
+        dangling flat value, since nothing else did.
+        """
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        # Another user already owns the address remote wants to promote.
+        UserFactory(email="shared@example.com")
+
+        shared_remote_uuid = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
+        mock_client.digitaal_adres.list.return_value = self._list_response(
+            [
+                self._make_adres(
+                    shared_remote_uuid,
+                    "email",
+                    "shared@example.com",
+                    is_standaard=True,
+                ),
+            ]
+        )
+
+        user = DigidUserFactory(email="old@example.com")
+        address = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="old@example.com",
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=address,
+            ok_uuid="99999999-9999-9999-9999-999999999999",
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_user_from_partij(self._partij(), user)
+
+        user.refresh_from_db()
+        self.assertEqual(result.email_conflicts_skipped, 1)
+        self.assertEqual(user.email, "old@example.com")
+        self.assertEqual(result.orphaned_addresses_restored, 1)
+
+        standard_addresses = user.digital_addresses.filter(
+            type=DigitalAddressType.email, is_standard_for_type=True
+        )
+        self.assertEqual(standard_addresses.count(), 1)
+        self.assertEqual(standard_addresses.get().value, "old@example.com")
+
     def test_email_conflict_with_other_user_is_skipped(self, mock_client_class):
         mock_client = Mock()
         mock_client_class.return_value = mock_client

@@ -1895,6 +1895,14 @@ class OpenKlant2Service(
             # Phase 2: sync is_standard_for_type from remote isStandaardAdres.
             # Only acts when remote explicitly designates a standard; if remote
             # has no standard for a type the local flag is left unchanged.
+            #
+            # Types for which a remote-designated standard was actually applied
+            # to a local row this run -- distinct from remote_standard_uuid_by_type
+            # simply being non-None, since the designated address may not exist
+            # locally (e.g. its email is owned by another user and was skipped
+            # in Phase 1), in which case Phase 2 is a no-op for that type.
+            applied_standard_types: set[DigitalAddressType] = set()
+
             for (
                 digital_address_type,
                 standard_uuid,
@@ -1907,6 +1915,7 @@ class OpenKlant2Service(
                     )
                     standard_address.is_standard_for_type = True
                     standard_address.save(update_fields=["is_standard_for_type"])
+                    applied_standard_types.add(digital_address_type)
 
             # Phase 3: keep flat fields (user.email, user.phonenumber,
             # user.preferred_address) in sync with the remote standard addresses.
@@ -1947,6 +1956,12 @@ class OpenKlant2Service(
             for da_type, flat_value in orphaned_flat_values:
                 if (
                     flat_value
+                    # Phase 2 already promoted a remote-designated standard
+                    # address for this type this run; restoring the stale
+                    # flat value as standard too would create a second
+                    # is_standard_for_type=True row for (user, type),
+                    # violating unique_standard_digital_address_per_user_type.
+                    and da_type not in applied_standard_types
                     and not user.digital_addresses.filter(
                         type=da_type, value=flat_value
                     ).exists()
