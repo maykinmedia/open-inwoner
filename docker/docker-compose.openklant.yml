@@ -42,6 +42,7 @@ services:
       - CACHE_DEFAULT=openklant-redis:6379/0
       - CACHE_AXES=openklant-redis:6379/0
       - NOTIFICATIONS_DISABLED=1
+      - DISABLE_2FA=true
       # Same OTel setup as the main app (docker-compose.yml's x-app-env) --
       # open-klant is built on the same `open_api_framework`/`maykin_common`
       # base, so it exports to the same collector. OTEL_SDK_DISABLED
