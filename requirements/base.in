@@ -57,7 +57,7 @@ django-structlog
 jinja2
 
 # django cms
-django-cms==4.1.10
+django-cms==5.0.11
 djangocms-versioning
 djangocms-alias<3
 djangocms-link
