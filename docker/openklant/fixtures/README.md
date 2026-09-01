@@ -23,12 +23,16 @@ Inwoner backend container and the browser, add the following entry to your
 
 ## Load fixtures
 
-To load some initial data to get set up quickly, run the following command
+`docker-compose.openklant.yml` already loads `db.json` on `up`. To reload it
+manually:
 
 ```bash
 cat openklant/fixtures/db.json | docker exec -i docker-openklant-web-1 src/manage.py loaddata --format=json -
 ```
 
-This creates an admin account (credentials: admin / `admin`) and creates a
-`Klant` object that is linked to KvK number `68750110`, as well as a
-`ContactMoment` and `KlantContactMoment` linked to this `Klant`
+This creates an admin account (admin / `admin`), the API token
+`seed_conversations.py` uses, and a few base `klantinteracties.partij` records.
+It also includes a batch of klantcontacten for BSN `111222333` (the DigiD-mock
+`testuser`), seeded by running `python docker/openklant/seed_conversations.py`
+against a running instance -- log in locally with that BSN and open "Mijn
+vragen" to see them.

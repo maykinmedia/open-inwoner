@@ -149,6 +149,8 @@ ignore-names = [
 "src/open_inwoner/openzaak/exceptions.py" = ["TID251"]
 "src/open_inwoner/openzaak/services.py" = ["TID251"]
 "src/open_inwoner/openzaak/tests/test_clients.py" = ["TID251"]
+# A CLI seeding script reports progress on stdout
+"docker/openklant/seed_conversations.py" = ["T201"]
 
 # Import sorting configuration (equivalent to isort)
 [tool.ruff.lint.isort]

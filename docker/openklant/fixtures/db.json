@@ -1,5 +1,965 @@
 [
   {
+    "model": "klantinteracties.actor",
+    "pk": 1,
+    "fields": {
+      "uuid": "0ee17a4b-8709-4d0b-a525-ae0e93f17fc0",
+      "naam": "Backoffice (seed_conversations.py)",
+      "soort_actor": "medewerker",
+      "indicatie_actief": true,
+      "actoridentificator_object_id": "",
+      "actoridentificator_code_objecttype": "",
+      "actoridentificator_code_register": "",
+      "actoridentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 1,
+    "fields": {
+      "uuid": "fbf350d0-857f-4c97-878f-333d3589a7c4",
+      "nummer": "0000000001",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vraag over mijn uitkering [2026-09-07 15:16:01]",
+      "inhoud": "Ik heb een vraag over de hoogte van mijn uitkering deze maand.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.344Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 2,
+    "fields": {
+      "uuid": "41c3d55d-b093-4cf3-8139-68fcf3589e32",
+      "nummer": "0000000002",
+      "kanaal": "contactformulier",
+      "onderwerp": "Klacht over de wachttijd [2026-09-07 15:16:01]",
+      "inhoud": "Ik wacht al drie weken op een reactie op mijn eerdere melding.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.451Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 3,
+    "fields": {
+      "uuid": "8491dceb-9c28-4f46-9ee5-315fce36af56",
+      "nummer": "0000000003",
+      "kanaal": "contactformulier",
+      "onderwerp": "Klacht over de wachttijd [2026-09-07 15:16:01]",
+      "inhoud": "Excuses voor de wachttijd, we hebben dit inmiddels doorgezet.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.502Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 4,
+    "fields": {
+      "uuid": "a5a9fe55-534b-472d-aa9a-ba0bb000c5ba",
+      "nummer": "0000000004",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vragen over mijn paspoortaanvraag [2026-09-07 15:16:01]",
+      "inhoud": "Wanneer kan ik mijn nieuwe paspoort ophalen?",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.546Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 5,
+    "fields": {
+      "uuid": "12ac17fb-d984-408a-8b14-405448dad7ec",
+      "nummer": "0000000005",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vragen over mijn paspoortaanvraag [2026-09-07 15:16:01]",
+      "inhoud": "Uw paspoort ligt over 5 werkdagen klaar bij de balie.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.583Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 6,
+    "fields": {
+      "uuid": "54676cf8-c075-47cc-9a28-7db769b5bb0e",
+      "nummer": "0000000006",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vragen over mijn paspoortaanvraag [2026-09-07 15:16:01]",
+      "inhoud": "Kan iemand anders het voor mij ophalen met een machtiging?",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.623Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 7,
+    "fields": {
+      "uuid": "8961a56d-17bb-4fdb-970d-144e12363bb0",
+      "nummer": "0000000007",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vragen over mijn paspoortaanvraag [2026-09-07 15:16:01]",
+      "inhoud": "Ja, met een schriftelijke machtiging en een kopie van uw ID-bewijs.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.655Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 8,
+    "fields": {
+      "uuid": "993188ee-b85f-48bc-a599-b39a9a31807a",
+      "nummer": "0000000008",
+      "kanaal": "contactformulier",
+      "onderwerp": "Bezwaar tegen de parkeerboete [2026-09-07 15:16:01]",
+      "inhoud": "Ik wil bezwaar maken tegen deze parkeerboete.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.685Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 9,
+    "fields": {
+      "uuid": "4a73ff3f-aeea-43fd-9eea-a5f7ed1c1f48",
+      "nummer": "0000000009",
+      "kanaal": "contactformulier",
+      "onderwerp": "Bezwaar tegen de parkeerboete [2026-09-07 15:16:01]",
+      "inhoud": "We hebben uw bezwaar ontvangen en in behandeling genomen.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.730Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 10,
+    "fields": {
+      "uuid": "2dcbddc9-aa35-43ec-b10e-41cf939b0a31",
+      "nummer": "0000000010",
+      "kanaal": "contactformulier",
+      "onderwerp": "Melding kapotte lantaarnpaal [2026-09-07 15:16:01]",
+      "inhoud": "De lantaarnpaal bij nummer 12 doet het al een week niet.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.760Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 11,
+    "fields": {
+      "uuid": "3ff4d5c7-0ade-4a7e-8cbb-05646f620514",
+      "nummer": "0000000011",
+      "kanaal": "contactformulier",
+      "onderwerp": "Melding kapotte lantaarnpaal [2026-09-07 15:16:01]",
+      "inhoud": "Doorgezet naar de aannemer.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.796Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 12,
+    "fields": {
+      "uuid": "c7d4464b-5ccf-4878-82d3-eb2d8b2952aa",
+      "nummer": "0000000012",
+      "kanaal": "contactformulier",
+      "onderwerp": "Melding kapotte lantaarnpaal [2026-09-07 15:16:01]",
+      "inhoud": "De aannemer heeft de lantaarnpaal inmiddels gerepareerd.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.825Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 13,
+    "fields": {
+      "uuid": "f005c1b6-13c7-46ff-95e3-69ad651609ba",
+      "nummer": "0000000013",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vraag over de WOZ-beschikking [2026-09-07 15:16:01]",
+      "inhoud": "Ik snap de WOZ-waarde op mijn beschikking niet, kunt u dit toelichten?",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.855Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 14,
+    "fields": {
+      "uuid": "1f60e9e3-80b0-4140-b303-cd811d4ccba6",
+      "nummer": "0000000014",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vraag over de WOZ-beschikking [2026-09-07 15:16:01]",
+      "inhoud": "Doorgezet naar de afdeling belastingen.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.892Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 15,
+    "fields": {
+      "uuid": "789e1b7b-a1f1-4186-a962-ade70ddc19f0",
+      "nummer": "0000000015",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vraag over de WOZ-beschikking [2026-09-07 15:16:01]",
+      "inhoud": "Taxateur heeft het dossier opgevraagd.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.919Z"
+    }
+  },
+  {
+    "model": "klantinteracties.klantcontact",
+    "pk": 16,
+    "fields": {
+      "uuid": "7163dfff-be02-4a15-a4bd-d70fe15008ca",
+      "nummer": "0000000016",
+      "kanaal": "contactformulier",
+      "onderwerp": "Vraag over de WOZ-beschikking [2026-09-07 15:16:01]",
+      "inhoud": "De WOZ-waarde is gebaseerd op de verkoopprijzen van vergelijkbare woningen.",
+      "indicatie_contact_gelukt": null,
+      "taal": "nld",
+      "vertrouwelijk": false,
+      "plaatsgevonden_op": "2026-09-07T14:16:01.948Z"
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 1,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "4f7dd440-41b3-4173-84c3-b023040e9c9a",
+      "partij": 4,
+      "klantcontact": 1,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 2,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "7d1d705d-b054-45f1-8ce1-4eb4bc253c0b",
+      "partij": 4,
+      "klantcontact": 2,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 3,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "de3aa8b3-0c28-44e1-b2f3-f8594d382d63",
+      "partij": 4,
+      "klantcontact": 3,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 4,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "95ac8200-ec03-47d1-9c00-4066d7294a3c",
+      "partij": 4,
+      "klantcontact": 4,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 5,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "0a404a7d-5e3c-4554-a76e-a827d4748acb",
+      "partij": 4,
+      "klantcontact": 5,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 6,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "bd5d660d-2bf1-43a6-9e99-ce28e8da2440",
+      "partij": 4,
+      "klantcontact": 6,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 7,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "66048c14-ead4-4fc9-a1d3-3db90b501908",
+      "partij": 4,
+      "klantcontact": 7,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 8,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "41307bed-2e1d-4504-8a69-4b771fd21370",
+      "partij": 4,
+      "klantcontact": 8,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 9,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "370f5034-0d6a-421f-8dad-7e8213d6a6fd",
+      "partij": null,
+      "klantcontact": 9,
+      "rol": "vertegenwoordiger",
+      "organisatienaam": "Gemeente (backoffice)",
+      "initiator": false
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 10,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "75f1cbed-1d31-4a60-b096-2a5a1638dff4",
+      "partij": 4,
+      "klantcontact": 10,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 11,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "3c6274dd-fe83-4762-9e1e-17d6b90454f7",
+      "partij": null,
+      "klantcontact": 11,
+      "rol": "vertegenwoordiger",
+      "organisatienaam": "Gemeente (backoffice)",
+      "initiator": false
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 12,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "9bdca4c3-ea7b-4855-8c3d-68bc5c9da563",
+      "partij": 4,
+      "klantcontact": 12,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 13,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "4636ab44-fa9c-48a5-a882-b4dd53b6b4df",
+      "partij": 4,
+      "klantcontact": 13,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 14,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "aa89bedd-c8c8-478a-9ab0-13877dfac2ba",
+      "partij": null,
+      "klantcontact": 14,
+      "rol": "vertegenwoordiger",
+      "organisatienaam": "Gemeente (backoffice)",
+      "initiator": false
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 15,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "cf88b409-dde2-473c-a595-57575fd3cd16",
+      "partij": null,
+      "klantcontact": 15,
+      "rol": "vertegenwoordiger",
+      "organisatienaam": "Gemeente (backoffice)",
+      "initiator": false
+    }
+  },
+  {
+    "model": "klantinteracties.betrokkene",
+    "pk": 16,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "contactnaam_voorletters": "",
+      "contactnaam_voornaam": "",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "",
+      "uuid": "4725d165-0320-432b-810a-83c72a562588",
+      "partij": 4,
+      "klantcontact": 16,
+      "rol": "klant",
+      "organisatienaam": "",
+      "initiator": true
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 1,
+    "fields": {
+      "uuid": "f86f1fbb-2371-4451-abba-0c6d61bcebe2",
+      "klantcontact": 3,
+      "was_klantcontact": 2,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 2,
+    "fields": {
+      "uuid": "3638ddb2-5ec9-4ea1-ac87-bd59d556c77c",
+      "klantcontact": 5,
+      "was_klantcontact": 4,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 3,
+    "fields": {
+      "uuid": "fb8ee9b5-209f-4768-9541-93707fff4fe4",
+      "klantcontact": 6,
+      "was_klantcontact": 5,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 4,
+    "fields": {
+      "uuid": "2e5ecfd6-87ed-41f7-b885-3c8e4e8c2083",
+      "klantcontact": 7,
+      "was_klantcontact": 6,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 5,
+    "fields": {
+      "uuid": "b9f2f3d1-d720-4541-9cf4-19378ecf402c",
+      "klantcontact": 9,
+      "was_klantcontact": 8,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 6,
+    "fields": {
+      "uuid": "bc4807db-1dca-437b-b96f-5ff7e0dc9565",
+      "klantcontact": 11,
+      "was_klantcontact": 10,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 7,
+    "fields": {
+      "uuid": "044c313e-bdb9-480c-8b27-f6915e07e93f",
+      "klantcontact": 12,
+      "was_klantcontact": 11,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 8,
+    "fields": {
+      "uuid": "59426f91-1cc7-4abb-9446-cf578fd87a8f",
+      "klantcontact": 14,
+      "was_klantcontact": 13,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 9,
+    "fields": {
+      "uuid": "84682705-6619-481c-90d2-11d15db0a9a0",
+      "klantcontact": 15,
+      "was_klantcontact": 14,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
+    "model": "klantinteracties.onderwerpobject",
+    "pk": 10,
+    "fields": {
+      "uuid": "380ea5c6-eb37-48b7-9358-dd2c2e41cb59",
+      "klantcontact": 16,
+      "was_klantcontact": 15,
+      "onderwerpobjectidentificator_object_id": "",
+      "onderwerpobjectidentificator_code_objecttype": "",
+      "onderwerpobjectidentificator_code_register": "",
+      "onderwerpobjectidentificator_code_soort_object_id": ""
+    }
+  },
+  {
     "model": "klantinteracties.partij",
     "pk": 1,
     "fields": {
@@ -105,6 +1065,41 @@
     }
   },
   {
+    "model": "klantinteracties.partij",
+    "pk": 4,
+    "fields": {
+      "bezoekadres_nummeraanduiding_id": "",
+      "bezoekadres_straatnaam": "",
+      "bezoekadres_huisnummer": null,
+      "bezoekadres_huisnummertoevoeging": "",
+      "bezoekadres_postcode": "",
+      "bezoekadres_stad": "",
+      "bezoekadres_adresregel1": "",
+      "bezoekadres_adresregel2": "",
+      "bezoekadres_adresregel3": "",
+      "bezoekadres_land": "",
+      "correspondentieadres_nummeraanduiding_id": "",
+      "correspondentieadres_straatnaam": "",
+      "correspondentieadres_huisnummer": null,
+      "correspondentieadres_huisnummertoevoeging": "",
+      "correspondentieadres_postcode": "",
+      "correspondentieadres_stad": "",
+      "correspondentieadres_adresregel1": "",
+      "correspondentieadres_adresregel2": "",
+      "correspondentieadres_adresregel3": "",
+      "correspondentieadres_land": "",
+      "uuid": "b67cd9bb-7b6c-408d-a441-a1a1498c726e",
+      "voorkeurs_digitaal_adres": null,
+      "voorkeurs_rekeningnummer": null,
+      "nummer": "0000000004",
+      "interne_notitie": "",
+      "soort_partij": "persoon",
+      "indicatie_geheimhouding": false,
+      "voorkeurstaal": "nld",
+      "indicatie_actief": true
+    }
+  },
+  {
     "model": "klantinteracties.organisatie",
     "pk": 1,
     "fields": {
@@ -129,6 +1124,17 @@
       "contactnaam_voorvoegsel_achternaam": "",
       "contactnaam_achternaam": "Smith",
       "partij": 1
+    }
+  },
+  {
+    "model": "klantinteracties.persoon",
+    "pk": 2,
+    "fields": {
+      "contactnaam_voorletters": "M",
+      "contactnaam_voornaam": "Merel",
+      "contactnaam_voorvoegsel_achternaam": "",
+      "contactnaam_achternaam": "de Vries",
+      "partij": 4
     }
   },
   {
@@ -171,6 +1177,20 @@
       "partij_identificator_code_soort_object_id": "vestigingsnummer",
       "partij_identificator_object_id": "123456791201",
       "partij_identificator_code_register": "hr"
+    }
+  },
+  {
+    "model": "klantinteracties.partijidentificator",
+    "pk": 4,
+    "fields": {
+      "uuid": "a6ed33f2-0dab-4154-89d8-0278ff500733",
+      "sub_identificator_van": null,
+      "partij": 4,
+      "andere_partij_identificator": "",
+      "partij_identificator_code_objecttype": "natuurlijk_persoon",
+      "partij_identificator_code_soort_object_id": "bsn",
+      "partij_identificator_object_id": "111222333",
+      "partij_identificator_code_register": "brp"
     }
   },
   {
@@ -306,6 +1326,138 @@
       "omschrijving": "",
       "referentie": "",
       "verificatie_datum": null
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 1,
+    "fields": {
+      "uuid": "1cc8a415-a173-41a7-b05d-99756382360f",
+      "klantcontact": 1,
+      "nummer": "0000000001",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "te_verwerken",
+      "toegewezen_op": "2026-09-07T14:16:01.440Z",
+      "afgehandeld_op": null
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 2,
+    "fields": {
+      "uuid": "82ad08a3-71c6-43a9-bd67-109f562b3161",
+      "klantcontact": 2,
+      "nummer": "0000000002",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "verwerkt",
+      "toegewezen_op": "2026-09-07T14:16:01.493Z",
+      "afgehandeld_op": "2026-09-07T14:16:01.493Z"
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 3,
+    "fields": {
+      "uuid": "92a67f1f-5027-40eb-974a-4e0c37236995",
+      "klantcontact": 4,
+      "nummer": "0000000003",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "verwerkt",
+      "toegewezen_op": "2026-09-07T14:16:01.575Z",
+      "afgehandeld_op": "2026-09-07T14:16:01.575Z"
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 4,
+    "fields": {
+      "uuid": "cf9c942f-e407-4d41-9802-a386fc0df203",
+      "klantcontact": 8,
+      "nummer": "0000000004",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "verwerkt",
+      "toegewezen_op": "2026-09-07T14:16:01.722Z",
+      "afgehandeld_op": "2026-09-07T14:16:01.722Z"
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 5,
+    "fields": {
+      "uuid": "c68d0a28-0aba-40d4-9e37-12a4fdd6bead",
+      "klantcontact": 10,
+      "nummer": "0000000005",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "verwerkt",
+      "toegewezen_op": "2026-09-07T14:16:01.788Z",
+      "afgehandeld_op": "2026-09-07T14:16:01.788Z"
+    }
+  },
+  {
+    "model": "klantinteracties.internetaak",
+    "pk": 6,
+    "fields": {
+      "uuid": "8a2f1e08-aa54-4d62-b648-57918c122b92",
+      "klantcontact": 13,
+      "nummer": "0000000006",
+      "gevraagde_handeling": "Vraag beantwoorden in aanleiding gevend klant contact",
+      "toelichting": "Seed data (seed_conversations.py)",
+      "status": "verwerkt",
+      "toegewezen_op": "2026-09-07T14:16:01.884Z",
+      "afgehandeld_op": "2026-09-07T14:16:01.884Z"
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 1,
+    "fields": {
+      "actor": 1,
+      "internetaak": 1
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 2,
+    "fields": {
+      "actor": 1,
+      "internetaak": 2
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 3,
+    "fields": {
+      "actor": 1,
+      "internetaak": 3
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 4,
+    "fields": {
+      "actor": 1,
+      "internetaak": 4
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 5,
+    "fields": {
+      "actor": 1,
+      "internetaak": 5
+    }
+  },
+  {
+    "model": "klantinteracties.internetakenactorenthoughmodel",
+    "pk": 6,
+    "fields": {
+      "actor": 1,
+      "internetaak": 6
     }
   },
   {
