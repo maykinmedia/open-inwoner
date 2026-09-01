@@ -473,7 +473,7 @@ objects-api-client-django==0.5.0
     # via -r requirements/base.in
 odfpy==1.4.1
     # via tablib
-open-klant-client==0.6.0
+open-klant-client==0.7.0
     # via -r requirements/base.in
 openpyxl==3.0.9
     # via tablib
