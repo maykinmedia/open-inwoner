@@ -1,3 +1,4 @@
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -111,7 +112,7 @@ class NotificationRecordManager(models.Manager):
         )
 
     @contextmanager
-    def lock_for_processing(self, record: Union[int, "NotificationRecord"]):
+    def lock_for_processing(self, record: Union[uuid.UUID, str, "NotificationRecord"]):
         """
         Context manager for acquiring an exclusive lock on a notification record.
 
@@ -120,7 +121,8 @@ class NotificationRecordManager(models.Manager):
         atomically - no other transaction can see or modify the row in between.
 
         Args:
-            record: Either a NotificationRecord instance or a primary key (int)
+            record: Either a NotificationRecord instance or a primary key (UUID
+                or its string representation)
 
         Usage:
             # Using a primary key
@@ -141,7 +143,8 @@ class NotificationRecordManager(models.Manager):
         """
         # Get the record if a pk was provided, otherwise use the instance
         match record:
-            case int(record_pk):
+            case uuid.UUID() | str():
+                record_pk = record
                 record = self.get(pk=record_pk)
             case _:
                 record_pk = record.pk

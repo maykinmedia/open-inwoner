@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -161,6 +163,11 @@ class Subscription(models.Model):
 
 
 class NotificationRecord(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid4,
+        editable=False,
+    )
     subscription = models.ForeignKey(
         Subscription, related_name="received_notifications", on_delete=models.CASCADE
     )

@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
@@ -137,7 +138,7 @@ class ProcessZakenNotificationTaskTestCase(TestCase):
     def test_process_notification_record_does_not_exist(self):
         """Test handling of non-existent notification record"""
         with self.assertRaises(NotificationRecord.DoesNotExist):
-            process_zaken_notification(99999)
+            process_zaken_notification(uuid.uuid4())
 
     @patch("open_inwoner.openzaak.tasks.handle_zaken_notification", autospec=True)
     def test_process_notification_already_processed(self, mock_handle):

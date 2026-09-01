@@ -1,4 +1,5 @@
 import io
+import uuid
 
 from django.conf import settings
 from django.core.management import call_command
@@ -48,7 +49,7 @@ def import_zgw_data():
 
 
 @app.task
-def process_zaken_notification(record_pk: int):
+def process_zaken_notification(record_pk: uuid.UUID | str):
     logger.info("Started process_zaken_notification() task", record_pk=record_pk)
 
     try:
