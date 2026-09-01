@@ -3,8 +3,10 @@ from pathlib import Path
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
+from django.urls import clear_url_caches, reverse
 
 from cms.api import add_plugin
+from cms.appresolver import clear_app_resolvers
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from django_setup_configuration.test_utils import execute_single_step
 from djangocms_versioning.constants import PUBLISHED
@@ -22,6 +24,7 @@ from open_inwoner.cms.utils.page_display import (
 from open_inwoner.cms.utils.page_setup import CMS_BOOTSTRAP_USER_EMAIL
 from open_inwoner.configurations.bootstrap.cms import (
     _APP_HOOKS,
+    _REDIRECT_PAGES,
     CMSPagesConfigurationModel,
     CMSPagesConfigurationStep,
 )
@@ -42,6 +45,9 @@ CMS_PAGES_STEP_MULTIPLE_PAGES = str(BASE_DIR / "cms_pages_step_multiple_pages.ya
 CMS_PAGES_STEP_NOTHING_ENABLED = str(BASE_DIR / "cms_pages_step_nothing_enabled.yaml")
 CMS_PAGES_STEP_HOMEPAGE_WITH_PLUGINS = str(
     BASE_DIR / "cms_pages_step_homepage_with_plugins.yaml"
+)
+CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT = str(
+    BASE_DIR / "cms_pages_step_mijn_vragen_redirect.yaml"
 )
 
 
@@ -70,13 +76,24 @@ class AppHookMappingTests(TestCase):
         model_fields = set(CMSPagesConfigurationModel.model_fields)
 
         self.assertTrue(set(_APP_HOOKS).issubset(model_fields))
+        self.assertTrue(set(_REDIRECT_PAGES).issubset(model_fields))
 
-        # every configurable page except the homepage is backed by an apphook
-        self.assertEqual(model_fields - set(_APP_HOOKS), {"homepage"})
+        # every configurable page is the homepage, backed by an apphook, or a
+        # redirect page
+        self.assertEqual(
+            model_fields - set(_APP_HOOKS) - set(_REDIRECT_PAGES), {"homepage"}
+        )
 
 
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CMSPagesConfigurationStepTests(TestCase):
+    def setUp(self):
+        super().setUp()
+        # reload_urlconf() (used by the redirect-page tests) leaves stale
+        # resolvers in this CMS-internal, non-test-aware global otherwise.
+        self.addCleanup(clear_app_resolvers)
+        self.addCleanup(clear_url_caches)
+
     def test_cases_page_created_with_explicit_extension_settings(self):
         execute_single_step(
             CMSPagesConfigurationStep,
@@ -221,6 +238,94 @@ class CMSPagesConfigurationStepTests(TestCase):
         cases_page = Page.objects.get(application_urls=CasesApphook.__name__)
 
         self.assertEqual(cases_page.parent_page, homepage)
+
+    def test_redirect_page_created_pointing_at_configured_url(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+
+        page = Page.objects.get(reverse_id="mijn-vragen")
+        content = PageContent._original_manager.get(
+            page=page, language="nl", versions__state=PUBLISHED
+        )
+
+        self.assertEqual(content.title, "Mijn vragen")
+        self.assertEqual(content.redirect, reverse("cases:contactmoment_list"))
+
+    def test_redirect_page_extension_settings_applied(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+
+        page = Page.objects.get(reverse_id="mijn-vragen")
+        extension = page.commonextension
+
+        self.assertTrue(extension.requires_auth)
+        self.assertTrue(extension.requires_auth_bsn_or_kvk)
+        self.assertEqual(extension.menu_icon, "help_outline")
+
+    def test_redirect_page_creation_is_idempotent(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+
+        self.assertEqual(Page.objects.filter(reverse_id="mijn-vragen").count(), 1)
+
+    def test_redirect_page_is_a_child_of_homepage(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            object_source={
+                "cms_pages_config_enable": True,
+                "cms_pages_config": {
+                    "homepage": {"enabled": True},
+                    "cases": {"enabled": True},
+                    "mijn_vragen": {
+                        "enabled": True,
+                        "title": "Mijn vragen",
+                        "redirect_url_name": "cases:contactmoment_list",
+                    },
+                },
+            },
+        )
+
+        homepage = Page.objects.get(reverse_id="home")
+        redirect_page = Page.objects.get(reverse_id="mijn-vragen")
+
+        self.assertEqual(redirect_page.parent_page, homepage)
+
+    def test_rerun_with_a_different_redirect_title_overwrites_the_admin_edit(self):
+        """
+        The redirect-page equivalent of `test_rerun_with_a_different_title_overwrites_the_admin_edit`:
+        an admin edit to the title (or the target url, on a config change) does not
+        survive a re-run, and the page itself is reused rather than duplicated.
+        """
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+        page = Page.objects.get(reverse_id="mijn-vragen")
+        PageContent._original_manager.filter(page=page, language="nl").update(
+            title="Admin-edited title"
+        )
+
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT,
+        )
+
+        same_page = Page.objects.get(reverse_id="mijn-vragen")
+        self.assertEqual(same_page.pk, page.pk)
+        published_content = PageContent._original_manager.get(
+            page=same_page, language="nl", versions__state=PUBLISHED
+        )
+        self.assertEqual(published_content.title, "Mijn vragen")
 
     def test_rerun_with_a_different_title_overwrites_the_admin_edit(self):
         """

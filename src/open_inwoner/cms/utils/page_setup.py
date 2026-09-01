@@ -313,3 +313,120 @@ def get_or_create_apphook_page(
     _set_app_config_fields(hook_class, config_args)
 
     return page
+
+
+@transaction.atomic
+def _sync_redirect_page_content(
+    page: Page,
+    *,
+    title: str,
+    redirect_url: str,
+    user,
+    language: str = DEFAULT_LANGUAGE,
+) -> None:
+    """
+    Overwrite a redirect page's title and target URL to match, in one version.
+
+    The combined version of `update_page_title`: a redirect page's title and its
+    target change together, so doing both in one call means one new version
+    (and one publish) instead of two when a re-run changes both.
+    """
+    content = page.get_admin_content(language)
+    if content.title == title and content.redirect == redirect_url:
+        return
+
+    version = Version.objects.get_for_content(content)
+    if version.state == DRAFT:
+        content.title = title
+        content.redirect = redirect_url
+        content.save()
+        return
+
+    new_version = version.copy(user)
+    new_version.content.title = title
+    new_version.content.redirect = redirect_url
+    new_version.content.save()
+    new_version.publish(user)
+
+
+@transaction.atomic
+def create_redirect_page(
+    *,
+    user,
+    title: str,
+    redirect_url: str,
+    reverse_id: str,
+    extension_args: dict | None = None,
+    parent_page: Page | None = None,
+    language: str = DEFAULT_LANGUAGE,
+) -> Page:
+    """
+    Create a plain CMS page with no apphook that redirects to `redirect_url`.
+
+    The sidenav (`SideNavMenuData.get_menu_data`) is built entirely from the CMS
+    page tree, so a feature whose content lives at a URL belonging to another app's
+    apphook -- rather than one of its own -- needs a page-tree node of its own to get
+    a nav entry. This is that node: visiting it sends the browser straight to
+    `redirect_url`, via Django CMS's own page-redirect support (`PageContent.redirect`),
+    the same mechanism an editor gets by setting a page's "redirect" field in the admin.
+
+    `reverse_id` is this page's lookup key for `get_or_create_redirect_page`, the same
+    role `application_urls` plays for an apphook page: there is no apphook to filter
+    on, so the caller picks a stable identifier instead.
+    """
+    page = api.create_page(
+        title,
+        DEFAULT_TEMPLATE,
+        language,
+        redirect=redirect_url,
+        reverse_id=reverse_id,
+        in_navigation=True,
+        parent=parent_page,
+    )
+
+    if extension_args:
+        CommonExtension.objects.create(extended_object=page, **extension_args)
+
+    publish_page(page, language, user=user)
+    return page
+
+
+def get_or_create_redirect_page(
+    *,
+    user,
+    reverse_id: str,
+    title: str,
+    redirect_url: str,
+    extension_args: dict | None = None,
+    parent_page: Page | None = None,
+    language: str = DEFAULT_LANGUAGE,
+) -> Page:
+    """
+    Return the redirect page identified by `reverse_id`, creating it if needed.
+
+    If it exists, overwrites its title, target URL and common extension to match --
+    the same as `get_or_create_apphook_page` does for an apphook page.
+    """
+    page = Page.objects.filter(reverse_id=reverse_id).first()
+    if page is None:
+        return create_redirect_page(
+            user=user,
+            title=title,
+            redirect_url=redirect_url,
+            reverse_id=reverse_id,
+            extension_args=extension_args,
+            parent_page=parent_page,
+            language=language,
+        )
+
+    _sync_redirect_page_content(
+        page, title=title, redirect_url=redirect_url, user=user, language=language
+    )
+
+    if extension_args:
+        extension, _ = CommonExtension.objects.get_or_create(extended_object=page)
+        for field, value in extension_args.items():
+            setattr(extension, field, value)
+        extension.save()
+
+    return page
