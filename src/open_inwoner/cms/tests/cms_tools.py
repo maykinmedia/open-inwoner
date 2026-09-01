@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.template import Context
 from django.template.defaultfilters import truncatechars
 from django.test import RequestFactory
@@ -136,11 +137,14 @@ def create_homepage():
     """
     helper to create an empty, published homepage
     """
-    p = api.create_page(
-        "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
-    )
-    p.set_as_homepage()
-    publish_page(p, "nl")
+    with transaction.atomic():
+        p = api.create_page(
+            "Home", "cms/fullwidth.html", "nl", in_navigation=True, reverse_id="home"
+        )
+        # set_as_homepage takes a row-level lock on the tree root and asserts it
+        # runs in a transaction, which TransactionTestCase does not provide
+        p.set_as_homepage()
+        publish_page(p, "nl")
     return p
 
 
