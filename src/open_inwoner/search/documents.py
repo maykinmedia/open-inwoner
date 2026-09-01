@@ -124,8 +124,7 @@ class CMSPageDocument(Document):
         return content
 
     def prepare_title(self, instance: Page):
-        # The __str__ method for a page returns the title
-        return str(instance)
+        return instance.get_menu_title(language="nl") or ""
 
     def prepare_url(self, instance: Page):
         return instance.get_absolute_url() or ""
