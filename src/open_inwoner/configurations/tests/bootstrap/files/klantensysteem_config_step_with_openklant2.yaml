@@ -11,3 +11,6 @@ klantensysteem_config:
     mijn_vragen_actor: e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b
     interne_taak_gevraagde_handeling: Vraag beantwoorden
     interne_taak_toelichting: Vraag via OIP, graag beantwoorden
+    subjects:
+      - subject: Algemene vraag
+      - subject: Klacht
