@@ -13,3 +13,8 @@ klantensysteem_config:
     register_type: bericht
     register_employee_id: '1234'
     use_rsin_for_innNnpId_query_parameter: true
+    subjects:
+      - subject: Algemene vraag
+        esuite_subject_code: algemeen
+      - subject: Klacht
+        esuite_subject_code: klacht

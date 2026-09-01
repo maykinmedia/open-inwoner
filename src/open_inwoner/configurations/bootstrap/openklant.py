@@ -10,15 +10,37 @@ from zgw_consumers.models import Service
 
 from open_inwoner.configurations.bootstrap.utils import get_service
 from open_inwoner.openklant.models import (
+    ContactFormSubject,
     ESuiteKlantConfig,
     KlantenSysteemConfig,
     OpenKlant2Config,
 )
 
 
+class ContactFormSubjectConfigurationModel(ConfigurationModel):
+    """
+    A single selectable subject ("onderwerp") on the contact form.
+
+    `ContactForm` refuses to render without at least one for the active backend
+    (its `subject` field has no choices otherwise), so this is not optional in
+    practice, just modelled as a list for deployments with more than one.
+    """
+
+    subject: str
+    esuite_subject_code: str | None = Field(
+        default=None,
+        description=(
+            "The e-Suite 'onderwerp' code this maps to. Required for an eSuite "
+            "subject; must stay unset for an OpenKlant2 one, since `ContactForm` "
+            "picks the subjects it offers by whether this is set at all."
+        ),
+    )
+
+
 class OpenKlant2ConfigurationModel(ConfigurationModel):
     service_identifier: str = DjangoModelRef(OpenKlant2Config, "service")
     mijn_vragen_actor: UUID4 = DjangoModelRef(OpenKlant2Config, "mijn_vragen_actor")
+    subjects: list[ContactFormSubjectConfigurationModel] | None = Field(default=None)
 
     class Meta:
         django_model_refs = {
@@ -39,6 +61,7 @@ class EsuiteKlantConfigurationModel(ConfigurationModel):
         "exclude_contactmoment_kanalen",
         default=None,
     )
+    subjects: list[ContactFormSubjectConfigurationModel] | None = Field(default=None)
 
     class Meta:
         django_model_refs = {
@@ -138,6 +161,7 @@ class KlantenSysteemConfigurationStep(
             exclude={
                 "klanten_service_identifier",
                 "contactmomenten_service_identifier",
+                "subjects",
             }
         ).items():
             setattr(config, key, val)
@@ -150,6 +174,38 @@ class KlantenSysteemConfigurationStep(
                 "Unable to validate and save ESuiteKlantConfig"
             ) from exc
 
+        self._sync_subjects(model.subjects, esuite_config=config)
+
+    def _sync_subjects(
+        self,
+        subjects: list[ContactFormSubjectConfigurationModel] | None,
+        *,
+        esuite_config: ESuiteKlantConfig | None = None,
+        openklant_config: OpenKlant2Config | None = None,
+    ) -> None:
+        """
+        Replace the contact-form subjects tied to this config to match `subjects`.
+
+        Left alone when `subjects` is omitted (``None``), the same rule this step
+        follows for everything else it doesn't explicitly manage; pass an empty
+        list to clear them instead. Replacing rather than diffing keeps this in
+        line with the rest of the step, which always overwrites to match rather
+        than reconciling field by field.
+        """
+        if subjects is None:
+            return
+
+        ContactFormSubject.objects.filter(
+            esuite_config=esuite_config, openklant_config=openklant_config
+        ).delete()
+        for subject in subjects:
+            ContactFormSubject.objects.create(
+                subject=subject.subject,
+                esuite_subject_code=subject.esuite_subject_code,
+                esuite_config=esuite_config,
+                openklant_config=openklant_config,
+            )
+
     def _configure_openklant2(self, model: OpenKlant2ConfigurationModel):
         """Configure OpenKlant2 APIs"""
         try:
@@ -161,9 +217,9 @@ class KlantenSysteemConfigurationStep(
                 "ers` configuration steps."
             ) from exc
 
-        create_or_update_kwargs = model.model_dump(exclude={"service_identifier"}) | {
-            "service": service
-        }
+        create_or_update_kwargs = model.model_dump(
+            exclude={"service_identifier", "subjects"}
+        ) | {"service": service}
 
         config = OpenKlant2Config.get_solo()
 
@@ -177,3 +233,5 @@ class KlantenSysteemConfigurationStep(
             raise ConfigurationRunFailed(
                 "Unable to validate and save OpenKlant2Config"
             ) from exc
+
+        self._sync_subjects(model.subjects, openklant_config=config)
