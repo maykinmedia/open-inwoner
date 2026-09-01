@@ -327,6 +327,17 @@ cms_pages_config:
     title: Mijn afval
     requires_auth: true
     menu_icon: delete
+  # "Mijn vragen" has no apphook of its own -- its views live inside the `cases`
+  # app (`cases:contactmoment_list`), reachable so far only from a card on the
+  # profile page. This adds it as its own page-tree node purely so the sidenav
+  # (built from the page tree, see `SideNavMenuData`) gets an entry for it too.
+  mijn_vragen:
+    enabled: true
+    title: Mijn vragen
+    redirect_url_name: cases:contactmoment_list
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: help_outline
 
 # Set default (staff) users
 default_user_configuration_enable: true
