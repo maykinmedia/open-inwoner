@@ -1,3 +1,5 @@
+import uuid
+
 from django.test import TestCase, TransactionTestCase
 
 from zgw_consumers.constants import APITypes
@@ -205,7 +207,7 @@ class NotificationRecordLockManagerTestCase(TransactionTestCase):
     def test_lock_for_processing_record_does_not_exist(self):
         """Test that locking non-existent record raises DoesNotExist"""
         with self.assertRaises(NotificationRecord.DoesNotExist):
-            with NotificationRecord.objects.lock_for_processing(99999):
+            with NotificationRecord.objects.lock_for_processing(uuid.uuid4()):
                 pass
 
 
