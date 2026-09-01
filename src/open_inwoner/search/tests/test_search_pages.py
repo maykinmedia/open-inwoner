@@ -31,23 +31,15 @@ class CMSPageSearchTest(ESMixin, TestCase):
 
     def test_search_returns_expected_page(self):
         page_without_title = create_cms_page_with_content(title="", content="")
-        for term, expected_page, expected_hit in (
-            (
-                "foo",
-                self.foo_page,
-                GenericHit(title="foo page", summary="", link="/foo-page/"),
-            ),
-            (
-                "bar",
-                self.bar_page,
-                GenericHit(title="bar page", summary="", link="/bar-page/"),
-            ),
+        for term, expected_hit in (
+            ("foo", GenericHit(title="foo page", summary="", link="/foo-page/")),
+            ("bar", GenericHit(title="bar page", summary="", link="/bar-page/")),
         ):
             with self.subTest(term):
                 _, pages_result = multi_search(term)
                 self.assertEqual(
                     [r.title for r in pages_result.results if r.title],
-                    [str(expected_page)],
+                    [expected_hit.title],
                 )
                 self.assertEqual(pages_result.get_generic_hits(), [expected_hit])
                 self.assertNotIn(page_without_title, pages_result.results)
@@ -58,7 +50,7 @@ class CMSPageSearchTest(ESMixin, TestCase):
 
         response = Search(index=settings.ES_INDEX_CMS_PAGES).execute()
 
-        self.assertEqual([r.title for r in response.hits], [str(self.bar_page)])
+        self.assertEqual([r.title for r in response.hits], ["bar page"])
 
     def test_no_pages_are_indexed_when_config_flag_is_false(self):
         site_config = SiteConfiguration.get_solo()
