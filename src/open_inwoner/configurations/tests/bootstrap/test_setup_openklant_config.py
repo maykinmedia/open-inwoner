@@ -11,6 +11,7 @@ from open_inwoner.configurations.bootstrap.openklant import (
 )
 from open_inwoner.openklant.constants import KlantenServiceType
 from open_inwoner.openklant.models import (
+    ContactFormSubject,
     ESuiteKlantConfig,
     KlantenSysteemConfig,
     OpenKlant2Config,
@@ -104,6 +105,55 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         self.assertEqual(esuite_config.register_type, "bericht")
         self.assertEqual(esuite_config.register_employee_id, "1234")
         self.assertEqual(esuite_config.use_rsin_for_innNnpId_query_parameter, True)
+
+        subjects = list(
+            ContactFormSubject.objects.filter(esuite_config=esuite_config).order_by(
+                "order"
+            )
+        )
+        self.assertEqual([s.subject for s in subjects], ["Algemene vraag", "Klacht"])
+        self.assertEqual(
+            [s.esuite_subject_code for s in subjects], ["algemeen", "klacht"]
+        )
+
+    def test_configure_esuite_subjects_clear_orphaned_pre_migration_rows(self):
+        """
+        A subject created before the migration that added `esuite_config`/
+        `openklant_config` has both FKs unset, yet `ContactForm` still offers it
+        to whichever backend matches on `esuite_subject_code` alone -- so a
+        re-run must clear those too, not just the ones already tied to this
+        config, or the eventual subject list won't match what was configured.
+        """
+        ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+        ServiceFactory(
+            slug="contactmomenten-service",
+            api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
+            api_type=APITypes.cmc,
+        )
+        orphaned_esuite_subject = ContactFormSubject.objects.create(
+            subject="Orphaned e-Suite subject", esuite_subject_code="orphaned"
+        )
+        orphaned_openklant2_subject = ContactFormSubject.objects.create(
+            subject="Orphaned OpenKlant2 subject"
+        )
+
+        execute_single_step(
+            KlantenSysteemConfigurationStep,
+            yaml_source=KLANTENSYSTEEM_CONFIG_STEP_WITH_ESUITE_YAML,
+        )
+
+        self.assertFalse(
+            ContactFormSubject.objects.filter(pk=orphaned_esuite_subject.pk).exists()
+        )
+        self.assertTrue(
+            ContactFormSubject.objects.filter(
+                pk=orphaned_openklant2_subject.pk
+            ).exists()
+        )
 
     def test_configure_esuite_fails_with_nonexistent_service_identifiers(self):
         ServiceFactory(
@@ -267,6 +317,82 @@ class KlantenSysteemConfigurationStepTest(TestCase):
             "Vraag via OIP, graag beantwoorden",
         )
 
+        subjects = list(
+            ContactFormSubject.objects.filter(
+                openklant_config=openklant2_config
+            ).order_by("order")
+        )
+        self.assertEqual([s.subject for s in subjects], ["Algemene vraag", "Klacht"])
+        self.assertTrue(all(s.esuite_subject_code is None for s in subjects))
+
+    def test_configure_openklant2_subjects_are_replaced_on_rerun(self):
+        """
+        A re-run with a different subject list replaces the old one rather than
+        appending to it -- and rather than leaving it as the admin may have
+        edited it, the same rule the rest of this step follows.
+        """
+        ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+        execute_single_step(
+            KlantenSysteemConfigurationStep,
+            yaml_source=KLANTENSYSTEEM_CONFIG_STEP_WITH_OPENKLANT2_YAML,
+        )
+        config = OpenKlant2Config.get_solo()
+        ContactFormSubject.objects.create(
+            subject="Admin-added subject", openklant_config=config
+        )
+
+        execute_single_step(
+            KlantenSysteemConfigurationStep,
+            yaml_source=KLANTENSYSTEEM_CONFIG_STEP_WITH_OPENKLANT2_YAML,
+        )
+
+        subjects = ContactFormSubject.objects.filter(openklant_config=config)
+        self.assertEqual(
+            sorted(s.subject for s in subjects), ["Algemene vraag", "Klacht"]
+        )
+
+    def test_configure_openklant2_subjects_omitted_leaves_existing_alone(self):
+        """
+        Subjects are only touched when the config says something about them --
+        the same "omitted means leave it alone" rule as everywhere else in
+        setup-configuration that doesn't overwrite unconditionally.
+        """
+        kc = ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+        execute_single_step(
+            KlantenSysteemConfigurationStep,
+            yaml_source=KLANTENSYSTEEM_CONFIG_STEP_WITH_OPENKLANT2_YAML,
+        )
+        config = OpenKlant2Config.get_solo()
+
+        execute_single_step(
+            KlantenSysteemConfigurationStep,
+            object_source={
+                "klantensysteem_config_enable": True,
+                "klantensysteem_config": {
+                    "primary_backend": "openklant2",
+                    "register_contact_via_api": True,
+                    "register_contact_email": "oip-test@test.nl",
+                    "openklant2_config": {
+                        "service_identifier": kc.slug,
+                        "mijn_vragen_actor": "e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b",
+                    },
+                },
+            },
+        )
+
+        subjects = ContactFormSubject.objects.filter(openklant_config=config)
+        self.assertEqual(
+            sorted(s.subject for s in subjects), ["Algemene vraag", "Klacht"]
+        )
+
     def test_configure_openklant2_is_idempotent_and_overwrites_modified_values(self):
         kc = ServiceFactory(
             slug="klanten-service",
@@ -310,3 +436,99 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
         assert_values()
+
+
+class SyncSubjectsBackendMismatchTest(TestCase):
+    """
+    `esuite_subject_code` is what `ContactForm` uses to decide which backend a
+    subject belongs to (see `ContactFormSubjectConfigurationModel`'s docstring),
+    so a subject with the field set on the OpenKlant2 side, or unset on the
+    e-Suite side, would silently never be offered by the form it was configured
+    for. `_sync_subjects` rejects that before writing anything, rather than as a
+    pydantic validator: `ContactFormSubjectConfigurationModel` is shared between
+    both backends' config models, and the sphinx directive that renders this
+    step's example YAML instantiates it in isolation, so a validator rejecting
+    the combination in one context would also reject the auto-generated example
+    for the other.
+    """
+
+    def test_configure_openklant2_fails_when_a_subject_has_an_esuite_subject_code(
+        self,
+    ):
+        ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+
+        with self.assertRaises(ConfigurationRunFailed) as exc:
+            execute_single_step(
+                KlantenSysteemConfigurationStep,
+                object_source={
+                    "klantensysteem_config_enable": True,
+                    "klantensysteem_config": {
+                        "primary_backend": "openklant2",
+                        "register_contact_via_api": True,
+                        "register_contact_email": "oip-test@test.nl",
+                        "openklant2_config": {
+                            "service_identifier": "klanten-service",
+                            "mijn_vragen_actor": (
+                                "e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b"
+                            ),
+                            "subjects": [
+                                {
+                                    "subject": "Algemene vraag",
+                                    "esuite_subject_code": "algemeen",
+                                }
+                            ],
+                        },
+                    },
+                },
+            )
+
+        self.assertIn("openklant2_config", str(exc.exception))
+        self.assertIn("Algemene vraag", str(exc.exception))
+        self.assertFalse(ContactFormSubject.objects.exists())
+
+    def test_configure_esuite_fails_when_a_subject_is_missing_an_esuite_subject_code(
+        self,
+    ):
+        ServiceFactory(
+            slug="klanten-service",
+            api_root=KLANTEN_SERVICE_API_ROOT,
+            api_type=APITypes.kc,
+        )
+        ServiceFactory(
+            slug="contactmomenten-service",
+            api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
+            api_type=APITypes.cmc,
+        )
+
+        with self.assertRaises(ConfigurationRunFailed) as exc:
+            execute_single_step(
+                KlantenSysteemConfigurationStep,
+                object_source={
+                    "klantensysteem_config_enable": True,
+                    "klantensysteem_config": {
+                        "primary_backend": "esuite",
+                        "register_contact_via_api": True,
+                        "register_contact_email": "oip-test@test.nl",
+                        "esuite_config": {
+                            "klanten_service_identifier": "klanten-service",
+                            "contactmomenten_service_identifier": (
+                                "contactmomenten-service"
+                            ),
+                            "register_bronorganisatie_rsin": "837194569",
+                            "register_channel": "email",
+                            "register_type": "bericht",
+                            "register_employee_id": "1234",
+                            "use_rsin_for_innNnpId_query_parameter": True,
+                            "subjects": [{"subject": "Algemene vraag"}],
+                        },
+                    },
+                },
+            )
+
+        self.assertIn("esuite_config", str(exc.exception))
+        self.assertIn("Algemene vraag", str(exc.exception))
+        self.assertFalse(ContactFormSubject.objects.exists())
