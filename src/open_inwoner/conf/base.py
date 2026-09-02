@@ -1029,6 +1029,7 @@ CMS_CONFIRM_VERSION4 = True
 # This project uses email as the User.USERNAME_FIELD (no 'username' column).
 # djangocms-versioning defaults to 'username' — override it here.
 DJANGOCMS_VERSIONING_USERNAME_FIELD = "email"
+DJANGOCMS_VERSIONING_ALLOW_DELETING_VERSIONS = True
 
 DJANGOCMS_LINK_TEMPLATES = [
     ("arrow", _("Arrow")),
