@@ -120,6 +120,20 @@ export const UnknownContainerType: Story = {
   },
 };
 
+export const WithoutCosts: Story = {
+  name: 'Without costs (weight trend line only)',
+  args: {
+    period: 'month',
+    data: data.map((obj) => ({
+      ...obj,
+      containers: obj.containers.map((container) => ({
+        ...container,
+        ledigingen: container.ledigingen.map(({ kosten, ...rest }) => rest),
+      })),
+    })),
+  },
+};
+
 // ============================================
 // Web Component
 // ============================================

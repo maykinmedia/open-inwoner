@@ -3,6 +3,7 @@ export interface AfvalLediging {
   tijdstip_datum: string;
   tijdstip_tijd?: string;
   gewicht: string;
+  kosten?: string;
 }
 
 export interface AfvalContainer {
@@ -27,6 +28,15 @@ export interface ChartDataPoint {
   x: string;
   y: number | null;
 }
+
+/** Cumulative trend line series, keyed by the unit they track. */
+export interface Trends {
+  weight: ChartDataPoint[];
+  cost: ChartDataPoint[];
+}
+
+/** Localized legend labels for the trend lines in {@link Trends}. */
+export type TrendLabels = Record<keyof Trends, string>;
 
 export interface ContainerSeries {
   type: string;
