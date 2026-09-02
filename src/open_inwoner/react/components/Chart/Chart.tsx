@@ -16,7 +16,7 @@ export interface IChartProps {
 
 const OIPChart: AC<IChartProps> = ({ data, period = 'month', dataId }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<Chart<'bar', ChartDataPoint[]> | null>(null);
+  const chartRef = useRef<Chart<'bar' | 'line', ChartDataPoint[]> | null>(null);
 
   // Generate chart configuration using custom hook
   const config = useChart(data, dataId, period);
