@@ -1,0 +1,90 @@
+/**
+ * Light/default theme implementation.
+ *
+ * Use this as:
+ *
+ *   @use './themes/light' as light-theme;
+ *
+ *   @include light-theme.styles;
+ */
+
+/**
+ * Define the CSS properties overriding default admin theme.
+ *
+ * See `admin/static/admin/css/base.css` for a reference of available variables.
+ */
+@mixin variables {
+  --primary: #04a5bb;
+  --accent: #f3f3f3;
+  --secondary: #04a5bb;
+  --primary-fg: #fff;
+
+  --header-color: #fff;
+
+  --breadcrumbs-fg: #04a5bb;
+  --breadcrumbs-link-fg: var(--body-fg);
+  --breadcrumbs-bg: #f3f3f3;
+
+  --link-fg: #017092;
+  --link-hover-color: #051f31;
+  --link-selected-fg: #5b80b2;
+
+  // override for more contrast
+  --hairline-color: #e5e5e5;
+
+  --button-fg: #fff;
+  --button-hover-bg: #017092;
+  --default-button-bg: #017092;
+  --default-button-hover-bg: #000;
+  --close-button-bg: #888;
+  --close-button-hover-bg: #333;
+
+  --object-tools-bg: #888;
+  --object-tools-hover-bg: #333;
+}
+
+/**
+ * Custom CSS properties to override the default admin theme, with variables *not*
+ * defined in core django admin CSS.
+ */
+@mixin custom-variables {
+  --breadcrumbs-link-hover: #000;
+  --calendar-widget-background: #ddd;
+  --calendar-widget-color: #333;
+}
+
+/**
+ * Define the CSS properties overriding default django-admin-index theme.
+ */
+@mixin djai-variables {
+  --djai-tab-bg: var(--primary); // no fallback to default admin vars
+  --djai-tab-bg--active: var(--breadcrumbs-bg);
+  --djai-tab-bg--hover: #017092;
+  --djai-tab-fg--active: var(--secondary);
+  --djai-dropdown-bg--active: #017092;
+  --djai-dropdown-bg--hover: #017092;
+
+  // custom properties
+  --custom-djai-border-bottom-width: 8px;
+  --custom-djai-border-bottom-color: #f3f3f3;
+}
+
+/**
+ * Aggregate the bits and pieces to define the light theme style rules.
+ *
+ * The light theme styles are not guarded by a media query to make sure they're the
+ * default that is applied.
+ */
+@mixin styles {
+  html[data-theme='light'],
+  :root {
+    @include variables;
+    @include custom-variables;
+  }
+
+  // generic selector to be more specific than the library itself, but less specific
+  // than the dark theme styles
+  body {
+    @include djai-variables;
+  }
+}

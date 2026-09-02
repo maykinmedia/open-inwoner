@@ -1,26 +1,15 @@
-/* Colors */
-$color_primary: #04a5bb;
-$color_primary_dark: #017092;
-$color_primary_light: #c3eaef;
+@use './themes/dark' as dark-theme;
+@use './themes/light' as light-theme;
 
-$color_secondary: #f3f3f3;
-$color_secondary_dark: #ddd;
-$color_secondary_light: #fff;
+/**
+ * Dark/light theme specific variables should typically be specified in their
+ * respective `./themes/[theme].scss` files!
+ */
 
-$color_link: #017092;
-$color_link_hover: #051f31;
+:root {
+  /* Form input element dimensions */
+  --input-field-size: 40em; // django-original: 20em;
+}
 
-$color_darkest: #000;
-$color_dark: #333;
-$color_lightest: #fff;
-
-$color-error: #ba2121; // default django admin color
-$color-warning: #fd7e14; // Warning orange
-$color-success: #28a745; // Success green
-
-$color-tooltip-background: #fffeaa;
-$color-tooltip-border: #f7f071;
-$color-tooltip-text: #000;
-
-/* Dimensions */
-$input-field-size: 40em; // original: 20em;
+@include light-theme.styles;
+@include dark-theme.styles;
