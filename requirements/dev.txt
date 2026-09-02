@@ -600,7 +600,7 @@ djangocms-versioning==2.5.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-djangorestframework==3.16.1
+djangorestframework==3.18.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
