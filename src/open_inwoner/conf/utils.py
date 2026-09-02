@@ -37,11 +37,19 @@ def get_sentry_integrations() -> list:
     return [*default, *extra]
 
 
-def _get_version_from_file():
+def _get_version_from_file(base_dir=None):
     """
     Returns a commit hash from the project's .git/ dir if it exists
+
+    ``base_dir`` defaults to ``settings.BASE_DIR``. Pass it explicitly when
+    calling this from settings module code itself (e.g. to derive ``GIT_SHA``) -
+    touching ``django.conf.settings`` while it's still being constructed for the
+    first time causes Django to silently reconstruct it from a half-initialized
+    module, permanently losing settings defined after this point.
     """
-    heads_dir = os.path.join(settings.BASE_DIR, ".git", "refs", "heads")
+    if base_dir is None:
+        base_dir = settings.BASE_DIR
+    heads_dir = os.path.join(base_dir, ".git", "refs", "heads")
 
     try:
         heads = os.listdir(heads_dir)
@@ -88,7 +96,7 @@ def _get_version_from_git():
     return commit or ""
 
 
-def get_current_version():
+def get_current_version(base_dir=None):
     version = config("VERSION_TAG", default=None)
 
     if version:
@@ -96,4 +104,4 @@ def get_current_version():
     elif which("git"):
         return _get_version_from_git()
 
-    return _get_version_from_file()
+    return _get_version_from_file(base_dir)
