@@ -14,7 +14,7 @@ from maykin_common.config import DocumentationParams, config
 from maykin_common.health_checks import default_health_check_apps
 
 from .structlog_sentry import SentryStructlogProcessor
-from .utils import get_sentry_integrations
+from .utils import get_current_version, get_sentry_integrations
 
 # django.utils.timezone.utc was removed in Django 5.0. Restore it as a
 # compatibility shim for third-party packages (e.g. zgw-consumers-oas) that
@@ -390,6 +390,7 @@ INSTALLED_APPS = [
     *default_health_check_apps,
     "maykin_common.health_checks.celery",
     "maykin_config_checks",
+    "maykin_common",
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
@@ -932,6 +933,12 @@ ENVIRONMENT = config(
         group="Monitoring",
     ),
 )
+# Displaying environment information in the admin
+ENVIRONMENT_LABEL = config("ENVIRONMENT_LABEL", default=ENVIRONMENT)
+ENVIRONMENT_BACKGROUND_COLOR = config("ENVIRONMENT_BACKGROUND_COLOR", default="orange")
+ENVIRONMENT_FOREGROUND_COLOR = config("ENVIRONMENT_FOREGROUND_COLOR", default="black")
+SHOW_ENVIRONMENT = config("SHOW_ENVIRONMENT", default=True)
+GIT_SHA = get_current_version()
 SHOW_ALERT = True
 
 ##############################
