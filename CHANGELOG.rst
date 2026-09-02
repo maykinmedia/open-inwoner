@@ -275,7 +275,10 @@ Bugfixes
   gedeeltelijke API- of database-fouten (de strengere foutafhandeling uit
   :gh:`2581` is teruggedraaid).
 * [:gh:`2673`]: Document-eigendom wordt nu afgedwongen bij het downloaden
-  van bestanden via de inbox.
+  van bestanden via de inbox. Met dank aan `@Santoshkumarpuppala
+  <https://github.com/Santoshkumarpuppala>`_ en `White Hat Security
+  <https://www.whitehatsecurity.nl/>`_ voor het rapporteren van dit
+  issue.
 * [:gh:`2619`]: Celery health checks zijn gemigreerd naar de
   implementatie uit maykin-common 0.19.0 (de oude implementatie bevatte
   een padfout waardoor de check nooit slaagde).
