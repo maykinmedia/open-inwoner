@@ -938,7 +938,9 @@ ENVIRONMENT_LABEL = config("ENVIRONMENT_LABEL", default=ENVIRONMENT)
 ENVIRONMENT_BACKGROUND_COLOR = config("ENVIRONMENT_BACKGROUND_COLOR", default="orange")
 ENVIRONMENT_FOREGROUND_COLOR = config("ENVIRONMENT_FOREGROUND_COLOR", default="black")
 SHOW_ENVIRONMENT = config("SHOW_ENVIRONMENT", default=True)
-GIT_SHA = get_current_version()
+# The Docker image sets this explicitly at build time (see Dockerfile's
+# COMMIT_HASH build arg); fall back to git introspection for local development.
+GIT_SHA = os.getenv("GIT_SHA") or get_current_version()
 SHOW_ALERT = True
 
 ##############################
