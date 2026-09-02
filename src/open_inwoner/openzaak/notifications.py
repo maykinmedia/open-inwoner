@@ -1,4 +1,7 @@
+import enum
+from dataclasses import dataclass, field
 from datetime import date, timedelta
+from typing import Any, Generic, TypeVar
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -41,12 +44,89 @@ logger = structlog.stdlib.get_logger(__name__)
 _log_helper = WebhookLogMixin()
 
 
+T = TypeVar("T")
+
+
+class NotificationOutcome(enum.Enum):
+    """Whether a notification-processing step was ignored or went ahead"""
+
+    IGNORED = "ignored"
+    PROCESSED = "processed"
+
+
+@dataclass(frozen=True)
+class NotificationProcessingResult(Generic[T]):
+    """
+    Outcome of (a step in) handling a notification.
+
+    `outcome` dictates control flow at the caller: `IGNORED` means the caller
+    should stop and report `message` (why it was ignored); `PROCESSED` means
+    `value` holds whatever was checked/produced, and the caller should
+    continue using it.
+
+    `str()` renders `message` plus optional structured `context` as a single
+    human-readable line - this is what callers (e.g. the
+    `process_zaken_notification` task) store on the NotificationRecord as
+    `processing_output`.
+    """
+
+    outcome: NotificationOutcome
+    message: str
+    value: T | None = None
+    level: str = "info"
+    context: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def ignored(self) -> bool:
+        return self.outcome is NotificationOutcome.IGNORED
+
+    def __str__(self) -> str:
+        if not self.context:
+            return self.message
+        detail = ", ".join(f"{k}={v}" for k, v in self.context.items())
+        return f"{self.message} ({detail})"
+
+    @classmethod
+    def ignore(
+        cls, message: str, *, level: str = "info", **context
+    ) -> "NotificationProcessingResult":
+        """
+        Log `message` (with structured `context`) at `level`, then return it as
+        a result explaining why the notification was ignored.
+        """
+        getattr(logger, level)(message, **context)
+        return cls(NotificationOutcome.IGNORED, message, level=level, context=context)
+
+    @classmethod
+    def ok(cls, value: T) -> "NotificationProcessingResult[T]":
+        """
+        Continue processing with `value` - nothing to report, so nothing is logged.
+        """
+        return cls(NotificationOutcome.PROCESSED, "", value=value)
+
+    @classmethod
+    def processed(cls, message: str, **context) -> "NotificationProcessingResult":
+        """
+        Log `message` (with structured `context`), then return it as a result
+        summarizing what was done.
+        """
+        logger.info(message, **context)
+        return cls(NotificationOutcome.PROCESSED, message, context=context)
+
+
 # TODO: check siteconfig for notification enabled
-def handle_zaken_notification(notification: Notification):
+def handle_zaken_notification(
+    notification: Notification,
+) -> NotificationProcessingResult:
     """
     Perform basic checks, then dispatch to
         - `handle_status_notification` or
         - `handle_zaakinformatieobject_notification`
+
+    Returns a `NotificationProcessingResult` describing the outcome: why the
+    notification was ignored, or a short summary of what was done. Callers
+    (e.g. the `process_zaken_notification` task) format this and store it on
+    the NotificationRecord as `processing_output`.
     """
     if notification.kanaal != "zaken":
         raise Exception(
@@ -61,19 +141,21 @@ def handle_zaken_notification(notification: Notification):
     r = notification.resource  # short alias for logging
 
     if notification.resource not in resources:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: resource is not one of the expected resources",
             resource=r,
             expected_resources=resources,
             zaak_url=zaak_url,
         )
-        return
 
     try:
         api_group = ZGWApiGroupConfig.objects.resolve_group_from_hints(url=zaak_url)
     except ZGWApiGroupConfig.DoesNotExist:
-        logger.error("No API group defined for zaak", zaak_url=zaak_url)
-        return
+        return NotificationProcessingResult.ignore(
+            "ignored notification: no API group configured for zaak",
+            level="error",
+            zaak_url=zaak_url,
+        )
 
     service = ZGWService(use_cache=False)
 
@@ -83,12 +165,11 @@ def handle_zaken_notification(notification: Notification):
     except (ZgwAPIError, RequestException):
         # NOTE this used to be logger.error, but as this is also our first call
         # we get a lot of 403 "Niet geautoriseerd voor zaaktype"
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve rollen for zaak",
             resource=r,
             zaak_url=zaak_url,
         )
-        return
 
     config = OpenZaakConfig.get_solo()
     inform_users = _get_initiator_users_from_roles(
@@ -97,50 +178,48 @@ def handle_zaken_notification(notification: Notification):
         limit_access_to_role=config.limit_user_visible_cases_to_role,
     )
     if not inform_users:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: no users with bsn/nnp_id as (mede)initiators in zaak",
             resource=r,
             zaak_url=zaak_url,
         )
-        return
 
     # check if this case is visible
     try:
         zaak = service.fetch_zaak_by_url(zaak_url, api_group)
     except (ZgwAPIError, RequestException):
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve zaak",
+            level="error",
             resource=r,
             zaak_url=zaak_url,
         )
-        return
 
     zaaktype_url = zaak.zaaktype  # URL string before resolution
     try:
         zaaktype = service.fetch_zaaktype_by_url(zaaktype_url, api_group)
     except (ZgwAPIError, RequestException):
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve zaaktype",
+            level="error",
             resource=r,
             zaaktype_url=zaaktype_url,
         )
-        return
     zaak.zaaktype = zaaktype
 
     if not service._is_zaak_visible(zaak)[0]:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: zaak not visible after applying website visibility filter",
             resource=r,
             zaak_url=zaak_url,
         )
-        return
 
     if notification.resource == "status":
-        _handle_status_notification(
+        return _handle_status_notification(
             notification, zaak, inform_users, api_group, service
         )
     elif notification.resource == "zaakinformatieobject":
-        _handle_zaakinformatieobject_notification(
+        return _handle_zaakinformatieobject_notification(
             notification, zaak, inform_users, api_group
         )
     else:
@@ -211,7 +290,7 @@ def _handle_zaakinformatieobject_notification(
     zaak: Zaak,
     inform_users: list[User],
     api_group: ZGWApiGroupConfig,
-):
+) -> NotificationProcessingResult:
     oz_config = api_group.open_zaak_config
     r = notification.resource  # short alias for logging
 
@@ -222,26 +301,26 @@ def _handle_zaakinformatieobject_notification(
     try:
         ziobj = service.fetch_single_zaak_information_object(ziobj_url, api_group)
     except (ZgwAPIError, RequestException):
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve zaakinformatieobject",
+            level="error",
             resource=r,
             ziobj_url=ziobj_url,
             zaak_url=zaak.url,
         )
-        return
 
     try:
         info_object = service.fetch_information_object_by_url(
             ziobj.informatieobject, api_group
         )
     except ZgwAPIError:
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve informatieobject",
+            level="error",
             resource=r,
             informatieobject_url=ziobj.informatieobject,
             zaak_url=zaak.url,
         )
-        return
 
     ziobj.informatieobject = info_object
 
@@ -250,28 +329,26 @@ def _handle_zaakinformatieobject_notification(
         oz_config.document_max_confidentiality,
         oz_config.document_visible_statuses,
     ):
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: informatieobject not visible after applying "
             "website visibility filter",
             resource=r,
             zaak_url=zaak.url,
         )
-        return
 
     # NOTE for documents we don't check the statustype.informeren
     ztiotc = get_zaak_type_info_object_type_config(
         zaak.zaaktype, info_object.informatieobjecttype
     )
     if not ztiotc:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve info_type configuration",
             resource=r,
             informatieobjecttype=info_object.informatieobjecttype,
             zaak_url=zaak.url,
         )
-        return
     elif not ztiotc.document_notification_enabled:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: info_type configuration found but "
             "'document_notification_enabled' is False",
             resource=r,
@@ -279,12 +356,17 @@ def _handle_zaakinformatieobject_notification(
             informatieobjecttype=info_object.informatieobjecttype,
             zaak_url=zaak.url,
         )
-        return
 
     # reaching here means we're going to inform users
     _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
     for user in inform_users:
         _handle_zaakinformatieobject_update(notification, user, zaak, ziobj, api_group)
+
+    return NotificationProcessingResult.processed(
+        "processed zaakinformatieobject notification for zaak",
+        zaak_url=zaak.url,
+        informed_users=len(inform_users),
+    )
 
 
 def _handle_zaakinformatieobject_update(
@@ -341,7 +423,7 @@ def _check_status_history(
     zaak: Zaak,
     service: ZGWService,
     api_group: ZGWApiGroupConfig,
-) -> list[Status] | None:
+) -> NotificationProcessingResult[list[Status]]:
     """
     Check if more than one status exists for `zaak` (else notifications are skipped)
     """
@@ -349,30 +431,29 @@ def _check_status_history(
     try:
         status_history = service.fetch_status_history(zaak.url, api_group)
     except (ZgwAPIError, RequestException):
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve status_history for zaak",
+            level="error",
             resource=resource,
             zaak_url=zaak.url,
         )
-        return None
 
     if not status_history:
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve status_history for zaak",
+            level="error",
             resource=resource,
             zaak_url=zaak.url,
         )
-        return None
 
     if len(status_history) == 1:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: skip initial status notification for zaak",
             resource=resource,
             zaak_url=zaak.url,
         )
-        return None
 
-    return status_history
+    return NotificationProcessingResult.ok(status_history)
 
 
 def _check_status(
@@ -381,7 +462,7 @@ def _check_status(
     status_history: list[Status],
     service: ZGWService,
     api_group: ZGWApiGroupConfig,
-) -> Status | None:
+) -> NotificationProcessingResult[Status]:
     """
     Check if this is a status we want to inform on
     """
@@ -397,15 +478,15 @@ def _check_status(
         status = service.fetch_single_status(status_url, api_group)
 
     if not status:
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve status for zaak",
+            level="error",
             resource=resource,
             status_url=status_url,
             zaak_url=zaak.url,
         )
-        return None
 
-    return status
+    return NotificationProcessingResult.ok(status)
 
 
 def _check_status_type(
@@ -415,7 +496,7 @@ def _check_status_type(
     oz_config: OpenZaakConfig,
     service: ZGWService,
     api_group: ZGWApiGroupConfig,
-) -> StatusType | None:
+) -> NotificationProcessingResult[StatusType]:
     """
     Check if a status_type exists for `status` and if notifications are enabled
     """
@@ -424,34 +505,33 @@ def _check_status_type(
     try:
         status_type = service.fetch_single_status_type(status.statustype, api_group)
     except (ZgwAPIError, RequestException):
-        logger.error(
+        return NotificationProcessingResult.ignore(
             "ignored notification: cannot retrieve status_type for zaak",
+            level="error",
             resource=resource,
             statustype_url=status.statustype,
             zaak_url=zaak.url,
         )
-        return None
 
     if (
         not oz_config.skip_notification_statustype_informeren
         and not status_type.informeren
     ):
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: status_type.informeren is false for status and zaak",
             resource=resource,
             status_url=status.url,
             zaak_url=zaak.url,
         )
-        return None
 
-    return status_type
+    return NotificationProcessingResult.ok(status_type)
 
 
 def _check_zaaktype_config(
     notification: Notification,
     zaak: Zaak,
     oz_config: OpenZaakConfig,
-) -> ZaakTypeConfig | None:
+) -> NotificationProcessingResult[ZaakTypeConfig]:
     """
     Check if zaaktype_config exists and notifications are enabled
     """
@@ -460,32 +540,36 @@ def _check_zaaktype_config(
 
     if oz_config.skip_notification_statustype_informeren:
         if not ztc:
-            logger.info(
+            return NotificationProcessingResult.ignore(
                 "ignored notification: 'skip_notification_statustype_informeren' "
                 "is True but cannot retrieve zaaktype configuration for zaak",
                 resource=resource,
                 zaaktype_identificatie=zaak.zaaktype.identificatie,
                 zaak_url=zaak.url,
             )
-            return None
         elif not ztc.notify_status_changes:
-            logger.info(
+            return NotificationProcessingResult.ignore(
                 "ignored notification: zaaktype configuration found but "
                 "'notify_status_changes' is False",
                 resource=resource,
                 zaaktype_identificatie=zaak.zaaktype.identificatie,
                 zaak_url=zaak.url,
             )
-            return None
+    elif not ztc:
+        return NotificationProcessingResult.ignore(
+            "ignored notification: cannot retrieve zaaktype configuration for zaak",
+            resource=resource,
+            zaak_url=zaak.url,
+        )
 
-    return ztc
+    return NotificationProcessingResult.ok(ztc)
 
 
 def _check_statustype_config(
     notification: Notification,
     zaak: Zaak,
     ztc: ZaakTypeConfig,
-) -> ZaakTypeStatusTypeConfig | None:
+) -> NotificationProcessingResult[ZaakTypeStatusTypeConfig]:
     """
     Check if statustype_config exists and notifications are enabled
     """
@@ -497,23 +581,21 @@ def _check_statustype_config(
             zaaktype_config=ztc, statustype_url=statustype_url
         )
     except ZaakTypeStatusTypeConfig.DoesNotExist:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: ZaakTypeStatusTypeConfig could not be found for statustype",
             resource=resource,
             statustype_url=statustype_url,
         )
-        return None
 
     if not statustype_config.notify_status_change:
-        logger.info(
+        return NotificationProcessingResult.ignore(
             "ignored notification: 'notify_status_change' is False for the status "
             "type configuration of the status of this zaak",
             resource=resource,
             zaak_url=zaak.url,
         )
-        return None
 
-    return statustype_config
+    return NotificationProcessingResult.ok(statustype_config)
 
 
 def _check_user_status_notitifactions(
@@ -546,41 +628,50 @@ def _handle_status_notification(
     inform_users: list[User],
     api_group: ZGWApiGroupConfig,
     service: ZGWService,
-):
+) -> NotificationProcessingResult:
     """
     Check status notification settings of user and case-related objects/configs
     """
     oz_config = api_group.open_zaak_config
 
-    if not (
-        status_history := _check_status_history(notification, zaak, service, api_group)
-    ):
-        return
+    result = _check_status_history(notification, zaak, service, api_group)
+    if result.ignored:
+        return result
+    status_history = result.value
 
-    if not (
-        status := _check_status(notification, zaak, status_history, service, api_group)
-    ):
-        return
+    result = _check_status(notification, zaak, status_history, service, api_group)
+    if result.ignored:
+        return result
+    status = result.value
 
-    if not (
-        status_type := _check_status_type(
-            notification, zaak, status, oz_config, service, api_group
-        )
-    ):
-        return
+    result = _check_status_type(
+        notification, zaak, status, oz_config, service, api_group
+    )
+    if result.ignored:
+        return result
+    status_type = result.value
 
-    if not (ztc := _check_zaaktype_config(notification, zaak, oz_config)):
-        return
+    result = _check_zaaktype_config(notification, zaak, oz_config)
+    if result.ignored:
+        return result
+    ztc = result.value
 
     status = service.fetch_single_status(zaak.status, api_group)
     if not status:
         # TODO: check if should we return or continue if the case has no status
-        logger.error("Unable to fetch status", status_url=zaak.status)
-        return
+        return NotificationProcessingResult.ignore(
+            "ignored notification: unable to fetch status for zaak",
+            level="error",
+            resource=notification.resource,
+            status_url=zaak.status,
+            zaak_url=zaak.url,
+        )
 
     zaak.status = status
-    if not (status_type_config := _check_statustype_config(notification, zaak, ztc)):
-        return
+    result = _check_statustype_config(notification, zaak, ztc)
+    if result.ignored:
+        return result
+    status_type_config = result.value
 
     status.statustype = status_type
 
@@ -588,7 +679,13 @@ def _handle_status_notification(
         if not _check_user_status_notitifactions(
             notification, user, zaak, status, status_type_config
         ):
-            return
+            return NotificationProcessingResult.ignore(
+                "ignored notification: user has case notifications disabled or "
+                "no contact email for zaak",
+                resource=notification.resource,
+                user=str(user),
+                zaak_url=zaak.url,
+            )
 
         # all checks have passed
         _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
@@ -596,6 +693,12 @@ def _handle_status_notification(
         _handle_status_update(
             notification, user, zaak, status, status_type_config, api_group
         )
+
+    return NotificationProcessingResult.processed(
+        "processed status notification for zaak",
+        zaak_url=zaak.url,
+        informed_users=len(inform_users),
+    )
 
 
 def _handle_status_update(
