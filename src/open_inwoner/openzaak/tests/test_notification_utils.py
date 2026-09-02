@@ -13,6 +13,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
 from open_inwoner.openzaak.constants import ZaakBetrokkeneRol
 from open_inwoner.openzaak.notifications import (
+    NotificationProcessingResult,
     _get_initiator_users_from_roles,
     _get_nnp_initiator_nnp_id_from_roles,
     _get_np_initiator_bsns_from_roles,
@@ -349,3 +350,62 @@ class NotificationHandlerUtilsTestCase(TestCase):
         )
 
         self.assertEqual(actual, [user_initiator])
+
+
+class NotificationProcessingResultTestCase(TestCase):
+    logger_name = "open_inwoner.openzaak.notifications"
+
+    def test_ignore_logs_at_the_requested_level(self):
+        with self.assertLogs(self.logger_name, level="ERROR") as cm:
+            result = NotificationProcessingResult.ignore(
+                "ignored notification: cannot retrieve zaak",
+                level="error",
+                zaak_url="https://zaken.nl/api/v1/zaken/1234",
+            )
+
+        self.assertTrue(result.ignored)
+        self.assertEqual(result.level, "error")
+        self.assertIn("cannot retrieve zaak", cm.output[0])
+
+    def test_ignore_falls_back_to_info_for_misspelled_level(self):
+        """
+        A misspelled level must not raise. `getattr(logger, "eror")` would,
+        and that propagates out of the handler and records the notification as
+        FAILED, losing the reason it was ignored
+        """
+        with self.assertLogs(self.logger_name, level="INFO") as cm:
+            result = NotificationProcessingResult.ignore(
+                "ignored notification: cannot retrieve zaak",
+                level="eror",
+                zaak_url="https://zaken.nl/api/v1/zaken/1234",
+            )
+
+        # the result is still usable and still explains itself
+        self.assertTrue(result.ignored)
+        self.assertIn("cannot retrieve zaak", str(result))
+
+        logged = "\n".join(cm.output)
+        self.assertIn("unknown log level for notification result", logged)
+        self.assertIn("cannot retrieve zaak", logged)
+
+    def test_ignore_rejects_non_logging_attributes(self):
+        """
+        `bind` is a real logger attribute and callable, so a bare
+        `getattr(logger, level)` would call it and drop the message entirely
+        """
+        with self.assertLogs(self.logger_name, level="INFO") as cm:
+            NotificationProcessingResult.ignore("ignored notification", level="bind")
+
+        logged = "\n".join(cm.output)
+        self.assertIn("unknown log level for notification result", logged)
+        self.assertIn("ignored notification", logged)
+
+    def test_ignore_rejects_deprecated_warn_alias(self):
+        """
+        `warn` works on the logger but is the deprecated stdlib alias; we take
+        canonical names only, and say so rather than downgrading silently
+        """
+        with self.assertLogs(self.logger_name, level="INFO") as cm:
+            NotificationProcessingResult.ignore("ignored notification", level="warn")
+
+        self.assertIn("unknown log level for notification result", "\n".join(cm.output))
