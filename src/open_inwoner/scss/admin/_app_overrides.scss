@@ -3,36 +3,37 @@
 
  Generic overrides should go in _admin_theme.scss
  */
-@use './_vars' as *;
 
 /**
  * DJANGO ADMIN INDEX
  */
-body {
-  --djai-tab-bg: #{$color-primary}; // no fallback to default admin vars
-  --djai-tab-bg--active: #{$color-secondary};
-  --djai-tab-bg--hover: #{$color-primary-dark};
-  --djai-tab-fg--active: #{$color-primary};
-  --djai-dropdown-bg--active: var(--color-primary);
-  --djai-dropdown-bg--hover: #{$color-primary};
-}
-
-$djai-padding: 40px;
-$djai-padding--mobile: 15px;
-$djai-padding--tablet: 30px;
-$djai-border-width: 8px;
-
 .djai-dropdown-menu {
+  // by default, the header has 40px padding on both sides. To make the border stretch
+  // full width, set negative margins and positive paddings. On mobile and tablet these
+  // values are 15px and 30px respectively.
+  --custom-djai-padding: 40px;
+  margin-inline: calc(-1 * var(--custom-djai-padding));
+  padding-inline: var(--custom-djai-padding);
+
   // use full width on mobile & tablet
   width: 100%;
+
+  /* Added to attach to body/breadcrumbs */
+  border-bottom: var(--custom-djai-border-bottom-width) solid
+    var(--custom-djai-border-bottom-color);
 
   & &__drop {
     min-width: 250px !important;
   }
 
+  /* Override for wider filer dropzone Taiga #359 */
+  .js-filer-dropzone {
+    min-width: 600px !important;
+  }
+
   // remove the header padding on mobile and tablet
   @at-root #header {
-    padding-bottom: 0 !important;
+    padding-block-end: 0 !important;
 
     // overwrite admin '#header a:link' rule which is otherwise more specific
     .djai-dropdown-menu .djai-dropdown-menu__item--active:link,
@@ -43,15 +44,33 @@ $djai-border-width: 8px;
         color: var(--djai-tab-fg--hover);
       }
     }
-  }
 
-  /* Override for wider filer dropzone Taiga #359 */
-  .js-filer-dropzone {
-    min-width: 600px !important;
-  }
+    // remove the border height from the breadcrumbs padding
+    @at-root div.breadcrumbs {
+      padding-top: calc(
+        10px - var(--custom-djai-border-bottom-width)
+      ); // 10px is original django value
+    }
 
-  @at-root body.login #header {
-    padding-bottom: 15px !important;
+    @at-root body.login #header {
+      padding-block-end: 15px !important;
+    }
+  }
+}
+
+// See admin/css/responsive.css for the Django admin breakpoints.
+
+@media (max-width: 1024px) {
+  .djai-dropdown-menu {
+    --custom-djai-padding: 30px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+  .djai-dropdown-menu {
+    --custom-djai-padding: 15px;
   }
 }
 
@@ -62,11 +81,10 @@ $djai-border-width: 8px;
  */
 .dynamic-array-widget {
   button {
-    background: $color_primary !important;
-    color: $color_lightest !important;
+    background: var(--primary) !important;
+    color: var(--primary-fg) !important;
     &:hover {
-      background: $color_primary_dark !important;
-      /* border: 2px solid $color_dark !important; */
+      background: var(--link-fg) !important;
     }
 
     /* Substitute theme style above with icon. Solves translation string as well. */
@@ -100,7 +118,7 @@ $djai-border-width: 8px;
 
   .array-item {
     input {
-      width: $input-field-size;
+      width: var(--input-field-size);
     }
   }
 }
@@ -110,4 +128,108 @@ $djai-border-width: 8px;
   text-align: center;
   clear: both;
   padding-top: 1em;
+}
+
+.admin-login-divider {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-block-start: 1em;
+  &:after,
+  &:before {
+    content: '';
+    display: block;
+    border-bottom: 1px solid var(--border-color);
+    flex-grow: 1;
+  }
+  > span {
+    flex-shrink: 0;
+    padding-inline: 10px;
+  }
+}
+
+/**
+ * django-cms page tree
+ * hack to get changelist_view with search styled properly alongside the filter sidebar
+ */
+#changelist-filter {
+  min-height: 100vh;
+}
+
+#content {
+  /* adjusting for django-cms page */
+  #changelist:not([class~='cms-pagetree-root']) {
+    display: block;
+    grid-template-columns: 1fr 260px;
+    gap: 16px;
+
+    @media (min-width: 768px) {
+      display: grid;
+    }
+  }
+
+  #toolbar,
+  .xfull {
+    grid-column: 1/ 3;
+  }
+}
+
+/**
+ * Help text
+ */
+div.help,
+form div.help {
+  font-size: 12px;
+}
+
+/* Additional components seem to need the same behaviour as core's `.aligned label + p` */
+/* TODO: TinyMCE is different... */
+.aligned label + ul {
+  display: inline-block;
+  margin-left: inherit !important;
+}
+
+/* Custom code fields */
+.textfield {
+  &--code {
+    font-family: monospace;
+    font-size: 95%;
+  }
+}
+
+.css-properties-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 2em;
+
+  &__column {
+    font-family: monospace;
+    font-size: 95%;
+  }
+}
+
+// Custom JavaScript status indicators in Django admin
+.js-enabled {
+  color: #28a745; // Success green
+  font-weight: 500;
+
+  &::before {
+    content: '✓ ';
+    font-weight: bold;
+  }
+}
+
+.js-disabled {
+  color: #fd7e14; // Warning orange
+  font-weight: 500;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  display: inline-block;
+
+  &::before {
+    content: '⚠ ';
+    font-weight: bold;
+  }
 }
