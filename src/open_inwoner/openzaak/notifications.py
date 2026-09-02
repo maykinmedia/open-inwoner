@@ -691,19 +691,16 @@ def _handle_status_notification(
 
     status.statustype = status_type
 
+    eligible = 0
     emailed = 0
     for user in inform_users:
         if not _check_user_status_notitifactions(
             notification, user, zaak, status, status_type_config
         ):
-            return NotificationProcessingResult.ignore(
-                "ignored notification: user has case notifications disabled or "
-                "no contact email for zaak",
-                resource=notification.resource,
-                user=str(user),
-                zaak_url=zaak.url,
-            )
+            # a user who opted out must not stop delivery to the other initiators
+            continue
 
+        eligible += 1
         # all checks have passed
         _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
         # TODO: replace with notify_about_status_update(...args, method: Callable)
@@ -711,6 +708,15 @@ def _handle_status_notification(
             notification, user, zaak, status, status_type_config, api_group
         ):
             emailed += 1
+
+    if not eligible:
+        return NotificationProcessingResult.ignore(
+            "ignored notification: no users have case notifications enabled or a "
+            "contact email for zaak",
+            resource=notification.resource,
+            zaak_url=zaak.url,
+            informed_users=len(inform_users),
+        )
 
     return NotificationProcessingResult.processed(
         "processed status notification for zaak",
