@@ -128,6 +128,40 @@ class StatusNotificationHandlerTestCase(
         self.assertIn(data.user_initiator.email, log_dump)
         self.assertIn(data_alt.user_initiator_alt.email, log_dump)
 
+    def test_emailed_users_counts_mails_actually_sent(self, m, mock_handle: Mock):
+        """
+        `informed_users` counts recipients considered, `emailed_users` counts the
+        mails that went out, which is fewer when a recipient is a duplicate or
+        rate limited
+        """
+        data = MockAPIData().install_mocks(m)
+
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+
+        with self.subTest("no mail sent"):
+            mock_handle.return_value = False
+
+            outcome = handle_zaken_notification(data.status_notification)
+
+            self.assertEqual(outcome.context["informed_users"], 1)
+            self.assertEqual(outcome.context["emailed_users"], 0)
+
+        with self.subTest("mail sent"):
+            mock_handle.return_value = True
+
+            outcome = handle_zaken_notification(data.status_notification)
+
+            self.assertEqual(outcome.context["informed_users"], 1)
+            self.assertEqual(outcome.context["emailed_users"], 1)
+
     # start of generic checks
 
     def test_no_api_group_found(self, m, mock_handle: Mock):
@@ -604,7 +638,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # first call
-        _handle_status_update(
+        sent = _handle_status_update(
             data.status_notification,
             user,
             zaak,
@@ -613,6 +647,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
             data.api_group,
         )
 
+        self.assertTrue(sent)
         mock_send.assert_called_once()
         mock_send.assert_called_with(
             user,
@@ -646,7 +681,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # second call with same zaak/status
-        _handle_status_update(
+        sent = _handle_status_update(
             data.status_notification,
             user,
             zaak,
@@ -656,6 +691,7 @@ class NotificationHandlerUserMessageTestCase(AssertTimelineLogMixin, TestCase):
         )
 
         # no duplicate mail for this user/zaak/status
+        self.assertFalse(sent)
         mock_send.assert_not_called()
 
         with self.subTest("mails are throttled based on template_name"):
