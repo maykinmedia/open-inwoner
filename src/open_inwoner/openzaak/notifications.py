@@ -115,7 +115,6 @@ class NotificationProcessingResult(Generic[T]):
         return cls(NotificationOutcome.PROCESSED, message, context=context)
 
 
-# TODO: check siteconfig for notification enabled
 def handle_zaken_notification(
     notification: Notification,
 ) -> NotificationProcessingResult:
