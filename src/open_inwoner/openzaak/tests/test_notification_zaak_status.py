@@ -237,9 +237,10 @@ class StatusNotificationHandlerTestCase(
         # API group is resolved from zaak url == hoofd_object
         data.status_notification.hoofd_object = "http://www.bogus.com"
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no API group configured for zaak", str(outcome))
 
     def test_status_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
         notification = NotificationFactory(kanaal="not_zaken")
@@ -327,9 +328,10 @@ class StatusNotificationHandlerTestCase(
                 json=paginated_response([]),
             )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_status_bails_when_no_emailable_users_are_found_for_roles(
         self, m, mock_handle: Mock
@@ -338,25 +340,28 @@ class StatusNotificationHandlerTestCase(
         data.user_initiator.delete()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_status_bails_when_cannot_fetch_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak"])
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaak", str(outcome))
 
     def test_status_bails_when_cannot_fetch_case_type(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_type"])
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaaktype", str(outcome))
 
     def test_status_bails_when_case_not_visible_because_confidentiality(
         self, m, mock_handle: Mock
@@ -365,9 +370,10 @@ class StatusNotificationHandlerTestCase(
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("zaak not visible after applying website", str(outcome))
 
     def test_status_bails_when_case_not_visible_because_internal_case(
         self, m, mock_handle: Mock
@@ -376,9 +382,10 @@ class StatusNotificationHandlerTestCase(
         data.zaak_type["indicatieInternOfExtern"] = "intern"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("zaak not visible after applying website", str(outcome))
 
     # end of generic checks
 
@@ -436,9 +443,14 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn(
+            "'skip_notification_statustype_informeren' is True but cannot "
+            "retrieve zaaktype configuration",
+            str(outcome),
+        )
 
     def test_status_bails_when_skip_informeren_is_set_and_no_zaaktypeconfig_is_found_from_zaaktype_none_catalog(
         self, m, mock_handle: Mock
@@ -450,9 +462,14 @@ class StatusNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn(
+            "'skip_notification_statustype_informeren' is True but cannot "
+            "retrieve zaaktype configuration",
+            str(outcome),
+        )
 
     def test_status_handle_notification_when_skip_informeren_is_set_and_zaaktypeconfig_is_found(
         self, m, mock_handle: Mock
@@ -522,9 +539,10 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("'notify_status_change' is False", str(outcome))
 
     def test_status_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_found_but_not_set(
         self, m, mock_handle: Mock
@@ -542,9 +560,10 @@ class StatusNotificationHandlerTestCase(
             notify_status_changes=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("'notify_status_changes' is False", str(outcome))
 
     def test_status_bails_when_skip_informeren_is_set_and_zaaktypeconfig_is_not_found_because_different_catalog(
         self, m, mock_handle: Mock
@@ -562,9 +581,14 @@ class StatusNotificationHandlerTestCase(
             notify_status_changes=False,
         )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn(
+            "'skip_notification_statustype_informeren' is True but cannot "
+            "retrieve zaaktype configuration",
+            str(outcome),
+        )
 
     def test_user_status_notifications_disabled(self, m, mock_handle: Mock):
         oz_config = OpenZaakConfig.get_solo()
@@ -579,6 +603,7 @@ class StatusNotificationHandlerTestCase(
         user.save()
 
         ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
@@ -590,9 +615,10 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=True,
         )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users have case notifications enabled", str(outcome))
 
     def test_action_required_notifications_cannot_be_disabled(
         self, m, mock_handle: Mock
@@ -638,6 +664,7 @@ class StatusNotificationHandlerTestCase(
         user.save()
 
         ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
             identificatie=data.zaak_type["identificatie"],
             # set this to notify
             notify_status_changes=True,
@@ -649,9 +676,29 @@ class StatusNotificationHandlerTestCase(
             notify_status_change=True,
         )
 
-        handle_zaken_notification(data.status_notification)
+        outcome = handle_zaken_notification(data.status_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users have case notifications enabled", str(outcome))
+
+    def test_status_bails_when_no_zaaktypeconfig_and_skip_informeren_is_off(
+        self, m, mock_handle: Mock
+    ):
+        """
+        With `skip_notification_statustype_informeren` off, a missing
+        ZaakTypeConfig bails out silently before; now it says so
+        """
+        oz_config = OpenZaakConfig.get_solo()
+        oz_config.skip_notification_statustype_informeren = False
+        oz_config.save()
+
+        data = MockAPIData()
+        data.install_mocks(m)
+
+        outcome = handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaaktype configuration for zaak", str(outcome))
 
 
 @freeze_time("2023-01-01 01:00:00")

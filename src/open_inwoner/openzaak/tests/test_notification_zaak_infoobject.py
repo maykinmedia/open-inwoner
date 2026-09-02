@@ -147,9 +147,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         # API group is resolved from zaak url == hoofd_object
         data.zio_notification.hoofd_object = "http://www.bogus.com"
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no API group configured for zaak", str(outcome))
 
     def test_zio_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
         notification = NotificationFactory(kanaal="not_zaken")
@@ -231,9 +232,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
                 json=paginated_response([]),
             )
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_zio_bails_when_no_emailable_users_are_found_for_roles(
         self, m, mock_handle: Mock
@@ -242,25 +244,28 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.user_initiator.delete()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaak", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_case_type(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_type"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaaktype", str(outcome))
 
     def test_zio_bails_when_case_not_visible_because_confidentiality(
         self, m, mock_handle: Mock
@@ -281,9 +286,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.zaak_type["indicatieInternOfExtern"] = "intern"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("zaak not visible after applying website", str(outcome))
 
     # end of generic checks
 
@@ -294,17 +300,19 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_informatie_object"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve zaakinformatieobject", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_informatie_object(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["informatie_object"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve informatieobject", str(outcome))
 
     def test_zio_bails_when_info_object_not_visible_because_confidentiality(
         self, m, mock_handle: Mock
@@ -315,9 +323,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         )
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("informatieobject not visible after applying", str(outcome))
 
     def test_zio_bails_when_info_object_not_visible_because_not_definitive(
         self, m, mock_handle: Mock
@@ -326,18 +335,20 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.informatie_object["status"] = "concept"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("informatieobject not visible after applying", str(outcome))
 
     def test_zio_bails_when_zaak_type_info_object_type_config_is_not_found(
         self, m, mock_handle: Mock
     ):
         data = MockAPIData().install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("cannot retrieve info_type configuration", str(outcome))
 
     def test_zio_bails_when_zaak_type_info_object_type_config_is_found_not_marked_for_notifications(
         self, m, mock_handle: Mock
@@ -351,9 +362,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             omschrijving="important document",
         )
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("'document_notification_enabled' is False", str(outcome))
 
 
 @freeze_time("2023-01-01 01:00:00")
