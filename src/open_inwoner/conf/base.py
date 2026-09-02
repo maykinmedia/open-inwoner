@@ -940,7 +940,12 @@ ENVIRONMENT_FOREGROUND_COLOR = config("ENVIRONMENT_FOREGROUND_COLOR", default="b
 SHOW_ENVIRONMENT = config("SHOW_ENVIRONMENT", default=True)
 # The Docker image sets this explicitly at build time (see Dockerfile's
 # COMMIT_HASH build arg); fall back to git introspection for local development.
-GIT_SHA = os.getenv("GIT_SHA") or get_current_version()
+# NOTE: pass BASE_DIR explicitly rather than letting get_current_version() read
+# settings.BASE_DIR - django.conf.settings is still being constructed for the
+# first time at this point in settings module execution, and touching it here
+# reenters Settings() construction with a half-initialized module, silently
+# dropping every setting defined after this line (e.g. CELERY_BROKER_URL).
+GIT_SHA = os.getenv("GIT_SHA") or get_current_version(BASE_DIR)
 SHOW_ALERT = True
 
 ##############################
