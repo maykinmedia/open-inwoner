@@ -1,3 +1,4 @@
+import { formatToEuro, formatToKiloGrams } from '@react/lib/format/format';
 import { ChartOptions } from 'chart.js';
 
 /**
@@ -35,6 +36,22 @@ export const CHART_STYLES = {
       '--color-fallback-bar'
     ),
   },
+  trendLines: {
+    weight: getComputedStyle(document.documentElement).getPropertyValue(
+      '--color-weight-line'
+    ),
+    cost: getComputedStyle(document.documentElement).getPropertyValue(
+      '--color-cost-line'
+    ),
+    borderWidth: 2,
+    pointRadius: 3,
+    pointHoverRadius: 5,
+    tension: 0,
+    order: 0,
+  },
+  barCharts: {
+    order: 1,
+  },
   padding: {
     chart: {
       left: 16,
@@ -56,7 +73,34 @@ export const CHART_STYLES = {
   },
 } as const;
 
-export const chartOptions = (title: string = 'Chart'): ChartOptions<'bar'> => ({
+/**
+ * Shared tick configuration of the two cumulative trend line axes.
+ */
+const trendAxis = (
+  callback: (value: any) => string,
+  color: string
+): Record<string, unknown> => ({
+  // Hidden while no visible dataset uses the axis.
+  display: 'auto',
+  position: 'right',
+  beginAtZero: true,
+  min: 0,
+  // Only the primary axis draws gridlines, otherwise they double up.
+  grid: { drawOnChartArea: false },
+  ticks: {
+    font: {
+      weight: CHART_STYLES.fontWeights.regular,
+      size: CHART_STYLES.fontSizes.axis,
+      family: CHART_STYLES.fonts.body,
+    },
+    color,
+    callback,
+  },
+});
+
+export const chartOptions = (
+  title: string = 'Chart'
+): ChartOptions<'bar' | 'line'> => ({
   maintainAspectRatio: false,
   layout: { padding: CHART_STYLES.padding.chart },
   scales: {
@@ -80,9 +124,11 @@ export const chartOptions = (title: string = 'Chart'): ChartOptions<'bar'> => ({
           size: CHART_STYLES.fontSizes.axis,
           family: CHART_STYLES.fonts.body,
         },
-        callback: (value: any) => value + ' kg',
+        callback: formatToKiloGrams,
       },
     },
+    y1: trendAxis(formatToEuro, CHART_STYLES.trendLines.cost),
+    y2: trendAxis(formatToKiloGrams, CHART_STYLES.trendLines.weight),
   },
   plugins: {
     legend: {

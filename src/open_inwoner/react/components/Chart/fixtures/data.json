@@ -13,91 +13,106 @@
             "tijdstip_datum": "15-07-2024",
             "tijdstip_tijd": "07:15",
             "tijdstip_dag": "maandag",
-            "gewicht": "48,2"
+            "gewicht": "48,2",
+            "kosten": "13,98"
           },
           {
             "tijdstip_datum": "12-08-2024",
             "tijdstip_tijd": "06:45",
             "tijdstip_dag": "maandag",
-            "gewicht": "52,8"
+            "gewicht": "52,8",
+            "kosten": "15,31"
           },
           {
             "tijdstip_datum": "09-09-2024",
             "tijdstip_tijd": "07:30",
             "tijdstip_dag": "maandag",
-            "gewicht": "46,5"
+            "gewicht": "46,5",
+            "kosten": "13,48"
           },
           {
             "tijdstip_datum": "07-10-2024",
             "tijdstip_tijd": "08:00",
             "tijdstip_dag": "maandag",
-            "gewicht": "51,3"
+            "gewicht": "51,3",
+            "kosten": "14,88"
           },
           {
             "tijdstip_datum": "04-11-2024",
             "tijdstip_tijd": "07:20",
             "tijdstip_dag": "maandag",
-            "gewicht": "49,7"
+            "gewicht": "49,7",
+            "kosten": "14,41"
           },
           {
             "tijdstip_datum": "02-12-2024",
             "tijdstip_tijd": "06:50",
             "tijdstip_dag": "maandag",
-            "gewicht": "53,1"
+            "gewicht": "53,1",
+            "kosten": "15,40"
           },
           {
             "tijdstip_datum": "06-01-2025",
             "tijdstip_tijd": "07:35",
             "tijdstip_dag": "maandag",
-            "gewicht": "47,9"
+            "gewicht": "47,9",
+            "kosten": "13,89"
           },
           {
             "tijdstip_datum": "03-02-2025",
             "tijdstip_tijd": "08:10",
             "tijdstip_dag": "maandag",
-            "gewicht": "50,2"
+            "gewicht": "50,2",
+            "kosten": "14,56"
           },
           {
             "tijdstip_datum": "03-03-2025",
             "tijdstip_tijd": "07:05",
             "tijdstip_dag": "maandag",
-            "gewicht": "48,8"
+            "gewicht": "48,8",
+            "kosten": "14,15"
           },
           {
             "tijdstip_datum": "07-04-2025",
             "tijdstip_tijd": "06:55",
             "tijdstip_dag": "maandag",
-            "gewicht": "51,6"
+            "gewicht": "51,6",
+            "kosten": "14,96"
           },
           {
             "tijdstip_datum": "05-05-2025",
             "tijdstip_tijd": "07:40",
             "tijdstip_dag": "maandag",
-            "gewicht": "49,3"
+            "gewicht": "49,3",
+            "kosten": "14,30"
           },
           {
             "tijdstip_datum": "02-06-2025",
             "tijdstip_tijd": "08:20",
             "tijdstip_dag": "maandag",
-            "gewicht": "52,4"
+            "gewicht": "52,4",
+            "kosten": "15,20"
           },
           {
             "tijdstip_datum": "30-06-2025",
             "tijdstip_tijd": "07:15",
             "tijdstip_dag": "maandag",
-            "gewicht": "47,1"
+            "gewicht": "47,1",
+            "kosten": "13,66"
           },
           {
             "tijdstip_datum": "28-07-2025",
             "tijdstip_tijd": "06:40",
             "tijdstip_dag": "maandag",
-            "gewicht": "50,9"
+            "gewicht": "50,9",
+            "kosten": "14,76"
           },
           {
             "tijdstip_datum": "25-08-2025",
             "tijdstip_tijd": "07:25",
             "tijdstip_dag": "maandag",
-            "gewicht": "48,6"
+            "gewicht": "48,6",
+            "kosten": "14,09"
           }
         ],
         "table_data": {
@@ -211,67 +226,78 @@
             "tijdstip_datum": "20-07-2024",
             "tijdstip_tijd": "09:15",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "28,5"
+            "gewicht": "28,5",
+            "kosten": "3,14"
           },
           {
             "tijdstip_datum": "17-08-2024",
             "tijdstip_tijd": "10:30",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "31,2"
+            "gewicht": "31,2",
+            "kosten": "3,43"
           },
           {
             "tijdstip_datum": "14-09-2024",
             "tijdstip_tijd": "09:45",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "29,8"
+            "gewicht": "29,8",
+            "kosten": "3,28"
           },
           {
             "tijdstip_datum": "12-10-2024",
             "tijdstip_tijd": "10:00",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "33,1"
+            "gewicht": "33,1",
+            "kosten": "3,64"
           },
           {
             "tijdstip_datum": "09-11-2024",
             "tijdstip_tijd": "09:20",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "27,4"
+            "gewicht": "27,4",
+            "kosten": "3,01"
           },
           {
             "tijdstip_datum": "07-12-2024",
             "tijdstip_tijd": "10:15",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "30,6"
+            "gewicht": "30,6",
+            "kosten": "3,37"
           },
           {
             "tijdstip_datum": "11-01-2025",
             "tijdstip_tijd": "09:35",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "32,8"
+            "gewicht": "32,8",
+            "kosten": "3,61"
           },
           {
             "tijdstip_datum": "08-02-2025",
             "tijdstip_tijd": "10:45",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "28,9"
+            "gewicht": "28,9",
+            "kosten": "3,18"
           },
           {
             "tijdstip_datum": "08-03-2025",
             "tijdstip_tijd": "09:50",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "31,5"
+            "gewicht": "31,5",
+            "kosten": "3,46"
           },
           {
             "tijdstip_datum": "12-04-2025",
             "tijdstip_tijd": "10:20",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "29,1"
+            "gewicht": "29,1",
+            "kosten": "3,20"
           },
           {
             "tijdstip_datum": "10-05-2025",
             "tijdstip_tijd": "09:40",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "32,4"
+            "gewicht": "32,4",
+            "kosten": "3,56"
           }
         ],
         "table_data": {
@@ -365,61 +391,71 @@
             "tijdstip_datum": "05-08-2024",
             "tijdstip_tijd": "14:10",
             "tijdstip_dag": "maandag",
-            "gewicht": "12,3"
+            "gewicht": "12,3",
+            "kosten": "3,57"
           },
           {
             "tijdstip_datum": "23-09-2024",
             "tijdstip_tijd": "13:45",
             "tijdstip_dag": "maandag",
-            "gewicht": "13,8"
+            "gewicht": "13,8",
+            "kosten": "4,00"
           },
           {
             "tijdstip_datum": "18-11-2024",
             "tijdstip_tijd": "14:20",
             "tijdstip_dag": "maandag",
-            "gewicht": "11,5"
+            "gewicht": "11,5",
+            "kosten": "3,33"
           },
           {
             "tijdstip_datum": "13-01-2025",
             "tijdstip_tijd": "13:55",
             "tijdstip_dag": "maandag",
-            "gewicht": "14,2"
+            "gewicht": "14,2",
+            "kosten": "4,12"
           },
           {
             "tijdstip_datum": "10-03-2025",
             "tijdstip_tijd": "14:35",
             "tijdstip_dag": "maandag",
-            "gewicht": "12,7"
+            "gewicht": "12,7",
+            "kosten": "3,68"
           },
           {
             "tijdstip_datum": "05-05-2025",
             "tijdstip_tijd": "13:40",
             "tijdstip_dag": "maandag",
-            "gewicht": "13,1"
+            "gewicht": "13,1",
+            "kosten": "3,80"
           },
           {
             "tijdstip_datum": "30-06-2025",
             "tijdstip_tijd": "14:15",
             "tijdstip_dag": "maandag",
-            "gewicht": "11,9"
+            "gewicht": "11,9",
+            "kosten": "3,45"
           },
           {
             "tijdstip_datum": "25-08-2025",
             "tijdstip_tijd": "13:50",
             "tijdstip_dag": "maandag",
-            "gewicht": "14,5"
+            "gewicht": "14,5",
+            "kosten": "4,21"
           },
           {
             "tijdstip_datum": "20-10-2025",
             "tijdstip_tijd": "14:25",
             "tijdstip_dag": "maandag",
-            "gewicht": "12,4"
+            "gewicht": "12,4",
+            "kosten": "3,60"
           },
           {
             "tijdstip_datum": "15-12-2025",
             "tijdstip_tijd": "13:30",
             "tijdstip_dag": "maandag",
-            "gewicht": "13,6"
+            "gewicht": "13,6",
+            "kosten": "3,94"
           }
         ],
         "table_data": {
@@ -515,85 +551,99 @@
             "tijdstip_datum": "08-07-2024",
             "tijdstip_tijd": "06:30",
             "tijdstip_dag": "maandag",
-            "gewicht": "78,5"
+            "gewicht": "78,5",
+            "kosten": "22,76"
           },
           {
             "tijdstip_datum": "05-08-2024",
             "tijdstip_tijd": "07:15",
             "tijdstip_dag": "maandag",
-            "gewicht": "82,3"
+            "gewicht": "82,3",
+            "kosten": "23,87"
           },
           {
             "tijdstip_datum": "02-09-2024",
             "tijdstip_tijd": "06:45",
             "tijdstip_dag": "maandag",
-            "gewicht": "76,8"
+            "gewicht": "76,8",
+            "kosten": "22,27"
           },
           {
             "tijdstip_datum": "30-09-2024",
             "tijdstip_tijd": "07:00",
             "tijdstip_dag": "maandag",
-            "gewicht": "80,1"
+            "gewicht": "80,1",
+            "kosten": "23,23"
           },
           {
             "tijdstip_datum": "28-10-2024",
             "tijdstip_tijd": "06:50",
             "tijdstip_dag": "maandag",
-            "gewicht": "77,4"
+            "gewicht": "77,4",
+            "kosten": "22,45"
           },
           {
             "tijdstip_datum": "25-11-2024",
             "tijdstip_tijd": "07:20",
             "tijdstip_dag": "maandag",
-            "gewicht": "81,7"
+            "gewicht": "81,7",
+            "kosten": "23,69"
           },
           {
             "tijdstip_datum": "23-12-2024",
             "tijdstip_tijd": "06:35",
             "tijdstip_dag": "maandag",
-            "gewicht": "79,2"
+            "gewicht": "79,2",
+            "kosten": "22,97"
           },
           {
             "tijdstip_datum": "20-01-2025",
             "tijdstip_tijd": "07:10",
             "tijdstip_dag": "maandag",
-            "gewicht": "83,6"
+            "gewicht": "83,6",
+            "kosten": "24,24"
           },
           {
             "tijdstip_datum": "17-02-2025",
             "tijdstip_tijd": "06:55",
             "tijdstip_dag": "maandag",
-            "gewicht": "75,9"
+            "gewicht": "75,9",
+            "kosten": "22,01"
           },
           {
             "tijdstip_datum": "17-03-2025",
             "tijdstip_tijd": "07:25",
             "tijdstip_dag": "maandag",
-            "gewicht": "80,8"
+            "gewicht": "80,8",
+            "kosten": "23,43"
           },
           {
             "tijdstip_datum": "14-04-2025",
             "tijdstip_tijd": "06:40",
             "tijdstip_dag": "maandag",
-            "gewicht": "78,1"
+            "gewicht": "78,1",
+            "kosten": "22,65"
           },
           {
             "tijdstip_datum": "12-05-2025",
             "tijdstip_tijd": "07:05",
             "tijdstip_dag": "maandag",
-            "gewicht": "82,4"
+            "gewicht": "82,4",
+            "kosten": "23,90"
           },
           {
             "tijdstip_datum": "09-06-2025",
             "tijdstip_tijd": "06:50",
             "tijdstip_dag": "maandag",
-            "gewicht": "76,5"
+            "gewicht": "76,5",
+            "kosten": "22,18"
           },
           {
             "tijdstip_datum": "07-07-2025",
             "tijdstip_tijd": "07:30",
             "tijdstip_dag": "maandag",
-            "gewicht": "81,2"
+            "gewicht": "81,2",
+            "kosten": "23,55"
           }
         ],
         "table_data": {
@@ -702,79 +752,92 @@
             "tijdstip_datum": "13-07-2024",
             "tijdstip_tijd": "10:00",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "42,8"
+            "gewicht": "42,8",
+            "kosten": "4,71"
           },
           {
             "tijdstip_datum": "10-08-2024",
             "tijdstip_tijd": "09:30",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "38,5"
+            "gewicht": "38,5",
+            "kosten": "4,24"
           },
           {
             "tijdstip_datum": "07-09-2024",
             "tijdstip_tijd": "10:15",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "45,2"
+            "gewicht": "45,2",
+            "kosten": "4,97"
           },
           {
             "tijdstip_datum": "05-10-2024",
             "tijdstip_tijd": "09:45",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "41,3"
+            "gewicht": "41,3",
+            "kosten": "4,54"
           },
           {
             "tijdstip_datum": "02-11-2024",
             "tijdstip_tijd": "10:30",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "39,7"
+            "gewicht": "39,7",
+            "kosten": "4,37"
           },
           {
             "tijdstip_datum": "30-11-2024",
             "tijdstip_tijd": "09:50",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "43,9"
+            "gewicht": "43,9",
+            "kosten": "4,83"
           },
           {
             "tijdstip_datum": "28-12-2024",
             "tijdstip_tijd": "10:20",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "37,6"
+            "gewicht": "37,6",
+            "kosten": "4,14"
           },
           {
             "tijdstip_datum": "25-01-2025",
             "tijdstip_tijd": "09:40",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "44,1"
+            "gewicht": "44,1",
+            "kosten": "4,85"
           },
           {
             "tijdstip_datum": "22-02-2025",
             "tijdstip_tijd": "10:05",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "40,8"
+            "gewicht": "40,8",
+            "kosten": "4,49"
           },
           {
             "tijdstip_datum": "22-03-2025",
             "tijdstip_tijd": "09:55",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "42,4"
+            "gewicht": "42,4",
+            "kosten": "4,66"
           },
           {
             "tijdstip_datum": "19-04-2025",
             "tijdstip_tijd": "10:25",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "38,2"
+            "gewicht": "38,2",
+            "kosten": "4,20"
           },
           {
             "tijdstip_datum": "17-05-2025",
             "tijdstip_tijd": "09:35",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "45,7"
+            "gewicht": "45,7",
+            "kosten": "5,03"
           },
           {
             "tijdstip_datum": "14-06-2025",
             "tijdstip_tijd": "10:10",
             "tijdstip_dag": "zaterdag",
-            "gewicht": "41,6"
+            "gewicht": "41,6",
+            "kosten": "4,58"
           }
         ],
         "table_data": {

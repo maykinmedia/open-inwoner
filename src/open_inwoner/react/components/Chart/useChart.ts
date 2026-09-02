@@ -5,11 +5,15 @@ import {
   ChartDataPoint,
   ChartPeriod,
   ContainerSeries,
+  TrendLabels,
+  Trends,
 } from './types';
 import { usePropsOrScriptData } from '@react/lib/json';
+import { useIntl } from 'react-intl';
 import { CHART_STYLES } from './config';
 import { format, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
 import { chartOptions } from './config';
+import { parseAmount } from '@react/lib/format/format';
 
 /**
  * Custom hook for generating bar chart configurations
@@ -23,48 +27,111 @@ export function useChart(
   data: AfvalData | undefined,
   dataId: string | undefined,
   period: ChartPeriod
-): ChartConfiguration<'bar', ChartDataPoint[]> | null {
+): ChartConfiguration<'bar' | 'line', ChartDataPoint[]> | null {
   const actualData = usePropsOrScriptData<AfvalData>(data, dataId);
+  const intl = useIntl();
+
+  const weightLabel = intl.formatMessage({
+    id: 'chart.trendLine.weight',
+    description: 'Legend label of the cumulative weight trend line.',
+    defaultMessage: 'Totaal gewicht (cumulatief)',
+  });
+  const costLabel = intl.formatMessage({
+    id: 'chart.trendLine.cost',
+    description: 'Legend label of the cumulative costs trend line.',
+    defaultMessage: 'Totale kosten (cumulatief)',
+  });
 
   return useMemo(() => {
     if (!actualData) return null;
-
-    return new BarChartBuilder().build(actualData, period);
-  }, [actualData, period]);
+    return new ChartBuilder().build(actualData, period, {
+      weight: weightLabel,
+      cost: costLabel,
+    });
+  }, [actualData, period, weightLabel, costLabel]);
 }
 
 /**
  * Bar Chart Builder - builds stacked bar charts for waste container data
  */
-export class BarChartBuilder {
+export class ChartBuilder {
   build(
     data: AfvalData,
-    period: ChartPeriod
-  ): ChartConfiguration<'bar', ChartDataPoint[]> {
-    const { series, range: chartTitle } = this.processData(data, period);
+    period: ChartPeriod,
+    labels: TrendLabels
+  ): ChartConfiguration<'bar' | 'line', ChartDataPoint[]> {
+    const {
+      series,
+      trends,
+      range: chartTitle,
+    } = this.processData(data, period);
 
     return {
       type: 'bar',
       options: chartOptions(chartTitle),
       data: {
-        datasets: series.map((container) => ({
-          type: 'bar',
-          label: this.getLabel(container),
-          data: container.points,
-          backgroundColor: this.getColor(
-            container.type,
-            container.containerIndex
-          ),
-          stack: `${container.address}-${container.type}`,
-        })),
+        datasets: [
+          ...series.map((container) => ({
+            type: 'bar' as const,
+            label: this.getLabel(container),
+            data: container.points,
+            backgroundColor: this.getColor(
+              container.type,
+              container.containerIndex
+            ),
+            stack: `${container.address}-${container.type}`,
+            order: CHART_STYLES.barCharts.order,
+          })),
+          ...this.getTrendDatasets(trends, labels),
+        ],
       },
     };
+  }
+
+  /**
+   * The cumulative weight and costs trend lines, each plotted against its own
+   * secondary y-axis.
+   *
+   * A line is omitted when the data carries no values for it at all - an empty
+   * line and its axis would only add noise.
+   */
+  private getTrendDatasets(trends: Trends, labels: TrendLabels) {
+    const lines = [
+      {
+        points: trends.weight,
+        label: labels.weight,
+        yAxisID: 'y2',
+        color: CHART_STYLES.trendLines.weight,
+      },
+      {
+        points: trends.cost,
+        label: labels.cost,
+        yAxisID: 'y1',
+        color: CHART_STYLES.trendLines.cost,
+      },
+    ];
+
+    return lines
+      .filter(({ points }) => points.length)
+      .map(({ points, label, yAxisID, color }) => ({
+        type: 'line' as const,
+        label,
+        data: points,
+        yAxisID,
+        borderColor: color,
+        backgroundColor: color,
+        borderWidth: CHART_STYLES.trendLines.borderWidth,
+        pointRadius: CHART_STYLES.trendLines.pointRadius,
+        pointHoverRadius: CHART_STYLES.trendLines.pointHoverRadius,
+        tension: CHART_STYLES.trendLines.tension,
+        order: CHART_STYLES.trendLines.order,
+      }));
   }
 
   private processData(
     data: AfvalData,
     period: ChartPeriod
-  ): { series: ContainerSeries[]; range: string } {
+  ): { series: ContainerSeries[]; trends: Trends; range: string } {
     // Step 1: Check if we need to include years in labels
     let firstYear: number | null = null;
     let includeYear = false;
@@ -88,6 +155,10 @@ export class BarChartBuilder {
     const series: ContainerSeries[] = [];
     const containerIndexes: Record<string, number> = {};
     const allTimestamps = new Set<number>();
+    // Weights and costs are summed across every container and location: the
+    // trend lines show the resident's totals, not per container figures.
+    const weightsByTimestamp = new Map<number, number>();
+    const costsByTimestamp = new Map<number, number>();
 
     data.forEach(({ object_address, containers }) => {
       containers.forEach(({ ledigingen, type }) => {
@@ -98,13 +169,26 @@ export class BarChartBuilder {
 
         // Aggregate weights by period and build points
         const pointsMap = ledigingen.reduce<Map<number, ChartDataPoint>>(
-          (acc, { gewicht, tijdstip_datum }) => {
+          (acc, { gewicht, kosten, tijdstip_datum }) => {
             const [day, month, year] = tijdstip_datum.split('-');
             const date = new Date(Number(year), Number(month) - 1, Number(day));
             const timestamp = this.getPeriodTimestamp(date, period);
 
             allTimestamps.add(timestamp);
             const weight = Number(gewicht.replace(',', '.'));
+
+            // Set incremented weight for a timestamp.
+            weightsByTimestamp.set(
+              timestamp,
+              (weightsByTimestamp.get(timestamp) ?? 0) + weight
+            );
+
+            const cost = parseAmount(kosten);
+            if (cost !== null)
+              costsByTimestamp.set(
+                timestamp,
+                (costsByTimestamp.get(timestamp) ?? 0) + cost
+              );
 
             const existing = acc.get(timestamp);
 
@@ -160,10 +244,40 @@ export class BarChartBuilder {
       }));
     });
 
-    // Step 5: Generate range string
+    // Step 5: Accumulate the per-period totals into running totals
+    const trends: Trends = {
+      weight: this.accumulate(weightsByTimestamp, sortedTimestamps, labels),
+      cost: this.accumulate(costsByTimestamp, sortedTimestamps, labels),
+    };
+
+    // Step 6: Generate range string
     const range = this.getRange(sortedTimestamps, period);
 
-    return { series, range };
+    return { series, trends, range };
+  }
+
+  /**
+   * Turn per-period totals into a cumulative series over the full x-axis.
+   *
+   * Periods without a value carry the previous total forward, so the line
+   * stays continuous instead of dropping back to zero. Returns an empty array
+   * when there is nothing to accumulate, which drops the line entirely.
+   */
+  private accumulate(
+    totals: Map<number, number>,
+    sortedTimestamps: number[],
+    labels: Record<number, string>
+  ): ChartDataPoint[] {
+    if (!totals.size) return [];
+
+    return sortedTimestamps.reduce<ChartDataPoint[]>((acc, timestamp) => {
+      const previous = acc[acc.length - 1]?.y ?? 0;
+      acc.push({
+        x: labels[timestamp],
+        y: previous + (totals.get(timestamp) ?? 0),
+      });
+      return acc;
+    }, []);
   }
 
   private getRange(timestamps: number[], period: ChartPeriod): string {
