@@ -43,11 +43,13 @@ class OIDCConfigTest(OIDCMixin, ClearCachesMixin, WebTest):
         # admin login
         response = self.app.get(reverse("admin:login"))
 
+        oidc_login_divider = response.pyquery.find(".admin-login-divider")
         oidc_login_option = response.pyquery.find(".admin-login-option")
 
+        self.assertEqual(oidc_login_divider.text(), _("or"))
         self.assertEqual(
             oidc_login_option.text(),
-            "{} {}".format(_("or"), _("Login with organization account")),
+            _("Login with organization account"),
         )
 
     def test_admin_only_disabled(self):
