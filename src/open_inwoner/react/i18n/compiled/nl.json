@@ -5,6 +5,18 @@
       "value": "De grafiek kan niet worden weergegeven. Zie de tabellen hieronder voor de gegevens."
     }
   ],
+  "chart.trendLine.cost": [
+    {
+      "type": 0,
+      "value": "Totale kosten (cumulatief)"
+    }
+  ],
+  "chart.trendLine.weight": [
+    {
+      "type": 0,
+      "value": "Totaal gewicht (cumulatief)"
+    }
+  ],
   "file.confirmDelete": [
     {
       "type": 0,

@@ -5,6 +5,18 @@
       "value": "The chart is not created. See tables below for the data."
     }
   ],
+  "chart.trendLine.cost": [
+    {
+      "type": 0,
+      "value": "Total costs (cumulative)"
+    }
+  ],
+  "chart.trendLine.weight": [
+    {
+      "type": 0,
+      "value": "Total amount (cumulative)"
+    }
+  ],
   "file.confirmDelete": [
     {
       "type": 0,
