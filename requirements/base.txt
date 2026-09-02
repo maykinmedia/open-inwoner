@@ -337,7 +337,7 @@ djangocms-picture==4.1.1
     # via -r requirements/base.in
 djangocms-versioning==2.5.1
     # via -r requirements/base.in
-djangorestframework==3.16.1
+djangorestframework==3.18.0
     # via
     #   -r requirements/base.in
     #   django-extra-fields
