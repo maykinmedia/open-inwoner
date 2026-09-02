@@ -27,10 +27,7 @@ from open_inwoner.openzaak.metrics import (
     webhook_processing_skipped,
 )
 from open_inwoner.openzaak.models import OpenZaakConfig
-from open_inwoner.openzaak.notifications import (
-    NotificationProcessingResult,
-    handle_zaken_notification,
-)
+from open_inwoner.openzaak.notifications import handle_zaken_notification
 from open_inwoner.openzaak.services import ZGWService
 from open_inwoner.utils.concurrency import TimedParallel
 
@@ -86,9 +83,8 @@ def process_zaken_notification(record_pk: int):
             else:
                 # record the outcome (e.g. why a notification was ignored, or a
                 # summary of what was done) so it's visible on the record itself
-                if isinstance(outcome, NotificationProcessingResult):
-                    record.processing_output = str(outcome)
-                    record.save(update_fields=["processing_output"])
+                record.processing_output = str(outcome)
+                record.save(update_fields=["processing_output"])
     except NotificationRecord.DoesNotExist:
         logger.error(
             "Attempted to process unknown Notification Record",
