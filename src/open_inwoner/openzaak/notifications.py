@@ -1,4 +1,3 @@
-import logging  # noqa: TID251 - only used for log levels
 from datetime import date, timedelta
 
 from django.urls import reverse
@@ -34,7 +33,6 @@ from open_inwoner.openzaak.utils import (
     get_zaak_type_info_object_type_config,
 )
 from open_inwoner.userfeed import hooks
-from open_inwoner.utils.logentry import system_action as log_system_action
 from open_inwoner.utils.url import build_absolute_url
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -63,10 +61,11 @@ def handle_zaken_notification(notification: Notification):
     r = notification.resource  # short alias for logging
 
     if notification.resource not in resources:
-        log_system_action(
-            f"ignored {r} notification: resource is not "
-            f"{_wrap_join(resources, 'or')} but '{notification.resource}' for zaak {zaak_url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: resource is not one of the expected resources",
+            resource=r,
+            expected_resources=resources,
+            zaak_url=zaak_url,
         )
         return
 
@@ -82,11 +81,12 @@ def handle_zaken_notification(notification: Notification):
     try:
         roles = service.fetch_zaak_roles(zaak_url, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve rollen for zaak {zaak_url}",
-            # NOTE this used to be logging.ERROR, but as this is also our first call
-            # we get a lot of 403 "Niet geautoriseerd voor zaaktype"
-            log_level=logging.INFO,
+        # NOTE this used to be logger.error, but as this is also our first call
+        # we get a lot of 403 "Niet geautoriseerd voor zaaktype"
+        logger.info(
+            "ignored notification: cannot retrieve rollen for zaak",
+            resource=r,
+            zaak_url=zaak_url,
         )
         return
 
@@ -97,9 +97,10 @@ def handle_zaken_notification(notification: Notification):
         limit_access_to_role=config.limit_user_visible_cases_to_role,
     )
     if not inform_users:
-        log_system_action(
-            f"ignored {r} notification: no users with bsn/nnp_id as (mede)initiators in zaak {zaak_url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: no users with bsn/nnp_id as (mede)initiators in zaak",
+            resource=r,
+            zaak_url=zaak_url,
         )
         return
 
@@ -107,9 +108,10 @@ def handle_zaken_notification(notification: Notification):
     try:
         zaak = service.fetch_zaak_by_url(zaak_url, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaak {zaak_url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve zaak",
+            resource=r,
+            zaak_url=zaak_url,
         )
         return
 
@@ -117,18 +119,19 @@ def handle_zaken_notification(notification: Notification):
     try:
         zaaktype = service.fetch_zaaktype_by_url(zaaktype_url, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaaktype {zaaktype_url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve zaaktype",
+            resource=r,
+            zaaktype_url=zaaktype_url,
         )
         return
     zaak.zaaktype = zaaktype
 
     if not service._is_zaak_visible(zaak)[0]:
-        log_system_action(
-            f"ignored {r} notification: zaak not visible after applying website "
-            f"visibility filter for zaak {zaak_url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: zaak not visible after applying website visibility filter",
+            resource=r,
+            zaak_url=zaak_url,
         )
         return
 
@@ -219,10 +222,11 @@ def _handle_zaakinformatieobject_notification(
     try:
         ziobj = service.fetch_single_zaak_information_object(ziobj_url, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve zaakinformatieobject "
-            f"{ziobj_url} for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve zaakinformatieobject",
+            resource=r,
+            ziobj_url=ziobj_url,
+            zaak_url=zaak.url,
         )
         return
 
@@ -231,10 +235,11 @@ def _handle_zaakinformatieobject_notification(
             ziobj.informatieobject, api_group
         )
     except ZgwAPIError:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve informatieobject "
-            f"{ziobj.informatieobject} for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve informatieobject",
+            resource=r,
+            informatieobject_url=ziobj.informatieobject,
+            zaak_url=zaak.url,
         )
         return
 
@@ -245,10 +250,11 @@ def _handle_zaakinformatieobject_notification(
         oz_config.document_max_confidentiality,
         oz_config.document_visible_statuses,
     ):
-        log_system_action(
-            f"ignored {r} notification: informatieobject not visible after "
-            f"applying website visibility filter for zaak {zaak.url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: informatieobject not visible after applying "
+            "website visibility filter",
+            resource=r,
+            zaak_url=zaak.url,
         )
         return
 
@@ -257,18 +263,21 @@ def _handle_zaakinformatieobject_notification(
         zaak.zaaktype, info_object.informatieobjecttype
     )
     if not ztiotc:
-        log_system_action(
-            f"ignored {r} notification: cannot retrieve info_type "
-            f"configuration {info_object.informatieobjecttype} and zaak {zaak.url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: cannot retrieve info_type configuration",
+            resource=r,
+            informatieobjecttype=info_object.informatieobjecttype,
+            zaak_url=zaak.url,
         )
         return
     elif not ztiotc.document_notification_enabled:
-        log_system_action(
-            f"ignored {r} notification: info_type configuration "
-            f"'{ztiotc.omschrijving}' {info_object.informatieobjecttype} "
-            f"found but 'document_notification_enabled' is False for zaak {zaak.url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: info_type configuration found but "
+            "'document_notification_enabled' is False",
+            resource=r,
+            info_type_omschrijving=ztiotc.omschrijving,
+            informatieobjecttype=info_object.informatieobjecttype,
+            zaak_url=zaak.url,
         )
         return
 
@@ -340,23 +349,26 @@ def _check_status_history(
     try:
         status_history = service.fetch_status_history(zaak.url, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status_history for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve status_history for zaak",
+            resource=resource,
+            zaak_url=zaak.url,
         )
         return None
 
     if not status_history:
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status_history for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve status_history for zaak",
+            resource=resource,
+            zaak_url=zaak.url,
         )
         return None
 
     if len(status_history) == 1:
-        log_system_action(
-            f"ignored {resource} notification: skip initial status notification for zaak {zaak.url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: skip initial status notification for zaak",
+            resource=resource,
+            zaak_url=zaak.url,
         )
         return None
 
@@ -385,9 +397,11 @@ def _check_status(
         status = service.fetch_single_status(status_url, api_group)
 
     if not status:
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status {status_url} for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve status for zaak",
+            resource=resource,
+            status_url=status_url,
+            zaak_url=zaak.url,
         )
         return None
 
@@ -410,10 +424,11 @@ def _check_status_type(
     try:
         status_type = service.fetch_single_status_type(status.statustype, api_group)
     except (ZgwAPIError, RequestException):
-        log_system_action(
-            f"ignored {resource} notification: cannot retrieve status_type "
-            f"{status.statustype} for zaak {zaak.url}",
-            log_level=logging.ERROR,
+        logger.error(
+            "ignored notification: cannot retrieve status_type for zaak",
+            resource=resource,
+            statustype_url=status.statustype,
+            zaak_url=zaak.url,
         )
         return None
 
@@ -421,10 +436,11 @@ def _check_status_type(
         not oz_config.skip_notification_statustype_informeren
         and not status_type.informeren
     ):
-        log_system_action(
-            f"ignored {resource} notification: status_type.informeren is false for "
-            f"status {status.url} and zaak {zaak.url}",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: status_type.informeren is false for status and zaak",
+            resource=resource,
+            status_url=status.url,
+            zaak_url=zaak.url,
         )
         return None
 
@@ -444,19 +460,21 @@ def _check_zaaktype_config(
 
     if oz_config.skip_notification_statustype_informeren:
         if not ztc:
-            log_system_action(
-                f"ignored {resource} notification: 'skip_notification_statustype_informeren' "
-                f"is True but cannot retrieve zaaktype configuration '{zaak.zaaktype.identificatie}' "
-                f"for zaak {zaak.url}",
-                log_level=logging.INFO,
+            logger.info(
+                "ignored notification: 'skip_notification_statustype_informeren' "
+                "is True but cannot retrieve zaaktype configuration for zaak",
+                resource=resource,
+                zaaktype_identificatie=zaak.zaaktype.identificatie,
+                zaak_url=zaak.url,
             )
             return None
         elif not ztc.notify_status_changes:
-            log_system_action(
-                f"ignored {resource} notification: zaaktype configuration "
-                f"'{zaak.zaaktype.identificatie}' found but 'notify_status_changes' is False "
-                f"for zaak {zaak.url}",
-                log_level=logging.INFO,
+            logger.info(
+                "ignored notification: zaaktype configuration found but "
+                "'notify_status_changes' is False",
+                resource=resource,
+                zaaktype_identificatie=zaak.zaaktype.identificatie,
+                zaak_url=zaak.url,
             )
             return None
 
@@ -479,19 +497,19 @@ def _check_statustype_config(
             zaaktype_config=ztc, statustype_url=statustype_url
         )
     except ZaakTypeStatusTypeConfig.DoesNotExist:
-        log_system_action(
-            "ignored {resource} notification: ZaakTypeStatusTypeConfig could not be found for statustype {url}",
+        logger.info(
+            "ignored notification: ZaakTypeStatusTypeConfig could not be found for statustype",
             resource=resource,
-            url=statustype_url,
-            log_level=logging.INFO,
+            statustype_url=statustype_url,
         )
         return None
 
     if not statustype_config.notify_status_change:
-        log_system_action(
-            f"ignored {resource} notification: 'notify_status_change' is False for "
-            f"the status type configuration of the status of this zaak ({zaak.url})",
-            log_level=logging.INFO,
+        logger.info(
+            "ignored notification: 'notify_status_change' is False for the status "
+            "type configuration of the status of this zaak",
+            resource=resource,
+            zaak_url=zaak.url,
         )
         return None
 
