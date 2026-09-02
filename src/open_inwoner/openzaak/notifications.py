@@ -46,6 +46,9 @@ _log_helper = WebhookLogMixin()
 
 T = TypeVar("T")
 
+# level names `NotificationProcessingResult.ignore()` may log at
+LOG_LEVELS = frozenset({"debug", "info", "warning", "error", "critical"})
+
 
 class NotificationOutcome(enum.Enum):
     """Whether a notification-processing step was ignored or went ahead"""
@@ -86,6 +89,23 @@ class NotificationProcessingResult(Generic[T]):
         detail = ", ".join(f"{k}={v}" for k, v in self.context.items())
         return f"{self.message} ({detail})"
 
+    @staticmethod
+    def _log(level: str, message: str, **context) -> None:
+        """
+        Log at `level`, falling back to info for a level we don't recognize.
+
+        Explaining why a notification was ignored must not itself be able to
+        fail: an unknown level would otherwise raise out of the handler and
+        record a FAILED notification, losing the reason it was ignored.
+        """
+        if level not in LOG_LEVELS:
+            logger.warning(
+                "unknown log level for notification result, falling back to info",
+                level=level,
+            )
+            level = "info"
+        getattr(logger, level)(message, **context)
+
     @classmethod
     def ignore(
         cls, message: str, *, level: str = "info", **context
@@ -94,7 +114,7 @@ class NotificationProcessingResult(Generic[T]):
         Log `message` (with structured `context`) at `level`, then return it as
         a result explaining why the notification was ignored.
         """
-        getattr(logger, level)(message, **context)
+        cls._log(level, message, **context)
         return cls(NotificationOutcome.IGNORED, message, level=level, context=context)
 
     @classmethod
