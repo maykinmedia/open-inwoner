@@ -570,7 +570,7 @@ def _handle_status_notification(
         if not _check_user_status_notitifactions(
             notification, user, zaak, status, status_type_config
         ):
-            return
+            continue
 
         # all checks have passed
         _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
