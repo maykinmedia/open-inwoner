@@ -1,54 +1,58 @@
-{% extends "admin/base.html" %}
-{% load i18n static utils %}
+{% extends "admin/base_site.html" %}
+{% load i18n static maykin_common %}
 
 {% block title %}
-{{ title }} | {{ site_title|default:_('Administration') }}
+{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Administration') }}
 {% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
 
     <link rel="stylesheet" type="text/css" href="{% static 'bundles/admin_overrides.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'maykin_common/css/env-info.css' %}">
+
+    <link href="{% static 'maykin_common/ico/favicon.svg' %}" sizes="any" rel="icon" type="image/svg+xml" />
+    <link href="{% static 'maykin_common/ico/favicon-96x96.png' %}" sizes="96x96" rel="icon" type="image/png" />
+    <link href="{% static 'maykin_common/ico/favicon-32x32.png' %}" sizes="32x32" rel="icon" type="image/png" />
+    <link href="{% static 'maykin_common/ico/favicon.png' %}" sizes="16x16" rel="icon" type="image/png" />
+    <link href="{% static 'maykin_common/ico/favicon.png' %}" rel="shortcut icon">
 {% endblock %}
 
 {% block branding %}
-    {% version as build %}
-    <h1 class="utrecht-heading-1" id="site-name">
+    <div id="site-name">
         <a href="{% url 'admin:index' %}">
             {{ site_header|default:_('Administration') }}
-
-            {% if build %}
-                <span class="version">
-                    ({{ build }})
-                </span>
-            {% endif %}
         </a>
-    </h1>
+    </div>
+    {% show_environment_info %}
+    {% if user.is_anonymous %}
+      {% include "admin/color_theme_toggle.html" %}
+    {% endif %}
 {% endblock %}
 
 {% block userlinks %}
     {% if site_url %}
         <a href="{{ site_url }}">{% if settings.SITE_TITLE %}{{ settings.SITE_TITLE }}{% else %}{% trans 'View site' %}{% endif %}</a> /
     {% endif %}
-    {% url 'admin:two_factor:profile' as 2fa_profile_url %}
-    {% if 2fa_profile_url %}
-        <a href="{{ 2fa_profile_url }}">{% trans "View 2fa profile" %}</a> /
+    {% url 'maykin_2fa:account_security' as 2fa_account_security_url %}
+    {% if 2fa_account_security_url %}
+        <a href="{{ 2fa_account_security_url }}">{% trans "Account security" %}</a> /
     {% endif %}
     {% if user.has_usable_password %}
     <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
     {% endif %}
-    <form method="post" action="{% url 'admin:logout' %}" id="logout-form">
+    <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
         {% csrf_token %}
         <button type="submit">{% trans 'Log out' %}</button>
     </form>
+
+    {% include "admin/color_theme_toggle.html" %}
 {% endblock %}
 
-{% block nav-global %}
-{% endblock %}
-
-
+{% comment %} Override footer block to display version information if you're a logged in staff user {% endcomment %}
+{% comment %} Django 5.2 puts this block inside the <footer id="footer"> element {% endcomment %}
 {% block footer %}
-    {{ block.super }}
+    {% include "maykin_common/includes/footer.html" with user=user only %}
     {# Load the custom JS #}
     <script src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
     <script src="{% static 'bundles/django-admin.js' %}"></script>
