@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from zgw_consumers.api_models.base import factory
 from zgw_consumers.api_models.constants import RolTypes, VertrouwelijkheidsAanduidingen
 
-from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openzaak.api.views import ZakenNotificationsWebhookView
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak, ZaakType
@@ -161,6 +161,73 @@ class StatusNotificationHandlerTestCase(
 
             self.assertEqual(outcome.context["informed_users"], 1)
             self.assertEqual(outcome.context["emailed_users"], 1)
+
+    def _add_second_initiator(self, data, user):
+        """Give the zaak a second natuurlijk-persoon initiator role for `user`"""
+        data.case_roles.append(
+            {
+                **data.role_initiator,
+                "url": f"{ZAKEN_ROOT}rollen/aaaaaaaa-0009-aaaa-aaaa-aaaaaaaaaaaa",
+                "betrokkeneIdentificatie": {"inpBsn": user.bsn},
+            }
+        )
+
+    def _configure_status_notifications(self, data):
+        ztc = ZaakTypeConfigFactory.create(
+            catalogus__url=data.zaak_type["catalogus"],
+            identificatie=data.zaak_type["identificatie"],
+        )
+        ZaakTypeStatusTypeConfigFactory.create(
+            zaaktype_config=ztc,
+            omschrijving=data.status_type_final["omschrijving"],
+            statustype_url=data.status_type_final["url"],
+        )
+
+    def test_status_informs_other_users_when_one_opted_out(self, m, mock_handle: Mock):
+        """
+        An initiator who turned case notifications off must not stop delivery to
+        the other initiators on the same zaak
+        """
+        data = MockAPIData()
+
+        opted_out = data.user_initiator
+        opted_out.cases_notifications = False
+        opted_out.save()
+
+        opted_in = DigidUserFactory(bsn="100000002", email="second@example.com")
+        self._add_second_initiator(data, opted_in)
+        data.install_mocks(m)
+        self._configure_status_notifications(data)
+
+        outcome = handle_zaken_notification(data.status_notification)
+
+        # the opted-out user is skipped, the other one is still informed
+        mock_handle.assert_called_once()
+        self.assertEqual(mock_handle.call_args.args[1], opted_in)
+
+        # the notification as a whole was handled; the opt-out is not its outcome
+        self.assertFalse(outcome.ignored)
+        self.assertEqual(outcome.context["emailed_users"], 1)
+
+    def test_status_ignored_when_all_users_opted_out(self, m, mock_handle: Mock):
+        data = MockAPIData()
+
+        opted_out = data.user_initiator
+        opted_out.cases_notifications = False
+        opted_out.save()
+
+        also_opted_out = DigidUserFactory(
+            bsn="100000002", email="second@example.com", cases_notifications=False
+        )
+        self._add_second_initiator(data, also_opted_out)
+        data.install_mocks(m)
+        self._configure_status_notifications(data)
+
+        outcome = handle_zaken_notification(data.status_notification)
+
+        mock_handle.assert_not_called()
+        self.assertTrue(outcome.ignored)
+        self.assertIn("no users have case notifications enabled", str(outcome))
 
     # start of generic checks
 
