@@ -361,13 +361,18 @@ def _handle_zaakinformatieobject_notification(
 
     # reaching here means we're going to inform users
     _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
+    emailed = 0
     for user in inform_users:
-        _handle_zaakinformatieobject_update(notification, user, zaak, ziobj, api_group)
+        if _handle_zaakinformatieobject_update(
+            notification, user, zaak, ziobj, api_group
+        ):
+            emailed += 1
 
     return NotificationProcessingResult.processed(
         "processed zaakinformatieobject notification for zaak",
         zaak_url=zaak.url,
         informed_users=len(inform_users),
+        emailed_users=emailed,
     )
 
 
@@ -377,7 +382,11 @@ def _handle_zaakinformatieobject_update(
     zaak: Zaak,
     zaak_info_object: ZaakInformatieObject,
     api_group: ZGWApiGroupConfig,
-):
+) -> bool:
+    """
+    Inform one user about a document. Returns whether an email was sent, so the
+    caller can report how many users were actually reached.
+    """
     template_name = "case_document_notification"
 
     # hook into userfeed
@@ -387,7 +396,7 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_blocked_by_user(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return False
 
     note = UserCaseInfoObjectNotification.objects.record_if_unique_notification(
         user,
@@ -399,7 +408,7 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_duplicate(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return False
 
     # let's not spam the users
     period = timedelta(seconds=OpenZaakConfig.get_solo().notification_frequency_limit)
@@ -407,7 +416,7 @@ def _handle_zaakinformatieobject_update(
         _log_helper.log_notification_email_rate_limited(
             notification, user, zaak_info_object.url, zaak.url
         )
-        return
+        return False
 
     send_case_update_email(user, zaak, template_name, api_group=api_group)
     note.mark_sent()
@@ -415,6 +424,7 @@ def _handle_zaakinformatieobject_update(
     _log_helper.log_notification_email_sent(
         notification, user, zaak_info_object.url, zaak.url, template_name=template_name
     )
+    return True
 
 
 #
@@ -681,6 +691,7 @@ def _handle_status_notification(
 
     status.statustype = status_type
 
+    emailed = 0
     for user in inform_users:
         if not _check_user_status_notitifactions(
             notification, user, zaak, status, status_type_config
@@ -696,14 +707,16 @@ def _handle_status_notification(
         # all checks have passed
         _log_helper.log_notification_accepted(notification, inform_users, zaak.url)
         # TODO: replace with notify_about_status_update(...args, method: Callable)
-        _handle_status_update(
+        if _handle_status_update(
             notification, user, zaak, status, status_type_config, api_group
-        )
+        ):
+            emailed += 1
 
     return NotificationProcessingResult.processed(
         "processed status notification for zaak",
         zaak_url=zaak.url,
         informed_users=len(inform_users),
+        emailed_users=emailed,
     )
 
 
@@ -714,7 +727,11 @@ def _handle_status_update(
     status: Status,
     status_type_config: ZaakTypeStatusTypeConfig,
     api_group: ZGWApiGroupConfig,
-):
+) -> bool:
+    """
+    Inform one user about a status change. Returns whether an email was sent,
+    so the caller can report how many users were actually reached.
+    """
     # choose template
     if status_type_config.action_required:
         template_name = "case_status_notification_action_required"
@@ -735,7 +752,7 @@ def _handle_status_update(
         _log_helper.log_notification_email_duplicate(
             notification, user, status.url, zaak.url
         )
-        return
+        return False
 
     # let's not spam the users
     period = timedelta(seconds=OpenZaakConfig.get_solo().notification_frequency_limit)
@@ -743,7 +760,7 @@ def _handle_status_update(
         _log_helper.log_notification_email_rate_limited(
             notification, user, status.url, zaak.url
         )
-        return
+        return False
 
     send_case_update_email(
         user, zaak, template_name, api_group=api_group, status=status
@@ -753,6 +770,7 @@ def _handle_status_update(
     _log_helper.log_notification_email_sent(
         notification, user, status.url, zaak.url, template_name=template_name
     )
+    return True
 
 
 # - - - - -
