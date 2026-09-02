@@ -48,6 +48,13 @@ SCRIPT=$(readlink -f "$0")
 REPO_ROOT=$(dirname "$(dirname "$SCRIPT")")
 cd "$REPO_ROOT"
 
+# docker-compose.yml's web build arg defaults COMMIT_HASH to empty when unset,
+# which bakes an empty GIT_SHA into the image (the final stage has neither
+# git nor .git/, so base.py's fallback can't recover it either -- see
+# open_inwoner/conf/base.py's GIT_SHA setting). Fall back to the local HEAD
+# so dev builds still show a real commit in the admin footer/version info.
+export COMMIT_HASH="${COMMIT_HASH:-$(git rev-parse HEAD)}"
+
 # --project-directory pins path resolution to the repo root, regardless of
 # `include:`/`-f` order -- see docker-compose.dev.yml's header.
 COMPOSE=(
