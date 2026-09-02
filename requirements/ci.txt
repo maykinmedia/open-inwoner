@@ -779,7 +779,7 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-common[cli, docs, health-checks, otel]==0.20.1
+maykin-common[cli, docs, health-checks, otel] @ git+https://github.com/maykinmedia/django-common@78f54b190ef6e716af7f2902b3ee53dfad94c753
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
