@@ -256,6 +256,12 @@ klantensysteem_config:
     mijn_vragen_actor: e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b
     interne_taak_gevraagde_handeling: Vraag beantwoorden
     interne_taak_toelichting: Vraag via OIP, graag beantwoorden
+    # ContactForm has no choices to offer, and so cannot be submitted, without
+    # at least one of these.
+    subjects:
+      - subject: Algemene vraag
+      - subject: Klacht
+      - subject: Bezwaar
 
 # Django site config
 sites_config_enable: true
@@ -327,6 +333,17 @@ cms_pages_config:
     title: Mijn afval
     requires_auth: true
     menu_icon: delete
+  # "Mijn vragen" has no apphook of its own -- its views live inside the `cases`
+  # app (`cases:contactmoment_list`), reachable so far only from a card on the
+  # profile page. This adds it as its own page-tree node purely so the sidenav
+  # (built from the page tree, see `SideNavMenuData`) gets an entry for it too.
+  mijn_vragen:
+    enabled: true
+    title: Mijn vragen
+    redirect_url_name: cases:contactmoment_list
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: help_outline
 
 # Set default (staff) users
 default_user_configuration_enable: true

@@ -1,10 +1,12 @@
 from typing import Annotated
 
+from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 
 from cms.app_base import CMSApp
 from cms.models import Page
 from cms.plugin_base import CMSPluginBase
+from cms.utils.apphook_reload import reload_urlconf
 from django_setup_configuration import ConfigurationModel
 from django_setup_configuration.configuration import BaseConfigurationStep
 from pydantic import Field
@@ -80,6 +82,38 @@ class CMSPageConfig(ConfigurationModel):
         }
 
 
+class CMSRedirectPageConfig(ConfigurationModel):
+    """
+    Configuration for a page-tree node that only redirects to another URL.
+
+    For a feature whose views live inside another app's apphook rather than one of
+    its own -- e.g. "Mijn vragen" (`cases:contactmoment_list`) -- this is what gets it
+    a page in the tree, and so a sidenav entry: see `page_setup.create_redirect_page`.
+    """
+
+    enabled: bool = False
+    title: Annotated[str, Field(description="Page title shown in navigation.")]
+    redirect_url_name: Annotated[
+        str,
+        Field(
+            description=(
+                "Django URL name this page redirects to, e.g. "
+                "'cases:contactmoment_list'."
+            )
+        ),
+    ]
+
+    class Meta:
+        django_model_refs = {
+            CommonExtension: [
+                "requires_auth",
+                "requires_auth_bsn_or_kvk",
+                "menu_indicator",
+                "menu_icon",
+            ]
+        }
+
+
 class CMSProfilePageConfig(CMSPageConfig):
     """Configuration for the Profile page; extends CMSPageConfig with section toggles."""
 
@@ -103,7 +137,9 @@ class CMSProfilePageConfig(CMSPageConfig):
 
 class CMSPagesConfigurationModel(ConfigurationModel):
     """
-    Groups per-page configuration for the homepage and every CMS apphook page.
+    Groups per-page configuration for the homepage, every CMS apphook page, and
+    every redirect page (a page-tree node for a feature -- e.g. "Mijn vragen" --
+    whose views live inside another app's apphook rather than one of its own).
 
     Omitting a page is the same as disabling it, hence the ``None`` defaults. A
     model instance as default would be more direct, but the documentation
@@ -119,6 +155,7 @@ class CMSPagesConfigurationModel(ConfigurationModel):
     profile: CMSProfilePageConfig | None = Field(default=None)
     openklant: CMSPageConfig | None = Field(default=None)
     mijn_afval: CMSPageConfig | None = Field(default=None)
+    mijn_vragen: CMSRedirectPageConfig | None = Field(default=None)
 
 
 # maps the field name on CMSPagesConfigurationModel to the apphook it configures
@@ -132,6 +169,12 @@ _APP_HOOKS: dict[str, type[CMSApp]] = {
     "profile": ProfileApphook,
     "openklant": OpenklantApphook,
     "mijn_afval": MijnAfvalApphook,
+}
+
+# maps the field name on CMSPagesConfigurationModel to the `reverse_id` its redirect
+# page is created and looked up under (see `page_setup.get_or_create_redirect_page`)
+_REDIRECT_PAGES: dict[str, str] = {
+    "mijn_vragen": "mijn-vragen",
 }
 
 # the ProfileConfig fields, i.e. everything CMSProfilePageConfig adds on top of
@@ -155,7 +198,7 @@ _HOMEPAGE_CONTENT_SLOT = "content"
 class CMSPagesConfigurationStep(BaseConfigurationStep):
     """
     Creates or updates the site homepage and every individually enabled CMS
-    apphook page.
+    apphook or redirect page.
 
     The step reads nested configuration from ``CMSPagesConfigurationModel``.
     Each sub-model carries an ``enabled`` flag; entries whose flag is ``False``
@@ -209,6 +252,51 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
                 title=page_config.title,
                 extension_args=extension_args,
                 config_args=config_args,
+                parent_page=homepage,
+            )
+
+        self._sync_redirect_pages(model, homepage, user=user)
+
+    def _sync_redirect_pages(
+        self, model: CMSPagesConfigurationModel, homepage: Page | None, *, user
+    ) -> None:
+        """
+        Create or update every enabled redirect page (see `_REDIRECT_PAGES`).
+
+        Run after the apphook pages above, since a redirect page's target is
+        typically one of those apphooks' URLs (e.g. "Mijn vragen" points at
+        `cases:contactmoment_list`) and so needs that page to exist first.
+        """
+        for model_attr, reverse_id in _REDIRECT_PAGES.items():
+            page_config: CMSRedirectPageConfig | None = getattr(model, model_attr)
+            if page_config is None or not page_config.enabled:
+                continue
+
+            # The apphook page this redirects to may have been created moments ago
+            # in the loop above. Django CMS only recomputes its apphook URL patterns
+            # on an actual HTTP request (via ApphookReloadMiddleware); in a management
+            # command there's no request, so if `cms.urls` was already imported earlier
+            # in this process (e.g. by a preceding setup_configuration step reversing an
+            # unrelated URL) it stays frozen without the apphook pages created here.
+            # `clear_url_caches()` alone can't fix that since it just rebuilds the
+            # resolver around the same stale, already-imported module; force a real
+            # reimport of the urlconf so the new apphook page's namespace is picked up.
+            reload_urlconf()
+            redirect_url = reverse(page_config.redirect_url_name)
+
+            extension_args = {
+                "requires_auth": page_config.requires_auth,
+                "requires_auth_bsn_or_kvk": page_config.requires_auth_bsn_or_kvk,
+                "menu_indicator": page_config.menu_indicator,
+                "menu_icon": page_config.menu_icon,
+            }
+
+            page_setup.get_or_create_redirect_page(
+                user=user,
+                reverse_id=reverse_id,
+                title=page_config.title,
+                redirect_url=redirect_url,
+                extension_args=extension_args,
                 parent_page=homepage,
             )
 
