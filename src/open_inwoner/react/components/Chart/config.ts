@@ -35,6 +35,18 @@ export const CHART_STYLES = {
       '--color-fallback-bar'
     ),
   },
+  trendLines: {
+    weight: getComputedStyle(document.documentElement).getPropertyValue(
+      '--color-weight-line'
+    ),
+    cost: getComputedStyle(document.documentElement).getPropertyValue(
+      '--color-cost-line'
+    ),
+    borderWidth: 2,
+    pointRadius: 3,
+    pointHoverRadius: 5,
+    tension: 0.3,
+  },
   padding: {
     chart: {
       left: 16,
@@ -56,7 +68,47 @@ export const CHART_STYLES = {
   },
 } as const;
 
-export const chartOptions = (title: string = 'Chart'): ChartOptions<'bar'> => ({
+/**
+ * Format a number as a whole euro amount in the current document language.
+ */
+export const formatEuro = (value: number): string =>
+  Intl.NumberFormat(document.documentElement.lang, {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(value);
+
+/**
+ * Shared tick configuration of the two cumulative trend line axes.
+ */
+const trendAxis = (
+  id: 'y1' | 'y2',
+  callback: (value: any) => string
+): Record<string, unknown> => ({
+  // Hidden while no visible dataset uses the axis.
+  display: 'auto',
+  position: 'right',
+  beginAtZero: true,
+  min: 0,
+  // Only the primary axis draws gridlines, otherwise they double up.
+  grid: { drawOnChartArea: false },
+  ticks: {
+    font: {
+      weight: CHART_STYLES.fontWeights.regular,
+      size: CHART_STYLES.fontSizes.axis,
+      family: CHART_STYLES.fonts.body,
+    },
+    color:
+      id === 'y1'
+        ? CHART_STYLES.trendLines.cost
+        : CHART_STYLES.trendLines.weight,
+    callback,
+  },
+});
+
+export const chartOptions = (
+  title: string = 'Chart'
+): ChartOptions<'bar' | 'line'> => ({
   maintainAspectRatio: false,
   layout: { padding: CHART_STYLES.padding.chart },
   scales: {
@@ -83,6 +135,11 @@ export const chartOptions = (title: string = 'Chart'): ChartOptions<'bar'> => ({
         callback: (value: any) => value + ' kg',
       },
     },
+    // Separate axes for the two cumulative trend lines. Deliberately not
+    // stacked like the bars: a running total dwarfs the per-period weights,
+    // so sharing the primary axis would flatten the bars.
+    y1: trendAxis('y1', (value) => formatEuro(Number(value))),
+    y2: trendAxis('y2', (value) => value + ' kg'),
   },
   plugins: {
     legend: {

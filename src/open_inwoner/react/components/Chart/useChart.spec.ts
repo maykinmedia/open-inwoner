@@ -23,6 +23,12 @@ const dataSinglePoint: AfvalData = [
   },
 ];
 
+const TREND_LABELS = { weight: 'Gewicht totaal', cost: 'Kosten totaal' };
+
+/** Strip the costs trend line, leaving only the stacked bar datasets. */
+const barDatasets = (config: { data: { datasets: any[] } }) =>
+  config.data.datasets.filter((d) => d.type === 'bar');
+
 describe('BarChartBuilder', () => {
   let builder: BarChartBuilder;
 
@@ -34,7 +40,7 @@ describe('BarChartBuilder', () => {
 
   describe('build', () => {
     it('returns a valid chart configuration', () => {
-      const config = builder.build(dataSingleYear, 'month');
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
 
       expect(config.type).toBe('bar');
       expect(config.data).toBeDefined();
@@ -43,14 +49,14 @@ describe('BarChartBuilder', () => {
     });
 
     it('creates one dataset per container', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       // data.json has 5 containers across 2 addresses
       expect(config.data.datasets.length).toBeGreaterThan(1);
     });
 
     it('sets correct dataset labels with address', () => {
-      const config = builder.build(dataSingleYear, 'month');
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
 
       // First container in data-2025.json is Restafval at Kerkstraat 12
       expect(config.data.datasets[0].label).toContain('Restafval');
@@ -58,7 +64,7 @@ describe('BarChartBuilder', () => {
     });
 
     it('labels multiple containers of same type with index', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       // data.json has 2 Restafval containers at Kerkstraat 12
       const kerkstraatRestafval = config.data.datasets.filter(
@@ -75,7 +81,7 @@ describe('BarChartBuilder', () => {
 
   describe('period aggregation', () => {
     it('aggregates weights by month', () => {
-      const config = builder.build(dataSingleYear, 'month');
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
       const dataset = config.data.datasets[0];
 
       // All points should have numeric y values (aggregated per month)
@@ -88,7 +94,7 @@ describe('BarChartBuilder', () => {
     });
 
     it('aggregates weights by year', () => {
-      const config = builder.build(dataMultiYear, 'year');
+      const config = builder.build(dataMultiYear, 'year', TREND_LABELS);
       const dataset = config.data.datasets[0];
 
       // data.json spans 2024-2025, so should have data for both years
@@ -97,7 +103,7 @@ describe('BarChartBuilder', () => {
     });
 
     it('aggregates weights by week', () => {
-      const config = builder.build(dataSingleYear, 'week');
+      const config = builder.build(dataSingleYear, 'week', TREND_LABELS);
       const dataset = config.data.datasets[0];
 
       // Should have multiple weeks of data
@@ -110,7 +116,7 @@ describe('BarChartBuilder', () => {
 
   describe('range string generation', () => {
     it('generates month range for single year data', () => {
-      const config = builder.build(dataSingleYear, 'month');
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
 
       // Title should contain month names (single year, no year numbers)
       const title = config.options?.plugins?.title?.text as string;
@@ -118,20 +124,20 @@ describe('BarChartBuilder', () => {
     });
 
     it('generates month range with years for multi-year data', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       // Title should include years when spanning multiple years
       expect(config.options?.plugins?.title?.text).toMatch(/2024.*2025/);
     });
 
     it('generates year range for year period', () => {
-      const config = builder.build(dataMultiYear, 'year');
+      const config = builder.build(dataMultiYear, 'year', TREND_LABELS);
 
       expect(config.options?.plugins?.title?.text).toMatch(/2024.*2025/);
     });
 
     it('generates single value for single data point', () => {
-      const config = builder.build(dataSinglePoint, 'month');
+      const config = builder.build(dataSinglePoint, 'month', TREND_LABELS);
 
       // Should not contain a dash (range separator)
       const title = config.options?.plugins?.title?.text as string;
@@ -139,7 +145,7 @@ describe('BarChartBuilder', () => {
     });
 
     it('generates week range', () => {
-      const config = builder.build(dataSingleYear, 'week');
+      const config = builder.build(dataSingleYear, 'week', TREND_LABELS);
 
       expect(config.options?.plugins?.title?.text).toMatch(/Week/);
     });
@@ -147,7 +153,7 @@ describe('BarChartBuilder', () => {
 
   describe('colors', () => {
     it('assigns backgroundColor to each dataset', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       config.data.datasets.forEach((dataset) => {
         expect(dataset.backgroundColor).toBeDefined();
@@ -156,7 +162,7 @@ describe('BarChartBuilder', () => {
     });
 
     it('applies different opacity for multiple containers of same type', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       // Find the two Restafval containers at Kerkstraat 12
       const kerkstraatRestafval = config.data.datasets.filter(
@@ -180,27 +186,123 @@ describe('BarChartBuilder', () => {
 
   describe('data normalization', () => {
     it('fills gaps with null for missing periods', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
       // Not all containers have data for every month
-      const hasNullPoints = config.data.datasets.some((dataset) =>
-        dataset.data.some((p) => p.y === null)
+      const hasNullPoints = barDatasets(config).some((dataset) =>
+        dataset.data.some((p: any) => p.y === null)
       );
       expect(hasNullPoints).toBe(true);
     });
 
     it('all datasets have same number of data points', () => {
-      const config = builder.build(dataMultiYear, 'month');
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
 
-      const lengths = config.data.datasets.map((d) => d.data.length);
+      const lengths = config.data.datasets.map((d: any) => d.data.length);
       const allSame = lengths.every((l) => l === lengths[0]);
       expect(allSame).toBe(true);
     });
   });
 
+  describe('cumulative trend lines', () => {
+    const trendLines = (data: AfvalData, period: 'week' | 'month' | 'year') =>
+      builder
+        .build(data, period, TREND_LABELS)
+        .data.datasets.filter((d) => d.type === 'line') as any[];
+
+    /** Sum a field over every lediging in the data. */
+    const totalOf = (data: AfvalData, field: 'gewicht' | 'kosten') =>
+      data.reduce(
+        (sum, obj) =>
+          sum +
+          obj.containers.reduce(
+            (containerSum, container) =>
+              containerSum +
+              container.ledigingen.reduce(
+                (ledigingSum, lediging) =>
+                  ledigingSum + Number(lediging[field]!.replace(',', '.')),
+                0
+              ),
+            0
+          ),
+        0
+      );
+
+    it('adds a weight and a costs line, each on its own axis', () => {
+      const [weightLine, costLine] = trendLines(dataMultiYear, 'month');
+
+      expect(weightLine.label).toBe(TREND_LABELS.weight);
+      expect(weightLine.yAxisID).toBe('y2');
+      expect(costLine.label).toBe(TREND_LABELS.cost);
+      expect(costLine.yAxisID).toBe('y1');
+    });
+
+    it('draws the lines on top of the bars', () => {
+      const config = builder.build(dataMultiYear, 'month', TREND_LABELS);
+      const orderOf = (type: string) =>
+        config.data.datasets
+          .filter((d) => d.type === type)
+          .map((d: any) => d.order);
+
+      // Chart.js draws the sorted (order, index) list in reverse, so a lower
+      // order is drawn later and therefore on top.
+      expect(Math.max(...orderOf('line'))).toBeLessThan(
+        Math.min(...orderOf('bar'))
+      );
+    });
+
+    it('accumulates so the values never decrease', () => {
+      trendLines(dataMultiYear, 'month').forEach((line) => {
+        const values = line.data.map((p: any) => p.y);
+        expect(values.length).toBeGreaterThan(1);
+        values.forEach((value: number, index: number) => {
+          expect(value).toBeGreaterThanOrEqual(index ? values[index - 1] : 0);
+        });
+      });
+    });
+
+    it('sums across all containers and locations', () => {
+      const [weightLine, costLine] = trendLines(dataMultiYear, 'year');
+
+      // The final point of each line is the total over the whole range.
+      const last = (line: any) => line.data[line.data.length - 1].y;
+      expect(last(weightLine)).toBeCloseTo(
+        totalOf(dataMultiYear, 'gewicht'),
+        2
+      );
+      expect(last(costLine)).toBeCloseTo(totalOf(dataMultiYear, 'kosten'), 2);
+    });
+
+    it('shares the x-axis labels with the bar datasets', () => {
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
+      const expected = barDatasets(config)[0].data.map((p: any) => p.x);
+
+      config.data.datasets
+        .filter((d) => d.type === 'line')
+        .forEach((line: any) => {
+          expect(line.data.map((p: any) => p.x)).toEqual(expected);
+        });
+    });
+
+    it('omits the costs line when the data carries no costs', () => {
+      const withoutCosts: AfvalData = dataSingleYear.map((obj) => ({
+        ...obj,
+        containers: obj.containers.map((container) => ({
+          ...container,
+          ledigingen: container.ledigingen.map(({ kosten, ...rest }) => rest),
+        })),
+      }));
+
+      // The weight line survives, the costs line does not.
+      expect(trendLines(withoutCosts, 'month').map((l) => l.label)).toEqual([
+        TREND_LABELS.weight,
+      ]);
+    });
+  });
+
   describe('weight parsing', () => {
     it('parses Dutch decimal format (comma)', () => {
-      const config = builder.build(dataSingleYear, 'month');
+      const config = builder.build(dataSingleYear, 'month', TREND_LABELS);
       const dataset = config.data.datasets[0];
 
       // Weights like "47,9" should be parsed as 47.9
