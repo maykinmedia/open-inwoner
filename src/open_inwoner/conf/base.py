@@ -1582,6 +1582,22 @@ DIGID_ENABLED = config(
         group="Authentication",
     ),
 )
+
+#
+# HAAL CENTRAAL (BRP)
+#
+HAALCENTRAAL_BRPAPI_ENABLED = config(
+    "HAALCENTRAAL_BRPAPI_ENABLED",
+    default=True,
+    documentation=DocumentationParams(
+        help_text=(
+            "Enable the Haal Centraal BRP integration. Set to False to disable "
+            "BRP lookups (e.g. for local development without a working BRP "
+            "connection) without needing to change the HaalCentraalConfig."
+        ),
+        group="Haal Centraal",
+    ),
+)
 DIGID_MOCK = config(
     "DIGID_MOCK",
     default=True,
