@@ -37,4 +37,5 @@ Documentation
     installation/index
     configuration/index
     testing
+    versioning_policy
     changelog
