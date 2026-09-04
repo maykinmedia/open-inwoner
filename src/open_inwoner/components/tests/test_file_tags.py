@@ -260,7 +260,7 @@ class TestFileItemFromInformatieObject(SimpleTestCase):
             ),
         )
 
-    def test_extension_from_formaat_mime_type(self):
+    def test_extension_from_bestandsnaam(self):
         info_obj = make_info_object(
             formaat="image/png", bestandsnaam="foto.png", titel="foto.png"
         )
@@ -269,6 +269,20 @@ class TestFileItemFromInformatieObject(SimpleTestCase):
         )
         self.assertEqual(result.extension, "png")
         self.assertTrue(result.is_image)
+
+    def test_bestandsnaam_extension_takes_priority_over_formaat(self):
+        """bestandsnaam reflects the actual served file; formaat may be stale (e.g. after
+        eSuite converts DOCX→PDF and updates bestandsnaam but not formaat, or OIP wrote
+        a wrong formaat from an untrusted browser Content-Type header)."""
+        info_obj = make_info_object(
+            formaat="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            bestandsnaam="rapport.pdf",
+            titel="rapport",
+        )
+        result = FileItem.from_informatieobject(
+            info_obj, make_zaak_info_object(), "/dl/"
+        )
+        self.assertEqual(result.extension, "pdf")
 
     def test_extension_falls_back_to_bestandsnaam_when_no_formaat(self):
         info_obj = make_info_object(

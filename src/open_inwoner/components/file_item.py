@@ -61,12 +61,14 @@ class FileItem:
         case_info_obj: "ZaakInformatieObject",
         url: str,
     ) -> "FileItem":
-        guessed = (
-            mimetypes.guess_extension(info_obj.formaat) if info_obj.formaat else None
+        bestandsnaam_ext = (
+            pathlib.Path(info_obj.bestandsnaam).suffix if info_obj.bestandsnaam else ""
         )
-        extension = (guessed or "").lstrip(".") or pathlib.Path(
-            info_obj.bestandsnaam or info_obj.titel
-        ).suffix.lstrip(".")
+        formaat_ext = (
+            mimetypes.guess_extension(info_obj.formaat) if info_obj.formaat else ""
+        ) or ""
+        titel_ext = pathlib.Path(info_obj.titel).suffix
+        extension = (bestandsnaam_ext or formaat_ext or titel_ext).lstrip(".")
         return cls(
             name=pathlib.Path(info_obj.titel).stem,
             extension=extension,
