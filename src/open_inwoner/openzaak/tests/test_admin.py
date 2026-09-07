@@ -1,5 +1,6 @@
 import html
 import json
+import uuid
 from unittest import mock
 
 from django.test import override_settings
@@ -25,6 +26,7 @@ from .factories import (
     ZaakTypeConfigFactory,
     ZaakTypeInformatieObjectTypeConfigFactory,
     ZaakTypeResultaatTypeConfigFactory,
+    ZaakTypeStatusTypeConfigFactory,
 )
 
 
@@ -159,6 +161,105 @@ class TestZaakTypeConfigAdmin(WebTest):
         doc = PyQuery(response.content)
         div = doc.find("div.field-esuite_compat_naam div.readonly")[0]
         self.assertEqual(div.text, "foobar")
+
+    def test_search_by_nested_statustype_uuid(self):
+        statustype_uuid = uuid.uuid4()
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.ztc,
+            statustype_url=f"https://example.com/statustypen/{statustype_uuid}",
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": str(statustype_uuid)},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_nested_resultaattype_uuid(self):
+        resultaattype_uuid = uuid.uuid4()
+        ZaakTypeResultaatTypeConfigFactory(
+            zaaktype_config=self.ztc,
+            resultaattype_url=f"https://example.com/resultaattypen/{resultaattype_uuid}",
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": str(resultaattype_uuid)},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_nested_informatieobjecttype_uuid(self):
+        informatieobjecttype_uuid = uuid.uuid4()
+        self.ztiotc.informatieobjecttype_url = (
+            f"https://example.com/informatieobjecttypen/{informatieobjecttype_uuid}"
+        )
+        self.ztiotc.save()
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": str(informatieobjecttype_uuid)},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_nested_statustype_omschrijving(self):
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.ztc,
+            omschrijving="In behandeling genomen",
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": "In behandeling"},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_nested_resultaattype_omschrijving(self):
+        ZaakTypeResultaatTypeConfigFactory(
+            zaaktype_config=self.ztc,
+            omschrijving="Verleend",
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": "Verleend"},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_nested_informatieobjecttype_omschrijving(self):
+        self.ztiotc.omschrijving = "Aanvraagformulier"
+        self.ztiotc.save()
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": "Aanvraagformulier"},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
+
+    def test_search_by_unrelated_uuid_returns_no_results(self):
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.ztc,
+            statustype_url=f"https://example.com/statustypen/{uuid.uuid4()}",
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": str(uuid.uuid4())},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [])
 
 
 @disable_admin_mfa()

@@ -539,6 +539,12 @@ class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
         "catalogus__domein",
         "catalogus__rsin",
         "contact_subject_code",
+        "zaaktypestatustypeconfig__statustype_url",
+        "zaaktypestatustypeconfig__omschrijving",
+        "zaaktyperesultaattypeconfig__resultaattype_url",
+        "zaaktyperesultaattypeconfig__omschrijving",
+        "zaaktypeinformatieobjecttypeconfig__informatieobjecttype_url",
+        "zaaktypeinformatieobjecttypeconfig__omschrijving",
     ]
     ordering = ("identificatie", "catalogus__domein")
 
