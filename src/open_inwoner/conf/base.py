@@ -1166,7 +1166,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "Opschonen notificatieberichten": {
         "task": "notifications.tasks.prune_notification_records",
-        "schedule": crontab(hour=3, minute=0),
+        "schedule": crontab(hour="*", minute=0),
     },
     "Beat health sentinel": {
         "task": "open_inwoner.celery.beat_health_sentinel",
