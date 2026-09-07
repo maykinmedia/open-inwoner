@@ -222,23 +222,23 @@ class NotificationRecord(models.Model):
 class NotificationProcessingConfig(SingletonModel):
     """Configuration for notification record processing and retention."""
 
-    retention_days = models.PositiveIntegerField(
-        verbose_name=_("retention days"),
+    retention_hours = models.PositiveIntegerField(
+        verbose_name=_("retention hours"),
         null=True,
         blank=True,
         help_text=_(
-            "Number of days to retain notification records in terminal states "
+            "Number of hours to retain notification records in terminal states "
             "(SUCCESS, FAILED, SKIPPED). "
             "Records older than this will be pruned. "
             "Leave empty to keep records indefinitely."
         ),
     )
-    stuck_processing_retention_days = models.PositiveIntegerField(
-        verbose_name=_("stuck processing retention days"),
+    stuck_processing_retention_hours = models.PositiveIntegerField(
+        verbose_name=_("stuck processing retention hours"),
         null=True,
         blank=True,
         help_text=_(
-            "Number of days after which PROCESSING records are considered stuck "
+            "Number of hours after which PROCESSING records are considered stuck "
             "(worker killed before completion) and will be pruned. "
             "Leave empty to never prune stuck records."
         ),

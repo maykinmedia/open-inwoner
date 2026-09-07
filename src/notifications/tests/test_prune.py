@@ -40,7 +40,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
     def test_prune_old_records_basic(self):
         """Test basic pruning of old records."""
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         # Create old records in final states
         old_success = NotificationRecord.objects.create(
@@ -78,13 +78,13 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30, dry_run=False
+            retention_hours=30, dry_run=False
         )
 
         self.assertEqual(result.total_count, 3)
-        self.assertEqual(result.retention_days, 30)
+        self.assertEqual(result.retention_hours, 30)
         self.assertTrue(result.deleted)
-        self.assertIsNone(result.stuck_processing_retention_days)
+        self.assertIsNone(result.stuck_processing_retention_hours)
         self.assertIsNone(result.stuck_processing_cutoff_date)
         self.assertIn("success", result.breakdown_by_status)
         self.assertIn("failed", result.breakdown_by_status)
@@ -99,7 +99,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
     def test_prune_old_records_dry_run(self):
         """Test dry run mode doesn't delete records."""
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         old_record = NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -109,7 +109,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30, dry_run=True
+            retention_hours=30, dry_run=True
         )
 
         self.assertEqual(result.total_count, 1)
@@ -119,7 +119,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
     def test_prune_old_records_no_records(self):
         """Test pruning when no old records exist."""
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30, dry_run=False
+            retention_hours=30, dry_run=False
         )
 
         self.assertEqual(result.total_count, 0)
@@ -130,7 +130,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
     def test_prune_old_records_breakdown(self):
         """Test status breakdown is accurate."""
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         for _ in range(3):
             NotificationRecord.objects.create(
@@ -156,7 +156,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30, dry_run=False
+            retention_hours=30, dry_run=False
         )
 
         self.assertEqual(result.total_count, 6)
@@ -165,9 +165,9 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         self.assertEqual(result.breakdown_by_status["skipped"], 1)
 
     def test_prune_old_records_processing_not_deleted_without_config(self):
-        """Test that PROCESSING records are not deleted when stuck_processing_retention_days is not set."""
+        """Test that PROCESSING records are not deleted when stuck_processing_retention_hours is not set."""
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         processing_record = NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -177,7 +177,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30, dry_run=False
+            retention_hours=30, dry_run=False
         )
 
         self.assertEqual(result.total_count, 0)
@@ -186,9 +186,9 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
     def test_prune_old_records_stuck_processing_deleted(self):
-        """Test that old PROCESSING records are deleted when stuck_processing_retention_days is set."""
+        """Test that old PROCESSING records are deleted when stuck_processing_retention_hours is set."""
         now = timezone.now()
-        old_date = now - timedelta(days=8)
+        old_date = now - timedelta(hours=8)
 
         stuck_record = NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -198,8 +198,8 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30,
-            stuck_processing_retention_days=7,
+            retention_hours=30,
+            stuck_processing_retention_hours=7,
             dry_run=False,
         )
 
@@ -210,7 +210,7 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         self.assertFalse(NotificationRecord.objects.filter(pk=stuck_record.pk).exists())
 
     def test_prune_old_records_recent_processing_not_deleted(self):
-        """Test that recent PROCESSING records are not deleted even with stuck_processing_retention_days set."""
+        """Test that recent PROCESSING records are not deleted even with stuck_processing_retention_hours set."""
         recent_record = NotificationRecord.objects.create(
             subscription=self.subscription,
             payload={"test": "data"},
@@ -219,8 +219,8 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30,
-            stuck_processing_retention_days=7,
+            retention_hours=30,
+            stuck_processing_retention_hours=7,
             dry_run=False,
         )
 
@@ -231,24 +231,24 @@ class PruneOldRecordsTestCase(TransactionTestCase):
         """Test that stuck PROCESSING and terminal records use their independent cutoff dates."""
         now = timezone.now()
 
-        # Record that's 20 days old: old enough for stuck processing (7d) but not for terminal (30d)
+        # Record that's 20 hours old: old enough for stuck processing (7h) but not for terminal (30h)
         stuck_record = NotificationRecord.objects.create(
             subscription=self.subscription,
             payload={"test": "data"},
             status=ProcessingStatus.PROCESSING,
-            process_started_at=now - timedelta(days=20),
+            process_started_at=now - timedelta(hours=20),
         )
-        # Terminal record that's 20 days old: NOT old enough for 30d terminal retention
+        # Terminal record that's 20 hours old: NOT old enough for 30h terminal retention
         recent_terminal = NotificationRecord.objects.create(
             subscription=self.subscription,
             payload={"test": "data"},
             status=ProcessingStatus.FAILED,
-            last_processed_at=now - timedelta(days=20),
+            last_processed_at=now - timedelta(hours=20),
         )
 
         result = NotificationRecord.objects.prune_old_records(
-            retention_days=30,
-            stuck_processing_retention_days=7,
+            retention_hours=30,
+            stuck_processing_retention_hours=7,
             dry_run=False,
         )
 
@@ -289,13 +289,13 @@ class PruneNotificationRecordsCommandTestCase(TestCase):
         call_command("prune_notification_records", stdout=out)
 
         output = out.getvalue()
-        self.assertIn("No retention_days configured", output)
+        self.assertIn("No retention_hours configured", output)
         self.assertIn("kept indefinitely", output)
 
-    def test_command_with_override_days(self):
-        """Test command with --days override."""
+    def test_command_with_override_hours(self):
+        """Test command with --hours override."""
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -305,21 +305,21 @@ class PruneNotificationRecordsCommandTestCase(TestCase):
         )
 
         out = StringIO()
-        call_command("prune_notification_records", days=30, stdout=out)
+        call_command("prune_notification_records", hours=30, stdout=out)
 
         output = out.getvalue()
-        self.assertIn("Using override: 30 days retention", output)
+        self.assertIn("Using override: 30 hours retention", output)
         self.assertIn("Successfully deleted", output)
         self.assertIn("1 notification records", output)
 
     def test_command_with_dry_run(self):
         """Test command with --dry-run flag."""
         config = NotificationProcessingConfig.get_solo()
-        config.retention_days = 30
+        config.retention_hours = 30
         config.save()
 
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         record = NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -338,26 +338,26 @@ class PruneNotificationRecordsCommandTestCase(TestCase):
         self.assertTrue(NotificationRecord.objects.filter(pk=record.pk).exists())
 
     def test_command_with_config(self):
-        """Test command uses configured retention days."""
+        """Test command uses configured retention hours."""
         config = NotificationProcessingConfig.get_solo()
-        config.retention_days = 45
+        config.retention_hours = 45
         config.save()
 
         out = StringIO()
         call_command("prune_notification_records", stdout=out)
 
         output = out.getvalue()
-        self.assertIn("Using configured retention: 45 days retention", output)
+        self.assertIn("Using configured retention: 45 hours retention", output)
         self.assertIn("No records found to prune.", output)
 
     def test_command_shows_breakdown(self):
         """Test command shows status breakdown."""
         config = NotificationProcessingConfig.get_solo()
-        config.retention_days = 30
+        config.retention_hours = 30
         config.save()
 
         now = timezone.now()
-        old_date = now - timedelta(days=31)
+        old_date = now - timedelta(hours=31)
 
         NotificationRecord.objects.create(
             subscription=self.subscription,
@@ -380,32 +380,32 @@ class PruneNotificationRecordsCommandTestCase(TestCase):
         self.assertIn("- failed:", output)
         self.assertIn("Successfully deleted 2 notification records", output)
 
-    def test_command_with_processing_days_override(self):
-        """Test command with --processing-days override prunes stuck PROCESSING records."""
+    def test_command_with_processing_hours_override(self):
+        """Test command with --processing-hours override prunes stuck PROCESSING records."""
         now = timezone.now()
 
         stuck_record = NotificationRecord.objects.create(
             subscription=self.subscription,
             payload={"test": "data"},
             status=ProcessingStatus.PROCESSING,
-            process_started_at=now - timedelta(days=8),
+            process_started_at=now - timedelta(hours=8),
         )
 
         out = StringIO()
         call_command(
-            "prune_notification_records", days=30, processing_days=7, stdout=out
+            "prune_notification_records", hours=30, processing_hours=7, stdout=out
         )
 
         output = out.getvalue()
-        self.assertIn("Using override: 7 days for stuck processing", output)
+        self.assertIn("Using override: 7 hours for stuck processing", output)
         self.assertIn("Successfully deleted", output)
         self.assertFalse(NotificationRecord.objects.filter(pk=stuck_record.pk).exists())
 
     def test_command_with_stuck_processing_config(self):
-        """Test command uses configured stuck_processing_retention_days."""
+        """Test command uses configured stuck_processing_retention_hours."""
         config = NotificationProcessingConfig.get_solo()
-        config.retention_days = 30
-        config.stuck_processing_retention_days = 7
+        config.retention_hours = 30
+        config.stuck_processing_retention_hours = 7
         config.save()
 
         now = timezone.now()
@@ -414,13 +414,15 @@ class PruneNotificationRecordsCommandTestCase(TestCase):
             subscription=self.subscription,
             payload={"test": "data"},
             status=ProcessingStatus.PROCESSING,
-            process_started_at=now - timedelta(days=8),
+            process_started_at=now - timedelta(hours=8),
         )
 
         out = StringIO()
         call_command("prune_notification_records", stdout=out)
 
         output = out.getvalue()
-        self.assertIn("Using configured retention: 7 days for stuck processing", output)
+        self.assertIn(
+            "Using configured retention: 7 hours for stuck processing", output
+        )
         self.assertIn("stuck processing before", output)
         self.assertFalse(NotificationRecord.objects.filter(pk=stuck_record.pk).exists())

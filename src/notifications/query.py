@@ -23,9 +23,9 @@ if TYPE_CHECKING:
 class PruneResult:
     """Result of a prune operation with detailed statistics."""
 
-    retention_days: int
+    retention_hours: int
     cutoff_date: datetime
-    stuck_processing_retention_days: int | None
+    stuck_processing_retention_hours: int | None
     stuck_processing_cutoff_date: datetime | None
     total_count: int
     breakdown_by_status: dict[str, int]
@@ -45,9 +45,9 @@ class NotificationsConfigManager(models.Manager):
 class NotificationRecordManager(models.Manager):
     def prune_old_records(
         self,
-        retention_days: int,
+        retention_hours: int,
         *,
-        stuck_processing_retention_days: int | None = None,
+        stuck_processing_retention_hours: int | None = None,
         dry_run: bool = False,
     ) -> PruneResult:
         """
@@ -57,8 +57,8 @@ class NotificationRecordManager(models.Manager):
         also deletes PROCESSING records whose worker was killed before completing.
 
         Args:
-            retention_days: Number of days to retain terminal-state records
-            stuck_processing_retention_days: Number of days after which PROCESSING
+            retention_hours: Number of hours to retain terminal-state records
+            stuck_processing_retention_hours: Number of hours after which PROCESSING
                 records are considered stuck and pruned. None skips this cleanup.
             dry_run: If True, only calculate what would be deleted without deleting
 
@@ -66,7 +66,7 @@ class NotificationRecordManager(models.Manager):
             PruneResult with detailed statistics about the operation
         """
         now = timezone.now()
-        cutoff_date = now - timedelta(days=retention_days)
+        cutoff_date = now - timedelta(hours=retention_hours)
 
         terminal_q = Q(
             last_processed_at__lt=cutoff_date,
@@ -74,9 +74,9 @@ class NotificationRecordManager(models.Manager):
         )
 
         stuck_processing_cutoff_date = None
-        if stuck_processing_retention_days is not None:
+        if stuck_processing_retention_hours is not None:
             stuck_processing_cutoff_date = now - timedelta(
-                days=stuck_processing_retention_days
+                hours=stuck_processing_retention_hours
             )
             combined_q = terminal_q | Q(
                 process_started_at__lt=stuck_processing_cutoff_date,
@@ -102,9 +102,9 @@ class NotificationRecordManager(models.Manager):
                 deleted = count_deleted > 0
 
         return PruneResult(
-            retention_days=retention_days,
+            retention_hours=retention_hours,
             cutoff_date=cutoff_date,
-            stuck_processing_retention_days=stuck_processing_retention_days,
+            stuck_processing_retention_hours=stuck_processing_retention_hours,
             stuck_processing_cutoff_date=stuck_processing_cutoff_date,
             total_count=total_count,
             breakdown_by_status=breakdown,
