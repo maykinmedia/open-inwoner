@@ -35,6 +35,22 @@ For Linux (Debian) they are following:
 * libgdal-dev
 * gdal-bin
 
+For mac OS with `homebrew`_:
+
+* gdal 
+* weasyprint 
+* libpq 
+* libxml2 
+* libxmlsec1 
+
+If you're using homebrew postgres, also install:
+   .. code-block:: bash
+
+       brew install postgis
+
+For Mac OS, you need a partition that is 'case sensitive'. To create one, go to `Disk Utility`.
+      
+
 .. _Python: https://www.python.org/
 .. _Virtualenv: https://virtualenv.pypa.io/en/stable/
 .. _Pip: https://packaging.python.org/tutorials/installing-packages/#ensure-pip-setuptools-and-wheel-are-up-to-date
@@ -44,6 +60,8 @@ For Linux (Debian) they are following:
 .. _Elastic Search: https://www.elastic.co/
 .. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 .. _GDAL: https://gdal.org/
+.. _homebrew: https://brew.sh/
+.. _Disk Utility: https://support.apple.com/en-euro/guide/disk-utility/welcome/mac 
 
 
 Getting started
@@ -109,11 +127,11 @@ development machine.
 
        python src/manage.py runserver
 
-9. Create a .env file with database settings. See dotenv.example for an example.
+9. Create a .env file with database settings. See dotenv.example for an example and for mac OS see dotenv.mac.example for the homebrew library paths.
 
    .. code-block:: bash
 
-       cp dotenv.example .env
+       cp dotenv.example .env # Append values from dotenv.mac.example if on Mac OS
 
 **Note:** If you are making local, machine specific, changes, add them to
 ``src/open_inwoner/conf/local.py``. You can base this file on the
