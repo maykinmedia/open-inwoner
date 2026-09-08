@@ -115,8 +115,8 @@ Other Services
 Documentation
 =============
 
-See ``INSTALL.rst`` for installation instructions, available settings and
-commands.
+See ``docs/installation/index.rst`` for installation instructions, available
+settings and commands.
 
 Full documentation is available at https://docs.openinwoner.nl
 
