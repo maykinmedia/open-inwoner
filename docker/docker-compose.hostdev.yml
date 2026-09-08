@@ -1,0 +1,22 @@
+# Publishes the backing services a host-run OIP process needs, on top of the
+# services already defined in docker-compose.yml. Opt-in: `bin/stack.sh up
+# --localhost` adds this file to the compose chain; by hand, add
+# `-f docker/docker-compose.hostdev.yml` to any invocation that already
+# includes docker-compose.yml.
+#
+# Postgres, Redis and Elasticsearch use non-default host ports (5433, 6380,
+# 9202) so they don't collide with a native install on 5432/6379/9200. See
+# docs/installation/docker-compose.rst for the env vars this requires on the
+# Django side.
+services:
+  db:
+    ports:
+      - 5433:5432
+
+  redis:
+    ports:
+      - 6380:6379
+
+  elasticsearch:
+    ports:
+      - 9202:9200
