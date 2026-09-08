@@ -1,0 +1,355 @@
+# Admin OIDC
+oidc_db_config_enable: true
+oidc_db_config_admin_auth:
+  # Shared Keycloak test-realm provider for the citizen-facing flows below. Endpoints
+  # match docker/keycloak/fixtures/realm.json (imported into the local Keycloak).
+  providers:
+    - identifier: keycloak-provider
+      oidc_token_use_basic_auth: false
+      oidc_use_nonce: true
+      oidc_nonce_size: 32
+      oidc_state_size: 32
+      endpoint_config:
+        oidc_op_authorization_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/auth
+        oidc_op_token_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/token
+        oidc_op_user_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/userinfo
+        oidc_op_logout_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/logout
+        oidc_op_jwks_endpoint: http://keycloak.open-inwoner.local:8080/realms/test/protocol/openid-connect/certs
+  items:
+    - identifier: admin-oidc
+      enabled: True
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_scopes_list:
+        - openid
+        - email
+        - profile
+      oidc_rp_sign_algo: RS256
+      oidc_provider_identifier: keycloak-provider
+      userinfo_claims_source: id_token
+      options:
+        user_settings:
+          claim_mappings:
+            username:
+              - sub
+            first_name:
+              - given_name
+          username_case_sensitive: false
+        groups_settings:
+          make_users_staff: true
+          # Read the `groups` claim (a testid default scope). The realm's `admin`
+          # user is in the `Registreerders` group, so grant superuser on that. Both
+          # name-only and full-path forms are listed because the realm has two
+          # `groups` mappers (full.path=false and full.path=true).
+          claim_mapping:
+            - groups
+          sync: true
+          sync_pattern: '*'
+          superuser_group_names:
+            - Registreerders
+            - /Registreerders
+          default_groups:
+            - Functioneel beheer
+    # DigiD (BSN) via the Keycloak test realm
+    - identifier: oidc-digid
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - bsn
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          bsn_claim_path:
+            - bsn
+    # eHerkenning (legal subject via legalSubjectID; claims live in the `bsn` scope)
+    - identifier: oidc-eherkenning
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - bsn
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          identifier_type_claim_path:
+            - name_qualifier
+          legal_subject_claim_path:
+            - legalSubjectID
+          acting_subject_claim_path:
+            - actingSubjectID
+          branch_number_claim_path:
+            - vestiging
+    # eIDAS (natural person + company, single combined flow)
+    - identifier: oidc-eidas
+      enabled: true
+      oidc_provider_identifier: keycloak-provider
+      oidc_rp_client_id: testid
+      oidc_rp_client_secret: 7DB3KUAAizYCcmZufpHRVOcD0TOkNO3I
+      oidc_rp_sign_algo: RS256
+      oidc_rp_scopes_list:
+        - openid
+        - eidas
+        - profile
+      userinfo_claims_source: userinfo_endpoint
+      options:
+        identity_settings:
+          legal_subject_pseudo_identifier_claim_path:
+            - person_pseudo_identifier
+          legal_subject_bsn_identifier_claim_path:
+            - person_bsn_identifier
+          legal_subject_first_name_claim_path:
+            - first_name
+          legal_subject_family_name_claim_path:
+            - family_name
+          legal_subject_date_of_birth_claim_path:
+            - birthdate
+          legal_entity_identifier_claim_path:
+            - company_identifier
+          company_name_claim_path:
+            - company_name
+
+# Site configuration
+#
+# Every field this step manages is overwritten on every run, using its
+# default when this file doesn't set it, so admin edits do not survive a
+# re-run.
+site_config_enable: true
+site_config:
+  name: Open Inwoner Lokaal
+  email_verification_required: false
+  # Matches the `clamav` service in docker-compose.yml (host/port are
+  # already its defaults; set explicitly here for clarity).
+  enable_virus_scan: true
+  clamav_host: {{ clamav_host }}
+  clamav_port: 3310
+
+# DigiD via SAML - disabled locally, since this docker-compose stack has no
+# certificate or real identity provider to configure it against.
+digid_saml_config_enable: false
+
+# eHerkenning/eIDAS via SAML - disabled locally, for the same reason as DigiD
+# above.
+eherkenning_saml_config_enable: false
+
+# Setup service connectivity
+zgw_consumers_config_enable: True
+zgw_consumers:
+  services:
+    - identifier: zaken-test
+      label: Open Zaak - Zaken API
+      api_root: http://{{ openzaak_host }}/zaken/api/v1/
+      api_type: zrc
+      auth_type: zgw
+      client_id: test_client_id
+      secret: test_secret_key
+    - identifier: documenten-test
+      label: Open Zaak - Documenten API
+      api_root: http://{{ openzaak_host }}/documenten/api/v1/
+      api_type: drc
+      auth_type: zgw
+      client_id: test_client_id
+      secret: test_secret_key
+    - identifier: catalogi-test
+      label: Open Zaak - Catalogi API
+      api_root: http://{{ openzaak_host }}/catalogi/api/v1/
+      api_type: ztc
+      auth_type: zgw
+      client_id: test_client_id
+      secret: test_secret_key
+    - identifier: besluiten-test
+      label: Open Zaak - Besluiten API
+      api_root: http://{{ openzaak_host }}/besluiten/api/v1/
+      api_type: brc
+      auth_type: zgw
+      client_id: test_client_id
+      secret: test_secret_key
+    - identifier: selectielijst
+      label: Open Zaak (public) - Selectielijst API
+      api_root: https://selectielijst.openzaak.nl/api/v1/
+      api_type: orc
+      auth_type: no_auth
+    - identifier: klanten-test
+      label: Open Klant - Klantinteracties API
+      api_root: http://{{ openklant_host }}/klantinteracties/api/v1/
+      api_type: kc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
+      # OpenKlant2Service (services.py) builds its client straight from
+      # `service.secret` as the raw token, not from header_key/header_value
+      # (those are only honoured by the generic zgw_consumers auth used for
+      # the eSuite services below) -- without this, no Authorization header
+      # is sent at all and every klantinteracties call 401s.
+      secret: 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
+    - identifier: contactmomenten-test
+      label: Open Klant - Contactmomenten API
+      api_root: http://{{ openklant_host }}/contactmomenten/api/v1/
+      api_type: cmc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 9b17346dbb9493f967e6653bbcdb03ac2f7009fa
+    - identifier: objecttypen-test
+      label: Objecttypen API
+      api_root: http://{{ objecttypes_host }}/api/v2/
+      api_type: orc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 171be5abaf41e7856b423ad513df1ef8f867ff48
+    - identifier: objecten-test
+      label: Objecten API
+      api_root: http://{{ objects_host }}/api/v2/
+      api_type: orc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token 7657474c3d75f56ae0abd0d1bf7994b09964dca9
+    - identifier: brp-personen-mock
+      label: Haal Centraal BRP (personen-mock)
+      api_root: http://{{ hc_brp_host }}/haalcentraal/api/brp/
+      api_type: orc
+      auth_type: no_auth
+
+# Openzaak
+openzaak_config_enable: true
+openzaak_config:
+  zaak_max_confidentiality: openbaar
+  document_max_confidentiality: vertrouwelijk
+  max_upload_size: 50
+  skip_notification_statustype_informeren: false
+  reformat_esuite_zaak_identificatie: true
+  derive_zaak_titel_from: zaaktype_omschrijving
+  order_statuses_by_date_set: false
+  title_text: title text from setup configuration
+  enable_categories_filtering_with_zaken: true
+  action_required_deadline_days: 1874
+  zaken_filter_enabled: 'true'
+  allowed_file_extensions:
+    - .pdf
+    - .txt
+  api_groups:
+    - zaken_api_identifier: zaken-test
+      documenten_api_identifier: documenten-test
+      catalogi_api_identifier: catalogi-test
+      fetch_eherkenning_zaken_with_rsin: true
+
+# Haal Centraal BRP (personen-mock)
+haalcentraal_config_enable: true
+haalcentraal_config:
+  service_identifier: brp-personen-mock
+
+# KlantenSysteem (consolidated OpenKlant/eSuite and OpenKlant2 configuration)
+klantensysteem_config_enable: true
+klantensysteem_config:
+  primary_backend: openklant2
+  register_contact_via_api: true
+  register_contact_email: admin@oip.org
+  openklant2_config:
+    service_identifier: klanten-test
+    mijn_vragen_kanaal: formulier
+    mijn_vragen_organisatie_naam: De Gemeente
+    mijn_vragen_actor: e412c6f6-bc31-4fd4-b883-0fb5e88d3f5b
+    interne_taak_gevraagde_handeling: Vraag beantwoorden
+    interne_taak_toelichting: Vraag via OIP, graag beantwoorden
+    # ContactForm has no choices to offer, and so cannot be submitted, without
+    # at least one of these.
+    subjects:
+      - subject: Algemene vraag
+      - subject: Klacht
+      - subject: Bezwaar
+
+# Django site config
+sites_config_enable: true
+sites_config:
+  items:
+    # Used for absolute links built outside a request context, e.g. in mail
+    # templates (see build_absolute_url()). Matches CSRF_TRUSTED_ORIGINS.
+    - domain: {{ domain }}
+      name: The Django Sites default
+
+# CMS pages
+#
+# Re-running setup_configuration overwrites the fields listed here (title,
+# extension settings, app config toggles) on every run, so admin edits to
+# them do not survive a re-run. Anything else on the page -- placeholders,
+# plugins not managed below -- is left alone.
+cms_pages_config_enable: true
+cms_pages_config:
+  homepage:
+    enabled: true
+    title: Home
+    mijn_zaken:
+      title: Mijn zaken
+      num_zaken: 4
+    mijn_taken:
+      title: Mijn taken
+  ssd:
+    enabled: true
+    title: Mijn uitkeringen
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: euro
+  cases:
+    enabled: true
+    title: Mijn zaken
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: inventory_2
+  collaborate:
+    enabled: true
+    title: Samenwerken
+    requires_auth: true
+    menu_icon: group
+  inbox:
+    enabled: true
+    title: Berichten
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_indicator: inbox_new_messages
+    menu_icon: inbox
+  products:
+    enabled: true
+    title: Onderwerpen
+    menu_icon: description
+  profile:
+    enabled: true
+    title: Mijn profiel
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: person
+  openklant:
+    enabled: true
+    title: Contact
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: help_outline
+  mijn_afval:
+    enabled: true
+    title: Mijn afval
+    requires_auth: true
+    menu_icon: delete
+  # "Mijn vragen" has no apphook of its own -- its views live inside the `cases`
+  # app (`cases:contactmoment_list`), reachable so far only from a card on the
+  # profile page. This adds it as its own page-tree node purely so the sidenav
+  # (built from the page tree, see `SideNavMenuData`) gets an entry for it too.
+  mijn_vragen:
+    enabled: true
+    title: Mijn vragen
+    redirect_url_name: cases:contactmoment_list
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: help_outline
+
+# Set default (staff) users
+default_user_configuration_enable: true
+default_user_configuration_config:
+  users:
+    - email: admin@user.nl
+      is_staff: True
+      is_superuser: True
+      password: change_me
