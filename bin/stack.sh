@@ -15,12 +15,24 @@ Commands:
                    db/redis/elasticsearch/image are ready, then a ZGW import
                    + search index rebuild once Open Zaak/Objects are
                    healthy. `--logs` follows the app's logs afterwards.
+  up --localhost   Bring up only the satellites and backing services, with
+                   their ports published to localhost, then generate Open
+                   Inwoner's host-mode config and seed it (migrate,
+                   setup_configuration, ZGW import, search index) so you can
+                   run it yourself on the host instead of in Docker. Prints
+                   the command to start it once everything is ready. Can't
+                   be combined with `--logs` (there is no app container to
+                   follow the logs of).
   down [args]      Stop and remove containers. Forwarded to
                    `docker compose down` (e.g. `bin/stack.sh down -v` to
                    also remove volumes).
   reset-config     Force setup_configuration to run again on next `up`
-                   (e.g. after editing docker/setup_configuration/data.yaml),
-                   instead of being skipped as already-completed.
+                   (e.g. after editing
+                   docker/setup_configuration/data.yaml.j2), instead of
+                   being skipped as already-completed. Clears web-init's
+                   marker and restarts it.
+  reset-config     Same, but for `up --localhost`: clears its marker only,
+  --localhost      without touching web-init or starting any app container.
   urls             Print the service URLs shown at the end of `up`, without
                    bringing anything up or down.
   <anything else>  Forwarded to `docker compose` as-is, e.g.:
@@ -49,6 +61,13 @@ COMPOSE=(
     -f docker/docker-compose.openafval.yml
     -f docker/docker-compose.observability.yml
 )
+
+# Marker for the one-off setup_configuration/loaddata step in `up
+# --localhost`, mirroring web-init's own marker (see
+# bin/setup_configuration.sh) so re-running `up --localhost` doesn't
+# overwrite admin changes on every restart. Lives in the already-gitignored
+# .host/ dir that bin/generate_setup_configuration.py generates into.
+HOST_SETUP_MARKER=docker/setup_configuration/.host/.completed
 
 wait_for_completion() {
     # Polls a one-shot container until it exits, failing on a non-zero exit
@@ -81,10 +100,8 @@ wait_for_completion() {
     fi
 }
 
-print_urls() {
+print_satellite_urls() {
     cat <<'EOF'
-  Open Inwoner              http://localhost:8000/        (behind nginx: http://localhost:9000/)
-  Open Inwoner admin        http://localhost:8000/admin/  (click "Login with OIDC", Keycloak admin / admin)
   Mailpit (sent emails)     http://localhost:8025/
   Keycloak admin            http://localhost:8080/         (admin / admin)
   Open Zaak admin           http://localhost:8002/admin/   (admin / admin)
@@ -96,6 +113,16 @@ print_urls() {
   Grafana (observability)   http://localhost:3000/
   Prometheus                http://localhost:9090/
   Loki                      http://localhost:3100/ready
+EOF
+}
+
+print_urls() {
+    cat <<'EOF'
+  Open Inwoner              http://localhost:8000/        (behind nginx: http://localhost:9000/)
+  Open Inwoner admin        http://localhost:8000/admin/  (click "Login with OIDC", Keycloak admin / admin)
+EOF
+    print_satellite_urls
+    cat <<'EOF'
 
   DigiD login               http://localhost:8000/digid-oidc/authenticate/
   eHerkenning login         http://localhost:8000/eherkenning-oidc/authenticate/
@@ -111,10 +138,15 @@ cmd=${1:-}
 case "$cmd" in
     up)
         logs=false
+        localhost=false
         while [ $# -gt 0 ]; do
             case "$1" in
                 --logs)
                     logs=true
+                    shift
+                    ;;
+                --localhost)
+                    localhost=true
                     shift
                     ;;
                 *)
@@ -124,21 +156,34 @@ case "$cmd" in
             esac
         done
 
+        if [ "$logs" = true ] && [ "$localhost" = true ]; then
+            echo "==> --logs and --localhost can't be combined: with --localhost," >&2
+            echo "    Open Inwoner doesn't run in Docker, so there are no app logs" >&2
+            echo "    to follow." >&2
+            exit 1
+        fi
+
+        if [ "$localhost" = true ]; then
+            COMPOSE+=(-f docker/docker-compose.hostdev.yml)
+        fi
+
         # Enable OTEL by default
         export OTEL_SDK_DISABLED=false
 
         echo "==> Ensuring the shared open-inwoner-dev network exists"
         bin/ensure_dev_network.sh
 
-        echo
-        echo "==> Building the app image in the background"
-        # Explicit rebuild so a stale image never silently runs
-        # setup_configuration against outdated code. Backgrounded, since it
-        # doesn't need anything else here to happen first; `--quiet` keeps
-        # its output from interleaving with everything else starting up
-        # below, while still surfacing a build failure.
-        "${COMPOSE[@]}" build --quiet web &
-        build_pid=$!
+        if [ "$localhost" = false ]; then
+            echo
+            echo "==> Building the app image in the background"
+            # Explicit rebuild so a stale image never silently runs
+            # setup_configuration against outdated code. Backgrounded, since it
+            # doesn't need anything else here to happen first; `--quiet` keeps
+            # its output from interleaving with everything else starting up
+            # below, while still surfacing a build failure.
+            "${COMPOSE[@]}" build --quiet web &
+            build_pid=$!
+        fi
 
         echo
         echo "==> Starting satellites, backing services and observability in the background"
@@ -182,8 +227,51 @@ case "$cmd" in
 
         echo
         echo "==> Waiting for the app's own database, redis and elasticsearch"
-        # web-init needs these to run migrate and start at all.
+        # Needed to run migrate and start at all -- web-init here, or you
+        # yourself with --localhost.
         "${COMPOSE[@]}" up -d --wait db redis elasticsearch
+
+        if [ "$localhost" = true ]; then
+            echo
+            echo "==> Waiting for Open Zaak/Objects APIs"
+            "${COMPOSE[@]}" up -d --wait openzaak-web objecttypes-web objects-web
+
+            echo
+            echo "==> Satellites and backing services are up."
+            echo
+            print_satellite_urls
+
+            echo
+            echo "==> Generating host-mode config and running migrations"
+            python bin/generate_setup_configuration.py
+            python src/manage.py migrate
+
+            if [ -f "$HOST_SETUP_MARKER" ]; then
+                echo "    setup_configuration already completed previously (marker:"
+                echo "    $HOST_SETUP_MARKER); skipping. Run 'bin/stack.sh reset-config'"
+                echo "    to force it to run again."
+            else
+                echo
+                echo "==> Running setup_configuration"
+                python src/manage.py setup_configuration \
+                    --yaml-file docker/setup_configuration/.host/data.yaml
+                python src/manage.py loaddata docker/setup_configuration/.host/openzaak_config.json
+                touch "$HOST_SETUP_MARKER"
+            fi
+
+            echo
+            echo "==> Triggering a ZGW data import and search index rebuild"
+            python src/manage.py zgw_import_data
+            python src/manage.py search_index --rebuild -f
+
+            echo
+            echo "==> Open Inwoner is configured and seeded. Start it yourself:"
+            echo "  python src/manage.py runserver"
+            echo
+            echo "Bring the satellites down again with:"
+            echo "  bin/stack.sh down"
+            exit 0
+        fi
 
         echo
         echo "==> Waiting for the app image build to finish"
@@ -234,16 +322,37 @@ case "$cmd" in
         ;;
 
     reset-config)
-        # web-init is one-shot, not a running service, so its marker (see
-        # bin/setup_configuration.sh) can't be removed via `exec` -- use a
-        # throwaway container against the same volume instead.
-        echo "==> Clearing the setup_configuration marker"
-        "${COMPOSE[@]}" run --rm --entrypoint sh web-init -c \
-            "rm -f /var/lib/open-inwoner/setup-configuration/.completed"
+        localhost=false
+        while [ $# -gt 0 ]; do
+            case "$1" in
+                --localhost)
+                    localhost=true
+                    shift
+                    ;;
+                *)
+                    echo "==> Unknown option for 'reset-config': $1" >&2
+                    exit 1
+                    ;;
+            esac
+        done
 
-        echo
-        echo "==> Re-running web-init"
-        "${COMPOSE[@]}" up -d web-init
+        if [ "$localhost" = true ]; then
+            echo "==> Clearing the 'up --localhost' setup_configuration marker"
+            rm -f "$HOST_SETUP_MARKER"
+        else
+            # web-init is one-shot, not a running service, so its marker (see
+            # bin/setup_configuration.sh) can't be removed via `exec` -- use a
+            # throwaway container against the same volume instead. `--localhost`
+            # never builds or starts the app image, so this branch must not
+            # touch web-init at all when that flag is given.
+            echo "==> Clearing the setup_configuration marker"
+            "${COMPOSE[@]}" run --rm --entrypoint sh web-init -c \
+                "rm -f /var/lib/open-inwoner/setup-configuration/.completed"
+
+            echo
+            echo "==> Re-running web-init"
+            "${COMPOSE[@]}" up -d web-init
+        fi
         ;;
 
     ""|-h|--help)

@@ -14,6 +14,17 @@ os.environ.setdefault("VERSION_TAG", "dev")
 os.environ.setdefault("DB_NAME", "open_inwoner")
 os.environ.setdefault("DB_USER", "open_inwoner")
 os.environ.setdefault("DB_PASSWORD", "open_inwoner")
+# `bin/stack.sh up --localhost` (see docs/installation/docker-compose.rst) is the
+# standard way to run OIP outside Docker: it publishes Postgres/Redis/Elasticsearch
+# on 5433/6380/9202 rather than the defaults 5432/6379/9200, so they don't collide
+# with a native install. These are only defaults -- conf.docker (used inside Docker
+# containers, see conf/docker.py) doesn't import this module, so full-Docker mode is
+# unaffected. Override in conf/local.py if you're not using `up --localhost` (e.g. a
+# native Postgres/Redis/Elasticsearch install).
+os.environ.setdefault("DB_PORT", "5433")
+os.environ.setdefault("CACHE_DEFAULT", "localhost:6380/0")
+os.environ.setdefault("CELERY_BROKER_URL", "redis://localhost:6380/0")
+os.environ.setdefault("ES_HOST", "http://localhost:9202")
 
 os.environ.setdefault("ES_USERNAME", "elastic")
 os.environ.setdefault("ES_PASSWORD", "elastic")
@@ -72,12 +83,10 @@ LOGGING["loggers"].update(
     }
 )
 
-# in memory cache and django-axes don't get along.
-# https://django-axes.readthedocs.io/en/latest/configuration.html#known-configuration-problems
-CACHES = {
-    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
-    "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
-}
+# No CACHES override: Redis-backed caches (conf.base) apply as-is. Redis is a
+# required service for host mode (see docs/installation/docker-compose.rst) --
+# an in-memory cache here would make a host-run Celery worker's results
+# invisible to `runserver`.
 
 _MOCK_AUTHENTICATION_BACKENDS = {
     "digid_eherkenning.backends.DigiDBackend": "digid_eherkenning.mock.backends.DigiDBackend",
