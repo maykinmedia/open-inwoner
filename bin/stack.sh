@@ -110,6 +110,20 @@ cmd=${1:-}
 
 case "$cmd" in
     up)
+        logs=false
+        while [ $# -gt 0 ]; do
+            case "$1" in
+                --logs)
+                    logs=true
+                    shift
+                    ;;
+                *)
+                    echo "==> Unknown option for 'up': $1" >&2
+                    exit 1
+                    ;;
+            esac
+        done
+
         # Enable OTEL by default
         export OTEL_SDK_DISABLED=false
 
@@ -201,7 +215,7 @@ case "$cmd" in
         echo "Bring it all down again with:"
         echo "  bin/stack.sh down"
 
-        if [ "$1" = "--logs" ]; then
+        if [ "$logs" = true ]; then
             "${COMPOSE[@]}" logs -f web web-init
         fi
         ;;
