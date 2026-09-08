@@ -11,7 +11,7 @@ The `docker_compose.yml` defines 'convenience' settings, meaning that that no
 additional configuration is needed to run the app. It is **not** suitable
 for production.
 
-This comes in two flavours:
+This comes in three flavours:
 
 - The base stack (``docker compose up``, `Getting started`_ below) -- just
   the app itself plus its own database and Mailpit, with none of the
@@ -24,6 +24,11 @@ This comes in two flavours:
   Afval) and an observability stack, all pre-wired together. Use this for
   integration/end-to-end testing of anything that touches those services --
   OIDC login, case management, BRP lookups, and so on.
+- The full stack, minus the app itself (``bin/stack.sh up --localhost``,
+  :ref:`installation_docker_compose_host_mode` below) -- everything above
+  except Open Inwoner, which you then run yourself on the host. Use this
+  when you're working on Open Inwoner's own code and want a debugger and
+  autoreload, while still testing against every other service for real.
 
 
 Getting started
@@ -245,6 +250,91 @@ login instead of silently reusing whichever user is still logged in at
 Keycloak. If you need to switch users faster than that, log out at Keycloak
 (or use a private/incognito window) rather than relying on the timeout alone
 -- a still-active session is reused with no prompt at all.
+
+.. _installation_docker_compose_host_mode:
+
+Running Open Inwoner on the host
+=================================
+
+Running Open Inwoner itself in Docker is a slow loop for working on its own
+code: every change needs a rebuild, and there's no debugger or autoreload.
+``bin/stack.sh up --localhost`` keeps every satellite and backing service
+(database, Redis, Elasticsearch, and everything listed above) running in
+Docker exactly as with a normal ``bin/stack.sh up``, but skips starting Open
+Inwoner itself so you can run it yourself from a virtualenv instead --
+generating its host-mode config, migrating, seeding (``setup_configuration``,
+the ZGW import, the search index) and printing the command to start it,
+the same way a normal ``bin/stack.sh up`` does for the Dockerized app:
+
+.. code:: bash
+
+     bin/stack.sh up --localhost
+
+Once it finishes, start the app itself:
+
+.. code:: bash
+
+     python src/manage.py runserver
+
+Postgres, Redis and Elasticsearch are published on 5433, 6380 and 9202, not
+their usual 5432/6379/9200, so they don't collide with a native install on
+the host. ``conf.dev`` defaults ``DB_PORT``/``CACHE_DEFAULT``/
+``CELERY_BROKER_URL``/``ES_HOST`` to those ports, since ``up --localhost`` is
+the standard way to run OIP outside Docker -- no env vars to export. If
+you're *not* using ``up --localhost`` (e.g. a native Postgres/Redis/
+Elasticsearch install instead), override those in ``local.py``. This only
+affects the host: ``conf.docker``, used inside the containers themselves,
+doesn't import ``conf.dev`` and is unaffected either way.
+
+``docker/setup_configuration/data.yaml`` and its ``openzaak_config.json``
+fixture are themselves generated -- from ``data.yaml.j2``/
+``openzaak_config.json.j2``, the actual source of truth, which use
+Jinja2 placeholders for the satellites' addresses instead of hardcoding
+either mode's values. ``bin/generate_setup_configuration.py`` renders both
+templates twice: once with Docker-internal addresses into the paths above
+(committed to git, since plain ``docker compose up`` reads them directly
+with no generation step of its own -- re-run this script and commit the
+result whenever you edit a ``.j2`` template), and once with ``localhost``
+equivalents on the satellites' published ports into the gitignored
+``docker/setup_configuration/.host/`` folder, which is what ``up
+--localhost`` actually feeds to ``setup_configuration``/``loaddata``. Run it
+by hand if you only edited a template and don't need a full re-seed --
+``up --localhost`` already runs it automatically.
+
+Like ``web-init`` in the full stack, ``setup_configuration`` and the
+``openzaak_config.json`` load only run once per database -- a marker file in
+that same ``.host/`` folder records it, so re-running ``up --localhost``
+(e.g. after a restart) doesn't overwrite any admin changes you've made
+locally. ``bin/stack.sh reset-config`` clears that marker (and web-init's)
+to force it to run again, e.g. after editing ``data.yaml``. Migrations, the
+ZGW import and the search index rebuild aren't gated by that marker and run
+on every ``up --localhost``, same as the full stack.
+
+The Keycloak hosts-file entry from above is still needed. Once
+``runserver`` is up, the same login table above applies unchanged -- Open
+Inwoner runs on ``http://localhost:8000/`` either way.
+
+Bring the satellites down again the same way as the full stack:
+
+.. code:: bash
+
+     bin/stack.sh down
+
+A few things worth knowing about this mode:
+
+- ``.env`` is read by both ``python-dotenv`` (loaded by the app on startup)
+  and by Docker Compose's own ``${VAR:-default}`` substitution. Prefer
+  ``src/open_inwoner/conf/local.py`` for settings that only matter to the
+  app itself, and leave ``.env`` for Compose-side settings, so the two
+  don't collide.
+- Redis is a required service for host mode, same as Postgres/Elasticsearch --
+  not just as Celery's broker, but because async tasks (e.g. login cache
+  warm-up) hand their results back to the web process through the shared
+  ``default``/``axes`` caches, which are Redis-backed.
+- Elasticsearch isn't required for the app to start, but saving a product or
+  CMS page in the admin will error while it's down, since indexing happens
+  synchronously by default. Set ``ELASTICSEARCH_DSL_AUTOSYNC=False`` if you
+  want to work without it.
 
 Testing OpenTelemetry Observability
 ===================================

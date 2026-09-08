@@ -4,6 +4,13 @@
 Development
 ===========
 
+This installs every dependency (Postgres, Elasticsearch, Node, ...) directly
+on your machine, with no Docker at all. For most development work, running
+:ref:`Docker-Compose <installation_docker_compose_host_mode>` for the
+satellites/backing services and Open Inwoner itself on the host is
+considerably less setup -- use this fully native path only if Docker isn't
+an option for you.
+
 Prerequisites
 -------------
 
