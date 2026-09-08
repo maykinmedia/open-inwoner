@@ -10,6 +10,7 @@ import structlog
 from celery.schedules import crontab
 from easy_thumbnails.conf import Settings as ThumbnailSettings
 from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
+from maykin_common.branding import ProductDefinition
 from maykin_common.config import DocumentationParams, config
 from maykin_common.health_checks import default_health_check_apps
 
@@ -947,6 +948,61 @@ SHOW_ENVIRONMENT = config("SHOW_ENVIRONMENT", default=True)
 # dropping every setting defined after this line (e.g. CELERY_BROKER_URL).
 GIT_SHA = os.getenv("GIT_SHA") or get_current_version(BASE_DIR)
 SHOW_ALERT = True
+
+# Branding (through maykin-common), rendered in the admin footer
+MKN_BRANDING_PRODUCT_DEFINITION = ProductDefinition(
+    name="Open Inwoner",
+    hyperlink="https://github.com/maykinmedia/open-inwoner",
+    logo_path="img/branding/open-inwoner-icon.svg",
+)
+CUSTOM_PRODUCT_NAME = config(
+    "CUSTOM_PRODUCT_NAME",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Specify the custom product name when redistributing the application, "
+            "e.g. as part of your own software suite. Leave empty (the default) to "
+            "render no custom branding at all in the admin footer, only the "
+            "standard Open Inwoner branding."
+        ),
+        group="Branding",
+    ),
+)
+MKN_BRANDING_DERIVED_PRODUCT_DEFINITION = (
+    ProductDefinition(
+        name=CUSTOM_PRODUCT_NAME,
+        hyperlink=config(
+            "CUSTOM_PRODUCT_URL",
+            default="",
+            documentation=DocumentationParams(
+                help_text=(
+                    "Optional link for the custom product when redistributing the "
+                    "application. If provided, the product name will be clickable."
+                ),
+                group="Branding",
+            ),
+        ),
+        logo_path=config(
+            "CUSTOM_PRODUCT_LOGO_PATH",
+            default="",
+            documentation=DocumentationParams(group="Branding"),
+        ),
+        logo_url=config(
+            "CUSTOM_PRODUCT_LOGO_URL",
+            default="",
+            documentation=DocumentationParams(
+                help_text=(
+                    "Optional link for the custom product logo when redistributing "
+                    "the application. When using externally hosted assets, note that "
+                    "you may need to tweak the Content-Security-Policy settings."
+                ),
+                group="Branding",
+            ),
+        ),
+    )
+    if CUSTOM_PRODUCT_NAME
+    else None
+)
 
 ##############################
 #                            #
