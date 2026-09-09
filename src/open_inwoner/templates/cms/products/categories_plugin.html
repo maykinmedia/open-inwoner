@@ -9,9 +9,8 @@
 
         <nl-paragraph>{{ configurable_text.home_page.home_theme_intro|linebreaksbr }}</nl-paragraph>
 
-        {% has_sidenav_items as has_menu %}
         {% if request.user.is_authenticated %}
-            {% if has_menu %}
+            {% if sidenav_items %}
                 {% include "components/Card/CardContainer.html" with categories=categories columns=3 image_object_fit="cover" only %}
             {% else %}
                 {% include "components/Card/CardContainer.html" with categories=categories columns=4 image_object_fit="cover" only %}

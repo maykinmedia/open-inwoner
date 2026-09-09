@@ -6,7 +6,6 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from open_inwoner.cms.utils.plugin_mixins import CMSActiveAppMixin
-from open_inwoner.components.templatetags.menu import react_sidenav_data
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
 from open_inwoner.pdc.forms import ProductFinderForm
 from open_inwoner.pdc.models import Category, ProductCondition, ProductLocation
@@ -30,18 +29,6 @@ def selected_categories_enabled() -> bool:
     return False
 
 
-def has_menu_items(context):
-    """Check if there are sidenav menu items available"""
-    if not context["request"].user.is_authenticated:
-        return False
-
-    try:
-        menu_data = react_sidenav_data(context)
-        return len(menu_data) > 0
-    except Exception:
-        return False
-
-
 @plugin_pool.register_plugin
 class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
     module = _("PDC")
@@ -56,8 +43,7 @@ class CategoriesPlugin(CMSActiveAppMixin, CMSPluginBase):
         request = context["request"]
 
         # Check if user has menu items instead of just authentication
-        has_menu = has_menu_items(context)
-        self.limit = 3 if has_menu else 4
+        self.limit = 3 if context.get("sidenav_items") else 4
 
         if (
             request.user.is_authenticated

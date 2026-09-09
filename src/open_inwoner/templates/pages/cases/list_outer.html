@@ -5,10 +5,6 @@
     <div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 {% endblock notifications %}
 
-{% block sidebar_content %}
-    {% include "components/Sidenav/Sidenav.html" %}
-{% endblock %}
-
 {% block content %}
     <div class="cases" id="any-error" data-error-message="{% trans 'We konden geen zaken ophalen. Probeer het later opnieuw.' %}"></div>
     <div class="cases" id="cases-content"></div>

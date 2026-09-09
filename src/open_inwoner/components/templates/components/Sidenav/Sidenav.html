@@ -1,12 +1,8 @@
-{% load i18n form_tags string_tags solo_tags custom_session_tags menu_tags button_tags menu %}
+{% load menu %}
 
-{% if request.user.is_authenticated %}
-    {% has_sidenav_items as has_menu %}
-    {% if has_menu %}
-        <div class="side-navigation--oip">
-            {% react_sidenav_data as menu_data %}
-            {{ menu_data|json_script:"sidenav-menu-data" }}
-            <side-navigation items-id="sidenav-menu-data"></side-navigation>
-        </div>
-    {% endif %}
-{% endif %}
+{# callers decide whether to show this: check "sidenav_items" first #}
+<div class="side-navigation--oip">
+    {% react_sidenav_data as menu_data %}
+    {{ menu_data|json_script:"sidenav-menu-data" }}
+    <side-navigation items-id="sidenav-menu-data"></side-navigation>
+</div>

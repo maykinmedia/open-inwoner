@@ -30,7 +30,7 @@
   &--fullwidth {
     margin-top: var(--row-height);
 
-    @media (max-width: 1023px) {
+    @media (max-width: 767px) {
       .grid {
         &__sidebar {
           display: none;

@@ -140,7 +140,7 @@
             <main id="content" class="container">
                 {% block main_inner %}
                     <div class="grid{% block grid_class %}{% endblock %}">
-                        {% spaceless %}<div class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</div>{% endspaceless %}
+                        {% spaceless %}<div class="grid__sidebar">{% if sidenav_items %}{% include "components/Sidenav/Sidenav.html" %}{% else %}{% block sidebar_content %}{% endblock sidebar_content %}{% endif %}</div>{% endspaceless %}
 
                         <div class="grid__main">
                             {% block content %}Please provide the content{% endblock content %}
