@@ -363,7 +363,7 @@ django-csp-reports==1.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-debug-toolbar==6.3.0
+django-debug-toolbar==8.0.0
     # via -r requirements/dev.in
 django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@090e31589ca2b79b81ff741d851e31dfb7df0e0c
     # via
