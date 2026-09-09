@@ -22,6 +22,7 @@ from open_inwoner.cms.tests.cms_tools import publish_page
 from open_inwoner.components.templatetags.menu import (
     SideNavMenuData,
     react_sidenav_data,
+    should_show_menu_item_in_dropdown,
 )
 
 
@@ -474,6 +475,41 @@ class TestSideNavigationMenuFactory(CMSTestCase):
         ):
             SideNavMenuData(context).get_menu_data()
 
+    def test_menu_data_is_computed_once_per_request(self):
+        request = self.factory.get("/")
+        request.user = self.regular_user
+        request.toolbar = CMSToolbar(request)
+        context = Context({"request": request})
+
+        with patch.object(
+            SideNavMenuData, "get_menu_data", wraps=SideNavMenuData.get_menu_data
+        ) as mock_get_menu_data:
+            first_result = react_sidenav_data(context)
+            second_result = react_sidenav_data(context)
+
+        mock_get_menu_data.assert_called_once()
+        self.assertEqual(first_result, second_result)
+
+    def test_menu_data_is_not_shared_between_requests(self):
+        context_a = Context({"request": self.factory.get("/")})
+        context_a["request"].user = self.regular_user
+        context_a["request"].toolbar = CMSToolbar(context_a["request"])
+
+        context_b = Context({"request": self.factory.get("/")})
+        context_b["request"].user = self.regular_user
+        context_b["request"].toolbar = CMSToolbar(context_b["request"])
+
+        with patch.object(
+            SideNavMenuData, "get_menu_data", wraps=SideNavMenuData.get_menu_data
+        ) as mock_get_menu_data:
+            react_sidenav_data(context_a)
+            react_sidenav_data(context_b)
+
+        self.assertEqual(mock_get_menu_data.call_count, 2)
+
+    def test_missing_request_in_context_returns_empty_list(self):
+        self.assertEqual(react_sidenav_data(Context({})), [])
+
 
 class TestExtraMenuItemGeneration(TestCase):
     def setUp(self):
@@ -557,3 +593,27 @@ class TestExtraMenuItemGeneration(TestCase):
                 [],
                 msg="Should return empty list on URL failure",
             )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.components.tests.test_urls")
+class TestDropdownMenuItems(TestCase):
+    def test_profile_detail_is_shown(self):
+        self.assertTrue(should_show_menu_item_in_dropdown("/profile/detail/"))
+
+    def test_profile_detail_is_shown_for_fully_qualified_url(self):
+        self.assertTrue(
+            should_show_menu_item_in_dropdown("http://testserver/profile/detail/")
+        )
+
+    def test_other_pages_are_hidden(self):
+        self.assertFalse(should_show_menu_item_in_dropdown("/faq/"))
+
+    def test_empty_url_is_hidden(self):
+        self.assertFalse(should_show_menu_item_in_dropdown(""))
+
+    def test_unresolvable_url_is_hidden(self):
+        with patch(
+            "open_inwoner.components.templatetags.menu.resolve",
+            side_effect=Resolver404,
+        ):
+            self.assertFalse(should_show_menu_item_in_dropdown("/no-such-page/"))
