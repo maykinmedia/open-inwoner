@@ -335,6 +335,10 @@ A few things worth knowing about this mode:
   CMS page in the admin will error while it's down, since indexing happens
   synchronously by default. Set ``ELASTICSEARCH_DSL_AUTOSYNC=False`` if you
   want to work without it.
+- Outgoing mail goes to a queue, not straight out, so a Celery worker
+  (``bin/celery_worker.sh``) needs to be running for it to actually reach
+  Mailpit. Same worker also handles notification webhooks and login cache
+  warm-up.
 
 Testing OpenTelemetry Observability
 ===================================

@@ -26,6 +26,9 @@ os.environ.setdefault("CACHE_DEFAULT", "localhost:6380/0")
 os.environ.setdefault("CELERY_BROKER_URL", "redis://localhost:6380/0")
 os.environ.setdefault("ES_HOST", "http://localhost:9202")
 
+# Mailpit's SMTP port, so mail sent by the app ends up there.
+os.environ.setdefault("EMAIL_PORT", "1025")
+
 os.environ.setdefault("ES_USERNAME", "elastic")
 os.environ.setdefault("ES_PASSWORD", "elastic")
 
@@ -40,7 +43,6 @@ from .base import *  # noqa isort:skip
 # Standard Django settings.
 #
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # This is commented out because it causes tests in the CI to fail. It can be enabled in the local.py settings.
 # SESSION_COOKIE_DOMAIN = ".localhost"

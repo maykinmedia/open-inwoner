@@ -25,6 +25,6 @@ MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
 MAIL_EDITOR_BASE_HOST = "http://localhost:8000"
 
-# optional to test mail queue
-EMAIL_BACKEND = "mailer.backend.DbBackend"
-MAILER_EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Mail goes to Mailpit by default: http://localhost:8025/
+# Uncomment to print emails to the console instead:
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
