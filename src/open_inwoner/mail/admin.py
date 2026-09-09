@@ -8,6 +8,8 @@ from django_yubin.models import Log as YubinLog, Message as YubinMessage
 
 from open_inwoner.utils.admin import ReadOnlyAdminMixin
 
+from .models import EmailLog, EmailMessage
+
 
 class LogReadOnlyAdmin(ReadOnlyAdminMixin, YubinLogAdmin):
     readonly_fields = [
@@ -18,8 +20,10 @@ class LogReadOnlyAdmin(ReadOnlyAdminMixin, YubinLogAdmin):
     ]
 
 
+# Register our EmailLog proxy instead of YubinLog directly, so it gets a
+# clearer name in the admin (and admin index) than upstream's plain "Log".
 admin.site.unregister(YubinLog)
-admin.site.register(YubinLog, LogReadOnlyAdmin)
+admin.site.register(EmailLog, LogReadOnlyAdmin)
 
 
 class MessageReadOnlyAdmin(ReadOnlyAdminMixin, YubinMessageAdmin):
@@ -33,5 +37,8 @@ class MessageReadOnlyAdmin(ReadOnlyAdminMixin, YubinMessageAdmin):
     ]
 
 
+# Register our EmailMessage proxy instead of YubinMessage directly, so it
+# gets a clearer name in the admin (and admin index) than upstream's plain
+# "Message" -- which is otherwise indistinguishable from accounts.Message.
 admin.site.unregister(YubinMessage)
-admin.site.register(YubinMessage, MessageReadOnlyAdmin)
+admin.site.register(EmailMessage, MessageReadOnlyAdmin)
