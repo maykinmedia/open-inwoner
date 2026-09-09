@@ -14,6 +14,7 @@ from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 
 from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.pdc.models import Question
 
 register = template.Library()
 
@@ -376,111 +377,73 @@ class SideNavMenuData:
         return extra_items
 
 
-@register.simple_tag(takes_context=True)
-def react_sidenav_data(context):
-    """Template tag to provide menu data for React SideNavModule component"""
+# views that aren't part of normal navigation: either a forced step the user
+# hasn't completed yet, a way out of the site, or otherwise voluntarily
+# revisited outside the regular flow (e.g. switching eHerkenning branch)
+SIDENAV_HIDDEN_VIEW_NAMES = {
+    "kvk:branches",
+    "logout_confirm",
+    "profile:registration_necessary",
+    "profile:email_verification_user",
+}
+
+
+def get_sidenav_items(request: HttpRequest) -> List[MenuItem]:
+    """
+    Build the side navigation menu items for this request.
+
+    Empty whenever the sidenav should not be shown at all, so that templates can
+    treat "has items" and "show the sidenav" as the same question. Reached
+    through the "sidenav_items" context variable, which builds this at most once
+    per request.
+    """
+    if not request.user.is_authenticated:
+        return []
+
+    if (
+        request.resolver_match
+        and request.resolver_match.view_name in SIDENAV_HIDDEN_VIEW_NAMES
+    ):
+        return []
 
     try:
-        side_nav_menu = SideNavMenuData(context, root_id="home")
-        return side_nav_menu.get_menu_data()
+        return SideNavMenuData(
+            {
+                "request": request,
+                "has_general_faq_questions": Question.objects.general().exists(),
+            },
+            root_id="home",
+        ).get_menu_data()
     except Exception:
         logger.exception("Error loading sidenav menu")
         return []
 
 
 @register.simple_tag(takes_context=True)
-def has_sidenav_items(context):
+def react_sidenav_data(context):
     """
-    Check if there are any menu items.
-    If False then sidebar should be hidden and main content should be fullwidth
+    Template tag to provide menu data for React SideNavModule component.
+
+    The context variable holds a lazy object, which json_script cannot
+    serialize, so hand the template a real list.
     """
-    if not context["request"].user.is_authenticated:
-        return False
-
-    menu_data = react_sidenav_data(context)
-    return len(menu_data) > 0
+    return list(context["sidenav_items"])
 
 
-@register.simple_tag(takes_context=True)
-def show_full_dropdown_menu(context) -> bool:
-    """
-    Determines whether the full dropdown menu should be shown.
-
-    This is to avoid showing the full menu in the dropdown when those same items are
-    already displayed in the side menu.
-    """
-    request = context["request"]
-
-    if not request.resolver_match:
-        return True  # Show all items when URL resolution fails
-
-    current_url_name = request.resolver_match.url_name
-    current_namespace = (
-        request.resolver_match.namespaces[0]
-        if request.resolver_match.namespaces
-        else None
-    )
-    current_qualified_url_name = (
-        f"{current_namespace}:{current_url_name}"
-        if current_namespace
-        else current_url_name
-    )
-
-    # The following URLs are expected to have the sidenav, so they only need a minimal
-    # dropdown menu.
-    urls_with_minimal_dropdown_menu = {
-        "pages-root",
-        "general_faq",
-        "collaborate:plan_list",
-        "ssd:uitkeringen",
-        "ssd:yearly_benefits_index",
-        "ssd:monthly_benefits_index",
-        "products:category_list",
-        "cases:index",
-        "cases:contactmoment_list",
-        "profile:appointments",
-        "mijn_afval:index",
-    }
-
-    is_url_with_minimal_dropdown = (
-        current_qualified_url_name in urls_with_minimal_dropdown_menu
-    )
-    should_show_full_dropdown_menu = not is_url_with_minimal_dropdown
-
-    if not should_show_full_dropdown_menu:
-        logger.debug(
-            "Menu items hidden from dropdown menu",
-            extra={
-                "current_url_name": current_url_name,
-                "current_namespace": current_namespace,
-                "current_qualified_url_name": current_qualified_url_name,
-                "excluded": is_url_with_minimal_dropdown,
-                "show_menu": should_show_full_dropdown_menu,
-            },
-        )
-
-    return should_show_full_dropdown_menu
-
-
-@register.simple_tag(takes_context=True)
-def should_show_menu_item_in_dropdown(context, menu_item_url: str) -> bool:
+@register.simple_tag
+def should_show_menu_item_in_dropdown(menu_item_url: str) -> bool:
     """
     Determines whether a specific menu item should be shown in the dropdown.
 
-    When the side navigation is active, only show "My Profile" (profile:detail) in the
-    dropdown. Otherwise, show all items.
+    The dropdown is always minimal: it only shows "My Profile" (profile:detail),
+    because the other menu items are reachable through the side navigation.
 
     Args:
-        context: Template context
         menu_item_url: The URL of the menu item to check
 
     Returns:
         True if the item should be shown, False otherwise
     """
-    # If the full dropdown menu should be shown, all items are visible
-    if show_full_dropdown_menu(context):
-        return True
-
     if not menu_item_url:
         logger.warning(
             "Empty menu item url passed to dropdown menu",
@@ -488,7 +451,6 @@ def should_show_menu_item_in_dropdown(context, menu_item_url: str) -> bool:
         )
         return False
 
-    # When side nav is active, only show these items
     allowed_url_names_in_minimal_dropdown = {
         "profile:detail",
     }

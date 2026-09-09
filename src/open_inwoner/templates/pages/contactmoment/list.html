@@ -1,10 +1,6 @@
 {% extends 'master.html' %}
 {% load i18n anchor_menu_tags button_tags card_tags form_tags grid_tags icon_tags link_tags list_tags notification_tags pagination_tags utils static %}
 
-{% block sidebar_content %}
-    {% include "components/Sidenav/Sidenav.html" %}
-{% endblock %}
-
 {% block content %}
     <h1 class="utrecht-heading-1" id="contactmomenten">{{ page_title }} ({{ paginator.count }})</h1>
 

@@ -511,6 +511,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "open_inwoner.utils.context_processors.settings",
                 "open_inwoner.cms.context_processors.active_apphooks",
+                "open_inwoner.cms.context_processors.sidenav",
                 "sekizai.context_processors.sekizai",
                 "cms.context_processors.cms_settings",
                 "django.template.context_processors.i18n",

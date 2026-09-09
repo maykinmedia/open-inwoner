@@ -17,10 +17,9 @@
 {% block main_outer %}
     <main id="content" class="container container--fullwidth">
         {% block main_inner %}
-            {% has_sidenav_items as has_menu %}
-            <div class="grid{% if has_menu %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock %}">
+            <div class="grid{% if sidenav_items %} grid--with-sidebar{% else %} grid--no-sidebar{% endif %}{% block grid_class %}{% endblock %}">
                 {% spaceless %}
-                    {% if has_menu %}
+                    {% if sidenav_items %}
                         <div class="grid__sidebar">
                             {% block sidebar_content %}
                                 {% include "components/Sidenav/Sidenav.html" %}

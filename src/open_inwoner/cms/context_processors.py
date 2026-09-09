@@ -1,8 +1,10 @@
 from django.db.models import Q
+from django.utils.functional import SimpleLazyObject
 
 from cms.models import Page
 
 from open_inwoner.cms.utils.page_display import get_published_page_ids
+from open_inwoner.components.templatetags.menu import get_sidenav_items
 
 
 def active_apphooks(request):
@@ -28,3 +30,14 @@ def active_apphooks(request):
 
     context = {"cms_apps": lookup}
     return context
+
+
+def sidenav(request):
+    """
+    add the side navigation menu items to the context
+
+    Lazy on purpose: building the items walks the CMS menu tree and queries per
+    node, which should not happen on requests that never render the sidenav,
+    such as the admin.
+    """
+    return {"sidenav_items": SimpleLazyObject(lambda: get_sidenav_items(request))}
