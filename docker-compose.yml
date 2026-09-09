@@ -41,7 +41,7 @@ x-app-env: &x-app-env
   TZ: Europe/Amsterdam
   # WARNING: Strictly for development!
   DISABLE_2FA: ${DISABLE_2FA:-True}
-  DEBUG: 'True'
+  DEBUG: 'False'
   IS_HTTPS: 'no'
   ALLOW_CUSTOM_JS: 'False'
   # Overridable uwsgi settings
