@@ -1,7 +1,7 @@
 {% extends 'master.html' %}
 {% load i18n form_tags icon_tags grid_tags pagination_tags render_tags cms_tags filter_tags %}
 
-{% block main_inner %}
+{% block content %}
     {#  search term section #}
     <h1 class="utrecht-heading-1">{% trans "Zoekresultaten voor " %} "{% firstof search_form.query.value "" %}"</h1>
     <nl-paragraph>{{ paginator.count }} {% trans "resultaten" %}</nl-paragraph>
@@ -115,4 +115,4 @@
 
     {% endrender_grid %}
 
-{% endblock main_inner %}
+{% endblock content %}

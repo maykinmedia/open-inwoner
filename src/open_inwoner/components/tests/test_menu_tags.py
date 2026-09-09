@@ -22,6 +22,7 @@ from open_inwoner.cms.tests.cms_tools import publish_page
 from open_inwoner.components.templatetags.menu import (
     SideNavMenuData,
     react_sidenav_data,
+    should_show_menu_item_in_dropdown,
 )
 
 
@@ -557,3 +558,27 @@ class TestExtraMenuItemGeneration(TestCase):
                 [],
                 msg="Should return empty list on URL failure",
             )
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.components.tests.test_urls")
+class TestDropdownMenuItems(TestCase):
+    def test_profile_detail_is_shown(self):
+        self.assertTrue(should_show_menu_item_in_dropdown("/profile/detail/"))
+
+    def test_profile_detail_is_shown_for_fully_qualified_url(self):
+        self.assertTrue(
+            should_show_menu_item_in_dropdown("http://testserver/profile/detail/")
+        )
+
+    def test_other_pages_are_hidden(self):
+        self.assertFalse(should_show_menu_item_in_dropdown("/faq/"))
+
+    def test_empty_url_is_hidden(self):
+        self.assertFalse(should_show_menu_item_in_dropdown(""))
+
+    def test_unresolvable_url_is_hidden(self):
+        with patch(
+            "open_inwoner.components.templatetags.menu.resolve",
+            side_effect=Resolver404,
+        ):
+            self.assertFalse(should_show_menu_item_in_dropdown("/no-such-page/"))
