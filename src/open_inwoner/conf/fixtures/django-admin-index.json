@@ -4,15 +4,45 @@
     "fields": {
       "order": 0,
       "translations": {},
-      "name": "Gebruikersprofielen",
-      "slug": "accounts",
+      "name": "Modules",
+      "slug": "modules",
+      "parent": null,
+      "models": []
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 0,
+      "translations": {},
+      "name": "Zaken",
+      "slug": "zaken",
+      "parent": ["modules"],
       "models": [
-        ["accounts", "action"],
-        ["accounts", "document"],
-        ["accounts", "invite"],
-        ["accounts", "message"],
-        ["accounts", "user"],
-        ["userfeed", "feeditemdata"]
+        ["notifications", "notificationprocessingconfig"],
+        ["notifications", "notificationrecord"],
+        ["notifications", "notificationsapiconfig"],
+        ["notifications", "subscription"],
+        ["openzaak", "catalogusconfig"],
+        ["openzaak", "openzaakconfig"],
+        ["openzaak", "usercaseinfoobjectnotification"],
+        ["openzaak", "usercasestatusnotification"],
+        ["openzaak", "zaaktypeconfig"],
+        ["openzaak", "zaaktypeinformatieobjecttypeconfig"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 1,
+      "translations": {},
+      "name": "OpenKlant",
+      "slug": "openklant",
+      "parent": ["modules"],
+      "models": [
+        ["openklant", "klantcontactmomentanswer"],
+        ["openklant", "klantensysteemconfig"]
       ]
     }
   },
@@ -23,7 +53,9 @@
       "translations": {},
       "name": "PDC",
       "slug": "pdc",
+      "parent": ["modules"],
       "models": [
+        ["openformsclient", "configuration"],
         ["pdc", "category"],
         ["pdc", "organization"],
         ["pdc", "organizationtype"],
@@ -33,7 +65,19 @@
         ["pdc", "productlocation"],
         ["pdc", "question"],
         ["pdc", "tag"],
-        ["pdc", "tagtype"],
+        ["pdc", "tagtype"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 3,
+      "translations": {},
+      "name": "Vragenlijsten",
+      "slug": "vragenlijsten",
+      "parent": ["modules"],
+      "models": [
         ["questionnaire", "questionnairestep"],
         ["questionnaire", "questionnairestepfile"]
       ]
@@ -44,42 +88,56 @@
     "fields": {
       "order": 4,
       "translations": {},
-      "name": "Permissies, 2FA en logging",
-      "slug": "permissies-2fa-en-logging",
+      "name": "Mijn Samenwerkingen",
+      "slug": "samenwerkingen",
+      "parent": ["modules"],
       "models": [
-        ["auth", "group"],
-        ["axes", "accessattempt"],
-        ["axes", "accesslog"],
-        ["cspreports", "cspreport"],
-        ["django_yubin", "log"],
-        ["django_yubin", "message"],
-        ["log_outgoing_requests", "outgoingrequestslog"],
-        ["log_outgoing_requests", "outgoingrequestslogconfig"],
-        ["otp_totp", "totpdevice"],
-        ["timeline_logger", "timelinelog"]
+        ["accounts", "action"],
+        ["accounts", "document"],
+        ["accounts", "message"],
+        ["plans", "actiontemplate"],
+        ["plans", "plan"],
+        ["plans", "plantemplate"]
       ]
     }
   },
   {
     "model": "admin_index.appgroup",
     "fields": {
-      "order": 10,
-      "translations": {
-        "nl": "Overige/Diverse"
-      },
-      "name": "Overige / Diverse",
-      "slug": "overige-diverse",
+      "order": 5,
+      "translations": {},
+      "name": "Mijn Uitkeringen",
+      "slug": "uitkeringen",
+      "parent": ["modules"],
       "models": [
-        ["admin_index", "appgroup"],
-        ["admin_index", "applink"],
-        ["admin_index", "contenttypeproxy"],
-        ["celery_monitor", "taskstate"],
-        ["django_celery_beat", "periodictask"],
-        ["easy_thumbnails", "source"],
-        ["easy_thumbnails", "thumbnail"],
-        ["easy_thumbnails", "thumbnaildimensions"],
-        ["filer", "folder"],
-        ["filer", "folderpermission"]
+        ["soap", "soapservice"],
+        ["ssd", "ssdconfig"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 6,
+      "translations": {},
+      "name": "Mijn Afval",
+      "slug": "afval",
+      "parent": ["modules"],
+      "models": [
+        ["mijn_afval", "mijnafvalconfig"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 7,
+      "translations": {},
+      "name": "Laposta",
+      "slug": "laposta",
+      "parent": ["modules"],
+      "models": [
+        ["laposta", "lapostaconfig"]
       ]
     }
   },
@@ -88,24 +146,35 @@
     "fields": {
       "order": 8,
       "translations": {},
-      "name": "Configuratie",
-      "slug": "configuratie",
+      "name": "Qmatic",
+      "slug": "qmatic",
+      "parent": ["modules"],
       "models": [
-        ["configurations", "siteconfiguration"],
-        ["configurations", "siteconfigurationpage"],
-        ["custom_csp", "cspsetting"],
-        ["mail_editor", "mailtemplate"],
-        ["sites", "site"]
+        ["qmatic", "qmaticconfig"]
       ]
     }
   },
   {
     "model": "admin_index.appgroup",
     "fields": {
-      "order": 3,
+      "order": 9,
+      "translations": {},
+      "name": "Externe taken",
+      "slug": "externe-taken",
+      "parent": ["modules"],
+      "models": [
+        ["objectsapiclient", "objectsapiserviceconfiguration"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 10,
       "translations": {},
       "name": "Zoeken",
       "slug": "zoeken",
+      "parent": ["modules"],
       "models": [
         ["search", "feedback"],
         ["search", "fieldboost"],
@@ -118,46 +187,60 @@
     "fields": {
       "order": 1,
       "translations": {},
-      "name": "Plannen",
-      "slug": "plannen",
+      "name": "Gebruikers & Authenticatie",
+      "slug": "gebruikers",
+      "parent": null,
+      "models": []
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 0,
+      "translations": {},
+      "name": "Gebruikers",
+      "slug": "accounts",
+      "parent": ["gebruikers"],
       "models": [
-        ["plans", "actiontemplate"],
-        ["plans", "plan"],
-        ["plans", "plantemplate"]
+        ["accounts", "invite"],
+        ["accounts", "user"],
+        ["auth", "group"],
+        ["otp_totp", "totpdevice"],
+        ["userfeed", "feeditemdata"]
       ]
     }
   },
   {
     "model": "admin_index.appgroup",
     "fields": {
-      "order": 5,
+      "order": 1,
       "translations": {
-        "nl": "Data koppelingen"
+        "nl": "Inlog koppelingen"
       },
-      "name": "Data koppelingen",
-      "slug": "koppelingen",
+      "name": "Inlog koppelingen",
+      "slug": "auth-koppelingen",
+      "parent": ["gebruikers"],
       "models": [
-        ["laposta", "lapostaconfig"],
-        ["mijn_afval", "mijnafvalconfig"],
-        ["notifications", "notificationprocessingconfig"],
-        ["notifications", "notificationrecord"],
-        ["notifications", "notificationsapiconfig"],
-        ["notifications", "subscription"],
-        ["objectsapiclient", "objectsapiserviceconfiguration"],
-        ["openformsclient", "configuration"],
-        ["openklant", "klantcontactmomentanswer"],
-        ["openklant", "klantensysteemconfig"],
-        ["openzaak", "catalogusconfig"],
-        ["openzaak", "openzaakconfig"],
-        ["openzaak", "usercaseinfoobjectnotification"],
-        ["openzaak", "usercasestatusnotification"],
-        ["openzaak", "zaaktypeconfig"],
-        ["openzaak", "zaaktypeinformatieobjecttypeconfig"],
-        ["qmatic", "qmaticconfig"],
+        ["digid_eherkenning", "digidconfiguration"],
+        ["digid_eherkenning", "eherkenningconfiguration"],
+        ["haalcentraal", "haalcentraalconfig"],
+        ["kvk", "kvkconfig"],
+        ["mozilla_django_oidc_db", "oidcclient"],
+        ["mozilla_django_oidc_db", "oidcprovider"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 2,
+      "translations": {},
+      "name": "Koppelingen",
+      "slug": "koppelingen",
+      "parent": null,
+      "models": [
         ["simple_certmanager", "certificate"],
         ["simple_certmanager", "signingrequest"],
-        ["soap", "soapservice"],
-        ["ssd", "ssdconfig"],
         ["zgw_consumers", "certificate"],
         ["zgw_consumers", "service"]
       ]
@@ -166,38 +249,92 @@
   {
     "model": "admin_index.appgroup",
     "fields": {
-      "order": 7,
-      "translations": {
-        "nl": "CMS"
-      },
-      "name": "CMS",
-      "slug": "cms",
+      "order": 3,
+      "translations": {},
+      "name": "Beheer",
+      "slug": "beheer",
+      "parent": null,
+      "models": []
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 0,
+      "translations": {},
+      "name": "Configuratie",
+      "slug": "configuratie",
+      "parent": ["beheer"],
       "models": [
         ["cms", "globalpagepermission"],
         ["cms", "page"],
         ["cms", "pagecontent"],
         ["cms", "pageuser"],
         ["cms", "pageusergroup"],
-        ["cms", "placeholder"]
+        ["cms", "placeholder"],
+        ["configurations", "siteconfiguration"],
+        ["configurations", "siteconfigurationpage"],
+        ["custom_csp", "cspsetting"],
+        ["mail_editor", "mailtemplate"],
+        ["sites", "site"]
       ]
     }
   },
   {
     "model": "admin_index.appgroup",
     "fields": {
-      "order": 6,
-      "translations": {
-        "nl": "Inlog koppelingen"
-      },
-      "name": "Inlog koppelingen",
-      "slug": "auth-koppelingen",
+      "order": 1,
+      "translations": {},
+      "name": "Permissies, 2FA en logging",
+      "slug": "permissies-2fa-en-logging",
+      "parent": ["beheer"],
       "models": [
-        ["digid_eherkenning", "digidconfiguration"],
-        ["digid_eherkenning", "eherkenningconfiguration"],
-        ["mozilla_django_oidc_db", "oidcclient"],
-        ["mozilla_django_oidc_db", "oidcprovider"],
-        ["haalcentraal", "haalcentraalconfig"],
-        ["kvk", "kvkconfig"]
+        ["axes", "accessattempt"],
+        ["axes", "accesslog"],
+        ["cspreports", "cspreport"],
+        ["log_outgoing_requests", "outgoingrequestslog"],
+        ["log_outgoing_requests", "outgoingrequestslogconfig"],
+        ["mail", "emaillog"],
+        ["mail", "emailmessage"],
+        ["timeline_logger", "timelinelog"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 2,
+      "translations": {
+        "nl": "Asynchrone taken"
+      },
+      "name": "Asynchrone taken",
+      "slug": "asynchrone-taken",
+      "parent": ["beheer"],
+      "models": [
+        ["celery_monitor", "taskstate"],
+        ["django_celery_beat", "periodictask"]
+      ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 3,
+      "translations": {
+        "nl": "Overige/Diverse"
+      },
+      "name": "Overige / Diverse",
+      "slug": "overige-diverse",
+      "parent": ["beheer"],
+      "models": [
+        ["admin_index", "appgroup"],
+        ["admin_index", "applink"],
+        ["admin_index", "contenttypeproxy"],
+        ["easy_thumbnails", "source"],
+        ["easy_thumbnails", "thumbnail"],
+        ["easy_thumbnails", "thumbnaildimensions"],
+        ["filer", "folder"],
+        ["filer", "folderpermission"]
       ]
     }
   },
