@@ -16,7 +16,7 @@ typing-extensions
 
 # Framework libraries
 Django>=5.2,<6.0
-django-admin-index
+django-admin-index @ git+https://github.com/maykinmedia/django-admin-index@5fc781044873cdb91148051ec57b2f65fe4efbfb
 django-axes
 django-filer
 django-ordered-model
