@@ -286,8 +286,8 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         )
 
         user = User.objects.get(login_type=LoginTypeChoices.eherkenning)
-        self.assertEqual(user.kvk, "12345678")
-        self.assertEqual(user.vestiging, "123456789012")
+        self.assertEqual(user.kvk, "68750110")
+        self.assertEqual(user.vestiging, "000037178598")
         self._assert_active_session(page.context, user)
 
     def test_eherkenning_rechtspersoon_login(self):
@@ -305,7 +305,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         )
 
         user = User.objects.get(login_type=LoginTypeChoices.eherkenning)
-        self.assertEqual(user.kvk, "12345678")
+        self.assertEqual(user.kvk, "68750110")
         self.assertEqual(user.vestiging, "")
         self._assert_active_session(page.context, user)
 
@@ -371,7 +371,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
 
     def test_eherkenning_login_reuses_existing_user(self):
         existing = eHerkenningVestigingUserFactory(
-            kvk="12345678", vestiging="123456789012"
+            kvk="68750110", vestiging="000037178598"
         )
 
         self._login(
@@ -382,7 +382,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
             activate_zakelijk=True,
         )
 
-        self._assert_reused(existing.pk, kvk="12345678")
+        self._assert_reused(existing.pk, kvk="68750110")
 
     def test_eidas_login_reuses_existing_user(self):
         existing = UserFactory(
