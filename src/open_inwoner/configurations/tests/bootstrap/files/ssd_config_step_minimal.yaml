@@ -1,0 +1,3 @@
+ssd_config_enable: true
+ssd_config:
+  service_identifier: ssd-service
