@@ -1,0 +1,3 @@
+kvk_config_enable: true
+kvk_config:
+  api_root: https://api.kvk.nl/test/api/
