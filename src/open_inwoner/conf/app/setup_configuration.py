@@ -6,6 +6,7 @@ SETUP_CONFIGURATION_STEPS = [
     "open_inwoner.configurations.bootstrap.saml.DigiDSAMLConfigurationStep",
     "open_inwoner.configurations.bootstrap.saml.eHerkenningSAMLConfigurationStep",
     "zgw_consumers.contrib.setup_configuration.steps.ServiceConfigurationStep",
+    "open_inwoner.configurations.bootstrap.soap.SoapServiceConfigurationStep",
     "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.KlantenSysteemConfigurationStep",
     "open_inwoner.configurations.bootstrap.haalcentraal.HaalCentraalConfigurationStep",
