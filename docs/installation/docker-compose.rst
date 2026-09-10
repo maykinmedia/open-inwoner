@@ -240,7 +240,7 @@ eIDAS          http://localhost:8000/eidas-oidc/authenticate/        any eIDAS t
 =============  ====================================================  ===============================================
 
 See ``docker/keycloak/README.md`` for the full list of test users (DigiD
-machtigen, eHerkenning bewindvoering/vestiging, eIDAS natural
+machtigen, eHerkenning vestiging/rechtspersoon, eIDAS natural
 person/company, etc.) and which claims each one carries.
 
 The realm's SSO session lifetimes are deliberately short (``ssoSessionIdleTimeout``:
