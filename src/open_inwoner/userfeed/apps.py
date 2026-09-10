@@ -9,6 +9,8 @@ class UserFeedConfig(AppConfig):
     def ready(self):
         auto_import_adapters()
 
+        from .config_checks import fetch_userfeed  # noqa
+
 
 def auto_import_adapters():
     """
