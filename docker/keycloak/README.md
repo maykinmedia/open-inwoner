@@ -33,13 +33,10 @@ http://localhost:8080/. You can now log in with the `admin`/`admin` credentials.
   `legalSubjectID` and `actingSubjectID` attributes
 - `digid-machtigen` / `digid-machtigen`, has the `aanvrager.bsn`,
   `gemachtigde.bsn` and `service_id` attributes (for DigiD machtigen)
-- `eherkenning-bewindvoering` / `eherkenning-bewindvoering`, has the
-  `legalSubjectID` (kvk), `actingSubjectID` (pseudo ID), `representeeBSN`,
-  `service_id`, `service_uuid`, and `name_qualifier` attributes (for eHerkenning
-  bewindvoering) # CLAUDE: Remove this from the docs and the realm json. It
-  confuses things, we don't use bewindvoering. Double check the docs too.
-- `eherkenning-vestiging` / `eherkenning-vestiging`, has the `vestiging`
-  attribute plus the attributes from `eherkenning-bewindvoering`.
+- `eherkenning-vestiging` / `eherkenning-vestiging`, has the `legalSubjectID`
+  (kvk), `actingSubjectID` (pseudo ID), `representeeBSN`, `service_id`,
+  `service_uuid`, `name_qualifier` and `vestiging` attributes (for eHerkenning
+  with a branch restriction).
 - `eherkenning-rechtspersoon` / `eherkenning-rechtspersoon`, a legal entity with
   the `legalSubjectID` (kvk), `actingSubjectID` and `name_qualifier` attributes
   but NO `vestiging` claim (for eHerkenning without a branch restriction).
