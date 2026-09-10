@@ -501,39 +501,6 @@
       "groups": []
     },
     {
-      "id": "646e27c6-1b42-4e11-a5c6-d9fae4c3cea6",
-      "createdTimestamp": 1716392361705,
-      "username": "eherkenning-bewindvoering",
-      "enabled": true,
-      "totp": false,
-      "emailVerified": false,
-      "attributes": {
-        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
-        "representeeBSN": ["111222333"],
-        "legalSubjectID": ["12345678"],
-        "actingSubjectID": ["4B75A0EA107B3D36"],
-        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
-        "aanvrager.kvk": ["12345678"],
-        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"],
-        "gemachtigde.pseudoID": ["4B75A0EA107B3D36"]
-      },
-      "credentials": [
-        {
-          "id": "8d284b91-21db-4bc7-8163-b35fac289108",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1716393311799,
-          "secretData": "{\"value\":\"c7ugclHPaUkxdiBzUaUKQscFGSp2ioE3z6Ipvcmwfag=\",\"salt\":\"UHMZypw/YcFH0m0/4YnnjA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["default-roles-test"],
-      "notBefore": 0,
-      "groups": []
-    },
-    {
       "id": "44be45f6-a7ae-42c2-9486-30f078cf5b39",
       "createdTimestamp": 1719999585061,
       "username": "eherkenning-vestiging",
@@ -543,11 +510,11 @@
       "attributes": {
         "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
         "representeeBSN": ["111222333"],
-        "legalSubjectID": ["12345678"],
+        "legalSubjectID": ["68750110"],
         "actingSubjectID": ["4B75A0EA107B3D36"],
         "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
         "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"],
-        "vestiging": ["123456789012"]
+        "vestiging": ["000037178598"]
       },
       "credentials": [
         {
@@ -574,7 +541,7 @@
       "emailVerified": false,
       "attributes": {
         "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
-        "legalSubjectID": ["12345678"],
+        "legalSubjectID": ["68750110"],
         "actingSubjectID": ["4B75A0EA107B3D36"],
         "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
         "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"]

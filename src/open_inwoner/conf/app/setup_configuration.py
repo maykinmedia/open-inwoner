@@ -9,6 +9,7 @@ SETUP_CONFIGURATION_STEPS = [
     "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.KlantenSysteemConfigurationStep",
     "open_inwoner.configurations.bootstrap.haalcentraal.HaalCentraalConfigurationStep",
+    "open_inwoner.configurations.bootstrap.kvk.KvKConfigurationStep",
     "open_inwoner.configurations.bootstrap.default_users.UserConfigurationStep",
     "django_setup_configuration.contrib.sites.steps.SitesConfigurationStep",
     "open_inwoner.configurations.bootstrap.cms.CMSPagesConfigurationStep",
