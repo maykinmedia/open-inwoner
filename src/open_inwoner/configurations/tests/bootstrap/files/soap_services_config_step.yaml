@@ -1,0 +1,5 @@
+soap_services_config_enable: true
+soap_services_config:
+  services:
+    - identifier: ssd-service
+      url: http://ssd.internal/
