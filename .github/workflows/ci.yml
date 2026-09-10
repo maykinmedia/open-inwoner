@@ -265,11 +265,19 @@ jobs:
   # Full application stack
   #
   full-app-stack-test:
-    name: Full Docker application stack
-    runs-on: maykin-runner # Many containers, much resources
-    timeout-minutes: 20
+    name: Full Docker application stack (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: maykin-runner # Many containers, much resources
+          - arch: arm64
+            runner: ubuntu-24.04-arm
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
 
@@ -343,13 +351,17 @@ jobs:
       - name: Save the image for the docker job to push
         env:
           TAG: ${{ steps.vars.outputs.tag }}
-        run: docker save "$IMAGE_NAME:$TAG" | gzip > open-inwoner-image.tar.gz
+        run: |
+          # Tag per architecture so the `docker` job can load both images
+          # without one overwriting the other.
+          docker tag "$IMAGE_NAME:$TAG" "$IMAGE_NAME:$TAG-${{ matrix.arch }}"
+          docker save "$IMAGE_NAME:$TAG-${{ matrix.arch }}" | gzip > "open-inwoner-image-${{ matrix.arch }}.tar.gz"
 
       - name: Upload the image
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: docker-image
-          path: open-inwoner-image.tar.gz
+          name: docker-image-${{ matrix.arch }}
+          path: open-inwoner-image-${{ matrix.arch }}.tar.gz
           if-no-files-found: error
           retention-days: 1
 
@@ -410,20 +422,31 @@ jobs:
       TAG: ${{ needs.full-app-stack-test.outputs.tag }}
 
     steps:
-      # The image itself was already built (and proven healthy), so nothing
-      # here rebuilds it.
-      - name: Download the image built by full-app-stack-test
+      # The images themselves were already built (and proven healthy) per
+      # architecture by full-app-stack-test, so nothing here rebuilds them.
+      - name: Download the images built by full-app-stack-test
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: docker-image
+          pattern: docker-image-*
+          merge-multiple: true
 
-      - name: Load the image
-        run: gunzip -c open-inwoner-image.tar.gz | docker load
+      - name: Load the images
+        run: |
+          gunzip -c open-inwoner-image-amd64.tar.gz | docker load
+          gunzip -c open-inwoner-image-arm64.tar.gz | docker load
 
       - name: Log into registry
         run:
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{
           secrets.DOCKER_USERNAME }} --password-stdin
 
-      - name: Push the Docker image
-        run: docker push "$IMAGE_NAME:$TAG"
+      - name: Push the per-architecture images
+        run: |
+          docker push "$IMAGE_NAME:$TAG-amd64"
+          docker push "$IMAGE_NAME:$TAG-arm64"
+
+      - name: Push the multi-arch manifest
+        run: |
+          docker buildx imagetools create -t "$IMAGE_NAME:$TAG" \
+            "$IMAGE_NAME:$TAG-amd64" \
+            "$IMAGE_NAME:$TAG-arm64"
