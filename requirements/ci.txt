@@ -643,7 +643,7 @@ fontawesomefree==6.4.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-fonttools[woff]==4.61.1
+fonttools[woff]==4.64.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -779,7 +779,7 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-maykin-common[cli, docs, health-checks, otel] @ git+https://github.com/maykinmedia/django-common@78f54b190ef6e716af7f2902b3ee53dfad94c753
+maykin-common[cli, docs, health-checks, otel, pdf]==0.21.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1074,7 +1074,7 @@ pyopenssl==26.4.0
     #   -r requirements/base.txt
     #   -r requirements/test-tools.in
     #   webauthn
-pyphen==0.12.0
+pyphen==0.18.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1320,7 +1320,7 @@ tinycss2==1.5.1
     #   cssselect2
     #   svglib
     #   weasyprint
-tinyhtml5==2.0.0
+tinyhtml5==2.1.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
@@ -1393,10 +1393,11 @@ wcwidth==0.2.5
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   prompt-toolkit
-weasyprint==69.0
+weasyprint==70.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
+    #   maykin-common
 webauthn==2.0.0
     # via
     #   -c requirements/base.txt
@@ -1456,7 +1457,7 @@ zipp==3.23.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   importlib-metadata
-zopfli==0.1.9
+zopfli==0.4.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt

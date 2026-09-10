@@ -103,12 +103,10 @@ class SSDBaseClient(ABC):
         """
 
     @abstractmethod
-    def get_reports(self, bsn: str, report_date: str, base_url: str) -> bytes | None:
+    def get_reports(self, bsn: str, report_date: str) -> bytes | None:
         """
         :param bsn: the BSN number of the client making the request
         :param report_date: the date of the requested report
-        :param base_url: the absolute URI of the request, allows the use of
-        relative URLs in templates used to generate PDFs
         :returns: a yearly/monthly benefits report PDF (bytes) if the request to
         the client's SOAP service is successful, `None` otherwise
         """
@@ -141,7 +139,7 @@ class JaaropgaveClient(SSDBaseClient):
         """
         return f"Jaaropgave {report_date}"
 
-    def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
+    def get_reports(self, bsn: str, report_date: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, dienstjaar=report_date)
 
         jaaropgaven = get_jaaropgaven(response)
@@ -159,7 +157,6 @@ class JaaropgaveClient(SSDBaseClient):
         pdf = render_pdf(
             self.html_template,
             context={"reports": jaaropgaven},
-            base_url=request_url,
         )
         return pdf
 
@@ -191,7 +188,7 @@ class UitkeringClient(SSDBaseClient):
         dt_formatted = django_date(dt, "F Y").lower()
         return f"Maandspecificatie {dt_formatted}"
 
-    def get_reports(self, bsn: str, report_date: str, request_url: str) -> bytes | None:
+    def get_reports(self, bsn: str, report_date: str) -> bytes | None:
         response = self.templated_request(bsn=bsn, period=report_date)
 
         uitkeringen = get_uitkeringen(response)
@@ -211,7 +208,6 @@ class UitkeringClient(SSDBaseClient):
                 "reports": uitkeringen,
                 "comments": self.config.maandspecificatie_pdf_comments.html,
             },
-            base_url=request_url,
         )
         return pdf
 
