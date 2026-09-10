@@ -1,0 +1,6 @@
+ssd_config_enable: true
+ssd_config:
+  service_identifier: ssd-service
+  applicatie_naam: Open Inwoner
+  bedrijfs_naam: Open Inwoner
+  gemeentecode: '0000'
