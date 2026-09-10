@@ -1,0 +1,72 @@
+name: kvk-cert-chain
+
+# Checks every certificate in kvk-chain.pem (see bin/fetch_kvk_cert_chain.sh)
+# is still valid. Runs on a schedule so an upcoming expiry is caught even
+# without a code change.
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - '**'
+    paths:
+      - 'kvk-chain.pem'
+  pull_request:
+    paths:
+      - 'kvk-chain.pem'
+  schedule:
+    - cron: '0 6 * * 1' # every Monday at 06:00 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check-expiry:
+    name: Check kvk-chain.pem certificate expiry
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate certificate chain expiry
+        run: |
+          set -euo pipefail
+
+          CHAIN="kvk-chain.pem"
+          # Fail if expired, or expiring within this many seconds (30 days warning).
+          WARN_BEFORE_SECONDS=$((30 * 24 * 60 * 60))
+
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+
+          awk -v dir="$workdir" '
+            /-----BEGIN CERTIFICATE-----/ { n++ }
+            n { print > (dir "/cert-" n ".pem") }
+          ' "$CHAIN"
+
+          cert_count=$(find "$workdir" -name 'cert-*.pem' | wc -l)
+          if [ "$cert_count" -eq 0 ]; then
+            echo "::error::No certificates found in $CHAIN"
+            exit 1
+          fi
+
+          status=0
+          for cert in "$workdir"/cert-*.pem; do
+            subject=$(openssl x509 -in "$cert" -noout -subject)
+            not_after=$(openssl x509 -in "$cert" -noout -enddate | cut -d= -f2)
+
+            if openssl x509 -in "$cert" -noout -checkend "$WARN_BEFORE_SECONDS" >/dev/null; then
+              echo "OK   $subject (expires $not_after)"
+            else
+              echo "::error::Certificate expired or expiring within 30 days: $subject (expires $not_after)"
+              status=1
+            fi
+          done
+
+          exit $status
