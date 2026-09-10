@@ -38,17 +38,67 @@ class FetchCompanyCheckTests(TestCase):
         self.assertFalse(result.success)
         self.assertIn("No company found", result.message)
 
-    def test_company_found(self):
+    def test_company_found_exercises_all_client_methods(self):
+        """A successful run mirrors every KvKClient method the app actually calls."""
         form = FetchCompanyForm(data={"kvk_number": "68750110"})
         self.assertTrue(form.is_valid())
 
-        with patch.object(
-            KvKClient, "get_basisprofiel", return_value=mocks.hoofdvestiging
+        branches = [
+            branch
+            for branch in mocks.multiple_branches["resultaten"]
+            if branch["type"] != "rechtspersoon"
+        ]
+        vestigingsprofiel = {"eersteHandelsnaam": "Test BV Donald"}
+
+        with (
+            patch.object(
+                KvKClient, "get_basisprofiel", return_value=mocks.basisprofiel_detail
+            ) as mock_basisprofiel,
+            patch.object(
+                KvKClient, "get_all_company_branches", return_value=branches
+            ) as mock_branches,
+            patch.object(
+                KvKClient, "get_vestigingsprofiel", return_value=vestigingsprofiel
+            ) as mock_vestigingsprofiel,
+            patch.object(
+                KvKClient, "retrieve_rsin_with_kvk", return_value="857587973"
+            ) as mock_rsin,
         ):
             result = self.check.run(form.cleaned_data)
 
+        mock_basisprofiel.assert_called_once_with("68750110")
+        mock_branches.assert_called_once_with("68750110")
+        mock_vestigingsprofiel.assert_called_once_with(branches[0]["vestigingsnummer"])
+        mock_rsin.assert_called_once_with("68750110")
+
         self.assertTrue(result.success)
-        self.assertEqual(result.extra, mocks.hoofdvestiging)
+        self.assertEqual(
+            result.extra,
+            {
+                "basisprofiel": mocks.basisprofiel_detail,
+                "rsin": "857587973",
+                "branches": branches,
+                "vestigingsprofiel": vestigingsprofiel,
+            },
+        )
+
+    def test_company_found_without_branches_skips_vestigingsprofiel(self):
+        form = FetchCompanyForm(data={"kvk_number": "68750110"})
+        self.assertTrue(form.is_valid())
+
+        with (
+            patch.object(
+                KvKClient, "get_basisprofiel", return_value=mocks.basisprofiel_detail
+            ),
+            patch.object(KvKClient, "get_all_company_branches", return_value=[]),
+            patch.object(KvKClient, "get_vestigingsprofiel") as mock_vestigingsprofiel,
+            patch.object(KvKClient, "retrieve_rsin_with_kvk", return_value=None),
+        ):
+            result = self.check.run(form.cleaned_data)
+
+        mock_vestigingsprofiel.assert_not_called()
+        self.assertTrue(result.success)
+        self.assertIsNone(result.extra["vestigingsprofiel"])
 
     def test_api_exception(self):
         form = FetchCompanyForm(data={"kvk_number": "68750110"})

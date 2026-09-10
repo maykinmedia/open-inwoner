@@ -72,7 +72,19 @@ class FetchCompanyCheck(
 
         try:
             client = KvKClient(instance)
+
+            # Mirrors the real call sequence: basisprofiel + RSIN on every
+            # eHerkenning login (accounts/signals.py), branches on the branch
+            # switcher page (kvk/views.py), and, for whichever branch that
+            # search turns up, its vestigingsprofiel (also signals.py, for
+            # branch-restricted users).
             basisprofiel = client.get_basisprofiel(kvk_number)
+            rsin = client.retrieve_rsin_with_kvk(kvk_number)
+            branches = client.get_all_company_branches(kvk_number)
+
+            vestigingsprofiel = None
+            if branches and (vestigingsnummer := branches[0].get("vestigingsnummer")):
+                vestigingsprofiel = client.get_vestigingsprofiel(vestigingsnummer)
         except KVKAPIException as exc:
             return GenericConfigCheckResult(
                 success=False,
@@ -104,5 +116,10 @@ class FetchCompanyCheck(
             identifier=self.identifier,
             verbose_name=self.label,
             message=_("Company data returned"),
-            extra=basisprofiel,
+            extra={
+                "basisprofiel": basisprofiel,
+                "rsin": rsin,
+                "branches": branches,
+                "vestigingsprofiel": vestigingsprofiel,
+            },
         )
