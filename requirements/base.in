@@ -8,7 +8,6 @@ python-decouple  # processing of envvar configs
 geopy # geo decoder
 glom # processing nested data
 furl # processing urls
-weasyprint # export to pdf
 tinycss2
 css_inline
 pydantic[email]
@@ -26,7 +25,7 @@ django-treebeard
 maykin-2fa
 phonenumbers
 maykin-django-prosemirror[images]
-maykin-common[otel,cli,health-checks,docs] @ git+https://github.com/maykinmedia/django-common@78f54b190ef6e716af7f2902b3ee53dfad94c753
+maykin-common[otel,cli,health-checks,docs,pdf]
 django-localflavor
 django-privates
 django-cors-headers
