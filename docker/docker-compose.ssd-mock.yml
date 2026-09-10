@@ -1,0 +1,41 @@
+services:
+  ssd-mock:
+    image: nginx:alpine
+    volumes:
+      # Relative paths resolve against the repo root (bin/stack.sh's
+      # `--project-directory .`), not this file's own directory -- see
+      # docs/installation/docker-compose.rst's docker-compose.keycloak.yml
+      # note for the one exception.
+      - ./docker/ssd-mock/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Reuse the fixtures the unit tests already use, so the two can't
+      # drift apart.
+      - ./src/open_inwoner/ssd/tests/files/jaaropgave_response.xml:/usr/share/nginx/html/jaaropgave_response.xml:ro
+      - ./src/open_inwoner/ssd/tests/files/uitkering_response_basic.xml:/usr/share/nginx/html/uitkering_response_basic.xml:ro
+    ports:
+      - '5020:80'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '-q',
+          '-O',
+          '/dev/null',
+          'http://localhost/JaarOpgaveClient-v0400',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    networks:
+      open-inwoner-dev:
+        aliases:
+          - ssd.local
+          - ssd.internal
+
+networks:
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true
