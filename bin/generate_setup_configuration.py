@@ -46,6 +46,7 @@ DOCKER_PROFILE = {
     "objecttypes_host": "objecttypes.internal:8000",
     "objects_host": "objects.internal:8000",
     "hc_brp_host": "hc-brp.internal:5010",
+    "ssd_host": "ssd.internal",
     "clamav_host": "clamav",
     "domain": "localhost:9000",
 }
@@ -60,6 +61,7 @@ HOST_PROFILE = {
     "objecttypes_host": "localhost:8003",
     "objects_host": "localhost:8004",
     "hc_brp_host": "localhost:5010",
+    "ssd_host": "localhost:5020",
     "clamav_host": "localhost",
     "domain": "localhost:8000",
 }

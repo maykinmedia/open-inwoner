@@ -243,6 +243,22 @@ haalcentraal_config_enable: true
 haalcentraal_config:
   service_identifier: brp-personen-mock
 
+# SOAP services (currently just the SSD GWS mock)
+soap_services_config_enable: true
+soap_services_config:
+  services:
+    - identifier: ssd-mock
+      url: http://ssd.internal/
+
+# SSD (Mijn uitkeringen), backed by the nginx-based mock in
+# docker/docker-compose.ssd-mock.yml
+ssd_config_enable: true
+ssd_config:
+  service_identifier: ssd-mock
+  applicatie_naam: Open Inwoner
+  bedrijfs_naam: Open Inwoner
+  gemeentecode: '0000'
+
 # KlantenSysteem (consolidated OpenKlant/eSuite and OpenKlant2 configuration)
 klantensysteem_config_enable: true
 klantensysteem_config:

@@ -116,6 +116,9 @@ shared acceptance environments:
   Objecttypes API
 - ``docker/docker-compose.hc-brp-mock.yml`` -- the Haal Centraal BRP
   ``personen-mock``
+- ``docker/docker-compose.ssd-mock.yml`` -- an nginx-based mock of the SSD
+  SOAP service backing the "Mijn uitkeringen" pages (see
+  ``open_inwoner.ssd``)
 - ``docker/docker-compose.openklant.yml`` -- Open Klant (Klantinteracties and
   Contactmomenten APIs)
 - ``docker/docker-compose.openafval.yml`` -- `Open Afval
@@ -128,13 +131,13 @@ shared acceptance environments:
 All of these attach to the same external ``open-inwoner-dev`` network as the
 main app stack (see `Getting started`_, step 3) and publish internal DNS
 aliases such as ``keycloak.internal``, ``openzaak.internal``,
-``openklant.internal``, ``objects.internal``, ``objecttypes.internal`` and
-``openafval.internal``. ``docker/setup_configuration/data.yaml`` -- which
-``web-init`` applies on its first run (see below) -- already points its
-ZGW/OpenKlant/Objects/Haal Centraal service configuration at those aliases
-(Keycloak's OIDC endpoints are the exception, see below), so once those
-stacks are up the app is pre-configured to talk to them without any manual
-admin work. Open Afval is the exception to that: there's no
+``openklant.internal``, ``objects.internal``, ``objecttypes.internal``,
+``openafval.internal`` and ``ssd.internal``. ``docker/setup_configuration/data.yaml``
+-- which ``web-init`` applies on its first run (see below) -- already points
+its ZGW/OpenKlant/Objects/Haal Centraal/SSD service configuration at those
+aliases (Keycloak's OIDC endpoints are the exception, see below), so once
+those stacks are up the app is pre-configured to talk to them without any
+manual admin work. Open Afval is the exception to that: there's no
 ``setup_configuration`` step for ``MijnAfvalConfig`` yet (the same gap Haal
 Centraal BRP had until one was added), so wiring the "Mijn afval" page up to
 the ``openafval-web`` service still means creating the ``zgw_consumers``
@@ -215,6 +218,7 @@ Objects API admin       http://localhost:8004/admin/  admin / admin
 Open Klant admin        http://localhost:8338/admin/  admin / admin [1]_
 Open Afval admin        http://localhost:8339/admin/  admin / admin [1]_
 Haal Centraal BRP mock  http://localhost:5010/        --
+SSD mock                http://localhost:5020/        --
 Grafana                 http://localhost:3000/        --
 Prometheus              http://localhost:9090/        --
 Loki (readiness)        http://localhost:3100/ready   --
