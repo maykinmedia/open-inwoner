@@ -124,6 +124,9 @@ site_config_enable: true
 site_config:
   name: Open Inwoner Lokaal
   email_verification_required: false
+  # Without this, the "Zakelijk" tab and eHerkenning button on the login page
+  # stay hidden regardless of the oidc-eherkenning client below being enabled.
+  eherkenning_enabled: true
   # Matches the `clamav` service in docker-compose.yml (host/port are
   # already its defaults; set explicitly here for clarity).
   enable_virus_scan: true
