@@ -1789,6 +1789,9 @@ else:
 
 MAIL_EDITOR_BASE_HOST = BASE_URL
 
+# maykin-common PDF rendering (see `maykin_common.pdf`)
+PDF_BASE_URL_FUNCTION = "open_inwoner.utils.url.get_pdf_base_url"
+
 CKEDITOR_CONFIGS = {
     "default": {
         "allowedContent": True,

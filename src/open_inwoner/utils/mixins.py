@@ -217,7 +217,6 @@ class ExportMixin:
         file = render_pdf(
             self.template_name,
             context,
-            base_url=self.request.build_absolute_uri(),
             request=self.request,
         )
         filename = self.get_filename()
