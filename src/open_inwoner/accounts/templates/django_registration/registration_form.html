@@ -6,7 +6,7 @@
 <h1 class="utrecht-heading-1">{% trans 'Registreren' %}</h1>
   {% render_grid %}
    {% if settings.DIGID_ENABLED and digid_url %}
-    {% render_column start=5 span=5 %}
+    {% render_column start=1 span=5 %}
         {% render_card direction='horizontal' tinted=True compact=True %}
             <a href="{{ digid_url }}" class="link digid-logo">
                 <img class="digid-logo__image" src="{% static 'accounts/digid_logo.svg' %}" alt="DigiD inlogpagina">
@@ -17,7 +17,7 @@
   {% endif %}
 
   {% if eherkenning_enabled and eherkenning_url %}
-    {% render_column start=5 span=5 %}
+    {% render_column start=1 span=5 %}
         {% render_card direction='horizontal' tinted=True compact=True %}
             <a href="{{ eherkenning_url }}" class="link eherkenning-logo">
                 <img class="eherkenning-logo__image" src="{% static 'accounts/eherkenning.png' %}" height=30 alt="eHerkenning inlogpagina">
@@ -28,7 +28,7 @@
   {% endif %}
 
   {% if login_allow_registration %}
-        {% render_column start=5 span=5 %}
+        {% render_column start=1 span=5 %}
             {% render_card tinted=True compact=True  %}
                 <h3 class="utrecht-heading-3">{% trans "Registreren met E-mail" %}</h3>
                 {% form form_object=form method="POST" id="registration-form" submit_text=_('Registreren') extra_classes="form__registration" show_required=True %}
