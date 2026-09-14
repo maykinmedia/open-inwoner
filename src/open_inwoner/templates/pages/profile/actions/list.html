@@ -4,11 +4,13 @@
 
 {% block content %}
     {% render_grid %}
-        {% render_column span=9 %}
+        {% render_column span=12 %}
+        <header class="oip-header-group">
             <h1 class="utrecht-heading-1" id="title">
                 {% trans "Mijn acties" %}
-                {% button href="profile:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
             </h1>
+            {% button href="profile:action_create" text=_("Nieuwe actie toevoegen") icon="date_range" primary=True %}
+        </header>
             {% button_row align="right" %}
                 {% button href="profile:action_list_export" text=_("Exporteer naar PDF") hide_text=True icon="file-pdf" icon_outlined=True transparent=True secondary=True %}
             {% endbutton_row %}
