@@ -131,14 +131,10 @@ aliases such as ``keycloak.internal``, ``openzaak.internal``,
 ``openklant.internal``, ``objects.internal``, ``objecttypes.internal`` and
 ``openafval.internal``. ``docker/setup_configuration/data.yaml`` -- which
 ``web-init`` applies on its first run (see below) -- already points its
-ZGW/OpenKlant/Objects/Haal Centraal service configuration at those aliases
-(Keycloak's OIDC endpoints are the exception, see below), so once those
-stacks are up the app is pre-configured to talk to them without any manual
-admin work. Open Afval is the exception to that: there's no
-``setup_configuration`` step for ``MijnAfvalConfig`` yet (the same gap Haal
-Centraal BRP had until one was added), so wiring the "Mijn afval" page up to
-the ``openafval-web`` service still means creating the ``zgw_consumers``
-``Service`` and ``MijnAfvalConfig`` by hand in the admin.
+ZGW/OpenKlant/Objects/Haal Centraal/Open Afval service configuration at those
+aliases (Keycloak's OIDC endpoints are the exception, see below), so once
+those stacks are up the app is pre-configured to talk to them without any
+manual admin work.
 
 Keycloak's OIDC endpoints are the one exception to "server-side only": the
 authorization endpoint is where your own *browser* gets redirected to log
@@ -223,8 +219,10 @@ Loki (readiness)        http://localhost:3100/ready   --
 .. [1] Open Klant's and Open Afval's images don't support the
    ``*_SUPERUSER_*``/``KEYCLOAK_ADMIN*`` environment variables the other
    admins use -- both instead bring up a one-shot ``*-seed`` container that
-   ``loaddata``\ s an ``accounts.user`` fixture (``docker/openklant/fixtures/db.json``
-   and ``docker/openafval/fixtures/db.json``).
+   ``loaddata``\ s a fixture containing that ``accounts.user``
+   (``docker/openklant/fixtures/db.json`` and
+   ``docker/openafval/fixtures/db.json``; each fixture's README describes the
+   demo data it seeds alongside it).
 
 Logging in to Open Inwoner itself, at either ``http://localhost:8000/`` or
 the nginx-fronted ``http://localhost:9000/`` (both work equally well, see

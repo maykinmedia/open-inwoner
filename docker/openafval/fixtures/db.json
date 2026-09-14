@@ -16,5 +16,2247 @@
       "groups": [],
       "user_permissions": []
     }
+  },
+  {
+    "model": "api.application",
+    "pk": 1,
+    "fields": {
+      "token": "e3b1f5c2a94d8067bb2f1d3e6a9c04578f21b6da",
+      "contact_person": "Open Inwoner development stack",
+      "email": "admin@example.org",
+      "phone_number": "",
+      "created": "2026-09-01T00:00:00Z",
+      "last_modified": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.klant",
+    "pk": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+    "fields": {
+      "bsn": "111222333",
+      "naam": "Testuser",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.containerlocation",
+    "pk": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+    "fields": {
+      "adres": "Keizersgracht 117 [1015CJ AMSTERDAM]",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.containerlocation",
+    "pk": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+    "fields": {
+      "adres": "Kerkplein 3 [3512JE UTRECHT]",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.container",
+    "pk": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+    "fields": {
+      "public_container_id": "CONT-00001",
+      "afval_type": "restafval",
+      "is_verzamelcontainer": false,
+      "heeft_sleutel": true,
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.container",
+    "pk": "65764d63-6e08-5eb7-8d82-e685c5205531",
+    "fields": {
+      "public_container_id": "CONT-00002",
+      "afval_type": "gft",
+      "is_verzamelcontainer": false,
+      "heeft_sleutel": true,
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.container",
+    "pk": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+    "fields": {
+      "public_container_id": "CONT-00003",
+      "afval_type": "med",
+      "is_verzamelcontainer": false,
+      "heeft_sleutel": true,
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.container",
+    "pk": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+    "fields": {
+      "public_container_id": "CONT-00004",
+      "afval_type": "restafval",
+      "is_verzamelcontainer": true,
+      "heeft_sleutel": false,
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.container",
+    "pk": "d7218faf-8849-5760-9265-44998bfab6f2",
+    "fields": {
+      "public_container_id": "CONT-00005",
+      "afval_type": "gft",
+      "is_verzamelcontainer": true,
+      "heeft_sleutel": false,
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "32b88d9f-5ee3-58a1-baa9-681505201fe8",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 19.3,
+      "geleegd_op": "2025-01-02T10:34:00Z",
+      "kosten": "5.40",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c8810f2f-f2ec-514b-b587-70fc8e438aa2",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 18.0,
+      "geleegd_op": "2025-01-03T09:05:00Z",
+      "kosten": "5.04",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "874dd809-2156-5d1e-9fa9-3f84d3768032",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.7,
+      "geleegd_op": "2025-01-05T10:05:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "818531db-0fb3-50e1-97f6-af2ff8f44d73",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 14.1,
+      "geleegd_op": "2025-01-09T10:27:00Z",
+      "kosten": "1.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "d2cf39da-9d4d-5dc4-815e-ee4047489079",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 8.6,
+      "geleegd_op": "2025-01-16T09:56:00Z",
+      "kosten": "2.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ec4d1fd4-b4fd-50e8-bc1c-90faa2bf928c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 10.1,
+      "geleegd_op": "2025-01-17T11:12:00Z",
+      "kosten": "1.11",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f915ab66-ad49-58de-913a-8ab4d8a3d6b0",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.9,
+      "geleegd_op": "2025-01-23T08:41:00Z",
+      "kosten": "0.54",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b42c2f23-13f7-5fdb-a77d-ed3256ed93e0",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 22.1,
+      "geleegd_op": "2025-01-30T09:19:00Z",
+      "kosten": "6.19",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "4ca114c2-db0a-5872-9c4c-665c9e9d6c45",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 17.4,
+      "geleegd_op": "2025-01-31T07:56:00Z",
+      "kosten": "4.87",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c430aa71-f795-5217-a1d8-b2166414ea97",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 3.6,
+      "geleegd_op": "2025-02-02T06:48:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "17f27bfb-ce51-5c00-81a0-4a95593e7849",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 5.7,
+      "geleegd_op": "2025-02-06T08:41:00Z",
+      "kosten": "0.63",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "a58d64eb-8108-5977-9bed-7c79ef154aba",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 12.5,
+      "geleegd_op": "2025-02-13T08:48:00Z",
+      "kosten": "3.50",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "a186621e-3e02-5611-8b68-d8bcf4a99fdf",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 4.4,
+      "geleegd_op": "2025-02-14T07:34:00Z",
+      "kosten": "0.48",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "27a23efc-3787-58c8-b814-f91db580f9e4",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 8.9,
+      "geleegd_op": "2025-02-20T08:12:00Z",
+      "kosten": "0.98",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3cbb09f8-e8a7-5f26-bf29-2352faccaa6e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.7,
+      "geleegd_op": "2025-02-27T08:41:00Z",
+      "kosten": "5.24",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "09f47b40-3087-5d0b-a919-c4e708fa0d4c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 13.2,
+      "geleegd_op": "2025-02-28T10:05:00Z",
+      "kosten": "3.70",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3e6fbc0b-8939-5b88-a430-bfa715c04a1d",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.5,
+      "geleegd_op": "2025-03-02T06:05:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0ff790b8-56b3-5ea2-9f1c-1bb4c8f7834d",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 13.6,
+      "geleegd_op": "2025-03-06T06:12:00Z",
+      "kosten": "1.50",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0038607e-05fa-5049-800b-4bced70e8576",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 8.2,
+      "geleegd_op": "2025-03-13T09:27:00Z",
+      "kosten": "2.30",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "63f835ea-eabf-596f-8f34-65bc151ce050",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 6.1,
+      "geleegd_op": "2025-03-14T06:27:00Z",
+      "kosten": "0.67",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c7d83de5-d8de-5f1a-b7a2-4f73d9458aec",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 11.4,
+      "geleegd_op": "2025-03-20T06:41:00Z",
+      "kosten": "1.25",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "89829416-5974-55ef-ab6d-b7a979893ccf",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 14.4,
+      "geleegd_op": "2025-03-27T11:41:00Z",
+      "kosten": "4.03",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0f0327f0-f455-5cd7-9f4b-d93174f05aac",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 10.6,
+      "geleegd_op": "2025-03-28T08:56:00Z",
+      "kosten": "2.97",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "55fe7c7c-5c15-5143-a7bd-0bc337d5a700",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 0.9,
+      "geleegd_op": "2025-03-30T06:27:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0a105739-4274-5c36-a1be-cd5afd64c04e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 9.3,
+      "geleegd_op": "2025-04-03T07:05:00Z",
+      "kosten": "1.02",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "fe0ed871-5219-5507-ac6c-784b914ce78a",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 15.8,
+      "geleegd_op": "2025-04-10T06:41:00Z",
+      "kosten": "4.42",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "1a31dbd9-dc71-5378-8f7d-38d57fcbdab8",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 6.2,
+      "geleegd_op": "2025-04-11T06:41:00Z",
+      "kosten": "0.68",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0e3f96ce-0a62-5719-b217-42aa63f071b7",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.8,
+      "geleegd_op": "2025-04-17T11:12:00Z",
+      "kosten": "1.19",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "4390f82a-0a87-55f3-9f22-991b15bc01cd",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 9.3,
+      "geleegd_op": "2025-04-24T07:12:00Z",
+      "kosten": "2.60",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0902d5f3-35c5-5673-aa7c-25b31aee2d74",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 14.5,
+      "geleegd_op": "2025-04-25T11:41:00Z",
+      "kosten": "4.06",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "11a4a2a7-39b2-52a9-8590-3f5b6035f6ef",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.3,
+      "geleegd_op": "2025-04-27T10:12:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "25ecd3d9-a478-5853-b5e2-6f074cdbaa2f",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 8.4,
+      "geleegd_op": "2025-05-01T11:27:00Z",
+      "kosten": "0.92",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f3ebd7b6-0769-5178-ac0b-d37975fd713e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.8,
+      "geleegd_op": "2025-05-08T10:56:00Z",
+      "kosten": "5.26",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f146931e-ce7c-5a47-be97-1e5ff2959e11",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 5.6,
+      "geleegd_op": "2025-05-09T07:19:00Z",
+      "kosten": "0.62",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "81c3d0ce-fa9e-5bca-93be-80e1ea83ae8c",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.2,
+      "geleegd_op": "2025-05-15T06:12:00Z",
+      "kosten": "0.46",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "43a1f07d-eab2-564f-9d4a-569c7a142d00",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 8.7,
+      "geleegd_op": "2025-05-22T10:05:00Z",
+      "kosten": "2.44",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "aeafd673-90d3-57fb-aeb0-7dfe47b844e0",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 16.9,
+      "geleegd_op": "2025-05-23T09:12:00Z",
+      "kosten": "4.73",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "da442edb-8f1e-56df-abd5-ecde3167cef6",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 0.5,
+      "geleegd_op": "2025-05-25T10:19:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8963e505-b87c-522c-b12e-7c15a63ef2a8",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 11.1,
+      "geleegd_op": "2025-05-29T07:27:00Z",
+      "kosten": "1.22",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f6facbd9-99e4-5578-943e-cb6b1f4bc247",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 17.2,
+      "geleegd_op": "2025-06-05T06:12:00Z",
+      "kosten": "4.82",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "44729df0-72fe-5004-bd3b-2bfe77ee3ffe",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 5.1,
+      "geleegd_op": "2025-06-06T09:12:00Z",
+      "kosten": "0.56",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6bd1230a-c459-55d3-ab4e-609b5912a29f",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 12.4,
+      "geleegd_op": "2025-06-12T07:27:00Z",
+      "kosten": "1.36",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f69ec4fc-fbc8-5857-bb43-10246c6bad17",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 10.4,
+      "geleegd_op": "2025-06-19T06:12:00Z",
+      "kosten": "2.91",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "a264954d-f2a7-55a2-be0c-b7efd631b72c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 13.3,
+      "geleegd_op": "2025-06-20T11:56:00Z",
+      "kosten": "3.72",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6c01ad48-2b2f-5eeb-aa1d-f24eb1f38d9b",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.5,
+      "geleegd_op": "2025-06-22T11:48:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "d2af6cbf-13e0-57fe-a2c6-a1c5689589c5",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.2,
+      "geleegd_op": "2025-06-26T06:48:00Z",
+      "kosten": "0.46",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "4ac118d0-81b4-539f-9cc0-0db6a130432b",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 16.2,
+      "geleegd_op": "2025-07-03T09:41:00Z",
+      "kosten": "4.54",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6c79b33c-5b3b-578d-b0a1-01edbc079f86",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 4.1,
+      "geleegd_op": "2025-07-04T07:27:00Z",
+      "kosten": "0.45",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "5fd9d0db-2b3e-5e70-bd83-4b463a84c929",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.7,
+      "geleegd_op": "2025-07-10T06:19:00Z",
+      "kosten": "1.18",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "7ece7cf6-c923-51b4-95f2-e3cd3852967e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 19.7,
+      "geleegd_op": "2025-07-17T07:56:00Z",
+      "kosten": "5.52",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "12120e2e-e3a7-552b-b80f-0b73f0bdb1b2",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 12.2,
+      "geleegd_op": "2025-07-18T07:12:00Z",
+      "kosten": "3.42",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6ec6b09d-ed1b-5ee5-9ae1-b2cd344e8164",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 0.7,
+      "geleegd_op": "2025-07-20T09:19:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "80a1215e-758f-56b2-894d-91f1cc38e9c2",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 6.9,
+      "geleegd_op": "2025-07-24T11:19:00Z",
+      "kosten": "0.76",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3472d974-5e89-55ec-9b0b-4d633d26ef32",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.5,
+      "geleegd_op": "2025-07-31T11:12:00Z",
+      "kosten": "5.18",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e4ce709f-52a1-5ce9-810e-bc75d3254d97",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 7.9,
+      "geleegd_op": "2025-08-01T11:19:00Z",
+      "kosten": "0.87",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8e2e2d1d-88e3-5ebc-a8d3-f7000fb989bb",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.0,
+      "geleegd_op": "2025-08-07T08:05:00Z",
+      "kosten": "1.10",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6ce7e7c3-4c17-5528-8f25-0b932ed82c91",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 13.5,
+      "geleegd_op": "2025-08-14T10:12:00Z",
+      "kosten": "3.78",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3a6d3a2b-93db-591d-9215-fe3956a1fbc9",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 9.1,
+      "geleegd_op": "2025-08-15T09:27:00Z",
+      "kosten": "2.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b3b29e19-4ddd-547c-acba-61de9edf724a",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.7,
+      "geleegd_op": "2025-08-17T06:56:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "2225eff6-7dd3-5085-bd13-0966a091fcc8",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 13.0,
+      "geleegd_op": "2025-08-21T11:48:00Z",
+      "kosten": "1.43",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0e00cf48-0dd3-51c5-98ab-bb2ab8bc99d1",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 13.9,
+      "geleegd_op": "2025-08-28T10:19:00Z",
+      "kosten": "3.89",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "309160c5-0128-593d-a412-753efa42f200",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 7.3,
+      "geleegd_op": "2025-08-29T08:19:00Z",
+      "kosten": "0.80",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c7b809ea-fc26-56bd-9222-46b5d96ba1f7",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 6.1,
+      "geleegd_op": "2025-09-04T10:48:00Z",
+      "kosten": "0.67",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "417961f3-6316-55df-83fd-275faa342772",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 13.2,
+      "geleegd_op": "2025-09-11T10:41:00Z",
+      "kosten": "3.70",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b6aa15e8-f9b5-5151-a7b7-eb776ac54709",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 11.2,
+      "geleegd_op": "2025-09-12T07:41:00Z",
+      "kosten": "3.14",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e6f12623-eb0b-5ed7-9054-aeb618819b25",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 3.8,
+      "geleegd_op": "2025-09-14T06:34:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "58ac9dca-d674-5083-8c5f-0bd49af4422f",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.8,
+      "geleegd_op": "2025-09-18T06:48:00Z",
+      "kosten": "1.19",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "997f5b20-e8f6-5323-b1d9-7703e1ac95dc",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 13.9,
+      "geleegd_op": "2025-09-25T09:34:00Z",
+      "kosten": "3.89",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "bf895cfb-b0d6-50a3-be6d-ec492274047c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 10.3,
+      "geleegd_op": "2025-09-26T08:12:00Z",
+      "kosten": "1.13",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "bb642b82-08b1-5974-9586-4dbb5cad43e3",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 7.3,
+      "geleegd_op": "2025-10-02T09:05:00Z",
+      "kosten": "0.80",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "7c0a54e3-2e9a-5b7f-b584-d7a69964c413",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 15.4,
+      "geleegd_op": "2025-10-09T11:48:00Z",
+      "kosten": "4.31",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "5ce9d3d8-63c3-5fa6-91c4-75007be242aa",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 10.5,
+      "geleegd_op": "2025-10-10T06:27:00Z",
+      "kosten": "2.94",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b1c9d415-08bf-5c8c-b41b-cdfa5548a16b",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.8,
+      "geleegd_op": "2025-10-12T08:19:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b1f3baa4-5736-5925-893f-c78bb5a7acbf",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 8.7,
+      "geleegd_op": "2025-10-16T07:34:00Z",
+      "kosten": "0.96",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6852230b-645b-5cb2-b51e-9e0bf031c31c",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.5,
+      "geleegd_op": "2025-10-23T10:41:00Z",
+      "kosten": "5.18",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "5748c383-0e31-5a0b-814e-882ce629d599",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 9.4,
+      "geleegd_op": "2025-10-24T11:41:00Z",
+      "kosten": "1.03",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "66e218b5-222a-5470-93d5-e4f66a1d0108",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 9.4,
+      "geleegd_op": "2025-10-30T06:34:00Z",
+      "kosten": "1.03",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "bf183737-a374-5269-8847-0b36203115d2",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 20.1,
+      "geleegd_op": "2025-11-06T08:27:00Z",
+      "kosten": "5.63",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "2cb09568-87d9-5c3a-a762-8ab7af5cd034",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 14.6,
+      "geleegd_op": "2025-11-07T06:41:00Z",
+      "kosten": "4.09",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "da3bb9c1-31b0-58ed-b428-603bf09f9df4",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.9,
+      "geleegd_op": "2025-11-09T10:27:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "451fcf3a-a050-55c8-85b5-0531a71d2738",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 11.0,
+      "geleegd_op": "2025-11-13T06:05:00Z",
+      "kosten": "1.21",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "85fa338f-b333-516b-a8c6-3953385bd187",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 22.1,
+      "geleegd_op": "2025-11-20T08:56:00Z",
+      "kosten": "6.19",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "acb7453c-0fc9-58fc-b6ed-a23af6b83f6c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 4.6,
+      "geleegd_op": "2025-11-21T11:41:00Z",
+      "kosten": "0.51",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "29b94ba4-30b8-5fb0-afd3-523d17cd112e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 14.4,
+      "geleegd_op": "2025-11-27T09:34:00Z",
+      "kosten": "1.58",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8aa72d5d-3e2c-5728-8623-b8bf42f48d79",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.5,
+      "geleegd_op": "2025-12-04T06:56:00Z",
+      "kosten": "5.18",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "af249306-c0f2-5ea2-92de-759de6587c61",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 15.2,
+      "geleegd_op": "2025-12-05T06:05:00Z",
+      "kosten": "4.26",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "1fcd4942-aab7-5ae3-8d4e-3e42d5b280f0",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 0.8,
+      "geleegd_op": "2025-12-07T10:48:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "725ed731-2e2e-50d2-aeff-57d16f42b638",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.9,
+      "geleegd_op": "2025-12-11T09:27:00Z",
+      "kosten": "0.54",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "17f3ec0e-6db4-59b2-a5f3-52d1fe0dceca",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 21.3,
+      "geleegd_op": "2025-12-18T08:48:00Z",
+      "kosten": "5.96",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c5b521b5-3d92-5450-9755-72becb70471c",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 3.5,
+      "geleegd_op": "2025-12-19T09:41:00Z",
+      "kosten": "0.39",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f8a59404-dafa-535b-87cc-ea3217a5ae48",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.2,
+      "geleegd_op": "2025-12-25T08:12:00Z",
+      "kosten": "1.12",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3d200fa1-9110-5e42-b1fd-4707b24c1855",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 16.8,
+      "geleegd_op": "2026-01-01T10:05:00Z",
+      "kosten": "4.70",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "fac3e995-c418-55f6-a061-3bec8d47027e",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 8.6,
+      "geleegd_op": "2026-01-02T08:56:00Z",
+      "kosten": "2.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0d767e24-977f-5137-bdaf-9eb223166894",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 3.8,
+      "geleegd_op": "2026-01-04T07:48:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "642bcdf7-225a-57d7-b0bd-0a58902e6dcd",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.0,
+      "geleegd_op": "2026-01-08T11:05:00Z",
+      "kosten": "1.10",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "de5b27b3-03e2-54fb-98e3-e890bca93b9c",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 22.9,
+      "geleegd_op": "2026-01-15T10:48:00Z",
+      "kosten": "6.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "b93000a5-ff84-5ab2-ba14-06042a4c2cfa",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 11.2,
+      "geleegd_op": "2026-01-16T08:48:00Z",
+      "kosten": "1.23",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "60fee9aa-883c-5d03-9e74-6a268306c1a5",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 13.2,
+      "geleegd_op": "2026-01-22T06:05:00Z",
+      "kosten": "1.45",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f5e4d42e-08fd-5a9f-b3b8-1d0bda9f7492",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 9.6,
+      "geleegd_op": "2026-01-29T11:12:00Z",
+      "kosten": "2.69",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ae5a3dfa-0592-534c-8699-344196e22511",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 7.7,
+      "geleegd_op": "2026-01-30T11:34:00Z",
+      "kosten": "2.16",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "af2ecf37-b822-5e9f-94bb-9ce05223f518",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.0,
+      "geleegd_op": "2026-02-01T09:27:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "d37e0f87-e9b3-56d3-af10-01428f4ae785",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.6,
+      "geleegd_op": "2026-02-05T06:56:00Z",
+      "kosten": "1.17",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "4ef75c81-0f89-5728-b4fe-35113920bfcd",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 15.9,
+      "geleegd_op": "2026-02-12T11:34:00Z",
+      "kosten": "4.45",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "53e414f6-9575-5b63-941c-e7978197a092",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 3.7,
+      "geleegd_op": "2026-02-13T06:56:00Z",
+      "kosten": "0.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3af70387-8843-54a5-bde0-919928d3ff43",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.8,
+      "geleegd_op": "2026-02-19T11:12:00Z",
+      "kosten": "0.53",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ba4de8db-2b17-5120-b95b-c9373c181a6e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 8.2,
+      "geleegd_op": "2026-02-26T07:48:00Z",
+      "kosten": "2.30",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "0ac3461b-45cc-5cd3-af3c-b099e457cef4",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 10.9,
+      "geleegd_op": "2026-02-27T08:34:00Z",
+      "kosten": "3.05",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "fb7c47d4-4a8a-5212-a564-3e2a6e2472a9",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.9,
+      "geleegd_op": "2026-03-01T09:19:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ead887a0-d970-5c0a-94e6-193e7ef3b739",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 12.1,
+      "geleegd_op": "2026-03-05T10:56:00Z",
+      "kosten": "1.33",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f58e5d7d-f00c-5f1f-828e-e464ac4727c5",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 20.0,
+      "geleegd_op": "2026-03-12T09:12:00Z",
+      "kosten": "5.60",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "7aaf9dbd-b97e-5278-86cd-7c99892d1907",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 4.7,
+      "geleegd_op": "2026-03-13T06:27:00Z",
+      "kosten": "0.52",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "bf89b5b4-193d-5ab4-84d1-dd700dc5d9a3",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 5.2,
+      "geleegd_op": "2026-03-19T06:19:00Z",
+      "kosten": "0.57",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e2f1f2bf-c750-5808-95d3-d28d91a22746",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 23.4,
+      "geleegd_op": "2026-03-26T11:12:00Z",
+      "kosten": "6.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ead48234-b2a4-5c46-9eb9-816ebca21bd5",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 17.6,
+      "geleegd_op": "2026-03-27T11:41:00Z",
+      "kosten": "4.93",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "be06c23f-54ba-5802-bf24-bd5afe24932d",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 3.9,
+      "geleegd_op": "2026-03-29T07:05:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "06420a84-05a5-580c-a7c6-1c23b0a390a7",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 12.1,
+      "geleegd_op": "2026-04-02T06:48:00Z",
+      "kosten": "1.33",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "88713f8d-b7ef-51ad-8602-7eee2fa474ef",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 13.4,
+      "geleegd_op": "2026-04-09T07:56:00Z",
+      "kosten": "3.75",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "6728cc49-1161-5558-a0ed-c85f5a7ee7db",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 3.7,
+      "geleegd_op": "2026-04-10T06:56:00Z",
+      "kosten": "0.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e34b2228-4a98-5b04-9f8a-aaea58ab3af9",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 14.1,
+      "geleegd_op": "2026-04-16T08:12:00Z",
+      "kosten": "1.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "7b7146cf-b0a5-5a9d-89e0-27229360b7d8",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 8.9,
+      "geleegd_op": "2026-04-23T07:48:00Z",
+      "kosten": "2.49",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c2cd0e07-5d09-5c31-b5f3-4b1dfaf63ab2",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 7.7,
+      "geleegd_op": "2026-04-24T06:34:00Z",
+      "kosten": "2.16",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "d8d4b90c-99fe-5685-a6f8-5124b6262dd5",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.4,
+      "geleegd_op": "2026-04-26T10:19:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "06be20ad-f0d4-5594-9e2e-a90ad091eeeb",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 5.2,
+      "geleegd_op": "2026-04-30T09:41:00Z",
+      "kosten": "0.57",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "80d2e67d-5b9b-5692-ae89-889c207ea0a1",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 16.4,
+      "geleegd_op": "2026-05-07T09:05:00Z",
+      "kosten": "4.59",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "ce302317-4fdf-5262-9691-f7edce51f302",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 5.5,
+      "geleegd_op": "2026-05-08T10:05:00Z",
+      "kosten": "0.61",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "eb1f21a6-a493-5022-b6c1-375e652d117f",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 5.2,
+      "geleegd_op": "2026-05-14T08:12:00Z",
+      "kosten": "0.57",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e5ff3aee-e751-5cde-9add-eb3584e11d26",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 18.9,
+      "geleegd_op": "2026-05-21T09:19:00Z",
+      "kosten": "5.29",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "5fae1d90-cf4d-5bbb-8f15-ffc3fd199e51",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 6.8,
+      "geleegd_op": "2026-05-22T07:48:00Z",
+      "kosten": "1.90",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "db5203ad-bedc-5496-83b0-393446848394",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.7,
+      "geleegd_op": "2026-05-24T09:34:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "c9c291b8-4d3d-5f6e-b763-ac5110a25065",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.7,
+      "geleegd_op": "2026-05-28T06:19:00Z",
+      "kosten": "0.52",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "913455f2-3f0c-51a8-a575-de8698d8da4c",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 12.1,
+      "geleegd_op": "2026-06-04T10:34:00Z",
+      "kosten": "3.39",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "84405f6b-7fe2-550c-ae8f-e453350478e5",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 3.7,
+      "geleegd_op": "2026-06-05T07:27:00Z",
+      "kosten": "0.41",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "28142aeb-0aa8-5e1b-a59b-2fc6d38ac003",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 14.1,
+      "geleegd_op": "2026-06-11T06:41:00Z",
+      "kosten": "1.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8f5d54f9-c8af-5d66-879e-cbc175eec4ec",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 16.5,
+      "geleegd_op": "2026-06-18T07:48:00Z",
+      "kosten": "4.62",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8a126b99-35c5-5269-8a2d-73c5ef95ee16",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 9.1,
+      "geleegd_op": "2026-06-19T06:05:00Z",
+      "kosten": "2.55",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "17245f3f-bcb3-5e4e-98b6-b94d1f3c4eb5",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 2.5,
+      "geleegd_op": "2026-06-21T07:56:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "be27089a-0d1e-592f-98bf-5298386bf986",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 10.8,
+      "geleegd_op": "2026-06-25T09:41:00Z",
+      "kosten": "1.19",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "a835eed0-7b12-57b3-9b67-8e85feee63fc",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 11.6,
+      "geleegd_op": "2026-07-02T07:48:00Z",
+      "kosten": "3.25",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "eed998a8-22d3-53fa-be0f-cf4effab8726",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 3.3,
+      "geleegd_op": "2026-07-03T10:34:00Z",
+      "kosten": "0.36",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "10e276b7-2417-5736-9a5a-2c278d218781",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.4,
+      "geleegd_op": "2026-07-09T06:41:00Z",
+      "kosten": "0.48",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8cafa260-634b-5ba9-b3c3-6f3d843821de",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 20.4,
+      "geleegd_op": "2026-07-16T07:48:00Z",
+      "kosten": "5.71",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "4a759ca6-a7f5-5e07-bf8a-737042585b13",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 12.8,
+      "geleegd_op": "2026-07-17T10:41:00Z",
+      "kosten": "3.58",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "a357642d-a21e-51c9-a557-85a9013fb8c6",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.1,
+      "geleegd_op": "2026-07-19T08:41:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "099fa031-4c66-5696-8ae2-0b369235e909",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 4.8,
+      "geleegd_op": "2026-07-23T10:56:00Z",
+      "kosten": "0.53",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "fe77a3cc-57c2-56ab-8d34-684a29e825bc",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 19.3,
+      "geleegd_op": "2026-07-30T09:27:00Z",
+      "kosten": "5.40",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "3d3c6870-54ce-5c17-8c03-e21630b5199e",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 5.8,
+      "geleegd_op": "2026-07-31T11:34:00Z",
+      "kosten": "0.64",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "e8f887b5-ef9c-588e-89a1-74dbbf594a6d",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 8.4,
+      "geleegd_op": "2026-08-06T09:34:00Z",
+      "kosten": "0.92",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "f6f7a999-f96b-5529-a7f1-d1169a4eeb2e",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 14.7,
+      "geleegd_op": "2026-08-13T07:12:00Z",
+      "kosten": "4.12",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "536da1df-8bae-5635-9f41-b14a05ac3009",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
+      "gewicht": 10.3,
+      "geleegd_op": "2026-08-14T10:19:00Z",
+      "kosten": "2.88",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "8ea2e295-fc43-5fa5-b76b-b9dff1d6fc13",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
+      "gewicht": 1.3,
+      "geleegd_op": "2026-08-16T10:12:00Z",
+      "kosten": "0.00",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "65cd855c-6403-568f-82e4-dacd0a6eb865",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "65764d63-6e08-5eb7-8d82-e685c5205531",
+      "gewicht": 8.7,
+      "geleegd_op": "2026-08-20T06:48:00Z",
+      "kosten": "0.96",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "650bbd54-80af-5812-85f6-6bb679a65782",
+    "fields": {
+      "container_location": "7c7f29e9-13ce-5d14-9b74-84ff30d80595",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
+      "gewicht": 15.0,
+      "geleegd_op": "2026-08-27T08:27:00Z",
+      "kosten": "4.20",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "afval.lediging",
+    "pk": "fe3378f3-3b6f-579b-9439-bf24273ed721",
+    "fields": {
+      "container_location": "a4211da9-caa9-54da-bdc5-f120f87c0168",
+      "klant": "12077546-7a25-51bb-9a3d-1e1dca372d8d",
+      "container": "d7218faf-8849-5760-9265-44998bfab6f2",
+      "gewicht": 8.7,
+      "geleegd_op": "2026-08-28T09:34:00Z",
+      "kosten": "0.96",
+      "aangemaakt_op": "2026-09-01T00:00:00Z",
+      "gewijzigd_op": "2026-09-01T00:00:00Z"
+    }
   }
 ]
