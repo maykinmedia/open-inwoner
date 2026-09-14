@@ -217,6 +217,14 @@ zgw_consumers:
       api_root: http://hc-brp.internal:5010/haalcentraal/api/brp/
       api_type: orc
       auth_type: no_auth
+    - identifier: openafval-test
+      label: Open Afval - Afval profiel API
+      # Token seeded by docker/openafval/fixtures/db.json.
+      api_root: http://openafval.internal:8000/api/v1/
+      api_type: orc
+      auth_type: api_key
+      header_key: Authorization
+      header_value: Token e3b1f5c2a94d8067bb2f1d3e6a9c04578f21b6da
 
 # Openzaak
 openzaak_config_enable: true
@@ -245,6 +253,11 @@ openzaak_config:
 haalcentraal_config_enable: true
 haalcentraal_config:
   service_identifier: brp-personen-mock
+
+# Open Afval, backing the "Mijn afval" page
+mijn_afval_config_enable: true
+mijn_afval_config:
+  service_identifier: openafval-test
 
 # KvK (Chamber of Commerce) - real sandbox, used to look up company data for
 # eHerkenning users. No local mock exists for this one.

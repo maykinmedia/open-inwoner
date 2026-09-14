@@ -1,0 +1,3 @@
+mijn_afval_config_enable: true
+mijn_afval_config:
+  service_identifier: openafval-service
