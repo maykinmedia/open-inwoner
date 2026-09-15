@@ -64,7 +64,7 @@ LOGGING["loggers"].update(
             "propagate": True,
         },
         "django.db.backends": {
-            "handlers": ["django"],
+            "handlers": ["json_file"],
             "level": "DEBUG",
             "propagate": False,
         },
@@ -78,7 +78,7 @@ LOGGING["loggers"].update(
         # Autoreload logs excessively, turn it down a bit.
         #
         "django.utils.autoreload": {
-            "handlers": ["django"],
+            "handlers": ["json_file"],
             "level": "INFO",
             "propagate": False,
         },
