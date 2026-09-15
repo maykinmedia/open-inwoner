@@ -36,6 +36,7 @@ local.py
 /static/
 /mail/
 /log/*.log*
+/log/*.jsonl*
 /log/nginx/*.log*
 /.env
 .DS_STORE

@@ -19,6 +19,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
     libpango-1.0-0 \
     libpangoft2-1.0-0 \
+    # required for (log) routing support in uwsgi
+    libpcre3 \
+    libpcre3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -77,10 +80,13 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     # weasyprint deps (https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#debian-11)
     libpango-1.0-0 \
     libpangoft2-1.0-0 \
+    # required for (log) routing support in uwsgi
+    libpcre3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY ./bin/docker_start.sh /start.sh
+COPY ./bin/uwsgi.ini /uwsgi.ini
 COPY ./bin/wait_for_db.sh /wait_for_db.sh
 COPY ./bin/celery_worker.sh /celery_worker.sh
 COPY ./bin/celery_beat.sh /celery_beat.sh
