@@ -1,0 +1,32 @@
+De logoutput is gewijzigd; controleer log-scrapers, dashboards en alerts.
+
+De belangrijkste wijziging betreft uWSGI: de eigen server- en requestlogs van
+uWSGI worden nu als JSON naar stdout geschreven (herkenbaar aan
+``"source": "uwsgi"``) in plaats van als platte tekst. Logregels van de
+applicatie zelf worden ongewijzigd doorgegeven.
+
+Daarnaast worden fouten die met een exception worden gelogd niet meer naar
+Sentry gestuurd. Onafgevangen exceptions worden zoals voorheen wel gemeld.
+Gelogde fouten zijn alleen nog terug te vinden in de logs.
+
+JSON-logregels van de webapplicatie en Celery kunnen nieuwe velden bevatten:
+``trace_id``, ``span_id`` en ``parent_span_id`` als OpenTelemetry-tracing actief
+is, en de ``extra``-velden van log-aanroepen via de standaard ``logging``-module.
+De bestaande velden (``event``, ``timestamp``, ``logger``, ``level``), loggers
+en logniveaus blijven gelijk.
+
+**Docker-image en Helm-chart**: met de standaardinstellingen
+(``DJANGO_SETTINGS_MODULE=open_inwoner.conf.docker``) staan ``LOG_STDOUT`` en
+``LOG_FORMAT_CONSOLE=json`` al aan. In dat geval zijn de onderstaande punten
+niet van toepassing en blijven de logs van de applicatie en Celery JSON-regels
+op stdout.
+
+Alleen als ``LOG_STDOUT`` of ``LOG_FORMAT_CONSOLE`` zelf is ingesteld, of bij
+een installatie zonder Docker:
+
+* Zonder ``LOG_STDOUT`` worden de logbestanden ``log/django.log`` en
+  ``log/open_inwoner.log`` vervangen door één bestand, ``log/application.jsonl``.
+  Ook de ``open_inwoner``-logs van Celery gaan naar dit bestand in plaats van
+  naar stdout.
+* Met ``LOG_STDOUT`` maar zonder ``LOG_FORMAT_CONSOLE`` schrijft Celery (workers,
+  beat en monitor), net als de webapplicatie, leesbare tekst in plaats van JSON.
