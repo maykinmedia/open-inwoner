@@ -226,7 +226,10 @@ Loki (readiness)        http://localhost:3100/ready   --
    ``loaddata``\ s a fixture containing that ``accounts.user``
    (``docker/openklant/fixtures/db.json`` and
    ``docker/openafval/fixtures/db.json``; each fixture's README describes the
-   demo data it seeds alongside it).
+   demo data it seeds alongside it). Open Inwoner's own database gets demo
+   data the same way, via ``web-init``'s ``loaddata`` of
+   ``docker/setup_configuration/fixtures/samenwerken.json`` -- see that
+   directory's README.
 
 Logging in to Open Inwoner itself, at either ``http://localhost:8000/`` or
 the nginx-fronted ``http://localhost:9000/`` (both work equally well, see
@@ -304,8 +307,9 @@ by hand if you only edited a template and don't need a full re-seed --
 ``up --localhost`` already runs it automatically.
 
 Like ``web-init`` in the full stack, ``setup_configuration`` and the
-``openzaak_config.json`` load only run once per database -- a marker file in
-that same ``.host/`` folder records it, so re-running ``up --localhost``
+``openzaak_config.json``/``samenwerken.json`` loads only run once per
+database -- a marker file in that same ``.host/`` folder records it, so
+re-running ``up --localhost``
 (e.g. after a restart) doesn't overwrite any admin changes you've made
 locally. ``bin/stack.sh reset-config`` clears that marker (and web-init's)
 to force it to run again, e.g. after editing ``data.yaml``. Migrations, the

@@ -40,6 +40,10 @@ else
     # notify_status_changes, document_upload_enabled, status_indicator, etc.
     src/manage.py loaddata /app/setup_configuration/fixtures/openzaak_config.json
 
+    # Demo data for the "Samenwerken" page -- it has no satellite service of its
+    # own, so there's no setup_configuration step to seed it through.
+    src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
+
     mkdir -p "$MARKER_DIR"
     touch "$MARKER"
 fi
