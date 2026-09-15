@@ -1,0 +1,7 @@
+Structured logging is verder uitgebreid en gebruikt nu de gedeelde
+configuratie uit ``maykin-common``, die ook in andere Maykin-producten wordt
+gebruikt. De webapplicatie, uWSGI, Celery-workers en Celery beat schrijven nu
+allemaal JSON-logregels in hetzelfde formaat, zodat logs eenvoudig centraal
+verzameld en doorzocht kunnen worden (bijvoorbeeld met Loki en Grafana). Als
+OpenTelemetry-tracing actief is, bevatten logregels de trace- en span-ID's,
+waardoor logs aan traces gekoppeld kunnen worden.
