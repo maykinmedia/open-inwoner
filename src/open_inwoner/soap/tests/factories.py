@@ -22,7 +22,7 @@ class CertificateFactory(factory.django.DjangoModelFactory):
 
 
 class SoapServiceFactory(factory.django.DjangoModelFactory):
-    label = "Test SOAP service"
+    slug = factory.Sequence(lambda n: f"test-soap-service-{n}")
     url = "https://www.soap-example.com/"
 
     class Meta:

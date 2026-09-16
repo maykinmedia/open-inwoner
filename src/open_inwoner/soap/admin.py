@@ -7,11 +7,11 @@ from .models import SoapService
 @admin.register(SoapService)
 class SoapServiceAdmin(admin.ModelAdmin):
     list_display = (
-        "label",
+        "slug",
         "url",
     )
     search_fields = (
-        "label",
+        "slug",
         "url",
     )
     fieldsets = (
@@ -19,7 +19,7 @@ class SoapServiceAdmin(admin.ModelAdmin):
             None,
             {
                 "fields": (
-                    "label",
+                    "slug",
                     "url",
                 ),
             },

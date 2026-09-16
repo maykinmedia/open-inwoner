@@ -5,10 +5,11 @@ from simple_certmanager.models import Certificate
 
 
 class SoapService(models.Model):
-    label = models.CharField(
-        _("label"),
+    slug = models.SlugField(
+        _("slug"),
         max_length=100,
-        help_text=_("Human readable label to identify services"),
+        unique=True,
+        help_text=_("Unique, human-friendly identifier for this service"),
     )
     url = models.URLField(
         _("URL"),
@@ -40,7 +41,7 @@ class SoapService(models.Model):
         verbose_name_plural = _("SOAP services")
 
     def __str__(self):
-        return self.label
+        return self.slug
 
     def get_cert(self) -> str | tuple[str, str] | None:
         certificate = self.client_certificate
