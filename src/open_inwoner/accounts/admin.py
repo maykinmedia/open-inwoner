@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _, ngettext
 from image_cropping import ImageCroppingMixin
 from privates.admin import PrivateMediaMixin
 
+from maykin_config_checks.api.api import with_config_checks
+from open_inwoner.userfeed.config_checks.fetch_userfeed import FetchUserfeedCheck
 from open_inwoner.utils.mixins import UUIDAdminFirstInOrder
 
 from .choices import ContactTypeChoices
@@ -100,6 +102,7 @@ class DigitalAddressInline(admin.TabularInline):
 
 
 @admin.register(User)
+@with_config_checks(FetchUserfeedCheck)
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
     add_form = _UserCreationForm
@@ -164,6 +167,10 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
             _("Important dates"),
             {"fields": ("last_login", "previous_login", "date_joined")},
         ),
+        (
+            _("Checks"),
+            {"fields": ("config_check_links",)},
+        ),
     )
     add_fieldsets = (
         (
@@ -183,6 +190,7 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "previous_login",
         "last_login",
         "date_joined",
+        "config_check_links",
     )
     list_display = (
         "email",
