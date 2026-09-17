@@ -58,8 +58,8 @@ htmx.config.allowEval = false;
 // injecting a style element is problematic with CSP
 htmx.config.includeIndicatorStyles = false;
 
-// Set default timeout of 5s;
-htmx.config.timeout = 5000;
+// Set default timeout of 90s;
+htmx.config.timeout = 90 * 1000;
 
 // define selectors and callables to apply after we loaded a html fragment
 const elementWrappers = [
