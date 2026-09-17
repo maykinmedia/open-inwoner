@@ -167,7 +167,6 @@ class UitkeringClientTest(TestCase):
                     ssd_client.get_reports(
                         bsn="12345",
                         report_date="198507",
-                        request_url="https://dummy.com",
                     )
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -185,7 +184,6 @@ class UitkeringClientTest(TestCase):
             ssd_client.get_reports(
                 bsn="12345",
                 report_date="198507",
-                request_url="https://dummy.com",
             )
 
         # get request body and parse XML
@@ -226,7 +224,6 @@ class JaaropgaveClientTest(TestCase):
                     ssd_client.get_reports(
                         bsn="12345",
                         report_date="198507",
-                        request_url="https://dummy.com",
                     )
 
     @patch("django.utils.timezone.localtime", return_value=datetime(2023, 7, 12, 11, 0))
@@ -244,7 +241,6 @@ class JaaropgaveClientTest(TestCase):
             ssd_client.get_reports(
                 bsn="12345",
                 report_date="1985",
-                request_url="https://dummy.com",
             )
 
         # get request body and parse XML

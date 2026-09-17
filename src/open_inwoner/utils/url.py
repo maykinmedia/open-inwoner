@@ -15,6 +15,14 @@ def build_absolute_url(path: str) -> str:
     return f"{protocol}://{domain}{path}"
 
 
+def get_pdf_base_url() -> str:
+    """
+    Base URL used by ``maykin_common.pdf`` to resolve static/media assets
+    referenced in templates rendered to PDF.
+    """
+    return build_absolute_url("")
+
+
 def get_next_url_from(request, *, default: str = "") -> str:
     # possibly add parameter to prioritize get/post, override parameter name
     next_url = request.GET.get("next")
