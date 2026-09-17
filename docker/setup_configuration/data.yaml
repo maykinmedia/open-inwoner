@@ -345,6 +345,8 @@ cms_pages_config:
     requires_auth: true
     requires_auth_bsn_or_kvk: true
     menu_icon: person
+    # needed for the Samenwerken views (see PlanActionsEnabledMixin)
+    actions: true
   openklant:
     enabled: true
     title: Contact
