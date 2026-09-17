@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.utils import unquote
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -11,6 +13,7 @@ from djangocms_versioning.constants import DRAFT, PUBLISHED
 from djangocms_versioning.helpers import version_list_url
 from djangocms_versioning.models import Version
 
+from .constants import Icons
 from .models import CommonExtension
 
 # States that djangocms-versioning refuses to delete, see the `forbidden` check in
@@ -127,7 +130,35 @@ admin.site.register(Version, VersionAdmin)
 
 
 class CommonExtensionAdmin(PageExtensionAdmin):
-    pass
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "menu-icons/",
+                self.admin_site.admin_view(self.menu_icons_view),
+                name="cms_extensions_menu_icons",
+            ),
+        ]
+        return custom_urls + urls
+
+    def menu_icons_view(self, request):
+        context = {
+            **self.admin_site.each_context(request),
+            "title": _("Menu icons"),
+            "icons": Icons.choices,
+        }
+        return TemplateResponse(request, "admin/menu_icons.html", context)
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == "menu_icon":
+            formfield.help_text = format_html(
+                '{} <a href="{}" target="_blank">{}</a>&nbsp;',
+                formfield.help_text,
+                reverse("admin:cms_extensions_menu_icons"),
+                _("click here to view all available icons"),
+            )
+        return formfield
 
 
 admin.site.register(CommonExtension, CommonExtensionAdmin)
