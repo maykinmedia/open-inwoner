@@ -1,4 +1,4 @@
-{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
+{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags menu sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
 <html
     lang="nl"
     class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
@@ -140,7 +140,8 @@
             <main id="content" class="container">
                 {% block main_inner %}
                     <div class="grid{% block grid_class %}{% endblock %}">
-                        {% spaceless %}<div class="grid__sidebar">{% block sidebar_content %}{% endblock sidebar_content %}</div>{% endspaceless %}
+                        {% has_sidenav_items as has_sidenav %}
+                        {% spaceless %}<div class="grid__sidebar">{% if has_sidenav %}{% include "components/Sidenav/Sidenav.html" %}{% else %}{% block sidebar_content %}{% endblock sidebar_content %}{% endif %}</div>{% endspaceless %}
 
                         <div class="grid__main">
                             {% block content %}Please provide the content{% endblock content %}
