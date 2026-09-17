@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load i18n icon_tags %}
+
+{% block content %}
+<style>
+    .menu-icons-table { border-collapse: collapse; }
+    .menu-icons-table th, .menu-icons-table td { text-align: left; padding: 6px 12px; }
+    .menu-icons-table .material-icons, .menu-icons-table .material-icons-outlined { font-size: 24px; }
+</style>
+
+<table class="menu-icons-table">
+    <thead>
+        <tr>
+            <th>{% trans "Icon" %}</th>
+            <th>{% trans "Label" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for value, label in icons %}
+        <tr>
+            <td>{% icon value %}</td>
+            <td>{{ label }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
