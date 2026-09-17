@@ -23,6 +23,7 @@
         hx-get="{{ hxget }}"
         hx-trigger="load"
         hx-target="#cases-content"
-        hx-target-error="#any-error">
+        hx-target-error="#any-error"
+        hx-request='{"timeout": 90000}'>
     </oip-loading-spinner>
 {% endblock content %}
