@@ -195,6 +195,9 @@ export class HtmxSpinnerManager {
     if (!detail || !target) return;
     if (!(target instanceof HTMLElement)) return;
 
+    const cached = this.spinnerContextCache.get('cases-content');
+    if (!cached) return;
+
     // Update error text.
     const anyError = document.getElementById('any-error');
     const errorText =
