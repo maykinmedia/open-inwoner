@@ -39,8 +39,10 @@ class ZakenPluginConfig(ConfigurationModel):
 class TasksPluginConfig(ConfigurationModel):
     """Configuration for the 'Mijn taken' plugin placed on the homepage."""
 
+    object_type_dimpact: str | None = None
+
     class Meta:
-        django_model_refs = {TasksConfig: ["title"]}
+        django_model_refs = {TasksConfig: ["title", "object_type_dimpact"]}
 
 
 class CMSHomepageConfig(ConfigurationModel):

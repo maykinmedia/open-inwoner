@@ -1,0 +1,4 @@
+objects_api_config_enable: true
+objects_api_config:
+  objects_api_identifier: objecten-test
+  objecttypes_api_identifier: objecttypen-test

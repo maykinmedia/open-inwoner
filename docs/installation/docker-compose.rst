@@ -113,7 +113,8 @@ shared acceptance environments:
 - ``docker/docker-compose.open-zaak.yml`` -- Open Zaak (Zaken, Catalogi,
   Documenten and Besluiten APIs)
 - ``docker/docker-compose.objects-apis.yml`` -- the Objects API and
-  Objecttypes API
+  Objecttypes API, seeded with demo "externe taken" backing the "Mijn taken"
+  CMS page (see ``docker/objects-apis/README.md``)
 - ``docker/docker-compose.hc-brp-mock.yml`` -- the Haal Centraal BRP
   ``personen-mock``
 - ``docker/docker-compose.ssd-mock.yml`` -- an nginx-based mock of the SSD

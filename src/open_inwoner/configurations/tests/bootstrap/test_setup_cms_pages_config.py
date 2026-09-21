@@ -438,6 +438,9 @@ class CMSPagesConfigurationStepTests(TestCase):
 
         tasks = TasksConfig.objects.get(placeholder=placeholder)
         self.assertEqual(tasks.title, "Mijn taken")
+        self.assertEqual(
+            tasks.object_type_dimpact, "73eb56b4-3801-4a54-9a04-a5c8e42bf8ac"
+        )
 
     def test_homepage_plugins_rerun_with_unchanged_config_is_a_no_op(self):
         """
