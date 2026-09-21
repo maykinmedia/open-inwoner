@@ -192,11 +192,8 @@ export class HtmxSpinnerManager {
 
   private handleTimeoutResponseError(e: Event): void {
     const { detail, target } = e as CustomEvent<HtmxResponseInfo>;
-    if (!detail || !target) return;
-    if (!(target instanceof HTMLElement)) return;
-
-    const cached = this.spinnerContextCache.get('cases-content');
-    if (!cached) return;
+    if (!target) return;
+    // if (!(target instanceof HTMLElement)) return;
 
     // Update error text.
     const anyError = document.getElementById('any-error');
@@ -207,14 +204,25 @@ export class HtmxSpinnerManager {
       anyError.textContent = errorText;
     }
 
+    const targetId =
+      detail.target?.id ?? (target as HTMLElement).dataset.spinnerFor;
+    const cached = this.spinnerContextCache.get(targetId);
+    // if (!cached) return;
+
+    const spinners = cached?.spinners ?? this.getSpinners(targetId); // same as other comment.
+    const liveRegions =
+      cached?.liveRegions ??
+      spinners.map((s) => this.getLiveRegion(s)).filter((r) => r !== null);
+
     // Announce the error to screen readers via the live region.
-    const liveRegions = this.getLiveRegion(target);
-    if (liveRegions) liveRegions.textContent = errorText;
+    liveRegions.forEach((region) => (region.textContent = errorText));
 
     // Hide spinners (error occured).
-    target.classList.add('loader-container--hide');
+    spinners.forEach((spinner) =>
+      spinner.classList.add('loader-container--hide')
+    );
 
-    this.spinnerContextCache.delete(target.id);
+    this.spinnerContextCache.delete(targetId);
   }
 }
 
