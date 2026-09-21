@@ -79,7 +79,8 @@
         ["easy_thumbnails", "thumbnail"],
         ["easy_thumbnails", "thumbnaildimensions"],
         ["filer", "folder"],
-        ["filer", "folderpermission"]
+        ["filer", "folderpermission"],
+        ["upgrade_check", "version"]
       ]
     }
   },

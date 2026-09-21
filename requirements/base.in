@@ -35,6 +35,7 @@ django-import-export
 django-solo
 django-colorfield
 django-registration
+django-upgrade-check
 django-view-breadcrumbs
 markdown
 django-jsonform
