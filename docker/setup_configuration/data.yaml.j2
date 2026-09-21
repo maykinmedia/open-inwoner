@@ -254,6 +254,12 @@ haalcentraal_config_enable: true
 haalcentraal_config:
   service_identifier: brp-personen-mock
 
+# Objects/Objecttypes API, backing the "Mijn taken" plugin's "externe taken"
+objects_api_config_enable: true
+objects_api_config:
+  objects_api_identifier: objecten-test
+  objecttypes_api_identifier: objecttypen-test
+
 # Open Afval, backing the "Mijn afval" page
 mijn_afval_config_enable: true
 mijn_afval_config:
@@ -327,6 +333,9 @@ cms_pages_config:
       num_zaken: 4
     mijn_taken:
       title: Mijn taken
+      # uuid of the "Extern Formulier Taak" object type registered in
+      # docker/objects-apis/fixtures/objecttypes_api_fixtures.json.
+      object_type_dimpact: 73eb56b4-3801-4a54-9a04-a5c8e42bf8ac
   ssd:
     enabled: true
     title: Mijn uitkeringen

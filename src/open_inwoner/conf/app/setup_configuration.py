@@ -10,6 +10,7 @@ SETUP_CONFIGURATION_STEPS = [
     "open_inwoner.configurations.bootstrap.zgw.OpenZaakConfigurationStep",
     "open_inwoner.configurations.bootstrap.openklant.KlantenSysteemConfigurationStep",
     "open_inwoner.configurations.bootstrap.haalcentraal.HaalCentraalConfigurationStep",
+    "open_inwoner.configurations.bootstrap.objects_api.ObjectsAPIConfigurationStep",
     "open_inwoner.configurations.bootstrap.mijn_afval.MijnAfvalConfigurationStep",
     "open_inwoner.configurations.bootstrap.kvk.KvKConfigurationStep",
     "open_inwoner.configurations.bootstrap.ssd.SSDConfigurationStep",

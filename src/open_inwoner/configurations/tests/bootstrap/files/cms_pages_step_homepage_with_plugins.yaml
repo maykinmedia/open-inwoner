@@ -8,3 +8,4 @@ cms_pages_config:
       num_zaken: 6
     mijn_taken:
       title: Mijn taken
+      object_type_dimpact: 73eb56b4-3801-4a54-9a04-a5c8e42bf8ac

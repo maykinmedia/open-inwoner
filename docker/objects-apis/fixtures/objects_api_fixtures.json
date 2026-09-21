@@ -135,6 +135,167 @@
     }
   },
   {
+    "model": "core.objecttype",
+    "pk": 7,
+    "fields": {
+      "service": 1,
+      "uuid": "73eb56b4-3801-4a54-9a04-a5c8e42bf8ac",
+      "_name": "Extern Formulier Taak"
+    }
+  },
+  {
+    "model": "token.permission",
+    "pk": 7,
+    "fields": {
+      "token_auth": 1,
+      "object_type": 7,
+      "mode": "read_and_write",
+      "use_fields": false,
+      "fields": null
+    }
+  },
+  {
+    "model": "core.object",
+    "pk": 1,
+    "fields": {
+      "uuid": "3af3393b-3a46-4a35-ad20-8704ec2c5417",
+      "object_type": 7
+    }
+  },
+  {
+    "model": "core.object",
+    "pk": 2,
+    "fields": {
+      "uuid": "dfe9b978-471c-4261-b63b-bf8c455a786f",
+      "object_type": 7
+    }
+  },
+  {
+    "model": "core.object",
+    "pk": 3,
+    "fields": {
+      "uuid": "687a7555-8355-4c1b-ba1d-7a14edec952c",
+      "object_type": 7
+    }
+  },
+  {
+    "model": "core.objectrecord",
+    "pk": 1,
+    "fields": {
+      "object": 1,
+      "version": 1,
+      "index": 1,
+      "data": {
+        "titel": "Onderteken de digitale volmacht",
+        "status": "open",
+        "soort": "externformulier",
+        "eigenaar": "Team Burgerzaken",
+        "verwerker_taak_id": "2da1364d-d189-40f1-847b-b572fad08bca",
+        "betrokkene": {
+          "source": "digid",
+          "levelOfAssurance": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+          "authorizee": {
+            "legalSubject": {
+              "identifierType": "bsn",
+              "identifier": "111222333"
+            }
+          }
+        },
+        "portaalformulier": {
+          "formulier": {
+            "soort": "url",
+            "value": "https://open-forms.gemeente.nl/formulieren/digitale-volmacht/"
+          }
+        },
+        "toelichting": "Onderteken de volmacht zodat wij uw aanvraag kunnen afhandelen.",
+        "doorlooptijd": "P14D",
+        "verloopdatum": "2026-10-15T00:00:00Z"
+      },
+      "start_at": "2026-09-21",
+      "end_at": null,
+      "registration_at": "2026-09-21",
+      "correct": null,
+      "geometry": null
+    }
+  },
+  {
+    "model": "core.objectrecord",
+    "pk": 2,
+    "fields": {
+      "object": 2,
+      "version": 1,
+      "index": 1,
+      "data": {
+        "titel": "Bevestig uw adreswijziging",
+        "status": "verwerkt",
+        "soort": "externformulier",
+        "eigenaar": "Team Burgerzaken",
+        "verwerker_taak_id": "50b50d10-057d-4e90-80bd-6a6bd32eff36",
+        "betrokkene": {
+          "source": "digid",
+          "levelOfAssurance": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+          "authorizee": {
+            "legalSubject": {
+              "identifierType": "bsn",
+              "identifier": "111222333"
+            }
+          }
+        },
+        "portaalformulier": {
+          "formulier": {
+            "soort": "url",
+            "value": "https://open-forms.gemeente.nl/formulieren/adreswijziging-bevestigen/"
+          }
+        },
+        "toelichting": "Bedankt, uw adreswijziging is verwerkt."
+      },
+      "start_at": "2026-09-21",
+      "end_at": null,
+      "registration_at": "2026-09-21",
+      "correct": null,
+      "geometry": null
+    }
+  },
+  {
+    "model": "core.objectrecord",
+    "pk": 3,
+    "fields": {
+      "object": 3,
+      "version": 1,
+      "index": 1,
+      "data": {
+        "titel": "Upload uw inkomstenbewijs",
+        "status": "open",
+        "soort": "externformulier",
+        "eigenaar": "Team Werk en Inkomen",
+        "verwerker_taak_id": "43a3fea6-9112-4bc5-826b-225cf68667a9",
+        "betrokkene": {
+          "source": "digid",
+          "levelOfAssurance": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+          "authorizee": {
+            "legalSubject": {
+              "identifierType": "bsn",
+              "identifier": "111222333"
+            }
+          }
+        },
+        "portaalformulier": {
+          "formulier": {
+            "soort": "url",
+            "value": "https://open-forms.gemeente.nl/formulieren/inkomstenbewijs-uploaden/"
+          }
+        },
+        "doorlooptijd": "P14D",
+        "verloopdatum": "2026-10-05T00:00:00Z"
+      },
+      "start_at": "2026-09-21",
+      "end_at": null,
+      "registration_at": "2026-09-21",
+      "correct": null,
+      "geometry": null
+    }
+  },
+  {
     "model": "zgw_consumers.service",
     "pk": 1,
     "fields": {
@@ -143,7 +304,7 @@
       "oas_file": "",
       "uuid": "ee08faa2-4cd1-45f6-ba16-d50872cf5cf2",
       "api_type": "orc",
-      "api_root": "http://objecttypes-web:8000/api/v2/",
+      "api_root": "http://objecttypes.internal:8000/api/v2/",
       "client_id": "",
       "secret": "",
       "auth_type": "api_key",
