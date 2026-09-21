@@ -1230,7 +1230,7 @@ snowballstemmer==3.1.0
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   sphinx
-soupsieve==2.8.4
+soupsieve==2.9.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
