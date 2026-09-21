@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 
 from django_celery_beat.admin import PeriodicTaskAdmin as _PeriodicTaskAdmin
 from django_celery_beat.models import PeriodicTask
+from easy_thumbnails.models import Source, Thumbnail, ThumbnailDimensions
 from import_export.admin import ExportMixin
 from import_export.formats import base_formats
 from timeline_logger.admin import TimelineLogAdmin
@@ -191,3 +192,27 @@ class ReadOnlyAdminMixin:
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+class SourceAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
+    list_display = ["name", "storage_hash", "modified"]
+    search_fields = ["name"]
+
+
+class ThumbnailAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
+    list_display = ["name", "source", "storage_hash", "modified"]
+    list_select_related = ["source"]
+    search_fields = ["name", "source__name"]
+
+
+class ThumbnailDimensionsAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
+    list_display = ["thumbnail", "width", "height"]
+    list_select_related = ["thumbnail"]
+
+
+# easy_thumbnails doesn't register any admin of its own; do so here (read-only,
+# since these are generated cache records, not something to hand-edit) so they
+# show up in the admin index instead of silently disappearing from it.
+admin.site.register(Source, SourceAdmin)
+admin.site.register(Thumbnail, ThumbnailAdmin)
+admin.site.register(ThumbnailDimensions, ThumbnailDimensionsAdmin)

@@ -7,6 +7,18 @@
 /**
  * DJANGO ADMIN INDEX
  */
+
+// On the admin dashboard, Django's base.css styles the top-level group
+// header (`.app-group-header`) and each nested group's table caption
+// (`.module caption`) identically via `.module h2, .module caption`, whose
+// specificity (0,1,1) beats a plain `.app-group-header` (0,1,0). !important
+// is needed to win, same as the `.module.clockbox h2` override in
+// _admin_theme.scss.
+.app-group-header {
+  background: var(--primary) !important;
+  color: var(--primary-fg) !important;
+}
+
 .djai-dropdown-menu {
   // by default, the header has 40px padding on both sides. To make the border stretch
   // full width, set negative margins and positive paddings. On mobile and tablet these

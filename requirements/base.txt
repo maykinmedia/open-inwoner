@@ -171,7 +171,7 @@ django==5.2.17
     #   sentry-sdk
     #   zgw-consumers
     #   zgw-consumers-oas
-django-admin-index==4.0.0
+django-admin-index @ git+https://github.com/maykinmedia/django-admin-index@6e30ce22b02fd2691d44559d8a740ed8faf6297b
     # via -r requirements/base.in
 django-appconf==1.0.5
     # via
