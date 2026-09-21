@@ -13,8 +13,13 @@ from log_outgoing_requests.structlog import ExtractRequestAndResponseDetails
 from maykin_common.branding import ProductDefinition
 from maykin_common.config import DocumentationParams, config
 from maykin_common.health_checks import default_health_check_apps
+from maykin_common.logging.config import (
+    LOGGING_APPS,
+    LOGGING_FORMATTERS,
+    LOGGING_MIDDLEWARE,
+    structlog_configure_defaults,
+)
 
-from .structlog_sentry import SentryStructlogProcessor
 from .utils import get_current_version, get_sentry_integrations
 
 # django.utils.timezone.utc was removed in Django 5.0. Restore it as a
@@ -392,6 +397,7 @@ INSTALLED_APPS = [
     "maykin_common.health_checks.celery",
     "maykin_config_checks",
     "maykin_common",
+    *LOGGING_APPS,
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
@@ -447,13 +453,7 @@ _log_requests_via_middleware = config(
         group="Logging",
     ),
 )
-_structlog_middleware = (
-    [
-        "django_structlog.middlewares.RequestMiddleware",
-    ]
-    if _log_requests_via_middleware
-    else []
-)
+_structlog_middleware = LOGGING_MIDDLEWARE if _log_requests_via_middleware else []
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -651,34 +651,25 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "timestamped": {"format": "%(asctime)s %(levelname)s %(name)s  %(message)s"},
-        "simple": {"format": "%(levelname)s  %(message)s"},
         "performance": {
             "format": "%(asctime)s %(process)d | %(thread)d | %(message)s",
         },
         "json": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
+            **LOGGING_FORMATTERS["json"],
+            # extend the shared foreign_pre_chain: enrich log_outgoing_requests
+            # records with request/response details and render foreign (stdlib
+            # logging) exceptions, same as the structlog-originated ones.
             "foreign_pre_chain": [
                 ExtractRequestAndResponseDetails(),
-                structlog.contextvars.merge_contextvars,
-                structlog.processors.TimeStamper(fmt="iso"),
-                structlog.stdlib.add_logger_name,
-                structlog.stdlib.add_log_level,
-                structlog.stdlib.PositionalArgumentsFormatter(),
+                *LOGGING_FORMATTERS["json"]["foreign_pre_chain"],
                 structlog.processors.format_exc_info,
             ],
         },
         "plain_console": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(pad_level=False),
+            **LOGGING_FORMATTERS["plain_console"],
             "foreign_pre_chain": [
                 ExtractRequestAndResponseDetails(),
-                structlog.contextvars.merge_contextvars,
-                structlog.processors.TimeStamper(fmt="iso"),
-                structlog.stdlib.add_logger_name,
-                structlog.stdlib.add_log_level,
-                structlog.stdlib.PositionalArgumentsFormatter(),
+                *LOGGING_FORMATTERS["plain_console"]["foreign_pre_chain"],
                 structlog.processors.format_exc_info,
             ],
         },
@@ -711,18 +702,12 @@ LOGGING = {
                 ),
             ),
         },
-        "django": {
+        # replaces the "django" and "project" handlers - in containerized applications
+        # the best practices is to log to stdout (use the console handler).
+        "json_file": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "django.log"),
-            "formatter": "json",
-            "maxBytes": 1024 * 1024 * 10,  # 10 MB
-            "backupCount": 10,
-        },
-        "project": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "open_inwoner.log"),
+            "filename": os.path.join(LOGGING_DIR, "application.jsonl"),
             "formatter": "json",
             "maxBytes": 1024 * 1024 * 10,  # 10 MB
             "backupCount": 10,
@@ -742,12 +727,12 @@ LOGGING = {
     },
     "loggers": {
         "open_inwoner": {
-            "handlers": ["project"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "INFO",
             "propagate": True,
         },
         "django.request": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "ERROR",
             "propagate": True,
         },
@@ -756,29 +741,34 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "django.server": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
         "digid_eherkenning": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "INFO",
             "propagate": True,
         },
         "log_outgoing_requests": {
-            "handlers": (["project"] if not LOG_STDOUT else ["console"])
+            "handlers": (["json_file"] if not LOG_STDOUT else ["console"])
             + ["save_outgoing_requests"],
             "level": "DEBUG",
             "propagate": True,
         },
         "opentelemetry": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "ERROR",
             "propagate": True,
         },
         "opentelemetry.metrics": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "ERROR",
             "propagate": True,
         },
         "opentelemetry.sdk.metrics": {
-            "handlers": ["django"] if not LOG_STDOUT else ["console"],
+            "handlers": ["json_file"] if not LOG_STDOUT else ["console"],
             "level": "ERROR",
             "propagate": True,
         },
@@ -789,29 +779,7 @@ LOGGING = {
     },
 }
 
-structlog.configure(
-    processors=[
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.filter_by_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.StackInfoRenderer(),
-        # Capture exceptions for Sentry BEFORE any formatting happens.
-        # This ensures Sentry receives raw exception objects with full stack traces
-        # and all the context from the event dict.
-        SentryStructlogProcessor(),
-        # Format exceptions for display in logs. This happens AFTER Sentry has
-        # captured the raw exception, so both Sentry (proper exception) and logs
-        # (formatted traceback) work correctly.
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+structlog_configure_defaults()
 
 #
 # DJANGO-STRUCTLOG
@@ -1404,7 +1372,6 @@ if SENTRY_DSN:
         traces_sample_rate=0,
         integrations=get_sentry_integrations(),
         send_default_pii=True,
-        before_send=SentryStructlogProcessor.before_send,
     )
 
 # Elastic APM

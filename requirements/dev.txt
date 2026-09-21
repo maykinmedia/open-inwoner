@@ -89,6 +89,7 @@ celery==5.5.3
     #   celery-once
     #   django-celery-beat
     #   django-celery-monitor
+    #   django-structlog
     #   django-yubin
     #   maykin-common
     #   notifications-api-common
@@ -533,7 +534,7 @@ django-solo==2.2.0
     #   notifications-api-common
     #   objects-api-client-django
     #   zgw-consumers
-django-structlog==6.0.1
+django-structlog[celery]==6.0.1
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -866,7 +867,7 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-common[cli, docs, health-checks, otel, pdf]==0.21.0
+maykin-common[cli, docs, health-checks, otel, pdf] @ git+https://github.com/maykinmedia/django-common@e3fec949e0e301e731130b822d40e08fd9c35601
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
