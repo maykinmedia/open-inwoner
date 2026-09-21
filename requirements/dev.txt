@@ -273,6 +273,7 @@ django==5.2.17
     #   django-timezone-field
     #   django-treebeard
     #   django-two-factor-auth
+    #   django-upgrade-check
     #   django-view-breadcrumbs
     #   djangocms-alias
     #   djangorestframework
@@ -561,6 +562,10 @@ django-two-factor-auth[phonenumberslite, webauthn]==1.16.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-2fa
+django-upgrade-check==2.0.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-view-breadcrumbs==2.5.1
     # via
     #   -c requirements/ci.txt
@@ -1332,6 +1337,11 @@ ruff==0.11.7
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+semantic-version==2.10.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+    #   django-upgrade-check
 sentry-sdk[django]==2.59.0
     # via
     #   -c requirements/ci.txt

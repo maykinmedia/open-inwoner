@@ -392,6 +392,7 @@ INSTALLED_APPS = [
     "maykin_common.health_checks.celery",
     "maykin_config_checks",
     "maykin_common",
+    "upgrade_check",
     # Project applications.
     "open_inwoner.core",
     "open_inwoner.components",
@@ -1271,6 +1272,10 @@ SENTRY_DSN = config(
     ),
 )
 RELEASE = "v2.5-dev"  # get_current_version()
+
+# Django Upgrade Check
+UPGRADE_CHECK_PATHS = {}
+
 
 PRIVATE_MEDIA_ROOT = os.path.join(BASE_DIR, "private_media")
 FILER_ROOT = os.path.join(BASE_DIR, "media", "filer")
