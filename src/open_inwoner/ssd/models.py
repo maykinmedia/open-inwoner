@@ -150,4 +150,4 @@ class SSDConfig(SingletonModel):
         return SiteConfiguration.get_solo().logo
 
     class Meta:
-        verbose_name = _("SSD")
+        verbose_name = _("Mijn uitkeringen")
