@@ -193,7 +193,6 @@ export class HtmxSpinnerManager {
   private handleTimeoutResponseError(e: Event): void {
     const { detail, target } = e as CustomEvent<HtmxResponseInfo>;
     if (!target) return;
-    // if (!(target instanceof HTMLElement)) return;
 
     // Update error text.
     const anyError = document.getElementById('any-error');
@@ -207,9 +206,8 @@ export class HtmxSpinnerManager {
     const targetId =
       detail.target?.id ?? (target as HTMLElement).dataset.spinnerFor;
     const cached = this.spinnerContextCache.get(targetId);
-    // if (!cached) return;
 
-    const spinners = cached?.spinners ?? this.getSpinners(targetId); // same as other comment.
+    const spinners = cached?.spinners ?? this.getSpinners(targetId);
     const liveRegions =
       cached?.liveRegions ??
       spinners.map((s) => this.getLiveRegion(s)).filter((r) => r !== null);
