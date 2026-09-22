@@ -233,6 +233,23 @@ def migrate_to_prosemirror_field(
             )
 
 
+def sanitize_prosemirror_link_hrefs(
+    apps, schema_editor, app_label, model_name, field_name
+):
+    """
+    Strip unsafe (e.g. javascript:) URLs from a ProsemirrorModelField.
+
+    Delegates to django_prosemirror's own migration utility (added upstream
+    alongside its href/src validation), which strips both unsafe link hrefs
+    and unsafe filer_image srcs and already bypasses the field descriptor for
+    reads/writes.
+    """
+    from django_prosemirror.migration_utils import strip_unsafe_prosemirror_urls
+
+    Model = apps.get_model(app_label, model_name)
+    strip_unsafe_prosemirror_urls(Model, field_name)
+
+
 def _clean_empty_html_tags(html):
     """
     Remove empty HTML tags to prevent prosemirror parser errors.

@@ -782,3 +782,68 @@ class CKEditorToTextPluginMigrationTest(TestSuccessfulMigrations):
                 7,
                 f"Expected 7, found {text_plugin_count}. Migrated: {migrated_ids}",
             )
+
+
+def _text_with_link(text, href):
+    return {
+        "type": "doc",
+        "content": [
+            {
+                "type": "paragraph",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                        "marks": [{"type": "link", "attrs": {"href": href}}],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+@tag("migrations")
+class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0017: strip unsafe hrefs from stored prosemirror link marks
+    on Text.body.
+    """
+
+    migrate_from = "0016_merge_20260504_1103"
+    migrate_to = "0017_sanitize_prosemirror_link_hrefs"
+    app = "plugins"
+
+    def setUpBeforeMigration(self, apps):
+        Placeholder = apps.get_model("cms", "Placeholder")
+        placeholder = Placeholder.objects.create(slot="content")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO cms_cmsplugin
+                    (placeholder_id, language, plugin_type, position, creation_date, changed_date)
+                VALUES (%s, %s, %s, %s, NOW(), NOW())
+                RETURNING id
+                """,
+                (placeholder.id, "nl", "TextPlugin", 0),
+            )
+            self.plugin_id = cursor.fetchone()[0]
+
+            cursor.execute(
+                "INSERT INTO plugins_text (cmsplugin_ptr_id, body) VALUES (%s, %s::jsonb)",
+                (
+                    self.plugin_id,
+                    json.dumps(_text_with_link("click", "javascript:alert(1)")),
+                ),
+            )
+
+    def test_unsafe_href_stripped_from_body(self):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT body::text FROM plugins_text WHERE cmsplugin_ptr_id = %s",
+                (self.plugin_id,),
+            )
+            doc = json.loads(cursor.fetchone()[0])
+        text_node = doc["content"][0]["content"][0]
+        self.assertEqual(text_node["marks"], [])
+        self.assertEqual(text_node["text"], "click")
