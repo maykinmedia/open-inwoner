@@ -44,6 +44,10 @@ else
     # own, so there's no setup_configuration step to seed it through.
     src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
 
+    # Demo data for the "Openstaande acties" homepage plugin. Loaded after
+    # samenwerken.json, which it references the citizen user from.
+    src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
+
     mkdir -p "$MARKER_DIR"
     touch "$MARKER"
 fi

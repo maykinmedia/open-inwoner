@@ -18,8 +18,10 @@ from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.plugins.cms_plugins.tasks import TasksPlugin
+from open_inwoner.cms.plugins.cms_plugins.userfeed import UserFeedPlugin
 from open_inwoner.cms.plugins.cms_plugins.zaken import CMSZakenPlugin
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
+from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
 from open_inwoner.cms.products.cms_apps import ProductsApphook
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
@@ -45,6 +47,13 @@ class TasksPluginConfig(ConfigurationModel):
         django_model_refs = {TasksConfig: ["title", "object_type_dimpact"]}
 
 
+class UserFeedPluginConfig(ConfigurationModel):
+    """Configuration for the 'Openstaande acties' plugin placed on the homepage."""
+
+    class Meta:
+        django_model_refs = {UserFeed: ["title"]}
+
+
 class CMSHomepageConfig(ConfigurationModel):
     """Configuration for the site homepage (a plain CMS page with no apphook)."""
 
@@ -57,6 +66,10 @@ class CMSHomepageConfig(ConfigurationModel):
     mijn_taken: Annotated[
         TasksPluginConfig | None,
         Field(description="Adds a 'Mijn taken' plugin to the homepage."),
+    ] = Field(default=None)
+    acties: Annotated[
+        UserFeedPluginConfig | None,
+        Field(description="Adds an 'Openstaande acties' plugin to the homepage."),
     ] = Field(default=None)
 
 
@@ -194,6 +207,7 @@ _PROFILE_CONFIG_FIELDS = tuple(
 _HOMEPAGE_PLUGINS: dict[str, type[CMSPluginBase]] = {
     "mijn_zaken": CMSZakenPlugin,
     "mijn_taken": TasksPlugin,
+    "acties": UserFeedPlugin,
 }
 _HOMEPAGE_CONTENT_SLOT = "content"
 
