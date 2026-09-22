@@ -7,6 +7,8 @@ services:
 
   objects-db:
     image: postgis/postgis:${PG_VERSION:-14-master}
+    # no arm64 image
+    platform: linux/amd64
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
@@ -22,6 +24,8 @@ services:
 
   objecttypes-web:
     image: maykinmedia/objecttypes-api:${OBJECTTYPES_VERSION:-2.2.0}
+    # no arm64 image
+    platform: linux/amd64
     environment:
       - DJANGO_SETTINGS_MODULE=objecttypes.conf.docker
       - SECRET_KEY=${SECRET_KEY:-fgv=c0hz&tl*8*3m3893@m+1pstrvidc9e^5@fpspmg%cy$15d}
@@ -83,6 +87,8 @@ services:
 
   objects-web:
     image: maykinmedia/objects-api:${OBJECTS_VERSION:-2.4.0}
+    # no arm64 image
+    platform: linux/amd64
     environment: &objects_web_env
       - DJANGO_SETTINGS_MODULE=objects.conf.docker
       - SECRET_KEY=${SECRET_KEY:-fgv=c0hz&tl*8*3m3893@m+1pstrvidc9e^5@fpspmg%cy$15d}
@@ -148,6 +154,8 @@ services:
 
   objects-celery:
     image: maykinmedia/objects-api:${OBJECTS_VERSION:-2.4.0}
+    # no arm64 image
+    platform: linux/amd64
     environment: *objects_web_env
     command: /celery_worker.sh
     # No healthcheck: only objects-web's readiness gates bin/stack.sh up's
