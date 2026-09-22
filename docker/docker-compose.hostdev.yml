@@ -20,3 +20,16 @@ services:
   elasticsearch:
     ports:
       - 9202:9200
+
+  # The Objects API validates its `type=` filter by an exact string match
+  # against the `zgw_consumers.service.api_root` it has on file for the
+  # objecttype's owning service (docker/objects-apis/fixtures/objects_api_fixtures.json,
+  # correct for the "objecttypes.internal" alias a container-mode Open Inwoner
+  # uses). A host-run Open Inwoner instead builds that filter from
+  # http://localhost:8003/..., so the fixture loader also loads this file
+  # (sorted after the base one -- see /start.sh's `for fixture in $(ls
+  # fixtures_dir/*.json)`) to overwrite that one row with the localhost value.
+  objects-web:
+    volumes:
+      - ./docker/objects-apis/fixtures/objects_api_fixtures.json:/app/fixtures/objects_api_fixtures.json
+      - ./docker/objects-apis/fixtures/objects_api_fixtures.localhost.json:/app/fixtures/objects_api_fixtures.localhost.json

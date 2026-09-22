@@ -1,0 +1,24 @@
+[
+  {
+    "model": "zgw_consumers.service",
+    "pk": 1,
+    "fields": {
+      "label": "Local objecttypes",
+      "oas": "https://raw.githubusercontent.com/maykinmedia/objecttypes-api/master/src/objecttypes/api/v2/openapi.yaml",
+      "oas_file": "",
+      "uuid": "ee08faa2-4cd1-45f6-ba16-d50872cf5cf2",
+      "api_type": "orc",
+      "api_root": "http://localhost:8003/api/v2/",
+      "client_id": "",
+      "secret": "",
+      "auth_type": "api_key",
+      "header_key": "Authorization",
+      "header_value": "Token 171be5abaf41e7856b423ad513df1ef8f867ff48",
+      "nlx": "",
+      "user_id": "",
+      "user_representation": "",
+      "client_certificate": null,
+      "server_certificate": null
+    }
+  }
+]
