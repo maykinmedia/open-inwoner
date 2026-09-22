@@ -336,6 +336,8 @@ cms_pages_config:
       # uuid of the "Extern Formulier Taak" object type registered in
       # docker/objects-apis/fixtures/objecttypes_api_fixtures.json.
       object_type_dimpact: 73eb56b4-3801-4a54-9a04-a5c8e42bf8ac
+    acties:
+      title: Openstaande acties
   ssd:
     enabled: true
     title: Mijn uitkeringen

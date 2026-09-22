@@ -13,6 +13,7 @@ from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
+from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
@@ -442,6 +443,9 @@ class CMSPagesConfigurationStepTests(TestCase):
             tasks.object_type_dimpact, "73eb56b4-3801-4a54-9a04-a5c8e42bf8ac"
         )
 
+        acties = UserFeed.objects.get(placeholder=placeholder)
+        self.assertEqual(acties.title, "Openstaande acties")
+
     def test_homepage_plugins_rerun_with_unchanged_config_is_a_no_op(self):
         """
         Nothing to converge means no new page version, so an unrelated
@@ -526,6 +530,7 @@ class CMSPagesConfigurationStepTests(TestCase):
             CMSZakenPluginConfig.objects.filter(placeholder=placeholder).exists()
         )
         self.assertTrue(TasksConfig.objects.filter(placeholder=placeholder).exists())
+        self.assertTrue(UserFeed.objects.filter(placeholder=placeholder).exists())
 
     def test_no_service_account_is_created_when_nothing_is_enabled(self):
         execute_single_step(

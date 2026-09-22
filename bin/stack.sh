@@ -267,6 +267,7 @@ case "$cmd" in
                     --yaml-file docker/setup_configuration/.host/data.yaml
                 python src/manage.py loaddata docker/setup_configuration/.host/openzaak_config.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
+                python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
                 touch "$HOST_SETUP_MARKER"
             fi
 

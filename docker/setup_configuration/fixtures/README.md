@@ -1,6 +1,6 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Two unrelated things live here, both loaded by `bin/setup_configuration.sh`
+Three unrelated things live here, all loaded by `bin/setup_configuration.sh`
 right after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
@@ -39,14 +39,32 @@ Contents:
 Log in via DigiD as `testuser`/`testuser` and open "Samenwerken" or "Berichten"
 to see them.
 
+## `acties.json`
+
+Demo data for the "Openstaande acties" homepage plugin (`UserFeedPlugin`), which
+-- like `samenwerken.json` -- has no satellite service of its own:
+`FeedItemData` lives in Open Inwoner's own database. Not templated, for the same
+reason as `samenwerken.json`. Loaded after `samenwerken.json`, since it
+references the citizen user (pk `9002`) defined there.
+
+Contents: three `message_simple` feed items for that same citizen, of the kind
+normally created by `userfeed.hooks.common.simple_message()` for
+development/debugging -- a profile-completion reminder, an appointment reminder,
+and a new-message notification.
+
+Log in via DigiD as `testuser`/`testuser` and open the homepage to see them
+under "Openstaande acties".
+
 ## Load fixtures manually
 
 ```bash
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 ```
 
 or, for `up --localhost`:
 
 ```bash
 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
+python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
 ```
