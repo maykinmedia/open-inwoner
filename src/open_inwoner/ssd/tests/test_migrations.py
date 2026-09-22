@@ -126,3 +126,62 @@ class MaandspecificatiePdfCommentsEmptyContentTest(
     migrate_from = "0016_ssdconfig_maandspecificatie_pdf_comments_schema_1"
     migrate_to = "0017_ssdconfig_maandspecificatie_pdf_comments_data"
     field_name = "maandspecificatie_pdf_comments"
+
+
+def _text_with_link(text, href):
+    return {
+        "type": "doc",
+        "content": [
+            {
+                "type": "paragraph",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                        "marks": [{"type": "link", "attrs": {"href": href}}],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+@tag("migrations")
+class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0020: strip unsafe hrefs from stored prosemirror link marks
+    on SSDConfig.jaaropgave_display_text/maandspecificatie_display_text.
+
+    jaaropgave_pdf_comments/maandspecificatie_pdf_comments are excluded:
+    their schema forbids the LINK mark entirely (allowed_mark_types=[]).
+    """
+
+    app = "ssd"
+    migrate_from = "0019_alter_ssdconfig_jaaropgave_display_text_and_more"
+    migrate_to = "0020_sanitize_prosemirror_link_hrefs"
+
+    def setUpBeforeMigration(self, apps):
+        SSDConfig = apps.get_model("ssd", "SSDConfig")
+        self.config = SSDConfig.objects.create()
+        SSDConfig.objects.filter(pk=self.config.pk).update(
+            jaaropgave_display_text=_text_with_link("click", "javascript:alert(1)"),
+            maandspecificatie_display_text=_text_with_link(
+                "click", "https://example.com"
+            ),
+        )
+
+    def _get(self):
+        SSDConfig = self.apps.get_model("ssd", "SSDConfig")
+        return SSDConfig.objects.get(pk=self.config.pk)
+
+    def test_unsafe_href_stripped_from_jaaropgave_display_text(self):
+        config = self._get()
+        text_node = config.jaaropgave_display_text.raw_data["content"][0]["content"][0]
+        self.assertEqual(text_node["marks"], [])
+
+    def test_safe_href_preserved_on_maandspecificatie_display_text(self):
+        config = self._get()
+        text_node = config.maandspecificatie_display_text.raw_data["content"][0][
+            "content"
+        ][0]
+        self.assertEqual(text_node["marks"][0]["attrs"]["href"], "https://example.com")

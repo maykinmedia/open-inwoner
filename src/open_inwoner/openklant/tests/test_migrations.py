@@ -1,5 +1,7 @@
+import json
 import uuid
 
+from django.db import connection
 from django.test import tag
 
 from zgw_consumers.constants import AuthTypes
@@ -187,3 +189,83 @@ class NoLinkedServiceAuthTest(TestSuccessfulMigrations):
         OpenKlant2Config = self.apps.get_model("openklant", "OpenKlant2Config")
         config = OpenKlant2Config.objects.get(id=self.config_id)
         self.assertIsNone(config.service_id)
+
+
+def _text_with_link(text, href):
+    return {
+        "type": "doc",
+        "content": [
+            {
+                "type": "paragraph",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                        "marks": [{"type": "link", "attrs": {"href": href}}],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+@tag("migrations")
+class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0042: strip unsafe hrefs from stored prosemirror link marks
+    on ContactFormConfig.description_authenticated_user/description_anonymous_user.
+    """
+
+    migrate_from = "0041_migrate_openklant2_service_auth"
+    migrate_to = "0042_sanitize_prosemirror_link_hrefs"
+    app = "openklant"
+
+    def setUpBeforeMigration(self, apps):
+        Placeholder = apps.get_model("cms", "Placeholder")
+        placeholder = Placeholder.objects.create(slot="content")
+
+        # Use raw SQL to create the CMSPlugin row, avoiding treebeard fields
+        # (depth, path, numchild) removed in CMS 4.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO cms_cmsplugin
+                    (placeholder_id, language, plugin_type, position, creation_date, changed_date)
+                VALUES (%s, %s, %s, %s, NOW(), NOW())
+                RETURNING id
+                """,
+                (placeholder.id, "nl", "ContactFormPlugin", 0),
+            )
+            self.plugin_id = cursor.fetchone()[0]
+
+            cursor.execute(
+                """
+                INSERT INTO openklant_contactformconfig
+                    (cmsplugin_ptr_id, description_authenticated_user, description_anonymous_user)
+                VALUES (%s, %s::jsonb, %s::jsonb)
+                """,
+                (
+                    self.plugin_id,
+                    json.dumps(_text_with_link("click", "javascript:alert(1)")),
+                    json.dumps(_text_with_link("click", "https://example.com")),
+                ),
+            )
+
+    def _get_field(self, field_name):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT {field_name}::text FROM openklant_contactformconfig "
+                "WHERE cmsplugin_ptr_id = %s",
+                (self.plugin_id,),
+            )
+            return json.loads(cursor.fetchone()[0])
+
+    def test_unsafe_href_stripped_from_description_authenticated_user(self):
+        doc = self._get_field("description_authenticated_user")
+        text_node = doc["content"][0]["content"][0]
+        self.assertEqual(text_node["marks"], [])
+
+    def test_safe_href_preserved_on_description_anonymous_user(self):
+        doc = self._get_field("description_anonymous_user")
+        text_node = doc["content"][0]["content"][0]
+        self.assertEqual(text_node["marks"][0]["attrs"]["href"], "https://example.com")

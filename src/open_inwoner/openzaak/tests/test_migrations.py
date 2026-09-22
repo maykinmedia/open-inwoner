@@ -243,3 +243,61 @@ class FixEmptyStringProsemirrorFieldsTest(TestSuccessfulMigrations):
         status_none = ZaakTypeStatusTypeConfig.objects.get(id=self.status_with_none.id)
         self.assertIsNone(status_none.description.raw_data)
         self.assertIsNone(status_none.document_upload_description.raw_data)
+
+
+def _text_with_link(text, href):
+    return {
+        "type": "doc",
+        "content": [
+            {
+                "type": "paragraph",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                        "marks": [{"type": "link", "attrs": {"href": href}}],
+                    }
+                ],
+            }
+        ],
+    }
+
+
+@tag("migrations")
+class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0087: strip unsafe hrefs from stored prosemirror link marks
+    on ZaakTypeStatusTypeConfig.document_upload_description/description.
+    """
+
+    migrate_from = "0086_alter_openzaakconfig_document_visible_statuses"
+    migrate_to = "0087_sanitize_prosemirror_link_hrefs"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        self.config = _make_zaaktype_status_config(apps)
+        ZaakTypeStatusTypeConfig = apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        ZaakTypeStatusTypeConfig.objects.filter(pk=self.config.pk).update(
+            document_upload_description=_text_with_link("click", "javascript:alert(1)"),
+            description=_text_with_link("click", "https://example.com"),
+        )
+
+    def _get(self):
+        ZaakTypeStatusTypeConfig = self.apps.get_model(
+            "openzaak", "ZaakTypeStatusTypeConfig"
+        )
+        return ZaakTypeStatusTypeConfig.objects.get(id=self.config.id)
+
+    def test_unsafe_href_stripped_from_document_upload_description(self):
+        config = self._get()
+        text_node = config.document_upload_description.raw_data["content"][0][
+            "content"
+        ][0]
+        self.assertEqual(text_node["marks"], [])
+
+    def test_safe_href_preserved_on_description(self):
+        config = self._get()
+        text_node = config.description.raw_data["content"][0]["content"][0]
+        self.assertEqual(text_node["marks"][0]["attrs"]["href"], "https://example.com")
