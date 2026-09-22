@@ -46,6 +46,8 @@ services:
 
   openafval-web:
     image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    # no arm64 image
+    platform: linux/amd64
     environment: &openafval_web_env
       - DJANGO_SETTINGS_MODULE=openafval.conf.docker
       # Literal `$` in the default must be escaped as `$$`, or Compose tries to
@@ -104,6 +106,8 @@ services:
 
   openafval-seed:
     image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    # no arm64 image
+    platform: linux/amd64
     environment: *openafval_web_env
     command: python src/manage.py loaddata --ignorenonexistent /fixtures/db.json
     volumes:

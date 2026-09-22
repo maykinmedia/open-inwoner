@@ -175,6 +175,24 @@ it all down again. Anything else, e.g. ``bin/stack.sh ps`` or
 ``bin/stack.sh exec web bash``, is forwarded straight to ``docker compose``
 with the right ``-f`` chain already applied.
 
+.. note::
+
+   Several satellite images -- Open Zaak, the Objects/Objecttypes APIs, Open
+   Klant, Open Afval, ``postgis/postgis`` and ``clamav/clamav`` -- don't
+   publish arm64 builds, so the compose files pin them to
+   ``platform: linux/amd64`` and rely on Docker Desktop's Rosetta-based
+   emulation to run them on Apple Silicon Macs. Apple has said Rosetta will
+   be removed in macOS 28, at which point these services will stop running
+   on Apple Silicon entirely unless their upstream projects publish arm64
+   images by then -- worth keeping an eye on before upgrading.
+
+   The full stack also starts around twenty containers at once, which can
+   exceed Docker Desktop's default memory allocation on macOS and get one of
+   them (usually Elasticsearch) killed with exit code 137 while it's still
+   starting up. If a container dies for no obvious reason, increase Docker
+   Desktop's memory limit under *Settings > Resources > Memory* (8 GB or
+   more) and try again.
+
 ``bin/stack.sh up`` also overrides ``OTEL_SDK_DISABLED`` to ``false`` for the
 app containers (it defaults to ``true`` -- disabled -- everywhere else, per
 `Testing OpenTelemetry Observability`_ below), since it brings up the

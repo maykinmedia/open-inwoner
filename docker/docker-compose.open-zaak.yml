@@ -7,6 +7,8 @@ services:
 
   openzaak-db:
     image: postgis/postgis:${PG_VERSION:-14-master}
+    # no arm64 image
+    platform: linux/amd64
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
@@ -22,6 +24,8 @@ services:
 
   openzaak-web:
     image: openzaak/open-zaak:${OPENZAAK_VERSION:-1.27.4}
+    # no arm64 image
+    platform: linux/amd64
     environment: &openzaak_web_env
       - DJANGO_SETTINGS_MODULE=openzaak.conf.docker
       - SECRET_KEY=${SECRET_KEY:-fgv=c0hz&tl*8*3m3893@m+1pstrvidc9e^5@fpspmg%cy$15d}
@@ -92,6 +96,8 @@ services:
 
   openzaak-celery:
     image: openzaak/open-zaak:${OPENZAAK_VERSION:-1.27.4}
+    # no arm64 image
+    platform: linux/amd64
     environment: *openzaak_web_env
     volumes: *openzaak_web_volumes
     command: /celery_worker.sh
