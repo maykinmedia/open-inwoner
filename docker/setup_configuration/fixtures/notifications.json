@@ -1,0 +1,50 @@
+[
+  {
+    "model": "zgw_consumers.service",
+    "pk": 9101,
+    "fields": {
+      "label": "Mock Notifications API",
+      "uuid": "5aee31ab-1a89-471f-bc44-64feaef1b34b",
+      "slug": "mock-notifications-api",
+      "api_type": "nrc",
+      "api_root": "http://notificaties.local/api/v1/",
+      "api_connection_check_path": "",
+      "auth_type": "no_auth",
+      "client_id": "",
+      "secret": "",
+      "oauth2_token_url": "",
+      "oauth2_scope": "",
+      "jwt_valid_for": 43200,
+      "header_key": "",
+      "header_value": "",
+      "nlx": "",
+      "user_id": "",
+      "user_representation": "",
+      "client_certificate": null,
+      "server_certificate": null,
+      "timeout": 10
+    }
+  },
+  {
+    "model": "notifications.notificationsapiconfig",
+    "pk": 9101,
+    "fields": {
+      "notifications_api_service": 9101,
+      "notification_delivery_max_retries": 5,
+      "notification_delivery_retry_backoff": 3,
+      "notification_delivery_retry_backoff_max": 48
+    }
+  },
+  {
+    "model": "notifications.subscription",
+    "pk": 9101,
+    "fields": {
+      "notifications_api_config": 9101,
+      "callback_url": "http://web:8000/api/openzaak/notifications/webhook/zaken",
+      "client_id": "notifications-test",
+      "secret": "notifications-test-secret",
+      "channels": ["zaken"],
+      "_subscription": ""
+    }
+  }
+]
