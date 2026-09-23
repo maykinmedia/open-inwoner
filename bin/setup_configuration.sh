@@ -48,6 +48,13 @@ else
     # samenwerken.json, which it references the citizen user from.
     src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 
+    # A Subscription (+ its placeholder NRC Service) to authenticate against
+    # the ZGW notifications webhook with -- there's no real Notifications API
+    # in this stack, so nothing ever calls Subscription.register(); this only
+    # exists so `manage.py send_mock_notification` has something to sign a
+    # JWT against. See docker/setup_configuration/fixtures/README.md.
+    src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
+
     mkdir -p "$MARKER_DIR"
     touch "$MARKER"
 fi
