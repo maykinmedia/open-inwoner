@@ -14,7 +14,7 @@ Open Inwoner
 
 |build-status| |docker| |ruff| |python-versions| |storybook|
 
-Platform voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
+Portaal voor gemeenten en overheden om producten inzichtelijker en toegankelijker te maken voor inwoners.
 
 Ontwikkeld door `Maykin B.V.`_ voor Dimpact en de `Open Inwoner`_ gemeenten:
 Deventer, Enschede, Groningen, Leeuwarden, Hoorn, Zwolle.
@@ -23,13 +23,13 @@ Deventer, Enschede, Groningen, Leeuwarden, Hoorn, Zwolle.
 Introductie
 ============
 
-Het Open Inwoner Platform is ontwikkeld voor en door gemeenten om producten en diensten aan te bieden aan hun inwoners, gecombineerd met een "Mijn" omgeving.
+Het Open Inwoner Portaal is ontwikkeld voor en door gemeenten om producten en diensten aan te bieden aan hun inwoners, gecombineerd met een "Mijn" omgeving.
 
-Informatie over de producten kan eenvoudig beheerd worden middels een handige WYSIWYG editor. Gebruikers van het platform kunnen door de beschikbare producten zoeken, veelgestelde vragen bekijken en tevens eenvoudige vragenlijsten invullen om zo de voor hun relevante informatie zo laagdrempelig mogelijk te vinden.
+Informatie over de producten kan eenvoudig beheerd worden middels een handige WYSIWYG editor. Gebruikers van het portaal kunnen door de beschikbare producten zoeken, veelgestelde vragen bekijken en tevens eenvoudige vragenlijsten invullen om zo de voor hun relevante informatie zo laagdrempelig mogelijk te vinden.
 
 Gebruikers kunnen tevens berichten en documenten uitwisselen, dit vindt plaats door middel van samenwerkingsplannen en desgewenst zonder of met de gemeente.
 
-Zie voor meer informatie de demo-omgeving op https://openinwoner.nl waarop de verschillende onderdelen van het Open Inwoner Platform worden toegelicht.
+Zie voor meer informatie de demo-omgeving op https://openinwoner.nl waarop de verschillende onderdelen van het Open Inwoner Portaal worden toegelicht.
 
 Open Inwoner is ontwikkeld in lijn met de `Common Ground`_ principes en bevat integraties met Common Ground componenten zoals Open Zaak en Haal Centraal.
 
@@ -37,7 +37,7 @@ Open Inwoner is ontwikkeld in lijn met de `Common Ground`_ principes en bevat in
 Introduction (English)
 ======================
 
-Open Inwoner is a Dutch citizen-facing government services platform ("MijnGemeente" / "My Municipality" portal) that enables municipalities to provide personalized digital services to their citizens.
+Open Inwoner is a Dutch citizen-facing government services portal ("MijnGemeente" / "My Municipality" portal) that enables municipalities to provide personalized digital services to their citizens.
 
 Key capabilities:
 
