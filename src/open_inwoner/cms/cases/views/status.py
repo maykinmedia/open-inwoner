@@ -833,6 +833,11 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
                     api_group,
                 )
             except ZgwAPIError:
+                logger.exception(
+                    "Failed to upload document for zaak",
+                    case_uuid=str(self.zaak.uuid),
+                    filename=file.name,
+                )
                 return self.handle_document_error(request, file)
 
             try:
@@ -840,6 +845,11 @@ class CaseDocumentUploadFormView(CaseAccessMixin, CaseLogMixin, FormView):
                     self.zaak.url, created_document.get("url"), api_group
                 )
             except ZgwAPIError:
+                logger.exception(
+                    "Failed to connect uploaded document to zaak",
+                    case_uuid=str(self.zaak.uuid),
+                    filename=file.name,
+                )
                 return self.handle_document_error(request, file)
 
             self.log_case_document_uploaded(self.zaak, file.name)
