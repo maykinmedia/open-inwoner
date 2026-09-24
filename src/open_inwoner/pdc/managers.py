@@ -4,7 +4,7 @@ from django.db import models
 
 from dateutil.relativedelta import relativedelta
 from ordered_model.models import OrderedModelQuerySet
-from treebeard.mp_tree import MP_NodeQuerySet
+from treebeard.mp_tree import MP_NodeManager, MP_NodeQuerySet
 
 from open_inwoner.accounts.models import User
 from open_inwoner.configurations.models import SiteConfiguration
@@ -115,6 +115,16 @@ class CategoryPublishedQueryset(LogMixin, MP_NodeQuerySet):
                     break
 
         return qs.filter(pk__in=pks)
+
+
+class CategoryManager(MP_NodeManager.from_queryset(CategoryPublishedQueryset)):
+    def get_queryset(self):
+        # `MP_NodeManager.get_queryset` hardcodes `MP_NodeQuerySet`, ignoring
+        # `_queryset_class`, so it needs to be overridden explicitly to keep
+        # `CategoryPublishedQueryset`'s methods available on `Category.objects`
+        # and on the querysets returned by treebeard's tree-walking methods
+        # (`get_children()`, `get_root_nodes()`, etc).
+        return CategoryPublishedQueryset(self.model, using=self._db).order_by("path")
 
 
 class QuestionQueryset(OrderedModelQuerySet):
