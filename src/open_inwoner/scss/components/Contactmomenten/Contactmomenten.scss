@@ -80,7 +80,9 @@
 }
 
 .contactmoment {
-  --nl-paragraph-margin-block-start: var(--row-height);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 
   &__heading {
     margin: 0 0 var(--spacing-large) 0;
@@ -88,6 +90,10 @@
 
   &__actions {
     font-weight: bold;
+  }
+
+  &__answer {
+    margin-block-end: 1em;
   }
 
   .button--transparent {
