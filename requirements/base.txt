@@ -314,7 +314,7 @@ django-timeline-logger==4.0.0
     # via -r requirements/base.in
 django-timezone-field==6.1.0
     # via django-celery-beat
-django-treebeard==4.4
+django-treebeard==5.3.1
     # via
     #   -r requirements/base.in
     #   django-cms

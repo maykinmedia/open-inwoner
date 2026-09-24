@@ -30,7 +30,7 @@ class QuestionnaireStepAdminForm(movenodeform_factory(QuestionnaireStep)):
         cleaned_data = super().clean(*args, **kwargs)
 
         highlighted = cleaned_data["highlighted"]
-        ref_node = cleaned_data["_ref_node_id"]
+        ref_node = cleaned_data["treebeard_ref_node"]
         if highlighted and ref_node:
             raise forms.ValidationError(
                 _("Only root nodes (parent questionnaire steps) can be highlighted.")
@@ -76,8 +76,8 @@ class QuestionnaireStepAdmin(TreeAdmin):
             {
                 "classes": ("collapse",),
                 "fields": (
-                    "_position",
-                    "_ref_node_id",
+                    "treebeard_position",
+                    "treebeard_ref_node",
                     "title",
                     "description",
                     "category",

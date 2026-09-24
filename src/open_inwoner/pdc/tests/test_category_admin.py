@@ -27,8 +27,8 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "foo1"
         form["slug"] = "foo1"
         form["published"] = True
-        form["_position"] = "first-child"
-        form["_ref_node_id"] = 0
+        form["treebeard_position"] = "first-child"
+        form["treebeard_ref_node"] = ""
         # django-jsonform requires JS to work properly and with Webtest the default
         # value for ArrayFields is an empty string, causing it crash to when trying to parse
         # that value as JSON
@@ -46,8 +46,8 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "bar1"
         form["slug"] = "bar1"
         form["published"] = True
-        form["_position"] = "first-child"
-        form["_ref_node_id"] = root.id
+        form["treebeard_position"] = "first-child"
+        form["treebeard_ref_node"] = str(root.id)
         # django-jsonform requires JS to work properly and with Webtest the default
         # value for ArrayFields is an empty string, causing it crash to when trying to parse
         # that value as JSON
@@ -67,8 +67,8 @@ class TestAdminCategoryForm(WebTest):
         form["name"] = "bar2"
         form["slug"] = "bar2"
         form["published"] = True
-        form["_position"] = "first-child"
-        form["_ref_node_id"] = category.id
+        form["treebeard_position"] = "first-child"
+        form["treebeard_ref_node"] = str(category.id)
         form.submit()
         categories = Category.objects.filter(slug="bar2")
         self.assertEqual(categories.count(), 0)
