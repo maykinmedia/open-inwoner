@@ -10,18 +10,21 @@ function collapseNode(node) {
 }
 
 function updateNodeStatus() {
-  const buttons = document.querySelectorAll('a.collapse');
+  const buttons = document.querySelectorAll('a.treebeard-collapse');
   buttons.forEach((button) => {
     button.addEventListener('click', (event) => {
       if (event.detail.system) {
         return;
       }
-      const buttonId = event.currentTarget.parentElement.parentElement.id;
+      const nodeId = event.currentTarget.closest('tr')?.dataset.nodeId;
+      if (!nodeId) {
+        return;
+      }
       setTimeout(() => {
-        if (button.classList.contains('expanded')) {
-          window.localStorage.setItem(`${buttonId}-open`, true);
+        if (button.classList.contains('treebeard-expanded')) {
+          window.localStorage.setItem(`${nodeId}-open`, true);
         } else {
-          window.localStorage.removeItem(`${buttonId}-open`);
+          window.localStorage.removeItem(`${nodeId}-open`);
         }
       }, 100);
     });
@@ -31,9 +34,16 @@ function updateNodeStatus() {
 function expandOpenNodes() {
   const rows = document.querySelectorAll('#result_list tr');
   rows.forEach((row) => {
-    const currentRowOpen = window.localStorage.getItem(`${row.id}-open`);
+    const nodeId = row.dataset.nodeId;
+    if (!nodeId) {
+      return;
+    }
+    const currentRowOpen = window.localStorage.getItem(`${nodeId}-open`);
     if (currentRowOpen) {
-      const button = row.querySelector('.collapse');
+      const button = row.querySelector('.treebeard-collapse');
+      if (!button) {
+        return;
+      }
       const event = new MouseEvent('click', {
         view: window,
         bubbles: true,
@@ -52,7 +62,7 @@ function main() {
 
   if (questionnairePage) {
     // Collapse all expanded nodes when the page is loaded
-    [...document.querySelectorAll('a.collapse')]
+    [...document.querySelectorAll('a.treebeard-collapse')]
       .reverse()
       .forEach(collapseNode);
 
