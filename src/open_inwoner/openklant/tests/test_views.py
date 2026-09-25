@@ -17,6 +17,8 @@ from zgw_consumers.constants import APITypes
 
 from open_inwoner.accounts.signals import update_user_on_login
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
+from open_inwoner.cms.cases.cms_apps import CasesApphook
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.openklant.api_models import ContactMoment, Klant, KlantContactMoment
 from open_inwoner.openklant.constants import KlantenServiceType, Status
@@ -80,6 +82,12 @@ class ContactMomentViewsTestCase(
         self.config = KlantenSysteemConfig.get_solo()
         self.config.primary_backend = KlantenServiceType.ESUITE.value
         self.config.save()
+
+        # Create CMS pages for testing (required for request.current_page to be set)
+        cms_tools.create_homepage()
+        self.cases_page = cms_tools.create_apphook_page(
+            CasesApphook, title="Mijn Aanvragen"
+        )
 
     def test_contactmoment_list_bsn(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
