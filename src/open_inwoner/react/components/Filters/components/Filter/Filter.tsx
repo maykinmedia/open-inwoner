@@ -99,41 +99,48 @@ const Filter: AC<IFilterGroup> = ({
               : undefined
           }
         >
-          {choices.map((choice, index) => {
-            const isChecked = selectedValues.includes(choice.value);
+          {[...choices]
+            .sort((a, b) => {
+              return a.label.localeCompare(b.label, undefined, {
+                numeric: true,
+                sensitivity: 'variant',
+              });
+            })
+            .map((choice, index) => {
+              const isChecked = selectedValues.includes(choice.value);
 
-            return (
-              <div
-                className={clsx('oip-filter__option', {
-                  'oip-filter__option--active': index === activeIndex,
-                })}
-                role="option"
-                aria-selected={isChecked}
-                key={`${name}.${choice.value}`}
-                id={`option-${name}-${choice.value}`}
-              >
-                <input
-                  type={multiple ? 'checkbox' : 'radio'}
-                  name={name}
-                  class="oip-filter__option-input"
-                  id={`${name}.${choice.value}`}
-                  value={choice.value}
-                  checked={isChecked}
-                  tabIndex={isMobile ? undefined : -1}
-                  onChange={() => {
-                    if (multiple) toggleValue(name, choice.value);
-                    else toggleValueRadio(name, choice.value);
-                  }}
-                />
-                <label
-                  class="oip-filter__option-label"
-                  htmlFor={`${name}.${choice.value}`}
+              return (
+                <div
+                  className={clsx('oip-filter__option', {
+                    'oip-filter__option--active': index === activeIndex,
+                  })}
+                  role="option"
+                  aria-selected={isChecked}
+                  key={`${name}.${choice.value}`}
+                  id={`option-${name}-${choice.value}`}
                 >
-                  <span>{choice.label}</span>
-                </label>
-              </div>
-            );
-          })}
+                  <input
+                    type={multiple ? 'checkbox' : 'radio'}
+                    name={name}
+                    class="oip-filter__option-input"
+                    id={`${name}.${choice.value}`}
+                    value={choice.value}
+                    checked={isChecked}
+                    tabIndex={isMobile ? undefined : -1}
+                    onChange={() => {
+                      if (multiple) toggleValue(name, choice.value);
+                      else toggleValueRadio(name, choice.value);
+                    }}
+                  />
+                  <label
+                    class="oip-filter__option-label"
+                    htmlFor={`${name}.${choice.value}`}
+                  >
+                    <span>{choice.label}</span>
+                  </label>
+                </div>
+              );
+            })}
         </div>
       )}
     </Wrapper>
