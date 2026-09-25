@@ -50,7 +50,11 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 
 # The file storage engine to use when collecting static files with the
 # collectstatic management command.
-# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+# NOTE: `STORAGES` (set in base.py) takes precedence over `STATICFILES_STORAGE`
+# whenever both are defined, so the override has to happen on the dict itself.
+STORAGES["staticfiles"]["BACKEND"] = (
+    "open_inwoner.utils.files.TolerantManifestStaticFilesStorage"
+)
 
 # Production logging facility.
 handlers = ["console"] if LOG_STDOUT else ["django"]
