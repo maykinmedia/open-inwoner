@@ -1,6 +1,7 @@
 import abc
 from abc import ABC
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from zgw_consumers.client import build_client
@@ -34,6 +35,9 @@ class BRPClient(ABC):
 
     @classmethod
     def from_config(cls) -> "BRPClient":
+        if not settings.HAALCENTRAAL_BRPAPI_ENABLED:
+            raise ImproperlyConfigured("Haal Centraal BRP integration is disabled")
+
         config = HaalCentraalConfig.get_solo()
         if not config.service:
             raise ImproperlyConfigured("No service configured for Haal Centraal")
