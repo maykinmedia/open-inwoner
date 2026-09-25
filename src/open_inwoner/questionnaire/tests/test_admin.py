@@ -23,8 +23,8 @@ class TestQuestionnaireStepForm(WebTest):
         form["question_subject"] = "subject"
         form["slug"] = "a-question"
         form["code"] = "some code text"
-        form["_position"] = "first-child"
-        form["_ref_node_id"] = 0
+        form["treebeard_position"] = "first-child"
+        form["treebeard_ref_node"] = ""
         form["highlighted"] = True
         form.submit()
         questionnaire = QuestionnaireStep.objects.first()
@@ -39,8 +39,8 @@ class TestQuestionnaireStepForm(WebTest):
         form["question_subject"] = "subject"
         form["slug"] = "this-should-not-work"
         form["code"] = "some code text"
-        form["_position"] = "first-child"
-        form["_ref_node_id"] = questionnaire.id
+        form["treebeard_position"] = "first-child"
+        form["treebeard_ref_node"] = str(questionnaire.id)
         form["highlighted"] = True
         form.submit()
         questionnaires = QuestionnaireStep.objects.filter(slug="this-should-not-work")

@@ -9,7 +9,7 @@ from filer.fields.image import FilerImageField
 from treebeard.exceptions import InvalidMoveToDescendant
 from treebeard.mp_tree import MP_MoveHandler, MP_Node
 
-from open_inwoner.pdc.managers import CategoryPublishedQueryset
+from open_inwoner.pdc.managers import CategoryManager
 
 
 class PublishedMoveHandler(MP_MoveHandler):
@@ -126,7 +126,7 @@ class Category(MP_Node):
         related_name="managed_categories",
     )
 
-    objects = CategoryPublishedQueryset.as_manager()
+    objects = CategoryManager()
 
     class Meta:
         verbose_name = _("Category")
