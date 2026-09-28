@@ -2209,7 +2209,15 @@ class OpenKlant2Service(
             was_partij={"uuid": partij_uuid},
             contactnaam=None,
         )
-        self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
+        # The question is already visible and registered by this point, so a failure
+        # below must not fail the call.
+        try:
+            self._create_interne_taak(klantcontact_uuid=klantcontact["uuid"])
+        except Exception:
+            logger.exception(
+                "Failed to create interne taak for question",
+                klantcontact_uuid=klantcontact["uuid"],
+            )
 
         return OpenKlant2Question.from_klantcontact_and_answers(klantcontact, [])
 
