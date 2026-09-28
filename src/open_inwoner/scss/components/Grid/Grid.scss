@@ -66,6 +66,20 @@
     grid-column-gap: var(--gutter-width);
   }
 
+  &--tablet {
+    @media (min-width: 768px) {
+      display: flex;
+    }
+
+    @media (min-width: 1000px) {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: 1fr;
+      grid-row-gap: var(--spacing-extra-large);
+      grid-column-gap: var(--gutter-width);
+    }
+  }
+
   /// Layout.
 
   > * {
@@ -101,5 +115,9 @@
 
   .form__grid-box {
     grid-template-columns: 1fr;
+  }
+
+  .utrecht-heading-1 + .grid {
+    margin-block-start: var(--spacing-extra-large);
   }
 }
