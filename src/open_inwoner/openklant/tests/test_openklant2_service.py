@@ -1352,6 +1352,39 @@ class OpenKlant2QuestionAnswerTestCase(TestCase):
         self.assertEqual(len(q3.answers), 1)
         self.assertEqual(q3.answers[0].answer, "Second answer to Q3")
 
+    def test_asking_a_question_succeeds_even_if_interne_taak_fails(
+        self, mock_client_class
+    ):
+        """A failure assigning the interne taak must not fail the call.
+
+        The citizen-facing outcome, a submitted and visible question, already
+        happened by the time the interne taak is created.
+        """
+        question = {
+            "uuid": "q1",
+            "inhoud": "Question?",
+            "onderwerp": "Philosophy",
+            "kanaal": "oip_mijn_vragen",
+            "taal": "nld",
+            "nummer": "0001",
+            "plaatsgevondenOp": "2024-10-01T10:00:00Z",
+            "url": "http://example.com/q1",
+        }
+
+        service = OpenKlant2Service(config=self.config)
+        with (
+            patch.object(service, "_create_klantcontact", return_value=question),
+            patch.object(service, "_create_betrokkene_in_klantcontact"),
+            patch.object(
+                service, "_create_interne_taak", side_effect=RuntimeError("boom")
+            ),
+        ):
+            result = service.create_question_for_partij(
+                "partij", "Question?", "Philosophy"
+            )
+
+        self.assertEqual(result.question_kcm_uuid, "q1")
+
     def test_retrieve_question_returns_none_when_uuid_not_found(
         self, mock_client_class
     ):
