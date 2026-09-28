@@ -1504,6 +1504,41 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
 
         self.assertEqual(listing.call_count, 2)
 
+    def test_asking_a_question_invalidates_cache_even_if_interne_taak_fails(
+        self, mock_client_class
+    ):
+        """A failure assigning the interne taak must not hide an already-visible question.
+
+        Nor should it fail the call itself: the citizen-facing outcome, a submitted
+        and visible question, already happened by the time the interne taak is
+        created.
+        """
+
+        question = make_klantcontact("q1", "Question?", "2024-10-01T10:00:00Z")
+        self._mock_conversation_client(mock_client_class)
+
+        service = OpenKlant2Service(config=self.config)
+        with (
+            patch.object(service, "_create_klantcontact", return_value=question),
+            patch.object(service, "_create_betrokkene_in_klantcontact"),
+            patch.object(
+                service, "_create_interne_taak", side_effect=RuntimeError("boom")
+            ),
+            patch.object(
+                service, "klantcontacten_for_partij", return_value=[question]
+            ) as listing,
+        ):
+            service.questions_for_partij("partij")
+
+            result = service.create_question_for_partij(
+                "partij", "Question?", "Philosophy"
+            )
+            self.assertEqual(result.question_kcm_uuid, "q1")
+
+            service.questions_for_partij("partij")
+
+        self.assertEqual(listing.call_count, 2)
+
     def _resolve_one_question(self, mock_client_class, klantcontacten):
         # Resolutions are cached per partij, and these are complete ones, so a caller
         # running several cases against the same partij would keep getting the first.
