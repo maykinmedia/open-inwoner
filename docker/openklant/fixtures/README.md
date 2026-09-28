@@ -36,3 +36,9 @@ It also includes a batch of klantcontacten for BSN `111222333` (the DigiD-mock
 `testuser`), seeded by running `python docker/openklant/seed_conversations.py`
 against a running instance -- log in locally with that BSN and open "Mijn
 vragen" to see them.
+
+It also creates the `klantinteracties.actor` that Open Inwoner assigns interne
+taken to when a citizen submits a question, at a fixed uuid:
+`0ee17a4b-8709-4d0b-a525-ae0e93f17fc0`. Point Open Inwoner's OpenKlant2
+configuration's "Vragen mijn vragen actor" setting at this uuid, or question
+submission fails once it tries to create that taak.
