@@ -2,15 +2,12 @@
 {% load i18n form_tags grid_tags button_tags link_tags list_tags messages_tags pagination_tags querystring_tags %}
 
 {% block content %}
-    {% render_column span=12 %}
-        <header>
-            <h1 class="utrecht-heading-1">
-                {% trans "Mijn berichten" %}
-            </h1>
-        </header>
-    {% endrender_column %}
 
-    {% render_grid %}
+    <h1 class="utrecht-heading-1">
+        {% trans "Mijn berichten" %}
+    </h1>
+
+    {% render_grid tablet=True %}
         {% render_column start=1 span=4 extra_classes="inbox__conversations" %}
         <div class="list--messages">
          {% button primary=True href='inbox:start' text=_('Nieuw bericht versturen') %}
