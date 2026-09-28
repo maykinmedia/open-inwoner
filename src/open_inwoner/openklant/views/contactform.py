@@ -223,6 +223,7 @@ class ContactFormView(
                     phonenumber=phonenumber,
                 )
         except Exception:
+            logger.exception("Error registering question via OpenKlant2")
             self.log_question_registered_via_openklant(success=False)
             return False, ""
 
