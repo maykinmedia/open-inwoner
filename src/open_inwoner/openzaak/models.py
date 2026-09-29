@@ -824,7 +824,7 @@ class ZaakTypeInformatieObjectTypeConfig(models.Model):
     informatieobjecttype_uuid.short_description = _("Information object UUID")
 
     def __str__(self):
-        return f"{self.omschrijving} [{self.zaaktype_config.catalogus.base_url}]"
+        return f"{self.omschrijving}"
 
     def natural_key(self):
         return (self.omschrijving,) + self.zaaktype_config.natural_key()
