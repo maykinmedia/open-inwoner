@@ -1,6 +1,7 @@
 {% load i18n button_tags form_tags messages_tags icon_tags %}
 
 <section class="messages">
+    <div class="messages__container">
     <header class="messages__header">
         <h2 class="utrecht-heading-4">{{ subject }}</h2>
         <nl-paragraph class-name="nl-paragraph--oip">{{ status }}</nl-paragraph>
@@ -69,10 +70,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            </div>
                 {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}
             {% endrender_form %}
         {% else %}
             <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-paragraph-muted">{% trans "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen." %}</nl-paragraph>
         {% endif %}
-    </div>
 </section>
