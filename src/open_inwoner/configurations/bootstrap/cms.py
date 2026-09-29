@@ -12,6 +12,8 @@ from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from pydantic import Field
 
+from open_inwoner.cms.banner.cms_plugins import BannerTextPlugin
+from open_inwoner.cms.banner.models import BannerText
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
@@ -29,6 +31,13 @@ from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.utils import page_setup
 from open_inwoner.mijn_afval.cms.cms_apps import MijnAfvalApphook
 from open_inwoner.openklant.cms_apps import OpenklantApphook
+
+
+class BannerTextPluginConfig(ConfigurationModel):
+    """Configuration for the welcome banner text placed on the homepage."""
+
+    class Meta:
+        django_model_refs = {BannerText: ["title", "description"]}
 
 
 class ZakenPluginConfig(ConfigurationModel):
@@ -59,6 +68,10 @@ class CMSHomepageConfig(ConfigurationModel):
 
     enabled: bool = False
     title: Annotated[str, Field(description="Page title for the homepage.")] = "Home"
+    banner: Annotated[
+        BannerTextPluginConfig | None,
+        Field(description="Adds a welcome banner text plugin to the homepage."),
+    ] = Field(default=None)
     mijn_zaken: Annotated[
         ZakenPluginConfig | None,
         Field(description="Adds a 'Mijn zaken' plugin to the homepage."),
@@ -201,15 +214,18 @@ _PROFILE_CONFIG_FIELDS = tuple(
     if name not in CMSPageConfig.model_fields
 )
 
-# maps a CMSHomepageConfig field name to the plugin it configures on the
-# homepage's "content" placeholder (the ordering determines the order the
-# plugins are placed in)
-_HOMEPAGE_PLUGINS: dict[str, type[CMSPluginBase]] = {
-    "mijn_zaken": CMSZakenPlugin,
-    "mijn_taken": TasksPlugin,
-    "acties": UserFeedPlugin,
+# maps a homepage placeholder slot to the CMSHomepageConfig fields and plugins
+# it holds (ordering determines plugin order). The banner has its own slot: the
+# template only shows it to logged-in users, anonymous users get the welcome
+# text from the site configuration instead.
+_HOMEPAGE_PLUGINS: dict[str, dict[str, type[CMSPluginBase]]] = {
+    "banner_text": {"banner": BannerTextPlugin},
+    "content": {
+        "mijn_zaken": CMSZakenPlugin,
+        "mijn_taken": TasksPlugin,
+        "acties": UserFeedPlugin,
+    },
 }
-_HOMEPAGE_CONTENT_SLOT = "content"
 
 
 class CMSPagesConfigurationStep(BaseConfigurationStep):
@@ -362,13 +378,13 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
         was previously added: like everything else this step doesn't
         explicitly manage, it is left as-is for admins to change.
         """
-        plugin_specs = []
-        if config is not None:
-            for model_attr, plugin_class in _HOMEPAGE_PLUGINS.items():
-                plugin_config = getattr(config, model_attr)
-                if plugin_config is not None:
-                    plugin_specs.append((plugin_class, plugin_config.model_dump()))
+        if config is None:
+            return
 
-        page_setup.sync_placeholder_plugins(
-            homepage, _HOMEPAGE_CONTENT_SLOT, plugin_specs, user=user
-        )
+        for slot, plugins in _HOMEPAGE_PLUGINS.items():
+            plugin_specs = [
+                (plugin_class, plugin_config.model_dump())
+                for model_attr, plugin_class in plugins.items()
+                if (plugin_config := getattr(config, model_attr)) is not None
+            ]
+            page_setup.sync_placeholder_plugins(homepage, slot, plugin_specs, user=user)
