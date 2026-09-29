@@ -139,7 +139,7 @@ class _LedigingData(TypedDict):
     tijdstip_datum: str  # Date formatted as "dd-mm-yyyy"
     tijdstip_tijd: str  # Time formatted as "HH:MM"
     tijdstip_dag: str  # Localized day of the week, e.g., "maandag"
-    gewicht: str  # Weight (in kg) as string, e.g., "32,5"
+    gewicht: str  # Weight (in kg) as string, e.g., "32,50"
     kosten: str  # Cost (in euros) as string, e.g., "12,50"
 
 
@@ -393,13 +393,13 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
                         "tijdstip_datum": lediging.geleegd_op.strftime("%d-%m-%Y"),
                         "tijdstip_tijd": lediging.geleegd_op.strftime("%H:%M"),
                         "tijdstip_dag": date_format(lediging.geleegd_op, "D"),
-                        "gewicht": _format_number(lediging.gewicht),
+                        "gewicht": _format_number(lediging.gewicht, decimal_places=2),
                         "kosten": _format_number(lediging.kosten, decimal_places=2),
                     }
                     ledigingen_data.append(lediging_data)
 
             # Format container data
-            totaal_gewicht = _format_number(container.totaal_gewicht)
+            totaal_gewicht = _format_number(container.totaal_gewicht, decimal_places=2)
             totaal_kosten = _format_number(container.totaal_kosten, decimal_places=2)
             afval_type = container.afval_type
 
@@ -425,7 +425,9 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
         location_data: _ContainerLocationData = {
             "object_id": container_location.id,
             "object_address": _format_address(container_location.adres),
-            "totaal_gewicht": _format_number(container_location.totaal_gewicht),
+            "totaal_gewicht": _format_number(
+                container_location.totaal_gewicht, decimal_places=2
+            ),
             "containers": containers_data,
         }
         result.append(location_data)
