@@ -1,14 +1,28 @@
 from typing import Any
 
 from django.apps import apps
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db.models import Model
 from django.forms import Form
-from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseForbidden, HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.urls import NoReverseMatch, reverse
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.translation import gettext as _
 
 from maykin_config_checks.registry import registry
+
+
+def _get_safe_referring_url(request: HttpRequest) -> str:
+    candidate = request.headers.get("Referer") or ""
+    if not url_has_allowed_host_and_scheme(
+        candidate,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return reverse("admin:index")
+    return candidate
 
 
 def run_config_check(
@@ -21,6 +35,17 @@ def run_config_check(
     # Enforce base-line access: authenticated users with staff priviliges
     if not request.user.is_authenticated or not request.user.is_staff:
         raise PermissionDenied
+
+    if not getattr(settings, "ENABLE_INTERACTIVE_CHECKS", False):
+        return render(
+            request,
+            "admin/config_checks_disabled.html",
+            {
+                "title": _("Interactive configuration checks are disabled"),
+                "back_url": _get_safe_referring_url(request),
+            },
+            status=403,
+        )
 
     obj: Model | None = None
     model: type[Model] | None = None

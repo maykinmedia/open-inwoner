@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
@@ -28,11 +29,44 @@ def with_config_checks(*checks, url_name="run_config_check"):
             for check in checks:
                 registry.register(check, model=target_model)
 
+        original_get_fieldsets = admin_class.get_fieldsets
+
+        def wrapped_get_fieldsets(self, request, obj=None):
+            fieldsets = original_get_fieldsets(self, request, obj)
+
+            if getattr(settings, "ENABLE_INTERACTIVE_CHECKS", False):
+                return fieldsets
+
+            return _without_config_check_links(fieldsets)
+
         admin_class.__init__ = wrapped_init
+        admin_class.get_fieldsets = wrapped_get_fieldsets
         admin_class.config_check_links = config_check_links
         return admin_class
 
     return decorator
+
+
+def _without_config_check_links(fieldsets):
+    result = []
+
+    for name, options in fieldsets:
+        fields = []
+
+        for field in options.get("fields", ()):
+            if isinstance(field, (list, tuple)):
+                field = tuple(f for f in field if f != "config_check_links")
+                if not field:
+                    continue
+            elif field == "config_check_links":
+                continue
+
+            fields.append(field)
+
+        if fields:
+            result.append((name, {**options, "fields": fields}))
+
+    return result
 
 
 def config_check_links(self, obj):

@@ -1,10 +1,12 @@
 from unittest.mock import patch
 
 from django import forms
+from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from maykin_config_checks import GenericConfigCheckResult
+from maykin_config_checks.api.api import with_config_checks
 from maykin_config_checks.registry import registry
 
 User = get_user_model()
@@ -111,6 +113,7 @@ class MissingRequiredPermissionsCheck:
         return {}
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class ConfigCheckTestCase(TestCase):
     def setUp(self):
         super().setUp()
@@ -161,6 +164,74 @@ class RunConfigCheckAccessTests(ConfigCheckTestCase):
         response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
 
         self.assertEqual(response.status_code, 200)
+
+
+@override_settings(ENABLE_INTERACTIVE_CHECKS=False)
+class RunConfigCheckDisabledTests(ConfigCheckTestCase):
+    def test_anonymous_user_is_denied(self):
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateNotUsed(response, "admin/config_checks_disabled.html")
+
+    def test_non_staff_user_is_denied(self):
+        self.client.force_login(self.regular_user)
+
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateNotUsed(response, "admin/config_checks_disabled.html")
+
+    def test_get_shows_disabled_page(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "admin/config_checks_disabled.html")
+        self.assertContains(response, "ENABLE_INTERACTIVE_CHECKS", status_code=403)
+
+    def test_post_does_not_run_check(self):
+        self.client.force_login(self.staff_user)
+
+        with patch.object(MinimalCheck, "run") as mock_run:
+            response = self.client.post(
+                f"/admin/config-check/{MinimalCheck.identifier}/",
+                data={},
+            )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "admin/config_checks_disabled.html")
+        mock_run.assert_not_called()
+
+    def test_back_url_uses_same_host_referer(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(
+            f"/admin/config-check/{MinimalCheck.identifier}/",
+            headers={"referer": "http://testserver/admin/accounts/user/"},
+        )
+
+        self.assertEqual(
+            response.context["back_url"], "http://testserver/admin/accounts/user/"
+        )
+
+    def test_back_url_ignores_external_referer(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(
+            f"/admin/config-check/{MinimalCheck.identifier}/",
+            headers={"referer": "https://evil.example.com/phish/"},
+        )
+
+        self.assertEqual(response.context["back_url"], "/admin/")
+
+    def test_back_url_falls_back_to_admin_index_without_referer(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.context["back_url"], "/admin/")
 
 
 class RunConfigCheckGuardTests(ConfigCheckTestCase):
@@ -257,3 +328,38 @@ class RunConfigCheckFormTests(ConfigCheckTestCase):
         self.assertIsNone(response.context["result"])
         self.assertFalse(response.context["form"].is_valid())
         mock_run.assert_not_called()
+
+
+class WithConfigChecksFieldsetsTests(ConfigCheckTestCase):
+    def setUp(self):
+        super().setUp()
+
+        @with_config_checks(MinimalCheck)
+        class UserAdmin(admin.ModelAdmin):
+            fieldsets = (
+                (None, {"fields": ("email", ("first_name", "config_check_links"))}),
+                ("Checks", {"fields": ("config_check_links",)}),
+            )
+            readonly_fields = ("config_check_links",)
+
+        self.model_admin = UserAdmin(User, admin.AdminSite())
+
+    def test_fieldsets_include_config_check_links_when_enabled(self):
+        fieldsets = self.model_admin.get_fieldsets(request=None)
+
+        self.assertEqual(
+            fieldsets,
+            (
+                (None, {"fields": ("email", ("first_name", "config_check_links"))}),
+                ("Checks", {"fields": ("config_check_links",)}),
+            ),
+        )
+
+    @override_settings(ENABLE_INTERACTIVE_CHECKS=False)
+    def test_fieldsets_exclude_config_check_links_when_disabled(self):
+        fieldsets = self.model_admin.get_fieldsets(request=None)
+
+        self.assertEqual(
+            fieldsets,
+            [(None, {"fields": ["email", ("first_name",)]})],
+        )
