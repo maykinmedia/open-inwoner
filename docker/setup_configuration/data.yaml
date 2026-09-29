@@ -330,6 +330,9 @@ cms_pages_config:
   homepage:
     enabled: true
     title: Home
+    banner:
+      title: Welkom
+      description: Bekijk uw zaken, taken en berichten op één plek.
     mijn_zaken:
       title: Mijn zaken
       num_zaken: 4
