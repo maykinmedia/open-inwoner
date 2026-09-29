@@ -9,6 +9,7 @@ from cms.api import add_plugin
 from cms.appresolver import clear_app_resolvers
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from django_setup_configuration.test_utils import execute_single_step
+from djangocms_alias.models import Alias
 from djangocms_versioning.constants import PUBLISHED
 
 from open_inwoner.cms.banner.models import BannerText
@@ -81,9 +82,10 @@ class AppHookMappingTests(TestCase):
         self.assertTrue(set(_REDIRECT_PAGES).issubset(model_fields))
 
         # every configurable page is the homepage, backed by an apphook, or a
-        # redirect page
+        # redirect page (the footer configures plugins, not a page)
         self.assertEqual(
-            model_fields - set(_APP_HOOKS) - set(_REDIRECT_PAGES), {"homepage"}
+            model_fields - set(_APP_HOOKS) - set(_REDIRECT_PAGES),
+            {"homepage", "footer"},
         )
 
 
@@ -536,6 +538,43 @@ class CMSPagesConfigurationStepTests(TestCase):
         )
         self.assertTrue(TasksConfig.objects.filter(placeholder=placeholder).exists())
         self.assertTrue(UserFeed.objects.filter(placeholder=placeholder).exists())
+
+    def test_footer_pages_list_created_and_published(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            object_source={
+                "cms_pages_config_enable": True,
+                "cms_pages_config": {"footer": {"pages_list": "right"}},
+            },
+        )
+
+        alias = Alias.objects.get(static_code="footer_right")
+        placeholder = alias.get_placeholder(language="nl")
+        self.assertIsNotNone(placeholder)
+        self.assertEqual(
+            CMSPlugin.objects.filter(
+                placeholder=placeholder, plugin_type="FooterPagesPlugin"
+            ).count(),
+            1,
+        )
+        self.assertFalse(Alias.objects.filter(static_code="footer_left").exists())
+
+    def test_footer_pages_list_rerun_is_a_no_op(self):
+        config = {
+            "cms_pages_config_enable": True,
+            "cms_pages_config": {"footer": {"pages_list": "right"}},
+        }
+        execute_single_step(CMSPagesConfigurationStep, object_source=config)
+        alias = Alias.objects.get(static_code="footer_right")
+        content_before = alias.get_content(language="nl")
+
+        execute_single_step(CMSPagesConfigurationStep, object_source=config)
+
+        alias = Alias.objects.get(static_code="footer_right")
+        self.assertEqual(content_before.pk, alias.get_content(language="nl").pk)
+        self.assertEqual(
+            CMSPlugin.objects.filter(plugin_type="FooterPagesPlugin").count(), 1
+        )
 
     def test_no_service_account_is_created_when_nothing_is_enabled(self):
         execute_single_step(

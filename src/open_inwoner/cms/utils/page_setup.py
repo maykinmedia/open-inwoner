@@ -16,6 +16,8 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.models import Page, PageContent, Placeholder
 from cms.plugin_base import CMSPluginBase
+from djangocms_alias.constants import DEFAULT_STATIC_ALIAS_CATEGORY_NAME
+from djangocms_alias.models import Alias, AliasContent, Category
 from djangocms_versioning.constants import DRAFT
 from djangocms_versioning.models import Version
 
@@ -160,6 +162,88 @@ def sync_placeholder_plugins(
         content_type=ContentType.objects.get_for_model(content),
         object_id=content.pk,
     )
+    for plugin_class, fields in plugin_specs:
+        instance = _get_plugin_instance(placeholder, plugin_class)
+        if instance is None:
+            api.add_plugin(placeholder, plugin_class.__name__, language, **fields)
+            continue
+        for field, value in fields.items():
+            setattr(instance, field, value)
+        instance.save()
+
+    new_version = Version.objects.get_for_content(content)
+    if new_version.state == DRAFT:
+        new_version.publish(user)
+
+
+def _get_or_create_static_alias_content(static_code: str, *, user, language: str):
+    """
+    Return the latest (draft or published) `AliasContent` of the static alias
+    `static_code`, creating the alias and a first draft version if needed.
+
+    Mirrors what the `{% static_alias %}` template tag does on first render, which
+    only works for a logged-in user while versioning is enabled.
+    """
+    category = Category.objects.filter(
+        translations__name=DEFAULT_STATIC_ALIAS_CATEGORY_NAME
+    ).first()
+    if category is None:
+        category = Category.objects.create(name=DEFAULT_STATIC_ALIAS_CATEGORY_NAME)
+
+    alias, _ = Alias.objects.get_or_create(
+        static_code=static_code,
+        site=None,
+        defaults={
+            "category": category,
+            "creation_method": Alias.CREATION_BY_TEMPLATE,
+        },
+    )
+
+    content = (
+        alias.contents(manager="admin_manager")
+        .latest_content()
+        .filter(language=language)
+        .first()
+    )
+    if content is None:
+        content = AliasContent._base_manager.create(
+            alias=alias, name=static_code, language=language
+        )
+        Version.objects.create(content=content, created_by=user)
+    return content
+
+
+@transaction.atomic
+def sync_static_alias_plugins(
+    static_code: str,
+    plugin_specs: list[tuple[type[CMSPluginBase], dict]],
+    *,
+    user,
+    language: str = DEFAULT_LANGUAGE,
+) -> None:
+    """
+    Like `sync_placeholder_plugins`, but for the placeholder of the static alias
+    `static_code` (as rendered by `{% static_alias %}`, e.g. the footer blocks).
+    """
+    if not plugin_specs:
+        return
+
+    content = _get_or_create_static_alias_content(
+        static_code, user=user, language=language
+    )
+    placeholder = content.placeholder
+    version = Version.objects.get_for_content(content)
+
+    if not _plugin_needs_sync(content, placeholder.slot, plugin_specs):
+        # a freshly created draft that needs nothing still has to be published
+        if version.state == DRAFT:
+            version.publish(user)
+        return
+
+    if version.state != DRAFT:
+        content = version.copy(user).content
+        placeholder = content.placeholder
+
     for plugin_class, fields in plugin_specs:
         instance = _get_plugin_instance(placeholder, plugin_class)
         if instance is None:

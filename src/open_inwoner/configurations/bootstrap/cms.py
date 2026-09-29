@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import SimpleLazyObject
@@ -18,6 +18,7 @@ from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.extensions.models import CommonExtension
+from open_inwoner.cms.footer.cms_plugins import FooterPagesPlugin
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
 from open_inwoner.cms.plugins.cms_plugins.tasks import TasksPlugin
 from open_inwoner.cms.plugins.cms_plugins.userfeed import UserFeedPlugin
@@ -164,6 +165,20 @@ class CMSProfilePageConfig(CMSPageConfig):
         }
 
 
+class CMSFooterConfig(ConfigurationModel):
+    """Configuration for the plugins placed in the footer blocks."""
+
+    pages_list: Annotated[
+        Literal["left", "center", "right"] | None,
+        Field(
+            description=(
+                "Adds a 'Pages List' plugin (the footer pages and the sitemap "
+                "link) to this footer block."
+            )
+        ),
+    ] = None
+
+
 class CMSPagesConfigurationModel(ConfigurationModel):
     """
     Groups per-page configuration for the homepage, every CMS apphook page, and
@@ -185,6 +200,7 @@ class CMSPagesConfigurationModel(ConfigurationModel):
     openklant: CMSPageConfig | None = Field(default=None)
     mijn_afval: CMSPageConfig | None = Field(default=None)
     mijn_vragen: CMSRedirectPageConfig | None = Field(default=None)
+    footer: CMSFooterConfig | None = Field(default=None)
 
 
 # maps the field name on CMSPagesConfigurationModel to the apphook it configures
@@ -287,6 +303,13 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
             )
 
         self._sync_redirect_pages(model, homepage, user=user)
+
+        if model.footer is not None and model.footer.pages_list is not None:
+            page_setup.sync_static_alias_plugins(
+                f"footer_{model.footer.pages_list}",
+                [(FooterPagesPlugin, {})],
+                user=user,
+            )
 
     def _sync_redirect_pages(
         self, model: CMSPagesConfigurationModel, homepage: Page | None, *, user
