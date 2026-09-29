@@ -41,7 +41,16 @@ else
     src/manage.py loaddata /app/setup_configuration/fixtures/openzaak_config.json
 
     # Demo data for the "Samenwerken" page -- it has no satellite service of its
-    # own, so there's no setup_configuration step to seed it through.
+    # own, so there's no setup_configuration step to seed it through. The
+    # citizen (pk 9002) is keyed by BSN, so first delete any other user with
+    # that BSN (e.g. a DigiD-mock testuser from an earlier login); otherwise
+    # loading it would create a duplicate and break BSN lookups.
+    src/manage.py shell -c "
+from django.db import transaction
+from open_inwoner.accounts.models import User
+with transaction.atomic():
+    User.objects.filter(bsn='111222333').exclude(pk=9002).delete()
+"
     src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
 
     # Demo data for the "Openstaande acties" homepage plugin. Loaded after
