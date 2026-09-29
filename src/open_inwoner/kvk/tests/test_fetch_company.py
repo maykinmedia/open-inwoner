@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from maykin_2fa.test import disable_admin_mfa
@@ -117,6 +117,7 @@ class FetchCompanyCheckTests(TestCase):
         self.assertIn("Failed to connect to KvK API", result.message)
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchCompanyViewTests(TestCase):
     def setUp(self):
         self.client = Client()
