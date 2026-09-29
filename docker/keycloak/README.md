@@ -31,6 +31,10 @@ http://localhost:8080/. You can now log in with the `admin`/`admin` credentials.
 
 - `testuser` / `testuser`, has the `bsn`, `kvk`, `name_qualifier`,
   `legalSubjectID` and `actingSubjectID` attributes
+- `newuser` / `newuser`, same attributes as `testuser` but with BSN `444555666`
+  and KvK `087654321`, which no seeded user or satellite service knows about.
+  Use it to walk through first-login registration from a blank state; `testuser`
+  is pre-registered instead.
 - `digid-machtigen` / `digid-machtigen`, has the `aanvrager.bsn`,
   `gemachtigde.bsn` and `service_id` attributes (for DigiD machtigen)
 - `eherkenning-vestiging` / `eherkenning-vestiging`, has the `legalSubjectID`

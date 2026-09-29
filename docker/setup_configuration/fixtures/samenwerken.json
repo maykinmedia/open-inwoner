@@ -21,7 +21,9 @@
     "fields": {
       "uuid": "10000000-0000-0000-0000-000000009002",
       "password": "!y1yW8adMbyolHOxknDDLd7sKnVnjzgI6ci33TMuW",
-      "email": "8d431e684fc7450b2d2ab8496d9a8ea6@localhost",
+      "first_name": "Test",
+      "last_name": "User",
+      "email": "testuser@test.nl",
       "is_staff": false,
       "is_active": true,
       "bsn": "111222333",
