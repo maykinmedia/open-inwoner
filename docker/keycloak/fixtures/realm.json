@@ -737,6 +737,33 @@
       "realmRoles": ["default-roles-test"],
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "3f6d2b8e-9a41-4c57-8e0d-5b7a1c9e4d23",
+      "createdTimestamp": 1707141446006,
+      "username": "newuser",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"],
+        "kvk": ["087654321"],
+        "bsn": ["444555666"],
+        "legalSubjectID": ["87654321"],
+        "actingSubjectID": ["5C86B1FB218C4E47"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "userLabel": "My password",
+          "value": "newuser"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
     }
   ],
   "scopeMappings": [
