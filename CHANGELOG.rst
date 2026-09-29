@@ -1,3 +1,86 @@
+2.4.4 (2026-09-28)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.4`.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`2847`]: ``django-cms`` is bijgewerkt van ``4.1.10`` naar ``5.0.11``
+  (nieuwe major versie). Controleer na de upgrade of CMS-pagina's, de
+  paginaboom en het bewerken/publiceren van pagina's in het beheerscherm
+  correct werken. Herbouw daarnaast de zoekindex
+  (``python src/manage.py search_index --rebuild``), zodat paginatitels in de
+  zoekresultaten correct worden weergegeven.
+* [:gh:`2831`] / [:gh:`2832`]: De webserver wordt niet langer met
+  ``--lazy-apps`` gestart, zodat OpenTelemetry nu ook voor de webcontainer
+  werkt. Daarnaast wordt de standaard ``OTEL_SERVICE_NAME`` per rol
+  (``openinwoner-web``, ``openinwoner-celery-worker``,
+  ``openinwoner-celery-beat``, ``openinwoner-celery-monitor``) nu daadwerkelijk
+  gezet in plaats van één generieke ``openinwoner``. Dashboards of alerts die
+  filteren op de service-naam ``openinwoner`` moeten mogelijk worden aangepast.
+
+Nieuwe features
+---------------
+
+* [:gh:`2784`]: Parallelle ZGW-verzoeken (o.a. het ophalen en resolven van
+  zaken, formulieren en het opwarmen van de ZGW-cache) respecteren nu
+  daadwerkelijk de ingestelde timeout: taken die bij het verstrijken van de
+  timeout nog niet zijn gestart worden geannuleerd in plaats van alsnog
+  uitgevoerd, en resultaten van taken die net na de timeout klaar zijn worden
+  niet langer weggegooid.
+
+Bugfixes
+--------
+
+* [:gh:`2807`]: Bij een statusnotificatie voor een zaak met meerdere
+  betrokkenen werd de verwerking voor alle gebruikers afgebroken zodra één
+  gebruiker zich had afgemeld voor notificaties. Afgemelde gebruikers worden
+  nu overgeslagen.
+* [:gh:`2852`]: Het toevoegen, wijzigen of verwijderen van niet-standaard
+  digitale adressen (e-mail/telefoon) in het profiel werd niet doorgezet naar
+  OpenKlant. Dit is hersteld.
+* [:gh:`2793`]: De synchronisatie vanuit OpenKlant kon een ``IntegrityError``
+  geven wanneer het oude standaard e-mailadres of telefoonnummer was
+  verwijderd en OpenKlant tegelijkertijd een ander adres als standaard had
+  aangewezen.
+* [:gh:`2776`]: ``RenderableTag`` is beveiligd tegen template-injectie:
+  argumentwaarden worden niet langer in de template-broncode geïnterpoleerd
+  maar via de template-context doorgegeven.
+* [:gh:`2789`]: Fouten bij het resolven van gerelateerde ZGW-objecten (rol,
+  zaaktype, status, statustype, resultaat, resultaattype) worden nu per object
+  gelogd en gerapporteerd. Ook zoekresultaten melden deze fouten nu, zodat een
+  onvolledig resultaat de waarschuwingsbanner toont.
+* [:gh:`2786`]: De cache-sleutel voor zaken van bedrijven houdt nu rekening met
+  de instelling ``use_openzaak_120_params``; voorheen werden na het wijzigen van
+  deze instelling tot het verlopen van de cache nog zaken getoond die met de
+  oude parameters waren opgehaald.
+* [:gh:`2847`]: Paginatitels van CMS-pagina's werden na de ``django-cms``
+  upgrade inclusief paginapad (bijv. ``Foo (/foo)``) geïndexeerd en zo in de
+  zoekresultaten getoond. Dit is gecorrigeerd.
+* [:gh:`2594`]: Verbeterde foutafhandeling in de setup-configuration stappen
+  voor Open Zaak en OpenKlant2. In de Docker Compose-setup wacht de
+  ``web``-service nu tot ``setup_configuration`` succesvol is afgerond.
+* [:gh:`2747`]: De pijl in de "Ga naar"-plugin wordt nu via flexbox uitgelijnd
+  in plaats van met absolute positionering.
+* [:gh:`2957`]: De ruimte tussen de vraag- en antwoordsecties op de
+  vraagdetailpagina is verkleind.
+
+Onderhoud
+---------
+
+* [:gh:`2847`]: ``django-cms`` bijgewerkt naar versie ``5.0.11``.
+* [:gh:`2625`]: ``django-treebeard`` bijgewerkt naar versie ``5.3.1``
+  (voorheen ``4.4``). De beheerschermen voor categorieën en vragenlijsten en
+  het in-/uitklappen van de boomstructuur in het beheer zijn hierop aangepast.
+* [:gh:`2174`]: PDF-export maakt nu gebruik van de PDF-rendering uit
+  ``maykin-common`` (bijgewerkt naar ``0.21.0``) in plaats van ``weasyprint``
+  direct; ``weasyprint`` is daarmee bijgewerkt naar ``70.0``.
+* [:gh:`2868`]: ``djangorestframework`` bijgewerkt naar versie ``3.18.0``.
+* [:gh:`2819`]: ``sqlparse`` bijgewerkt naar versie ``0.6.0``.
+* [:gh:`2810`]: ``tablib`` bijgewerkt naar versie ``3.10.0``.
+* [:gh:`2747`]: ``@open-inwoner/design-tokens`` bijgewerkt naar versie ``0.0.33``.
+
 2.4.3 (2026-08-11)
 ==================
 
