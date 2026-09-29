@@ -1,6 +1,6 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Four unrelated things live here, all loaded by `bin/setup_configuration.sh`
+Five unrelated things live here, all loaded by `bin/setup_configuration.sh`
 right after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
@@ -79,12 +79,21 @@ The homepage banner image. Not a fixture: `data.yaml` points
 uploads it to the media library (once -- an image with the same name and content
 is reused) and places it in the homepage's banner image slot.
 
+## `producten.json`
+
+A minimal set of products and categories for the "Onderwerpen" page, which --
+like `samenwerken.json` -- live in Open Inwoner's own database. Two root
+categories ("Werk en inkomen" with a child "Schulden", and "Zorg en welzijn")
+and three published products, each in one category. No images or content, so the
+pages render without any filer files.
+
 ## Load fixtures manually
 
 ```bash
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
 ```
 
 or, for `up --localhost`:
@@ -93,4 +102,5 @@ or, for `up --localhost`:
 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
+python src/manage.py loaddata docker/setup_configuration/fixtures/producten.json
 ```
