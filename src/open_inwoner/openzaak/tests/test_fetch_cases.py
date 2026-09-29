@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from requests.exceptions import RequestException
@@ -158,6 +158,7 @@ class FetchCasesCheckTests(TestCase):
         self.assertIn("Gefaald om verbinding te maken", result.message)
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchCasesViewTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -197,6 +198,7 @@ class FetchCasesViewTests(TestCase):
         self.assertContains(response, "Geen zichtbare zaken")
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchCasesStandaloneTests(TestCase):
     def setUp(self):
         self.client = Client()

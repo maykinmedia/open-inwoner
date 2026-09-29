@@ -44,6 +44,7 @@ x-app-env: &x-app-env
   DEBUG: 'True'
   IS_HTTPS: 'no'
   ALLOW_CUSTOM_JS: 'False'
+  ENABLE_INTERACTIVE_CHECKS: ${ENABLE_INTERACTIVE_CHECKS:-False}
   # Overridable uwsgi settings
   UWSGI_PROCESSES:
   UWSGI_THREADS:
