@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<p>
+  <a href="{{ back_url }}" class="button">← {% trans "Back" %}</a>
+</p>
+
+<div id="content-main">
+  <p class="errornote">
+    {% blocktrans trimmed %}
+      Interactive configuration checks are disabled for this environment.
+    {% endblocktrans %}
+  </p>
+  <p>
+    {% blocktrans trimmed %}
+      To run interactive configuration checks, the <code>ENABLE_INTERACTIVE_CHECKS</code>
+      Django setting must be set to <code>True</code>. Please contact
+      the administrator of this deployment if you need to run this check.
+    {% endblocktrans %}
+  </p>
+</div>
+{% endblock %}
