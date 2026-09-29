@@ -27,6 +27,8 @@ import './Filter.scss';
  * />
  * ```
  */
+// Choices are sorted alphabetically bij label and number.
+
 const Filter: AC<IFilterGroup> = ({
   name,
   label,
@@ -101,10 +103,13 @@ const Filter: AC<IFilterGroup> = ({
         >
           {[...choices]
             .sort((a, b) => {
-              return a.label.localeCompare(b.label, undefined, {
-                numeric: true,
-                sensitivity: 'variant',
-              });
+              return a.label.localeCompare(
+                b.label,
+                document.documentElement.lang || undefined,
+                {
+                  numeric: true,
+                }
+              );
             })
             .map((choice, index) => {
               const isChecked = selectedValues.includes(choice.value);
