@@ -2538,12 +2538,12 @@ class TestCaseDetailView(
             (
                 str(zaak_type_iotc1.id),
                 False,
-                f"{zaak_type_iotc1.omschrijving} [{zaak_type_iotc1.zaaktype_config.catalogus.base_url}]",
+                f"{zaak_type_iotc1.omschrijving}",
             ),
             (
                 str(zaak_type_iotc2.id),
                 False,
-                f"{zaak_type_iotc2.omschrijving} [{zaak_type_iotc2.zaaktype_config.catalogus.base_url}]",
+                f"{zaak_type_iotc2.omschrijving}",
             ),
         ]
 
