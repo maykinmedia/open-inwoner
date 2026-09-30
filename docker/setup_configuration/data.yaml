@@ -401,6 +401,10 @@ cms_pages_config:
     requires_auth: true
     requires_auth_bsn_or_kvk: true
     menu_icon: help_outline
+  # The footer's 'Pages List' plugin, which is also where the sitemap link comes
+  # from -- the footer is empty otherwise.
+  footer:
+    pages_list: right
 
 # Set default (staff) users
 default_user_configuration_enable: true
