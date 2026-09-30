@@ -238,7 +238,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         messages = [str(msg) for msg in response.context["messages"]]
         self.assertEqual(
             messages,
-            [_("1 item(s) processed in total, with 0 failing row(s).")],
+            ["1 item(s) in totaal verwerkt, met 0 falende rij(en)."],
         )
         self.assertFalse(
             private_media_storage.exists("zgw_import_dump_2024-08-14-17-50-01.jsonl"),
@@ -315,7 +315,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         messages = [html.unescape(str(msg)) for msg in response.context["messages"]]
         self.assertEqual(len(messages), 2)
         self.assertEqual(
-            _("6 item(s) processed in total, with 6 failing row(s)."),
+            "6 item(s) in totaal verwerkt, met 6 falende rij(en).",
             messages[0],
         )
         self.assertIn(
@@ -376,7 +376,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         messages = [html.unescape(str(msg)) for msg in response.context["messages"]]
         self.assertEqual(len(messages), 2)
         self.assertEqual(
-            _("2 item(s) processed in total, with 1 failing row(s)."),
+            "2 item(s) in totaal verwerkt, met 1 falende rij(en).",
             messages[0],
         )
         self.assertEqual(

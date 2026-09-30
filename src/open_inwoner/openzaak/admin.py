@@ -205,11 +205,11 @@ class ZGWImportExportMixin:
                         request,
                         _(
                             "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
-                            % {
-                                "num_rows": import_result.total_rows_processed,
-                                "error_rows": len(import_result.import_errors),
-                            }
-                        ),
+                        )
+                        % {
+                            "num_rows": import_result.total_rows_processed,
+                            "error_rows": len(import_result.import_errors),
+                        },
                         (
                             messages.SUCCESS
                             if not import_result.import_errors
