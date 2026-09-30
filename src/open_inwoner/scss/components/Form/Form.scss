@@ -285,6 +285,11 @@
       transform: translateY(-50%);
     }
 
+    &--move-up *[class*='icons'],
+    &--move-up *[class*='Icons'] {
+      transform: translateY(-100%) !important;
+    }
+
     // Icon alignment fix if there is no help_text.
     &--no-help *[class*='icons'],
     &--no-help *[class*='Icons'] {
