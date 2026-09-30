@@ -114,7 +114,7 @@
   "filter.show_results": [
     {
       "type": 0,
-      "value": "Show results"
+      "value": "Apply filter"
     }
   ],
   "kvkbranchselector.clear": [
