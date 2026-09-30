@@ -113,7 +113,7 @@ class ContactCreateView(
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _("{contact} is toegevoegd aan uw contactpersonen.".format(contact=email)),
+            _("{contact} is toegevoegd aan uw contactpersonen.").format(contact=email),
         )
         return HttpResponseRedirect(self.get_success_url())
 
