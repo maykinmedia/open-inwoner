@@ -17,7 +17,11 @@ class ImportResource(resources.ModelResource):
         missing_headers = set(self.get_diff_headers()) - set(dataset.headers)
         if missing_headers:
             missing_headers = ",\n".join(missing_headers)
-            raise ImportExportError(_(f"Missing required headers: {missing_headers}"))
+            raise ImportExportError(
+                _("Missing required headers: {missing_headers}").format(
+                    missing_headers=missing_headers
+                )
+            )
 
         return super().before_import(dataset, using_transactions, dry_run, **kwargs)
 
