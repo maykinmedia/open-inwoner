@@ -122,6 +122,7 @@ linkcheck_ignore = [
     # 403s when running on github actions:
     r"https?://stackoverflow\.com/.*",
     r"https?://www\.npmjs\.com/.*",
+    r"https://www\.signicat\.com/",
     r"https://packaging\.python\.org/.*",  # anchor detection fails in CI
 ]
 
