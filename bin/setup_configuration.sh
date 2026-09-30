@@ -64,6 +64,10 @@ with transaction.atomic():
     # JWT against. See docker/setup_configuration/fixtures/README.md.
     src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
 
+    # A minimal set of products and categories (the "Onderwerpen" page), which
+    # live in Open Inwoner's own database like the demo data above.
+    src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
+
     mkdir -p "$MARKER_DIR"
     touch "$MARKER"
 fi

@@ -1,0 +1,116 @@
+[
+  {
+    "model": "pdc.category",
+    "pk": 9101,
+    "fields": {
+      "path": "0001",
+      "depth": 1,
+      "numchild": 1,
+      "name": "Werk en inkomen",
+      "slug": "werk-en-inkomen",
+      "published": true,
+      "visible_for_anonymous": true,
+      "visible_for_companies": true,
+      "visible_for_citizens": true,
+      "highlighted": true
+    }
+  },
+  {
+    "model": "pdc.category",
+    "pk": 9102,
+    "fields": {
+      "path": "00010001",
+      "depth": 2,
+      "numchild": 0,
+      "name": "Schulden",
+      "slug": "schulden",
+      "published": true,
+      "visible_for_anonymous": true,
+      "visible_for_companies": true,
+      "visible_for_citizens": true,
+      "highlighted": false
+    }
+  },
+  {
+    "model": "pdc.category",
+    "pk": 9103,
+    "fields": {
+      "path": "0002",
+      "depth": 1,
+      "numchild": 0,
+      "name": "Zorg en welzijn",
+      "slug": "zorg-en-welzijn",
+      "published": true,
+      "visible_for_anonymous": true,
+      "visible_for_companies": true,
+      "visible_for_citizens": true,
+      "highlighted": false
+    }
+  },
+  {
+    "model": "pdc.product",
+    "pk": 9101,
+    "fields": {
+      "name": "Schuldhulpverlening",
+      "slug": "schuldhulpverlening",
+      "published": true,
+      "summary": "Hulp van de gemeente bij het overzien en aflossen van uw schulden.",
+      "costs": "0.00",
+      "created_on": "2026-09-01T09:00:00Z",
+      "updated_on": "2026-09-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "pdc.product",
+    "pk": 9102,
+    "fields": {
+      "name": "Bijstandsuitkering",
+      "slug": "bijstandsuitkering",
+      "published": true,
+      "summary": "Financiele ondersteuning als u niet genoeg inkomen heeft om van te leven.",
+      "costs": "0.00",
+      "created_on": "2026-09-01T09:00:00Z",
+      "updated_on": "2026-09-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "pdc.product",
+    "pk": 9103,
+    "fields": {
+      "name": "Mantelzorgondersteuning",
+      "slug": "mantelzorgondersteuning",
+      "published": true,
+      "summary": "Ondersteuning en advies voor wie zorgt voor een naaste.",
+      "costs": "0.00",
+      "created_on": "2026-09-01T09:00:00Z",
+      "updated_on": "2026-09-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "pdc.categoryproduct",
+    "pk": 9101,
+    "fields": {
+      "category": 9102,
+      "product": 9101,
+      "order": 0
+    }
+  },
+  {
+    "model": "pdc.categoryproduct",
+    "pk": 9102,
+    "fields": {
+      "category": 9101,
+      "product": 9102,
+      "order": 0
+    }
+  },
+  {
+    "model": "pdc.categoryproduct",
+    "pk": 9103,
+    "fields": {
+      "category": 9103,
+      "product": 9103,
+      "order": 0
+    }
+  }
+]
