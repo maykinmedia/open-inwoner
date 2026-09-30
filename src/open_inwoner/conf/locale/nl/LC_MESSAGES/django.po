@@ -6209,7 +6209,7 @@ msgstr ""
 msgid ""
 "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
 msgstr ""
-"%(num_rows)d item(s) in totaal verwerkt, met %(error_rows)d falende item(s)."
+"%(num_rows)d item(s) in totaal verwerkt, met %(error_rows)d falende rij(en)."
 
 #: open_inwoner/openzaak/admin.py:227
 msgid "It was not possible to import the following items:"
