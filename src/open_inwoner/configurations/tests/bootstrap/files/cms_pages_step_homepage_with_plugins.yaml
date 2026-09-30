@@ -3,6 +3,9 @@ cms_pages_config:
   homepage:
     enabled: true
     title: Welkom
+    banner:
+      title: Welkom terug
+      description: Uw persoonlijke pagina.
     mijn_zaken:
       title: Mijn zaken
       num_zaken: 6

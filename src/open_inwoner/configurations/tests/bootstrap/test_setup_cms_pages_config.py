@@ -11,6 +11,7 @@ from cms.models import CMSPlugin, Page, PageContent, Placeholder
 from django_setup_configuration.test_utils import execute_single_step
 from djangocms_versioning.constants import PUBLISHED
 
+from open_inwoner.cms.banner.models import BannerText
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
@@ -432,6 +433,10 @@ class CMSPagesConfigurationStepTests(TestCase):
 
         page = Page.objects.get(reverse_id="home")
         placeholder = _published_content_placeholder(page, "content")
+
+        banner = BannerText.objects.get(placeholder=placeholder)
+        self.assertEqual(banner.title, "Welkom terug")
+        self.assertEqual(banner.description, "Uw persoonlijke pagina.")
 
         zaken = CMSZakenPluginConfig.objects.get(placeholder=placeholder)
         self.assertEqual(zaken.title, "Mijn zaken")
