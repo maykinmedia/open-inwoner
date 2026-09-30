@@ -1,3 +1,18 @@
+2.4.5 (2026-09-29)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.5`.
+
+Bugfixes
+--------
+
+* [:gh:`2878`]: Een via het contactformulier gestelde vraag (OpenKlant2) werd
+  niet getoond op de 'Mijn vragen'-pagina als het aanmaken van de interne taak
+  mislukte, omdat de vragencache dan niet werd ververst. De vraag wordt nu
+  geregistreerd en de cache ververst, ongeacht of het aanmaken van de interne
+  taak slaagt. Fouten bij het aanmaken van de interne taak en bij het
+  registreren van een vraag worden nu gelogd.
+
 2.4.4 (2026-09-28)
 ==================
 
