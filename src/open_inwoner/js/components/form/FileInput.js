@@ -20,7 +20,7 @@ export class FileInput extends Component {
    * @returns {string} of file extensions.
    */
   getUploadTypes() {
-    return this.getInput().dataset.fileTypes.replace(/["'\[\]]/g, '');
+    return this.getInput().dataset.fileTypes.replace(/["'.\[\]]/g, '');
   }
 
   /**
