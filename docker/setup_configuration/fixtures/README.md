@@ -1,6 +1,6 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Three unrelated things live here, all loaded by `bin/setup_configuration.sh`
+Four unrelated things live here, all loaded by `bin/setup_configuration.sh`
 right after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
@@ -55,11 +55,27 @@ and a new-message notification.
 Log in via DigiD as `testuser`/`testuser` and open the homepage to see them
 under "Openstaande acties".
 
+## `notifications.json`
+
+A `Subscription` (plus a placeholder `zgw_consumers.Service` for its required
+`notifications_api_config`/NRC FK) for the ZGW notifications webhook at
+`/api/openzaak/notifications/webhook/zaken`. There's no real Notifications API
+in this stack, so nothing ever calls `Subscription.register()` against it --
+this only exists so the webhook's JWT auth has a `client_id`/`secret` to
+validate against. Not templated, for the same reason as `samenwerken.json`.
+
+Use it with `manage.py send_mock_notification --resource status`, which
+auto-discovers a real seeded zaak/status for BSN `111222333` and posts a
+notification for it through the real webhook -- see that command's `--help` for
+posting notifications for other zaken/resources, or generating malformed ones to
+test rejection.
+
 ## Load fixtures manually
 
 ```bash
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
 ```
 
 or, for `up --localhost`:
@@ -67,4 +83,5 @@ or, for `up --localhost`:
 ```bash
 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
+python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
 ```

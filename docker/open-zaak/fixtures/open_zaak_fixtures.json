@@ -1218,6 +1218,22 @@
     }
   },
   {
+    "model": "zaken.status",
+    "pk": 7,
+    "fields": {
+      "_etag": "c4b1e7a09d2f4e58a63b1f0e9d7c2a15",
+      "uuid": "b7e2f3a4-5c6d-4e8f-9a0b-1c2d3e4f5a6b",
+      "zaak": 1,
+      "_statustype_base_url": null,
+      "_statustype_relative_url": null,
+      "_statustype_url": null,
+      "_statustype": 2,
+      "datum_status_gezet": "2026-08-21T09:00:00.000Z",
+      "statustoelichting": "Tweede status voor het testen van notificaties",
+      "gezetdoor": null
+    }
+  },
+  {
     "model": "zaken.resultaat",
     "pk": 1,
     "fields": {

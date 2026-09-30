@@ -268,6 +268,7 @@ case "$cmd" in
                 python src/manage.py loaddata docker/setup_configuration/.host/openzaak_config.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
+                python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
                 touch "$HOST_SETUP_MARKER"
             fi
 
