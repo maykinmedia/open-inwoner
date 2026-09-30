@@ -7774,6 +7774,11 @@ msgstr "Tag type"
 msgid "Tag types"
 msgstr "Tag types"
 
+#: open_inwoner/pdc/resources/import_resource.py:21
+#, python-brace-format
+msgid "Missing required headers: {missing_headers}"
+msgstr "Ontbrekende vereiste headers: {missing_headers}"
+
 #: open_inwoner/pdc/resources/widgets.py:13
 msgid "The field categories is required"
 msgstr "Het veld categories is verplicht"
@@ -10299,7 +10304,3 @@ msgstr "Nee, ga terug"
 #~ msgstr ""
 #~ "Een fout is opgetreden bij het uploaden van "
 #~ "{self.uploaded_informatie_object['bestandsnaam']}"
-
-#, python-brace-format
-#~ msgid "Missing required headers: {missing_headers}"
-#~ msgstr "Ontbrekende vereiste headers: {missing_headers}"
