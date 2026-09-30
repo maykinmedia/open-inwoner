@@ -58,10 +58,8 @@ class InviteAcceptView(LogMixin, CommonPageMixin, UpdateView):
             messages.add_message(
                 self.request,
                 messages.SUCCESS,
-                _(
-                    "{inviter} is toegevoegd aan uw contactpersonen.".format(
-                        inviter=invite.inviter.email
-                    )
+                _("{inviter} is toegevoegd aan uw contactpersonen.").format(
+                    inviter=invite.inviter.email
                 ),
             )
             return HttpResponseRedirect(reverse("profile:contact_list"))
