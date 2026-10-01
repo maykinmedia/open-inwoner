@@ -1067,6 +1067,7 @@ packaging==26.0
     #   opentelemetry-instrumentation
     #   pytest
     #   sphinx
+    #   virtualenv
 phonenumbers==8.13.29
     # via
     #   -c requirements/ci.txt
@@ -1086,7 +1087,6 @@ pillow==12.3.0
 platformdirs==4.4.0
     # via
     #   locust-cloud
-    #   python-discovery
     #   virtualenv
 playwright==1.50.0
     # via
@@ -1226,7 +1226,7 @@ python-decouple==3.5
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   maykin-common
-python-discovery==1.4.0
+python-discovery==1.6.1
     # via virtualenv
 python-dotenv==1.2.2
     # via
@@ -1541,7 +1541,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==21.4.1
+virtualenv==21.14.2
     # via pre-commit
 waitress==3.0.2
     # via
