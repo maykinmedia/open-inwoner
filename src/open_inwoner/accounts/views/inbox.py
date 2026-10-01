@@ -6,11 +6,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import formats
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
 
 import structlog
 from privates.views import PrivateMediaView
+from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import InboxForm
 from open_inwoner.accounts.models import Document, Message, User
@@ -23,12 +25,23 @@ logger = structlog.stdlib.get_logger(__name__)
 
 
 class InboxView(
-    LogMixin, LoginRequiredMixin, CommonPageMixin, PaginationMixin, FormView
+    LogMixin,
+    LoginRequiredMixin,
+    CommonPageMixin,
+    BaseBreadcrumbMixin,
+    PaginationMixin,
+    FormView,
 ):
     template_name = "accounts/inbox.html"
     form_class = InboxForm
     paginate_by = 10
     slug_field = "uuid"
+
+    @cached_property
+    def crumbs(self):
+        return [
+            (_("Mijn berichten"), reverse("inbox:index")),
+        ]
 
     def page_title(self):
         return _("Mijn berichten")
