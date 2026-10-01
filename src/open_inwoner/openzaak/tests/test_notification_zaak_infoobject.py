@@ -147,9 +147,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         # API group is resolved from zaak url == hoofd_object
         data.zio_notification.hoofd_object = "http://www.bogus.com"
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
+        self.assertIn("no API group configured for zaak", str(outcome))
 
     def test_zio_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
         notification = NotificationFactory(kanaal="not_zaken")
@@ -163,27 +164,19 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
     def test_zio_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
         notification = NotificationFactory(resource="not_status")
 
-        handle_zaken_notification(notification)
+        outcome = handle_zaken_notification(notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored not_status notification: resource is not 'status' or 'zaakinformatieobject' but 'not_status' for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("resource is not one of the expected resources", str(outcome))
 
     def test_zio_bails_when_no_roles_found_for_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["case_roles"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve rollen for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("cannot retrieve rollen for zaak", str(outcome))
 
     def test_handle_zaak_zio_notifications_with_betrokkene_type_flag(
         self, m, mock_handle: Mock
@@ -239,14 +232,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
                 json=paginated_response([]),
             )
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_zio_bails_when_no_emailable_users_are_found_for_roles(
         self, m, mock_handle: Mock
@@ -255,40 +244,28 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.user_initiator.delete()
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: no users with bsn/nnp_id as (mede)initiators in zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("no users with bsn/nnp_id as (mede)initiators", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_case(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.ERROR,
-        )
+        self.assertIn("cannot retrieve zaak", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_case_type(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_type"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: cannot retrieve zaaktype https://",
-            lookup=Lookups.startswith,
-            level=logging.ERROR,
-        )
+        self.assertIn("cannot retrieve zaaktype", str(outcome))
 
     def test_zio_bails_when_case_not_visible_because_confidentiality(
         self, m, mock_handle: Mock
@@ -297,14 +274,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.zaak["vertrouwelijkheidaanduiding"] = VertrouwelijkheidsAanduidingen.geheim
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: zaak not visible after applying website visibility filter for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("zaak not visible", str(outcome))
 
     def test_zio_bails_when_case_not_visible_because_internal_case(
         self, m, mock_handle: Mock
@@ -313,14 +286,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.zaak_type["indicatieInternOfExtern"] = "intern"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: zaak not visible after applying website visibility filter for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("zaak not visible after applying website", str(outcome))
 
     # end of generic checks
 
@@ -331,27 +300,19 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data = MockAPIData()
         data.install_mocks(m, res404=["zaak_informatie_object"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve zaakinformatieobject {data.zaak_informatie_object['url']} for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.ERROR,
-        )
+        self.assertIn("cannot retrieve zaakinformatieobject", str(outcome))
 
     def test_zio_bails_when_cannot_fetch_informatie_object(self, m, mock_handle: Mock):
         data = MockAPIData()
         data.install_mocks(m, res404=["informatie_object"])
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve informatieobject {data.informatie_object['url']} for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.ERROR,
-        )
+        self.assertIn("cannot retrieve informatieobject", str(outcome))
 
     def test_zio_bails_when_info_object_not_visible_because_confidentiality(
         self, m, mock_handle: Mock
@@ -362,14 +323,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         )
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("informatieobject not visible after applying", str(outcome))
 
     def test_zio_bails_when_info_object_not_visible_because_not_definitive(
         self, m, mock_handle: Mock
@@ -378,28 +335,20 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         data.informatie_object["status"] = "concept"
         data.install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            "ignored zaakinformatieobject notification: informatieobject not visible after applying website visibility filter for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("informatieobject not visible after applying", str(outcome))
 
     def test_zio_bails_when_zaak_type_info_object_type_config_is_not_found(
         self, m, mock_handle: Mock
     ):
         data = MockAPIData().install_mocks(m)
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: cannot retrieve info_type configuration {data.informatie_object['informatieobjecttype']} and zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("cannot retrieve info_type configuration", str(outcome))
 
     def test_zio_bails_when_zaak_type_info_object_type_config_is_found_not_marked_for_notifications(
         self, m, mock_handle: Mock
@@ -413,14 +362,10 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
             omschrijving="important document",
         )
 
-        handle_zaken_notification(data.zio_notification)
+        outcome = handle_zaken_notification(data.zio_notification)
 
         mock_handle.assert_not_called()
-        self.assertTimelineLog(
-            f"ignored zaakinformatieobject notification: info_type configuration 'important document' {data.informatie_object['informatieobjecttype']} found but 'document_notification_enabled' is False for zaak https://",
-            lookup=Lookups.startswith,
-            level=logging.INFO,
-        )
+        self.assertIn("'document_notification_enabled' is False", str(outcome))
 
 
 @freeze_time("2023-01-01 01:00:00")

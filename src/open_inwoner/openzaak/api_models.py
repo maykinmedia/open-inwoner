@@ -208,7 +208,6 @@ class InformatieObject(ZGWModel):
     titel: str
     vertrouwelijkheidaanduiding: str
     auteur: str
-    status: str
     formaat: str
     taal: str
     versie: int
@@ -221,6 +220,7 @@ class InformatieObject(ZGWModel):
     locked: bool
     # bestandsdelen: List[str]
     beschrijving: Optional[str] = ""
+    status: Optional[str] = ""
     link: Optional[str] = ""
     ontvangstdatum: Optional[str] = ""
     verzenddatum: Optional[str] = ""
@@ -244,7 +244,7 @@ class Rol(ZGWModel):
     roltype: Union[str, RolType]
     omschrijving: str
     omschrijving_generiek: str
-    roltoelichting: str
+    roltoelichting: Optional[str] = ""
     indicatie_machtiging: Optional[str] = ""
     registratiedatum: Optional[datetime] = None
     betrokkene: Optional[str] = ""
