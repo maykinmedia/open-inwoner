@@ -772,7 +772,7 @@ tzdata==2025.2
     #   kombu
 uritemplate==4.1.1
     # via drf-spectacular
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   elastic-apm
     #   elastic-transport
