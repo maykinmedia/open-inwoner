@@ -36,8 +36,13 @@
       .grid__welcome {
         background-color: var(--color-white);
         border-radius: var(--border-radius);
-        margin-top: calc(-1 * var(--image-height-mobile));
-        padding: var(--spacing-extra-large);
+      }
+
+      &:has(.banner .main-image) {
+        .grid__welcome {
+          margin-top: calc(-1 * var(--image-height-mobile));
+          padding: var(--spacing-extra-large);
+        }
       }
     }
 
