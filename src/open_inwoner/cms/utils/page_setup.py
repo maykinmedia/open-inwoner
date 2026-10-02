@@ -147,6 +147,9 @@ def sync_placeholder_plugins(
     if not plugin_specs:
         return
 
+    # re-fetch: `get_admin_content` is cached per instance, so after a sync of
+    # another slot it would return the superseded version
+    page = Page.objects.get(pk=page.pk)
     content = page.get_admin_content(language)
     if not _plugin_needs_sync(content, slot, plugin_specs):
         return

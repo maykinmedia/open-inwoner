@@ -62,7 +62,7 @@ Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe doorgestuurd 
 - Een URL is bijvoorbeeld: 'https://groningen.nl'.
 
 **Stuur security.txt door naar:**
-Voor alle overheidsinstanties is het verplicht een security.txt bestand te hebben. Het adres van dit bestand vult u hier in. Voor meer informatie over een security.txt bestand kijkt u op: https://www.ncsc.nl/documenten/publicaties/2023/maart/2/handreiking-security.txt
+Voor alle overheidsinstanties is het verplicht een security.txt bestand te hebben. Het adres van dit bestand vult u hier in. Voor meer informatie over een security.txt bestand kijkt u op: https://www.ncsc.nl/cvd-beleid/handreiking-securitytxt-voor-rijksoverheidsorganisaties
 
 
 12.1.2. Kleur
