@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -64,6 +64,7 @@ class FetchUserfeedCheckTests(TestCase):
         self.assertIn("Unexpected error", result.message)
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchUserfeedViewTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -114,6 +115,7 @@ class FetchUserfeedViewTests(TestCase):
         self.assertContains(response, "0 feed items found")
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchUserfeedStandaloneTests(TestCase):
     def test_run_without_instance_fails(self):
         result = FetchUserfeedCheck().run({})
