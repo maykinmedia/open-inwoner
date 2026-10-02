@@ -193,10 +193,8 @@ def _update_eherkenning_user_from_kvk_api(user: User):
 
     if updated_fields:
         system_action(
-            _(
-                "user attributes were updated from KvK API: %(fields)s"
-                % {"fields": ", ".join(updated_fields)}
-            ),
+            _("user attributes were updated from KvK API: %(fields)s")
+            % {"fields": ", ".join(updated_fields)},
             content_object=user,
         )
 

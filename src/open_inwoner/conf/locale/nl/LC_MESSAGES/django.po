@@ -6209,7 +6209,7 @@ msgstr ""
 msgid ""
 "%(num_rows)d item(s) processed in total, with %(error_rows)d failing row(s)."
 msgstr ""
-"%(num_rows)d item(s) in totaal verwerkt, met %(error_rows)d falende item(s)."
+"%(num_rows)d item(s) in totaal verwerkt, met %(error_rows)d falende rij(en)."
 
 #: open_inwoner/openzaak/admin.py:227
 msgid "It was not possible to import the following items:"
@@ -7773,6 +7773,11 @@ msgstr "Tag type"
 #: open_inwoner/pdc/models/tag.py:53
 msgid "Tag types"
 msgstr "Tag types"
+
+#: open_inwoner/pdc/resources/import_resource.py:21
+#, python-brace-format
+msgid "Missing required headers: {missing_headers}"
+msgstr "Ontbrekende vereiste headers: {missing_headers}"
 
 #: open_inwoner/pdc/resources/widgets.py:13
 msgid "The field categories is required"
@@ -10299,7 +10304,3 @@ msgstr "Nee, ga terug"
 #~ msgstr ""
 #~ "Een fout is opgetreden bij het uploaden van "
 #~ "{self.uploaded_informatie_object['bestandsnaam']}"
-
-#, python-brace-format
-#~ msgid "Missing required headers: {missing_headers}"
-#~ msgstr "Ontbrekende vereiste headers: {missing_headers}"

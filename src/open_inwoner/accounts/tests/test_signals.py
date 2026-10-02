@@ -40,7 +40,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
                     mock_update_eherkenning_user_from_kvk.assert_not_called()
 
                 self.assertNotIn(
-                    "user attributes were updated from KvK API:",
+                    "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API:",
                     self.getTimelineLogDump(),
                 )
 
@@ -70,7 +70,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_retrieve_rsin_with_kvk.assert_not_called()
 
         self.assertTimelineLog(
-            "user attributes were updated from KvK API: company_name, branch_name"
+            "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API: company_name, branch_name"
         )
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel")
@@ -99,7 +99,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_retrieve_rsin_with_kvk.assert_not_called()
 
         self.assertTimelineLog(
-            "user attributes were updated from KvK API: company_name"
+            "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API: company_name"
         )
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel")
@@ -128,7 +128,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_retrieve_rsin_with_kvk.assert_called_with(kvk=user.kvk)
 
         self.assertTimelineLog(
-            "user attributes were updated from KvK API: company_name, rsin"
+            "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API: company_name, rsin"
         )
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel")
@@ -154,7 +154,9 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_get_basisprofiel.assert_called_with(kvk=user.kvk)
         mock_retrieve_rsin_with_kvk.assert_called_with(kvk=user.kvk)
 
-        self.assertTimelineLog("user attributes were updated from KvK API: rsin")
+        self.assertTimelineLog(
+            "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API: rsin"
+        )
 
     @patch("open_inwoner.accounts.signals.KvKClient.get_basisprofiel")
     @patch("open_inwoner.accounts.signals.KvKClient.get_vestigingsprofiel")
@@ -180,5 +182,6 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
                 mock_retrieve_rsin_with_kvk.assert_not_called()
 
         self.assertNotIn(
-            "user attributes were updated from KvK API:", self.getTimelineLogDump()
+            "Gebruikerskenmerken zijn bijgewerkt vanuit de KvK API:",
+            self.getTimelineLogDump(),
         )
