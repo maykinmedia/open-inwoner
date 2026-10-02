@@ -8,12 +8,14 @@ from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
-from typing import Generic, NoReturn, Self, TypedDict, TypeVar, cast
+from typing import Any, Generic, NoReturn, Self, TypedDict, TypeVar
 
 from django.utils.functional import cached_property
 
 import structlog
 from zgw_consumers.api_models.constants import RolOmschrijving, RolTypes
+from zgw_consumers.client import ServiceConfigAdapter
+from zgw_consumers.models import Service
 
 from open_inwoner.accounts.user_identification import (
     BSNIdentification,
@@ -37,7 +39,6 @@ from open_inwoner.openzaak.clients import (
     DocumentenClient,
     FormulierenClient,
     ZakenClient,
-    build_zgw_client_from_service,
 )
 from open_inwoner.openzaak.constants import TypeAanvraag
 from open_inwoner.openzaak.exceptions import ZgwAPIError
@@ -232,6 +233,50 @@ class Timeouts(TypedDict):
     get_formulieren: int | float
 
 
+_ZgwClientT = TypeVar("_ZgwClientT")
+
+# Fraction of a client's configured read timeout used as its connect-phase
+# budget, and the floor under which that fraction is never allowed to shrink
+# it further.
+_CONNECT_TIMEOUT_FACTOR = 0.3
+_MIN_CONNECT_TIMEOUT = 2
+
+
+@dataclass
+class _TightConnectServiceConfigAdapter(ServiceConfigAdapter):
+    """
+    Split a service's configured (single, scalar) request timeout into a
+    tighter connect budget and an unchanged read budget.
+
+    Private to `ZGWService._build_client`: every client it builds is used
+    from inside a `TimedParallel` fan-out (see `_case_list_stage_timeouts`)
+    on a worker thread that can't be interrupted once it's blocked on a
+    socket call. A slow *read* there is the ordinary case for these
+    backends - an uncached first fetch (or one paginating through many
+    pages) can legitimately take close to the client's full configured
+    timeout, on the assumption that the cache absorbs the cost on the next
+    request. Failing to even establish the TCP connection is a different,
+    much rarer failure (host down, a network/routing issue) that has no
+    such excuse and should fail fast instead of eating the same budget as a
+    legitimately slow response.
+
+    This is deliberately not applied to every ZGW client in the app (i.e.
+    not folded into `build_zgw_client_from_service` itself): other callers
+    may not be making the same kind of call this service does, and
+    shouldn't inherit this assumption just because they build a ZGW client.
+    """
+
+    def get_client_session_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_client_session_kwargs()
+        read_timeout = kwargs.get("timeout")
+        if isinstance(read_timeout, (int, float)):
+            connect_timeout = max(
+                read_timeout * _CONNECT_TIMEOUT_FACTOR, _MIN_CONNECT_TIMEOUT
+            )
+            kwargs["timeout"] = (connect_timeout, read_timeout)
+        return kwargs
+
+
 class ZGWService:
     _max_workers: int | None
 
@@ -275,41 +320,56 @@ class ZGWService:
         }
 
     @staticmethod
+    def _build_client(
+        client_class: type[_ZgwClientT], service: Service, **client_init_kwargs
+    ) -> _ZgwClientT:
+        """
+        Build `client_class` for `service`, with its connect-phase timeout
+        tightened (see `_TightConnectServiceConfigAdapter`).
+
+        Deliberately bypasses `build_zgw_client_from_service`'s api_type
+        dispatch: every caller here already knows its client class, and this
+        keeps the tightened timeout local to this service rather than
+        applying it to every ZGW client in the app.
+        """
+        config_adapter = _TightConnectServiceConfigAdapter(service)
+        return client_class.configure_from(
+            config_adapter,
+            nlx_base_url=service.nlx,
+            configured_from=service,
+            **client_init_kwargs,
+        )
+
+    @staticmethod
     def _zaken_client_factory(
         group: ZGWApiGroupConfig, config: OpenZaakConfig | None = None
     ) -> ZakenClient:
         if config is None:
             config = OpenZaakConfig.get_solo()
-        return cast(
+        return ZGWService._build_client(
             ZakenClient,
-            build_zgw_client_from_service(
-                group.zrc_service,
-                use_openzaak_120_params=group.fetch_eherkenning_zaken_with_openzaak_120_params,
-                fetch_rollen_with_betrokkene_type=group.fetch_rollen_with_betrokkene_type,
-                zaak_max_confidentiality=config.zaak_max_confidentiality,
-                limit_user_visible_cases_to_role=config.limit_user_visible_cases_to_role,
-                cache_zaken_timeout=group.cache_zaken_timeout,
-            ),
+            group.zrc_service,
+            use_openzaak_120_params=group.fetch_eherkenning_zaken_with_openzaak_120_params,
+            fetch_rollen_with_betrokkene_type=group.fetch_rollen_with_betrokkene_type,
+            zaak_max_confidentiality=config.zaak_max_confidentiality,
+            limit_user_visible_cases_to_role=config.limit_user_visible_cases_to_role,
+            cache_zaken_timeout=group.cache_zaken_timeout,
         )
 
     @staticmethod
     def _catalogi_client_factory(group: ZGWApiGroupConfig) -> CatalogiClient:
-        return cast(
+        return ZGWService._build_client(
             CatalogiClient,
-            build_zgw_client_from_service(
-                group.ztc_service,
-                cache_catalogi_timeout=group.cache_catalogi_timeout,
-            ),
+            group.ztc_service,
+            cache_catalogi_timeout=group.cache_catalogi_timeout,
         )
 
     @staticmethod
     def _documenten_client_factory(group: ZGWApiGroupConfig) -> DocumentenClient:
-        return cast(
+        return ZGWService._build_client(
             DocumentenClient,
-            build_zgw_client_from_service(
-                group.drc_service,
-                cache_zaken_timeout=group.cache_zaken_timeout,
-            ),
+            group.drc_service,
+            cache_zaken_timeout=group.cache_zaken_timeout,
         )
 
     @staticmethod
@@ -318,14 +378,12 @@ class ZGWService:
 
         Select groups with `ZGWApiGroupConfigQuerySet.with_forms_service()`.
         Checking here anyway names the group that is misconfigured, instead of
-        failing with an `AttributeError` on `None` from inside `build_client`.
+        failing with an `AttributeError` on `None` from inside `_build_client`.
         """
         if group.form_service is None:
             raise ValueError(f"{group} has no `form_service`")
 
-        return cast(
-            FormulierenClient, build_zgw_client_from_service(group.form_service)
-        )
+        return ZGWService._build_client(FormulierenClient, group.form_service)
 
     @cached_property
     def _zaaktype_visible_from_dates(self) -> dict[tuple[str, str], date]:
@@ -1218,9 +1276,9 @@ class ZGWService:
         ).fetch_single_zaak_information_object(ziobj_url)
 
     def fetch_single_resultaat_type_for_service(
-        self, resultaat_type_url: str, service
+        self, resultaat_type_url: str, service: Service
     ) -> ResultaatType:
-        client = cast(CatalogiClient, build_zgw_client_from_service(service))
+        client = self._build_client(CatalogiClient, service)
         return client.fetch_single_resultaat_type(resultaat_type_url)
 
     def _sync_statuses_with_status_types(
