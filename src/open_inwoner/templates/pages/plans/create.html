@@ -26,7 +26,7 @@
                         {# TODO: create new model field to add a File to the plan #}
                         {# {% input form.file %} #}
 
-                        {% date_field form.end_date icon="calendar_today" icon_position="after" %}
+                        {% date_field form.end_date icon="calendar_today" icon_position="after" extra_classes='form__control--move-up' %}
                         <div class="plan__contacts">
                             <nl-paragraph>{% trans 'Contactpersoon' %}</nl-paragraph>
                             {% checkboxes form.plan_contacts %}
