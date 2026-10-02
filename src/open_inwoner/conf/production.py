@@ -53,7 +53,7 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [
 # STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 # Production logging facility.
-handlers = ["console"] if LOG_STDOUT else ["django"]
+handlers = ["console"] if LOG_STDOUT else ["json_file"]
 
 LOGGING["loggers"].update(
     {

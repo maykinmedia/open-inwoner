@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 
 from django.core.wsgi import get_wsgi_application
 
+from maykin_common.logging.wsgi import LogVars
+
 from open_inwoner.setup import setup_env
 
 setup_env()
 
-application = get_wsgi_application()
+application = LogVars(get_wsgi_application())
