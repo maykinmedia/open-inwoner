@@ -17,6 +17,28 @@ export default defineConfig(({ mode }) => {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const isProduction = mode === 'production';
 
+  // Named entries, referenced by Django templates via their exact, unhashed
+  // `{% static %}` path - unlike code-split chunks, these must not carry a
+  // Vite content hash in their output filename.
+  const buildInput = {
+    // Frontend folder (new)
+    [`${paths.package.name}-frontend`]: path.resolve(
+      __dirname,
+      paths.frontendEntry
+    ),
+    // Legacy CSS
+    [`${paths.package.name}-css`]: path.resolve(__dirname, paths.scssEntry),
+    // Legacy JS
+    [`${paths.package.name}-js`]: path.resolve(__dirname, paths.jsEntry),
+    // Admin overrides css
+    admin_overrides: path.resolve(__dirname, paths.adminOverridesEntry),
+    // PDF-P CSS
+    'pdf-p': path.resolve(__dirname, paths.pdfPortraitEntry),
+    // Django Admin JS.
+    'django-admin': path.resolve(__dirname, paths.djangoAdminEntry),
+  };
+  const buildInputNames = new Set(Object.keys(buildInput));
+
   return {
     plugins: [
       preact({
@@ -68,32 +90,33 @@ export default defineConfig(({ mode }) => {
 
       rollupOptions: {
         // dest/source manager.
-        input: {
-          // Frontend folder (new)
-          [`${paths.package.name}-frontend`]: path.resolve(
-            __dirname,
-            paths.frontendEntry
-          ),
-          // Legacy CSS
-          [`${paths.package.name}-css`]: path.resolve(
-            __dirname,
-            paths.scssEntry
-          ),
-          // Legacy JS
-          [`${paths.package.name}-js`]: path.resolve(__dirname, paths.jsEntry),
-          // Admin overrides css
-          admin_overrides: path.resolve(__dirname, paths.adminOverridesEntry),
-          // PDF-P CSS
-          'pdf-p': path.resolve(__dirname, paths.pdfPortraitEntry),
-          // Django Admin JS.
-          'django-admin': path.resolve(__dirname, paths.djangoAdminEntry),
-        },
+        input: buildInput,
 
         // Bundle file name manager.
         output: {
           entryFileNames: '[name].js',
-          chunkFileNames: '[name].bundle.js',
-          assetFileNames: '[name].[ext]',
+          // Chunks (dynamic imports) aren't referenced via Django's
+          // `{% static %}` tag or a rewritable url()/@import - they're
+          // loaded through Vite's own runtime, which bakes the filename in
+          // as a plain string at build time. Django's ManifestStaticFilesStorage
+          // can't see or rewrite that, so these need their own content hash
+          // from Vite directly.
+          chunkFileNames: '[name].[hash].bundle.js',
+          // Rollup emits CSS for both named entries (e.g. `open_inwoner-css`,
+          // referenced by Django templates via its exact, unhashed name) and
+          // for code-split chunks (e.g. a lazy-loaded component's CSS, only
+          // ever referenced from Vite's own runtime) through this same
+          // option. Only hash the latter - hashing an entry's output would
+          // break the hardcoded `{% static %}` reference to it.
+          assetFileNames: (assetInfo) => {
+            const baseName = (assetInfo.names?.[0] ?? '').replace(
+              /\.[^.]+$/,
+              ''
+            );
+            return buildInputNames.has(baseName)
+              ? '[name].[ext]'
+              : '[name].[hash].[ext]';
+          },
         },
       },
     },
