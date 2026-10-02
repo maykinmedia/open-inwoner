@@ -142,7 +142,7 @@ function initFilterBar() {
       );
       let currentIndex = -1;
 
-      if (selectButton) {
+      if (selectButton && selectButton.dataset.listener != 'true') {
         selectButton.addEventListener('click', () => {
           const isExpanded =
             selectButton.getAttribute('aria-expanded') === 'true';
@@ -171,6 +171,7 @@ function initFilterBar() {
             selectButton.focus();
           }
         });
+        selectButton.dataset.listener = true;
       }
 
       if (listboxDropdown) {
