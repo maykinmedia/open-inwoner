@@ -15,6 +15,11 @@
     padding: 0;
     width: 100%;
   }
+
+  &--messages {
+    display: grid;
+    gap: var(--spacing-extra-large);
+  }
 }
 
 .search + .list {
