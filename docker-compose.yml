@@ -216,6 +216,9 @@ services:
     healthcheck:
       disable: true
     volumes:
+      # uploads the setup step makes (e.g. the homepage banner image) must land on
+      # the volume `web` serves them from
+      - media:/app/media
       - ./docker/setup_configuration:/app/setup_configuration
       # Marker directory `/setup_configuration.sh` uses to only run
       # `setup_configuration` once per database, instead of on every

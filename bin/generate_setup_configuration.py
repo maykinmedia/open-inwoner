@@ -50,6 +50,7 @@ DOCKER_PROFILE = {
     "ssd_host": "ssd.internal",
     "clamav_host": "clamav",
     "domain": "localhost:9000",
+    "setup_dir": "/app/setup_configuration",
 }
 
 # Keycloak's OIDC endpoints (keycloak.open-inwoner.local:8080) are deliberately NOT
@@ -66,6 +67,7 @@ HOST_PROFILE = {
     "ssd_host": "localhost:5020",
     "clamav_host": "localhost",
     "domain": "localhost:8000",
+    "setup_dir": str(SETUP_CONFIG_DIR),
 }
 
 
