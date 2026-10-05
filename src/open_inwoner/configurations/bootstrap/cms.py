@@ -27,6 +27,7 @@ from open_inwoner.cms.plugins.models.tasks import TasksConfig
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
 from open_inwoner.cms.products.cms_apps import ProductsApphook
+from open_inwoner.cms.products.cms_plugins import CategoriesPlugin
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.utils import page_setup
@@ -82,6 +83,10 @@ class UserFeedPluginConfig(ConfigurationModel):
         django_model_refs = {UserFeed: ["title"]}
 
 
+class CategoriesPluginConfig(ConfigurationModel):
+    """The 'Categories' plugin placed on the homepage (it has no settings)."""
+
+
 class CMSHomepageConfig(ConfigurationModel):
     """Configuration for the site homepage (a plain CMS page with no apphook)."""
 
@@ -106,6 +111,10 @@ class CMSHomepageConfig(ConfigurationModel):
     acties: Annotated[
         UserFeedPluginConfig | None,
         Field(description="Adds an 'Openstaande acties' plugin to the homepage."),
+    ] = Field(default=None)
+    categories: Annotated[
+        CategoriesPluginConfig | None,
+        Field(description="Adds a 'Categories' plugin to the homepage."),
     ] = Field(default=None)
 
 
@@ -248,6 +257,7 @@ _HOMEPAGE_PLUGINS: dict[str, dict[str, type[CMSPluginBase]]] = {
         "mijn_zaken": CMSZakenPlugin,
         "mijn_taken": TasksPlugin,
         "acties": UserFeedPlugin,
+        "categories": CategoriesPlugin,
     },
 }
 
