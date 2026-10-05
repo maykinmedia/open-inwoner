@@ -457,6 +457,12 @@ class CMSPagesConfigurationStepTests(TestCase):
         acties = UserFeed.objects.get(placeholder=placeholder)
         self.assertEqual(acties.title, "Openstaande acties")
 
+        self.assertTrue(
+            CMSPlugin.objects.filter(
+                placeholder=placeholder, plugin_type="CategoriesPlugin"
+            ).exists()
+        )
+
     def test_homepage_plugins_rerun_with_unchanged_config_is_a_no_op(self):
         """
         Nothing to converge means no new page version, so an unrelated
