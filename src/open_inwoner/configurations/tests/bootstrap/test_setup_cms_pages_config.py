@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -8,10 +9,13 @@ from django.urls import clear_url_caches, reverse
 from cms.api import add_plugin
 from cms.appresolver import clear_app_resolvers
 from cms.models import CMSPlugin, Page, PageContent, Placeholder
+from django_setup_configuration.exceptions import ConfigurationRunFailed
 from django_setup_configuration.test_utils import execute_single_step
 from djangocms_versioning.constants import PUBLISHED
+from filer.models import Image as FilerImage
+from PIL import Image as PILImage
 
-from open_inwoner.cms.banner.models import BannerText
+from open_inwoner.cms.banner.models import BannerImage, BannerText
 from open_inwoner.cms.cases.cms_apps import CasesApphook
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
@@ -538,6 +542,67 @@ class CMSPagesConfigurationStepTests(TestCase):
         )
         self.assertTrue(TasksConfig.objects.filter(placeholder=placeholder).exists())
         self.assertTrue(UserFeed.objects.filter(placeholder=placeholder).exists())
+
+    def _banner_image_config(self, path) -> dict:
+        return {
+            "cms_pages_config_enable": True,
+            "cms_pages_config": {
+                "homepage": {"enabled": True, "banner_image": {"image": str(path)}}
+            },
+        }
+
+    def _make_image_file(self, name="banner.png") -> Path:
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        path = Path(tmpdir.name) / name
+        PILImage.new("RGB", (40, 12), "red").save(path)
+        return path
+
+    def test_homepage_banner_image_uploaded_and_placed_in_banner_slot(self):
+        path = self._make_image_file()
+
+        execute_single_step(
+            CMSPagesConfigurationStep, object_source=self._banner_image_config(path)
+        )
+
+        page = Page.objects.get(reverse_id="home")
+        banner = BannerImage.objects.get(
+            placeholder=_published_content_placeholder(page, "banner_image")
+        )
+        self.assertEqual(banner.image.original_filename, "banner.png")
+        self.assertEqual(banner.image_height, 12)
+
+    def test_homepage_banner_image_rerun_reuses_uploaded_image(self):
+        path = self._make_image_file()
+        config = self._banner_image_config(path)
+
+        execute_single_step(CMSPagesConfigurationStep, object_source=config)
+        execute_single_step(CMSPagesConfigurationStep, object_source=config)
+
+        self.assertEqual(
+            FilerImage.objects.filter(original_filename="banner.png").count(), 1
+        )
+
+    def test_homepage_banner_image_missing_file_fails(self):
+        with self.assertRaises(ConfigurationRunFailed):
+            execute_single_step(
+                CMSPagesConfigurationStep,
+                object_source=self._banner_image_config("/nonexistent/banner.png"),
+            )
+
+    def test_homepage_banner_image_that_is_not_an_image_fails(self):
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        path = Path(tmpdir.name) / "banner.png"
+        path.write_text("not an image")
+
+        with self.assertRaises(ConfigurationRunFailed):
+            execute_single_step(
+                CMSPagesConfigurationStep,
+                object_source=self._banner_image_config(path),
+            )
+
+        self.assertFalse(FilerImage.objects.exists())
 
     def test_no_service_account_is_created_when_nothing_is_enabled(self):
         execute_single_step(

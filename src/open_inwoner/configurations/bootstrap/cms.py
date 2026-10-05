@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 from django.urls import NoReverseMatch, reverse
@@ -12,7 +13,7 @@ from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
 from pydantic import Field
 
-from open_inwoner.cms.banner.cms_plugins import BannerTextPlugin
+from open_inwoner.cms.banner.cms_plugins import BannerImagePlugin, BannerTextPlugin
 from open_inwoner.cms.banner.models import BannerText
 from open_inwoner.cms.benefits.cms_apps import SSDApphook
 from open_inwoner.cms.cases.cms_apps import CasesApphook
@@ -31,6 +32,24 @@ from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.utils import page_setup
 from open_inwoner.mijn_afval.cms.cms_apps import MijnAfvalApphook
 from open_inwoner.openklant.cms_apps import OpenklantApphook
+
+
+class BannerImagePluginConfig(ConfigurationModel):
+    """Configuration for the banner image placed on the homepage."""
+
+    image: Annotated[
+        str,
+        Field(
+            description=(
+                "Path to the image file. It is uploaded to the media library if "
+                "an image with the same name and content isn't there yet."
+            )
+        ),
+    ]
+    image_height: Annotated[
+        int | None,
+        Field(description="Image height in pixels. Defaults to the image's height."),
+    ] = None
 
 
 class BannerTextPluginConfig(ConfigurationModel):
@@ -68,6 +87,10 @@ class CMSHomepageConfig(ConfigurationModel):
 
     enabled: bool = False
     title: Annotated[str, Field(description="Page title for the homepage.")] = "Home"
+    banner_image: Annotated[
+        BannerImagePluginConfig | None,
+        Field(description="Adds a banner image plugin to the homepage."),
+    ] = Field(default=None)
     banner: Annotated[
         BannerTextPluginConfig | None,
         Field(description="Adds a welcome banner text plugin to the homepage."),
@@ -219,6 +242,7 @@ _PROFILE_CONFIG_FIELDS = tuple(
 # template only shows it to logged-in users, anonymous users get the welcome
 # text from the site configuration instead.
 _HOMEPAGE_PLUGINS: dict[str, dict[str, type[CMSPluginBase]]] = {
+    "banner_image": {"banner_image": BannerImagePlugin},
     "banner_text": {"banner": BannerTextPlugin},
     "content": {
         "mijn_zaken": CMSZakenPlugin,
@@ -383,8 +407,28 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
 
         for slot, plugins in _HOMEPAGE_PLUGINS.items():
             plugin_specs = [
-                (plugin_class, plugin_config.model_dump())
+                (plugin_class, self._plugin_fields(plugin_class, plugin_config))
                 for model_attr, plugin_class in plugins.items()
                 if (plugin_config := getattr(config, model_attr)) is not None
             ]
             page_setup.sync_placeholder_plugins(homepage, slot, plugin_specs, user=user)
+
+    def _plugin_fields(
+        self, plugin_class: type[CMSPluginBase], plugin_config: ConfigurationModel
+    ) -> dict:
+        fields = plugin_config.model_dump()
+        if plugin_class is not BannerImagePlugin:
+            return fields
+
+        path = Path(fields["image"])
+        if not path.is_file():
+            raise ConfigurationRunFailed(f"Banner image file not found: {path}")
+
+        try:
+            image = page_setup.get_or_create_filer_image(path)
+        except ValueError as exc:
+            raise ConfigurationRunFailed(f"Banner image: {exc}") from exc
+        return {
+            "image": image,
+            "image_height": fields["image_height"] or int(image.height),
+        }

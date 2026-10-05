@@ -72,6 +72,13 @@ notification for it through the real webhook -- see that command's `--help` for
 posting notifications for other zaken/resources, or generating malformed ones to
 test rejection.
 
+## `oip_banner.jpg`
+
+The homepage banner image. Not a fixture: `data.yaml` points
+`cms_pages_config.homepage.banner_image` at it, and `setup_configuration`
+uploads it to the media library (once -- an image with the same name and content
+is reused) and places it in the homepage's banner image slot.
+
 ## Load fixtures manually
 
 ```bash

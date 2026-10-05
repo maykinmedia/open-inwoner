@@ -7,8 +7,12 @@ user). Everything in this module runs against production databases, so it must
 not create privileged accounts or otherwise rely on test-only assumptions.
 """
 
+import hashlib
+from pathlib import Path
+
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.core.files import File
 from django.db import transaction
 
 from cms import api
@@ -18,6 +22,8 @@ from cms.models import Page, PageContent, Placeholder
 from cms.plugin_base import CMSPluginBase
 from djangocms_versioning.constants import DRAFT
 from djangocms_versioning.models import Version
+from filer.models import Image
+from PIL import Image as PILImage
 
 from open_inwoner.cms.extensions.models import CommonExtension
 
@@ -95,6 +101,30 @@ def update_page_title(
     new_version.content.title = title
     new_version.content.save()
     new_version.publish(user)
+
+
+def get_or_create_filer_image(path: Path) -> Image:
+    """
+    Return the filer image for the file at `path`, uploading it to the media
+    library unless an image with the same name and content is already there.
+
+    Raises `ValueError` if the file is not a readable image.
+    """
+    try:
+        with PILImage.open(path) as pil_image:
+            pil_image.verify()
+    except (OSError, SyntaxError, PILImage.DecompressionBombError) as exc:
+        raise ValueError(f"{path} is not a valid image file") from exc
+
+    sha1 = hashlib.sha1(path.read_bytes(), usedforsecurity=False).hexdigest()
+    image = Image.objects.filter(original_filename=path.name, sha1=sha1).first()
+    if image is not None:
+        return image
+
+    with path.open("rb") as file:
+        return Image.objects.create(
+            file=File(file, name=path.name), original_filename=path.name
+        )
 
 
 def _get_plugin_instance(placeholder: Placeholder, plugin_class: type[CMSPluginBase]):
