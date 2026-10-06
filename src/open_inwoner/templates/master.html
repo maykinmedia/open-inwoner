@@ -1,4 +1,4 @@
-{% load static i18n card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
+{% load static i18n django_vite card_tags button_tags link_tags notification_tags anchor_menu_tags view_breadcrumbs utils solo_tags session_tags django_htmx cms_tags menu_tags sekizai_tags djangocms_alias_tags %}<!DOCTYPE html>
 <html
     lang="nl"
     class="view utrecht-document openinwoner-theme {% block view_class %}view--{{ request.resolver_match.namespaces|join:'-' }}-{{ request.resolver_match.url_name }}{% endblock %}"
@@ -35,8 +35,13 @@
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
 
-        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
-        <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-frontend.css' %}" media="all" rel="stylesheet" />
+        {# Only renders while the Vite dev server is running, for hot reloading #}
+        {% vite_hmr_client nonce=request.csp_nonce %}
+        <link nonce="{{ request.csp_nonce }}" href="{% vite_asset_url 'src/open_inwoner/scss/screen.scss' %}" media="all" rel="stylesheet" />
+        {# Module scripts are deferred, so they still run after the document is parsed #}
+        {% vite_asset 'src/open_inwoner/js/index.js' nonce=request.csp_nonce %}
+        {# Including this script (and its CSS) will allow the page to use the preact web-components #}
+        {% vite_asset 'src/open_inwoner/react/main.ts' nonce=request.csp_nonce %}
 
         <style nonce="{{ request.csp_nonce }}">
             :root {
@@ -195,8 +200,5 @@
             window.IS_DEV = true;
         </script>
         {% endif %}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
-        {# Including this script will allow the page to use the preact web-components #}
-        <script nonce="{{ request.csp_nonce }}" src="{% static 'bundles/open_inwoner-frontend.js' %}" type="module"></script>
     </body>
 </html>
