@@ -1,19 +1,23 @@
-import escapeHTML from 'escape-html';
 import 'leaflet';
 import { RD_CRS } from './rd';
 import { isMobile } from '../../lib/device/is-mobile';
 
 /**
- * Returns an escaped variable.
- * @param {string} textVariable
- * @return {string}
+ * Creates an element, setting attributes and children without parsing HTML.
+ * Using DOM nodes (rather than HTML strings) for popup content prevents XSS
+ * through Leaflet's `bindPopup`, which assigns string content via innerHTML.
+ * @param {string} tagName
+ * @param {Object<string, string>} [attributes]
+ * @param {Array<Node|string>} [children]
+ * @return {HTMLElement}
  */
-function escapeVariableText(textVariable) {
-  if (textVariable) {
-    return escapeHTML(textVariable);
-  } else {
-    return '';
-  }
+function createElement(tagName, attributes = {}, children = []) {
+  const element = document.createElement(tagName);
+  Object.entries(attributes).forEach(([key, value]) =>
+    element.setAttribute(key, value)
+  );
+  element.append(...children);
+  return element;
 }
 
 /** @type {NodeListOf<Element>} All the leaflet maps. */
@@ -84,9 +88,9 @@ class Map {
   }
 
   /**
-   * Renders a feature as html.
+   * Renders a feature as a DOM node.
    * @param {Object} feature
-   * @return {string}
+   * @return {HTMLElement}
    */
   featureToHTML(feature) {
     const {
@@ -99,41 +103,60 @@ class Map {
       ...properties
     } = feature.properties;
 
-    const displayName = escapeVariableText(name);
-    const locationDetailView = escapeVariableText(location_url);
-    const displayAddress1 = escapeVariableText(address_line_1);
-    const displayAddress2 = escapeVariableText(address_line_2);
-    const displayPhonenumber = escapeVariableText(phonenumber);
-    const displayEmail = escapeVariableText(email);
-    let title = '';
+    const displayName = name || '';
+    const displayPhonenumber = phonenumber || '';
+    const displayEmail = email || '';
 
-    if (locationDetailView) {
-      title = `
-        <a href="${locationDetailView}" class="link link--primary" aria-label=${displayName} title=${displayName}>
-          ${displayName}
-        </a>
-      `;
-    } else {
-      title = displayName;
-    }
+    const title = location_url
+      ? createElement(
+          'a',
+          {
+            href: location_url,
+            class: 'link link--primary',
+            'aria-label': displayName,
+            title: displayName,
+          },
+          [displayName]
+        )
+      : displayName;
 
-    return `
-      <div class="leaflet-content-name">
-        <h4 class="utrecht-heading-4">
-          ${title}
-        </h4>
-      </div>
-      <div class="leaflet-content-details container--no-margin">
-        <nl-paragraph>${displayAddress1}</nl-paragraph>
-        <nl-paragraph>${displayAddress2}</nl-paragraph>
-        <a href="tel:${displayPhonenumber}" class="link link--secondary" aria-label=${displayPhonenumber} title=${displayPhonenumber}>
-          <span class="link__text">${displayPhonenumber}</span>
-        </a>
-        <a href="mailto:${displayEmail}" class="link link--secondary" aria-label=${displayEmail} title=${displayEmail}>
-          <span class="link__text">${displayEmail}</span>
-        </a>
-      </div>
-    `;
+    return createElement('div', {}, [
+      createElement('div', { class: 'leaflet-content-name' }, [
+        createElement('h4', { class: 'utrecht-heading-4' }, [title]),
+      ]),
+      createElement(
+        'div',
+        { class: 'leaflet-content-details container--no-margin' },
+        [
+          createElement('nl-paragraph', {}, [address_line_1 || '']),
+          createElement('nl-paragraph', {}, [address_line_2 || '']),
+          createElement(
+            'a',
+            {
+              href: `tel:${displayPhonenumber}`,
+              class: 'link link--secondary',
+              'aria-label': displayPhonenumber,
+              title: displayPhonenumber,
+            },
+            [
+              createElement('span', { class: 'link__text' }, [
+                displayPhonenumber,
+              ]),
+            ]
+          ),
+          createElement(
+            'a',
+            {
+              href: `mailto:${displayEmail}`,
+              class: 'link link--secondary',
+              'aria-label': displayEmail,
+              title: displayEmail,
+            },
+            [createElement('span', { class: 'link__text' }, [displayEmail])]
+          ),
+        ]
+      ),
+    ]);
   }
 }
 
