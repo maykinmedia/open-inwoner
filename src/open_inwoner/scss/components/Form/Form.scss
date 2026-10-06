@@ -285,8 +285,9 @@
       transform: translateY(-50%);
     }
 
-    &--move-up *[class*='icons'],
-    &--move-up *[class*='Icons'] {
+    // Icon alignment fix if there is a help_text.
+    &--with-help *[class*='icons'],
+    &--with-help *[class*='Icons'] {
       transform: translateY(-100%) !important;
     }
 
