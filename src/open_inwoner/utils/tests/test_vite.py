@@ -136,6 +136,28 @@ class ViteAppClientDevModeTestCase(SimpleTestCase):
 
         self.assertFalse(client.dev_mode)
 
+    def test_hmr_client_includes_csp_nonce_meta(self):
+        self.server.listen()
+        client = self._client()
+
+        self.assertEqual(
+            client.generate_vite_ws_client(nonce="abc"),
+            '<meta property="csp-nonce" nonce="abc">'
+            f'<script type="module" nonce="abc" '
+            f'src="http://localhost:{self.port}/static/bundles/@vite/client"></script>',
+        )
+
+    def test_hmr_client_without_nonce_has_no_meta(self):
+        self.server.listen()
+        client = self._client()
+
+        self.assertNotIn("csp-nonce", client.generate_vite_ws_client())
+
+    def test_hmr_client_renders_nothing_while_port_is_closed(self):
+        client = self._client()
+
+        self.assertEqual(client.generate_vite_ws_client(nonce="abc"), "")
+
     def test_caches_probe_result(self):
         client = self._client()
         client.DEV_SERVER_PROBE_INTERVAL = 60

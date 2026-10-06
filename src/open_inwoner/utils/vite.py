@@ -2,6 +2,8 @@ import math
 import socket
 import time
 
+from django.utils.html import format_html
+
 from django_vite.core.asset_loader import (
     DEFAULT_APP_NAME,
     DjangoViteAppClient,
@@ -90,3 +92,16 @@ class ViteAppClient(DjangoViteAppClient):
                 return True
         except OSError:
             return False
+
+    def generate_vite_ws_client(self, **kwargs) -> str:
+        # The Vite client injects (S)CSS imported from JS as inline <style>
+        # elements, and reads the CSP nonce for those from this meta tag. The
+        # result of super() decides, rather than `dev_mode`, so both tags come
+        # from the same dev server probe.
+        client = super().generate_vite_ws_client(**kwargs)
+        if not client or "nonce" not in kwargs:
+            return client
+        return (
+            format_html('<meta property="csp-nonce" nonce="{}">', kwargs["nonce"])
+            + client
+        )
