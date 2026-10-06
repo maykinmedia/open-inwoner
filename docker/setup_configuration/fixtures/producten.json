@@ -48,6 +48,36 @@
     }
   },
   {
+    "model": "pdc.productlocation",
+    "pk": 9101,
+    "fields": {
+      "uuid": "5c0e4c3e-9a51-4d0e-8f43-2f6b0d6a9101",
+      "name": "Stadskantoor",
+      "street": "Stadsplateau",
+      "housenumber": "1",
+      "postcode": "3521 AZ",
+      "city": "Utrecht",
+      "geometry": "SRID=4326;POINT (5.1115 52.0894)",
+      "email": "stadskantoor@example.nl",
+      "phonenumber": "0301234567"
+    }
+  },
+  {
+    "model": "pdc.productlocation",
+    "pk": 9102,
+    "fields": {
+      "uuid": "5c0e4c3e-9a51-4d0e-8f43-2f6b0d6a9102",
+      "name": "Wijkbureau Overvecht",
+      "street": "Zamenhofdreef",
+      "housenumber": "1",
+      "postcode": "3562 JT",
+      "city": "Utrecht",
+      "geometry": "SRID=4326;POINT (5.1180 52.1167)",
+      "email": "overvecht@example.nl",
+      "phonenumber": "0307654321"
+    }
+  },
+  {
     "model": "pdc.product",
     "pk": 9101,
     "fields": {
@@ -57,7 +87,8 @@
       "summary": "Hulp van de gemeente bij het overzien en aflossen van uw schulden.",
       "costs": "0.00",
       "created_on": "2026-09-01T09:00:00Z",
-      "updated_on": "2026-09-01T09:00:00Z"
+      "updated_on": "2026-09-01T09:00:00Z",
+      "locations": [9101]
     }
   },
   {
@@ -70,7 +101,8 @@
       "summary": "Financiele ondersteuning als u niet genoeg inkomen heeft om van te leven.",
       "costs": "0.00",
       "created_on": "2026-09-01T09:00:00Z",
-      "updated_on": "2026-09-01T09:00:00Z"
+      "updated_on": "2026-09-01T09:00:00Z",
+      "locations": [9101, 9102]
     }
   },
   {
@@ -83,7 +115,8 @@
       "summary": "Ondersteuning en advies voor wie zorgt voor een naaste.",
       "costs": "0.00",
       "created_on": "2026-09-01T09:00:00Z",
-      "updated_on": "2026-09-01T09:00:00Z"
+      "updated_on": "2026-09-01T09:00:00Z",
+      "locations": [9102]
     }
   },
   {
