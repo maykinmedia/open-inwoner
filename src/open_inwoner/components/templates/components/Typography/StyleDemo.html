@@ -1,4 +1,4 @@
-{% load static i18n sekizai_tags %}
+{% load static i18n sekizai_tags django_vite %}
 
 <!DOCTYPE html>
 <html lang="nl" class="view view--style-demo">
@@ -11,7 +11,7 @@
         <link rel="apple-touch-icon" href="{{ favicon }}">
     {% endif %}
 
-    <link nonce="{{ request.csp_nonce }}" href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet"/>
+    <link nonce="{{ request.csp_nonce }}" href="{% vite_asset_url 'src/open_inwoner/scss/screen.scss' %}" media="all" rel="stylesheet"/>
 </head>
 
 <body>

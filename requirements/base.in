@@ -39,6 +39,7 @@ django-permissions-policy
 django-registration
 django-upgrade-check
 django-view-breadcrumbs
+django-vite
 markdown
 django-jsonform
 humanfriendly
