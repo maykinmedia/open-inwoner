@@ -61,6 +61,10 @@ export default defineConfig(({ mode }) => {
       // Minimum supported browsers
       target: 'es2020',
 
+      // Manifest of the hashed output, used by django-vite to resolve the
+      // entries referenced in Django templates.
+      manifest: 'manifest.json',
+
       // Speeds up builds (do not report gzip size).
       reportCompressedSize: false,
       // Disable asset inlining - keep all assets as separate files (no base64).
@@ -91,9 +95,16 @@ export default defineConfig(({ mode }) => {
 
         // Bundle file name manager.
         output: {
-          entryFileNames: '[name].js',
-          chunkFileNames: '[name].bundle.js',
-          assetFileNames: '[name].[ext]',
+          // Every output carries a Vite content hash, and Django leaves the
+          // bundles directory alone instead of hashing it a second time.
+          // Entries and chunks import each other by their Vite file names, so
+          // a Django-hashed copy of an entry would be evaluated as a separate
+          // module next to the one the chunks import (e.g. two preact
+          // instances). Templates find the hashed entry names through
+          // django-vite.
+          entryFileNames: '[name].[hash].js',
+          chunkFileNames: '[name].[hash].bundle.js',
+          assetFileNames: '[name].[hash].[ext]',
         },
       },
     },
