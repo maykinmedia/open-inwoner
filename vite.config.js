@@ -35,6 +35,43 @@ export default defineConfig(({ mode }) => {
       collectStaticPlugin,
     ],
 
+    // Dev server (`npm run watch`). Django switches to it while this port is
+    // open (see `open_inwoner.utils.vite.ViteAppClient`), so the port is fixed.
+    server: {
+      port: 5173,
+      strictPort: true,
+      // Pages are served by Django, so URLs to assets (e.g. in CSS) have to
+      // point to the dev server explicitly.
+      origin: 'http://localhost:5173',
+      // Vite watches the whole project root by default (only node_modules and
+      // .git are skipped), which includes Python virtualenvs and other
+      // non-frontend directories and quickly exhausts the inotify limit.
+      watch: {
+        ignored: [
+          '**/__pycache__/**',
+          '**/*.py',
+          '**/*.pyc',
+          '**/.mypy_cache/**',
+          '**/.ruff_cache/**',
+          ...[
+            'env',
+            'venv',
+            '.venv',
+            'docs',
+            'log',
+            'media',
+            'private_media',
+            'static',
+            'storybook-static',
+            'coverage',
+            'tempo-data',
+            'test-results',
+            paths.jsDir,
+          ].map((dir) => `${path.resolve(__dirname, dir)}/**`),
+        ],
+      },
+    },
+
     css: {
       preprocessorOptions: {
         scss: {

@@ -35,6 +35,10 @@
         {% if favicon %}<link rel="icon" href="{{ favicon }}" />
         <link rel="apple-touch-icon" href="{{ favicon }}">{% endif %}
 
+        {% if debug %}
+        {# The Vite dev server injects (S)CSS as inline <style> elements, and its client reads the CSP nonce for those from this tag #}
+        <meta property="csp-nonce" nonce="{{ request.csp_nonce }}">
+        {% endif %}
         {# Only renders while the Vite dev server is running, for hot reloading #}
         {% vite_hmr_client nonce=request.csp_nonce %}
         <link nonce="{{ request.csp_nonce }}" href="{% vite_asset_url 'src/open_inwoner/scss/screen.scss' %}" media="all" rel="stylesheet" />
