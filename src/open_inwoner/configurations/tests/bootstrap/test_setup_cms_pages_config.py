@@ -464,6 +464,11 @@ class CMSPagesConfigurationStepTests(TestCase):
                 placeholder=placeholder, plugin_type="CategoriesPlugin"
             ).exists()
         )
+        self.assertTrue(
+            CMSPlugin.objects.filter(
+                placeholder=placeholder, plugin_type="ProductLocationPlugin"
+            ).exists()
+        )
 
     def test_homepage_plugins_rerun_with_unchanged_config_is_a_no_op(self):
         """
