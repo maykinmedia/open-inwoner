@@ -148,6 +148,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+# Serve frontend assets from the Vite dev server (`npm run watch`) while it is
+# running, falling back to the build output (`npm run build`) otherwise.
+DJANGO_VITE["default"]["dev_mode"] = True
+# django-vite's default dev server address, matching `server` in vite.config.js
+_VITE_DEV_SERVER = "localhost:5173"
+CSP_SCRIPT_SRC += (f"http://{_VITE_DEV_SERVER}",)
+CSP_STYLE_SRC += (f"http://{_VITE_DEV_SERVER}",)
+CSP_FONT_SRC += (f"http://{_VITE_DEV_SERVER}",)
+CSP_IMG_SRC += (f"http://{_VITE_DEV_SERVER}",)
+CSP_CONNECT_SRC += (f"http://{_VITE_DEV_SERVER}", f"ws://{_VITE_DEV_SERVER}")
+
 # Django solo caching (disabled for CI)
 SOLO_CACHE = None
 
