@@ -1,3 +1,160 @@
+2.4.6 (2026-10-06)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.6`.
+
+.. warning::
+
+   Deze release bevat een beveiligingsupdate. Werk zo snel mogelijk bij, en volg
+   daarna de stappen onder **Deployment aandachtspunten** om bestaande uploads op
+   misbruik te controleren.
+
+Beveiliging
+-----------
+
+* ``maykin-django-prosemirror`` is bijgewerkt naar versie ``0.11.0``. Hiermee
+  is een kwetsbaarheid in de afbeeldingsendpoints van de editor
+  (``/prosemirror/filer-image-upload/``) opgelost. Voorheen kon iedere
+  ingelogde gebruiker, dus ook een inwoner of bedrijf ingelogd via DigiD of
+  eHerkenning:
+
+  * bestanden van elk type uploaden, waaronder HTML- en SVG-bestanden met
+    JavaScript. Deze werden als publieke afbeelding opgeslagen en vanuit
+    ``/media/`` geserveerd, wat kon leiden tot stored XSS op het domein van
+    Open Inwoner;
+  * de metadata van iedere filer-afbeelding opvragen, ook van privé
+    afbeeldingen;
+  * de naam, beschrijving en het bijschrift van iedere filer-afbeelding
+    wijzigen.
+
+  De endpoints zijn nu alleen beschikbaar voor medewerkers (staff) met de
+  juiste filer-permissies, en uploads worden gecontroleerd op het bestandstype.
+  Alle installaties vanaf versie ``2.0.0`` zijn kwetsbaar, ongeacht de
+  configuratie.
+
+Deployment aandachtspunten
+--------------------------
+
+* **Controleer na het bijwerken de bestaande afbeeldingen op misbruik.** Voer
+  hiervoor het volgende commando uit:
+
+  .. code-block:: bash
+
+      python src/manage.py check_filer_images
+
+  Het commando controleert alle filer-afbeeldingen en geeft elke afbeelding een
+  oordeel:
+
+  * ``SUSPICIOUS``: moet bekeken worden. Het bestand is geen afbeelding
+    (bijvoorbeeld HTML), het is een SVG met scripts, event handlers of
+    ingebedde data, het zou met een ander content type dan een afbeelding
+    worden geserveerd, of het wordt om een andere reden door de
+    uploadvalidatie geweigerd.
+  * ``UNCHECKED``: het bestand bestaat, maar kon niet worden gelezen
+    (bijvoorbeeld door een fout in de opslag). Voer het commando later opnieuw
+    uit.
+  * ``NOTE``: zou nu niet als upload worden geaccepteerd, maar kan geen code
+    uitvoeren, zoals een SVG zonder scripts, een beschadigde afbeelding of een
+    bestand dat ontbreekt in de opslag. Ook afbeeldingen die verder in orde
+    zijn, maar zijn geüpload door iemand die nu geen actieve medewerker is.
+  * ``OK``: voldoet aan de uploadvalidatie en is geüpload door een actieve
+    medewerker.
+
+  Standaard toont het commando een tabel met alleen de afbeeldingen die
+  aandacht nodig hebben, de ernstigste eerst, met per afbeelding het ID, de
+  uploaddatum, de uploader, de bestandsnaam, de reden en een link naar de
+  admin. De samenvatting wordt naar stderr geschreven. Met ``--all`` worden ook
+  de afbeeldingen getoond die in orde zijn. Gebruik ``--format csv --output
+  <bestand>`` voor een volledig overzicht van alle afbeeldingen, inclusief de
+  URL van het bestand. Kan het commando de admin- en bestands-URL's niet
+  volledig maken, geef dan het domein mee met
+  ``--base-url https://<domein>/``.
+
+  Het commando eindigt met exitcode ``3`` als er verdachte afbeeldingen zijn,
+  en anders met exitcode ``4`` als er afbeeldingen niet konden worden
+  gecontroleerd. Exitcode ``1`` betekent dat het commando is mislukt.
+
+  **Alleen als de virusscan (ClamAV) is ingeschakeld** in de algemene
+  configuratie, kunt u de afbeeldingen daarnaast op virussen scannen. Geef
+  hiervoor de validator van Open Inwoner mee aan hetzelfde commando:
+
+  .. code-block:: bash
+
+      python src/manage.py check_filer_images \
+          --validator open_inwoner.utils.virus_scan.filer_image_virus_validator
+
+  Geïnfecteerde afbeeldingen, en afbeeldingen die niet konden worden gescand,
+  worden dan als ``SUSPICIOUS`` gemarkeerd, met de naam van het virus of de
+  foutmelding als reden. Gebruik ``--validator`` alleen als de virusscan is
+  ingeschakeld en ClamAV bereikbaar is: anders stopt het commando met een
+  foutmelding (bijvoorbeeld ``CommandError: Virus scanning is not enabled in
+  the site configuration.``) en exitcode ``1``, zonder rapport. Valt ClamAV
+  tijdens het controleren weg, dan worden alle afbeeldingen die daarna nog
+  worden gecontroleerd als ``SUSPICIOUS`` gemarkeerd, met de reden
+  ``Could not be scanned: ...``. Herstel in dat geval de verbinding met ClamAV
+  en voer het commando opnieuw uit.
+
+  ``check_filer_images`` controleert alleen afbeeldingen. Scan met de virusscan
+  ingeschakeld ook alle overige filer-bestanden:
+
+  .. code-block:: bash
+
+      python src/manage.py scan_filer_files
+
+  Als er geen virussen worden gevonden, toont dit
+  ``Scanned N items and no viruses found``. Anders toont het per bestand het
+  ID, de bestandsnaam, de URL en het resultaat van de scan, en eindigt het
+  commando met exitcode ``1``. Is de virusscan niet ingeschakeld of is ClamAV
+  niet bereikbaar, dan eindigt het met exitcode ``2``.
+
+  Bekijk vervolgens alle afbeeldingen met ``SUSPICIOUS`` en ``UNCHECKED``:
+
+  * Open deze bestanden **niet** in een browser waarin u bent ingelogd op
+    Open Inwoner, ook niet via de link naar het bestand in de admin. Download
+    ze bijvoorbeeld met ``curl -o <bestand> <URL>`` (zonder sessiecookie) en
+    bekijk ze in een teksteditor.
+  * Bij SVG-bestanden: let op ``<script>``-elementen, event handlers (zoals
+    ``onload=`` of ``onclick=``), ``javascript:``-links, ``<foreignObject>``,
+    ``<iframe>``, ingebedde HTML en verwijzingen naar externe bronnen.
+  * Bij niet-afbeeldingen: controleer wat voor bestand het werkelijk is
+    (bijvoorbeeld met ``file <bestand>``). HTML-, JavaScript- en andere
+    bestanden die geen echte afbeelding zijn, horen hier niet thuis.
+  * Bestanden die via de editor zijn geüpload, staan in de filer-admin onder
+    "Unsorted Uploads" en hebben de uploadende gebruiker als eigenaar. Een
+    eigenaar die geen medewerker (staff) is, wijst op misbruik.
+
+  Verwijder bestanden die geen echte afbeelding zijn via de filer-admin en
+  controleer of ze ook uit de opslag (``MEDIA_ROOT/filer_public/``) en uit een
+  eventuele CDN of cache zijn verwijderd. Controleer ook de access logs op
+  ``POST``- en ``PATCH``-verzoeken naar ``/prosemirror/filer-image-upload/``
+  en op onverwacht gewijzigde namen, beschrijvingen en bijschriften van
+  afbeeldingen. Zijn er aanwijzingen dat een beheerder een geüpload bestand
+  heeft geopend, beschouw dat account dan als gecompromitteerd: beëindig de
+  sessies, reset het wachtwoord en de 2FA, en roteer de geheimen die in de
+  admin zichtbaar zijn.
+* Uploaden en bewerken van afbeeldingen in de editor is nu beperkt tot
+  medewerkers (staff) met de permissies ``filer.add_image`` (uploaden) en
+  ``filer.change_image`` (bewerken). Zorg dat de groepen van redacteuren die
+  producten en categorieën beheren deze permissies hebben.
+* In de editor kunnen alleen nog JPEG-, PNG-, GIF- en WebP-afbeeldingen van
+  maximaal 10 MiB worden geüpload. De inhoud van het bestand moet passen bij
+  de extensie. SVG-bestanden kunnen niet meer via de editor worden geüpload.
+
+Nieuwe features
+---------------
+
+* Nieuw management commando ``scan_filer_files``, dat alle filer-bestanden
+  (inclusief afbeeldingen) met de bestaande ClamAV-integratie op virussen
+  scant.
+* Nieuwe validator ``open_inwoner.utils.virus_scan.filer_image_virus_validator``
+  voor het commando ``check_filer_images``, die afbeeldingen met de bestaande
+  ClamAV-integratie op virussen scant.
+
+Onderhoud
+---------
+
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.11.0``.
+
 2.4.5 (2026-09-29)
 ==================
 
