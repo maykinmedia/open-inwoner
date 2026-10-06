@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static maykin_common %}
+{% load i18n static maykin_common django_vite %}
 
 {% block title %}
 {% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Administration') }}
@@ -8,7 +8,8 @@
 {% block extrastyle %}
     {{ block.super }}
 
-    <link rel="stylesheet" type="text/css" href="{% static 'bundles/admin_overrides.css' %}">
+    {% vite_hmr_client %}
+    <link rel="stylesheet" type="text/css" href="{% vite_asset_url 'src/open_inwoner/scss/admin/admin_overrides.scss' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'maykin_common/css/env-info.css' %}">
 
     <link href="{% static 'maykin_common/ico/favicon.svg' %}" sizes="any" rel="icon" type="image/svg+xml" />
@@ -54,6 +55,6 @@
 {% block footer %}
     {% include "maykin_common/includes/footer.html" with user=user only %}
     {# Load the custom JS #}
-    <script src="{% static 'bundles/open_inwoner-js.js' %}" type="module"></script>
-    <script src="{% static 'bundles/django-admin.js' %}"></script>
+    {% vite_asset 'src/open_inwoner/js/index.js' %}
+    {% vite_asset 'src/open_inwoner/js/django-admin.js' %}
 {% endblock %}

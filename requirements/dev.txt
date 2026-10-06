@@ -275,6 +275,7 @@ django==5.2.17
     #   django-two-factor-auth
     #   django-upgrade-check
     #   django-view-breadcrumbs
+    #   django-vite
     #   djangocms-alias
     #   djangorestframework
     #   drf-spectacular
@@ -567,6 +568,10 @@ django-upgrade-check==2.0.0
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
 django-view-breadcrumbs==2.5.1
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
+django-vite==3.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
