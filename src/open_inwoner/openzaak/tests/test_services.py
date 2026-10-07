@@ -69,6 +69,53 @@ class FormulierenClientFactoryTest(ClearCachesMixin, TestCase):
             ZGWService._formulieren_client_factory(group)
 
 
+class ZgwClientConnectTimeoutTest(ClearCachesMixin, TestCase):
+    """
+    Every client `ZGWService` builds gets a connect-phase timeout tighter
+    than its configured (read) timeout - see `_TightConnectServiceConfigAdapter`.
+
+    `timeout` isn't a `requests.Session` attribute, so `ape_pie.APIClient`
+    only ever stores it in this private per-request-defaults dict - there's
+    no public getter for it.
+    """
+
+    def test_zaken_client_gets_a_tighter_connect_timeout(self):
+        group = ZGWApiGroupConfigFactory(zrc_service__timeout=10)
+
+        client = ZGWService._zaken_client_factory(group)
+
+        self.assertEqual(client._request_kwargs["timeout"], (3.0, 10))
+
+    def test_catalogi_client_gets_a_tighter_connect_timeout(self):
+        group = ZGWApiGroupConfigFactory(ztc_service__timeout=10)
+
+        client = ZGWService._catalogi_client_factory(group)
+
+        self.assertEqual(client._request_kwargs["timeout"], (3.0, 10))
+
+    def test_documenten_client_gets_a_tighter_connect_timeout(self):
+        group = ZGWApiGroupConfigFactory(drc_service__timeout=10)
+
+        client = ZGWService._documenten_client_factory(group)
+
+        self.assertEqual(client._request_kwargs["timeout"], (3.0, 10))
+
+    def test_formulieren_client_gets_a_tighter_connect_timeout(self):
+        group = ZGWApiGroupConfigFactory(form_service__timeout=10)
+
+        client = ZGWService._formulieren_client_factory(group)
+
+        self.assertEqual(client._request_kwargs["timeout"], (3.0, 10))
+
+    def test_connect_timeout_never_drops_below_the_floor(self):
+        # 30% of 1s is 0.3s, well under the 2s floor.
+        group = ZGWApiGroupConfigFactory(zrc_service__timeout=1)
+
+        client = ZGWService._zaken_client_factory(group)
+
+        self.assertEqual(client._request_kwargs["timeout"], (2, 1))
+
+
 class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     """
     Verify that a still-in-flight fetch is correctly reflected in the
