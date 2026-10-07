@@ -87,6 +87,11 @@ categories ("Werk en inkomen" with a child "Schulden", and "Zorg en welzijn")
 and three published products, each in one category. No images or content, so the
 pages render without any filer files.
 
+It also has two `ProductLocation`s in Utrecht, linked to those products, for the
+homepage map (`cms_pages_config.homepage.product_locations` in `data.yaml`) and
+the products' location lists. Their `geometry` is set directly, so loading them
+doesn't need the PDOK geocoder that saving one through the admin uses.
+
 ## Load fixtures manually
 
 ```bash
