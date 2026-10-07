@@ -12,6 +12,8 @@ from django.views.generic import TemplateView
 
 import requests
 import structlog
+from cms.models import PageContent
+from djangocms_versioning.constants import PUBLISHED
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.models import User
@@ -90,6 +92,25 @@ class VragenService(Protocol):
 class KlantContactMomentBaseView(
     CommonPageMixin, BaseBreadcrumbMixin, KlantContactMomentAccessMixin, TemplateView
 ):
+    def get_redirect_page_title(self):
+        """
+        Find a CMS page that redirects to the contactmoment list and use its title.
+        This allows the contactmoment views to show a different title than the
+        apphook page (e.g., "Mijn vragen" instead of "Mijn Aanvragen").
+        """
+        contactmoment_url = reverse("cases:contactmoment_list")
+
+        redirect_page_content = PageContent._original_manager.filter(
+            redirect=contactmoment_url,
+            versions__state=PUBLISHED,
+        ).first()
+
+        if redirect_page_content:
+            return redirect_page_content.title
+
+        current_page = getattr(self.request, "current_page", None)
+        return current_page.get_title() if current_page else _("Mijn vragen")
+
     def get_service(self, service_type: KlantenServiceType) -> VragenService | None:
         if service_type == KlantenServiceType.OPENKLANT2:
             try:
@@ -135,14 +156,14 @@ class KlantContactMomentListView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]
+        return [(self.page_title(), reverse("cases:contactmoment_list"))]
 
     def page_title(self):
-        return _("Mijn vragen")
+        return self.get_redirect_page_title()
 
     def get_anchors(self) -> list:
         return [
-            ("#contactmomenten", _("Mijn vragen")),
+            ("#contactmomenten", self.page_title()),
         ]
 
     def get_context_data(self, **kwargs):
@@ -211,10 +232,12 @@ class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBase
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn vragen"), reverse("cases:contactmoment_list"))]
+        title = self.get_redirect_page_title()
+        return [(title, reverse("cases:contactmoment_list"))]
 
     def page_title(self):
-        return f"{_('Mijn vraag')} {self.question['identification']}"
+        page_title = self.get_redirect_page_title()
+        return f"{page_title} {self.question['identification']}"
 
     def get_anchors(self) -> list:
         return [
