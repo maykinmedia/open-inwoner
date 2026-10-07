@@ -191,6 +191,11 @@ function initFilterBar() {
             listboxDropdown.classList.remove('show');
             selectButton.setAttribute('aria-expanded', 'false');
             selectButton.focus();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (document.activeElement) {
+              document.activeElement.click();
+            }
           }
         });
       }
