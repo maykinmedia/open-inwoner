@@ -40,10 +40,10 @@
             </div>
 
             {% pagination page_obj=page_obj paginator=paginator request=request %}
-
-            {% if paginator.count and not messages %}
+        </div>
+        {% if paginator.count and not messages %}
                 {% render_grid %}
-                    {% render_column start=1 span=7 %}
+                    {% render_column start=1 span=12 %}
                         <section class="feedback" aria-label="{% trans "Pagina feedback" %}">
                             <h2 class="utrecht-heading-2">{% trans "Heeft u gevonden wat u zocht?" %}</h2>
                             {% render_form form=feedback_form method="POST" form_action=request.get_full_path id="feedback_form" show_notifications=True %}
@@ -86,7 +86,6 @@
                     {% endrender_column %}
                 {% endrender_grid %}
             {% endif %}
-        </div>
 
         {% else %}
 
