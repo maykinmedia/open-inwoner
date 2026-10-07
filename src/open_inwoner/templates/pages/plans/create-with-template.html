@@ -13,7 +13,7 @@
         </div>
 
         {% render_grid %}
-            {% render_column start=4 span=6 %}
+            {% render_column start=1 span=6 %}
                 {% if request.user.get_active_contacts %}
                     {% render_form id="plan-from-template-form" form=form method="POST" %}
                         {% csrf_token %}
