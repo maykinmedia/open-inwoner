@@ -17,7 +17,7 @@
                 {% if request.user.get_active_contacts %}
                     {% render_form id="plan-from-template-form" form=form method="POST" %}
                         {% csrf_token %}
-                        {% date_field form.end_date icon="calendar_today" icon_position="after" %}
+                        {% date_field form.end_date icon="calendar_today" icon_position="after" extra_classes='form__control--with-help' %}
                         <div class="plan__contacts">
                             <nl-paragraph>Contactpersoon</nl-paragraph>
                             {% checkboxes form.plan_contacts %}

@@ -285,6 +285,12 @@
       transform: translateY(-50%);
     }
 
+    // Icon alignment fix if there is a help_text.
+    &--with-help *[class*='icons'],
+    &--with-help *[class*='Icons'] {
+      transform: translateY(-100%) !important;
+    }
+
     // Icon alignment fix if there is no help_text.
     &--no-help *[class*='icons'],
     &--no-help *[class*='Icons'] {
