@@ -1,13 +1,19 @@
 {% extends 'master.html' %}
+{% load i18n link_tags %}
 
 {% block robots %}
     <meta name="robots" content="noindex">
 {% endblock robots %}
 
+{% block title %}{% trans "Toegang gewijgerd" %} - {{ site_name }}{% endblock title %}
+
+
 {% block content %}
   {% if exception %}
     <h1 class="utrecht-heading-1">{{ exception }}</h1>
+    <nl-paragraph>{% link href="pages-root" text=_("Ga naar de home pagina") %}</nl-paragraph>
   {% else %}
-    <h1 class="utrecht-heading-1">Sorry, you don't have access to this page (403)</h1>
+    <h1 class="utrecht-heading-1">{% trans "Sorry, you don't have access to this page (403)" %}</h1>
+    <nl-paragraph>{% link href="pages-root" text=_("Ga naar de home pagina") %}</nl-paragraph>
   {% endif %}
 {% endblock content %}
