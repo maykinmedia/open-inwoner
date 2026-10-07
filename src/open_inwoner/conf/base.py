@@ -937,10 +937,47 @@ ENVIRONMENT = config(
     ),
 )
 # Displaying environment information in the admin
-ENVIRONMENT_LABEL = config("ENVIRONMENT_LABEL", default=ENVIRONMENT)
-ENVIRONMENT_BACKGROUND_COLOR = config("ENVIRONMENT_BACKGROUND_COLOR", default="orange")
-ENVIRONMENT_FOREGROUND_COLOR = config("ENVIRONMENT_FOREGROUND_COLOR", default="black")
-SHOW_ENVIRONMENT = config("SHOW_ENVIRONMENT", default=True)
+ENVIRONMENT_LABEL = config(
+    "ENVIRONMENT_LABEL",
+    default=ENVIRONMENT,
+    documentation=DocumentationParams(
+        help_text=(
+            "Label of the deployment environment shown in the admin. Defaults to "
+            "the value of `ENVIRONMENT`."
+        ),
+        group="Branding",
+    ),
+)
+ENVIRONMENT_BACKGROUND_COLOR = config(
+    "ENVIRONMENT_BACKGROUND_COLOR",
+    default="orange",
+    documentation=DocumentationParams(
+        help_text=(
+            "Background color of the environment label in the admin. Accepts any "
+            "CSS color value."
+        ),
+        group="Branding",
+    ),
+)
+ENVIRONMENT_FOREGROUND_COLOR = config(
+    "ENVIRONMENT_FOREGROUND_COLOR",
+    default="black",
+    documentation=DocumentationParams(
+        help_text=(
+            "Text color of the environment label in the admin. Accepts any CSS "
+            "color value."
+        ),
+        group="Branding",
+    ),
+)
+SHOW_ENVIRONMENT = config(
+    "SHOW_ENVIRONMENT",
+    default=True,
+    documentation=DocumentationParams(
+        help_text="Whether to show the environment label in the admin.",
+        group="Branding",
+    ),
+)
 # The Docker image sets this explicitly at build time (see Dockerfile's
 # COMMIT_HASH build arg); fall back to git introspection for local development.
 # NOTE: pass BASE_DIR explicitly rather than letting get_current_version() read
@@ -970,37 +1007,47 @@ CUSTOM_PRODUCT_NAME = config(
         group="Branding",
     ),
 )
+CUSTOM_PRODUCT_URL = config(
+    "CUSTOM_PRODUCT_URL",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Optional link for the custom product when redistributing the "
+            "application. If provided, the product name will be clickable."
+        ),
+        group="Branding",
+    ),
+)
+CUSTOM_PRODUCT_LOGO_PATH = config(
+    "CUSTOM_PRODUCT_LOGO_PATH",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Optional path to a favicon-sized logo for the custom product, "
+            "relative to the static files. Ignored if "
+            "`CUSTOM_PRODUCT_LOGO_URL` is set."
+        ),
+        group="Branding",
+    ),
+)
+CUSTOM_PRODUCT_LOGO_URL = config(
+    "CUSTOM_PRODUCT_LOGO_URL",
+    default="",
+    documentation=DocumentationParams(
+        help_text=(
+            "Optional link for the custom product logo when redistributing "
+            "the application. When using externally hosted assets, note that "
+            "you may need to tweak the Content-Security-Policy settings."
+        ),
+        group="Branding",
+    ),
+)
 MKN_BRANDING_DERIVED_PRODUCT_DEFINITION = (
     ProductDefinition(
         name=CUSTOM_PRODUCT_NAME,
-        hyperlink=config(
-            "CUSTOM_PRODUCT_URL",
-            default="",
-            documentation=DocumentationParams(
-                help_text=(
-                    "Optional link for the custom product when redistributing the "
-                    "application. If provided, the product name will be clickable."
-                ),
-                group="Branding",
-            ),
-        ),
-        logo_path=config(
-            "CUSTOM_PRODUCT_LOGO_PATH",
-            default="",
-            documentation=DocumentationParams(group="Branding"),
-        ),
-        logo_url=config(
-            "CUSTOM_PRODUCT_LOGO_URL",
-            default="",
-            documentation=DocumentationParams(
-                help_text=(
-                    "Optional link for the custom product logo when redistributing "
-                    "the application. When using externally hosted assets, note that "
-                    "you may need to tweak the Content-Security-Policy settings."
-                ),
-                group="Branding",
-            ),
-        ),
+        hyperlink=CUSTOM_PRODUCT_URL,
+        logo_path=CUSTOM_PRODUCT_LOGO_PATH,
+        logo_url=CUSTOM_PRODUCT_LOGO_URL,
     )
     if CUSTOM_PRODUCT_NAME
     else None
@@ -1271,7 +1318,7 @@ SENTRY_DSN = config(
         group="Monitoring",
     ),
 )
-RELEASE = "v2.5-dev"  # get_current_version()
+RELEASE = "v2.5.0"  # get_current_version()
 
 # Django Upgrade Check
 UPGRADE_CHECK_PATHS = {}
