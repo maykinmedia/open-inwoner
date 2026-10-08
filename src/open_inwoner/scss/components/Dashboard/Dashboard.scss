@@ -8,11 +8,6 @@
     padding: 0;
     border-bottom: var(--border-width-thin) solid var(--color-gray);
     border-top: var(--border-width-thin) solid var(--color-gray);
-
-    @media (min-width: 1400px) {
-      display: flex;
-      gap: 0;
-    }
   }
 
   &__list-item {
@@ -22,23 +17,9 @@
     border-top: var(--border-width-thin) solid var(--color-gray);
     position: relative;
 
-    // Tablet and wider
-    @media (min-width: 1400px) {
-      border-left: 1px solid var(--color-gray);
-      border-top: none;
-      border-bottom: none;
-      min-width: 260px;
-      padding: 0 var(--spacing-large);
-      margin: var(--spacing-large) 0;
-    }
-
     &:first-child {
       padding-left: 0;
       border: none;
-    }
-
-    @media (min-width: 900px) {
-      text-align: start;
     }
   }
 
