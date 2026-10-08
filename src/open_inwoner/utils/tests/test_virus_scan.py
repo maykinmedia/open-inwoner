@@ -1,6 +1,7 @@
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
+from django.core.exceptions import ValidationError
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -10,6 +11,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.test import temp_media_root
 from open_inwoner.utils.tests.factories import FilerFileFactory, FilerImageFactory
 from open_inwoner.utils.virus_scan import (
+    FilerImageVirusValidator,
     ScanStatus,
     VirusScanNotConfigured,
     get_scanner,
@@ -118,3 +120,74 @@ class ScanFilerFilesCommandTests(TestCase):
         self.assertIn(infected.url, output)
         self.assertIn("infected Eicar-Test-Signature", output)
         self.assertIn("1 infected, 0 could not be scanned", str(ctx.exception))
+
+
+@patch("open_inwoner.utils.virus_scan.clamd.ClamdNetworkSocket")
+class FilerImageVirusValidatorTests(TestCase):
+    def test_clean_passes(self, mock_clamd_cls):
+        _enable_virus_scan()
+        scanner = mock_clamd_cls.return_value
+        scanner.instream.return_value = {"stream": ("OK", None)}
+
+        FilerImageVirusValidator()(MagicMock(), b"data")
+
+        self.assertEqual(scanner.instream.call_args.args[0].read(), b"data")
+
+    def test_infected_raises(self, mock_clamd_cls):
+        _enable_virus_scan()
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("FOUND", "Eicar-Test-Signature")
+        }
+
+        with self.assertRaisesMessage(
+            ValidationError, "Virus found: Eicar-Test-Signature"
+        ):
+            FilerImageVirusValidator()(MagicMock(), b"data")
+
+    def test_scan_error_raises(self, mock_clamd_cls):
+        _enable_virus_scan()
+        mock_clamd_cls.return_value.instream.side_effect = clamd.ConnectionError(
+            "broken pipe"
+        )
+
+        with self.assertRaisesMessage(
+            ValidationError, "Could not be scanned: broken pipe"
+        ):
+            FilerImageVirusValidator()(MagicMock(), b"data")
+
+    def test_not_configured_stops_the_command(self, mock_clamd_cls):
+        with self.assertRaisesMessage(
+            CommandError, "Virus scanning is not enabled in the site configuration."
+        ):
+            FilerImageVirusValidator()(MagicMock(), b"data")
+
+        mock_clamd_cls.assert_not_called()
+
+    def test_connects_once(self, mock_clamd_cls):
+        _enable_virus_scan()
+        mock_clamd_cls.return_value.instream.return_value = {"stream": ("OK", None)}
+        validator = FilerImageVirusValidator()
+
+        validator(MagicMock(), b"one")
+        validator(MagicMock(), b"two")
+
+        mock_clamd_cls.assert_called_once()
+        self.assertEqual(mock_clamd_cls.return_value.instream.call_count, 2)
+
+    @patch("open_inwoner.utils.virus_scan.logger")
+    def test_logs_each_scan(self, mock_logger, mock_clamd_cls):
+        _enable_virus_scan()
+        mock_clamd_cls.return_value.instream.return_value = {
+            "stream": ("FOUND", "Eicar-Test-Signature")
+        }
+
+        with self.assertRaises(ValidationError):
+            FilerImageVirusValidator()(MagicMock(pk=42), b"data")
+
+        mock_logger.info.assert_called_once_with(
+            "clamav.audit_scan_finished",
+            filer_image_pk=42,
+            size=4,
+            status="infected",
+            detail="Eicar-Test-Signature",
+        )

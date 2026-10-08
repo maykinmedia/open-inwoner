@@ -1,7 +1,11 @@
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from enum import StrEnum
+from io import BytesIO
 from typing import IO
+
+from django.core.exceptions import ValidationError
+from django.core.management import CommandError
 
 import clamd
 import structlog
@@ -121,3 +125,42 @@ def _scan_filer_files(
             )
             result = ScanResult(ScanStatus.error, f"Could not read file: {exc}")
         yield FilerFileScanResult(file=filer_file, result=result)
+
+
+class FilerImageVirusValidator:
+    """
+    Validator for the ``check_filer_images`` command of django-prosemirror, passed
+    with ``--validator``: scans the image content with ClamAV and raises
+    ``ValidationError`` if it is infected or could not be scanned, which marks the
+    image as suspicious.
+
+    Stops the command with a ``CommandError`` if virus scanning is not available,
+    since the images would otherwise be reported without having been scanned.
+    """
+
+    def __init__(self):
+        self._scanner = None
+
+    def __call__(self, image, data: bytes) -> None:
+        if self._scanner is None:
+            try:
+                self._scanner = get_scanner()
+            except VirusScanNotConfigured as exc:
+                raise CommandError(str(exc)) from exc
+
+        result = scan_file(self._scanner, BytesIO(data))
+        logger.info(
+            "clamav.audit_scan_finished",
+            filer_image_pk=image.pk,
+            size=len(data),
+            status=str(result.status),
+            detail=result.detail,
+        )
+        match result.status:
+            case ScanStatus.infected:
+                raise ValidationError(f"Virus found: {result.detail}")
+            case ScanStatus.error:
+                raise ValidationError(f"Could not be scanned: {result.detail}")
+
+
+filer_image_virus_validator = FilerImageVirusValidator()
