@@ -159,6 +159,8 @@ function initFilterBar() {
           );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
+            listboxDropdown.classList.add('show');
+            selectButton.setAttribute('aria-expanded', 'true');
             currentIndex = (currentIndex + 1) % items.length;
             items[currentIndex].focus();
           } else if (e.key === 'ArrowUp') {
