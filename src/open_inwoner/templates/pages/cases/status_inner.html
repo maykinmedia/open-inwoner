@@ -13,7 +13,6 @@
         {% render_column span=12 %}
             {# Title/dashboard #}
             <h1 class="utrecht-heading-1" id="title">{{ zaak.description }}</h1>
-            {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
         {% endrender_column %}
 
         {% render_column start=1 span=6 %}
