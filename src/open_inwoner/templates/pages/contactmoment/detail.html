@@ -5,7 +5,12 @@
     {% if question %}
         {% render_grid %}
             {% render_column span=12 %}
+                {# Title/Data Summary component #}
                 <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
+                {% if metrics %}
+                {{ metrics|json_script:"dashboard_data" }}
+                <oip-data-summary items-id="dashboard_data"></oip-data-summary>
+                {% endif %}
             {% endrender_column %}
         {% endrender_grid %}
 
