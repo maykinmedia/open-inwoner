@@ -112,22 +112,6 @@ export class FilterBar {
         this.listboxDropdown.classList.add('show');
       }
     };
-
-    const removeShowClass = () => {
-      if (this.listboxDropdown) {
-        this.listboxDropdown.classList.remove('show');
-      }
-    };
-
-    inputs.forEach((input) => {
-      input.addEventListener('focus', addShowClass);
-      input.addEventListener('blur', removeShowClass);
-    });
-
-    if (submitButton) {
-      submitButton.addEventListener('focus', addShowClass);
-      submitButton.addEventListener('blur', removeShowClass);
-    }
   }
 }
 

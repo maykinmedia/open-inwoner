@@ -135,6 +135,7 @@ function initFilterBar() {
     };
 
     const initSelectBehavior = function () {
+      const desktop = window.matchMedia('(min-width: 768px)');
       const selectButton = document.getElementById('selectButton');
       const listboxDropdown = document.getElementById('listboxDropdown');
       const selectDropdownWrapper = document.getElementById(
@@ -142,7 +143,7 @@ function initFilterBar() {
       );
       let currentIndex = -1;
 
-      if (selectButton) {
+      if (selectButton && selectButton.dataset.listener != 'true') {
         selectButton.addEventListener('click', () => {
           const isExpanded =
             selectButton.getAttribute('aria-expanded') === 'true';
@@ -159,6 +160,10 @@ function initFilterBar() {
           );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
+            if (desktop.matches) {
+              listboxDropdown.classList.add('show');
+              selectButton.setAttribute('aria-expanded', 'true');
+            }
             currentIndex = (currentIndex + 1) % items.length;
             items[currentIndex].focus();
           } else if (e.key === 'ArrowUp') {
@@ -171,12 +176,16 @@ function initFilterBar() {
             selectButton.focus();
           }
         });
+        selectButton.dataset.listener = true;
       }
 
       if (listboxDropdown) {
         listboxDropdown.addEventListener('keydown', (e) => {
           const items = listboxDropdown.querySelectorAll(
             '.filter-bar .checkbox__label'
+          );
+          const checkboxElement = e.target.closest(
+            '.checkbox__input, .checkbox__label'
           );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
@@ -190,6 +199,9 @@ function initFilterBar() {
             listboxDropdown.classList.remove('show');
             selectButton.setAttribute('aria-expanded', 'false');
             selectButton.focus();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (checkboxElement) target.click();
           }
         });
       }
