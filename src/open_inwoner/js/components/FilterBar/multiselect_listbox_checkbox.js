@@ -135,6 +135,7 @@ function initFilterBar() {
     };
 
     const initSelectBehavior = function () {
+      const desktop = window.matchMedia('(min-width: 768px)');
       const selectButton = document.getElementById('selectButton');
       const listboxDropdown = document.getElementById('listboxDropdown');
       const selectDropdownWrapper = document.getElementById(
@@ -159,8 +160,10 @@ function initFilterBar() {
           );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
-            listboxDropdown.classList.add('show');
-            selectButton.setAttribute('aria-expanded', 'true');
+            if (desktop.matches) {
+              listboxDropdown.classList.add('show');
+              selectButton.setAttribute('aria-expanded', 'true');
+            }
             currentIndex = (currentIndex + 1) % items.length;
             items[currentIndex].focus();
           } else if (e.key === 'ArrowUp') {
@@ -181,6 +184,9 @@ function initFilterBar() {
           const items = listboxDropdown.querySelectorAll(
             '.filter-bar .checkbox__label'
           );
+          const checkboxElement = e.target.closest(
+            '.checkbox__input, .checkbox__label'
+          );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
             currentIndex = (currentIndex + 1) % items.length;
@@ -195,9 +201,7 @@ function initFilterBar() {
             selectButton.focus();
           } else if (e.key === 'Enter') {
             e.preventDefault();
-            if (document.activeElement) {
-              document.activeElement.click();
-            }
+            if (checkboxElement) target.click();
           }
         });
       }
