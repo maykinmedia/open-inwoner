@@ -1,5 +1,10 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { formatToEuro, formatToKiloGrams, parseAmount } from './format';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {
+  formatDate,
+  formatToEuro,
+  formatToKiloGrams,
+  parseAmount,
+} from './format';
 
 /** Intl separates the currency symbol with a (narrow) non-breaking space. */
 const normalize = (value: string) => value.replace(/\s/g, ' ');
@@ -114,6 +119,37 @@ describe('test format.ts functions', () => {
       expect(() => formatToKiloGrams(undefined)).toThrow(message);
       expect(() => formatToKiloGrams({})).toThrow(message);
       expect(() => formatToKiloGrams([])).toThrow(message);
+    });
+  });
+
+  describe('formatDate', () => {
+    afterEach(() => {
+      document.documentElement.lang = 'nl';
+    });
+
+    it('formats a date as day, month name and year in Dutch by default', () => {
+      expect(formatDate('2025-05-26')).toBe('26 mei 2025');
+    });
+
+    it('removes the time', () => {
+      expect(formatDate('2025-05-26T14:30:00')).toBe('26 mei 2025');
+    });
+
+    it('supports other date formats', () => {
+      expect(formatDate('2025/05/26')).toBe('26 mei 2025');
+    });
+
+    it('returns the original value when the date is invalid', () => {
+      expect(formatDate('abc')).toBe('abc');
+    });
+
+    it('returns an empty string', () => {
+      expect(formatDate('')).toBe('');
+    });
+
+    it('uses the language of the page', () => {
+      document.documentElement.lang = 'en';
+      expect(formatDate('2025-05-26')).toBe('May 26, 2025');
     });
   });
 });

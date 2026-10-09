@@ -1297,7 +1297,10 @@ class TestCaseDetailView(
         metrics = response.context.get("metrics")
 
         self.assertIn(
-            {"label": "Besluit genomen op", "value": datetime.date(2025, 5, 10)},
+            {
+                "label": "Besluit genomen op",
+                "value": datetime.date(2025, 5, 10),
+            },
             metrics,
         )
 
@@ -1869,6 +1872,7 @@ class TestCaseDetailView(
         with patch(
             "open_inwoner.openzaak.api_models.Zaak._format_zaak_identificatie",
         ) as spy_format:
+            spy_format.return_value = "zaak-identificatie"
             self.app.get(self.case_detail_url, user=self.user)
 
         # _format_zaak_identificatie is called twice on requesting DetailVew:
