@@ -23,7 +23,7 @@ class OpenAfvalClientTest(TestCase):
                 {
                     "id": "container-1",
                     "publicContainerId": "PUB-001",
-                    "afvalType": "restafval",
+                    "afvalType": "Restafval",
                     "isVerzamelcontainer": True,
                     "heeftSleutel": True,
                     "totaalGewicht": 600.5,
@@ -61,7 +61,7 @@ class OpenAfvalClientTest(TestCase):
         self.assertEqual(profiel.klant.id, "klant-123")
         self.assertEqual(profiel.klant.bsn, "123456789")
         self.assertEqual(len(profiel.containers), 1)
-        self.assertEqual(profiel.containers[0].afval_type, "restafval")
+        self.assertEqual(profiel.containers[0].afval_type, "Restafval")
         self.assertEqual(len(profiel.container_locaties), 1)
         self.assertEqual(profiel.container_locaties[0].adres, "Teststraat 1")
         self.assertEqual(len(profiel.ledigingen), 1)
@@ -162,7 +162,7 @@ class OpenAfvalClientTest(TestCase):
             client.get_afval_profiel(
                 bsn="123456789",
                 adressen=["Teststraat 1"],
-                afval_type="gft",
+                afval_type="GFT",
                 startdatum="2024-01-01",
                 einddatum="2024-01-31",
             )
@@ -172,7 +172,7 @@ class OpenAfvalClientTest(TestCase):
                 "afval-profiel/123456789/",
                 params={
                     "adres": ["Teststraat 1"],
-                    "afval-type": "gft",
+                    "afval-type": "GFT",
                     "startdatum": "2024-01-01",
                     "einddatum": "2024-01-31",
                 },
@@ -228,10 +228,10 @@ class OpenAfvalClientTest(TestCase):
         mock_response.status_code = 200
 
         with patch.object(client, "get", return_value=mock_response) as mock_get:
-            client.get_afval_profiel(bsn="123456789", afval_type="restafval")
+            client.get_afval_profiel(bsn="123456789", afval_type="Restafval")
 
             mock_get.assert_called_once_with(
-                "afval-profiel/123456789/", params={"afval-type": "restafval"}
+                "afval-profiel/123456789/", params={"afval-type": "Restafval"}
             )
 
     def test_get_afval_profiel_no_filters(self):

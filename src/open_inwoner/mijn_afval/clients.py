@@ -24,7 +24,7 @@ class OpenAfvalAPIClient(APIClient):
         Args:
             bsn: BSN of the customer
             adressen: Filter container locations by address (multiple allowed)
-            afval_type: Filter containers by waste type (e.g., 'gft', 'restafval')
+            afval_type: Filter containers by waste type description (e.g., 'GFT')
             startdatum: Filter ledigingen from this date (YYYY-MM-DD)
             einddatum: Filter ledigingen until this date (YYYY-MM-DD)
 
