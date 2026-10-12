@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import JSONParser
@@ -94,12 +96,14 @@ class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
         if not serializer.is_valid():
             self.log_webhook_deserialization_error()
             notification_record.status = ProcessingStatus.FAILED
+            notification_record.last_processed_at = timezone.now()
             notification_record.processing_error = (
                 f"notification is not valid according to schema: {serializer.errors}"
             )
             notification_record.save(
                 update_fields=(
                     "status",
+                    "last_processed_at",
                     "processing_error",
                 )
             )
@@ -123,12 +127,14 @@ class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
 
             # Test webhooks don't have to be processed
             notification_record.status = ProcessingStatus.SUCCESS
+            notification_record.last_processed_at = timezone.now()
             notification_record.processing_output = (
                 "test channel, no further processing done"
             )
             notification_record.save(
                 update_fields=(
                     "status",
+                    "last_processed_at",
                     "processing_output",
                 )
             )
@@ -141,10 +147,12 @@ class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
                 f"notification channel '{notification.kanaal}' not subscribed to"
             )
             notification_record.status = ProcessingStatus.FAILED
+            notification_record.last_processed_at = timezone.now()
             notification_record.processing_error = error_msg
             notification_record.save(
                 update_fields=(
                     "status",
+                    "last_processed_at",
                     "processing_error",
                 )
             )
@@ -154,10 +162,13 @@ class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
             self.log_webhook_channel_not_acceptable(notification)
 
             notification_record.status = ProcessingStatus.FAILED
+
+            notification_record.last_processed_at = timezone.now()
             notification_record.processing_error = f"notification channel '{notification.kanaal}' not acceptable by webhook"
             notification_record.save(
                 update_fields=(
                     "status",
+                    "last_processed_at",
                     "processing_error",
                 )
             )
@@ -175,8 +186,11 @@ class NotificationsWebhookBaseView(WebhookLogMixin, APIView):
             # handler had an error
             self.log_webhook_handler_error(notification, e)
             notification_record.status = ProcessingStatus.FAILED
+            notification_record.last_processed_at = timezone.now()
             notification_record.processing_error = str(e)
-            notification_record.save(update_fields=("status", "processing_error"))
+            notification_record.save(
+                update_fields=("status", "last_processed_at", "processing_error")
+            )
             return Response(
                 {"detail": "internal error handling notification"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
