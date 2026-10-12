@@ -87,8 +87,8 @@ class AfvalProfielView(
             afval_types = self.request.GET.getlist("afval-type")
             period = self.request.GET.get("periode")
 
-            # Determine afval_type filter for API
-            # If both types selected (or none), don't filter by type (show all)
+            # The API filters on a single afval type only, so multiple selected
+            # types are filtered locally after fetching
             afval_type = afval_types[0] if len(afval_types) == 1 else None
 
             # Convert period (year as string) to startdatum/einddatum
@@ -111,10 +111,15 @@ class AfvalProfielView(
                     startdatum=startdatum,
                     einddatum=einddatum,
                 )
-                afval_data = _format_afval_profiel(filtered_profiel)
             else:
                 # No filters applied, reuse unfiltered data
-                afval_data = _format_afval_profiel(unfiltered_profiel)
+                filtered_profiel = unfiltered_profiel
+
+            if len(afval_types) > 1:
+                filtered_profiel = _filter_containers_by_afval_type(
+                    filtered_profiel, afval_types
+                )
+            afval_data = _format_afval_profiel(filtered_profiel)
 
         except MijnAfvalException:
             logger.warning("Error during fetch of Mijn Afval profiel", exc_info=True)
@@ -165,7 +170,7 @@ class _AfvalContainerData(TypedDict):
     """Formatted container data for template/JavaScript consumption."""
 
     identifier: str
-    type: str  # "gft", "restafval", or "med"
+    type: str  # Waste type description as supplied by the API, e.g. "GFT"
     totaal_gewicht: str
     ledigingen: list[_LedigingData]
     table_data: _TableData  # Table component data dict
@@ -186,20 +191,6 @@ def _format_number(value: int | float, decimal_places: int | None = None) -> str
     if decimal_places is None:
         decimal_places = 0 if isinstance(value, int) else 1
     return number_format(value, decimal_pos=decimal_places, force_grouping=False)
-
-
-def _get_container_type_label(container_type: str) -> str:
-    """Get the localized label for a container type."""
-
-    match container_type:
-        case "gft":
-            return _("Groente, Fruit en Tuin afval (GFT)")
-        case "restafval":
-            return _("Restafval")
-        case "med":
-            return _("Medisch afval")
-        case _:
-            return container_type
 
 
 def _format_address(address: str) -> str:
@@ -264,7 +255,7 @@ def _format_container_for_table(
         totaal_gewicht: Total weight of the container
         totaal_kosten: Total cost of all ledigingen for this container
         identifier: Public container identifier shown in the heading
-        type_label: Localized container type label (e.g., "Groente, Fruit en Tuin afval (GFT)")
+        type_label: Container type label as supplied by the API (e.g., "GFT")
 
     Returns:
         TableData dict with columns, rows, footerRow, footerColSpan, emptyStateMessage
@@ -299,8 +290,12 @@ def _format_container_for_table(
     }
 
     return {
-        "caption": _("Container: {type_label} - {identifier}").format(
-            type_label=type_label, identifier=identifier
+        "caption": (
+            _("Container: {type_label} - {identifier}").format(
+                type_label=type_label, identifier=identifier
+            )
+            if type_label
+            else _("Container: {identifier}").format(identifier=identifier)
         ),
         "columns": columns,
         "rows": rows,
@@ -322,7 +317,7 @@ def _extract_filter_options(profiel: AfvalProfiel) -> dict:
     Returns:
         dict with keys:
             - addresses: list[str] - All unique addresses (formatted)
-            - afval_types: list[dict] - [{"value": "gft", "label": "..."}, ...]
+            - afval_types: list[dict] - [{"value": "GFT", "label": "GFT"}, ...]
             - earliest_year: int | None - First year with data (None if no ledigingen)
             - latest_year: int | None - Last year with data (None if no ledigingen)
     """
@@ -330,11 +325,12 @@ def _extract_filter_options(profiel: AfvalProfiel) -> dict:
     addresses = sorted({loc.adres for loc in profiel.container_locaties})
     formatted_addresses = [_format_address(addr) for addr in addresses]
 
-    # Afval types (hardcoded as per requirements)
+    # Afval types are free text supplied by the API; offer those present in the data
     afval_types = [
-        {"value": "gft", "label": _("Groente, Fruit en Tuin afval (GFT)")},
-        {"value": "restafval", "label": _("Restafval")},
-        {"value": "med", "label": _("Medisch afval")},
+        {"value": afval_type, "label": afval_type}
+        for afval_type in sorted(
+            {container.afval_type for container in profiel.containers} - {""}
+        )
     ]
 
     # Calculate year range from ledigingen
@@ -345,6 +341,22 @@ def _extract_filter_options(profiel: AfvalProfiel) -> dict:
         "afval_types": afval_types,
         "periode": list(dates),
     }
+
+
+def _filter_containers_by_afval_type(
+    profiel: AfvalProfiel, afval_types: list[str]
+) -> AfvalProfiel:
+    """Return a copy of the profiel with only the containers of the given types."""
+
+    return profiel.model_copy(
+        update={
+            "containers": [
+                container
+                for container in profiel.containers
+                if container.afval_type in afval_types
+            ]
+        }
+    )
 
 
 def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]:
@@ -409,7 +421,7 @@ def _format_afval_profiel(profiel: AfvalProfiel) -> list[_ContainerLocationData]
                 totaal_gewicht,
                 totaal_kosten,
                 container.public_container_id,
-                _get_container_type_label(afval_type),
+                afval_type,
             )
 
             container_data: _AfvalContainerData = {

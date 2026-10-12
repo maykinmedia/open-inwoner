@@ -12,8 +12,53 @@ from open_inwoner.mijn_afval.api_models import (
 from open_inwoner.mijn_afval.views import (
     _convert_period_to_dates,
     _extract_filter_options,
+    _filter_containers_by_afval_type,
     _format_address,
+    _format_afval_profiel,
 )
+
+
+def _make_container(id: str, afval_type: str) -> AfvalContainer:
+    return AfvalContainer(
+        id=id,
+        public_container_id=f"PUB-{id}",
+        afval_type=afval_type,
+        is_verzamelcontainer=False,
+        heeft_sleutel=False,
+        totaal_gewicht=10.0,
+        totaal_kosten=1.00,
+    )
+
+
+def _make_lediging(id: str, container: str) -> AfvalLediging:
+    return AfvalLediging(
+        id=id,
+        container_location="loc-1",
+        klant="klant-1",
+        container=container,
+        gewicht=10.0,
+        geleegd_op=datetime(2024, 1, 15, 10, 0, 0),
+        kosten=1.00,
+    )
+
+
+def _make_profiel(containers: list[AfvalContainer]) -> AfvalProfiel:
+    return AfvalProfiel(
+        klant=Klant(id="klant-1", bsn="123456789", naam="Test User", totaal_kosten=0),
+        containers=containers,
+        container_locaties=[
+            AfvalContainerLocatie(
+                id="loc-1",
+                adres="Dorpsstraat 12 [1234AB AMSTERDAM]",
+                totaal_gewicht=10.0,
+                totaal_kosten=1.00,
+            )
+        ],
+        ledigingen=[
+            _make_lediging(f"led-{container.id}", container.id)
+            for container in containers
+        ],
+    )
 
 
 class ExtractFilterOptionsTest(TestCase):
@@ -26,7 +71,7 @@ class ExtractFilterOptionsTest(TestCase):
                 AfvalContainer(
                     id="container-1",
                     public_container_id="PUB-001",
-                    afval_type="gft",
+                    afval_type="GFT",
                     is_verzamelcontainer=False,
                     heeft_sleutel=True,
                     totaal_gewicht=100.0,
@@ -76,11 +121,8 @@ class ExtractFilterOptionsTest(TestCase):
         self.assertIn("Dorpsstraat 12, 1234 AB, Amsterdam", options["addresses"])
         self.assertIn("Kerkweg 45 B, 5678 CD, Utrecht", options["addresses"])
 
-        # Verify afval types
-        self.assertEqual(len(options["afval_types"]), 3)
-        self.assertEqual(options["afval_types"][0]["value"], "gft")
-        self.assertEqual(options["afval_types"][1]["value"], "restafval")
-        self.assertEqual(options["afval_types"][2]["value"], "med")
+        # Verify afval types are taken from the containers
+        self.assertEqual(options["afval_types"], [{"value": "GFT", "label": "GFT"}])
 
         # Verify year range calculated from ledigingen
         self.assertListEqual(options["periode"], [2025, 2023])
@@ -140,6 +182,79 @@ class ExtractFilterOptionsTest(TestCase):
 
         # Verify single period options
         self.assertListEqual(options["periode"], [2024])
+
+    def test_extract_filter_options_afval_types_unique_sorted_non_empty(self):
+        profiel = _make_profiel(
+            [
+                _make_container("c1", "Restafval"),
+                _make_container("c2", "GFT"),
+                _make_container("c3", "Restafval"),
+                _make_container("c4", ""),
+            ]
+        )
+
+        options = _extract_filter_options(profiel)
+
+        self.assertEqual(
+            options["afval_types"],
+            [
+                {"value": "GFT", "label": "GFT"},
+                {"value": "Restafval", "label": "Restafval"},
+            ],
+        )
+
+
+class FilterContainersByAfvalTypeTest(TestCase):
+    def test_keeps_only_containers_of_given_types(self):
+        profiel = _make_profiel(
+            [
+                _make_container("c1", "GFT"),
+                _make_container("c2", "Restafval"),
+                _make_container("c3", "Oud papier en karton"),
+            ]
+        )
+
+        filtered = _filter_containers_by_afval_type(profiel, ["GFT", "Restafval"])
+
+        self.assertEqual([c.id for c in filtered.containers], ["c1", "c2"])
+        self.assertEqual(len(profiel.containers), 3)
+
+    def test_formatted_profiel_excludes_filtered_containers(self):
+        profiel = _make_profiel(
+            [
+                _make_container("c1", "GFT"),
+                _make_container("c2", "Oud papier en karton"),
+            ]
+        )
+
+        result = _format_afval_profiel(
+            _filter_containers_by_afval_type(profiel, ["GFT", "Restafval"])
+        )
+
+        self.assertEqual([c["identifier"] for c in result[0]["containers"]], ["c1"])
+
+
+class FormatAfvalProfielTest(TestCase):
+    def test_container_caption_uses_afval_type_from_api(self):
+        profiel = _make_profiel([_make_container("c1", "Oud papier en karton")])
+
+        result = _format_afval_profiel(profiel)
+
+        container = result[0]["containers"][0]
+        self.assertEqual(container["type"], "Oud papier en karton")
+        self.assertEqual(
+            container["table_data"]["caption"],
+            "Container: Oud papier en karton - PUB-c1",
+        )
+
+    def test_container_caption_without_afval_type(self):
+        profiel = _make_profiel([_make_container("c1", "")])
+
+        result = _format_afval_profiel(profiel)
+
+        self.assertEqual(
+            result[0]["containers"][0]["table_data"]["caption"], "Container: PUB-c1"
+        )
 
 
 class ConvertPeriodToDatesTest(TestCase):
