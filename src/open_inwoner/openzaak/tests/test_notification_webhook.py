@@ -201,6 +201,37 @@ class NotificationWebhookAPITestCase(AssertTimelineLogMixin, APITestCase):
         record = NotificationRecord.objects.get()
         self.assertEqual(record.status, ProcessingStatus.FAILED)
         self.assertEqual(record.processing_error, "broker unavailable")
+        self.assertIsNotNone(record.last_processed_at)
+
+    def test_records_finalized_by_webhook_are_prunable(self, mock_handle):
+        """
+        Records the webhook moves to a final state itself (without involving the
+        Celery task) must get a `last_processed_at`, or pruning never removes them.
+        """
+        SubscriptionFactory.create(client_id="foo", secret="password")
+        headers = {"HTTP_AUTHORIZATION": generate_auth_header_value("foo", "password")}
+
+        test_channel = self.get_raw_notification() | {"kanaal": "test"}
+        unsubscribed_channel = self.get_raw_notification() | {"kanaal": "other"}
+        invalid_schema = self.get_raw_notification()
+        del invalid_schema["resource"]
+
+        for label, payload, expected_status in (
+            ("test channel", test_channel, ProcessingStatus.SUCCESS),
+            ("unsubscribed channel", unsubscribed_channel, ProcessingStatus.FAILED),
+            ("invalid schema", invalid_schema, ProcessingStatus.FAILED),
+        ):
+            with self.subTest(label):
+                self.client.post(self.url, payload, **headers, format="json")
+
+                record = NotificationRecord.objects.get()
+                self.assertEqual(record.status, expected_status)
+                self.assertIsNotNone(record.last_processed_at)
+
+                result = NotificationRecord.objects.prune_old_records(retention_hours=0)
+
+                self.assertEqual(result.total_count, 1)
+                self.assertFalse(NotificationRecord.objects.exists())
 
     def test_api_returns_http_500_when_valid_but_handler_raises(self, mock_handle):
         mock_handle.side_effect = Exception("whoopsie")
