@@ -6,7 +6,7 @@ export const DATASUMMARY_DEFINITION: WebComponentDefinition<
   IDataSummaryProps
 > = {
   tagName: 'oip-data-summary',
-  propNames: [],
+  propNames: ['items', 'itemsId'],
   options: { shadow: false },
   importer: () => import('./DataSummary'),
 };

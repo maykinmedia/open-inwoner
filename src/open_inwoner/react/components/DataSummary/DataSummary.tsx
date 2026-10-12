@@ -1,21 +1,31 @@
+import {
+  DescriptionList,
+  DescriptionListProps,
+} from '@gemeente-denhaag/descriptionlist';
+import { usePropsOrScriptData } from '@react/lib/json';
 import { AnyComponent as AC } from 'preact';
 
-export interface IDataSummaryProps {
+export interface ListItem {
   label: string;
   value?: string | number | null;
 }
 
-const DataSummary: AC<IDataSummaryProps> = ({ label, value }) => {
-  return (
-    <div class="data-summary">
-      <dl class="data-summary__container">
-        <div class="data-summary__list">
-          <dt class="data-summary__label">{label}</dt>
-          <dd class="data-summary__value">{value || '-'}</dd>
-        </div>
-      </dl>
-    </div>
-  );
+export interface IDataSummaryProps {
+  items?: ListItem[];
+  itemsId?: string;
+}
+
+const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId }) => {
+  const data = usePropsOrScriptData<ListItem[]>(items, itemsId);
+
+  if (!data?.length) return <></>;
+
+  const listItems = data.map(({ label, value }) => ({
+    title: label,
+    detail: value,
+  })) satisfies DescriptionListProps['items'];
+
+  return <DescriptionList items={listItems} />;
 };
 
 export default DataSummary;
