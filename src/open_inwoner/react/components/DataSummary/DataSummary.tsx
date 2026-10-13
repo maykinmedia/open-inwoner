@@ -4,6 +4,7 @@ import {
 } from '@gemeente-denhaag/descriptionlist';
 import { usePropsOrScriptData } from '@react/lib/json';
 import { AnyComponent as AC } from 'preact';
+import './DataSummary.scss';
 
 export interface ListItem {
   label: string;
