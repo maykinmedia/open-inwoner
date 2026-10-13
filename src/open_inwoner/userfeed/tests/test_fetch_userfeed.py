@@ -20,7 +20,7 @@ class FetchUserfeedCheckTests(TestCase):
         result = self.check.run({}, instance=self.user)
 
         self.assertTrue(result.success)
-        self.assertIn("0 feed items found", result.message)
+        self.assertIn("0 feeditems gevonden", result.message)
         self.assertEqual(result.extra["total_items"], 0)
         self.assertEqual(result.extra["raw_items_count"], 0)
         self.assertEqual(result.extra["items"], [])
@@ -34,7 +34,7 @@ class FetchUserfeedCheckTests(TestCase):
         result = self.check.run({}, instance=self.user)
 
         self.assertTrue(result.success)
-        self.assertIn("1 feed items found", result.message)
+        self.assertIn("1 feeditems gevonden", result.message)
         self.assertEqual(result.extra["total_items"], 1)
         self.assertEqual(result.extra["raw_items_count"], 1)
         self.assertEqual(
@@ -61,7 +61,7 @@ class FetchUserfeedCheckTests(TestCase):
             result = self.check.run({}, instance=self.user)
 
         self.assertFalse(result.success)
-        self.assertIn("Unexpected error", result.message)
+        self.assertIn("Onverwachte error", result.message)
 
 
 @override_settings(ENABLE_INTERACTIVE_CHECKS=True)
@@ -112,7 +112,7 @@ class FetchUserfeedViewTests(TestCase):
         response = self.client.post(self.get_url(), {})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "0 feed items found")
+        self.assertContains(response, "0 feeditems gevonden")
 
 
 @override_settings(ENABLE_INTERACTIVE_CHECKS=True)
@@ -121,4 +121,7 @@ class FetchUserfeedStandaloneTests(TestCase):
         result = FetchUserfeedCheck().run({})
 
         self.assertFalse(result.success)
-        self.assertIn("only be run from a user's admin page", result.message)
+        self.assertIn(
+            "alleen worden uitgevoerd vanaf de beheerpagina voor een gebruiker",
+            result.message,
+        )
