@@ -45,7 +45,7 @@ services:
       open-inwoner-dev:
 
   openafval-web:
-    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.11.0}
     # no arm64 image
     platform: linux/amd64
     environment: &openafval_web_env
@@ -105,7 +105,7 @@ services:
           - openafval.internal
 
   openafval-seed:
-    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.8.0}
+    image: maykinmedia/open-afval:${OPENAFVAL_VERSION:-0.11.0}
     # no arm64 image
     platform: linux/amd64
     environment: *openafval_web_env
