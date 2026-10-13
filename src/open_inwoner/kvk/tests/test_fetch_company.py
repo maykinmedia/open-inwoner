@@ -28,7 +28,7 @@ class FetchCompanyCheckTests(TestCase):
         result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Invalid KvK number format", result.message)
+        self.assertIn("Ongeldig KVK nummer", result.message)
 
     def test_no_company_found(self):
         form = FetchCompanyForm(data={"kvk_number": "12345678"})
@@ -38,7 +38,7 @@ class FetchCompanyCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("No company found", result.message)
+        self.assertIn("Geen bedrijf gevonden", result.message)
 
     def test_company_found_exercises_all_client_methods(self):
         """A successful run mirrors every KvKClient method the app actually calls."""
@@ -114,7 +114,7 @@ class FetchCompanyCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Failed to connect to KvK API", result.message)
+        self.assertIn("verbinding te maken met de KVK API", result.message)
 
 
 class FetchCompanyViewTests(TestCase):
@@ -144,7 +144,7 @@ class FetchCompanyViewTests(TestCase):
         response = self.client.get(self.get_url())
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Fetch company for KvK number")
+        self.assertContains(response, "Haal bedrijfsgegevens op voor dit KVK nummer")
 
     def test_post_runs_check(self):
         self.client.force_login(self.superuser)
@@ -155,7 +155,7 @@ class FetchCompanyViewTests(TestCase):
             response = self.client.post(self.get_url(), {"kvk_number": "68750110"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Company data returned")
+        self.assertContains(response, "Bedrijfsgegevens opgehaald")
 
     @disable_admin_mfa()
     def test_button_shown_on_admin_change_page(self):
