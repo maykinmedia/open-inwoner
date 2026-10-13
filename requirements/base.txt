@@ -391,7 +391,7 @@ gemma-zds-client==2.0.0
     # via notifications-api-common
 geographiclib==1.52
     # via geopy
-geopy==2.2.0
+geopy==2.5.0
     # via -r requirements/base.in
 glom==20.11.0
     # via
