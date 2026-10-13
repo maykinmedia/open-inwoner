@@ -961,9 +961,10 @@ CMS_TEMPLATES = [
     ("cms/contactform/form_outer.html", "CMS Contactformulier Template"),
 ]
 CMS_PLACEHOLDER_CONF = {
-    # TODO properly configure this based on actual available plugins
+    # NOTE: don't set "plugins" here. Since django-cms 5, the global entry also
+    # applies when no placeholder is given, which restricts the plugins offered in
+    # every placeholder's "add plugin" picker (`plugin_pool.registered_plugins`).
     None: {
-        "plugins": ["TextPlugin"],
         "excluded_plugins": ["InheritPlugin"],
     },
     "content": {
