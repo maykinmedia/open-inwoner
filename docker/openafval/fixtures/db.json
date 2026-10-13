@@ -62,7 +62,7 @@
     "pk": "9f02f1a6-fdac-5d10-ba72-6c4a4ad1dcf9",
     "fields": {
       "public_container_id": "CONT-00001",
-      "afval_type": "restafval",
+      "afval_type": "Rest afval (Rest)",
       "is_verzamelcontainer": false,
       "heeft_sleutel": true,
       "aangemaakt_op": "2026-09-01T00:00:00Z",
@@ -74,7 +74,7 @@
     "pk": "65764d63-6e08-5eb7-8d82-e685c5205531",
     "fields": {
       "public_container_id": "CONT-00002",
-      "afval_type": "gft",
+      "afval_type": "Groente, Fruit en Tuin afval (GFT)",
       "is_verzamelcontainer": false,
       "heeft_sleutel": true,
       "aangemaakt_op": "2026-09-01T00:00:00Z",
@@ -86,7 +86,7 @@
     "pk": "039db0ae-e1b3-5d6f-a449-ae78ca7b68db",
     "fields": {
       "public_container_id": "CONT-00003",
-      "afval_type": "med",
+      "afval_type": "Medisch afval (Med)",
       "is_verzamelcontainer": false,
       "heeft_sleutel": true,
       "aangemaakt_op": "2026-09-01T00:00:00Z",
@@ -98,7 +98,7 @@
     "pk": "1a7f192e-a44c-5a52-924c-5e789e4a7fc1",
     "fields": {
       "public_container_id": "CONT-00004",
-      "afval_type": "restafval",
+      "afval_type": "Rest afval (Rest)",
       "is_verzamelcontainer": true,
       "heeft_sleutel": false,
       "aangemaakt_op": "2026-09-01T00:00:00Z",
@@ -110,7 +110,7 @@
     "pk": "d7218faf-8849-5760-9265-44998bfab6f2",
     "fields": {
       "public_container_id": "CONT-00005",
-      "afval_type": "gft",
+      "afval_type": "Groente, Fruit en Tuin afval (GFT)",
       "is_verzamelcontainer": true,
       "heeft_sleutel": false,
       "aangemaakt_op": "2026-09-01T00:00:00Z",
