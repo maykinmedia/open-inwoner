@@ -35,6 +35,8 @@ from open_inwoner.cms.products.cms_plugins import (
 from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.utils import page_setup
+from open_inwoner.cms.utils.page_display import get_published_page_ids
+from open_inwoner.cms.utils.plugin_mixins import CMSActiveAppMixin
 from open_inwoner.mijn_afval.cms.cms_apps import MijnAfvalApphook
 from open_inwoner.openklant.cms_apps import OpenklantApphook
 
@@ -122,14 +124,19 @@ class CMSHomepageConfig(ConfigurationModel):
     ] = Field(default=None)
     categories: Annotated[
         CategoriesPluginConfig | None,
-        Field(description="Adds a 'Categories' plugin to the homepage."),
+        Field(
+            description=(
+                "Adds a 'Categories' plugin to the homepage. Requires a "
+                "published products page."
+            )
+        ),
     ] = Field(default=None)
     product_locations: Annotated[
         ProductLocationPluginConfig | None,
         Field(
             description=(
                 "Adds a 'Product Location' plugin (a map of all product "
-                "locations) to the homepage."
+                "locations) to the homepage. Requires a published products page."
             )
         ),
     ] = Field(default=None)
@@ -312,6 +319,10 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
     configured, are overwritten the same way. Anything else on a page --
     placeholders, plugins this step doesn't explicitly manage -- is left
     alone.
+
+    A homepage plugin that only renders while its apphook's page is published
+    (see ``CMSActiveAppMixin``) fails the run if no such page is published by
+    the end of it, rather than silently never showing up.
     """
 
     verbose_name = "Configuration for CMS pages"
@@ -363,6 +374,9 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
                 [(FooterPagesPlugin, {})],
                 user=user,
             )
+
+        if homepage is not None:
+            self._check_homepage_plugin_apphooks(model.homepage)
 
     def _sync_redirect_pages(
         self, model: CMSPagesConfigurationModel, homepage: Page | None, *, user
@@ -462,6 +476,46 @@ class CMSPagesConfigurationStep(BaseConfigurationStep):
                 if (plugin_config := getattr(config, model_attr)) is not None
             ]
             page_setup.sync_placeholder_plugins(homepage, slot, plugin_specs, user=user)
+
+    def _check_homepage_plugin_apphooks(self, config: CMSHomepageConfig | None) -> None:
+        """
+        Fail if a configured homepage plugin needs a published apphook page
+        (see `CMSActiveAppMixin`) and there is none.
+
+        Run at the end of the step, since the page may be created by this same
+        run. It checks the database rather than the configuration, so a page
+        created in the CMS admin or by an earlier run counts as well.
+        """
+        if config is None:
+            return
+
+        published_apphooks = set(
+            Page.objects.filter(id__in=get_published_page_ids()).values_list(
+                "application_urls", flat=True
+            )
+        )
+        page_config_fields = {
+            apphook.__name__: model_attr for model_attr, apphook in _APP_HOOKS.items()
+        }
+
+        for plugins in _HOMEPAGE_PLUGINS.values():
+            for model_attr, plugin_class in plugins.items():
+                if (
+                    getattr(config, model_attr) is None
+                    or not issubclass(plugin_class, CMSActiveAppMixin)
+                    or plugin_class.app_hook in published_apphooks
+                ):
+                    continue
+
+                page_config_field = page_config_fields.get(
+                    plugin_class.app_hook, plugin_class.app_hook
+                )
+                raise ConfigurationRunFailed(
+                    f"The homepage `{model_attr}` plugin is only shown when the "
+                    f"`{page_config_field}` page is published, but there is no "
+                    f"such page. Enable `{page_config_field}` in this same "
+                    "configuration, or remove the plugin."
+                )
 
     def _plugin_fields(
         self, plugin_class: type[CMSPluginBase], plugin_config: ConfigurationModel
