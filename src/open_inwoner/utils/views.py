@@ -16,6 +16,17 @@ from .logentry import (
 )
 
 
+def get_cms_page_title(request, fallback: str) -> str:
+    """
+    Return the title of the CMS page the (apphooked) view is attached to, so the
+    breadcrumbs follow the title that is configured in the CMS
+    """
+    current_page = getattr(request, "current_page", None)
+    if current_page and (title := current_page.get_title()):
+        return title
+    return fallback
+
+
 class CommonPageMixin:
     @property
     def page_title(self):

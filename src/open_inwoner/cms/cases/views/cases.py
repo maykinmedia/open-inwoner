@@ -21,7 +21,7 @@ from open_inwoner.openzaak.services import (
 )
 from open_inwoner.openzaak.types import UniformCase
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
@@ -61,7 +61,7 @@ class OuterCaseListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn zaken"), reverse("cases:index")),
+            (get_cms_page_title(self.request, _("Mijn zaken")), reverse("cases:index")),
         ]
 
     def page_title(self):
