@@ -355,7 +355,7 @@ django-filter==21.1
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-formtools==2.3
+django-formtools==2.7
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
