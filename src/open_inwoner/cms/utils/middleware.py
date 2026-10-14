@@ -1,9 +1,6 @@
 from django.http import HttpResponseRedirect
-from django.utils.translation import get_language
 
-from cms.models import PageContent
 from cms.toolbar.utils import get_toolbar_from_request
-from djangocms_versioning.constants import DRAFT, PUBLISHED
 
 from open_inwoner.configurations.models import SiteConfiguration
 
@@ -52,32 +49,6 @@ class DropToolbarMiddleware:
             toolbar.show_toolbar = False
         else:
             request.session.pop("cms_toolbar_disabled", None)
-
-        # VersionContentRenderer.render_obj_placeholder (djangocms_versioning) needs
-        # toolbar.get_object() to return a PageContent for any view that uses
-        # {% placeholder %} tags — including apphook views where cms/views.py never
-        # runs and therefore never calls toolbar.set_object().
-        page = getattr(request, "current_page", None)
-        if page:
-            language = get_language()
-            edit_or_preview = toolbar.edit_mode_active or toolbar.preview_mode_active
-            if edit_or_preview:
-                # In edit/preview mode prefer the DRAFT version; fall back to PUBLISHED
-                # so the editor sees the content they're working on.
-                page_content = (
-                    PageContent._original_manager.filter(
-                        page=page, language=language, versions__state=DRAFT
-                    ).first()
-                    or PageContent._original_manager.filter(
-                        page=page, language=language, versions__state=PUBLISHED
-                    ).first()
-                )
-            else:
-                page_content = PageContent._original_manager.filter(
-                    page=page, language=language, versions__state=PUBLISHED
-                ).first()
-            if page_content:
-                toolbar.set_object(page_content)
 
         response = self.get_response(request)
         return response
