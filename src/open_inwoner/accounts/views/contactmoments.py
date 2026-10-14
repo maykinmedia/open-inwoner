@@ -44,18 +44,29 @@ class KlantContactMomentAccessMixin(AccessMixin):
 
     Base checks:
     - user is authenticated
-    - user has a BSN
+    - user has a BSN or KvK, unless the view allows staff without one
 
     # When retrieving a case :
     # - users BSN has a role for this case
     # - case confidentiality is not higher than globally configured
     """
 
+    # Views using this mixin set this to let staff without BSN/KvK in, so they
+    # can reach the page for editing via the CMS toolbar. Only enable it on views
+    # that render without the user's data: the list view sets it to True, the
+    # detail and redirect views keep False because they fetch a single question
+    # for the user.
+    allow_staff = False
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
-        if not request.user.bsn and not request.user.kvk:
+        if (
+            not request.user.bsn
+            and not request.user.kvk
+            and not (self.allow_staff and request.user.is_staff)
+        ):
             return self.handle_no_permission()
 
         return super().dispatch(request, *args, **kwargs)
@@ -125,10 +136,11 @@ class KlantContactMomentListView(
 
     template_name = "pages/contactmoment/list.html"
     paginate_by = 9
+    allow_staff = True
 
     def dispatch(self, request, *args, **kwargs):
-        # This page is always accessible to users with BSN/KVK (checked by
-        # KlantContactMomentAccessMixin). ContactFormView.dispatch() would gate it on
+        # This page is always accessible to users with BSN/KVK and to staff
+        # (checked by KlantContactMomentAccessMixin). ContactFormView.dispatch() would gate it on
         # contact_registration_enabled, but that flag only controls whether the embedded
         # form renders - skip it and go straight to the access mixin.
         return super(ContactFormView, self).dispatch(request, *args, **kwargs)
@@ -153,7 +165,10 @@ class KlantContactMomentListView(
 
         questions = []
         fetch_error = False
-        for service_type in KlantenServiceType:
+        # staff without BSN/KvK only get the empty page; there is nothing to fetch
+        has_identification = bool(self.request.user.bsn or self.request.user.kvk)
+        service_types = list(KlantenServiceType) if has_identification else []
+        for service_type in service_types:
             service = self.get_service(service_type=service_type)
             if not service:
                 continue
@@ -201,7 +216,8 @@ class KlantContactMomentListView(
             and klanten_config.contact_registration_enabled
         )
 
-        self.log_contactmoment_list_accessed(questions=questions)
+        if has_identification:
+            self.log_contactmoment_list_accessed(questions=questions)
 
         return ctx
 
