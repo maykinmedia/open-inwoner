@@ -28,7 +28,7 @@ from open_inwoner.openklant.forms import ContactForm
 from open_inwoner.openklant.models import ESuiteKlantConfig, KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteVragenService
 from open_inwoner.openklant.views.utils import generate_question_answer_pair
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -76,7 +76,12 @@ class ContactFormView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Contact formulier"), self.request.path)]
+        return [
+            (
+                get_cms_page_title(self.request, _("Contact formulier")),
+                self.request.path,
+            )
+        ]
 
     def page_title(self):
         return _("Contact formulier")
