@@ -99,9 +99,6 @@ Hier kunt u de hoofdbanner van uw Open Inwoner omgeving uploaden. Deze banner is
 Dit is een pictogrammetje dat bij uw gemeente of Open Inwoner Platform hoort. Dit pictogrammetje wordt gebruikt in uw internetbrowser.
 
 
-**Banner samenwerken**
-Hier kunt u de banner voor het onderdeel *Samenwerken* wijzigen indien gewenst.
-
 12.1.4. Waarschuwingsbanner
 ---------------------------
 
