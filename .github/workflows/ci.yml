@@ -107,7 +107,7 @@ jobs:
           OTEL_SDK_DISABLED: true
 
       - name: Persist coverage data files
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.test-type }}
           path: .coverage*
@@ -133,7 +133,7 @@ jobs:
         # We only need coverage, but we need to match the version that was used
         # to generate the coverage files. Grab it from the dependencies.
         run: grep "^coverage" requirements/ci.txt | xargs -r pip install
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: coverages
       - name: Combine the coverage files
@@ -254,7 +254,7 @@ jobs:
           CLAMAV_PORT: 3310
 
       - name: Upload test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: e2e-test-results-${{ matrix.browser }}
@@ -346,7 +346,7 @@ jobs:
         run: docker save "$IMAGE_NAME:$TAG" | gzip > open-inwoner-image.tar.gz
 
       - name: Upload the image
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: docker-image
           path: open-inwoner-image.tar.gz
@@ -413,7 +413,7 @@ jobs:
       # The image itself was already built (and proven healthy), so nothing
       # here rebuilds it.
       - name: Download the image built by full-app-stack-test
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: docker-image
 
