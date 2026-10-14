@@ -272,6 +272,7 @@ class KlantContactMomentDetailView(ContactmomentLogMixin, KlantContactMomentBase
             {
                 "label": _("Ingediend op"),
                 "value": question["registered_date"],
+                "type": "date",
             },
             {
                 "label": _("Vraag nummer"),

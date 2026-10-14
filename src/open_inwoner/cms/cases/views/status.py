@@ -358,6 +358,7 @@ class InnerCaseDetailView(
                 {
                     "label": openzaak_config.zaak_start_date_label,
                     "value": zaak_context.start_date,
+                    "type": "date",
                 },
             ]
             if zaak_context.end_date:
@@ -365,6 +366,7 @@ class InnerCaseDetailView(
                     {
                         "label": openzaak_config.zaak_end_date_label,
                         "value": zaak_context.end_date,
+                        "type": "date",
                     },
                 )
             else:
@@ -375,6 +377,7 @@ class InnerCaseDetailView(
                         "value": end_date + dt.timedelta(days=1)
                         if end_date
                         else _("unkown"),
+                        "type": "date" if end_date else None,
                     }
                 )
         else:
