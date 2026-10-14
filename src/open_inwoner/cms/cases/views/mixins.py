@@ -182,6 +182,8 @@ class OuterCaseAccessMixin(LoginRequiredMixin):
             request.user.is_authenticated
             and not request.user.bsn
             and not request.user.kvk
+            # staff may open the (data-less) outer page to edit it via the CMS
+            and not request.user.is_staff
         ):
             logger.info(
                 "OuterCaseAccessMixin - permission denied: user doesn't have a bsn or kvk number"

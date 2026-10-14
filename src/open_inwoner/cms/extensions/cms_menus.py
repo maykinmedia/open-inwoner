@@ -47,13 +47,15 @@ class MenuModifier(Modifier):
                 # keep this if we need it for templates
                 node.common = ext
 
-                # modify menu check for page visibility
-                if (ext.requires_auth and not request.user.is_authenticated) or (
+                # modify menu check for page visibility; staff users see all
+                # pages so they can reach them for editing via the CMS toolbar
+                hidden = (ext.requires_auth and not request.user.is_authenticated) or (
                     ext.requires_auth_bsn_or_kvk
                     and not (
                         request.user.is_bsn_user or request.user.is_eherkenning_user
                     )
-                ):
+                )
+                if hidden and not request.user.is_staff:
                     nodes.remove(node)
                     continue
 
