@@ -1,3 +1,47 @@
+2.4.7 (2026-10-14)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.7`.
+
+.. note::
+
+   Deze release bevat een beveiligingsupdate voor de editor die beheerders en
+   redacteuren gebruiken. We adviseren u zo snel mogelijk te upgraden.
+
+Beveiliging
+-----------
+
+* ``maykin-django-prosemirror`` is bijgewerkt naar versie ``0.12.0``. Deze
+  versie bevat een fix voor de kwetsbaarheid `GHSA-c8x8-7fp4-3x9w
+  <https://github.com/advisories/GHSA-c8x8-7fp4-3x9w>`_ (CVE-2026-104847) in
+  ``prosemirror-view``: wanneer een gebruiker door een kwaadwillende
+  aangeleverde HTML in een ProseMirror-editor plakt, kan JavaScript van die
+  kwaadwillende worden uitgevoerd in het browservenster met de editor.
+
+  Alleen beheerders en redacteuren lopen risico: de editor wordt alleen in de
+  beheeromgeving en het CMS gebruikt.
+
+Bugfixes
+--------
+
+* [:gh:`3059`]: In de structuurweergave van het CMS toonde de keuzelijst voor
+  het toevoegen van een plugin alleen de tekstplugin. Bij placeholders die de
+  tekstplugin niet toestaan bleef de keuzelijst leeg, bij de overige werd
+  direct een tekstplugin toegevoegd. Alle plugins die een placeholder toestaat
+  zijn nu weer beschikbaar.
+* [:gh:`3075`]: Apphook-pagina's (zoals 'Samenwerken' en 'Mijn profiel')
+  konden in de bewerkmodus niet naar de structuurmodus worden geschakeld of
+  worden gepubliceerd: de toolbar toonde alleen 'Maken'. Dit is hersteld.
+* [:gh:`3088`]: Het aanmaken van een pagina via de wizard van het CMS mislukte
+  na het kiezen van het soort pagina met een foutmelding (``TypeError``). Dit
+  is hersteld door ``django-formtools`` bij te werken.
+
+Onderhoud
+---------
+
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.12.0``.
+* [:gh:`3088`]: ``django-formtools`` bijgewerkt van ``2.3`` naar ``2.7``.
+
 2.4.6 (2026-10-06)
 ==================
 
