@@ -854,7 +854,7 @@ class PlanViewTests(WebTest):
     def test_plan_actions_history_breadcrumbs(self):
         response = self.app.get(self.action_history_url, user=self.user)
         crumbs = response.pyquery(".breadcrumbs__list-item")
-        self.assertIn(_("Samenwerking"), crumbs[1].text_content())
+        self.assertIn(_("Samenwerken"), crumbs[1].text_content())
         self.assertIn(self.plan.title, crumbs[2].text_content())
         self.assertIn(self.action.name, crumbs[3].text_content())
 

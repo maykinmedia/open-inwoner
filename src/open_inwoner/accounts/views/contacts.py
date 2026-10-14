@@ -16,7 +16,7 @@ from view_breadcrumbs import BaseBreadcrumbMixin
 from open_inwoner.accounts.forms import ContactCreateForm, ContactFilterForm
 from open_inwoner.accounts.models import Invite, User
 from open_inwoner.cms.utils.page_display import inbox_page_is_published
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin, get_cms_page_title
 
 
 class ContactListView(
@@ -29,7 +29,10 @@ class ContactListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn contacten"), reverse("profile:contact_list")),
         ]
 
@@ -64,7 +67,10 @@ class ContactCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn contacten"), reverse("profile:contact_list")),
             (
                 _("Maak contact aan"),

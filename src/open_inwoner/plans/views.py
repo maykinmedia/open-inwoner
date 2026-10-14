@@ -30,7 +30,7 @@ from open_inwoner.plans.forms import PlanFileUploadForm
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.logentry import get_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin, get_cms_page_title
 
 from .forms import (
     CreatePlanFromTemplateForm,
@@ -109,10 +109,11 @@ class PlanListView(
 
     @cached_property
     def crumbs(self):
-        current_page = self.request.current_page
-        title = current_page.get_title() if current_page else _("Samenwerken")
         return [
-            (title, reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
         ]
 
     def get_queryset(self):
@@ -206,7 +207,10 @@ class PlanDetailView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -259,7 +263,10 @@ class PlanTemplateChoiceView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (_("Kies voorstel"), reverse("collaborate:plan_choose_template")),
         ]
 
@@ -313,7 +320,10 @@ class PlanCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 _("Start een nieuwe samenwerking"),
                 reverse("collaborate:plan_create"),
@@ -353,7 +363,10 @@ class PlanCreateFromTemplateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerken"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (_("Gebruik dit voorstel"), reverse("collaborate:plan_choose_template")),
         ]
 
@@ -400,7 +413,10 @@ class PlanEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -444,7 +460,10 @@ class PlanGoalEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -485,7 +504,10 @@ class PlanFileUploadView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -548,7 +570,10 @@ class PlanNoteEditView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -578,7 +603,10 @@ class PlanActionCreateView(PlanActionsEnabledMixin, ActionCreateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_object().title,
                 reverse("collaborate:plan_detail", kwargs=self.kwargs),
@@ -627,7 +655,10 @@ class PlanActionEditView(PlanActionsEnabledMixin, ActionUpdateView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerkingsplannen"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_plan().title,
                 reverse(
@@ -731,7 +762,10 @@ class PlanActionHistoryView(PlanActionsEnabledMixin, ActionHistoryView):
     @cached_property
     def crumbs(self):
         return [
-            (_("Samenwerking"), reverse("collaborate:plan_list")),
+            (
+                get_cms_page_title(self.request, _("Samenwerken")),
+                reverse("collaborate:plan_list"),
+            ),
             (
                 self.get_plan().title,
                 reverse(

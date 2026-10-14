@@ -52,7 +52,7 @@ from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenServ
 from open_inwoner.plans.models import Plan
 from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
 from open_inwoner.questionnaire.models import QuestionnaireStep
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
 from .mixins import ProfileLogMixin
 
@@ -92,7 +92,12 @@ class MyProfileView(
 
     @cached_property
     def crumbs(self):
-        return [(_("Mijn profiel"), reverse("profile:detail"))]
+        return [
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            )
+        ]
 
     @staticmethod
     def stringify(
@@ -249,7 +254,10 @@ class EditProfileView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Bewerk profiel"), reverse("profile:edit", kwargs=self.kwargs)),
         ]
 
@@ -569,7 +577,10 @@ class MyCategoriesView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn interessegebieden"), reverse("profile:categories")),
         ]
 
@@ -595,7 +606,10 @@ class MyDataView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn gegevens"), reverse("profile:data")),
         ]
 
@@ -641,7 +655,10 @@ class MyNotificationsView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Ontvang berichten over"), reverse("profile:notifications")),
         ]
 
@@ -728,6 +745,9 @@ class UserAppointmentsView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn afspraken"), reverse("profile:appointments")),
         ]

@@ -57,7 +57,7 @@ from open_inwoner.openzaak.services import ZaakDetailData, ZGWService
 from open_inwoner.userfeed import hooks
 from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
 from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
 
@@ -155,14 +155,17 @@ class OuterCaseDetailView(
         # zaak is retrieved via CaseAccessMixin
         if self.zaak:
             return [
-                (_("Mijn zaken"), reverse("cases:index")),
+                (
+                    get_cms_page_title(self.request, _("Mijn zaken")),
+                    reverse("cases:index"),
+                ),
                 (
                     f"{self.zaak.description} - {_('Status')}",
                     reverse("cases:case_detail", kwargs=self.kwargs),
                 ),
             ]
         return [
-            (_("Mijn zaken"), reverse("cases:index")),
+            (get_cms_page_title(self.request, _("Mijn zaken")), reverse("cases:index")),
             (
                 f"{_('Zaak')} - {_('Status')}",
                 reverse("cases:case_detail", kwargs=self.kwargs),
@@ -241,14 +244,17 @@ class InnerCaseDetailView(
         # zaak is retrieved via CaseAccessMixin
         if self.zaak:
             return [
-                (_("Mijn zaken"), reverse("cases:index")),
+                (
+                    get_cms_page_title(self.request, _("Mijn zaken")),
+                    reverse("cases:index"),
+                ),
                 (
                     f"{self.zaak.description} - {_('Status')}",
                     reverse("cases:case_detail", kwargs=self.kwargs),
                 ),
             ]
         return [
-            (_("Mijn zaken"), reverse("cases:index")),
+            (get_cms_page_title(self.request, _("Mijn zaken")), reverse("cases:index")),
             (
                 f"{_('Zaak')} - {_('Status')}",
                 reverse("cases:case_detail", kwargs=self.kwargs),

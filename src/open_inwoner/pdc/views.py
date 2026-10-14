@@ -13,7 +13,11 @@ from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.pdc.models.product import ProductCondition
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.html import get_rendered_content
-from open_inwoner.utils.views import CommonPageMixin, LoginMaybeRequiredMixin
+from open_inwoner.utils.views import (
+    CommonPageMixin,
+    LoginMaybeRequiredMixin,
+    get_cms_page_title,
+)
 
 from .choices import YesNo
 from .forms import ProductFinderForm
@@ -83,7 +87,12 @@ class CategoryListView(
     @cached_property
     def crumbs(self):
         config = SiteConfiguration.get_solo()
-        return [(config.theme_title, reverse("products:category_list"))]
+        return [
+            (
+                get_cms_page_title(self.request, config.theme_title),
+                reverse("products:category_list"),
+            )
+        ]
 
     @property
     def display_restricted(self):
@@ -108,7 +117,12 @@ class CategoryDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list = [
+            (
+                get_cms_page_title(self.request, _("Onderwerpen")),
+                reverse("products:category_list"),
+            )
+        ]
         return base_list + self.get_categories_breadcrumbs()
 
     def get_object(self, queryset=None):
@@ -184,7 +198,12 @@ class ProductDetailView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list = [
+            (
+                get_cms_page_title(self.request, _("Onderwerpen")),
+                reverse("products:category_list"),
+            )
+        ]
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [(self.get_object().name, self.request.path)]
 
@@ -246,7 +265,12 @@ class ProductFormView(
 
     @cached_property
     def crumbs(self):
-        base_list = [(_("Onderwerpen"), reverse("products:category_list"))]
+        base_list = [
+            (
+                get_cms_page_title(self.request, _("Onderwerpen")),
+                reverse("products:category_list"),
+            )
+        ]
         base_list += self.get_categories_breadcrumbs(slug_name="category_slug")
         return base_list + [
             (self.get_object().name, self.get_object().get_absolute_url()),
