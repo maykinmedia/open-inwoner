@@ -226,7 +226,7 @@ django-filer==3.4.4
     #   maykin-django-prosemirror
 django-filter==21.1
     # via -r requirements/base.in
-django-formtools==2.3
+django-formtools==2.7
     # via
     #   django-cms
     #   django-two-factor-auth

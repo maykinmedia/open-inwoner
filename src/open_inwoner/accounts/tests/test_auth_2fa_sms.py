@@ -426,6 +426,34 @@ class TestSMSVerificationLogin(WebTest):
         self.assertRedirects(phonenumber2_response, str(settings.LOGIN_REDIRECT_URL))
 
     @patch("open_inwoner.accounts.gateways.gateway.send")
+    def test_adding_phone_number_with_invalid_token_fails(self, mock_gateway_send):
+        self.user.phonenumber = ""
+        self.user.save(update_fields=["phonenumber"])
+
+        response = self.app.get(reverse("login"))
+
+        form = response.forms["login-form"]
+        form["username"] = self.user.email
+        form["password"] = "secret"
+        login_response_redirect = form.submit().follow()
+
+        phonenumber1_form = login_response_redirect.forms["add-phonenumber-1-form"]
+        phonenumber1_form["phonenumber-phonenumber_1"] = "0643465651"
+        phonenumber1_form["phonenumber-phonenumber_2"] = "0643465651"
+        phonenumber1_response = phonenumber1_form.submit()
+
+        phonenumber2_form = phonenumber1_response.forms["add-phonenumber-2-form"]
+        phonenumber2_form["verify-token"] = "abcdef"
+        phonenumber2_response = phonenumber2_form.submit()
+
+        self.assertEqual(
+            phonenumber2_response.context["form"].errors,
+            {"token": [_("De opgegeven code is ongeldig of is verlopen.")]},
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.phonenumber, "")
+
+    @patch("open_inwoner.accounts.gateways.gateway.send")
     def test_login_fails_with_different_phonenumbers(self, mock_gateway_send):
         self.user.phonenumber = ""
         self.user.save(update_fields=["phonenumber"])
