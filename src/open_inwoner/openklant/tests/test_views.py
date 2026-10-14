@@ -1034,6 +1034,36 @@ class ContactMomentViewsTestCase(
         response = self.app.get(list_url, user=user)
         self.assertRedirects(response, reverse("pages-root"))
 
+    def test_contactmoment_list_accessible_for_staff_without_bsn_or_kvk(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        user = UserFactory(bsn="", kvk="", is_staff=True)
+
+        with patch.object(
+            eSuiteVragenService, "list_questions", autospec=True
+        ) as mock_esuite_list_questions:
+            response = self.app.get(reverse("cases:contactmoment_list"), user=user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["object_list"]), [])
+        self.assertFalse(response.context["partial_results"])
+        mock_esuite_list_questions.assert_not_called()
+        mock_openklant2_service.assert_not_called()
+        self.assertFalse(m.called)
+
+    def test_contactmoment_detail_requires_bsn_or_kvk_for_staff(
+        self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
+    ):
+        user = UserFactory(bsn="", kvk="", is_staff=True)
+        url = reverse(
+            "cases:contactmoment_detail",
+            kwargs={"api_service": KlantenServiceType.ESUITE, "kcm_uuid": uuid4()},
+        )
+
+        response = self.app.get(url, user=user)
+
+        self.assertRedirects(response, reverse("pages-root"))
+
     def test_contactmoment_list_requires_login(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
