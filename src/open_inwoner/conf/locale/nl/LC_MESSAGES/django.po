@@ -358,11 +358,6 @@ msgid "stuck processing retention hours"
 msgstr "Bewaartermijn in uren voor vastgelopen verwerkingen"
 
 #: notifications/models.py:241
-#, fuzzy
-#| msgid ""
-#| "Number of days after which PROCESSING records are considered stuck "
-#| "(worker killed before completion) and will be pruned. Leave empty to "
-#| "never prune stuck records."
 msgid ""
 "Number of hours after which PROCESSING records are considered stuck (worker "
 "killed before completion) and will be pruned. Leave empty to never prune "
@@ -2843,102 +2838,88 @@ msgid "Afval"
 msgstr "Afval"
 
 #: open_inwoner/cms/extensions/constants.py:23
-#, fuzzy
-#| msgid "Homepage"
 msgid "Home"
-msgstr "Homepage"
+msgstr "Home"
 
 #: open_inwoner/cms/extensions/constants.py:24
 msgid "Housing"
-msgstr ""
+msgstr "Huis"
 
 #: open_inwoner/cms/extensions/constants.py:25
 msgid "Housing (work)"
-msgstr ""
+msgstr "Kantoor"
 
 #: open_inwoner/cms/extensions/constants.py:26
-#, fuzzy
-#| msgid "Locatie"
 msgid "Location"
 msgstr "Locatie"
 
 #: open_inwoner/cms/extensions/constants.py:29
 msgid "Business"
-msgstr ""
+msgstr "Zakelijk"
 
 #: open_inwoner/cms/extensions/constants.py:30
 msgid "Work"
-msgstr ""
+msgstr "Werk"
 
 #: open_inwoner/cms/extensions/constants.py:31
 msgid "Government"
-msgstr ""
+msgstr "Bestuur"
 
 #: open_inwoner/cms/extensions/constants.py:32
-#, fuzzy
-#| msgid "Permissions"
 msgid "Permits"
-msgstr "Permissies"
+msgstr "Vergunningen"
 
 #: open_inwoner/cms/extensions/constants.py:33
-#, fuzzy
-#| msgid "Form API"
 msgid "Forms"
 msgstr "Formulieren API (open zaken)"
 
 #: open_inwoner/cms/extensions/constants.py:36
 msgid "Healthcare"
-msgstr ""
+msgstr "Gezondheid"
 
 #: open_inwoner/cms/extensions/constants.py:37
 msgid "Care"
-msgstr ""
+msgstr "Zorg"
 
 #: open_inwoner/cms/extensions/constants.py:38
-#, fuzzy
-#| msgid "Youtube"
 msgid "Youth"
-msgstr "Youtube"
+msgstr "Kinderen"
 
 #: open_inwoner/cms/extensions/constants.py:39
 msgid "Elderly"
-msgstr ""
+msgstr "Ouderen"
 
 #: open_inwoner/cms/extensions/constants.py:40
 msgid "Accessibility"
-msgstr ""
+msgstr "Toegankelijkeheid"
 
 #: open_inwoner/cms/extensions/constants.py:43
-#, fuzzy
-#| msgid "Action"
 msgid "Education"
-msgstr "Actie"
+msgstr "Onderwijs"
 
 #: open_inwoner/cms/extensions/constants.py:46
 msgid "Environment"
-msgstr ""
+msgstr "Leefomgeving"
 
 #: open_inwoner/cms/extensions/constants.py:47
 msgid "Recycling"
-msgstr ""
+msgstr "Recycling"
 
 #: open_inwoner/cms/extensions/constants.py:48
 msgid "Pets"
-msgstr ""
+msgstr "Huisdieren"
 
 #: open_inwoner/cms/extensions/constants.py:51
 msgid "Traffic"
-msgstr ""
+msgstr "Verkeer"
 
 #: open_inwoner/cms/extensions/constants.py:52
-#, fuzzy
-#| msgid "Samenwerking"
 msgid "Parking"
-msgstr "Samenwerking"
+msgstr "Parkeren"
 
 #: open_inwoner/cms/extensions/constants.py:55
 msgid "Safety"
-msgstr ""
+msgstr "Veiligheid"
 
 #: open_inwoner/cms/extensions/constants.py:56
 #: open_inwoner/openzaak/constants.py:9
@@ -2947,37 +2928,35 @@ msgstr "Waarschuwing"
 
 #: open_inwoner/cms/extensions/constants.py:59
 msgid "Payments"
-msgstr ""
+msgstr "Betalingen"
 
 #: open_inwoner/cms/extensions/constants.py:60
 msgid "Finance"
-msgstr ""
+msgstr "Financiën"
 
 #: open_inwoner/cms/extensions/constants.py:61
 msgid "Savings"
-msgstr ""
+msgstr "Budget"
 
 #: open_inwoner/cms/extensions/constants.py:62
-#, fuzzy
-#| msgid "Services"
 msgid "Invoices"
-msgstr "Services"
+msgstr "Rekeningen"
 
 #: open_inwoner/cms/extensions/constants.py:65
 msgid "Community"
-msgstr ""
+msgstr "Samenleving"
 
 #: open_inwoner/cms/extensions/constants.py:66
 msgid "Forum"
-msgstr ""
+msgstr "Forum"
 
 #: open_inwoner/cms/extensions/constants.py:67
 msgid "Chat"
-msgstr ""
+msgstr "Gesprekken"
 
 #: open_inwoner/cms/extensions/constants.py:68
 msgid "Mail"
-msgstr ""
+msgstr "Post"
 
 #: open_inwoner/cms/extensions/constants.py:69
 #: open_inwoner/pdc/admin/organization.py:21 open_inwoner/pdc/views.py:215
@@ -2988,41 +2967,33 @@ msgstr "Contact"
 
 #: open_inwoner/cms/extensions/constants.py:70
 msgid "Support"
-msgstr ""
+msgstr "Ondersteuning"
 
 #: open_inwoner/cms/extensions/constants.py:73
 msgid "News"
-msgstr ""
+msgstr "Nieuws"
 
 #: open_inwoner/cms/extensions/constants.py:74
 msgid "Events"
-msgstr ""
+msgstr "Evenementen"
 
 #: open_inwoner/cms/extensions/constants.py:75
-#, fuzzy
-#| msgid "Calendar API"
 msgid "Calendar"
-msgstr "Calendar API"
+msgstr "Kalender"
 
 #: open_inwoner/cms/extensions/constants.py:77
-#, fuzzy
-#| msgid "File"
 msgid "Files"
-msgstr "Bestand"
+msgstr "Bestanden"
 
 #: open_inwoner/cms/extensions/constants.py:78
 msgid "FAQ"
-msgstr ""
+msgstr "Vragen"
 
 #: open_inwoner/cms/extensions/constants.py:79
-#, fuzzy
-#| msgid "Information object URL"
 msgid "Information"
-msgstr "Informatieobject URL"
+msgstr "Informatie"
 
 #: open_inwoner/cms/extensions/constants.py:80
-#, fuzzy
-#| msgid "language"
 msgid "Language"
 msgstr "Taal"
 
@@ -3035,15 +3006,15 @@ msgstr "Zoeken"
 #, fuzzy
 #| msgid "LoA settings"
 msgid "Settings"
-msgstr "LoA settings"
+msgstr "Opties"
 
 #: open_inwoner/cms/extensions/constants.py:86
 msgid "Favorites"
-msgstr ""
+msgstr "Favorieten"
 
 #: open_inwoner/cms/extensions/constants.py:87
 msgid "Maintenance"
-msgstr ""
+msgstr "Onderhoud"
 
 #: open_inwoner/cms/extensions/models.py:12
 msgid "Requires authentication"
@@ -5669,10 +5640,8 @@ msgid "Invalid BSN format (must be 9 digits)"
 msgstr "Ongeldig BSN formaat (moet bestaan uit 9 getallen)."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:42
-#, fuzzy
-#| msgid "Fetch cases for BSN"
 msgid "Fetch BRP data for BSN"
-msgstr "Zaken ophalen voor BSN"
+msgstr "BRP data ophalen voor BSN"
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:75
 msgid ""
@@ -5683,30 +5652,24 @@ msgid ""
 msgstr ""
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:91
-#, fuzzy
-#| msgid "Haal Centraal configuration"
 msgid "Haal Centraal is not configured"
-msgstr "Configuratie 'Haal Centraal'"
+msgstr "Haal Centraal is niet geconfigureerd"
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:102
 msgid "Connected, but the response data failed validation"
-msgstr ""
+msgstr "Verbonden, maar de response data is niet door de validatie gekomen."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:110
-#, fuzzy
-#| msgid "Failed to connect to Zaken API"
 msgid "Failed to connect to the BRP API"
-msgstr "Gefaald om verbinding te maken met de Zaken API."
+msgstr "Verbinding met de BRP-API mislukt."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:118
-#, fuzzy
-#| msgid "Unexpected error while fetching cases"
 msgid "Unexpected error while fetching BRP data"
-msgstr "Onverwachte error bij het ophalen van zaken."
+msgstr "Onverwachte fout bij het ophalen van BRP-gegevens."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:127
 msgid "No person found for this BSN"
-msgstr ""
+msgstr "Geen persoon gevonden bij dit BSN nummer"
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:135
 #, python-format
