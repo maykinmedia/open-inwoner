@@ -1,7 +1,7 @@
 import { withLoader } from '@react/lib/decorators/storybook';
 import { Meta, StoryObj } from '@storybook/preact-vite';
 import { DATASUMMARY_DEFINITION } from '.';
-import DataSummary, { IDataSummaryProps } from './DataSummary';
+import DataSummary from './DataSummary';
 
 const meta: Meta<typeof DataSummary> = {
   title: 'Components/DataSummary',
@@ -26,34 +26,21 @@ DataSummary is a pure React component that renders a list of title and detail pa
 };
 export default meta;
 
-type Story = StoryObj<IDataSummaryProps>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  name: 'Default',
-  parameters: {
-    docs: {
-      description: {
-        story: `
-        `,
-      },
-    },
-  },
-  args: {
-    items: [
-      { label: 'Status', value: 'Nieuw' },
-      { label: 'Ingediend op', value: '5 Juni 2025' },
-      { label: 'Vraagnummer', value: 'AB123' },
-      { label: 'Contact gehad via', value: 'Contactformulier' },
-    ],
-  },
-};
-
-const mockDataSummaryData = [
+const MOCK_DATA_SUMMARY_DATA = [
   { label: 'Status', value: 'Nieuw' },
   { label: 'Ingediend op', value: '5 Juni 2025' },
   { label: 'Vraagnummer', value: 'AB123' },
   { label: 'Contact gehad via', value: 'Contactformulier' },
 ];
+
+export const Default: Story = {
+  name: 'Default',
+  args: {
+    items: MOCK_DATA_SUMMARY_DATA,
+  },
+};
 
 export const AsWebComponent: Story = {
   args: { itemsId: 'DataSummary-test-data' },
@@ -61,7 +48,7 @@ export const AsWebComponent: Story = {
   render: ({ itemsId }) => (
     <>
       <script type="application/json" id={itemsId}>
-        {JSON.stringify(mockDataSummaryData)}
+        {JSON.stringify(MOCK_DATA_SUMMARY_DATA)}
       </script>
       <oip-data-summary items-id={itemsId} />
     </>
