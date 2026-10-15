@@ -572,7 +572,7 @@ pillow==13.0.0
     #   easy-thumbnails
     #   reportlab
     #   weasyprint
-playwright==1.50.0
+playwright==1.64.0
     # via -r requirements/base.in
 prompt-toolkit==3.0.36
     # via click-repl
@@ -598,7 +598,7 @@ pydantic-settings[yaml]==2.7.0
     # via django-setup-configuration
 pydyf==0.12.1
     # via weasyprint
-pyee==12.0.0
+pyee==14.0.0
     # via playwright
 pygments==2.20.0
     # via
