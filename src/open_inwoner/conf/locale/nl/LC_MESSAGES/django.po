@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 15:24+0200\n"
+"POT-Creation-Date: 2026-10-15 16:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -408,7 +408,7 @@ msgid "<a href='{url}'>{text}</a>"
 msgstr "<a href='{url}'>{text}</a>"
 
 #: open_inwoner/accounts/admin.py:52 open_inwoner/accounts/models.py:862
-#: open_inwoner/accounts/models.py:1073 open_inwoner/pdc/models/product.py:274
+#: open_inwoner/accounts/models.py:1073 open_inwoner/pdc/models/product.py:276
 #: open_inwoner/plans/models.py:26
 #: open_inwoner/templates/export/include/actions.html:11
 #: open_inwoner/templates/export/profile/action_export.html:36
@@ -530,7 +530,7 @@ msgstr "Organisatie"
 
 #: open_inwoner/accounts/choices.py:35 open_inwoner/accounts/choices.py:45
 #: open_inwoner/accounts/models.py:919
-#: open_inwoner/accounts/views/contactmoments.py:269
+#: open_inwoner/accounts/views/contactmoments.py:285
 #: open_inwoner/cms/cases/views/status.py:160
 #: open_inwoner/cms/cases/views/status.py:167
 #: open_inwoner/cms/cases/views/status.py:174
@@ -555,7 +555,7 @@ msgstr "Organisatie"
 #: open_inwoner/templates/pages/cases/list_inner.html:118
 #: open_inwoner/templates/pages/cases/statuses.html:4
 #: open_inwoner/templates/pages/contactmoment/list.html:58
-#: open_inwoner/templates/pages/plans/list.html:42
+#: open_inwoner/templates/pages/plans/list.html:38
 msgid "Status"
 msgstr "Status"
 
@@ -611,6 +611,7 @@ msgstr "Code"
 
 #: open_inwoner/accounts/forms.py:60
 #: open_inwoner/accounts/tests/test_auth_2fa_sms.py:99
+#: open_inwoner/accounts/tests/test_auth_2fa_sms.py:451
 msgid "De opgegeven code is ongeldig of is verlopen."
 msgstr "De opgegeven code is ongeldig of is verlopen."
 
@@ -635,13 +636,13 @@ msgid "Mobiele telefoonnummer bevestigen"
 msgstr "Mobiele telefoonnummer bevestigen"
 
 #: open_inwoner/accounts/forms.py:95
-#: open_inwoner/accounts/tests/test_auth_2fa_sms.py:453
+#: open_inwoner/accounts/tests/test_auth_2fa_sms.py:481
 msgid "De telefoonnummers komen niet overeen."
 msgstr "De telefoonnummers komen niet overeen."
 
 #: open_inwoner/accounts/forms.py:102 open_inwoner/accounts/forms.py:505
 #: open_inwoner/accounts/models.py:160 open_inwoner/accounts/models.py:1109
-#: open_inwoner/pdc/models/product.py:300
+#: open_inwoner/pdc/models/product.py:302
 msgid "First name"
 msgstr "Voornaam"
 
@@ -651,7 +652,7 @@ msgstr "Tussenvoegsel"
 
 #: open_inwoner/accounts/forms.py:114 open_inwoner/accounts/forms.py:508
 #: open_inwoner/accounts/models.py:172 open_inwoner/accounts/models.py:1115
-#: open_inwoner/pdc/models/product.py:305
+#: open_inwoner/pdc/models/product.py:307
 msgid "Last name"
 msgstr "Achternaam"
 
@@ -796,7 +797,7 @@ msgstr "Voer een geldig telefoonnummer in."
 
 #: open_inwoner/accounts/models.py:154 open_inwoner/accounts/models.py:850
 #: open_inwoner/accounts/models.py:901 open_inwoner/accounts/models.py:1031
-#: open_inwoner/pdc/models/product.py:376 open_inwoner/plans/models.py:110
+#: open_inwoner/pdc/models/product.py:378 open_inwoner/plans/models.py:110
 msgid "UUID"
 msgstr "UUID"
 
@@ -806,8 +807,8 @@ msgstr "Unieke identificatie"
 
 #: open_inwoner/accounts/models.py:178
 #: open_inwoner/pdc/models/organization.py:37
-#: open_inwoner/pdc/models/product.py:310
-#: open_inwoner/pdc/models/product.py:385
+#: open_inwoner/pdc/models/product.py:312
+#: open_inwoner/pdc/models/product.py:387
 msgid "Email address"
 msgstr "E-mailadres"
 
@@ -822,8 +823,8 @@ msgstr "Digitaal voorkeursadres"
 #: open_inwoner/accounts/models.py:198
 #: open_inwoner/configurations/models.py:512
 #: open_inwoner/pdc/models/organization.py:42
-#: open_inwoner/pdc/models/product.py:315
-#: open_inwoner/pdc/models/product.py:390
+#: open_inwoner/pdc/models/product.py:317
+#: open_inwoner/pdc/models/product.py:392
 msgid "Phonenumber"
 msgstr "Telefoonnummer"
 
@@ -1077,9 +1078,9 @@ msgstr "Wordt gebruikt als referentie in de documenten API."
 #: open_inwoner/pdc/models/organization.py:13
 #: open_inwoner/pdc/models/organization.py:68
 #: open_inwoner/pdc/models/product.py:37 open_inwoner/pdc/models/product.py:42
-#: open_inwoner/pdc/models/product.py:363
-#: open_inwoner/pdc/models/product.py:378
-#: open_inwoner/pdc/models/product.py:421 open_inwoner/pdc/models/tag.py:9
+#: open_inwoner/pdc/models/product.py:365
+#: open_inwoner/pdc/models/product.py:380
+#: open_inwoner/pdc/models/product.py:423 open_inwoner/pdc/models/tag.py:9
 #: open_inwoner/pdc/models/tag.py:45 open_inwoner/plans/models.py:19
 #: open_inwoner/plans/models.py:69
 #: open_inwoner/templates/export/include/actions.html:6
@@ -1094,7 +1095,7 @@ msgstr "De naam van het document"
 
 #: open_inwoner/accounts/models.py:865 open_inwoner/accounts/models.py:956
 #: open_inwoner/accounts/models.py:1051 open_inwoner/accounts/models.py:1127
-#: open_inwoner/openzaak/models.py:1036 open_inwoner/pdc/models/product.py:177
+#: open_inwoner/openzaak/models.py:1036 open_inwoner/pdc/models/product.py:179
 #: open_inwoner/search/models.py:60
 #: open_inwoner/templates/export/plans/plan_export.html:34
 #: open_inwoner/templates/export/profile/action_export.html:40
@@ -1106,7 +1107,7 @@ msgid "This is the date the document was created"
 msgstr "Datum dat het bestand is aangemaakt"
 
 #: open_inwoner/accounts/models.py:870 open_inwoner/accounts/models.py:961
-#: open_inwoner/pdc/models/product.py:184
+#: open_inwoner/pdc/models/product.py:186
 #: open_inwoner/templates/export/plans/plan_export.html:38
 #: open_inwoner/templates/export/profile/action_export.html:44
 msgid "Updated on"
@@ -1267,7 +1268,7 @@ msgid "This is the date the message was created"
 msgstr "Datum dat het bericht is aangemaakt"
 
 #: open_inwoner/accounts/models.py:1056 open_inwoner/cms/footer/models.py:17
-#: open_inwoner/conf/base.py:1116 open_inwoner/pdc/models/product.py:113
+#: open_inwoner/conf/base.py:1117 open_inwoner/pdc/models/product.py:115
 msgid "Content"
 msgstr "Content"
 
@@ -1915,7 +1916,7 @@ msgstr ""
 "afgebroken."
 
 #: open_inwoner/accounts/tests/test_auth_2fa_sms.py:405
-#: open_inwoner/accounts/tests/test_auth_2fa_sms.py:442
+#: open_inwoner/accounts/tests/test_auth_2fa_sms.py:470
 msgid "Account verificatie (stap 1 van 2)"
 msgstr "Account verificatie (stap 1 van 2)"
 
@@ -2270,26 +2271,26 @@ msgstr ""
 msgid "Something went wrong while logging in, please try again later."
 msgstr "Er ging iets mis bij het inloggen, Probeer het later nog eens"
 
-#: open_inwoner/accounts/views/contactmoments.py:138
-#: open_inwoner/accounts/views/contactmoments.py:141
-#: open_inwoner/accounts/views/contactmoments.py:145
-#: open_inwoner/accounts/views/contactmoments.py:214
+#: open_inwoner/accounts/views/contactmoments.py:150
+#: open_inwoner/accounts/views/contactmoments.py:153
+#: open_inwoner/accounts/views/contactmoments.py:157
+#: open_inwoner/accounts/views/contactmoments.py:230
 #: open_inwoner/cms/profile/cms_appconfig.py:51
 #: open_inwoner/core/tests/test_views.py:373 open_inwoner/core/views.py:71
 #: open_inwoner/templates/pages/profile/me.html:292
 msgid "Mijn vragen"
 msgstr "Mijn vragen"
 
-#: open_inwoner/accounts/views/contactmoments.py:217
+#: open_inwoner/accounts/views/contactmoments.py:233
 msgid "Mijn vraag"
 msgstr "Mijn vraag"
 
-#: open_inwoner/accounts/views/contactmoments.py:221
+#: open_inwoner/accounts/views/contactmoments.py:237
 #: open_inwoner/templates/pages/history.html:16
 msgid "Details"
 msgstr "Details"
 
-#: open_inwoner/accounts/views/contactmoments.py:222
+#: open_inwoner/accounts/views/contactmoments.py:238
 #: open_inwoner/cms/cases/forms.py:84
 #: open_inwoner/cms/cases/tests/test_htmx.py:522
 #: open_inwoner/conf/parts/maileditor.py:624 open_inwoner/openklant/forms.py:46
@@ -2299,34 +2300,34 @@ msgstr "Details"
 msgid "Vraag"
 msgstr "Vraag"
 
-#: open_inwoner/accounts/views/contactmoments.py:273
+#: open_inwoner/accounts/views/contactmoments.py:289
 msgid "Ingediend op"
 msgstr "Ingediend op"
 
-#: open_inwoner/accounts/views/contactmoments.py:277
+#: open_inwoner/accounts/views/contactmoments.py:293
 #: open_inwoner/templates/pages/contactmoment/list.html:59
 msgid "Vraag nummer"
 msgstr "Vraagnummer"
 
-#: open_inwoner/accounts/views/contactmoments.py:281
+#: open_inwoner/accounts/views/contactmoments.py:297
 msgid "Contact gehad via"
 msgstr "Contact gehad via"
 
-#: open_inwoner/accounts/views/contactmoments.py:289
+#: open_inwoner/accounts/views/contactmoments.py:305
 msgid "Terug naar overzicht"
 msgstr "Terug naar overzicht"
 
-#: open_inwoner/accounts/views/contactmoments.py:294
+#: open_inwoner/accounts/views/contactmoments.py:310
 msgid "Naar aanvraag"
 msgstr "Naar zaak"
 
-#: open_inwoner/accounts/views/contactmoments.py:299
+#: open_inwoner/accounts/views/contactmoments.py:315
 #: open_inwoner/openklant/tests/test_views.py:634
 #: open_inwoner/openklant/tests/test_views.py:712
 msgid "Terug naar aanvraag"
 msgstr "Terug naar zaak"
 
-#: open_inwoner/accounts/views/contactmoments.py:303
+#: open_inwoner/accounts/views/contactmoments.py:319
 #: open_inwoner/openklant/tests/test_views.py:647
 #: open_inwoner/openklant/tests/test_views.py:725
 msgid "Bekijk alle vragen"
@@ -2803,7 +2804,7 @@ msgstr ""
 msgid "click here to view all available icons"
 msgstr ""
 
-#: open_inwoner/cms/extensions/cms_toolbars.py:19
+#: open_inwoner/cms/extensions/cms_toolbars.py:28
 msgid "Pagina opties"
 msgstr "Pagina opties"
 
@@ -2816,7 +2817,7 @@ msgid "Inbox > new messages"
 msgstr "Berichten > nieuwe berichten"
 
 #: open_inwoner/cms/extensions/constants.py:14
-#: open_inwoner/pdc/models/product.py:236
+#: open_inwoner/pdc/models/product.py:238
 msgid "Products"
 msgstr "Producten"
 
@@ -3200,7 +3201,7 @@ msgstr "De inhoud"
 #: open_inwoner/cms/plugins/models/userfeed.py:12
 #: open_inwoner/core/tests/test_views.py:481
 #: open_inwoner/core/tests/test_views.py:490 open_inwoner/core/views.py:126
-#: open_inwoner/templates/pages/plans/list.html:43
+#: open_inwoner/templates/pages/plans/list.html:39
 msgid "Openstaande acties"
 msgstr "Openstaande acties"
 
@@ -3371,13 +3372,13 @@ msgid "Profile apphook configurations"
 msgstr "Configuratie Mijn Profiel"
 
 #: open_inwoner/components/templates/components/Action/Actions.html:7
-#: open_inwoner/templates/pages/plans/list.html:21
+#: open_inwoner/templates/pages/plans/list.html:17
 #: open_inwoner/templates/pages/profile/contacts/list.html:74
 msgid "Filter"
 msgstr "Filter"
 
 #: open_inwoner/components/templates/components/Action/Actions.html:10
-#: open_inwoner/templates/pages/plans/list.html:24
+#: open_inwoner/templates/pages/plans/list.html:20
 #: open_inwoner/templates/pages/profile/contacts/list.html:77
 msgid "Filter op:"
 msgstr "Filter op:"
@@ -3465,7 +3466,7 @@ msgstr "Zaak starten"
 
 #: open_inwoner/components/templates/components/Card/DescriptionCard.html:14
 #: open_inwoner/components/templates/components/Card/ProductCard.html:21
-#: open_inwoner/templates/pages/plans/list.html:41
+#: open_inwoner/templates/pages/plans/list.html:37
 msgid "Einddatum"
 msgstr "Einddatum"
 
@@ -3800,43 +3801,43 @@ msgstr "Volgende"
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: open_inwoner/conf/base.py:1119
+#: open_inwoner/conf/base.py:1120
 msgid "Banner Image"
 msgstr "Bannerafbeelding"
 
-#: open_inwoner/conf/base.py:1120
+#: open_inwoner/conf/base.py:1121
 msgid "Banner Text"
 msgstr "Banner tekst"
 
-#: open_inwoner/conf/base.py:1121
+#: open_inwoner/conf/base.py:1122
 msgid "Login Banner"
 msgstr "Login Banner"
 
-#: open_inwoner/conf/base.py:1123
+#: open_inwoner/conf/base.py:1124
 msgid "Footer, Left"
 msgstr "Footer linkerzijde"
 
-#: open_inwoner/conf/base.py:1130
+#: open_inwoner/conf/base.py:1131
 msgid "Footer, Center"
 msgstr "Footer midden"
 
-#: open_inwoner/conf/base.py:1137
+#: open_inwoner/conf/base.py:1138
 msgid "Footer, Right"
 msgstr "Footer rechterzijde"
 
-#: open_inwoner/conf/base.py:1144 open_inwoner/openklant/cms_plugins.py:45
+#: open_inwoner/conf/base.py:1145 open_inwoner/openklant/cms_plugins.py:45
 msgid "Contact form plugin"
 msgstr "Contactformulier plugin"
 
-#: open_inwoner/conf/base.py:1148
+#: open_inwoner/conf/base.py:1149
 msgid "CMS flatpage plugin"
 msgstr "CMS flatpage plugin"
 
-#: open_inwoner/conf/base.py:1164
+#: open_inwoner/conf/base.py:1165
 msgid "Arrow"
 msgstr "Pijl"
 
-#: open_inwoner/conf/base.py:1805
+#: open_inwoner/conf/base.py:1806
 #, python-brace-format
 msgid "Inlogcode: {token} (deze code is 5 minuten geldig.)"
 msgstr "Inlogcode: {token} (deze code is 5 minuten geldig.)"
@@ -6024,7 +6025,7 @@ msgstr "Titel"
 msgid "language"
 msgstr "Taal"
 
-#: open_inwoner/media/models/video.py:41 open_inwoner/pdc/models/product.py:144
+#: open_inwoner/media/models/video.py:41 open_inwoner/pdc/models/product.py:146
 msgid "Video"
 msgstr "Video"
 
@@ -6074,52 +6075,44 @@ msgstr "Gegevens alleen beschikbaar voor gebruikers met een BSN."
 msgid "This module is not yet configured"
 msgstr "Deze module is nog niet geconfigureerd"
 
-#: open_inwoner/mijn_afval/views.py:124
+#: open_inwoner/mijn_afval/views.py:129
 msgid ""
 "We kunnen uw afvalgegevens momenteel niet ophalen. Probeer het later opnieuw."
 msgstr ""
 "We kunnen uw afvalgegevens momenteel niet ophalen. Probeer het later opnieuw."
 
-#: open_inwoner/mijn_afval/views.py:196 open_inwoner/mijn_afval/views.py:335
-msgid "Groente, Fruit en Tuin afval (GFT)"
-msgstr "Groente, Fruit en Tuin afval (GFT)"
-
-#: open_inwoner/mijn_afval/views.py:198 open_inwoner/mijn_afval/views.py:336
-msgid "Restafval"
-msgstr "Restafval"
-
-#: open_inwoner/mijn_afval/views.py:200 open_inwoner/mijn_afval/views.py:337
-#, fuzzy
-#| msgid "Restafval"
-msgid "Medisch afval"
-msgstr "Restafval"
-
-#: open_inwoner/mijn_afval/views.py:275
+#: open_inwoner/mijn_afval/views.py:266
 msgid "Datum ophalen"
 msgstr "Datum ophalen"
 
-#: open_inwoner/mijn_afval/views.py:276
+#: open_inwoner/mijn_afval/views.py:267
 msgid "Tijd ophalen"
 msgstr "Tijd ophalen"
 
-#: open_inwoner/mijn_afval/views.py:277
+#: open_inwoner/mijn_afval/views.py:268
 msgid "Gewicht (kg)"
 msgstr "Gewicht (kg)"
 
-#: open_inwoner/mijn_afval/views.py:278
+#: open_inwoner/mijn_afval/views.py:269
 msgid "Bedrag (€)"
 msgstr "Bedrag (€)"
 
-#: open_inwoner/mijn_afval/views.py:295
+#: open_inwoner/mijn_afval/views.py:286
 msgid "Totaal"
 msgstr "Totaal"
 
-#: open_inwoner/mijn_afval/views.py:302
+#: open_inwoner/mijn_afval/views.py:294
 #, python-brace-format
 msgid "Container: {type_label} - {identifier}"
 msgstr "Container: {type_label} - {identifier}"
 
-#: open_inwoner/mijn_afval/views.py:310
+#: open_inwoner/mijn_afval/views.py:298
+#, fuzzy, python-brace-format
+#| msgid "Container: {type_label} - {identifier}"
+msgid "Container: {identifier}"
+msgstr "Container: {type_label} - {identifier}"
+
+#: open_inwoner/mijn_afval/views.py:305
 msgid "Voor deze container zijn in deze periode geen gegevens."
 msgstr "Voor deze container zijn in deze periode geen gegevens."
 
@@ -7640,7 +7633,7 @@ msgid "Address"
 msgstr "Adres"
 
 #: open_inwoner/pdc/admin/product.py:44 open_inwoner/pdc/models/category.py:133
-#: open_inwoner/pdc/models/product.py:151 open_inwoner/search/forms.py:16
+#: open_inwoner/pdc/models/product.py:153 open_inwoner/search/forms.py:16
 msgid "Categories"
 msgstr "Onderwerpen"
 
@@ -7773,9 +7766,9 @@ msgstr ""
 "Indien ingesteld, kunnen alleen gebruikers die tot deze groep behoren deze "
 "categorie en de bijbehorende producten bewerken"
 
-#: open_inwoner/pdc/models/faq.py:23 open_inwoner/pdc/models/product.py:235
-#: open_inwoner/pdc/models/product.py:268
-#: open_inwoner/pdc/models/product.py:357
+#: open_inwoner/pdc/models/faq.py:23 open_inwoner/pdc/models/product.py:237
+#: open_inwoner/pdc/models/product.py:270
+#: open_inwoner/pdc/models/product.py:359
 msgid "Product"
 msgstr "Product"
 
@@ -7895,12 +7888,12 @@ msgid "The neighbourhood of the organization"
 msgstr "Wijk van de organisatie"
 
 #: open_inwoner/pdc/models/organization.py:59
-#: open_inwoner/pdc/models/product.py:292
+#: open_inwoner/pdc/models/product.py:294
 msgid "Organization"
 msgstr "Organisatie"
 
 #: open_inwoner/pdc/models/organization.py:60
-#: open_inwoner/pdc/models/product.py:192 open_inwoner/search/forms.py:22
+#: open_inwoner/pdc/models/product.py:194 open_inwoner/search/forms.py:22
 msgid "Organizations"
 msgstr "Organisaties"
 
@@ -7966,15 +7959,16 @@ msgstr ""
 msgid "CTA Button text"
 msgstr "Tekst van CTA knop"
 
-#: open_inwoner/pdc/models/product.py:103
+#: open_inwoner/pdc/models/product.py:104
 msgid "The text displayed on the button inside the content of the product."
-msgstr "De tekst die zichtbaar is in de CTA knop binnen de inhoud van het product."
+msgstr ""
+"De tekst die zichtbaar is in de CTA knop binnen de inhoud van het product."
 
-#: open_inwoner/pdc/models/product.py:106
+#: open_inwoner/pdc/models/product.py:108
 msgid "Request form"
 msgstr "Aanvraagformulier"
 
-#: open_inwoner/pdc/models/product.py:109
+#: open_inwoner/pdc/models/product.py:111
 msgid ""
 "Select a form to show this form on the product page. If a form is selected, "
 "the link will not be shown."
@@ -7982,7 +7976,7 @@ msgstr ""
 "Kies een formulier om te tonen na de aanvraagknop van de productenpagina "
 "(Open Formulieren)"
 
-#: open_inwoner/pdc/models/product.py:137
+#: open_inwoner/pdc/models/product.py:139
 msgid ""
 "Product content with build-in WYSIWYG editor. By adding '[CTABUTTON]' you "
 "can embed a cta-button for linking to the defined form or link"
@@ -7990,46 +7984,46 @@ msgstr ""
 "Productcontent met een ingebouwde WYSIWYG editor. Door '[CTABUTTON]' in de "
 "lopende tekst toe te voegen wordt op die plek een productaanvraagknop getoond"
 
-#: open_inwoner/pdc/models/product.py:147
+#: open_inwoner/pdc/models/product.py:149
 msgid "Video to show after the intro"
 msgstr "Video om te laten zien na de introductietekst"
 
-#: open_inwoner/pdc/models/product.py:153
+#: open_inwoner/pdc/models/product.py:155
 msgid "Categories which the product relates to"
 msgstr "Onderwerpen waar het product aan gerelateerd is"
 
-#: open_inwoner/pdc/models/product.py:158
+#: open_inwoner/pdc/models/product.py:160
 msgid "Related products"
 msgstr "Gerelateerde producten"
 
-#: open_inwoner/pdc/models/product.py:160
+#: open_inwoner/pdc/models/product.py:162
 msgid "Related products to this product"
 msgstr "Producten die gerelateerd zijn aan dit product"
 
-#: open_inwoner/pdc/models/product.py:164 open_inwoner/pdc/models/tag.py:37
+#: open_inwoner/pdc/models/product.py:166 open_inwoner/pdc/models/tag.py:37
 #: open_inwoner/search/forms.py:19
 msgid "Tags"
 msgstr "Tags"
 
-#: open_inwoner/pdc/models/product.py:167
+#: open_inwoner/pdc/models/product.py:169
 msgid "Tags which the product is linked to"
 msgstr "Tags waar dit product aan gekoppeld is"
 
-#: open_inwoner/pdc/models/product.py:170
+#: open_inwoner/pdc/models/product.py:172
 msgid "Costs"
 msgstr "Kosten"
 
-#: open_inwoner/pdc/models/product.py:174
+#: open_inwoner/pdc/models/product.py:176
 msgid "Cost of the product in EUR"
 msgstr "Kosten van het product in EUR"
 
-#: open_inwoner/pdc/models/product.py:180
+#: open_inwoner/pdc/models/product.py:182
 msgid ""
 "This is the date the product was created. This field is automatically set."
 msgstr ""
 "Datum dat het product is aangemaakt, dit veld wordt automatisch ingevuld."
 
-#: open_inwoner/pdc/models/product.py:187
+#: open_inwoner/pdc/models/product.py:189
 msgid ""
 "This is the date when the product was last changed. This field is "
 "automatically set."
@@ -8037,172 +8031,172 @@ msgstr ""
 "Datum dat het product voor het laatst is gewijzigd, dit veld wordt "
 "automatisch ingevuld."
 
-#: open_inwoner/pdc/models/product.py:195
+#: open_inwoner/pdc/models/product.py:197
 msgid "Organizations which provides this product"
 msgstr "Aangeboden door deze organisaties"
 
-#: open_inwoner/pdc/models/product.py:199
+#: open_inwoner/pdc/models/product.py:201
 msgid "Keywords"
 msgstr "Zoekwoorden"
 
-#: open_inwoner/pdc/models/product.py:202
+#: open_inwoner/pdc/models/product.py:204
 msgid "List of keywords for search"
 msgstr "Lijst van zoekwoorden waarop het product gevonden kan worden"
 
-#: open_inwoner/pdc/models/product.py:205
+#: open_inwoner/pdc/models/product.py:207
 msgid "Uniforme productnaam"
 msgstr "Uniforme productnaam"
 
-#: open_inwoner/pdc/models/product.py:208
+#: open_inwoner/pdc/models/product.py:210
 msgid "Attribute to sync data from PDC's (like SDG)"
 msgstr ""
 "Attribuut om gegevens vanuit andere bronnen te synchroniseren (zoals SDG)"
 
-#: open_inwoner/pdc/models/product.py:212
-#: open_inwoner/pdc/models/product.py:330
+#: open_inwoner/pdc/models/product.py:214
+#: open_inwoner/pdc/models/product.py:332
 msgid "Product contacts"
 msgstr "Productcontacten"
 
-#: open_inwoner/pdc/models/product.py:215
+#: open_inwoner/pdc/models/product.py:217
 msgid "The contacts responsible for the product"
 msgstr "De contactpersonen verantwoordelijk voor het product"
 
-#: open_inwoner/pdc/models/product.py:219
-#: open_inwoner/pdc/models/product.py:400
+#: open_inwoner/pdc/models/product.py:221
+#: open_inwoner/pdc/models/product.py:402
 msgid "Product locations"
 msgstr "Productlocaties"
 
-#: open_inwoner/pdc/models/product.py:222
+#: open_inwoner/pdc/models/product.py:224
 msgid "Locations where the product is available at."
 msgstr "Locaties waar het product beschikbaar is."
 
-#: open_inwoner/pdc/models/product.py:227
-#: open_inwoner/pdc/models/product.py:446
+#: open_inwoner/pdc/models/product.py:229
+#: open_inwoner/pdc/models/product.py:448
 msgid "Conditions"
 msgstr "Condities"
 
-#: open_inwoner/pdc/models/product.py:229
+#: open_inwoner/pdc/models/product.py:231
 msgid "Conditions applicable for the product"
 msgstr "Voorwaarden waar de aanvrager van het product aan moet voldoen"
 
-#: open_inwoner/pdc/models/product.py:271
-#: open_inwoner/pdc/models/product.py:360
+#: open_inwoner/pdc/models/product.py:273
+#: open_inwoner/pdc/models/product.py:362
 msgid "Related product"
 msgstr "Gerelateerd product"
 
-#: open_inwoner/pdc/models/product.py:280
+#: open_inwoner/pdc/models/product.py:282
 msgid "Product file"
 msgstr "Productbestand"
 
-#: open_inwoner/pdc/models/product.py:281
+#: open_inwoner/pdc/models/product.py:283
 msgid "Product files"
 msgstr "Productbestanden"
 
-#: open_inwoner/pdc/models/product.py:297
+#: open_inwoner/pdc/models/product.py:299
 msgid "The organization of the product contact"
 msgstr "Organisatie van het productcontact"
 
-#: open_inwoner/pdc/models/product.py:302
+#: open_inwoner/pdc/models/product.py:304
 msgid "First name of the product contact"
 msgstr "Voornaam"
 
-#: open_inwoner/pdc/models/product.py:307
+#: open_inwoner/pdc/models/product.py:309
 msgid "Last name of the product contact"
 msgstr "Achternaam"
 
-#: open_inwoner/pdc/models/product.py:312
+#: open_inwoner/pdc/models/product.py:314
 msgid "The email address of the product contact"
 msgstr "E-mailadres"
 
-#: open_inwoner/pdc/models/product.py:319
+#: open_inwoner/pdc/models/product.py:321
 msgid "The phone number of the product contact"
 msgstr "Telefoonnummer"
 
-#: open_inwoner/pdc/models/product.py:322
+#: open_inwoner/pdc/models/product.py:324
 msgid "Rol"
 msgstr "Rol"
 
-#: open_inwoner/pdc/models/product.py:325
+#: open_inwoner/pdc/models/product.py:327
 msgid "The role/function of the product contact"
 msgstr "De rol/functie van de contactpersoon"
 
-#: open_inwoner/pdc/models/product.py:329
+#: open_inwoner/pdc/models/product.py:331
 msgid "Product contact"
 msgstr "Productcontact"
 
-#: open_inwoner/pdc/models/product.py:363
+#: open_inwoner/pdc/models/product.py:365
 msgid "Name for the link"
 msgstr "Naam voor de link"
 
-#: open_inwoner/pdc/models/product.py:365
+#: open_inwoner/pdc/models/product.py:367
 msgid "Url"
 msgstr "URL"
 
-#: open_inwoner/pdc/models/product.py:365
+#: open_inwoner/pdc/models/product.py:367
 msgid "Url of the link"
 msgstr "URL van de link"
 
-#: open_inwoner/pdc/models/product.py:368
+#: open_inwoner/pdc/models/product.py:370
 msgid "Product link"
 msgstr "Productlink"
 
-#: open_inwoner/pdc/models/product.py:369
+#: open_inwoner/pdc/models/product.py:371
 msgid "Product links"
 msgstr "Productlinks"
 
-#: open_inwoner/pdc/models/product.py:380
+#: open_inwoner/pdc/models/product.py:382
 msgid "Location name"
 msgstr "Locatie naam"
 
-#: open_inwoner/pdc/models/product.py:387
+#: open_inwoner/pdc/models/product.py:389
 msgid "The email address of the current location"
 msgstr "E-mailadres van de organisatie"
 
-#: open_inwoner/pdc/models/product.py:395
+#: open_inwoner/pdc/models/product.py:397
 msgid "The phonenumber of the current location"
 msgstr "Telefoonnummer van de organisatie"
 
-#: open_inwoner/pdc/models/product.py:399
+#: open_inwoner/pdc/models/product.py:401
 msgid "Product location"
 msgstr "Productlocatie"
 
-#: open_inwoner/pdc/models/product.py:423
+#: open_inwoner/pdc/models/product.py:425
 msgid "Short name of the condition"
 msgstr "Verkorte naam van de conditie"
 
-#: open_inwoner/pdc/models/product.py:426
+#: open_inwoner/pdc/models/product.py:428
 msgid "Question"
 msgstr "Vraag"
 
-#: open_inwoner/pdc/models/product.py:427
+#: open_inwoner/pdc/models/product.py:429
 msgid "Question used in the question-answer game"
 msgstr "Vraag gebruikt in het vraag-antwoordspel"
 
-#: open_inwoner/pdc/models/product.py:430
+#: open_inwoner/pdc/models/product.py:432
 msgid "Positive text"
 msgstr "Bevestigend antwoord"
 
-#: open_inwoner/pdc/models/product.py:431
+#: open_inwoner/pdc/models/product.py:433
 msgid "Description how to meet the condition"
 msgstr "Omschrijving waarmee u voldoet aan de conditie"
 
-#: open_inwoner/pdc/models/product.py:434
+#: open_inwoner/pdc/models/product.py:436
 msgid "Negative text"
 msgstr "Ontkennend antwoord"
 
-#: open_inwoner/pdc/models/product.py:435
+#: open_inwoner/pdc/models/product.py:437
 msgid "Description how not to meet the condition"
 msgstr "Omschrijving wanneer u niet voldoet aan de conditie"
 
-#: open_inwoner/pdc/models/product.py:438
+#: open_inwoner/pdc/models/product.py:440
 msgid "Rule"
 msgstr "Regel"
 
-#: open_inwoner/pdc/models/product.py:441
+#: open_inwoner/pdc/models/product.py:443
 msgid "Rule for the automated check"
 msgstr "Regels voor geautomatiseerde controle (nog niet beschikbaar)"
 
-#: open_inwoner/pdc/models/product.py:445
+#: open_inwoner/pdc/models/product.py:447
 msgid "Condition"
 msgstr "Conditie"
 
@@ -8507,18 +8501,18 @@ msgid "This field is required."
 msgstr "Dit veld is vereist."
 
 #: open_inwoner/plans/tests/test_views.py:857 open_inwoner/plans/views.py:734
-#: open_inwoner/templates/pages/plans/list.html:39
+#: open_inwoner/templates/pages/plans/list.html:35
 msgid "Samenwerking"
 msgstr "Samenwerking"
 
 #: open_inwoner/plans/tests/test_views.py:1025
 #: open_inwoner/plans/tests/test_views.py:1052
-#: open_inwoner/templates/pages/plans/list.html:57
+#: open_inwoner/templates/pages/plans/list.html:53
 msgid "Actie vereist"
 msgstr "Actie vereist"
 
 #: open_inwoner/plans/tests/test_views.py:1132
-#: open_inwoner/templates/pages/plans/list.html:64
+#: open_inwoner/templates/pages/plans/list.html:60
 msgid "There are no plans with these filters."
 msgstr "Er zijn nog geen plannen met deze filters."
 
@@ -8550,7 +8544,7 @@ msgstr "Kies voorstel"
 
 #: open_inwoner/plans/views.py:318
 #: open_inwoner/templates/pages/plans/create.html:7
-#: open_inwoner/templates/pages/plans/list.html:13
+#: open_inwoner/templates/pages/plans/list.html:9
 msgid "Start een nieuwe samenwerking"
 msgstr "Start een nieuwe samenwerking"
 
@@ -9590,7 +9584,7 @@ msgid "Aangemaakt door"
 msgstr "Aangemaakt door"
 
 #: open_inwoner/templates/pages/plans/detail.html:34
-#: open_inwoner/templates/pages/plans/list.html:40
+#: open_inwoner/templates/pages/plans/list.html:36
 msgid "Deelnemers"
 msgstr "Deelnemers"
 
@@ -9655,11 +9649,11 @@ msgstr "Aanpassen"
 msgid "Terug naar "
 msgstr "Terug naar "
 
-#: open_inwoner/templates/pages/plans/list.html:31
+#: open_inwoner/templates/pages/plans/list.html:27
 msgid "Reset filters"
 msgstr "Reset filters"
 
-#: open_inwoner/templates/pages/plans/list.html:73
+#: open_inwoner/templates/pages/plans/list.html:69
 msgid "U heeft op dit moment nog geen samenwerkingsplannen."
 msgstr "U heeft op dit moment nog geen samenwerkingsplannen."
 
@@ -10631,6 +10625,17 @@ msgstr "Er is een fout opgetreden tijdens de virusscan van dit bestand."
 #: open_inwoner/utils/validators.py:283
 msgid "The virus scan returned an unexpected status."
 msgstr "De virusscan gaf een onverwachte status terug."
+
+#~ msgid "Groente, Fruit en Tuin afval (GFT)"
+#~ msgstr "Groente, Fruit en Tuin afval (GFT)"
+
+#~ msgid "Restafval"
+#~ msgstr "Restafval"
+
+#, fuzzy
+#~| msgid "Restafval"
+#~ msgid "Medisch afval"
+#~ msgstr "Restafval"
 
 #~ msgid "Something went wrong. You might not see all of your questions."
 #~ msgstr "Er is iets fout gegaan. Je ziet mogelijk niet al jouw vragen."
