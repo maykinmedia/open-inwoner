@@ -24,7 +24,7 @@ django-sniplates
 django-treebeard
 maykin-2fa
 phonenumbers
-maykin-django-prosemirror[images]
+maykin-django-prosemirror[images] @ git+https://github.com/maykinmedia/django-prosemirror@c0a855d0404f90c414a98ea8003d8891de20ca7b
 maykin-common[otel,cli,health-checks,docs,pdf]
 django-localflavor
 django-privates
