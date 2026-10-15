@@ -1137,23 +1137,14 @@ CMS_PLACEHOLDER_CONF = {
     "footer_left": {
         "name": _("Footer, Left"),
         "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
-        "child_classes": {
-            "TextPlugin": ["LinkPlugin"],
-        },
     },
     "footer_center": {
         "name": _("Footer, Center"),
         "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
-        "child_classes": {
-            "TextPlugin": ["LinkPlugin"],
-        },
     },
     "footer_right": {
         "name": _("Footer, Right"),
         "plugins": ["TextPlugin", "LinkPlugin", "FooterPagesPlugin"],
-        "child_classes": {
-            "TextPlugin": ["LinkPlugin"],
-        },
     },
     "contact_form": {
         "name": _("Contact form plugin"),
