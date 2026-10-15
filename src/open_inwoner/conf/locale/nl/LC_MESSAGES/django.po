@@ -5674,7 +5674,7 @@ msgstr "Geen persoon gevonden bij dit BSN nummer"
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:135
 #, python-format
 msgid "BRP data retrieved and validated (version %(version)s)"
-msgstr ""
+msgstr "BRP-gegevens opgehaald en gevalideerd (versie %(version)s)"
 
 #: open_inwoner/haalcentraal/models.py:13
 msgid "BRP 1.3"
@@ -5782,42 +5782,32 @@ msgid "Basic"
 msgstr "Eenvoudig"
 
 #: open_inwoner/kvk/admin.py:34
-#, fuzzy
-#| msgid "Checks"
 msgid "Config checks"
-msgstr "Checks"
+msgstr "Configuratie checks"
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:31
 msgid "Fetch company for KvK number"
-msgstr ""
+msgstr "Haal bedrijfsgegevens op voor dit KVK nummer"
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:69
-#, fuzzy
-#| msgid "Invalid BSN format (must be 9 digits)"
 msgid "Invalid KvK number format (must be 8 digits)"
-msgstr "Ongeldig BSN formaat (moet bestaan uit 9 getallen)."
+msgstr "Ongeldig KVK nummer (moet bestaan uit 9 getallen)."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:93
-#, fuzzy
-#| msgid "Failed to connect to Zaken API"
 msgid "Failed to connect to KvK API"
-msgstr "Gefaald om verbinding te maken met de Zaken API."
+msgstr "Gefaald om verbinding te maken met de KVK API."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:101
-#, fuzzy
-#| msgid "Unexpected error while fetching cases"
 msgid "Unexpected error while fetching company"
-msgstr "Onverwachte error bij het ophalen van zaken."
+msgstr "Onverwachte error bij het ophalen van dit bedrijf."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:110
 msgid "No company found for this KvK number"
-msgstr ""
+msgstr "Geen bedrijf gevonden bij dit KVK nummer"
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:118
-#, fuzzy
-#| msgid "Company name"
 msgid "Company data returned"
-msgstr "Bedrijfsnaam"
+msgstr "Bedrijfsgegevens opgehaald"
 
 #: open_inwoner/kvk/constants.py:6
 msgid "Hoofdvestiging"
@@ -6070,10 +6060,8 @@ msgid "Container: {type_label} - {identifier}"
 msgstr "Container: {type_label} - {identifier}"
 
 #: open_inwoner/mijn_afval/views.py:298
-#, fuzzy, python-brace-format
-#| msgid "Container: {type_label} - {identifier}"
 msgid "Container: {identifier}"
-msgstr "Container: {type_label} - {identifier}"
+msgstr "Container: {identifier}"
 
 #: open_inwoner/mijn_afval/views.py:305
 msgid "Voor deze container zijn in deze periode geen gegevens."
@@ -6149,16 +6137,12 @@ msgid "Afgehandeld"
 msgstr "Afgehandeld"
 
 #: open_inwoner/openklant/constants.py:27
-#, fuzzy
-#| msgid "Doel bewerken"
 msgid "Te verwerken"
-msgstr "Doel bewerken"
+msgstr "Te bewerken"
 
 #: open_inwoner/openklant/constants.py:28
-#, fuzzy
-#| msgid "Bewerk"
 msgid "Verwerkt"
-msgstr "Bewerk"
+msgstr "Verwerkt"
 
 #: open_inwoner/openklant/forms.py:16
 #: open_inwoner/openklant/tests/test_contactform.py:186
@@ -6277,10 +6261,8 @@ msgstr ""
 "bij het registreren van een klantcontact."
 
 #: open_inwoner/openklant/models.py:111
-#, fuzzy
-#| msgid "Case list worker threads"
 msgid "Contactmoment worker threads"
-msgstr "Aantal workerthreads voor zakenlijst"
+msgstr "Contactmoment worker threads"
 
 #: open_inwoner/openklant/models.py:116
 #, fuzzy
