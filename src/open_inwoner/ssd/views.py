@@ -16,7 +16,7 @@ import structlog
 from furl import furl
 from view_breadcrumbs import BaseBreadcrumbMixin
 
-from open_inwoner.utils.views import CommonPageMixin
+from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
 from .client import JaaropgaveClient, UitkeringClient
 from .exceptions import SSDClientException, SSDServiceFaultException
@@ -39,10 +39,11 @@ class BenefitsFormView(
 
     @cached_property
     def crumbs(self):
-        current_page = self.request.current_page
-        title = current_page.get_title() if current_page else ("Mijn uitkeringen")
         return [
-            (title, reverse("ssd:uitkeringen")),
+            (
+                get_cms_page_title(self.request, _("Mijn uitkeringen")),
+                reverse("ssd:uitkeringen"),
+            ),
         ]
 
     def post(self, request, *args, **kwargs):

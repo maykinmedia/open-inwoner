@@ -19,7 +19,7 @@ from open_inwoner.accounts.models import Document, Message, User
 from open_inwoner.accounts.query import MessageQuerySet
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.mixins import PaginationMixin
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin, get_cms_page_title
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -40,7 +40,10 @@ class InboxView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn berichten"), reverse("inbox:index")),
+            (
+                get_cms_page_title(self.request, _("Mijn berichten")),
+                reverse("inbox:index"),
+            ),
         ]
 
     def page_title(self):

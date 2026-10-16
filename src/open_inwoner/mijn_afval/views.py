@@ -16,6 +16,8 @@ from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.client import build_client as build_zgw_client
 
+from open_inwoner.utils.views import get_cms_page_title
+
 from .api_models import AfvalProfiel
 from .clients import OpenAfvalAPIClient
 from .exceptions import MijnAfvalException
@@ -33,7 +35,7 @@ class AfvalProfielView(
     def crumbs(self):
         return [
             (
-                self.request.current_page.get_title(),
+                get_cms_page_title(self.request, _("Mijn afval")),
                 reverse("mijn_afval:afval-profiel"),
             ),
         ]

@@ -26,7 +26,7 @@ from open_inwoner.components.utils import RenderableTag
 from open_inwoner.htmx.views import HtmxTemplateTagModelFormView
 from open_inwoner.utils.logentry import get_verbose_change_message
 from open_inwoner.utils.mixins import ExportMixin
-from open_inwoner.utils.views import CommonPageMixin, LogMixin
+from open_inwoner.utils.views import CommonPageMixin, LogMixin, get_cms_page_title
 
 
 class ActionsEnabledMixin(AppConfigMixin):
@@ -72,7 +72,10 @@ class ActionListView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn acties"), reverse("profile:action_list")),
         ]
 
@@ -121,7 +124,10 @@ class ActionUpdateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Bewerk {}").format(self.object.name),
@@ -236,7 +242,10 @@ class ActionCreateView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("Maak actie aan"),
@@ -327,7 +336,10 @@ class ActionHistoryView(
     @cached_property
     def crumbs(self):
         return [
-            (_("Mijn profiel"), reverse("profile:detail")),
+            (
+                get_cms_page_title(self.request, _("Mijn profiel")),
+                reverse("profile:detail"),
+            ),
             (_("Mijn acties"), reverse("profile:action_list")),
             (
                 _("History of {}").format(self.object.name),
