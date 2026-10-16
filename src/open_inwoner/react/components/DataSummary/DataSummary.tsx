@@ -16,13 +16,17 @@ export interface IDataSummaryProps {
   itemsId?: string;
 }
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(document.documentElement.lang || 'nl-NL', {
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(document.documentElement.lang || 'nl-NL', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
     timeZone: 'Europe/Amsterdam',
-  }).format(new Date(value));
+  }).format(date);
+};
 
 const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId }) => {
   const data = usePropsOrScriptData<ListItem[]>(items, itemsId);
