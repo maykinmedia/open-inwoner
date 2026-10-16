@@ -28,6 +28,20 @@ class PrimaryNavigation extends Component {
     this.node.addEventListener('click', this.toggleDesktopNavOpen.bind(this));
     this.node.addEventListener('focusout', this.onFocusOut.bind(this));
     window.addEventListener('keyup', this.onKeyUp.bind(this));
+    document.addEventListener('click', this.onDocumentClick.bind(this), true);
+  }
+
+  /**
+   * Gets called when `node` is clicked.
+   * Closes the menu when it was opened via the icon.
+   */
+  onDocumentClick(event) {
+    if (this.node && !this.node.contains(event.target)) {
+      BEM.removeModifier(this.node, 'open');
+      this.navigationToggle.forEach((toggle) => {
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    }
   }
 
   /**
