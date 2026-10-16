@@ -3,6 +3,21 @@
   flex-direction: column;
   height: 100%;
 
+  > .form__actions {
+    margin-block-start: var(--spacing-medium);
+  }
+
+  &__sidebar {
+    display: grid;
+    gap: var(--spacing-extra-large);
+  }
+
+  &__container {
+    border: 1px solid var(--color-gray-light);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-large);
+  }
+
   &__header {
     align-items: center;
     background-color: var(--color-gray-lightest);
@@ -15,6 +30,10 @@
 
   &__body {
     overflow-y: auto;
+  }
+
+  &__body .form {
+    padding: var(--gutter-width) 0 0;
   }
 
   &__header nl-paragraph {
