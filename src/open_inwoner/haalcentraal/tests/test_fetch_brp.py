@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth.models import Permission
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from log_outgoing_requests.constants import SaveLogsChoice
@@ -134,6 +134,7 @@ class FetchBRPCheckTests(TestCase):
         self.assertEqual(result.extra["version"], "2.1")
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchBRPViewTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -197,6 +198,7 @@ class FetchBRPViewTests(TestCase):
         self.assertContains(response, self.get_url())
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class FetchBRPStandaloneTests(TestCase):
     def setUp(self):
         self.client = Client()

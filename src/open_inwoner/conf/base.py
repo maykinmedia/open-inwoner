@@ -227,6 +227,20 @@ ALLOW_CUSTOM_JS = config(
     ),
 )
 
+# Interactive config checks (maykin_config_checks) feature flag
+ENABLE_INTERACTIVE_CHECKS = config(
+    "ENABLE_INTERACTIVE_CHECKS",
+    default=False,
+    documentation=DocumentationParams(
+        help_text=(
+            "Allow staff users to run interactive configuration checks from the "
+            "admin interface. These checks may perform real requests against "
+            "connected services, so only enable this when needed."
+        ),
+        group="Application",
+    ),
+)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

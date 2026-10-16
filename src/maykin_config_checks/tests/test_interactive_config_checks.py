@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from maykin_config_checks import GenericConfigCheckResult
 from maykin_config_checks.registry import registry
@@ -111,6 +111,7 @@ class MissingRequiredPermissionsCheck:
         return {}
 
 
+@override_settings(ENABLE_INTERACTIVE_CHECKS=True)
 class ConfigCheckTestCase(TestCase):
     def setUp(self):
         super().setUp()
@@ -161,6 +162,37 @@ class RunConfigCheckAccessTests(ConfigCheckTestCase):
         response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
 
         self.assertEqual(response.status_code, 200)
+
+
+@override_settings(ENABLE_INTERACTIVE_CHECKS=False)
+class RunConfigCheckDisabledTests(ConfigCheckTestCase):
+    def test_anonymous_user_is_denied(self):
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateNotUsed(response, "admin/config_checks_disabled.html")
+
+    def test_get_shows_disabled_page(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(f"/admin/config-check/{MinimalCheck.identifier}/")
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "admin/config_checks_disabled.html")
+        self.assertContains(response, "ENABLE_INTERACTIVE_CHECKS", status_code=403)
+
+    def test_post_does_not_run_check(self):
+        self.client.force_login(self.staff_user)
+
+        with patch.object(MinimalCheck, "run") as mock_run:
+            response = self.client.post(
+                f"/admin/config-check/{MinimalCheck.identifier}/",
+                data={},
+            )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "admin/config_checks_disabled.html")
+        mock_run.assert_not_called()
 
 
 class RunConfigCheckGuardTests(ConfigCheckTestCase):
