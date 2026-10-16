@@ -313,6 +313,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.flatpages",
+    "django_vite",
     "django.forms",
     # load user model before CMS
     "open_inwoner.accounts",
@@ -545,6 +546,22 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
+
+# Resolves the Vite entries referenced in templates to their (hashed) build output.
+# The manifest is read from the build directory rather than STATIC_ROOT, so it
+# also works without running collectstatic. Setting `dev_mode` serves the assets
+# from the Vite dev server instead, but only while it is running (see
+# `open_inwoner.utils.vite.ViteAppClient`).
+DJANGO_VITE = {
+    "default": {
+        "dev_mode": False,
+        "static_url_prefix": "bundles",
+        "app_client_class": "open_inwoner.utils.vite.ViteAppClient",
+        "manifest_path": os.path.join(
+            DJANGO_PROJECT_DIR, "static", "bundles", "manifest.json"
+        ),
+    }
+}
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_SUBFOLDER = config(

@@ -156,6 +156,7 @@ django==5.2.18
     #   django-two-factor-auth
     #   django-upgrade-check
     #   django-view-breadcrumbs
+    #   django-vite
     #   djangocms-alias
     #   djangorestframework
     #   drf-spectacular
@@ -323,6 +324,8 @@ django-two-factor-auth[phonenumberslite, webauthn]==1.16.0
 django-upgrade-check==2.0.0
     # via -r requirements/base.in
 django-view-breadcrumbs==2.5.1
+    # via -r requirements/base.in
+django-vite==3.2.0
     # via -r requirements/base.in
 django-yubin==2.0.4
     # via -r requirements/base.in

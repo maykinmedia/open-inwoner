@@ -27,7 +27,7 @@
     "vitest:coverage": "vitest run --coverage",
     "vitest:coverage:watch": "vitest --watch --coverage",
     "type-check": "tsc --noEmit",
-    "watch": "vite build --watch --mode development"
+    "watch": "vite --mode development"
   },
   "repository": {
     "type": "git",
