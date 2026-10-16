@@ -1,3 +1,16 @@
+Unreleased
+==========
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`2930`]: Zonder ``LOG_STDOUT`` worden ``log/django.log`` en
+  ``log/open_inwoner.log`` vervangen door ``log/application.jsonl``. Pas
+  log-shippers of logrotatie zo nodig aan.
+* [:gh:`2930`]: Celery-workers slaan uitgaande verzoeken nu ook op, en met
+  ``logger.exception`` gelogde (afgehandelde) fouten worden niet langer naar
+  Sentry gestuurd.
+
 2.4.5 (2026-09-29)
 ==================
 
