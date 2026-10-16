@@ -16,3 +16,7 @@ cms_pages_config:
       title: Openstaande acties
     categories: {}
     product_locations: {}
+  # the categories and product locations plugins are only shown while the
+  # products page is published
+  products:
+    enabled: true
