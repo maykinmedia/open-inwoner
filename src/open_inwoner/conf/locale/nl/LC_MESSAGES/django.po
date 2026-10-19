@@ -5793,7 +5793,7 @@ msgstr "Ongeldig KVK nummer (moet uit 8 getallen bestaan)."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:93
 msgid "Failed to connect to KvK API"
-msgstr "Gefaald om verbinding te maken met de KVK API."
+msgstr "Kan geen verbinding maken met de KVK API."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:101
 msgid "Unexpected error while fetching company"
