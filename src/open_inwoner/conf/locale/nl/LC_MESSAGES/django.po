@@ -2987,7 +2987,7 @@ msgstr "Bestanden"
 
 #: open_inwoner/cms/extensions/constants.py:78
 msgid "FAQ"
-msgstr "Vragen"
+msgstr "Veelgestelde vragen"
 
 #: open_inwoner/cms/extensions/constants.py:79
 msgid "Information"
