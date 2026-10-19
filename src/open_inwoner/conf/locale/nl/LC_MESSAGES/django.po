@@ -5635,7 +5635,7 @@ msgstr "Request headers"
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:27
 #: open_inwoner/openzaak/config_checks/fetch_cases.py:74
 msgid "Invalid BSN format (must be 9 digits)"
-msgstr "Ongeldig BSN formaat (moet bestaan uit 9 getallen)."
+msgstr "Ongeldig BSN-formaat (moet uit 9 getallen bestaan)."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:42
 msgid "Fetch BRP data for BSN"
