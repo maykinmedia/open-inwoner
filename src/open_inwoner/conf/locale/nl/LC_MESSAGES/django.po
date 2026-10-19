@@ -5648,6 +5648,11 @@ msgid ""
 "logs. Disable 'Save request + response body' in the outgoing request log "
 "configuration before running this check."
 msgstr ""
+"Deze controle kan niet worden uitgevoerd zolang de bodies van uitgaande"
+"verzoeklogs worden opgeslagen, omdat hierdoor persoonsgegevens"
+"(BSN- en BRP-gegevens) zichtbaar worden in de logs van uitgaande verzoeken."
+"Schakel 'Save request + response body' uit in de configuratie van de"
+"uitgaande verzoeklogs voordat je deze controle uitvoert."
 
 #: open_inwoner/haalcentraal/config_checks/fetch_brp.py:91
 msgid "Haal Centraal is not configured"
@@ -8859,6 +8864,8 @@ msgid ""
 "Not all of your cases could be checked. If you were looking for a specific "
 "case, please try again later."
 msgstr ""
+"Niet al je zaken konden worden gecontroleerd. Als je een specifieke zaak zocht,"
+"probeer het dan later opnieuw."
 
 #: open_inwoner/search/tests/test_views.py:467 open_inwoner/search/views.py:144
 msgid ""
@@ -8883,11 +8890,11 @@ msgstr "Ongelidge pagina (%(page_number)s): %(message)s"
 
 #: open_inwoner/soap/models.py:9
 msgid "slug"
-msgstr ""
+msgstr "slug"
 
 #: open_inwoner/soap/models.py:12
 msgid "Unique, human-friendly identifier for this service"
-msgstr ""
+msgstr "Unieke, leesbare identificatie voor deze service"
 
 #: open_inwoner/soap/models.py:17
 msgid "Base URL of the service to connect to."
