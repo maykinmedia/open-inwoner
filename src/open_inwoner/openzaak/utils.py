@@ -33,6 +33,28 @@ def is_object_visible(obj, max_confidentiality_level: str) -> bool:
     return True
 
 
+def normalize_file_extension(extension: str) -> str:
+    """
+    Normalize a file extension to a bare lowercase value ('pdf', not '.PDF').
+    Used for both the configured and the uploaded extensions, so that uploads
+    are checked by the same rules as the configuration is stored.
+    """
+    return extension.strip().lstrip(".").lower()
+
+
+def normalize_file_extensions(extensions: list[str]) -> list[str]:
+    """
+    Normalize a list of file extensions with `normalize_file_extension`.
+    Empty values and duplicates are dropped, the order is preserved.
+    """
+    normalized = []
+    for extension in extensions:
+        extension = normalize_file_extension(extension)
+        if extension and extension not in normalized:
+            normalized.append(extension)
+    return normalized
+
+
 def get_role_name_display(rol: Rol) -> str:
     """
     best effort to get a presentable display string from a role
