@@ -184,9 +184,6 @@ function initFilterBar() {
           const items = listboxDropdown.querySelectorAll(
             '.filter-bar .checkbox__label'
           );
-          const checkboxElement = e.target.closest(
-            '.checkbox__input, .checkbox__label'
-          );
           if (e.key === 'ArrowDown') {
             e.preventDefault();
             currentIndex = (currentIndex + 1) % items.length;
@@ -201,7 +198,8 @@ function initFilterBar() {
             selectButton.focus();
           } else if (e.key === 'Enter') {
             e.preventDefault();
-            if (checkboxElement) target.click();
+            e.stopImmediatePropagation();
+            e.target.click();
           }
         });
       }
