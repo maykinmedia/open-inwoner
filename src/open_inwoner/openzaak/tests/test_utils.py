@@ -9,7 +9,11 @@ from open_inwoner.openzaak.constants import InformatieObjectStatus
 from open_inwoner.openzaak.models import OpenZaakConfig
 from open_inwoner.openzaak.services import SkipReason, ZGWService
 from open_inwoner.openzaak.tests.factories import generate_rol
-from open_inwoner.openzaak.utils import get_role_name_display
+from open_inwoner.openzaak.utils import (
+    get_role_name_display,
+    normalize_file_extension,
+    normalize_file_extensions,
+)
 from open_inwoner.utils.test import ClearCachesMixin
 
 from .helpers import copy_with_new_uuid
@@ -375,3 +379,22 @@ class TestHelpers(TestCase):
         # uuid AND url updated
         self.assertNotEqual(data["uuid"], res["uuid"])
         self.assertIn(data["uuid"], data["url"])
+
+
+class NormalizeFileExtensionsTests(TestCase):
+    def test_single_extension_is_normalized(self):
+        for value in ("pdf", ".pdf", " .PDF ", "..Pdf"):
+            with self.subTest(value=value):
+                self.assertEqual(normalize_file_extension(value), "pdf")
+
+    def test_dots_whitespace_and_case_are_normalized(self):
+        self.assertEqual(
+            normalize_file_extensions([".pdf", " DOCX ", ".Txt", "..xlsx"]),
+            ["pdf", "docx", "txt", "xlsx"],
+        )
+
+    def test_empty_values_and_duplicates_are_dropped(self):
+        self.assertEqual(
+            normalize_file_extensions(["pdf", ".PDF", ".", " ", "txt"]),
+            ["pdf", "txt"],
+        )

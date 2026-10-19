@@ -18,6 +18,7 @@ from solo.admin import SingletonModelAdmin
 
 from open_inwoner.openzaak.import_export import ZGWConfigExport, ZGWConfigImport
 from open_inwoner.openzaak.services import ZGWService
+from open_inwoner.openzaak.utils import normalize_file_extensions
 from open_inwoner.utils.forms import LimitedUploadFileField
 
 from .models import (
@@ -75,8 +76,18 @@ class ZGWApiGroupConfig(admin.StackedInline):
     )
 
 
+class OpenZaakConfigAdminForm(ModelForm):
+    class Meta:
+        model = OpenZaakConfig
+        fields = "__all__"
+
+    def clean_allowed_file_extensions(self):
+        return normalize_file_extensions(self.cleaned_data["allowed_file_extensions"])
+
+
 @admin.register(OpenZaakConfig)
 class OpenZaakConfigAdmin(SingletonModelAdmin):
+    form = OpenZaakConfigAdminForm
     inlines = [ZGWApiGroupConfig]
 
     fieldsets = (

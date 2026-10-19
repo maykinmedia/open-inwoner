@@ -540,3 +540,15 @@ class TestOpenZaakConfigAdmin(WebTest):
 
         config.refresh_from_db()
         self.assertEqual(config.document_visible_statuses, [])
+
+    def test_allowed_file_extensions_are_normalized(self):
+        self.form["allowed_file_extensions"] = json.dumps(
+            [".pdf", " DOCX ", ".Txt", "pdf", "."]
+        )
+        self.form["document_visible_statuses"] = "[]"
+        response = self.form.submit()
+
+        self.assertEqual(response.status_code, 302)
+
+        config = OpenZaakConfig.get_solo()
+        self.assertEqual(config.allowed_file_extensions, ["pdf", "docx", "txt"])

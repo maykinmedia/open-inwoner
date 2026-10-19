@@ -9,6 +9,7 @@ from open_inwoner.openzaak.models import (
     ZaakTypeConfig,
     ZaakTypeInformatieObjectTypeConfig,
 )
+from open_inwoner.openzaak.utils import normalize_file_extension
 from open_inwoner.utils.forms import MultipleFileField
 from open_inwoner.utils.validators import NoVirusValidator
 
@@ -67,7 +68,7 @@ class CaseUploadForm(forms.Form):
                     f"Een aangeleverd bestand dient maximaal {self.oz_config.max_upload_size} MB te zijn, uw bestand is te groot."
                 )
 
-            if file_extension.lower().replace(".", "") not in allowed_extensions:
+            if normalize_file_extension(file_extension) not in allowed_extensions:
                 raise ValidationError(
                     f"Het type bestand dat u hebt geüpload is ongeldig. Geldige bestandstypen zijn: {', '.join(allowed_extensions)}"
                 )
