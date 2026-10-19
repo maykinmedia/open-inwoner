@@ -5789,7 +5789,7 @@ msgstr "Haal bedrijfsgegevens op voor dit KVK nummer"
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:69
 msgid "Invalid KvK number format (must be 8 digits)"
-msgstr "Ongeldig KVK nummer (moet bestaan uit 8 getallen)."
+msgstr "Ongeldig KVK nummer (moet uit 8 getallen bestaan)."
 
 #: open_inwoner/kvk/config_checks/fetch_company.py:93
 msgid "Failed to connect to KvK API"
