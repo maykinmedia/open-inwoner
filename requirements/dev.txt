@@ -133,6 +133,7 @@ click==8.1.3
     #   click-plugins
     #   click-repl
     #   flask
+    #   towncrier
     #   typer
 click-didyoumean==0.3.0
     # via
@@ -812,6 +813,7 @@ jinja2==3.1.6
     #   commitizen
     #   flask
     #   sphinx
+    #   towncrier
 jsonschema==4.1.0
     # via
     #   -c requirements/ci.txt
@@ -1487,6 +1489,8 @@ tinyhtml5==2.1.0
     #   weasyprint
 tomlkit==0.15.0
     # via commitizen
+towncrier==26.9.0
+    # via -r requirements/dev.in
 typer==0.21.1
     # via
     #   -c requirements/ci.txt
