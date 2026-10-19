@@ -301,3 +301,27 @@ class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
         config = self._get()
         text_node = config.description.raw_data["content"][0]["content"][0]
         self.assertEqual(text_node["marks"][0]["attrs"]["href"], "https://example.com")
+
+
+@tag("migrations")
+class NormalizeAllowedFileExtensionsMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0088: strip whitespace and leading dots from
+    OpenZaakConfig.allowed_file_extensions, lowercase them and drop duplicates.
+    """
+
+    migrate_from = "0087_sanitize_prosemirror_link_hrefs"
+    migrate_to = "0088_normalize_allowed_file_extensions"
+    app = "openzaak"
+
+    def setUpBeforeMigration(self, apps):
+        OpenZaakConfig = apps.get_model("openzaak", "OpenZaakConfig")
+        self.config = OpenZaakConfig.objects.create(
+            allowed_file_extensions=[".pdf", " DOCX ", ".Txt", "pdf", "."]
+        )
+
+    def test_extensions_are_normalized(self):
+        OpenZaakConfig = self.apps.get_model("openzaak", "OpenZaakConfig")
+        config = OpenZaakConfig.objects.get(id=self.config.id)
+
+        self.assertEqual(config.allowed_file_extensions, ["pdf", "docx", "txt"])
