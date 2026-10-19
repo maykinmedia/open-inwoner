@@ -2891,7 +2891,7 @@ msgstr "Ouderen"
 
 #: open_inwoner/cms/extensions/constants.py:40
 msgid "Accessibility"
-msgstr "Toegankelijkeheid"
+msgstr "Toegankelijkheid"
 
 #: open_inwoner/cms/extensions/constants.py:43
 msgid "Education"
