@@ -3,10 +3,12 @@ from django.core.exceptions import ValidationError
 from django_setup_configuration import ConfigurationModel, DjangoModelRef
 from django_setup_configuration.configuration import BaseConfigurationStep
 from django_setup_configuration.exceptions import ConfigurationRunFailed
+from pydantic import field_validator
 from zgw_consumers.models import Service
 
 from open_inwoner.configurations.bootstrap.utils import get_service
 from open_inwoner.openzaak.models import OpenZaakConfig, ZGWApiGroupConfig
+from open_inwoner.openzaak.utils import normalize_file_extensions
 
 
 class ZGWAPIGroupConfigModel(ConfigurationModel):
@@ -28,6 +30,11 @@ class OpenZaakConfigurationModel(ConfigurationModel):
     allowed_file_extensions: list[str] = DjangoModelRef(
         OpenZaakConfig, "allowed_file_extensions"
     )
+
+    @field_validator("allowed_file_extensions")
+    @classmethod
+    def normalize_allowed_file_extensions(cls, value: list[str]) -> list[str]:
+        return normalize_file_extensions(value)
 
     class Meta:
         django_model_refs = {

@@ -118,7 +118,8 @@ class ZGWConfigurationTests(TestCase):
             VertrouwelijkheidsAanduidingen.intern,
         )
         self.assertEqual(config.action_required_deadline_days, 1874)
-        self.assertEqual(config.allowed_file_extensions, [".pdf", ".txt"])
+        # the YAML uses dotted values, which are normalized on the way in
+        self.assertEqual(config.allowed_file_extensions, ["pdf", "txt"])
         self.assertEqual(config.title_text, "title text from setup configuration")
         self.assertEqual(config.enable_categories_filtering_with_zaken, True)
         self.assertEqual(config.skip_notification_statustype_informeren, False)
