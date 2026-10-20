@@ -127,7 +127,7 @@ class ContactViewTests(WebTest):
         response = self.app.get(self.create_url)
         self.assertRedirects(response, f"{self.login_url}?next={self.create_url}")
 
-    def test_new_user_contact_not_created_and_invite_sent(self):
+    def test_adding_contact_without_account_fails(self):
         contacts_before = list(self.user.user_contacts.all())
         response = self.app.get(self.create_url, user=self.user)
 
@@ -136,24 +136,50 @@ class ContactViewTests(WebTest):
         form["last_name"] = "Smith"
         form["email"] = "john@smith.nl"
         response = form.submit(user=self.user)
-        self.assertEqual(response.status_code, 302)
 
-        # check that the contact was not created
+        self.assertEqual(response.status_code, 200)
+        expected_errors = {
+            "__all__": [
+                _(
+                    "Only registered users can be added as a contact. Ask your "
+                    "contact to create an account using the e-mail you provided."
+                )
+            ]
+        }
+        self.assertEqual(response.context["form"].errors, expected_errors)
+
+        # no contact, pending approval, invite or email
         self.assertEqual(list(self.user.user_contacts.all()), contacts_before)
+        self.assertFalse(self.user.contacts_for_approval.exists())
+        self.assertFalse(self.user.sent_invites.exists())
+        self.assertEqual(len(mail.outbox), 0)
 
-        # check that the invite was created
-        self.assertEqual(self.user.sent_invites.count(), 1)
-        invite = self.user.sent_invites.get()
-        self.assertEqual(invite.inviter, self.user)
+    def test_existing_users_with_shared_email_all_receive_approval_request(self):
+        regular_user = UserFactory(email="shared@example.com")
+        digid_user = DigidUserFactory(email="shared@example.com", bsn="111111111")
 
-        # check that the invite was sent
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
-        self.assertEqual(email.to, [invite.invitee_email])
-        invite_url = f"http://testserver{invite.get_absolute_url()}"
-        body = email.alternatives[0][0]  # html version of the email body
-        self.assertIn(invite_url, body)
+        response = self.app.get(self.create_url, user=self.user)
+        form = response.forms["contact-form"]
+        form["first_name"] = "Luke"
+        form["last_name"] = "Skywalker"
+        form["email"] = "shared@example.com"
+        response = form.submit(user=self.user)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            set(self.user.contacts_for_approval.all()), {regular_user, digid_user}
+        )
+        self.assertFalse(self.user.sent_invites.exists())
+
+        # one approval email per matched account, no registration invite
+        self.assertEqual(len(mail.outbox), 2)
+        for email in mail.outbox:
+            self.assertEqual(email.to, ["shared@example.com"])
+            self.assertEqual(
+                email.subject,
+                "Goedkeuring geven op Open Inwoner Platform: "
+                f"{self.user.get_full_name()} wil u toevoegen als contactpersoon",
+            )
 
     def test_existing_user_contact(self):
         existing_user = UserFactory(first_name="Luke")
@@ -523,29 +549,6 @@ class ContactViewTests(WebTest):
         invite_url = f"http://testserver{reverse('profile:contact_list')}"
         body = email.alternatives[0][0]  # html version of the email body
         self.assertIn(invite_url, body)
-
-    def test_notification_email_for_approval_is_not_sent_when_new_user(self):
-        response = self.app.get(self.create_url, user=self.user)
-        form = response.forms["contact-form"]
-
-        form["first_name"] = "John"
-        form["last_name"] = "Smith"
-        form["email"] = "john@example.nl"
-        response = form.submit()
-
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertNotEqual(
-            email.subject,
-            f"Goedkeuring geven op Open Inwoner Platform: {self.user.get_full_name()} wil u toevoegen als contactpersoon",
-        )
-        self.assertNotEqual(email.to, ["john@example.com"])
-        invite_url = f"http://testserver{reverse('profile:contact_list')}"
-        body = email.alternatives[0][0]  # html version of the email body
-        self.assertNotIn(invite_url, body)
-
-        # Email should be the one for registration, not for approval
-        self.assertEqual(email.subject, "Uitnodiging voor Open Inwoner Platform")
 
     def test_contacts_image_is_shown_in_contact_approval_section(self):
         # prepare image

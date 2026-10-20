@@ -389,29 +389,18 @@ class TestContacts(WebTest):
         self.contact = UserFactory()
         self.user.user_contacts.add(self.contact)
 
-    def test_new_contact_invite_is_logged(self):
+    def test_contact_without_account_is_not_logged(self):
         form = self.app.get(reverse("profile:contact_create"), user=self.user).forms[
             "contact-form"
         ]
         form["email"] = "user@example.com"
         form["first_name"] = "Koe"
         form["last_name"] = "Kilsor"
+        log_count_before = TimelineLog.objects.count()
         form.submit()
-        log_entry = TimelineLog.objects.last()
-        invite = Invite.objects.get(invitee_email="user@example.com")
 
-        self.assertEqual(
-            log_entry.timestamp.strftime("%m/%d/%Y, %H:%M:%S"), "10/18/2021, 13:00:00"
-        )
-        self.assertEqual(log_entry.content_object.id, invite.id)
-        self.assertEqual(
-            log_entry.extra_data,
-            {
-                "message": _("invite was created"),
-                "action_flag": list(LOG_ACTIONS[ADDITION]),
-                "content_object_repr": str(invite),
-            },
-        )
+        self.assertEqual(TimelineLog.objects.count(), log_count_before)
+        self.assertFalse(Invite.objects.exists())
 
     def test_existing_user_contact_approval_is_logged(self):
         existing_user = UserFactory()

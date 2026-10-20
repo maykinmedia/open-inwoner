@@ -14,7 +14,7 @@ from mail_editor.helpers import find_template
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.forms import ContactCreateForm, ContactFilterForm
-from open_inwoner.accounts.models import Invite, User
+from open_inwoner.accounts.models import User
 from open_inwoner.cms.utils.page_display import inbox_page_is_published
 from open_inwoner.utils.views import CommonPageMixin, LogMixin, get_cms_page_title
 
@@ -85,37 +85,11 @@ class ContactCreateView(
         user = cast(User, self.request.user)
         email = form.cleaned_data["email"]
 
-        # If the provided email matched any existing users, send them an approval
-        # request.
-        # added_contacts = form.cleaned_data.get("added_contacts")
-        if added_contacts := form.cleaned_data.get("added_contacts"):
-            for contact_user in added_contacts:
-                user.contacts_for_approval.add(contact_user)
-                self.send_contact_approval_email_to_existing_user(
-                    contact_user, user, self.request
-                )
-                self.log_addition(
-                    contact_user, _("contact was added, pending approval")
-                )
+        for contact_user in form.cleaned_data.get("added_contacts"):
+            user.contacts_for_approval.add(contact_user)
+            self.send_contact_approval_email(contact_user, user, self.request)
+            self.log_addition(contact_user, _("contact was added, pending approval"))
 
-        # The provided email did not match any existing user, send a request to sign up
-        # to the platform. They'll be added as contacts in the invite accept flow,
-        # assuming they make it that far.
-        else:
-            # send invitation to new users
-            invite = Invite.objects.create(
-                inviter=user,
-                invitee_email=email,
-                invitee_first_name=form.cleaned_data["first_name"],
-                invitee_last_name=form.cleaned_data["last_name"],
-            )
-            invite.send(self.request)
-            self.log_addition(
-                invite,
-                _("invite was created"),
-            )
-
-        # if we reach here if we did not raise an error
         messages.add_message(
             self.request,
             messages.SUCCESS,
@@ -123,9 +97,7 @@ class ContactCreateView(
         )
         return HttpResponseRedirect(self.get_success_url())
 
-    def send_contact_approval_email_to_existing_user(
-        self, receiver: User, sender: User, request=None
-    ):
+    def send_contact_approval_email(self, receiver: User, sender: User, request=None):
         contacts_url = reverse("profile:contact_list")
         if request:
             url = request.build_absolute_uri(contacts_url)
