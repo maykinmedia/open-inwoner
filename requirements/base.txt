@@ -17,6 +17,7 @@ asgiref==3.11.1
     # via
     #   django
     #   django-htmx
+    #   django-permissions-policy
     #   django-structlog
 asn1crypto==1.5.1
     # via webauthn
@@ -136,6 +137,7 @@ django==5.2.18
     #   django-open-forms-client
     #   django-otp
     #   django-parler
+    #   django-permissions-policy
     #   django-phonenumber-field
     #   django-polymorphic
     #   django-privates
@@ -264,6 +266,8 @@ django-otp==1.3.0
     # via django-two-factor-auth
 django-parler==2.3
     # via djangocms-alias
+django-permissions-policy==4.34.0
+    # via -r requirements/base.in
 django-phonenumber-field==5.2.0
     # via django-two-factor-auth
 django-polymorphic==3.0.0
