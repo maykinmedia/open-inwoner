@@ -7,8 +7,8 @@
   "refreshTokenMaxReuse": 0,
   "accessTokenLifespan": 300,
   "accessTokenLifespanForImplicitFlow": 900,
-  "ssoSessionIdleTimeout": 60,
-  "ssoSessionMaxLifespan": 300,
+  "ssoSessionIdleTimeout": 5,
+  "ssoSessionMaxLifespan": 5,
   "ssoSessionIdleTimeoutRememberMe": 0,
   "ssoSessionMaxLifespanRememberMe": 0,
   "offlineSessionIdleTimeout": 2592000,
@@ -2630,7 +2630,7 @@
         {
           "authenticator": "auth-cookie",
           "authenticatorFlow": false,
-          "requirement": "ALTERNATIVE",
+          "requirement": "DISABLED",
           "priority": 10,
           "autheticatorFlow": false,
           "userSetupAllowed": false
