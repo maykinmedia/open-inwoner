@@ -34,6 +34,7 @@ django-elasticsearch-dsl
 django-import-export
 django-solo
 django-colorfield
+django-permissions-policy
 django-registration
 django-upgrade-check
 django-view-breadcrumbs
