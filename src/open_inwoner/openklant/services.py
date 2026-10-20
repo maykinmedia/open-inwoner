@@ -728,7 +728,31 @@ class eSuiteVragenService(KlantenService):
         self.client.raise_for_status(response)
         data = self.client.parse_json(response)
         all_data = list(pagination_helper(self.client, data))
-        return self.client.factory(ObjectContactMoment, all_data)
+        object_contact_momenten = self.client.factory(ObjectContactMoment, all_data)
+
+        # Do not rely on the backend to apply the 'contactmoment' filter: a backend
+        # that ignores it would link the question to objects (e.g. a zaak) of another
+        # contactmoment. Match on UUID rather than URL, so a different hostname or
+        # gateway in the stored URL does not break the link.
+        contactmoment_uuid = uuid_from_url(contactmoment.url)
+        linked = [
+            ocm
+            for ocm in object_contact_momenten
+            if contactmoment_uuid is not None
+            and uuid_from_url(
+                ocm.contactmoment
+                if isinstance(ocm.contactmoment, str)
+                else ocm.contactmoment.url
+            )
+            == contactmoment_uuid
+        ]
+        if len(linked) != len(object_contact_momenten):
+            logger.warning(
+                "objectcontactmomenten returned links of other contactmomenten, "
+                "the backend ignored the contactmoment filter",
+                contactmoment_url=contactmoment.url,
+            )
+        return linked
 
     #
     # klantcontactmomenten

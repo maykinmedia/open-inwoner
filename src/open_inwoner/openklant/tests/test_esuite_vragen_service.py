@@ -20,7 +20,7 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openklant.tests.data import CONTACTMOMENTEN_ROOT, MockAPIReadData
-from open_inwoner.utils.test import ClearCachesMixin
+from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 from open_inwoner.utils.url import uuid_from_url
 
 
@@ -561,3 +561,94 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
                     },
                 )
                 m.reset_mock()
+
+    def test_objectcontactmomenten_of_other_contactmomenten_are_dropped(self, m):
+        data = MockAPIReadData().install_mocks(m)
+        other_contactmoment_ocm = {
+            **data.objectcontactmoment_zaak,
+            "contactmoment": data.contactmoment2["url"],
+        }
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={data.contactmoment['url']}",
+            # the backend ignored the filter and also returned a link of another
+            # contactmoment
+            json=paginated_response(
+                [data.objectcontactmoment_other, other_contactmoment_ocm]
+            ),
+        )
+        contactmoment = self.service.retrieve_contactmoment(data.contactmoment["url"])
+
+        with self.assertLogs("open_inwoner.openklant.services", level="WARNING"):
+            ocms = self.service.retrieve_objectcontactmomenten_for_contactmoment(
+                contactmoment
+            )
+
+        self.assertEqual(
+            [(ocm.object, ocm.contactmoment) for ocm in ocms],
+            [(data.objectcontactmoment_other["object"], data.contactmoment["url"])],
+        )
+
+    def test_objectcontactmomenten_of_contactmoment_are_kept(self, m):
+        data = MockAPIReadData().install_mocks(m, link_objectcontactmomenten=True)
+        contactmoment = self.service.retrieve_contactmoment(data.contactmoment["url"])
+
+        with self.assertNoLogs("open_inwoner.openklant.services", level="WARNING"):
+            ocms = self.service.retrieve_objectcontactmomenten_for_contactmoment(
+                contactmoment
+            )
+
+        self.assertEqual(
+            [ocm.object for ocm in ocms],
+            [
+                data.objectcontactmoment_other["object"],
+                data.objectcontactmoment_zaak["object"],
+            ],
+        )
+
+    def test_objectcontactmomenten_with_different_host_are_kept(self, m):
+        data = MockAPIReadData().install_mocks(m)
+        contactmoment_uuid = uuid_from_url(data.contactmoment["url"])
+        gateway_ocm = {
+            **data.objectcontactmoment_zaak,
+            # stored with another hostname for the same contactmomenten API
+            "contactmoment": "https://gateway.example.com/contactmomenten/api/v1/"
+            f"contactmomenten/{contactmoment_uuid}",
+        }
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={data.contactmoment['url']}",
+            json=paginated_response([gateway_ocm]),
+        )
+        contactmoment = self.service.retrieve_contactmoment(data.contactmoment["url"])
+
+        with self.assertNoLogs("open_inwoner.openklant.services", level="WARNING"):
+            ocms = self.service.retrieve_objectcontactmomenten_for_contactmoment(
+                contactmoment
+            )
+
+        self.assertEqual(
+            [ocm.object for ocm in ocms], [data.objectcontactmoment_zaak["object"]]
+        )
+
+    def test_retrieve_question_ignores_zaak_of_other_contactmoment(self, m):
+        data = MockAPIReadData().install_mocks(m)
+        other_contactmoment_ocm = {
+            **data.objectcontactmoment_zaak,
+            "contactmoment": data.contactmoment2["url"],
+        }
+        m.get(
+            f"{CONTACTMOMENTEN_ROOT}objectcontactmomenten?contactmoment={data.contactmoment['url']}",
+            json=paginated_response([other_contactmoment_ocm]),
+        )
+
+        question, zaak_with_api_group = self.service.retrieve_question(
+            {"user_bsn": "100000001"}, data.klant_contactmoment["uuid"], data.user
+        )
+
+        self.assertIsNotNone(question)
+        self.assertIsNone(zaak_with_api_group)
+        self.assertFalse(
+            any(
+                req.url == other_contactmoment_ocm["object"]
+                for req in m.request_history
+            )
+        )
