@@ -530,12 +530,11 @@ class ContactCreateForm(forms.Form):
         But we still want to provide some error feedback
         """
         cleaned_data = super().clean()
-        cleaned_data["added_contacts"] = set()
 
-        email = cleaned_data.get("email")
-        if not email:
+        if self.errors:
             return cleaned_data
 
+        email = cleaned_data.get("email")
         # use sets for simplicity, and use .only("id")
         existing_users = set(User.objects.filter(email__iexact=email))
         user_contacts = set(self.user.user_contacts.all().only("id"))
@@ -548,8 +547,12 @@ class ContactCreateForm(forms.Form):
                 raise ValidationError(_("You cannot add yourself as a contact."))
 
         if not existing_users:
-            # no users found, pass and let the view send an Invite to the email
-            return cleaned_data
+            raise ValidationError(
+                _(
+                    "Only registered users can be added as a contact. Ask your "
+                    "contact to create an account using the e-mail you provided."
+                )
+            )
 
         inactive_users: set[User] = set()
         already_added_users: set[User] = set()
@@ -577,12 +580,7 @@ class ContactCreateForm(forms.Form):
                 already_added_users=already_added_users,
             )
 
-        # Best effort: we're going to return successful if we find at least one good contact
-        # or only report the worst error (to not confuse the end-user).
-        if added_contacts:
-            cleaned_data["added_contacts"] = added_contacts
-        else:
-            # produce some feedback, check most interesting first
+        if not added_contacts:
             if already_added_users:
                 raise ValidationError(
                     _(
@@ -594,6 +592,7 @@ class ContactCreateForm(forms.Form):
                     _("The user cannot be added, their account has been deleted.")
                 )
 
+        cleaned_data["added_contacts"] = added_contacts
         return cleaned_data
 
 
