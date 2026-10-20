@@ -19,6 +19,19 @@ http://localhost:8080/. You can now log in with the `admin`/`admin` credentials.
 
 ### Test data
 
+**Realm**
+
+The `test` realm's browser flow has the `Cookie` step disabled, so Keycloak
+never silently reuses an existing SSO session: every login shows the
+username/password form. This avoids being logged in as the previous test user
+(e.g. the DigiD user when switching to eHerkenning) after quick successive
+logins.
+
+SSO sessions also expire after 5 seconds, just long enough for Open Inwoner to
+exchange the authorization code. Otherwise Keycloak refuses a login as a
+different user with "You are already authenticated as different user ... in this
+session" for as long as the previous session lives.
+
 **Clients**
 
 - Client ID: `test-userinfo-jwt`, secret `ktGlGUELd1FR7dTXc84L7dJzUTjCtw9S`
