@@ -8,6 +8,7 @@ python-decouple  # processing of envvar configs
 geopy # geo decoder
 glom # processing nested data
 furl # processing urls
+msgspec
 tinycss2
 css_inline
 pydantic[email]
