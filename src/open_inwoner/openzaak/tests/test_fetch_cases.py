@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
+from maykin_2fa.test import disable_admin_mfa
 from requests.exceptions import RequestException
 
 from open_inwoner.accounts.tests.factories import UserFactory
@@ -196,6 +197,25 @@ class FetchCasesViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Geen zichtbare zaken")
+
+    @disable_admin_mfa()
+    def test_config_check_button_on_admin_change_page(self):
+        self.client.force_login(self.superuser)
+
+        response = self.client.get(reverse("admin:openzaak_openzaakconfig_change"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.get_url())
+
+    @disable_admin_mfa()
+    @override_settings(ENABLE_INTERACTIVE_CHECKS=False)
+    def test_config_check_button_hidden_on_admin_change_page_when_disabled(self):
+        self.client.force_login(self.superuser)
+
+        response = self.client.get(reverse("admin:openzaak_openzaakconfig_change"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.get_url())
 
 
 @override_settings(ENABLE_INTERACTIVE_CHECKS=True)
