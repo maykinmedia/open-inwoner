@@ -40,6 +40,7 @@ from open_inwoner.openzaak.tests.helpers import generate_oas_component_cached
 from open_inwoner.openzaak.tests.shared import (
     ANOTHER_ZAKEN_ROOT,
     CATALOGI_ROOT,
+    DOCUMENTEN_ROOT,
     ZAKEN_ROOT,
 )
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
@@ -777,6 +778,108 @@ class GetZaakByUuidTests(ClearCachesMixin, TestCase):
         self.assertTrue(
             any("cancelled pending zaak-by-uuid fetches" in msg for msg in cm.output)
         )
+
+
+@requests_mock_module.Mocker()
+class ZaakDocumentLinkTest(ClearCachesMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT, form_service=None
+        )
+        self.service = ZGWService()
+        self.zaak_url = f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}"
+        self.info_object_url = (
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/"
+            "014c38fe-b010-4412-881c-3000032fb812"
+        )
+        self.other_info_object_url = (
+            f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/"
+            "6c01bb7f-f0cd-4aa6-9702-806025d995b6"
+        )
+        self.zio_endpoint = (
+            f"{ZAKEN_ROOT}zaakinformatieobjecten"
+            f"?zaak={self.zaak_url}&informatieobject={self.info_object_url}"
+        )
+
+    def _zio(self, zaak_url, info_object_url):
+        return generate_oas_component_cached(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/e55153aa-ad2c-4a07-ae75-15add57d6",
+            zaak=zaak_url,
+            informatieobject=info_object_url,
+            titel="",
+            registratiedatum="2021-01-12",
+        )
+
+    def _is_linked(self):
+        return self.service.is_info_object_linked_to_zaak(
+            self.zaak_url, self.info_object_url, self.api_group
+        )
+
+    def test_linked_when_row_matches_zaak_and_document(self, m):
+        m.get(
+            self.zio_endpoint,
+            json=[self._zio(self.zaak_url, self.info_object_url)],
+        )
+
+        self.assertTrue(self._is_linked())
+
+    def test_linked_when_matching_row_among_unrelated_rows(self, m):
+        m.get(
+            self.zio_endpoint,
+            json=[
+                self._zio(self.zaak_url, self.other_info_object_url),
+                self._zio(self.zaak_url, self.info_object_url),
+            ],
+        )
+
+        self.assertTrue(self._is_linked())
+
+    def test_not_linked_when_result_empty(self, m):
+        m.get(self.zio_endpoint, json=[])
+
+        with self.assertNoLogs("open_inwoner.openzaak.services", level="WARNING"):
+            self.assertFalse(self._is_linked())
+
+    def test_not_linked_when_rows_reference_other_document(self, m):
+        # backend ignored the informatieobject filter and returned all links
+        m.get(
+            self.zio_endpoint,
+            json=[self._zio(self.zaak_url, self.other_info_object_url)],
+        )
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="WARNING"):
+            self.assertFalse(self._is_linked())
+
+    def test_not_linked_when_row_references_other_zaak(self, m):
+        m.get(
+            self.zio_endpoint,
+            json=[
+                self._zio(
+                    f"{ZAKEN_ROOT}zaken/2c07a4ca-539a-47ca-a60c-9d524ce6d73d",
+                    self.info_object_url,
+                )
+            ],
+        )
+
+        self.assertFalse(self._is_linked())
+
+    def test_linked_when_document_url_has_different_host(self, m):
+        # the link was created with another hostname for the same documenten API
+        m.get(
+            self.zio_endpoint,
+            json=[
+                self._zio(
+                    self.zaak_url,
+                    "https://gateway.example.com/documenten/api/v1/"
+                    "enkelvoudiginformatieobjecten/014c38fe-b010-4412-881c-3000032fb812",
+                )
+            ],
+        )
+
+        self.assertTrue(self._is_linked())
 
 
 class UserHasRequiredRolTest(TestCase):

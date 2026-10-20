@@ -53,6 +53,7 @@ from open_inwoner.openzaak.utils import (
     is_object_visible,
 )
 from open_inwoner.utils.concurrency import TimedParallel
+from open_inwoner.utils.url import uuid_from_url
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -1411,12 +1412,47 @@ class ZGWService:
             api_group
         )._fetch_single_information_object(uuid=uuid)
 
-    def fetch_zaak_information_objects_for_zaak_and_info(
+    def is_info_object_linked_to_zaak(
         self, zaak_url: str, info_object_url: str, api_group: ZGWApiGroupConfig
-    ) -> list:
-        return self._zaken_client_factory(
+    ) -> bool:
+        """
+        Return True if the informatieobject is linked to the zaak.
+
+        Do not rely on the backend to apply both query filters: some implementations
+        only support filtering on 'zaak' and return every link of the zaak, so a
+        non-empty result says nothing about the requested informatieobject.
+
+        The informatieobject is matched on UUID rather than URL: the link stores the
+        URL used by whoever created it, which may differ from the one we fetched the
+        document with (e.g. another hostname or a gateway in between). The zaak URL is
+        compared as is, since both sides come from the same Zaken API.
+        """
+        info_object_uuid = uuid_from_url(info_object_url)
+        if info_object_uuid is None:
+            return False
+
+        zaak_info_objects = self._zaken_client_factory(
             api_group
         ).fetch_zaak_information_objects_for_zaak_and_info(zaak_url, info_object_url)
+
+        def _url(resource) -> str:
+            return resource if isinstance(resource, str) else resource.url
+
+        if any(
+            _url(zio.zaak) == zaak_url
+            and uuid_from_url(_url(zio.informatieobject)) == info_object_uuid
+            for zio in zaak_info_objects
+        ):
+            return True
+
+        if zaak_info_objects:
+            logger.warning(
+                "zaakinformatieobjecten returned only unrelated links, "
+                "the backend ignored the informatieobject filter",
+                zaak_url=zaak_url,
+                info_object_url=info_object_url,
+            )
+        return False
 
     def download_document(self, url: str, api_group: ZGWApiGroupConfig):
         return self._documenten_client_factory(api_group).download_document(url)
