@@ -526,6 +526,7 @@ _structlog_middleware = (
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
     "sessionprofile.middleware.SessionProfileMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
@@ -1894,6 +1895,7 @@ ACCOUNTS_SMS_GATEWAY = {
 }
 
 from .app.csp import *  # noqa
+from .app.permissions_policy import *  # noqa
 
 SECURE_REFERRER_POLICY = "same-origin"
 
