@@ -497,6 +497,32 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         )
         self.app.get(self.informatie_object_file.url, user=self.user, status=403)
 
+    def test_no_data_is_retrieved_when_backend_ignores_info_object_filter(self, m):
+        m.get(self.zaak["url"], json=self.zaak)
+        m.get(
+            f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
+            json=paginated_response([self.user_role, self.not_our_user_role]),
+        )
+        m.get(self.zaaktype["url"], json=self.zaaktype)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], content=self.informatie_object_content)
+        unrelated_zaak_info_object = {
+            **self.zaak_informatie_object,
+            "informatieobject": f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+        }
+        m.get(
+            f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak['url']}&informatieobject={self.informatie_object['url']}",
+            # the zaak has a link, but to a different document
+            json=[unrelated_zaak_info_object],
+        )
+
+        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+        self.assertFalse(
+            any(
+                req.url == self.informatie_object["inhoud"] for req in m.request_history
+            )
+        )
+
     def test_no_data_is_retrieved_when_info_object_http_404(self, m):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], status_code=404)

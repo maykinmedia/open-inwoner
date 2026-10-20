@@ -694,14 +694,12 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         # check if this info_object belongs to this zaak
         try:
-            zaak_info_objects = (
-                service.fetch_zaak_information_objects_for_zaak_and_info(
-                    self.zaak.url, info_object.url, api_group
-                )
+            is_linked = service.is_info_object_linked_to_zaak(
+                self.zaak.url, info_object.url, api_group
             )
         except ZgwAPIError as exc:
             raise Http404 from exc
-        if not zaak_info_objects:
+        if not is_linked:
             raise PermissionDenied()
 
         # check if this info_object should be visible
