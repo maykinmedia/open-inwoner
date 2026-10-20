@@ -472,6 +472,8 @@ mozilla-django-oidc-db[setup-configuration]==2.0.1
     # via
     #   -r requirements/base.in
     #   django-digid-eherkenning
+msgspec==0.22.0
+    # via -r requirements/base.in
 notifications-api-common==0.2.2
     # via -r requirements/base.in
 oath==1.4.4
