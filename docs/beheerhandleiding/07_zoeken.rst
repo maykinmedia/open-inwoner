@@ -30,12 +30,12 @@ Bij synoniemen vindt u het overzicht van de synoniemen voor zoekwoorden en ander
 7.2.1. Importeren
 -----------------
 
-Door op de knop [importeren] rechts bovenin uw scherm te klikken kunt u een bestaande synoniemenlijst vanuit .csv of .xlsx importeren. Er wordt een nieuw  scherm geopend waar u een bestand kunt selecteren om te importeren. Klik op [bestand kiezen] en selecteer het gewenste bestand. Selecteer het gewenste bestandsformaat in het drop down menu en klik op [indienen].
+Door op de knop [importeren] rechts bovenin uw scherm te klikken kunt u een bestaande synoniemenlijst vanuit een .csv-bestand importeren. Er wordt een nieuw scherm geopend waar u een bestand kunt selecteren om te importeren. Klik op [bestand kiezen], selecteer het gewenste bestand en klik op [indienen].
 
 7.2.2. Exporteren
 -----------------
 
-Door op de knop [exporteren] rechts bovenin uw scherm te klikken kunt de synoniemenlijst exporteren naar .csv of .xlsx. Er wordt een nieuw scherm geopend waar u het gewenste bestandsformaat kunt selecteren. Klik hierna op [indienen] om te exporteren.
+Door op de knop [exporteren] rechts bovenin uw scherm te klikken kunt u de synoniemenlijst exporteren naar een .csv-bestand. Er wordt een nieuw scherm geopend; klik hier op [indienen] om te exporteren.
 
 7.2.3. Item toevoegen
 ---------------------
@@ -82,7 +82,7 @@ Door op de knop [zoekveldgewicht toevoegen +] rechts bovenin uw scherm te klikke
    :width: 623px
    :height: 149px
 
-Naast de mogelijkheid om bij een match met een gehele zoekterm extra gewicht mee te geven, kunt u er ook voor kiezen extra gewicht mee te geven bij een match met slechts een gedeelte van een zoekterm/samenvatting/content/naam. Dit doet u door in het dropdown menu bij ‘veld’ te kiezen voor een van de opties met daarachter .partial. Bijvoorbeeld als de naam van een product “logeeropvang” is, dan geldt een ingesteld zoekveldgewicht zonder .partial enkel als er op de volledige zoekterm (logeeropvang) wordt gezocht. Bij het gebruik van .partial kan een bepaald (lager/hoger) gewicht gegeven worden aan een deel van de productnaam. Bijvoorbeeld wanneer gezocht wordt op “opvang” geldt het .partial gewicht. Om wijzigingen op te slaan klikt u op de knop [opslaan].
+Naast de mogelijkheid om bij een match met een gehele zoekterm extra gewicht mee te geven, kunt u er ook voor kiezen extra gewicht mee te geven bij een match met slechts een gedeelte van de naam, samenvatting, content of trefwoorden van een product. Dit doet u door in het dropdown menu bij ‘veld’ te kiezen voor een van de opties met daarachter .partial. Bijvoorbeeld als de naam van een product “logeeropvang” is, dan geldt een ingesteld zoekveldgewicht zonder .partial enkel als er op de volledige zoekterm (logeeropvang) wordt gezocht. Bij het gebruik van .partial kan een bepaald (lager/hoger) gewicht gegeven worden aan een deel van de productnaam. Bijvoorbeeld wanneer gezocht wordt op “opvang” geldt het .partial gewicht. Om wijzigingen op te slaan klikt u op de knop [opslaan].
 
 7.3.2. Zoekveldgewicht wijzigen
 -------------------------------
