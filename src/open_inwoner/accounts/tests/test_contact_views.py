@@ -1,13 +1,16 @@
 import io
 from unittest.mock import patch
 
+from django.conf import settings
 from django.core import mail
+from django.core.cache import caches
 from django.core.files.images import ImageFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from django_webtest import WebTest
+from freezegun import freeze_time
 
 from open_inwoner.accounts.choices import ContactTypeChoices
 from open_inwoner.accounts.models import User
@@ -18,11 +21,21 @@ from open_inwoner.utils.tests.helpers import create_image_bytes
 from .factories import DigidUserFactory, UserFactory
 
 
-@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+@override_settings(
+    ROOT_URLCONF="open_inwoner.cms.tests.urls",
+    CACHES={
+        **settings.CACHES,
+        "notification_throttle": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
+        },
+    },
+)
 class ContactViewTests(WebTest):
     csrf_checks = False
 
     def setUp(self) -> None:
+        caches["notification_throttle"].clear()
+
         self.user = UserFactory(first_name="Joe", infix="van de", last_name="Doe")
         self.digid_user = DigidUserFactory(
             first_name="Jane", infix="van de", last_name="Roe"
@@ -196,6 +209,69 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.email)
         self.assertNotContains(response, existing_user.first_name)
         self.assertEqual(existing_user, pending_invitation)
+
+    def submit_contact_form(self, sender: User, receiver: User):
+        response = self.app.get(self.create_url, user=sender)
+        form = response.forms["contact-form"]
+        form["first_name"] = receiver.first_name
+        form["last_name"] = receiver.last_name
+        form["email"] = receiver.email
+        return form.submit(user=sender)
+
+    def test_second_contact_request_within_minute_fails(self):
+        first_receiver = UserFactory()
+        second_receiver = UserFactory()
+
+        with freeze_time("2026-10-21 12:00:00"):
+            self.submit_contact_form(self.user, first_receiver)
+
+        with freeze_time("2026-10-21 12:00:59"):
+            response = self.submit_contact_form(self.user, second_receiver)
+
+        expected_errors = {
+            "__all__": [_("You've made too many requests. Please try again later.")]
+        }
+        self.assertEqual(response.context["form"].errors, expected_errors)
+        self.assertEqual(list(self.user.contacts_for_approval.all()), [first_receiver])
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_second_contact_request_after_minute_succeeds(self):
+        first_receiver = UserFactory()
+        second_receiver = UserFactory()
+
+        with freeze_time("2026-10-21 12:00:00"):
+            self.submit_contact_form(self.user, first_receiver)
+
+        with freeze_time("2026-10-21 12:01:01"):
+            response = self.submit_contact_form(self.user, second_receiver)
+
+        self.assertRedirects(response, self.list_url)
+        self.assertCountEqual(
+            self.user.contacts_for_approval.all(), [first_receiver, second_receiver]
+        )
+        self.assertEqual(len(mail.outbox), 2)
+
+    def test_contact_request_throttle_is_per_user(self):
+        other_sender = UserFactory()
+        receiver = UserFactory()
+
+        self.submit_contact_form(self.user, receiver)
+        response = self.submit_contact_form(other_sender, receiver)
+
+        self.assertRedirects(response, self.list_url)
+        self.assertEqual(list(other_sender.contacts_for_approval.all()), [receiver])
+        self.assertEqual(len(mail.outbox), 2)
+
+    def test_invalid_contact_request_is_not_throttled(self):
+        receiver = UserFactory()
+
+        response = self.submit_contact_form(self.user, self.contact)
+        self.assertEqual(len(response.context["form"].errors["__all__"]), 1)
+
+        response = self.submit_contact_form(self.user, receiver)
+
+        self.assertRedirects(response, self.list_url)
+        self.assertEqual(list(self.user.contacts_for_approval.all()), [receiver])
 
     def test_existing_user_contact_with_case_sensitive_email(self):
         existing_user = UserFactory(email="user@example.com", bsn="111111111")
