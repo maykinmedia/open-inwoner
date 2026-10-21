@@ -580,7 +580,7 @@ class TestCaseDetailView(
             "schemas/ZaakInformatieObject",
             url=f"{ZAKEN_ROOT}zaakinformatieobjecten/fa5153aa-ad2c-4a07-ae75-15add57ee",
             informatieobject=self.informatie_object_archived["url"],
-            zaak=self.zaak_invisible["url"],
+            zaak=self.zaak["url"],
             aardRelatieWeergave="some invisible content",
             titel="",
             beschrijving="",
