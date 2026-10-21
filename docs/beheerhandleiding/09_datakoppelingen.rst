@@ -943,7 +943,7 @@ Elk binnenkomend webhookbericht wordt direct opgeslagen als een notificatieberic
 een auditspoor van alle ontvangen berichten en maakt het mogelijk om mislukte berichten opnieuw
 te verwerken. Berichten die groter zijn dan de maximale payload-grootte (zie hoofdstuk 9.17.4), die niet bij een webhook-abonnement horen (de aanmelding van de verzender klopt niet) of die geen geldige JSON zijn, worden geweigerd en niet opgeslagen.
 
-Het overzicht toont per bericht het **Id**, het webhook-abonnement (**Subscription**), het **Kanaal**, de **Status** en wanneer het bericht is ontvangen (**Received at**), het laatst is verwerkt (**Last processed at**) en wanneer de verwerking is gestart (**Process started at**). Deze namen worden (nog) in het Engels getoond. U kunt filteren op status, abonnement, kanaal, of het bericht geldig is (is valid) en op de datum van ontvangst en verwerking, en zoeken in het kanaal, de verwerkingsfout en de inhoud van het bericht (de payload). Notificatieberichten kunt u niet zelf toevoegen.
+Het overzicht toont per bericht het **ID**, het webhook-abonnement (**Subscription**), het **Kanaal**, de **Status** en wanneer het bericht is ontvangen (**Received at**), het laatst is verwerkt (**Last processed at**) en wanneer de verwerking is gestart (**Process started at**). Deze namen worden (nog) in het Engels getoond. U kunt filteren op status, abonnement, kanaal, of het bericht geldig is (is valid) en op de datum van ontvangst en verwerking, en zoeken in het kanaal, de verwerkingsfout en de inhoud van het bericht (de payload). Notificatieberichten kunt u niet zelf toevoegen.
 
 .. image:: images/koppelingen-notificatieberichten.png
    :alt: Het overzicht van de notificatieberichten met hun status
