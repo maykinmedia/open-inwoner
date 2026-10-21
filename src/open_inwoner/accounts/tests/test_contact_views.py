@@ -222,10 +222,9 @@ class ContactViewTests(WebTest):
         first_receiver = UserFactory()
         second_receiver = UserFactory()
 
-        with freeze_time("2026-10-21 12:00:00"):
+        with freeze_time() as frozen_time:
             self.submit_contact_form(self.user, first_receiver)
-
-        with freeze_time("2026-10-21 12:00:59"):
+            frozen_time.tick(59)
             response = self.submit_contact_form(self.user, second_receiver)
 
         expected_errors = {
@@ -239,13 +238,12 @@ class ContactViewTests(WebTest):
         first_receiver = UserFactory()
         second_receiver = UserFactory()
 
-        with freeze_time("2026-10-21 12:00:00"):
+        with freeze_time() as frozen_time:
             self.submit_contact_form(self.user, first_receiver)
-
-        with freeze_time("2026-10-21 12:01:01"):
+            frozen_time.tick(61)
             response = self.submit_contact_form(self.user, second_receiver)
+            self.assertRedirects(response, self.list_url)
 
-        self.assertRedirects(response, self.list_url)
         self.assertCountEqual(
             self.user.contacts_for_approval.all(), [first_receiver, second_receiver]
         )
