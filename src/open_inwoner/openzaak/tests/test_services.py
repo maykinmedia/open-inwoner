@@ -882,6 +882,89 @@ class ZaakDocumentLinkTest(ClearCachesMixin, TestCase):
         self.assertTrue(self._is_linked())
 
 
+@requests_mock_module.Mocker()
+class ZaakDocumentListTest(ClearCachesMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.api_group = ZGWApiGroupConfigFactory(
+            zrc_service__api_root=ZAKEN_ROOT,
+            drc_service__api_root=DOCUMENTEN_ROOT,
+            form_service=None,
+        )
+        self.service = ZGWService()
+        self.zaak = factory(
+            Zaak,
+            generate_oas_component_cached(
+                "zrc",
+                "schemas/Zaak",
+                url=f"{ZAKEN_ROOT}zaken/{_ZAAK_UUID}",
+                startdatum="2022-01-02",
+                einddatum=None,
+            ),
+        )
+        self.own_document = self._info_object("014c38fe-b010-4412-881c-3000032fb812")
+        self.other_document = self._info_object("6c01bb7f-f0cd-4aa6-9702-806025d995b6")
+
+    def _info_object(self, uuid):
+        return generate_oas_component_cached(
+            "drc",
+            "schemas/EnkelvoudigInformatieObject",
+            uuid=uuid,
+            url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/{uuid}",
+            vertrouwelijkheidaanduiding=VertrouwelijkheidsAanduidingen.openbaar,
+            status="definitief",
+        )
+
+    def _zio(self, zaak_url, info_object):
+        return generate_oas_component_cached(
+            "zrc",
+            "schemas/ZaakInformatieObject",
+            url=f"{ZAKEN_ROOT}zaakinformatieobjecten/{info_object['uuid']}",
+            zaak=zaak_url,
+            informatieobject=info_object["url"],
+            titel="",
+            registratiedatum="2021-01-12",
+        )
+
+    def _setUpMocks(self, m, zios):
+        m.get(f"{ZAKEN_ROOT}zaakinformatieobjecten?zaak={self.zaak.url}", json=zios)
+        for document in (self.own_document, self.other_document):
+            m.get(document["url"], json=document)
+
+    def test_documents_of_zaak_are_listed(self, m):
+        self._setUpMocks(m, [self._zio(self.zaak.url, self.own_document)])
+
+        with self.assertNoLogs("open_inwoner.openzaak.services", level="WARNING"):
+            documents = self.service._fetch_zaak_documents(self.zaak, self.api_group)
+
+        self.assertEqual(
+            [d.info_obj.url for d in documents], [self.own_document["url"]]
+        )
+
+    def test_documents_of_other_zaken_are_not_listed(self, m):
+        # the backend ignored the zaak filter and returned links of another zaak too
+        self._setUpMocks(
+            m,
+            [
+                self._zio(self.zaak.url, self.own_document),
+                self._zio(
+                    f"{ZAKEN_ROOT}zaken/2c07a4ca-539a-47ca-a60c-9d524ce6d73d",
+                    self.other_document,
+                ),
+            ],
+        )
+
+        with self.assertLogs("open_inwoner.openzaak.services", level="WARNING"):
+            documents = self.service._fetch_zaak_documents(self.zaak, self.api_group)
+
+        self.assertEqual(
+            [d.info_obj.url for d in documents], [self.own_document["url"]]
+        )
+        self.assertFalse(
+            any(req.url == self.other_document["url"] for req in m.request_history)
+        )
+
+
 class UserHasRequiredRolTest(TestCase):
     """
     Unit tests for the shared rol predicate used by both `search_zaken` and

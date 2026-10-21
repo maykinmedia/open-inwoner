@@ -1359,9 +1359,24 @@ class ZGWService:
         api_group: ZGWApiGroupConfig,
     ) -> list[ZaakDocumentData]:
         """Fetch zaak documents filtered by visibility. Sorted newest-first."""
-        case_info_objects = self._zaken_client_factory(
+        fetched_case_info_objects = self._zaken_client_factory(
             api_group
         ).fetch_zaak_information_objects(zaak.url)
+
+        # Do not rely on the backend to apply the 'zaak' filter: a backend that
+        # ignores it would list the documents of other zaken. Both URLs come from the
+        # same Zaken API, so they can be compared as is.
+        case_info_objects = [
+            zio
+            for zio in fetched_case_info_objects
+            if (zio.zaak if isinstance(zio.zaak, str) else zio.zaak.url) == zaak.url
+        ]
+        if len(case_info_objects) != len(fetched_case_info_objects):
+            logger.warning(
+                "zaakinformatieobjecten returned links of other zaken, "
+                "the backend ignored the zaak filter",
+                zaak_url=zaak.url,
+            )
 
         config = OpenZaakConfig.get_solo()
         documents = []
