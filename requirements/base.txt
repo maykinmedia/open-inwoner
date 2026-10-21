@@ -566,7 +566,7 @@ phonenumbers==8.13.29
     # via -r requirements/base.in
 phonenumberslite==8.13.29
     # via django-two-factor-auth
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   -r requirements/base.in
     #   easy-thumbnails
