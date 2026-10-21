@@ -4,6 +4,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import Group
+from django.core.cache import caches
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.validators import validate_email
@@ -517,6 +518,9 @@ class ContactCreateForm(forms.Form):
         required=False,
     )
 
+    # minimum time (in seconds) between two contact requests of the same user
+    throttle_period = 60
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
@@ -592,8 +596,23 @@ class ContactCreateForm(forms.Form):
                     _("The user cannot be added, their account has been deleted.")
                 )
 
+        if self.is_throttled():
+            raise ValidationError(
+                _("You've made too many requests. Please try again later.")
+            )
+
         cleaned_data["added_contacts"] = added_contacts
         return cleaned_data
+
+    def is_throttled(self) -> bool:
+        """
+        If the cache is unavailable, the request is allowed: with
+        IGNORE_EXCEPTIONS=True, django-redis returns None instead of
+        raising, so only an explicit False counts as throttled.
+        """
+        cache = caches["notification_throttle"]
+        key = f"contact_request_{self.user.pk}"
+        return cache.add(key, True, timeout=self.throttle_period) is False
 
 
 class UserField(forms.ModelChoiceField):

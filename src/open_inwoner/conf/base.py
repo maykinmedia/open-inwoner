@@ -258,6 +258,16 @@ CACHES = {
             "IGNORE_EXCEPTIONS": True,
         },
     },
+    # rate limiting of notifications (e.g. emails) sent on behalf of users
+    "notification_throttle": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
+        "KEY_PREFIX": "notification_throttle",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    },
     "local": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     },

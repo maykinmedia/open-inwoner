@@ -33,6 +33,9 @@ LOGGING = {
 CACHES.update(
     {
         "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+        "notification_throttle": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
+        },
         # See: https://github.com/jazzband/django-axes/blob/master/docs/configuration.rst#cache-problems
         "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
     }
