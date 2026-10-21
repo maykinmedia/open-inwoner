@@ -1,3 +1,46 @@
+2.4.8 (2026-10-26)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.8`.
+
+.. note::
+
+   Dit is een hotfix-release met beveiligingsupdates voor een aantal
+   afhankelijkheden. We adviseren u zo snel mogelijk te upgraden.
+
+Beveiliging
+-----------
+
+* [:gh:`3119`]: ``certifi`` is bijgewerkt naar versie ``2026.10.19``. Hiermee
+  zijn de gecompromitteerde emSign-rootcertificaten verwijderd uit de lijst met
+  vertrouwde certificaten (`GHSA-6q48-6c7w-9gw2
+  <https://github.com/advisories/GHSA-6q48-6c7w-9gw2>`_). Het algemene
+  aanvalsscenario is een adversary-in-the-middle-aanval, waarbij een aanvaller
+  zich voordoet als een externe dienst waarmee Open Inwoner verbinding maakt.
+  Een via deze roots uitgegeven certificaat alleen is daarvoor niet voldoende:
+  de aanvaller moet ook het netwerkverkeer tussen Open Inwoner en die dienst
+  kunnen onderscheppen of omleiden. In een gebruikelijke configuratie schatten
+  wij de kans daarop laag in.
+* [:gh:`3122`]: ``pillow`` bijgewerkt naar ``13.0.0``.
+* ``djangorestframework`` bijgewerkt naar ``3.18.3``.
+* [:gh:`3134`]: ``brotli`` bijgewerkt naar ``1.2.1``.
+* [:gh:`3025`]: ``Django`` bijgewerkt naar ``5.2.18``.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`3119`]: Na de upgrade worden certificaten die zijn uitgegeven onder een
+  emSign-root niet langer vertrouwd. Controleer na de upgrade of de verbindingen
+  met externe diensten (zoals ZGW-API's, Haal Centraal, Open Klant en
+  e-mail/SMS-providers) nog werken. Mocht een dienst een certificaat gebruiken
+  dat onder een emSign-root valt, dan moet de beheerder van die dienst het
+  certificaat laten vervangen.
+
+Onderhoud
+---------
+
+* [:gh:`3119`]: ``certifi`` bijgewerkt van ``2025.11.12`` naar ``2026.10.19``.
+
 2.4.7 (2026-10-14)
 ==================
 
