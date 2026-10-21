@@ -356,7 +356,7 @@ django-cors-headers==3.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-csp==3.7
+django-csp==4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1067,6 +1067,7 @@ packaging==26.0
     #   -r requirements/ci.txt
     #   commitizen
     #   django-cms
+    #   django-csp
     #   djangocms-versioning
     #   kombu
     #   opentelemetry-instrumentation
