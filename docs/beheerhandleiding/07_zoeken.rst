@@ -54,7 +54,7 @@ Hier vult u de zoekterm in waar u synoniemen bij wilt aangeven.
 **Synoniemen**
 Hier vult u alle relevante synoniemen van de zoekterm in. Klik op [extra synoniem toevoegen] om een extra veld aan te maken voor een extra synoniem. Door op [x] te klikken kunt u een synoniem verwijderen. Met de pijltjes omhoog en omlaag kunt u de gecreëerde synoniemen omhoog of omlaag verplaatsen in de synoniemenlijst.
 
-7.2.4. Item wijzigen
+7.2.4. Synoniem wijzigen
 --------------------
 
 Door op een zoekterm in het overzicht te klikken kunt u deze term en de bijbehorende synoniemen wijzigen. Er wordt een nieuw scherm geopend met de velden beschreven in 7.2.3, maar wanneer er al synoniemen ingevuld zijn ziet dit scherm er anders uit. Ook hier kunt u door op [x] te klikken een synoniem verwijderen en gebruikt u de pijltjes omhoog en omlaag om de synoniemen omhoog of omlaag verplaatsen in de synoniemenlijst. Om wijzigingen op te slaan klikt u op de knop [opslaan].

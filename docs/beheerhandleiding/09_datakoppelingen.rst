@@ -25,6 +25,7 @@ gebruikers. Dit is overzichtelijk weergegeven in de tabel op deze pagina.
 |    | Open Zaak                    |    | Mijn zaken                                               |
 |    | Open Formulieren             |    | Producten                                                |
 |    | Webhook-abonnementen         |    | Mijn zaken - notificaties                                |
+|    | Open Afval                   |    | Mijn afval                                               |
 +-----------------------------------+---------------------------------------------------------------+
 
 .. _mijn-zaken-inrichten:
