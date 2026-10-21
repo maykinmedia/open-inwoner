@@ -18,7 +18,7 @@ Zowel via het menu als via het dashboard kunt u naar het gewenste onderdeel door
 
 Onder acties vindt u alle acties die gebruikers aan de voorkant van Open Inwoner (onder Mijn Profiel en in samenwerkingen) hebben aangemaakt. Dit onderdeel is enkel in te zien (read-only): u kunt geen acties toevoegen of wijzigen.
 
-.. image:: images/actions-list.png
+.. image:: images/actions-list-sorted.png
    :alt: Het overzicht van de acties, met rechts de filters
    :width: 600px
 
@@ -88,7 +88,7 @@ Door op een specifiek bericht te klikken kunt u de details van het bericht raadp
 
 Onder documenten vindt u alle documenten die gebruikers aan de voorkant van Open Inwoner (onder Mijn Profiel en in samenwerkingen) hebben toegevoegd. Dit onderdeel is read-only: er kunnen geen wijzigingen worden aangebracht.
 
-.. image:: images/documents-list.png
+.. image:: images/ScreenshotOIPdocumenten-Djuzz250311.png
    :alt: Het overzicht van de documenten, met rechts het filter op eigenaar
    :width: 600px
 
@@ -115,7 +115,7 @@ Elke melding is een feed item. Er zijn vier soorten (types): "Eenvoudig tekstber
 
 In de backend is het overzicht van de feed items te raadplegen. Dit onderdeel is read-only.
 
-.. image:: images/feed-items-list.png
+.. image:: images/ScreenshotOIPfeeditemdata-Djuzz250311.png
    :alt: Het overzicht van de feed items, met rechts het filter op type
    :width: 600px
 
@@ -127,7 +127,7 @@ Wilt u weten welke meldingen een bepaalde gebruiker op dit moment in het blok "O
 4.5. Gebruikers
 ===============
 
-**Locatie in het menu:** Gebruikers & Authenticatie > Gebruikers > Gebruikers
+**Locatie in het menu:** Gebruikers & Authenticatie > Gebruikers
 
 Onder gebruikers vindt u alle gebruikers van uw Open Inwoner: zowel inwoners en bedrijven als begeleiders en beheerders. Indien gewenst kunt u gebruikers toevoegen, wijzigen en verwijderen. Daarnaast kunt u de permissies van gebruikers wijzigen.
 
