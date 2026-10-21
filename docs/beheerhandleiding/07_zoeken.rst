@@ -25,6 +25,8 @@ Gebruikers kunnen na het uitvoeren van een zoekopdracht feedback geven of ze met
 7.2. Synoniemen
 ===============
 
+**Modules > Zoeken > Synoniemen**
+
 Bij synoniemen vindt u het overzicht van de synoniemen voor zoekwoorden en andere termen. Deze lijst is standaard gevuld met een import. U kunt het systeem slimmer maken door zelf synoniemen toe te voegen. Daarnaast kunnen synoniemen worden aangepast en worden verwijderd, kunt u hem verrijken met een geïmporteerde lijst en u kunt de synoniemenlijst in zijn geheel exporteren.
 
 7.2.1. Importeren
@@ -37,7 +39,7 @@ Door op de knop [importeren] rechts bovenin uw scherm te klikken kunt u een best
 
 Door op de knop [exporteren] rechts bovenin uw scherm te klikken kunt u de synoniemenlijst exporteren naar een .csv-bestand. Er wordt een nieuw scherm geopend; klik hier op [indienen] om te exporteren.
 
-7.2.3. Item toevoegen
+7.2.3. Synoniem toevoegen
 ---------------------
 
 Door op de knop [synoniem toevoegen +] rechts bovenin uw scherm te klikken kunt u een nieuwe synoniem toevoegen. Er wordt een nieuw scherm geopend waar u de term en de bijbehorende synoniemen kunt invullen. Door op [extra synoniem toevoegen] te klikken kunt u nog een synoniem aan dezelfde term toevoegen. Om wijzigingen op te slaan klikt u op de knop [opslaan].
