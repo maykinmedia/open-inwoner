@@ -64,7 +64,7 @@ Onder Modules vindt u de onderdelen van Open Inwoner die een inwoner aan de voor
 - **Klantensysteem**: de configuratie van het klantensysteem en de KlantContactMomenten voor Mijn vragen (zie hoofdstuk 9).
 - **Mailinglijsten**: de Laposta-configuratie voor de nieuwsbrieven (zie hoofdstuk 9).
 - **Producten en categorieën**: de producten, onderwerpen, organisaties, tags, veelgestelde vragen en vragenlijststappen (zie hoofdstuk 6), en de Open Forms-configuratie (zie hoofdstuk 9).
-- **Samenwerkingen**: de acties, berichten en documenten (zie hoofdstuk 4) en de samenwerkingsplannen en plan templates (zie hoofdstuk 5).
+- **Samenwerkingen**: de acties, berichten en documenten (zie hoofdstuk 4), evenals de samenwerkingsplannen en plantemplates (zie hoofdstuk 5).
 - **Uitkeringen**: de configuratie van Mijn uitkeringen (zie hoofdstuk 9).
 - **Zaken**: de configuratie van Open Zaak, de zaaktypen en de notificaties voor Mijn Zaken (zie hoofdstuk 9; hoe u Mijn Zaken inricht leest u in hoofdstuk 9.0).
 - **Zoeken**: feedback, synoniemen en zoekveldgewicht (zie hoofdstuk 7).
