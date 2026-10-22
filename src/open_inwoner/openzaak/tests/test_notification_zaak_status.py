@@ -288,9 +288,10 @@ class StatusNotificationHandlerTestCase(
             f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={RolTypes.niet_natuurlijk_persoon}",
             json=paginated_response([]),
         )
+        # WORKAROUND: vestiging is not queried, as Decos rejects it with a 400
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={zaak_url}&betrokkeneType={RolTypes.vestiging}",
-            json=paginated_response([]),
+            status_code=400,
         )
 
         ztc = ZaakTypeConfigFactory.create(
