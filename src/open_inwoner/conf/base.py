@@ -425,6 +425,7 @@ INSTALLED_APPS = [
     "open_inwoner.questionnaire",
     "open_inwoner.extended_sessions",
     "open_inwoner.custom_csp",
+    "open_inwoner.reporting_api",
     "open_inwoner.mail",
     "open_inwoner.media",
     "open_inwoner.userfeed",
@@ -472,6 +473,8 @@ _structlog_middleware = (
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django_permissions_policy.PermissionsPolicyMiddleware",
+    "open_inwoner.reporting_api.middleware.ReportingEndpointsMiddleware",
     "sessionprofile.middleware.SessionProfileMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 'django.middleware.locale.LocaleMiddleware',
@@ -800,6 +803,12 @@ LOGGING = {
         "django_structlog": {
             "handlers": ["console"],
             "level": "INFO",
+        },
+        # violation reports sent by browsers through the Reporting API
+        "reporting_api": {
+            "handlers": ["project"] if not LOG_STDOUT else ["console"],
+            "level": "INFO",
+            "propagate": True,
         },
     },
 }
@@ -1840,6 +1849,8 @@ ACCOUNTS_SMS_GATEWAY = {
 }
 
 from .app.csp import *  # noqa
+from .app.permissions_policy import *  # noqa
+from .app.reporting_api import *  # noqa
 
 SECURE_REFERRER_POLICY = "same-origin"
 

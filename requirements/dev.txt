@@ -34,6 +34,7 @@ asgiref==3.11.1
     #   -r requirements/ci.txt
     #   django
     #   django-htmx
+    #   django-permissions-policy
     #   django-structlog
 asn1crypto==1.5.1
     # via
@@ -254,6 +255,7 @@ django==5.2.18
     #   django-open-forms-client
     #   django-otp
     #   django-parler
+    #   django-permissions-policy
     #   django-phonenumber-field
     #   django-polymorphic
     #   django-privates
@@ -463,6 +465,10 @@ django-parler==2.3
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   djangocms-alias
+django-permissions-policy==4.34.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 django-phonenumber-field==5.2.0
     # via
     #   -c requirements/ci.txt
@@ -905,6 +911,10 @@ mozilla-django-oidc-db[setup-configuration]==2.0.1
     #   django-digid-eherkenning
 msgpack==1.1.2
     # via locust
+msgspec==0.22.0
+    # via
+    #   -c requirements/ci.txt
+    #   -r requirements/ci.txt
 nodeenv==1.9.1
     # via pre-commit
 notifications-api-common==0.2.2

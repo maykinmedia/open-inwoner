@@ -7,3 +7,4 @@ Configuration
 
    01_setup_config
    02_env_vars
+   03_permissions_policy
