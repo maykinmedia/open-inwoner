@@ -1871,7 +1871,6 @@ class TestCaseDetailView(
 
         with patch(
             "open_inwoner.openzaak.api_models.Zaak._format_zaak_identificatie",
-            return_value="ZAAK-2022-0000000001",
         ) as spy_format:
             self.app.get(self.case_detail_url, user=self.user)
 

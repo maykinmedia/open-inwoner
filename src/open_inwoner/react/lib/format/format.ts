@@ -33,3 +33,15 @@ export const formatToKiloGrams = (value: unknown) => {
 
   throw new Error('Only string and numbers can formatted to Kilo grams');
 };
+
+export const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(document.documentElement.lang || 'nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Amsterdam',
+  }).format(date);
+};

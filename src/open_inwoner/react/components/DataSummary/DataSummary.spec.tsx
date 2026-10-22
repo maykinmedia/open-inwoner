@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/preact';
 import { describe, it, expect, afterEach } from 'vitest';
 import DataSummary, { ListItem } from './DataSummary';
+import { isDate } from '@react/lib/compare';
 
 describe('DataSummary', () => {
   afterEach(() => {
@@ -18,11 +19,11 @@ describe('DataSummary', () => {
 
     expect(container.querySelector('dl')).toBeInTheDocument();
 
-    items.forEach(({ label, value, type }) => {
+    items.forEach(({ label, value }) => {
       if (label) {
         expect(screen.getByText(label)).toBeInTheDocument();
       }
-      if (value != null && type !== 'date') {
+      if (value != null && !isDate(value)) {
         expect(screen.getByText(String(value))).toBeInTheDocument();
       }
     });
@@ -31,9 +32,7 @@ describe('DataSummary', () => {
   it('renders a date as day, month name and year', () => {
     document.documentElement.lang = 'nl';
 
-    const items: ListItem[] = [
-      { label: 'Datum', value: '2026-08-20', type: 'date' },
-    ];
+    const items: ListItem[] = [{ label: 'Datum', value: '2026-08-20' }];
 
     render(<DataSummary items={items} />);
 
@@ -41,7 +40,7 @@ describe('DataSummary', () => {
   });
 
   it('shows a number as is when type is date', () => {
-    const items: ListItem[] = [{ label: 'Datum', value: 123456, type: 'date' }];
+    const items: ListItem[] = [{ label: 'Datum', value: 123456 }];
 
     render(<DataSummary items={items} />);
 
@@ -49,7 +48,7 @@ describe('DataSummary', () => {
   });
 
   it('does not crash when the date is invalid', () => {
-    const items: ListItem[] = [{ label: 'Datum', value: 'abc', type: 'date' }];
+    const items: ListItem[] = [{ label: 'Datum', value: 'abc' }];
 
     render(<DataSummary items={items} />);
 

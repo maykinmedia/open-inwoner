@@ -4,11 +4,12 @@ import {
 } from '@gemeente-denhaag/descriptionlist';
 import { usePropsOrScriptData } from '@react/lib/json';
 import { AnyComponent as AC } from 'preact';
+import { formatDate } from '@react/lib/format/format';
+import { isDate } from '@react/lib/compare';
 
 export interface ListItem {
   label: string;
   value?: string | number | null;
-  type?: 'date';
 }
 
 export interface IDataSummaryProps {
@@ -16,29 +17,14 @@ export interface IDataSummaryProps {
   itemsId?: string;
 }
 
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat(document.documentElement.lang || 'nl-NL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Europe/Amsterdam',
-  }).format(date);
-};
-
 const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId }) => {
   const data = usePropsOrScriptData<ListItem[]>(items, itemsId);
 
   if (!data?.length) return <></>;
 
-  const listItems = data.map(({ label, value, type }) => ({
+  const listItems = data.map(({ label, value }) => ({
     title: label,
-    detail:
-      type === 'date' && typeof value === 'string'
-        ? formatDate(value)
-        : (value ?? '-'),
+    detail: isDate(value) ? formatDate(value) : (value ?? '-'),
   })) satisfies DescriptionListProps['items'];
 
   return <DescriptionList items={listItems} />;
