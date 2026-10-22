@@ -242,3 +242,66 @@ message = "Provide additional contextual information about the code changes: (pr
 type = "input"
 name = "footer"
 message = "Information about Breaking Changes and reference issues that this commit closes: (press [enter] to skip)"
+
+#
+# towncrier for release notes
+#
+[tool.towncrier]
+name = "Open Inwoner Platform"
+directory = ".release-notes"
+filename = "release-notes.rst"
+template = ".release-notes/template.rst"
+# Everything else in the directory must be a valid fragment, which catches typos in types
+ignore = ["README.rst"]
+issue_format = '`#{issue} <https://github.com/maykinmedia/open-inwoner/issues/{issue}>`__'
+
+# Use array syntax so that sections are rendered in the order listed here
+[[tool.towncrier.type]]
+directory = "security"
+name = "Belangrijke updates"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "security-improvement"
+name = "Overige beveiligingsupdates"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "Breaking changes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "actiepunt"
+name = "Actiepunten"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "aandachtspunt"
+name = "Aandachtspunten"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecation"
+name = "Uitfaseringen"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "belangrijk"
+name = "Belangrijkste verbeteringen"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feat"
+name = "Nieuwe functies"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fix"
+name = "Bugfixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "onderhoud"
+name = "Onderhoud"
+showcontent = true
