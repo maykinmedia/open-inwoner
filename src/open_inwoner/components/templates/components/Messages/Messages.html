@@ -2,79 +2,81 @@
 
 <section class="messages">
     <div class="messages__container">
-    <header class="messages__header">
-        <h2 class="utrecht-heading-4">{{ subject }}</h2>
-        <nl-paragraph class-name="nl-paragraph--oip">{{ status }}</nl-paragraph>
-    </header>
+        <header class="messages__header">
+            <h2 class="utrecht-heading-4">{{ subject }}</h2>
+            <nl-paragraph class-name="nl-paragraph--oip">{{ status }}</nl-paragraph>
+        </header>
 
 
-    <div class="messages__body">
-        <ol
-            class="messages__days"
-            hx-get="{{ request.get_full_path }}"
-            hx-select=".messages__days"
-            hx-trigger="every 5s"
-        >
-            {% for day in days %}
-                <li class="messages__day">
-                    <header class="messages__day-header">
-                        <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-paragraph-muted">{{ day.text }}</nl-paragraph>
-                    </header>
+        <div class="messages__body">
+            <ol
+                class="messages__days"
+                hx-get="{{ request.get_full_path }}"
+                hx-select=".messages__days"
+                hx-trigger="every 5s"
+            >
+                {% for day in days %}
+                    <li class="messages__day">
+                        <header class="messages__day-header">
+                            <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-paragraph-muted">{{ day.text }}</nl-paragraph>
+                        </header>
 
-                    <ol class="messages__list">
-                        {% for message in day.messages %}
-                            <li class="messages__list-item">
-                                {% if forloop.last and forloop.parentloop.last %}
-                                    <a id="messages-last"></a>
-                                {% endif %}
+                        <ol class="messages__list">
+                            {% for message in day.messages %}
+                                <li class="messages__list-item">
+                                    {% if forloop.last and forloop.parentloop.last %}
+                                        <a id="messages-last"></a>
+                                    {% endif %}
 
-                                {% if message.content %}
-                                    {% message message user=user %}
-                                {% endif %}
+                                    {% if message.content %}
+                                        {% message message user=user %}
+                                    {% endif %}
 
-                                {% if message.file %}
-                                    {% message message user=user file=True %}
-                                {% endif %}
+                                    {% if message.file %}
+                                        {% message message user=user file=True %}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </li>
+                {% endfor %}
+            </ol>
 
-                            </li>
-                        {% endfor %}
-                    </ol>
-                </li>
-            {% endfor %}
-        </ol>
-
-        {% if other_user.is_active %}
-            {% url 'inbox:index' as form_action %}
-            {% render_form id="message-form" form=form method="POST" form_action=form_action enctype="multipart/form-data" %}
-                {% csrf_token %}
-                {% hidden form.receiver %}
-                <div class="group-input">
-                    {% textarea form.content %}
-                    <div class="group-input__toolbar">
-                        {% if allow_file_sharing %}
-                            {% input form.file no_label=True no_help=True extra_classes="message-file" %}
-                        {% endif %}
-                        <div class="emoji">
-                            {% button class="emoji__button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
-                            <div class="emoji__popup">
-                                <div class="emoji__header">
-                                    <input class="emoji__search input input--bordered" type="search" placeholder="{% trans "Zoek emoji" %}">
-                                    <div>
-                                        <span aria-hidden="true" class="material-icons emoji__close">close</span>
-                                        <span class="sr-only">Sluit emojis dropdown</span>
+            {% if other_user.is_active %}
+                {% url 'inbox:index' as form_action %}
+                {% render_form id="message-form" form=form method="POST" form_action=form_action enctype="multipart/form-data" %}
+                    {% csrf_token %}
+                    {% hidden form.receiver %}
+                    <div class="group-input">
+                        {% textarea form.content %}
+                        <div class="group-input__toolbar">
+                            {% if allow_file_sharing %}
+                                {% input form.file no_label=True no_help=True extra_classes="message-file" %}
+                            {% endif %}
+                            <div class="emoji">
+                                {% button class="emoji__button" icon="tag_faces" text=_('Selecteer emoji') hide_text=True type="button" %}
+                                <div class="emoji__popup">
+                                    <div class="emoji__header">
+                                        <input class="emoji__search input input--bordered" type="search" placeholder="{% trans "Zoek emoji" %}">
+                                        <div>
+                                            <span aria-hidden="true" class="material-icons emoji__close">close</span>
+                                            <span class="sr-only">Sluit emojis dropdown</span>
+                                        </div>
                                     </div>
-
+                                    <div class="emoji__emojis"></div>
+                                       </div>
+                                    </div>
                                 </div>
-                                <div class="emoji__emojis"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            </div>
-                {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' %}
-            {% endrender_form %}
-        {% else %}
+                {% endrender_form %}
+        </div> {# Closing tag for .messages__body #}
+    </div> {# Closing tag for .messages__container #}
+    {% form_actions primary_text=_("Verzenden") primary_icon='arrow_forward' form_id="message-form" %}
+    {% else %}
             <nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-paragraph-muted">{% trans "De gebruiker is inactief. Het is niet mogelijk een bericht te sturen." %}</nl-paragraph>
-        {% endif %}
+        </div> {# Closing tag for .messages__body #}
+    </div> {# Closing tag for .messages__container #}
+    {% endif %}
 </section>
