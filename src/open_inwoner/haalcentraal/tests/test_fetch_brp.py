@@ -61,7 +61,7 @@ class FetchBRPCheckTests(TestCase):
         result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("not configured", result.message)
+        self.assertIn("niet geconfigureerd", result.message)
 
     def test_network_error(self):
         form = FetchBRPForm(data={"bsn": "123456789"})
@@ -76,7 +76,7 @@ class FetchBRPCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Failed to connect", result.message)
+        self.assertIn("Verbinding met de BRP-API mislukt", result.message)
 
     def test_validation_error(self):
         form = FetchBRPForm(data={"bsn": "123456789"})
@@ -89,7 +89,7 @@ class FetchBRPCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("failed validation", result.message)
+        self.assertIn("niet door de validatie gekomen", result.message)
 
     def test_unexpected_error(self):
         form = FetchBRPForm(data={"bsn": "123456789"})
@@ -102,7 +102,7 @@ class FetchBRPCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("Unexpected error", result.message)
+        self.assertIn("Onverwachte fout", result.message)
 
     def test_no_person_found(self):
         form = FetchBRPForm(data={"bsn": "123456789"})
@@ -116,7 +116,7 @@ class FetchBRPCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertFalse(result.success)
-        self.assertIn("No person found", result.message)
+        self.assertIn("Geen persoon gevonden", result.message)
 
     def test_person_found(self):
         form = FetchBRPForm(data={"bsn": "123456789"})
@@ -130,7 +130,7 @@ class FetchBRPCheckTests(TestCase):
             result = self.check.run(form.cleaned_data)
 
         self.assertTrue(result.success)
-        self.assertIn("BRP data retrieved", result.message)
+        self.assertIn("BRP-gegevens opgehaald", result.message)
         self.assertEqual(result.extra["version"], "2.1")
 
 
@@ -182,7 +182,7 @@ class FetchBRPViewTests(TestCase):
         response = self.client.post(self.get_url(), {"bsn": "123456789"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "not configured")
+        self.assertContains(response, "niet geconfigureerd")
 
     @disable_admin_mfa()
     def test_config_check_button_on_admin_change_page(self):
@@ -212,4 +212,4 @@ class FetchBRPStandaloneTests(TestCase):
         response = self.client.post(url, {"bsn": "123456789"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "not configured")
+        self.assertContains(response, "niet geconfigureerd")
