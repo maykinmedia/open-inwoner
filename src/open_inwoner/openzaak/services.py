@@ -1124,10 +1124,13 @@ class ZGWService:
         # Only query types that can map to a user account; medewerker and
         # organisatorische_eenheid are internal government roles and some
         # backends (e.g. iConnect/Decos) reject those types with a 400.
+        #
+        # WORKAROUND: vestiging is skipped as well. Decos rejects it with a 400 too,
+        # and since a failing rollen fetch now aborts the whole notification, that
+        # would block notifications for every zaak.
         available_user_betrokkene_types = (
             RolTypes.natuurlijk_persoon,
             RolTypes.niet_natuurlijk_persoon,
-            RolTypes.vestiging,
         )
         roles = []
         for betrokkene_type in available_user_betrokkene_types:
