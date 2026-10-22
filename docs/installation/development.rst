@@ -122,11 +122,83 @@ This will include the `Open-Inwoner-Design-Tokens`_ subdirectory. When all is bu
 ``src/open_inwoner/conf/local.py``. You can base this file on the
 example file included in the same directory.
 
-**Note:** You can run watch-tasks to compile `Sass`_ to CSS and `ECMA`_ to JS
-using ``npm run watch``.
+**Note:** While working on the frontend, run ``npm run watch`` to start the
+Vite dev server, which hot reloads your `Sass`_ and JavaScript changes in the
+browser. See `Frontend assets (Vite)`_ below.
 
-.. _ECMA: https://ecma-international.org/
 .. _Sass: https://sass-lang.com/
+
+
+Frontend assets (Vite)
+----------------------
+
+The frontend is built with `Vite`_, and Django finds the build output through
+`django-vite`_.
+
+How it works
+~~~~~~~~~~~~
+
+``npm run build`` writes the bundles to ``src/open_inwoner/static/bundles/``.
+Every file name contains a content hash (e.g. ``index.3f9a1c.js``), and Vite
+also writes a ``manifest.json`` that maps each entry point to its hashed
+output. Templates don't hardcode bundle names: they reference the source
+entries, and django-vite looks up the hashed files in the manifest:
+
+.. code-block:: django
+
+    {% vite_asset_url 'src/open_inwoner/scss/screen.scss' %}
+    {% vite_asset 'src/open_inwoner/js/index.js' nonce=request.csp_nonce %}
+
+django-vite reads the manifest from the build directory, not from
+``STATIC_ROOT``, so it works without running ``collectstatic``. It's configured
+with the ``DJANGO_VITE`` setting in ``src/open_inwoner/conf/base.py``.
+
+Without a build (and without the dev server running, see below) the manifest
+doesn't exist and the pages can't load their CSS and JavaScript, so run
+``npm run build`` at least once.
+
+In production, ``collectstatic`` uses
+``open_inwoner.utils.files.ViteManifestStaticFilesStorage``. Like Django's
+``ManifestStaticFilesStorage``, it adds a content hash to the other static
+files, but it leaves ``bundles/`` alone. Vite already hashed those files, and
+they import each other by their Vite file names. A second, Django-hashed copy
+would be loaded as a separate module (e.g. two preact instances).
+
+Local development
+~~~~~~~~~~~~~~~~~
+
+With the development settings (``open_inwoner.conf.dev``) you can work in
+either of two ways:
+
+* **Dev server**: run ``npm run watch`` next to ``runserver``. This starts the
+  Vite dev server on ``http://localhost:5173``. Django serves the assets from
+  the dev server and adds Vite's hot reload client to the pages, so Sass and
+  JavaScript changes appear in the browser without a reload or a rebuild.
+* **Build output**: when the dev server isn't running, Django falls back to
+  the output of the last ``npm run build``. You don't need to restart Django
+  after a rebuild, because the manifest is re-read whenever it changes.
+
+Django checks whether the dev server is running by trying to connect to port
+5173, at most once a second (see ``open_inwoner.utils.vite.ViteAppClient``), so
+you can start and stop ``npm run watch`` at any time.
+
+Some things to keep in mind:
+
+* The port is fixed (``strictPort`` in ``vite.config.js``): if 5173 is already
+  in use, ``npm run watch`` fails instead of picking another port. If you
+  change the port, also change ``_VITE_DEV_SERVER`` in
+  ``src/open_inwoner/conf/dev.py``, which allows the dev server in the Content
+  Security Policy.
+* The dev server only switches on when ``DJANGO_VITE["default"]["dev_mode"]``
+  is enabled, as it is in ``open_inwoner.conf.dev``. Other settings modules
+  (e.g. ``docker`` and ``production``) always use the build output.
+* Vite watches the project directory for changes, minus the directories
+  listed under ``server.watch.ignored`` in ``vite.config.js``. If you hit the
+  ``inotify`` watch limit (``ENOSPC`` errors), add the offending directory,
+  such as a virtualenv with a different name, to that list.
+
+.. _Vite: https://vite.dev/
+.. _django-vite: https://github.com/MrBin99/django-vite
 
 
 ElasticSearch
@@ -171,14 +243,21 @@ When updating an existing installation:
        pip install -r requirements/dev.txt
        npm install
 
-3. Update the statics and database:
+3. Rebuild the frontend, since the hashed bundle names change with every
+   build (or run ``npm run watch`` instead, see `Frontend assets (Vite)`_):
+
+   .. code-block:: bash
+
+       npm run build
+
+4. Update the statics and database:
 
    .. code-block:: bash
 
        python src/manage.py collectstatic --link
        python src/manage.py migrate
 
-4. Update the ElasticSearch indices:
+5. Update the ElasticSearch indices:
 
    .. code-block:: bash
 
