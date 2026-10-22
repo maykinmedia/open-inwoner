@@ -25,19 +25,21 @@ Gebruikers kunnen na het uitvoeren van een zoekopdracht feedback geven of ze met
 7.2. Synoniemen
 ===============
 
+**Modules > Zoeken > Synoniemen**
+
 Bij synoniemen vindt u het overzicht van de synoniemen voor zoekwoorden en andere termen. Deze lijst is standaard gevuld met een import. U kunt het systeem slimmer maken door zelf synoniemen toe te voegen. Daarnaast kunnen synoniemen worden aangepast en worden verwijderd, kunt u hem verrijken met een geïmporteerde lijst en u kunt de synoniemenlijst in zijn geheel exporteren.
 
 7.2.1. Importeren
 -----------------
 
-Door op de knop [importeren] rechts bovenin uw scherm te klikken kunt u een bestaande synoniemenlijst vanuit .csv of .xlsx importeren. Er wordt een nieuw  scherm geopend waar u een bestand kunt selecteren om te importeren. Klik op [bestand kiezen] en selecteer het gewenste bestand. Selecteer het gewenste bestandsformaat in het drop down menu en klik op [indienen].
+Door op de knop [importeren] rechts bovenin uw scherm te klikken kunt u een bestaande synoniemenlijst vanuit een .csv-bestand importeren. Er wordt een nieuw scherm geopend waar u een bestand kunt selecteren om te importeren. Klik op [bestand kiezen], selecteer het gewenste bestand en klik op [indienen].
 
 7.2.2. Exporteren
 -----------------
 
-Door op de knop [exporteren] rechts bovenin uw scherm te klikken kunt de synoniemenlijst exporteren naar .csv of .xlsx. Er wordt een nieuw scherm geopend waar u het gewenste bestandsformaat kunt selecteren. Klik hierna op [indienen] om te exporteren.
+Door op de knop [exporteren] rechts bovenin uw scherm te klikken kunt u de synoniemenlijst exporteren naar een .csv-bestand. Er wordt een nieuw scherm geopend; klik hier op [indienen] om te exporteren.
 
-7.2.3. Item toevoegen
+7.2.3. Synoniem toevoegen
 ---------------------
 
 Door op de knop [synoniem toevoegen +] rechts bovenin uw scherm te klikken kunt u een nieuwe synoniem toevoegen. Er wordt een nieuw scherm geopend waar u de term en de bijbehorende synoniemen kunt invullen. Door op [extra synoniem toevoegen] te klikken kunt u nog een synoniem aan dezelfde term toevoegen. Om wijzigingen op te slaan klikt u op de knop [opslaan].
@@ -52,7 +54,7 @@ Hier vult u de zoekterm in waar u synoniemen bij wilt aangeven.
 **Synoniemen**
 Hier vult u alle relevante synoniemen van de zoekterm in. Klik op [extra synoniem toevoegen] om een extra veld aan te maken voor een extra synoniem. Door op [x] te klikken kunt u een synoniem verwijderen. Met de pijltjes omhoog en omlaag kunt u de gecreëerde synoniemen omhoog of omlaag verplaatsen in de synoniemenlijst.
 
-7.2.4. Item wijzigen
+7.2.4. Synoniem wijzigen
 --------------------
 
 Door op een zoekterm in het overzicht te klikken kunt u deze term en de bijbehorende synoniemen wijzigen. Er wordt een nieuw scherm geopend met de velden beschreven in 7.2.3, maar wanneer er al synoniemen ingevuld zijn ziet dit scherm er anders uit. Ook hier kunt u door op [x] te klikken een synoniem verwijderen en gebruikt u de pijltjes omhoog en omlaag om de synoniemen omhoog of omlaag verplaatsen in de synoniemenlijst. Om wijzigingen op te slaan klikt u op de knop [opslaan].
@@ -82,7 +84,7 @@ Door op de knop [zoekveldgewicht toevoegen +] rechts bovenin uw scherm te klikke
    :width: 623px
    :height: 149px
 
-Naast de mogelijkheid om bij een match met een gehele zoekterm extra gewicht mee te geven, kunt u er ook voor kiezen extra gewicht mee te geven bij een match met slechts een gedeelte van een zoekterm/samenvatting/content/naam. Dit doet u door in het dropdown menu bij ‘veld’ te kiezen voor een van de opties met daarachter .partial. Bijvoorbeeld als de naam van een product “logeeropvang” is, dan geldt een ingesteld zoekveldgewicht zonder .partial enkel als er op de volledige zoekterm (logeeropvang) wordt gezocht. Bij het gebruik van .partial kan een bepaald (lager/hoger) gewicht gegeven worden aan een deel van de productnaam. Bijvoorbeeld wanneer gezocht wordt op “opvang” geldt het .partial gewicht. Om wijzigingen op te slaan klikt u op de knop [opslaan].
+Naast de mogelijkheid om bij een match met een gehele zoekterm extra gewicht mee te geven, kunt u er ook voor kiezen extra gewicht mee te geven bij een match met slechts een gedeelte van de naam, samenvatting, content of trefwoorden van een product. Dit doet u door in het dropdown menu bij ‘veld’ te kiezen voor een van de opties met daarachter .partial. Bijvoorbeeld als de naam van een product “logeeropvang” is, dan geldt een ingesteld zoekveldgewicht zonder .partial enkel als er op de volledige zoekterm (logeeropvang) wordt gezocht. Bij het gebruik van .partial kan een bepaald (lager/hoger) gewicht gegeven worden aan een deel van de productnaam. Bijvoorbeeld wanneer gezocht wordt op “opvang” geldt het .partial gewicht. Om wijzigingen op te slaan klikt u op de knop [opslaan].
 
 7.3.2. Zoekveldgewicht wijzigen
 -------------------------------

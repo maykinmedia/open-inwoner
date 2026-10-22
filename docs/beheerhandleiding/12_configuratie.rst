@@ -58,7 +58,7 @@ Vink dit aan om te bepalen of gebruikers via Mijn Berichten bestanden kunnen del
 **Stuur niet-ingelogde gebruiker door naar**
 Geef hier een URL of pad op waar niet-ingelogde gebruikers naartoe doorgestuurd moeten worden vanuit de niet-ingelogde homepagina.
 
-- Een pad is bijvoorbeeld: '/accounts/login'.
+- Een pad is bijvoorbeeld: '/accounts/login/'.
 - Een URL is bijvoorbeeld: 'https://groningen.nl'.
 
 **Stuur security.txt door naar:**
@@ -73,7 +73,7 @@ Hier kunt u het kleurgebruik op uw Open Inwoner omgeving instellen. Gebruik hier
 12.1.3. Afbeeldingen
 --------------------
 
-Hier kunt u diverse afbeeldingen die gebruikt worden op uw Open Inwoner omgeving instellen. Het gaat hier om logo’s, de Favicon (de thumbnail die in de browser klein wordt gebruikt) en de banners.
+Hier kunt u diverse afbeeldingen die gebruikt worden op uw Open Inwoner omgeving instellen. Het gaat hier om logo’s en de Favicon (de thumbnail die in de browser klein wordt gebruikt). De banners op de homepage en de inlogpagina stelt u in via het CMS (zie hoofdstuk 11.7).
 
 **Logo**
 Hier kunt u het logo van de gemeente uploaden. Sleep het gewenste bestand naar het veld of klik op [ kies bestand].
@@ -92,7 +92,7 @@ Hier vult u de URL in van de link naar het footer logo. Indien u geen bestand ge
 
 
 **Hoofdafbeelding op de inlogpagina**
-Hier kunt u de hoofdbanner van uw Open Inwoner omgeving uploaden. Deze banner is zichtbaar op de homepage wanneer men niet is ingelogd. Sleep het gewenste bestand naar het veld of klik op [ kies bestand].
+Dit veld wordt niet meer gebruikt: een afbeelding die u hier uploadt wordt nergens op de website getoond. Gebruik in plaats daarvan de plugin Bannerafbeelding. Voor de homepage plaatst u deze plugin op de homepage zelf (zie hoofdstuk 11.7), voor de inlogpagina in de alias ``login_banner`` (zie hoofdstuk 11.2.11).
 
 
 **Favicon image (32x32) als png**
@@ -136,11 +136,13 @@ Dit is de tekst die wordt weergegeven op de registratiepagina.
 
 
 **Koptekst homepage**
-Dit is de header die op de homepage wordt weergegeven.
+Dit is de header die op de homepage wordt weergegeven aan bezoekers die niet zijn ingelogd. Ingelogde gebruikers zien in plaats daarvan de plugin Bannertext uit het CMS (zie hoofdstuk 11.7).
 
 
 **Introductietekst homepage**
-Dit is de tekst die op de homepage wordt weergegeven.
+Dit is de tekst die onder de koptekst op de homepage wordt weergegeven aan bezoekers die niet zijn ingelogd. Ingelogde gebruikers zien in plaats daarvan de omschrijving van de plugin Bannertext.
+
+Deze twee teksten worden getoond op elke pagina met het sjabloon "Home page template", niet alleen op de homepage.
 
 
 **Onderwerpentitel op de homepage**

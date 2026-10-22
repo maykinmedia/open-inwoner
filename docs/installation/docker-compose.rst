@@ -13,10 +13,12 @@ for production.
 
 This comes in three flavours:
 
-- The base stack (``docker compose up``, `Getting started`_ below) -- just
-  the app itself plus its own database and Mailpit, with none of the
-  external services it can integrate with configured. Enough for most local
-  development and for trying OIP out.
+- The base stack (``docker compose up``, `Getting started`_ below) -- the
+  app itself (web server, nginx, Celery workers and beat) plus its own
+  backing services: PostgreSQL, Redis, Elasticsearch, ClamAV and Mailpit.
+  The external services it can integrate with are already configured (see
+  `Running the full stack`_) but not started, so pages that depend on them
+  won't work. Enough for most local development and for trying OIP out.
 - The full stack (``bin/stack.sh up``,
   :ref:`installation_docker_compose_full_stack` below) -- the base stack
   plus every Common Ground service it talks to (Keycloak, Open Zaak, the
@@ -41,7 +43,7 @@ Getting started
         git clone git@github.com:maykinmedia/open-inwoner.git
 
 2. Optionally, you you can initialize the database on first startup with an SQL dump
-   by adding it to ``docker-init-db.sql/``. In order to create a user for the database,
+   by adding it to ``docker-initdb.d/``. In order to create a user for the database,
    add a ``.sql`` script in the same directory with the following content:
 
    .. code::
@@ -76,16 +78,17 @@ Getting started
 4. Start the docker containers with ``docker compose up``. If you want to run the
    containers in the background, add the ``-d`` option.
 
-5. Create a super-user:
+5. Navigate to ``http://127.0.0.1:8000/admin/`` and log in with
+   ``admin@user.nl`` / ``change_me``. This superuser is created by
+   ``web-init`` from ``docker/setup_configuration/data.yaml``. Two-factor
+   authentication is disabled in this stack (``DISABLE_2FA``). To create a
+   superuser of your own:
 
    .. code:: bash
 
-        sudo docker exec -it open-inwoner-web src/manage.py createsuperuser
+        docker exec -it open-inwoner-web src/manage.py createsuperuser
 
-6. Navigate to ``http://127.0.0.1:8000/admin/`` and use the credentials created
-   above to log in.
-
-7. To stop the containers, press *CTRL-C* or if you used the ``-d`` option:
+6. To stop the containers, press *CTRL-C* or if you used the ``-d`` option:
 
    .. code:: bash
 
@@ -213,19 +216,20 @@ details it takes care of that are easy to get wrong by hand:
   Compose's ``include:`` feature, which resolves each included file's paths
   relative to that file's own location.
 - ``web-init`` only runs ``setup_configuration`` once per database (see the
-  comment in ``bin/setup_configuration.sh``): several steps -- OpenZaak,
-  KlantenSysteem, Users -- converge their fields back to whatever
-  ``data.yaml`` says on *every* run, which would silently undo any changes
-  made through the admin on a plain restart. Run ``bin/stack.sh
+  comment in ``bin/setup_configuration.sh``): most steps overwrite their
+  fields with whatever ``data.yaml`` says on *every* run (see
+  :ref:`configuration_setup_config` for which ones), which would silently
+  undo any changes made through the admin on a plain restart. Run ``bin/stack.sh
   reset-config`` (then ``bin/stack.sh up`` if you want the app started too)
   to force a re-run, e.g. after changing ``data.yaml``.
 
 Once it's up, the individual services are also reachable from your host
-machine:
+machine. ``bin/stack.sh urls`` prints this list at any time:
 
 ======================  ============================  ==================
 Service                 URL                           Credentials
 ======================  ============================  ==================
+Mailpit                 http://localhost:8025/        --
 Keycloak admin          http://localhost:8080/        admin / admin
 Open Zaak admin         http://localhost:8002/admin/  admin / admin
 Objecttypes API admin   http://localhost:8003/admin/  admin / admin
@@ -257,7 +261,7 @@ below), goes through the same Keycloak test realm for every login type:
 =============  ====================================================  ===============================================
 Log in as      URL                                                   Notes
 =============  ====================================================  ===============================================
-Admin (staff)  http://localhost:8000/admin/                          Click "Login with OIDC", Keycloak admin / admin
+Admin (staff)  http://localhost:8000/admin/                          Click "Log in met een organisatieaccount", Keycloak admin / admin; or admin@user.nl / change_me
 DigiD          http://localhost:8000/digid-oidc/authenticate/        any BSN test user
 eHerkenning    http://localhost:8000/eherkenning-oidc/authenticate/  any eHerkenning test user
 eIDAS          http://localhost:8000/eidas-oidc/authenticate/        any eIDAS test user
@@ -330,8 +334,10 @@ Like ``web-init`` in the full stack, ``setup_configuration`` and the
 database -- a marker file in that same ``.host/`` folder records it, so
 re-running ``up --localhost``
 (e.g. after a restart) doesn't overwrite any admin changes you've made
-locally. ``bin/stack.sh reset-config`` clears that marker (and web-init's)
-to force it to run again, e.g. after editing ``data.yaml``. Migrations, the
+locally. ``bin/stack.sh reset-config --localhost`` clears that marker to
+force it to run again, e.g. after editing ``data.yaml`` (plain
+``bin/stack.sh reset-config`` only clears web-init's marker in the full
+stack). Migrations, the
 ZGW import and the search index rebuild aren't gated by that marker and run
 on every ``up --localhost``, same as the full stack.
 
