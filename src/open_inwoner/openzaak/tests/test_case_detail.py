@@ -1300,7 +1300,6 @@ class TestCaseDetailView(
             {
                 "label": "Besluit genomen op",
                 "value": datetime.date(2025, 5, 10),
-                "type": "date",
             },
             metrics,
         )

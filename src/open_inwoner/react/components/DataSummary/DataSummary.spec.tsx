@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/preact';
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import DataSummary, { ListItem } from './DataSummary';
+import { DATASUMMARY_DEFINITION } from '.';
 import { isDate } from '@react/lib/compare';
+import { WebComponentLoader } from '@react/lib/web-component';
 
 describe('DataSummary', () => {
   afterEach(() => {
@@ -54,5 +56,43 @@ describe('DataSummary', () => {
 
     expect(screen.getByText('Datum')).toBeInTheDocument();
     expect(screen.getByText('abc')).toBeInTheDocument();
+  });
+
+  describe('Web Component', () => {
+    beforeAll(async () => {
+      await WebComponentLoader.importWebComponent(
+        DATASUMMARY_DEFINITION.tagName
+      );
+    });
+
+    describe('definition', () => {
+      it('registers the oip-data-summary custom element', () => {
+        expect(customElements.get('oip-data-summary')).toBeDefined();
+      });
+
+      it('uses the correct tag name', () => {
+        expect(DATASUMMARY_DEFINITION.tagName).toBe('oip-data-summary');
+      });
+
+      it('has no props (slot-only component)', () => {
+        expect(DATASUMMARY_DEFINITION.propNames).toEqual(['items', 'itemsId']);
+      });
+
+      it('uses shadow DOM', () => {
+        expect(DATASUMMARY_DEFINITION.options?.shadow).toBe(false);
+      });
+    });
+
+    describe('rendering', () => {
+      it('renders a dl into shadow DOM', () => {
+        const element = document.createElement(
+          'oip-data-summary'
+        ) as HTMLElement & { items: ListItem[] };
+        element.items = [{ label: 'Zaaknummer', value: '1234' }];
+        document.body.appendChild(element);
+        expect(element.querySelector('dl')).toBeInTheDocument();
+        element.remove();
+      });
+    });
   });
 });
