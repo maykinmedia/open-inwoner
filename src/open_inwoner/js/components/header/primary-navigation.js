@@ -50,6 +50,10 @@ class PrimaryNavigation extends Component {
    * Focusin and Focusout are used instead of Focus for Safari
    */
   onFocusOut(event) {
+    if (pointerIsDown) {
+      return;
+    }
+
     if (this.node && !this.node.contains(event.relatedTarget)) {
       BEM.removeModifier(this.node, 'open');
       this.navigationToggle.forEach((toggle) => {
