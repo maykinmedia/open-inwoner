@@ -35,7 +35,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
         >
           {addressLineFirst ? (
             <>
-              {date && <span>{date}</span>}
+              {date && <span>{date}</span>}&nbsp;
               {address && <span>{address}</span>}
             </>
           ) : (
