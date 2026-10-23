@@ -8,6 +8,35 @@ const BLOCK_PRIMARY_NAVIGATION = 'primary-navigation';
 const MODIFIER_DISMISSED = 'dismissed';
 
 /**
+ * True while a mouse/touch press is in progress.
+ * @type {boolean}
+ */
+let pointerIsDown = false;
+document.addEventListener(
+  'pointerdown',
+  () => {
+    pointerIsDown = true;
+  },
+  true
+);
+document.addEventListener(
+  'pointerup',
+  () =>
+    setTimeout(() => {
+      pointerIsDown = false;
+    }, 0),
+  true
+);
+document.addEventListener(
+  'pointercancel',
+  () =>
+    setTimeout(() => {
+      pointerIsDown = false;
+    }, 0),
+  true
+);
+
+/**
  * Controls the primary navigation and dismissing it using the escape key.
  */
 class PrimaryNavigation extends Component {
@@ -50,6 +79,10 @@ class PrimaryNavigation extends Component {
    * Focusin and Focusout are used instead of Focus for Safari
    */
   onFocusOut(event) {
+    if (pointerIsDown) {
+      return;
+    }
+
     if (this.node && !this.node.contains(event.relatedTarget)) {
       BEM.removeModifier(this.node, 'open');
       this.navigationToggle.forEach((toggle) => {
