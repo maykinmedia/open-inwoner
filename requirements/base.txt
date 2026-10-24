@@ -34,7 +34,7 @@ boltons==21.0.0
     # via
     #   face
     #   glom
-brotli==1.2.0
+brotli==1.2.1
     # via fonttools
 cbor2==6.1.1
     # via webauthn
