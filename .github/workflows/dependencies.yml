@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
           - os: macos-latest
             brew_deps: postgresql
 
