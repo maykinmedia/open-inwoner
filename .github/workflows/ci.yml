@@ -309,7 +309,7 @@ jobs:
           wait_for() {
             local service="$1" want="$2" cid status
             for i in $(seq 1 60); do
-              cid=$(bin/stack.sh ps -q "$service")
+              cid=$(bin/stack.sh ps -aq "$service")
               if [ -n "$cid" ]; then
                 status=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$cid")
                 echo "$service: $status"

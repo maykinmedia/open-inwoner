@@ -77,6 +77,7 @@ export UWSGI_BUFFER_SIZE=${UWSGI_BUFFER_SIZE:-65535}
 exec uwsgi \
     --show-config \
     --strict \
+    --ini "${SCRIPTPATH}/uwsgi.ini" \
     --lazy-apps \
     --static-map /static=/app/static \
     --static-map /media=/app/media
