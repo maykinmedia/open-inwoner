@@ -15,7 +15,7 @@ permissions: {}
 jobs:
   migrations:
     name: Check for model changes not present in the migrations
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
@@ -61,7 +61,7 @@ jobs:
 
   pre-commit:
     name: Run pre-commit checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -80,7 +80,7 @@ jobs:
 
   ruff-version-check:
     name: Check ruff version consistency
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -110,7 +110,7 @@ jobs:
 
   commit-message-check:
     name: Validate commit messages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -128,7 +128,7 @@ jobs:
 
   zizmor:
     name: GitHub Actions Security Analysis with zizmor 🌈
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       security-events: write
       contents: read

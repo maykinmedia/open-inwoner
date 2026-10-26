@@ -22,7 +22,7 @@ jobs:
   tests:
     name: Run the Django test suite
     runs-on:
-      ${{ matrix.test-type == 'main' && 'maykin-runner' || 'ubuntu-latest' }}
+      ${{ matrix.test-type == 'main' && 'maykin-runner' || 'ubuntu-26.04' }}
     permissions:
       contents: read
     strategy:
@@ -114,7 +114,7 @@ jobs:
   upload_coverage:
     needs: tests
     name: Upload coverage information to codecov
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -148,7 +148,7 @@ jobs:
   # End-to-end tests
   #
   e2etests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -262,7 +262,7 @@ jobs:
   #
   docs:
     name: Build and check documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
@@ -294,7 +294,7 @@ jobs:
     needs: tests
 
     name: Build (and push) Docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
