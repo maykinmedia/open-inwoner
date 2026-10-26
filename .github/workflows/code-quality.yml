@@ -45,8 +45,7 @@ jobs:
             libgdal-dev \
             gdal-bin \
             libxml2-dev \
-            libxmlsec1-dev \
-            libxmlsec1-openssl
+            libxmlsec1-dev
       - name: Install dependencies
         run: |
           pip install uv

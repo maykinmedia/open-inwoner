@@ -66,8 +66,8 @@ jobs:
         uses: maykinmedia/setup-django-backend@4a6c5facc65bb1dd510cf06be20871db11a156b3 # v1.4.2
         with:
           apt-packages:
-            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
-            postgresql-client libgdal-dev gdal-bin'
+            'libxml2-dev libxmlsec1-dev gettext postgresql-client libgdal-dev
+            gdal-bin'
           python-version: '3.13'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
@@ -201,8 +201,8 @@ jobs:
         uses: maykinmedia/setup-django-backend@4a6c5facc65bb1dd510cf06be20871db11a156b3 # v1.4.2
         with:
           apt-packages:
-            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext
-            postgresql-client libgdal-dev gdal-bin'
+            'libxml2-dev libxmlsec1-dev gettext postgresql-client libgdal-dev
+            gdal-bin'
           python-version: '3.13'
           optimize-postgres: 'yes'
           pg-service: 'postgres'
@@ -381,8 +381,7 @@ jobs:
         uses: maykinmedia/setup-django-backend@4a6c5facc65bb1dd510cf06be20871db11a156b3 # v1.4.2
         with:
           apt-packages:
-            'libxml2-dev libxmlsec1-dev libxmlsec1-openssl gettext libgdal-dev
-            gdal-bin graphviz'
+            'libxml2-dev libxmlsec1-dev gettext libgdal-dev gdal-bin graphviz'
           python-version: '3.13'
           setup-node: 'no'
 
