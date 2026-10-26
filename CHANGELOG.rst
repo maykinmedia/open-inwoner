@@ -1,3 +1,319 @@
+2.5.0-rc1 (2026-10-21)
+======================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.5.0-rc1`.
+
+Beveiliging
+-----------
+
+* [:gh:`3119`]: ``certifi`` is bijgewerkt naar versie ``2026.10.19``. Hiermee
+  zijn de gecompromitteerde emSign-rootcertificaten verwijderd uit de lijst met
+  vertrouwde certificaten (`GHSA-6q48-6c7w-9gw2
+  <https://github.com/advisories/GHSA-6q48-6c7w-9gw2>`_).
+
+Update informatie
+-----------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+* [:gh:`2594`]: De oude, op omgevingsvariabelen gebaseerde
+  setup-configuration-stappen zijn verwijderd. Configuratie via
+  ``setup_configuration`` verloopt nu uitsluitend via het YAML-formaat. De
+  volgende omgevingsvariabelen worden na de update genegeerd:
+
+  * alle variabelen die beginnen met ``KIC_``, ``ADMIN_OIDC_``,
+    ``DIGID_OIDC_``, ``DIGID_SAML_``, ``EHERKENNING_OIDC_``,
+    ``EHERKENNING_SAML_`` of ``CMS_``;
+  * alle variabelen die beginnen met ``SITE_``, behalve ``SITE_ID``;
+  * de volgende ``ZGW_``-variabelen: ``ZGW_CONFIG_ENABLE``,
+    ``ZGW_ZAAK_SERVICE_API_ROOT``, ``ZGW_ZAAK_SERVICE_API_CLIENT_ID``,
+    ``ZGW_ZAAK_SERVICE_API_SECRET``, ``ZGW_CATALOGI_SERVICE_API_ROOT``,
+    ``ZGW_CATALOGI_SERVICE_API_CLIENT_ID``,
+    ``ZGW_CATALOGI_SERVICE_API_SECRET``, ``ZGW_DOCUMENTEN_SERVICE_API_ROOT``,
+    ``ZGW_DOCUMENTEN_SERVICE_API_CLIENT_ID``,
+    ``ZGW_DOCUMENTEN_SERVICE_API_SECRET``, ``ZGW_FORM_SERVICE_API_ROOT``,
+    ``ZGW_FORM_SERVICE_API_CLIENT_ID``, ``ZGW_FORM_SERVICE_API_SECRET``,
+    ``ZGW_SERVER_CERTIFICATE_LABEL``, ``ZGW_SERVER_CERTIFICATE_TYPE``,
+    ``ZGW_ALLOWED_FILE_EXTENSIONS``, ``ZGW_ZAAK_MAX_CONFIDENTIALITY``,
+    ``ZGW_DOCUMENT_MAX_CONFIDENTIALITY``,
+    ``ZGW_ENABLE_CATEGORIES_FILTERING_WITH_ZAKEN``,
+    ``ZGW_FETCH_EHERKENNING_ZAKEN_WITH_RSIN``,
+    ``ZGW_MIJN_AANVRAGEN_TITLE_TEXT``,
+    ``ZGW_REFORMAT_ESUITE_ZAAK_IDENTIFICATIE`` en
+    ``ZGW_SKIP_NOTIFICATION_STATUSTYPE_INFORMEREN``;
+  * ``OIP_ORGANIZATION``, ``ACTION_REQUIRED_DEADLINE_DAYS`` en
+    ``SEARCH_ZERO_RESULTS_TEXT``.
+
+  De volgende variabelen met een vergelijkbaar voorvoegsel worden **niet**
+  verwijderd en werken ongewijzigd: ``SITE_ID``, ``DIGID_ENABLED``,
+  ``DIGID_MOCK``, ``EHERKENNING_MOCK``, ``ZGW_CACHE_WARMUP_TIMEOUT``,
+  ``ZGW_CASE_LIST_FETCH_TIMEOUT``, ``ZGW_CASE_LIST_NUM_WORKERS``,
+  ``ZGW_LIMIT_NOTIFICATIONS_FREQUENCY`` en ``ZGW_MAX_REQUESTS``.
+* [:gh:`3102`]: Contactpersonen kunnen alleen nog worden toegevoegd als ze een
+  account hebben. Er worden geen uitnodigingen meer per e-mail verstuurd naar
+  e-mailadressen zonder account; de gebruiker krijgt dan een foutmelding met
+  het verzoek de contactpersoon eerst een account te laten aanmaken.
+
+Actiepunten
+~~~~~~~~~~~
+
+* [:gh:`2594`]: **Vóór de update**: gebruikt uw installatie een of meer van
+  de verwijderde omgevingsvariabelen voor ``setup_configuration`` (zie
+  Breaking changes), zet die configuratie dan om naar het YAML-formaat. Zie de
+  `documentatie over setup-configuration
+  <https://docs.openinwoner.nl/en/v2.5.0-rc1/configuration/01_setup_config.html>`_
+  voor een volledig overzicht van de beschikbare stappen en velden.
+
+Pre-update aandachtspunten
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* [:gh:`2828`]: De primaire sleutel van ``NotificationRecord`` is omgezet
+  naar een UUID. De migratie vult elke bestaande rij afzonderlijk; houd bij
+  een grote tabel rekening met een langere migratieduur (eventueel eerst
+  opschonen met ``prune_notification_records``). Uitsluitend relevant voor
+  installaties die gebruik maken van de ZGW notificatie functionaliteit. De
+  gegevens staan in de tabel ``notifications_notificationrecord`` (in de
+  beheeromgeving: 'Notificatieberichten'); het aantal rijen controleert u
+  met:
+
+  .. code-block:: sql
+
+      SELECT COUNT(*) FROM notifications_notificationrecord;
+
+Post-update aandachtspunten
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* [:gh:`2766`]: Datamigraties schonen links en afbeeldingen op in door
+  beheerders ingevoerde opgemaakte tekst (ProseMirror), o.a. in de
+  siteconfiguratie, CMS-plugins, de footer, producten, zaaktypen, OpenKlant,
+  vragenlijsten en SSD. Links met een ander URL-schema dan ``http``,
+  ``https``, ``mailto`` of ``tel`` worden verwijderd (de tekst blijft
+  staan); afbeeldingen met zo'n URL worden in hun geheel verwijderd. Elke
+  verwijdering wordt tijdens de migratie als waarschuwing gelogd. Controleer
+  na de update de gelogde waarschuwingen en de opgemaakte teksten met links,
+  en zet waar nodig een correcte link terug.
+* [:gh:`2893`]: Het gebruikersmenu toont alleen nog 'Mijn profiel'; alle
+  andere onderdelen zijn uitsluitend bereikbaar via de zijnavigatie, die wordt
+  opgebouwd uit de CMS-paginaboom. Controleer na de update of alle
+  onderdelen die inwoners moeten kunnen bereiken als gepubliceerde pagina in
+  de paginaboom staan, zoals de nieuwe 'Mijn vragen'-pagina (zie
+  :gh:`2744`).
+* [:gh:`2833`]: Een datamigratie zet de aan ``OpenKlant2Config`` gekoppelde
+  ``Service`` om naar ``auth_type=api_key`` met
+  ``Authorization: Token <secret>`` als header. Controleer na de update of
+  de pagina's die gegevens uit OpenKlant tonen nog correct werken, zoals
+  'Mijn vragen' en 'Mijn Profiel'.
+* [:gh:`3095`]: De toegestane plugins voor de footer (links, midden en
+  rechts) en de loginbanner worden nu daadwerkelijk toegepast. Voorheen gold
+  voor deze statische aliassen een algemene lijst, waardoor bijvoorbeeld de
+  plugin 'Pagina lijst' of een losse link niet kon worden toegevoegd, maar
+  plugins als 'Zaken' of 'Video' wel. Controleer na de update de inhoud van de
+  footer en de loginbanner.
+* [:gh:`2830`]: De standaardkleuren van ``SiteConfiguration`` zijn aangepast
+  zodat tekst- en achtergrondkleur voldoende contrast hebben. Dit raakt
+  alleen installaties die de kleuren nooit zelf hebben ingesteld; controleer
+  de huisstijl na de update.
+
+Belangrijkste verbeteringen
+---------------------------
+
+* [:gh:`2894`]: De menustructuur van de beheeromgeving is gewijzigd.
+  Onderdelen zijn opnieuw ingedeeld in de hoofdgroepen 'Gebruikers &
+  Authenticatie', 'Modules', 'Koppelingen', 'Beheer', 'Logging' en
+  'Overige', met gerelateerde onderdelen in subgroepen daaronder.
+* [:gh:`2893`]: De zijnavigatie wordt voor ingelogde gebruikers op alle
+  reguliere pagina's getoond, niet alleen op een vaste set overzichtspagina's.
+  Uitzonderingen zijn de verplichte stappen na het inloggen (registratie
+  afronden, e-mailadres verifiëren), het uitlogscherm en de keuze van een
+  KvK-vestiging. Het gebruikersmenu toont daardoor alleen nog 'Mijn profiel';
+  de overige onderdelen zijn via de zijnavigatie bereikbaar. In het mobiele
+  menu is de zoekoptie verwijderd.
+* [:gh:`2744`]: Verbeteringen aan 'Mijn vragen' (OpenKlant2):
+
+  * Reacties worden opgehaald ongeacht het kanaal waarlangs ze zijn
+    geregistreerd; ``mijn_vragen_kanaal`` geldt nu alleen nog bij het
+    aanmaken van vragen, niet meer voor het ophalen.
+  * Alle antwoorden op een vraag worden getoond, niet alleen de nieuwste.
+  * Een vraag krijgt de status 'Afgehandeld' zodra alle daaraan gekoppelde
+    interne taken verwerkt zijn.
+  * Reacties die naast de oorspronkelijke vraag ook naar de zaak verwijzen,
+    worden op de zaakpagina niet langer als aparte vraag getoond.
+  * Als niet alle reacties binnen een gesprek opgehaald kunnen worden, toont
+    de lijst 'Mijn vragen' een melding dat het overzicht onvolledig is.
+  * 'Mijn vragen' kan een eigen ingang in de zijnavigatie krijgen via een
+    nieuwe ``mijn_vragen`` redirect-pagina in de CMS-pagina-configuratie.
+
+* [:gh:`2617`]: Per zaaktypeconfiguratie kan een datum worden ingesteld
+  ("Show cases from date"); zaken met een startdatum vóór die datum zijn dan
+  niet zichtbaar voor inwoners. Dit geldt overal: in 'Mijn zaken', de
+  zoekresultaten en notificaties, en de zaakpagina is ook via een directe
+  link niet bereikbaar. Leeg laten behoudt het huidige gedrag.
+
+Nieuwe functies
+---------------
+
+* [:gh:`2842`]: Niet-gepubliceerde versies van CMS-pagina's kunnen worden
+  verwijderd.
+* [:gh:`2897`]: Uitgebreidere keuze aan menu-iconen, met een link naar een
+  voorbeeldpagina.
+* [:gh:`2886`, :gh:`2922`, :gh:`2987`]: Nieuwe configuratiechecks voor BRP,
+  de userfeed en het ophalen van een bedrijf op KvK-nummer. De userfeed-check
+  is ook beschikbaar vanuit het gebruikersbeheer. Omdat de checks echte
+  verzoeken uitvoeren naar gekoppelde diensten, zijn ze standaard
+  uitgeschakeld; zet de nieuwe omgevingsvariabele ``ENABLE_INTERACTIVE_CHECKS``
+  op ``True`` om ze in de beheeromgeving te tonen.
+* [:gh:`2078`, :gh:`3078`]: Medewerkers (staff) zien alle menu-items, ook van
+  pagina's waarvoor inloggen of DigiD/eHerkenning nodig is, en kunnen de
+  pagina's 'Mijn zaken' en 'Mijn vragen' openen om ze vanuit de frontend te
+  bewerken. Zaken en vragen worden voor hen niet opgehaald.
+* [:gh:`1781`]: De helptekst van de knoptekst van een product geeft aan dat
+  deze alleen geldt voor knoppen in de inhoud van het product.
+* [:gh:`2917`]: Nieuwe setup-configuration-stappen voor SOAP-services en SSD.
+  Hiervoor heeft ``SoapService`` een uniek ``slug``-veld gekregen in plaats
+  van ``label``; bestaande labels worden bij de migratie automatisch omgezet.
+* [:gh:`2827`]: Zaaktypeconfiguraties zijn in het beheerscherm doorzoekbaar
+  op onderliggende objecten (statustypen e.d.).
+* [:gh:`2801`, :gh:`2807`, :gh:`2853`, :gh:`2855`]: Verbeteringen aan de
+  verwerking van ZGW-notificaties (``NotificationRecord``):
+
+  * De uitkomst van de verwerking van een notificatie wordt opgeslagen op het
+    ``NotificationRecord``; logging is omgezet naar structlog.
+  * De volledige payload van notificaties is doorzoekbaar in de
+    beheeromgeving.
+  * ``is_valid`` is alleen-lezen in de beheeromgeving.
+  * Notificatieberichten worden elk uur opgeschoond in plaats van dagelijks.
+    De bewaartermijnen in de notificatie-instellingen worden daarom in uren
+    in plaats van dagen ingesteld; bestaande waarden worden automatisch
+    omgerekend.
+* [:gh:`2638`]: Nieuwe periodieke Celery-taak 'Beat health sentinel' die
+  elke minuut draait, zodat de celery-beat health check sneller slaagt. De
+  ``start_period`` van de celery-beat healthcheck in Docker Compose is
+  verlaagd van 900s naar 120s.
+* [:gh:`2679`, :gh:`2696`, :gh:`2755`, :gh:`2956`, :gh:`2990`]:
+  Verbeteringen aan Mijn Afval:
+
+  * Een cumulatieve lijn voor kosten en gewicht.
+  * Gewichten worden met 2 decimalen getoond.
+  * Afvaltypen worden getoond zoals Open Afval ze aanlevert, in plaats van een
+    vaste set codes. Het filter op afvaltype biedt de typen die in de gegevens
+    voorkomen.
+  * Tabelcellen tonen de eenheid bij de waarde (bv. €); numerieke
+    waarden worden rechts uitgelijnd.
+* [:gh:`2948`]: ``django-upgrade-check`` is geïnstalleerd, zodat de actieve
+  versies op installaties worden vastgelegd.
+* [:gh:`2873`]: De beheeromgeving gebruikt de standaard huisstijl van
+  ``maykin-common``, met licht/donker-thema en omgevingsinformatie. De
+  weergave van de omgeving en de branding in de beheeromgeving zijn
+  instelbaar via nieuwe, optionele omgevingsvariabelen
+  (``ENVIRONMENT_LABEL``, ``ENVIRONMENT_BACKGROUND_COLOR``,
+  ``ENVIRONMENT_FOREGROUND_COLOR``, ``SHOW_ENVIRONMENT``,
+  ``CUSTOM_PRODUCT_NAME``, ``CUSTOM_PRODUCT_URL``,
+  ``CUSTOM_PRODUCT_LOGO_PATH`` en ``CUSTOM_PRODUCT_LOGO_URL``).
+* [:gh:`3101`]: Extra controle op de koppelingen die externe diensten
+  teruggeven: Open Inwoner controleert nu zelf of een document bij de zaak
+  hoort, zowel op de zaakpagina als bij het downloaden, en of de zaak die op de
+  detailpagina van een vraag wordt getoond daadwerkelijk aan die vraag is
+  gekoppeld, in plaats van alleen te vertrouwen op de filtering van de API.
+  Dit is bedoeld voor backends die niet volledig ZGW-compliant zijn en
+  sommige filters negeren; bij volledig compliant backends verandert er niets.
+
+Bugfixes
+--------
+
+* [:gh:`2831`]: De webserver wordt weer met ``--lazy-apps`` gestart. Het
+  weglaten hiervan (2.4.4) leidde opnieuw tot segfaults.
+* [:gh:`2804`]: De laadindicator wordt na een timeout verborgen en er wordt
+  een foutmelding getoond.
+* [:gh:`2915`]: Correcte detectie van het bestandstype bij uploads in
+  Samenwerkingen.
+* [:gh:`2973`]: De keuzelijst bij het uploaden van documenten toont alleen nog
+  de omschrijving van het informatieobjecttype (zonder catalogus-URL).
+* [:gh:`2992`]: Broodkruimelpad toegevoegd aan de inbox.
+* [:gh:`3008`]: Ontbrekende en onjuiste vertalingen van meldingen bij de
+  ZGW-, PDC-, contact- en KvK-import gecorrigeerd.
+* [:gh:`2924`]: Diverse uitlijningsproblemen opgelost in Mijn Berichten, de
+  detailpagina's en de login- en registratiepagina's.
+* [:gh:`2797`]: De huidige pagina van de zakenlijst blijft behouden bij het
+  herladen.
+* [:gh:`2803`]: ``OpenZaakConfig.document_visible_statuses`` mag leeg zijn.
+* [:gh:`2885`]: De configuratiecheck ``fetch_cases`` wordt bij het opstarten
+  geregistreerd.
+* [:gh:`2786`]: De cache van de Laposta-abonnementen wordt op de juiste
+  sleutel geïnvalideerd.
+* [:gh:`2910`]: Correcte e-mailbackend in ``local_example.py``.
+* Logging toegevoegd voor API-fouten bij het uploaden van bestanden.
+* [:gh:`3098`]: Toegestane bestandsextensies voor uploads bij zaken die met
+  een punt of hoofdletters waren ingesteld (bv. ``.pdf`` of ``PDF``), werden
+  nooit herkend, waardoor uploads van dat type werden geweigerd. Bestaande
+  waarden worden bij de migratie genormaliseerd (``.PDF`` wordt ``pdf``), en
+  extensies die via de beheeromgeving of ``setup_configuration`` worden
+  ingesteld, worden op dezelfde manier opgeslagen.
+* [:gh:`3059`]: In de structuurweergave van het CMS toont de keuzelijst voor
+  het toevoegen van een plugin weer alle plugins die een placeholder toestaat,
+  in plaats van alleen de tekstplugin. Ook is de niet-werkende
+  banner-placeholder van de Samenwerken-pagina verwijderd.
+* [:gh:`3075`]: Apphook-pagina's (zoals 'Samenwerken' en 'Mijn profiel')
+  kunnen in de bewerkmodus weer naar de structuurmodus worden geschakeld en
+  worden gepubliceerd.
+* [:gh:`3088`]: Het aanmaken van een pagina via de wizard van het CMS werkt
+  weer.
+* [:gh:`3077`]: Broodkruimelpaden van CMS-app-pagina's beginnen met de titel
+  van de CMS-pagina in plaats van een vaste tekst.
+* [:gh:`3092`]: Notificaties die direct door de webhook worden afgerond
+  (bijv. bij een ongeldig schema of een niet-geabonneerd kanaal) worden nu
+  ook opgeschoond.
+* [:gh:`2987`]: De knop voor de configuratiecheck ``fetch_cases`` staat weer
+  in de Open Zaak-configuratie in de beheeromgeving.
+* [:gh:`2858`]: Verbeterde toetsenbordnavigatie in het filtermenu en de
+  keuzevakjes, en het filtermenu werkt weer na een HTMX-update.
+* [:gh:`3030`, :gh:`2954`]: Aangepaste opmaak van de zoekpagina en de
+  filterknop; de filterknop heet nu 'Filter toepassen'.
+* [:gh:`3080`]: Het menu sluit weer als het via het icoon is geopend.
+* [:gh:`3053`]: Pop-ups op de kaart worden opgebouwd uit DOM-elementen in
+  plaats van HTML.
+* [:gh:`2936`, :gh:`3026`, :gh:`3043`]: Diverse opmaakproblemen opgelost bij
+  het aanmaken van samenwerkingen, de tekst bij een banner en het dashboard op
+  mobiel.
+
+Onderhoud
+---------
+
+* [:gh:`2638`], [:gh:`2917`], [:gh:`2922`], [:gh:`2926`], [:gh:`2931`],
+  [:gh:`2932`], [:gh:`2925`], [:gh:`2744`], [:gh:`2994`], [:gh:`2995`],
+  [:gh:`2996`], [:gh:`2997`], [:gh:`2998`]: Docker Compose-stack voor lokale
+  ontwikkeling uitgebreid met Open Zaak, Objects API's, Haal Centraal
+  BRP-mock, OpenKlant, Open Afval, een SSD-mock, KvK, testgebruikers,
+  samenwerkingen, openstaande taken, documentuploads en een gevulde
+  homepage (banner, producten, categorieën, sitemap). Zie ``bin/stack.sh``.
+* [:gh:`2898`]: Ondersteuning voor het lokaal draaien van OIP tegen de
+  Docker-stack, inclusief documentatie.
+* [:gh:`2933`]: Script om ZGW-notificaties te versturen voor testdoeleinden.
+* [:gh:`2924`]: Opschoning van de code van Mijn Berichten.
+* [:gh:`2523`]: Nieuwe Open Inwoner-branding in de documentatie.
+* [:gh:`2968`]: 'Platform' vervangen door 'Portaal' in de README.
+* [:gh:`2662`]: ``COMMIT_HASH`` en ``RELEASE`` worden in het Docker-image
+  gezet.
+* [:gh:`2947`]: Docker-images zonder arm64-ondersteuning gemarkeerd.
+* [:gh:`2785`], [:gh:`2799`]: Refactorings van de formulieren- en
+  OpenKlant-clients.
+* [:gh:`3038`], [:gh:`3111`], [:gh:`3045`], [:gh:`2956`]: Docker-stack: kaart
+  met productlocaties op de homepage, genormaliseerde bestandsextensies,
+  Keycloak-sessies worden niet meer hergebruikt tussen logins, en Open Afval
+  bijgewerkt naar ``0.11.0``.
+* Verschillende bibliotheken bijgewerkt, o.a. Django ``5.2.18``,
+  ``djangorestframework`` ``3.18.0``, ``django-treebeard`` ``5.3.1``,
+  ``maykin-common`` ``0.21.0``, ``maykin-django-prosemirror`` ``0.13.0``,
+  ``pillow`` ``13.0.0``, ``certifi`` ``2026.10.19``, ``django-formtools``
+  ``2.7``, ``geopy`` ``2.5.0``, ``playwright`` ``1.64.0``,
+  ``open-klant-client`` ``0.7.0``, ``django-debug-toolbar`` ``8.0.0``,
+  ``werkzeug`` ``3.1.9``,
+  ``PyJWT``, ``urllib3``, ``sqlparse``, ``tablib``, ``webob``,
+  ``soupsieve``, ``virtualenv``, ``design-tokens`` ``0.0.33`` en diverse
+  npm-pakketten.
+* CI: Dependabot voor GitHub Actions, controle op het verlopen van de
+  KvK-certificaatketen, en diverse updates van GitHub Actions.
+
 2.4.5 (2026-09-29)
 ==================
 
