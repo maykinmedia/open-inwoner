@@ -19,7 +19,7 @@ permissions: {}
 jobs:
   unit-tests:
     name: Run unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
@@ -50,7 +50,7 @@ jobs:
 
   interaction-tests:
     name: Run Storybook tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
@@ -76,7 +76,7 @@ jobs:
 
   storybook:
     name: Create storybook build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [unit-tests, interaction-tests]
     permissions:
       contents: read
@@ -111,7 +111,7 @@ jobs:
       group: 'pages-${{ github.ref_name }}' # unique builds for branch/tag name
       cancel-in-progress: true
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push' # Exclude PRs
     needs: storybook
     steps:
