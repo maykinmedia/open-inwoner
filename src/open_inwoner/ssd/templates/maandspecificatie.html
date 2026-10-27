@@ -6,6 +6,8 @@
 {% with uitkeringsinstantie=report.uitkeringsinstantie client=report.client dossier=report.dossierhistorie last=report.details|last %}
 	<head>
         <title>Maandspecificatie {% format_date_month_name dossier.periodenummer %}</title>
+        <link href="{% static 'bundles/pdf-p.css' %}" media="all" rel="stylesheet" />
+        <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
 	</head>
 	<body>
 	<div class="monthly-report">
