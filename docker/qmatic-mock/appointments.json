@@ -1,0 +1,175 @@
+{
+  "qmatic-mock-testuser": {
+    "notifications": [],
+    "meta": {
+      "start": "",
+      "end": "",
+      "totalResults": 4,
+      "offset": null,
+      "limit": null,
+      "fields": "",
+      "arguments": []
+    },
+    "appointmentList": [
+      {
+        "services": [
+          {
+            "publicId": "qmatic-mock-service-paspoort",
+            "name": "Paspoort aanvragen",
+            "duration": 15,
+            "additionalCustomerDuration": 0,
+            "custom": null
+          },
+          {
+            "publicId": "qmatic-mock-service-idkaart",
+            "name": "ID-kaart aanvragen",
+            "duration": 15,
+            "additionalCustomerDuration": 0,
+            "custom": null
+          }
+        ],
+        "title": "Qmatic web booking",
+        "start": "__DAY_PLUS_3__T08:30:00+00:00",
+        "end": "__DAY_PLUS_3__T09:00:00+00:00",
+        "created": 1761556800000,
+        "updated": 1761556800000,
+        "publicId": "qmatic-mock-appointment-1",
+        "branch": {
+          "name": "Stadskantoor",
+          "publicId": "qmatic-mock-branch-stadskantoor",
+          "phone": "14 020",
+          "email": null,
+          "branchPrefix": null,
+          "addressLine1": "Stadskantoor",
+          "addressLine2": "Stadsplein 1",
+          "addressZip": "1234 AB",
+          "addressCity": "Amsterdam",
+          "addressState": null,
+          "addressCountry": "NL",
+          "latitude": null,
+          "longitude": null,
+          "timeZone": "Europe/Amsterdam",
+          "fullTimeZone": "Europe/Amsterdam",
+          "custom": null,
+          "created": 1761556800000,
+          "updated": 1761556800000
+        },
+        "notes": null
+      },
+      {
+        "services": [
+          {
+            "publicId": "qmatic-mock-service-rijbewijs",
+            "name": "Rijbewijs ophalen",
+            "duration": 10,
+            "additionalCustomerDuration": 0,
+            "custom": null
+          }
+        ],
+        "title": "Qmatic web booking",
+        "start": "__DAY_PLUS_10__T13:00:00+00:00",
+        "end": "__DAY_PLUS_10__T13:10:00+00:00",
+        "created": 1761556800000,
+        "updated": 1761556800000,
+        "publicId": "qmatic-mock-appointment-2",
+        "branch": {
+          "name": "Stadsdeelkantoor Noord",
+          "publicId": "qmatic-mock-branch-noord",
+          "phone": "14 020",
+          "email": null,
+          "branchPrefix": null,
+          "addressLine1": "Stadsdeelkantoor Noord",
+          "addressLine2": "Buikslotermeerplein 2",
+          "addressZip": "1025 XL",
+          "addressCity": "Amsterdam",
+          "addressState": null,
+          "addressCountry": "NL",
+          "latitude": null,
+          "longitude": null,
+          "timeZone": "Europe/Amsterdam",
+          "fullTimeZone": "Europe/Amsterdam",
+          "custom": null,
+          "created": 1761556800000,
+          "updated": 1761556800000
+        },
+        "notes": null
+      },
+      {
+        "services": [
+          {
+            "publicId": "qmatic-mock-service-uittreksel",
+            "name": "Uittreksel BRP",
+            "duration": 10,
+            "additionalCustomerDuration": 0,
+            "custom": null
+          }
+        ],
+        "title": "Qmatic web booking",
+        "start": "__DAY_PLUS_24__T09:15:00+00:00",
+        "end": "__DAY_PLUS_24__T09:25:00+00:00",
+        "created": 1761556800000,
+        "updated": 1761556800000,
+        "publicId": "qmatic-mock-appointment-3",
+        "branch": {
+          "name": "Stadskantoor",
+          "publicId": "qmatic-mock-branch-stadskantoor",
+          "phone": "14 020",
+          "email": null,
+          "branchPrefix": null,
+          "addressLine1": "Stadskantoor",
+          "addressLine2": "Stadsplein 1",
+          "addressZip": "1234 AB",
+          "addressCity": "Amsterdam",
+          "addressState": null,
+          "addressCountry": "NL",
+          "latitude": null,
+          "longitude": null,
+          "timeZone": "Europe/Amsterdam",
+          "fullTimeZone": "Europe/Amsterdam",
+          "custom": null,
+          "created": 1761556800000,
+          "updated": 1761556800000
+        },
+        "notes": null
+      },
+      {
+        "services": [
+          {
+            "publicId": "qmatic-mock-service-idkaart",
+            "name": "ID-kaart aanvragen",
+            "duration": 15,
+            "additionalCustomerDuration": 0,
+            "custom": null
+          }
+        ],
+        "title": "Qmatic web booking",
+        "start": "__DAY_MINUS_30__T10:00:00+00:00",
+        "end": "__DAY_MINUS_30__T10:15:00+00:00",
+        "created": 1761556800000,
+        "updated": 1761556800000,
+        "publicId": "qmatic-mock-appointment-past",
+        "branch": {
+          "name": "Stadskantoor",
+          "publicId": "qmatic-mock-branch-stadskantoor",
+          "phone": "14 020",
+          "email": null,
+          "branchPrefix": null,
+          "addressLine1": "Stadskantoor",
+          "addressLine2": "Stadsplein 1",
+          "addressZip": "1234 AB",
+          "addressCity": "Amsterdam",
+          "addressState": null,
+          "addressCountry": "NL",
+          "latitude": null,
+          "longitude": null,
+          "timeZone": "Europe/Amsterdam",
+          "fullTimeZone": "Europe/Amsterdam",
+          "custom": null,
+          "created": 1761556800000,
+          "updated": 1761556800000
+        },
+        "notes": null
+      }
+    ]
+  }
+}

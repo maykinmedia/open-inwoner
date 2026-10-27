@@ -1,0 +1,12 @@
+cms_pages_config_enable: true
+cms_pages_config:
+  profile:
+    enabled: true
+    appointments: true
+  mijn_afspraken:
+    enabled: true
+    title: Mijn afspraken
+    redirect_url_name: profile:appointments
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: calendar_today
