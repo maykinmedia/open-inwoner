@@ -15,6 +15,7 @@ export type ZaakCardOptions = DefaultCard & {
   description?: string;
   date?: undefined;
   address?: undefined;
+  subject?: undefined;
 };
 
 /**
@@ -23,6 +24,7 @@ export type ZaakCardOptions = DefaultCard & {
 export type AppointmentCardOptions = DefaultCard & {
   date: string;
   address: string;
+  subject: string;
   description?: undefined;
 };
 
@@ -33,6 +35,7 @@ export type SamenwerkingCardOptions = DefaultCard & {
   description: string;
   date?: undefined;
   address?: undefined;
+  subject?: undefined;
 };
 
 /**

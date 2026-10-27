@@ -13,6 +13,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
   detailUrl,
   date,
   address,
+  subject,
   renderAsHeading = false,
 }) => {
   const Heading = String(renderAsHeading) !== 'false' ? 'h3' : 'p';
@@ -43,7 +44,7 @@ const HomePluginCard: AC<HomepageCardTypes> = ({
           )}
         </Heading>
         <Paragraph id={addressLineFirst ? id : undefined}>
-          {addressLineFirst ? title : description}
+          {addressLineFirst ? subject || title : description}
         </Paragraph>
       </div>
 

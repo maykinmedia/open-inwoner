@@ -13,6 +13,7 @@ export const HOME_PLUGIN_CARD_ITEM_DEFINITION: WebComponentDefinition<
     'date',
     'address',
     'renderAsHeading',
+    'subject',
   ],
   options: { shadow: false, i18n: false },
   importer: () => import('./HomePluginCard'),
