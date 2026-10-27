@@ -38,6 +38,9 @@ class TestUserAppointmentsPlugin(TestCase):
         items = pyquery.find("oip-home-plugin-card")
         self.assertEqual(len(items), 2)
 
+        self.assertEqual(items[0].attrib["title"], "Paspoort")
+        self.assertEqual(items[1].attrib["title"], "ID kaart")
+
         aanvraag_paspoort_date = items[0].attrib["date"]
         aanvraag_paspoort_title = items[0].attrib["status"]
         aanvraag_id_kaart_date = items[1].attrib["date"]
