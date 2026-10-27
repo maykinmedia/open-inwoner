@@ -51,6 +51,19 @@ class TestUserAppointmentsPlugin(TestCase):
         action_url = items[0].attrib["detail-url"]
         self.assertEqual(action_url, reverse("profile:appointments"))
 
+    def test_plugin_qmatic_server_error(self, m):
+        data = QmaticMockData()
+        m.get(
+            f"{data.api_root}appointment/customers/identify;{data.user.email}",
+            status_code=500,
+        )
+
+        html, context = cms_tools.render_plugin(
+            UserAppointmentsPlugin, plugin_data={}, user=data.user
+        )
+
+        self.assertEqual(context["appointments"], [])
+
     def test_plugin__email_not_verified(self, m):
         data = QmaticMockData()
         data.setUpMocks(m)

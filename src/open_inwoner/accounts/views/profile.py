@@ -50,7 +50,7 @@ from open_inwoner.openklant.exceptions import KlantAPIError
 from open_inwoner.openklant.models import KlantenSysteemConfig
 from open_inwoner.openklant.services import OpenKlant2Service, eSuiteKlantenService
 from open_inwoner.plans.models import Plan
-from open_inwoner.qmatic.client import NoServiceConfigured, qmatic_client_factory
+from open_inwoner.qmatic.services import get_appointments_for_user
 from open_inwoner.questionnaire.models import QuestionnaireStep
 from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
@@ -727,19 +727,7 @@ class UserAppointmentsView(
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        user: User = self.request.user
-        if not user.has_verified_email():
-            context["appointments"] = []
-        else:
-            try:
-                client = qmatic_client_factory()
-            except NoServiceConfigured:
-                logger.exception("Error occurred while creating Qmatic client")
-                context["appointments"] = []
-            else:
-                context["appointments"] = client.list_appointments_for_customer(
-                    user.verified_email
-                )
+        context["appointments"] = get_appointments_for_user(self.request.user)
         return context
 
     @cached_property

@@ -1989,6 +1989,16 @@ class UserAppointmentsTests(ClearCachesMixin, WebTest):
 
         self.assertIn(_("Geen afspraken beschikbaar"), response.text)
 
+    def test_do_not_render_list_if_qmatic_server_error(self, m):
+        m.get(
+            f"{self.data.api_root}appointment/customers/identify;{self.data.user.email}",
+            status_code=500,
+        )
+
+        response = self.app.get(self.appointments_url, user=self.data.user)
+
+        self.assertIn(_("Geen afspraken beschikbaar"), response.text)
+
     def test_do_not_render_list_if_email_not_verified(self, m):
         self.data.user.verified_email = ""
         self.data.user.save()
