@@ -1,2 +1,2 @@
-class QmaticException(BaseException):
+class QmaticException(Exception):
     pass
