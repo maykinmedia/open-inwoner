@@ -4,9 +4,11 @@ import uuid
 from django.db import connection
 from django.test import tag
 
+from cms import api
 from zgw_consumers.constants import AuthTypes
 
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 from open_inwoner.utils.tests.test_migrations import TestSuccessfulMigrations
 
@@ -269,3 +271,38 @@ class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
         doc = self._get_field("description_anonymous_user")
         text_node = doc["content"][0]["content"][0]
         self.assertEqual(text_node["marks"][0]["attrs"]["href"], "https://example.com")
+
+
+@tag("migrations")
+class SetContactPageTemplateMigrationTest(TestSuccessfulMigrations):
+    """
+    Test migration 0043: put contact pages on the contact form template.
+    """
+
+    migrate_from = "0042_sanitize_prosemirror_link_hrefs"
+    migrate_to = "0043_set_contact_page_template"
+    app = "openklant"
+
+    def setUpBeforeMigration(self, apps):
+        # the cms app isn't migrated back, so its current models can be used
+        self.contact_page = api.create_page(
+            "Contact",
+            "cms/fullwidth.html",
+            "nl",
+            apphook="OpenklantApphook",
+            apphook_namespace="openklant",
+        )
+        cms_tools.publish_page(self.contact_page, "nl")
+        self.other_page = api.create_page("Other", "cms/fullwidth.html", "nl")
+
+    def _get_template(self, page):
+        PageContent = self.apps.get_model("cms", "PageContent")
+        return PageContent.objects.get(page_id=page.pk, language="nl").template
+
+    def test_contact_page_gets_contact_form_template(self):
+        self.assertEqual(
+            self._get_template(self.contact_page), "cms/contactform/form_outer.html"
+        )
+
+    def test_other_page_is_left_untouched(self):
+        self.assertEqual(self._get_template(self.other_page), "cms/fullwidth.html")
