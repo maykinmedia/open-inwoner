@@ -331,7 +331,7 @@ def create_apphook_page(
     """
     page = api.create_page(
         (title or hook_class.name),
-        DEFAULT_TEMPLATE,
+        getattr(hook_class, "page_template", DEFAULT_TEMPLATE),
         language,
         slug=hook_class.app_name,
         apphook=hook_class.__name__,
