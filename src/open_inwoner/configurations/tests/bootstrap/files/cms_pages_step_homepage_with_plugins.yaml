@@ -14,5 +14,7 @@ cms_pages_config:
       object_type_dimpact: 73eb56b4-3801-4a54-9a04-a5c8e42bf8ac
     acties:
       title: Openstaande acties
+    mijn_afspraken:
+      title: Mijn afspraken
     categories: {}
     product_locations: {}

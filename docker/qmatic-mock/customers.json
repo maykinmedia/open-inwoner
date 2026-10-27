@@ -1,0 +1,15 @@
+[
+  {
+    "id": 9001,
+    "publicId": "qmatic-mock-testuser",
+    "firstName": "Test",
+    "lastName": "User",
+    "cardNumber": "",
+    "properties": {
+      "email": "testuser@test.nl",
+      "phoneNumber": "",
+      "dateOfBirth": "",
+      "externalId": ""
+    }
+  }
+]

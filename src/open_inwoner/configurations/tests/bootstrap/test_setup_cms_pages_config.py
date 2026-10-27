@@ -18,6 +18,7 @@ from PIL import Image as PILImage
 
 from open_inwoner.cms.banner.models import BannerImage, BannerText
 from open_inwoner.cms.cases.cms_apps import CasesApphook
+from open_inwoner.cms.plugins.models.appointments import UserAppointments
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
@@ -55,6 +56,9 @@ CMS_PAGES_STEP_HOMEPAGE_WITH_PLUGINS = str(
 )
 CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT = str(
     BASE_DIR / "cms_pages_step_mijn_vragen_redirect.yaml"
+)
+CMS_PAGES_STEP_MIJN_AFSPRAKEN_REDIRECT = str(
+    BASE_DIR / "cms_pages_step_mijn_afspraken_redirect.yaml"
 )
 
 
@@ -261,6 +265,21 @@ class CMSPagesConfigurationStepTests(TestCase):
         self.assertEqual(content.title, "Mijn vragen")
         self.assertEqual(content.redirect, reverse("cases:contactmoment_list"))
 
+    def test_mijn_afspraken_redirect_page_points_at_profile_appointments(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_AFSPRAKEN_REDIRECT,
+        )
+
+        page = Page.objects.get(reverse_id="mijn-afspraken")
+        content = PageContent._original_manager.get(
+            page=page, language="nl", versions__state=PUBLISHED
+        )
+
+        self.assertEqual(content.title, "Mijn afspraken")
+        self.assertEqual(content.redirect, reverse("profile:appointments"))
+        self.assertEqual(page.commonextension.menu_icon, "calendar_today")
+
     def test_redirect_page_extension_settings_applied(self):
         execute_single_step(
             CMSPagesConfigurationStep,
@@ -459,6 +478,9 @@ class CMSPagesConfigurationStepTests(TestCase):
         acties = UserFeed.objects.get(placeholder=placeholder)
         self.assertEqual(acties.title, "Openstaande acties")
 
+        afspraken = UserAppointments.objects.get(placeholder=placeholder)
+        self.assertEqual(afspraken.title, "Mijn afspraken")
+
         self.assertTrue(
             CMSPlugin.objects.filter(
                 placeholder=placeholder, plugin_type="CategoriesPlugin"
@@ -555,6 +577,9 @@ class CMSPagesConfigurationStepTests(TestCase):
         )
         self.assertTrue(TasksConfig.objects.filter(placeholder=placeholder).exists())
         self.assertTrue(UserFeed.objects.filter(placeholder=placeholder).exists())
+        self.assertTrue(
+            UserAppointments.objects.filter(placeholder=placeholder).exists()
+        )
 
     def _banner_image_config(self, path) -> dict:
         return {

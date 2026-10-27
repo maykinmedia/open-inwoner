@@ -65,6 +65,7 @@ COMPOSE=(
     -f docker/docker-compose.objects-apis.yml
     -f docker/docker-compose.hc-brp-mock.yml
     -f docker/docker-compose.ssd-mock.yml
+    -f docker/docker-compose.qmatic-mock.yml
     -f docker/docker-compose.openklant.yml
     -f docker/docker-compose.openafval.yml
     -f docker/docker-compose.observability.yml
@@ -119,6 +120,7 @@ print_satellite_urls() {
   Open Afval admin          http://localhost:8339/admin/
   Haal Centraal BRP mock    http://localhost:5010/
   SSD mock                  http://localhost:5020/
+  Qmatic mock               http://localhost:5030/
   Grafana (observability)   http://localhost:3000/
   Prometheus                http://localhost:9090/
   Loki                      http://localhost:3100/ready
@@ -213,6 +215,7 @@ case "$cmd" in
             objects-web \
             personen-mock \
             ssd-mock \
+            qmatic-mock \
             openklant-web \
             openafval-web \
             loki \

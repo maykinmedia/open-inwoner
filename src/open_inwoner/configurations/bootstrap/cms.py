@@ -21,9 +21,11 @@ from open_inwoner.cms.collaborate.cms_apps import CollaborateApphook
 from open_inwoner.cms.extensions.models import CommonExtension
 from open_inwoner.cms.footer.cms_plugins import FooterPagesPlugin
 from open_inwoner.cms.inbox.cms_apps import InboxApphook
+from open_inwoner.cms.plugins.cms_plugins.appointments import UserAppointmentsPlugin
 from open_inwoner.cms.plugins.cms_plugins.tasks import TasksPlugin
 from open_inwoner.cms.plugins.cms_plugins.userfeed import UserFeedPlugin
 from open_inwoner.cms.plugins.cms_plugins.zaken import CMSZakenPlugin
+from open_inwoner.cms.plugins.models.appointments import UserAppointments
 from open_inwoner.cms.plugins.models.tasks import TasksConfig
 from open_inwoner.cms.plugins.models.userfeed import UserFeed
 from open_inwoner.cms.plugins.models.zaken import CMSZakenPluginConfig
@@ -87,6 +89,13 @@ class UserFeedPluginConfig(ConfigurationModel):
         django_model_refs = {UserFeed: ["title"]}
 
 
+class AppointmentsPluginConfig(ConfigurationModel):
+    """Configuration for the 'Mijn afspraken' plugin placed on the homepage."""
+
+    class Meta:
+        django_model_refs = {UserAppointments: ["title"]}
+
+
 class CategoriesPluginConfig(ConfigurationModel):
     """The 'Categories' plugin placed on the homepage (it has no settings)."""
 
@@ -119,6 +128,10 @@ class CMSHomepageConfig(ConfigurationModel):
     acties: Annotated[
         UserFeedPluginConfig | None,
         Field(description="Adds an 'Openstaande acties' plugin to the homepage."),
+    ] = Field(default=None)
+    mijn_afspraken: Annotated[
+        AppointmentsPluginConfig | None,
+        Field(description="Adds a 'Mijn afspraken' plugin to the homepage."),
     ] = Field(default=None)
     categories: Annotated[
         CategoriesPluginConfig | None,
@@ -248,6 +261,7 @@ class CMSPagesConfigurationModel(ConfigurationModel):
     openklant: CMSPageConfig | None = Field(default=None)
     mijn_afval: CMSPageConfig | None = Field(default=None)
     mijn_vragen: CMSRedirectPageConfig | None = Field(default=None)
+    mijn_afspraken: CMSRedirectPageConfig | None = Field(default=None)
     footer: CMSFooterConfig | None = Field(default=None)
 
 
@@ -268,6 +282,7 @@ _APP_HOOKS: dict[str, type[CMSApp]] = {
 # page is created and looked up under (see `page_setup.get_or_create_redirect_page`)
 _REDIRECT_PAGES: dict[str, str] = {
     "mijn_vragen": "mijn-vragen",
+    "mijn_afspraken": "mijn-afspraken",
 }
 
 # the ProfileConfig fields, i.e. everything CMSProfilePageConfig adds on top of
@@ -289,6 +304,7 @@ _HOMEPAGE_PLUGINS: dict[str, dict[str, type[CMSPluginBase]]] = {
         "mijn_zaken": CMSZakenPlugin,
         "mijn_taken": TasksPlugin,
         "acties": UserFeedPlugin,
+        "mijn_afspraken": UserAppointmentsPlugin,
         "categories": CategoriesPlugin,
         "product_locations": ProductLocationPlugin,
     },

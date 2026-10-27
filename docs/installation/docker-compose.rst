@@ -120,6 +120,10 @@ shared acceptance environments:
 - ``docker/docker-compose.ssd-mock.yml`` -- an nginx-based mock of the SSD
   SOAP service backing the "Mijn uitkeringen" pages (see
   ``open_inwoner.ssd``)
+- ``docker/docker-compose.qmatic-mock.yml`` -- a small Flask-based mock of the
+  Qmatic Orchestra Calendar API backing the "Mijn afspraken" profile page
+  (see ``open_inwoner.qmatic``), with upcoming appointments for the DigiD
+  ``testuser``
 - ``docker/docker-compose.openklant.yml`` -- Open Klant (Klantinteracties and
   Contactmomenten APIs)
 - ``docker/docker-compose.openafval.yml`` -- `Open Afval
@@ -133,9 +137,10 @@ All of these attach to the same external ``open-inwoner-dev`` network as the
 main app stack (see `Getting started`_, step 3) and publish internal DNS
 aliases such as ``keycloak.internal``, ``openzaak.internal``,
 ``openklant.internal``, ``objects.internal``, ``objecttypes.internal``,
-``openafval.internal`` and ``ssd.internal``. ``docker/setup_configuration/data.yaml``
--- which ``web-init`` applies on its first run (see below) -- already points
-its ZGW/OpenKlant/Objects/Haal Centraal/Open Afval/SSD service configuration at
+``openafval.internal``, ``ssd.internal`` and ``qmatic.internal``.
+``docker/setup_configuration/data.yaml`` -- which ``web-init`` applies on its
+first run (see below) -- already points its ZGW/OpenKlant/Objects/Haal
+Centraal/Open Afval/SSD/Qmatic service configuration at
 those aliases (Keycloak's OIDC endpoints are the exception, see below), so once
 those stacks are up the app is pre-configured to talk to them without any
 manual admin work.
@@ -234,6 +239,7 @@ Open Klant admin        http://localhost:8338/admin/  admin / admin [1]_
 Open Afval admin        http://localhost:8339/admin/  admin / admin [1]_
 Haal Centraal BRP mock  http://localhost:5010/        --
 SSD mock                http://localhost:5020/        --
+Qmatic mock             http://localhost:5030/        --
 Grafana                 http://localhost:3000/        --
 Prometheus              http://localhost:9090/        --
 Loki (readiness)        http://localhost:3100/ready   --
