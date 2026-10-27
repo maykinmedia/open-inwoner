@@ -1,0 +1,4 @@
+qmatic_config_enable: true
+qmatic_config:
+  service_identifier: qmatic-service
+  booking_base_url: https://qmatic.local/afspraak/

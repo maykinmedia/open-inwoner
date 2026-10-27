@@ -225,6 +225,11 @@ zgw_consumers:
       auth_type: api_key
       header_key: Authorization
       header_value: Token e3b1f5c2a94d8067bb2f1d3e6a9c04578f21b6da
+    - identifier: qmatic-mock
+      label: Qmatic Orchestra Calendar API (mock)
+      api_root: http://qmatic.internal/
+      api_type: orc
+      auth_type: no_auth
 
 # Openzaak
 openzaak_config_enable: true
@@ -287,6 +292,14 @@ ssd_config:
   applicatie_naam: Open Inwoner
   bedrijfs_naam: Open Inwoner
   gemeentecode: '0000'
+
+# Qmatic (Mijn afspraken), backed by the Flask-based mock in
+# docker/docker-compose.qmatic-mock.yml. The booking URL is opened by the
+# user's browser, so it's localhost in both modes.
+qmatic_config_enable: true
+qmatic_config:
+  service_identifier: qmatic-mock
+  booking_base_url: http://localhost:5030/afspraak/
 
 # KlantenSysteem (consolidated OpenKlant/eSuite and OpenKlant2 configuration)
 klantensysteem_config_enable: true
@@ -386,6 +399,8 @@ cms_pages_config:
     menu_icon: person
     # needed for the Samenwerken views (see PlanActionsEnabledMixin)
     actions: true
+    # "Mijn afspraken" card, backed by the Qmatic mock
+    appointments: true
   openklant:
     enabled: true
     title: Contact
@@ -408,6 +423,15 @@ cms_pages_config:
     requires_auth: true
     requires_auth_bsn_or_kvk: true
     menu_icon: help_outline
+  # Same for "Mijn afspraken" (`profile:appointments`, backed by the Qmatic
+  # mock), which otherwise only has a card on the profile page.
+  mijn_afspraken:
+    enabled: true
+    title: Mijn afspraken
+    redirect_url_name: profile:appointments
+    requires_auth: true
+    requires_auth_bsn_or_kvk: true
+    menu_icon: calendar_today
   # The footer's 'Pages List' plugin, which is also where the sitemap link comes
   # from -- the footer is empty otherwise.
   footer:

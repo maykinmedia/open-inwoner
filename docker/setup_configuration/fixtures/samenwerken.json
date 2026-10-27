@@ -24,6 +24,7 @@
       "first_name": "Test",
       "last_name": "User",
       "email": "testuser@test.nl",
+      "verified_email": "testuser@test.nl",
       "is_staff": false,
       "is_active": true,
       "bsn": "111222333",

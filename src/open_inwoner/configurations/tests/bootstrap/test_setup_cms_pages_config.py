@@ -56,6 +56,9 @@ CMS_PAGES_STEP_HOMEPAGE_WITH_PLUGINS = str(
 CMS_PAGES_STEP_MIJN_VRAGEN_REDIRECT = str(
     BASE_DIR / "cms_pages_step_mijn_vragen_redirect.yaml"
 )
+CMS_PAGES_STEP_MIJN_AFSPRAKEN_REDIRECT = str(
+    BASE_DIR / "cms_pages_step_mijn_afspraken_redirect.yaml"
+)
 
 
 def _page_is_published(hook_class) -> bool:
@@ -260,6 +263,21 @@ class CMSPagesConfigurationStepTests(TestCase):
 
         self.assertEqual(content.title, "Mijn vragen")
         self.assertEqual(content.redirect, reverse("cases:contactmoment_list"))
+
+    def test_mijn_afspraken_redirect_page_points_at_profile_appointments(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            yaml_source=CMS_PAGES_STEP_MIJN_AFSPRAKEN_REDIRECT,
+        )
+
+        page = Page.objects.get(reverse_id="mijn-afspraken")
+        content = PageContent._original_manager.get(
+            page=page, language="nl", versions__state=PUBLISHED
+        )
+
+        self.assertEqual(content.title, "Mijn afspraken")
+        self.assertEqual(content.redirect, reverse("profile:appointments"))
+        self.assertEqual(page.commonextension.menu_icon, "calendar_today")
 
     def test_redirect_page_extension_settings_applied(self):
         execute_single_step(

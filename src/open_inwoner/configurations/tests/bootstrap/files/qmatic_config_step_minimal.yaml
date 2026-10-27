@@ -1,0 +1,3 @@
+qmatic_config_enable: true
+qmatic_config:
+  service_identifier: qmatic-service

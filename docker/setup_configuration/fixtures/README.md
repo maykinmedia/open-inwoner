@@ -28,8 +28,10 @@ Contents:
   DigiD-mock `testuser` logs in with, and that
   `docker/openklant/fixtures/db.json` and `docker/openafval/fixtures/db.json`
   already use. The citizen has a real name and email, so `testuser` is
-  pre-registered and skips the "necessary fields" form on first login. The
-  Keycloak `newuser` (BSN `444555666`) has no counterpart here and starts blank;
+  pre-registered and skips the "necessary fields" form on first login. The email
+  is also marked as verified, which "Mijn afspraken" requires before it asks the
+  Qmatic mock (`docker/qmatic-mock/`) for appointments. The Keycloak `newuser`
+  (BSN `444555666`) has no counterpart here and starts blank;
 - two `PlanTemplate`s ("Schuldhulpverlening", "Re-integratie naar werk"), each
   with two `ActionTemplate`s, so `collaborate:plan_choose_template` has
   something to offer;

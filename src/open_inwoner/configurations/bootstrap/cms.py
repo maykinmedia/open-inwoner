@@ -248,6 +248,7 @@ class CMSPagesConfigurationModel(ConfigurationModel):
     openklant: CMSPageConfig | None = Field(default=None)
     mijn_afval: CMSPageConfig | None = Field(default=None)
     mijn_vragen: CMSRedirectPageConfig | None = Field(default=None)
+    mijn_afspraken: CMSRedirectPageConfig | None = Field(default=None)
     footer: CMSFooterConfig | None = Field(default=None)
 
 
@@ -268,6 +269,7 @@ _APP_HOOKS: dict[str, type[CMSApp]] = {
 # page is created and looked up under (see `page_setup.get_or_create_redirect_page`)
 _REDIRECT_PAGES: dict[str, str] = {
     "mijn_vragen": "mijn-vragen",
+    "mijn_afspraken": "mijn-afspraken",
 }
 
 # the ProfileConfig fields, i.e. everything CMSProfilePageConfig adds on top of

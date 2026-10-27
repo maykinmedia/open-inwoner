@@ -1,0 +1,47 @@
+services:
+  qmatic-mock:
+    image: ghcr.io/astral-sh/uv:python3.13-alpine
+    # Installs the script's inline dependencies (Flask) on first start; the
+    # cache volume below keeps that from repeating on every recreate.
+    command: ['uv', 'run', '--script', '/qmatic-mock/server.py']
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Relative paths resolve against the repo root (bin/stack.sh's
+      # `--project-directory .`), not this file's own directory -- see
+      # docs/installation/docker-compose.rst's docker-compose.keycloak.yml
+      # note for the one exception.
+      - ./docker/qmatic-mock:/qmatic-mock:ro
+      - qmatic_mock_uv_cache:/root/.cache/uv
+    ports:
+      - '5030:80'
+    healthcheck:
+      test: [
+          'CMD',
+          'wget',
+          '-q',
+          '-O',
+          '/dev/null',
+          # Not 'localhost': that resolves to ::1, and the server only binds
+          # to IPv4.
+          'http://127.0.0.1/calendar-backend/public/api/v1/customers/qmatic-mock-testuser/appointments',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks:
+      open-inwoner-dev:
+        aliases:
+          - qmatic.local
+          - qmatic.internal
+
+volumes:
+  qmatic_mock_uv_cache:
+
+networks:
+  # Created once via `bin/ensure_dev_network.sh`, not by this (or any other)
+  # compose file, so bringing up several stacks together never races over who
+  # "owns" the network. See docs/installation/docker-compose.rst.
+  open-inwoner-dev:
+    external: true
