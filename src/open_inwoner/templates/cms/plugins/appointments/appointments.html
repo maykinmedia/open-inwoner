@@ -11,7 +11,7 @@
         {% for appointment in appointments %}
             {% timezone appointment.branch.timeZone %}
                 <oip-home-plugin-card
-                    title="{{appointment.title}}"
+                    title="{{ appointment.services.0.name|default:appointment.title }}"
                     detail-url="{{appointment_list_url}}"
                     date="{{ appointment.start|date:"j F Y" }} {% trans "om" %} {{ appointment.start|date:"H:i" }}"
                     status="{{ appointment.services.0.name|default:appointment.title }}"
