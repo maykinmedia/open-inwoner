@@ -41,7 +41,7 @@ class ContactFormConfig(CMSPlugin):
 @plugin_pool.register_plugin
 class ContactFormPlugin(CMSPluginBase):
     model = ContactFormConfig
-    app_hook = "OpenKlantApphook"
+    app_hook = "OpenklantApphook"
     name = _("Contact form plugin")
     render_template = "cms/contactform/form_inner.html"
     cache = False
