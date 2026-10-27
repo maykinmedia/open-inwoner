@@ -1,9 +1,14 @@
+import os
+from pathlib import Path
+
 from django.template.loader import render_to_string
 
 from lxml import etree
 from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.parsers.handlers import LxmlEventHandler
+
+SNAPSHOTS_DIR = Path(__file__).parent.resolve() / "snapshots"
 
 
 def mock_get_report_info(path, info_response_node, info_type):  # pragma: no cover
@@ -58,3 +63,31 @@ def get_total_component_value(components: list, target: str) -> float:
         value = float(value_string.replace(",", "."))
         values.append(value)
     return sum(values)
+
+
+class HTMLSnapshotMixin:
+    """
+    Compare rendered HTML against a snapshot stored in `SNAPSHOTS_DIR`.
+
+    Run the tests with `UPDATE_SNAPSHOTS=1` to (re)write the snapshots instead, and
+    review the resulting diff before committing it.
+    """
+
+    def assertHTMLMatchesSnapshot(self, html: str, name: str):
+        path = SNAPSHOTS_DIR / f"{name}.html"
+
+        if os.environ.get("UPDATE_SNAPSHOTS"):
+            path.parent.mkdir(exist_ok=True)
+            # strip whitespace like the pre-commit hooks do, so regenerating the
+            # snapshots doesn't produce whitespace-only diffs
+            lines = [line.rstrip() for line in html.splitlines()]
+            path.write_text("\n".join(lines).rstrip("\n") + "\n")
+            return
+
+        if not path.exists():
+            self.fail(
+                f"Snapshot {path.name} does not exist, run the tests with "
+                "UPDATE_SNAPSHOTS=1 to create it"
+            )
+
+        self.assertHTMLEqual(html, path.read_text())

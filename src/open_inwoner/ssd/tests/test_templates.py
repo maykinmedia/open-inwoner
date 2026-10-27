@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.templatetags.static import static
@@ -9,7 +9,11 @@ import weasyprint
 from maykin_common.pdf import UrlFetcher
 from pyquery import PyQuery
 
-from open_inwoner.ssd.client import JaaropgaveClient, UitkeringClient
+from open_inwoner.ssd.client import (
+    JaaropgaveClient,
+    SSDBaseClient,
+    UitkeringClient,
+)
 from open_inwoner.ssd.models import SSDConfig
 from open_inwoner.ssd.service.jaaropgave import JaarOpgaveInfoResponse
 from open_inwoner.ssd.service.uitkering import (
@@ -17,17 +21,18 @@ from open_inwoner.ssd.service.uitkering import (
 )
 from open_inwoner.ssd.xml import (
     JAAROPGAVE_INFO_RESPONSE_NODE,
+    UITKERING_INFO_RESPONSE_NODE,
     get_jaaropgaven,
     get_uitkeringen,
 )
 from open_inwoner.utils.export import render_pdf
 from open_inwoner.utils.url import build_absolute_url
 
-from .utils import get_total_component_value, mock_get_report_info, render_html
-
-UITKERING_INFO_RESPONSE_NODE = (
-    "//{http://www.centric.nl/GWS/Diensten/UitkeringsSpecificatieClient/v0600}"
-    "UitkeringsSpecificatieInfoResponse"
+from .utils import (
+    HTMLSnapshotMixin,
+    get_total_component_value,
+    mock_get_report_info,
+    render_html,
 )
 
 FILES_DIR = Path(__file__).parent.resolve() / "files"
@@ -46,22 +51,9 @@ class UitkeringTemplateTest(TestCase):
         )
 
         config = SSDConfig.get_solo()
-        # Set ProsemirrorModelField with JSON data
-        config.maandspecificatie_pdf_comments = {
-            "type": "doc",
-            "content": [
-                {
-                    "type": "paragraph",
-                    "content": [
-                        {"type": "text", "text": "Lorem ipsum dolor sit amet..."}
-                    ],
-                }
-            ],
-        }
+        config.maandspecificatie_pdf_comments = "<p>Lorem ipsum dolor sit amet...</p>"
         config.save()
 
-        # Reload config to get ProsemirrorFieldDocument
-        config = SSDConfig.get_solo()
         comments_html = config.maandspecificatie_pdf_comments.html
 
         uitkeringen = get_uitkeringen(None)
@@ -219,3 +211,56 @@ class ReportStylesheetTest(TestCase):
         self.assertStylesheetsResolvedLocally(
             UitkeringClient.html_template, get_uitkeringen(None)
         )
+
+
+@patch("open_inwoner.ssd.client.render_pdf", new=render_html)
+@patch.object(SSDBaseClient, "templated_request", new=Mock())
+@patch("open_inwoner.ssd.xml._get_report_info")
+class ReportSnapshotTest(HTMLSnapshotMixin, TestCase):
+    """
+    Render the reports through the clients (minus the SOAP request and the PDF
+    conversion) and compare the HTML against the snapshots.
+    """
+
+    def setUp(self):
+        config = SSDConfig.get_solo()
+        config.jaaropgave_pdf_comments = "<p>Jaaropgave comments</p>"
+        config.maandspecificatie_pdf_comments = "<p>Maandspecificatie comments</p>"
+        config.save()
+
+    def render_jaaropgave(self, mock_get_report_info_, fixture: str) -> str:
+        mock_get_report_info_.return_value = mock_get_report_info(
+            FILES_DIR / fixture, JAAROPGAVE_INFO_RESPONSE_NODE, JaarOpgaveInfoResponse
+        )
+        return JaaropgaveClient().get_reports("900038937", "2023")
+
+    def render_maandspecificatie(self, mock_get_report_info_, fixture: str) -> str:
+        mock_get_report_info_.return_value = mock_get_report_info(
+            FILES_DIR / fixture, UITKERING_INFO_RESPONSE_NODE, UitkeringInfoResponse
+        )
+        return UitkeringClient().get_reports("900038937", "202301")
+
+    def test_jaaropgave(self, m):
+        html = self.render_jaaropgave(m, "jaaropgave_response.xml")
+
+        self.assertHTMLMatchesSnapshot(html, "jaaropgave")
+
+    def test_jaaropgave_extra_spec(self, m):
+        html = self.render_jaaropgave(m, "jaaropgave_response_extra_spec.xml")
+
+        self.assertHTMLMatchesSnapshot(html, "jaaropgave_extra_spec")
+
+    def test_maandspecificatie_basic(self, m):
+        html = self.render_maandspecificatie(m, "uitkering_response_basic.xml")
+
+        self.assertHTMLMatchesSnapshot(html, "maandspecificatie_basic")
+
+    def test_maandspecificatie_extra_row(self, m):
+        html = self.render_maandspecificatie(m, "uitkering_response_extra_row.xml")
+
+        self.assertHTMLMatchesSnapshot(html, "maandspecificatie_extra_row")
+
+    def test_maandspecificatie_extra_report(self, m):
+        html = self.render_maandspecificatie(m, "uitkering_response_extra_report.xml")
+
+        self.assertHTMLMatchesSnapshot(html, "maandspecificatie_extra_report")
