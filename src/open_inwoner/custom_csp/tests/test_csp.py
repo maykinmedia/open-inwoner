@@ -2,6 +2,8 @@ from django.conf import settings
 from django.test import override_settings
 
 from django_webtest import WebTest
+from maykin_common.csp.constants import CSPDirective
+from maykin_common.csp.models import CSPSetting
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 
@@ -30,3 +32,23 @@ class SkipStaffCSPMiddlewareTest(WebTest):
         user = UserFactory(is_staff=True)
         response = self.app.get("/admin", user=user)
         self.assertNotIn("Content-Security-Policy", response.headers)
+
+
+@override_settings(
+    CONTENT_SECURITY_POLICY=settings.CONTENT_SECURITY_POLICY
+    or settings.CONTENT_SECURITY_POLICY_REPORT_ONLY,
+    CONTENT_SECURITY_POLICY_REPORT_ONLY=None,
+    # the cache is not reset between tests, nor invalidated by their rollback
+    MKN_CSP_CACHE_TIMEOUT=0,
+)
+class DatabaseDirectivesTest(WebTest):
+    def test_csp_includes_database_directives(self):
+        CSPSetting.objects.create(
+            directive=CSPDirective.IMG_SRC, value="https://example.com"
+        )
+
+        response = self.app.get("/")
+
+        self.assertIn(
+            "https://example.com", response.headers["Content-Security-Policy"]
+        )
