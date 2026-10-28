@@ -1,3 +1,38 @@
+2.4.9 (2026-10-29)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.9`.
+
+Beveiliging
+-----------
+
+* [:gh:`3054`]: De pop-ups van locaties op de kaart binnen de CMS plugin
+  "Product Location" worden nu opgebouwd uit DOM-elementen in plaats van uit
+  HTML-tekst. Voorheen werden de gegevens van een locatie (zoals de naam) als
+  HTML in de pop-up geplaatst, wat ondanks het escapen ruimte liet voor XSS.
+  De locatiegegevens konden alleen door beheerders worden toegevoegd, en
+  vereiste verder dat de plugin was geactiveerd.
+
+Bugfixes
+--------
+
+* [:gh:`3143`]: De PDF-exports van de jaaropgave en de maandspecificatie
+  (uitkeringen) waren hun opmaak verloren. De opmaak is hersteld.
+* [:gh:`3131`, :gh:`3148`]: De weergave van balie-afspraken in de tegels van
+  de 'Mijn afspraken'-plugin op de homepage is verbeterd: de titel toont nu de
+  naam van de dienst (zoals 'Paspoort') in plaats van de algemene titel van de
+  afspraak, en tussen de tijd en de locatie staat nu een spatie.
+* [:gh:`3164`]: Op de CMS pagina 'Mijn afspraken' liep de tekst van de link om een
+  afspraak te wijzigen of te annuleren buiten de kaart. De linktekst is
+  ingekort tot "Wijzig of annuleer".
+
+Onderhoud
+---------
+
+* [:gh:`3017`]: ``PyJWT`` bijgewerkt van ``2.13.0`` naar ``2.15.1``.
+* [:gh:`3020`]: ``urllib3`` bijgewerkt van ``2.7.0`` naar ``2.8.0``.
+* [:gh:`3063`]: ``geopy`` bijgewerkt van ``2.2.0`` naar ``2.5.0``.
+
 2.4.8 (2026-10-26)
 ==================
 
