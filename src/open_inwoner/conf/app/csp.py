@@ -24,6 +24,9 @@ OPEN_FORMS_SDK_DOMAIN = OPEN_FORMS_API_DOMAIN
 # explanation of directives: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 # and how to specify them: https://django-csp.readthedocs.io/en/latest/configuration.html
 #
+# These are the sources every installation needs. Anything installation specific is
+# managed in the admin (maykin_common.csp), and merged into this policy per request.
+#
 _csp_report_only = config(
     "CSP_REPORT_ONLY",
     default=False,
@@ -66,20 +69,10 @@ _csp_policy = {
         "frame-src": [SELF],
         "object-src": [NONE],
         # See if the unsafe-eval can be removed....
-        "script-src": [
-            SELF,
-            NONCE,
-            "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
-            OPEN_FORMS_SDK_DOMAIN,
-        ],
+        "script-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
         # Fix this. I do not want to have the unsafe-inline here....
         "style-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
-        "img-src": [
-            SELF,
-            "data:",
-            "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
-            OPEN_FORMS_SDK_DOMAIN,
-        ],
+        "img-src": [SELF, "data:", OPEN_FORMS_SDK_DOMAIN],
         "connect-src": [SELF, OPEN_FORMS_API_DOMAIN],
         "upgrade-insecure-requests": False,  # TODO enable on production?
         "report-uri": [reverse_lazy("report_csp")],
