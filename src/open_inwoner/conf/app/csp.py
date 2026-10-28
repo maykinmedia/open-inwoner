@@ -24,6 +24,9 @@ OPEN_FORMS_SDK_DOMAIN = OPEN_FORMS_API_DOMAIN
 # explanation of directives: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 # and how to specify them: https://django-csp.readthedocs.io/en/latest/configuration.html
 #
+# These are the sources every installation needs. Anything installation specific is
+# managed in the admin (maykin_common.csp), and merged into this policy per request.
+#
 _csp_report_only = config(
     "CSP_REPORT_ONLY",
     default=False,
