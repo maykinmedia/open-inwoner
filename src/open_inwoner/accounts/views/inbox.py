@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import formats
+from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic import FormView
@@ -199,7 +200,17 @@ class InboxView(
 
         """Mark all messages as seen for the receiver"""
         self.mark_messages_seen(other_user=context["other_user"])
-        return self.render_to_response(context)
+        response = self.render_to_response(context)
+        # htmx polls the same URL for the messages only
+        patch_vary_headers(response, ("HX-Request",))
+        return response
+
+    def get_template_names(self):
+        # Polling only needs the messages. The full page would also make the browser
+        # report the CSP nonce of the page's <head> as a violation on every poll.
+        if self.request.htmx:
+            return ["accounts/inbox_messages.html"]
+        return super().get_template_names()
 
     def post(self, request, *args, **kwargs):
         config = SiteConfiguration.get_solo()
