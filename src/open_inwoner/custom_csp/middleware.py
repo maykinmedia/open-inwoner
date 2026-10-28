@@ -33,12 +33,14 @@ class UpdateCSPMiddleware:
         # we're basically copying/extending the @csp_update decorator
         update = {k.lower().replace("_", "-"): v for k, v in update.items()}
 
-        # cooperate with possible data from actual decorator
-        have = getattr(response, "_csp_update", None)
-        if have:
-            _append_dict_list_values(have, update)
-        else:
-            response._csp_update = update
+        # cooperate with possible data from actual decorator, for both the enforced
+        # and the report-only policy (django-csp tracks these separately)
+        for attr in ("_csp_update", "_csp_update_ro"):
+            have = getattr(response, attr, None)
+            if have:
+                _append_dict_list_values(have, update)
+            else:
+                setattr(response, attr, dict(update))
 
         return response
 
@@ -78,4 +80,5 @@ class SkipStaffCSPMiddleware:
         response = self.get_response(request)
         if request.user.is_authenticated and request.user.is_staff:
             response._csp_exempt = True
+            response._csp_exempt_ro = True
         return response
