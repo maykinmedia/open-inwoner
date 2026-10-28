@@ -6,6 +6,8 @@ from django.test import tag
 from django.urls import reverse
 
 from cms.models import CMSPlugin
+from maykin_common.csp.constants import CSPDirective
+from maykin_common.csp.models import CSPSetting
 from playwright.sync_api import FrameLocator, Page as BrowserPage, expect
 
 from open_inwoner.cms.tests.playwright import CMSAdminTests
@@ -19,6 +21,11 @@ class HomepageEditingTests(CMSAdminTests):
 
     def setUp(self):
         super().setUp()
+
+        # like any installation using the video plugin, which embeds Vimeo
+        CSPSetting.objects.create(
+            directive=CSPDirective.FRAME_SRC, value="https://player.vimeo.com"
+        )
 
         self.page = self.get_context().new_page()
         self.log_in_to_admin(self.page)
@@ -66,6 +73,16 @@ class HomepageEditingTests(CMSAdminTests):
 
         self.assertEqual(response.status, 200)
         expect(visitor).to_have_title(re.compile(r"^Home\b"))
+
+    def test_homepage_with_toolbar_works_under_csp(self):
+        self.open_in_edit_mode(self.page)
+        self.publish(self.page)
+
+        # unlike the admin, the frontend applies the CSP to staff, who get the toolbar
+        self.page.goto(self.live_url("/"))
+        expect(self.page.locator(".cms-toolbar")).to_be_visible()
+        # let the toolbar's scripts finish before tearDown checks for violations
+        self.page.wait_for_load_state("networkidle")
 
     # regression test for the global `CMS_PLACEHOLDER_CONF[None]["plugins"]`
     # restricting the picker of every placeholder since django-cms 5
