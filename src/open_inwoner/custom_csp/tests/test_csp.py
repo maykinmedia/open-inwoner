@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import override_settings
 
 from django_webtest import WebTest
@@ -5,7 +6,11 @@ from django_webtest import WebTest
 from open_inwoner.accounts.tests.factories import DigidUserFactory, UserFactory
 
 
-@override_settings(CSP_REPORT_ONLY=False)
+@override_settings(
+    CONTENT_SECURITY_POLICY=settings.CONTENT_SECURITY_POLICY
+    or settings.CONTENT_SECURITY_POLICY_REPORT_ONLY,
+    CONTENT_SECURITY_POLICY_REPORT_ONLY=None,
+)
 class SkipStaffCSPMiddlewareTest(WebTest):
     def test_csp_active_for_anonynous(self):
         response = self.app.get("/")
