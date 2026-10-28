@@ -581,6 +581,55 @@ class CMSPagesConfigurationStepTests(TestCase):
             UserAppointments.objects.filter(placeholder=placeholder).exists()
         )
 
+    def test_homepage_plugin_without_its_apphook_page_fails(self):
+        with self.assertRaisesMessage(
+            ConfigurationRunFailed,
+            "The homepage `categories` plugin is only shown when the `products` "
+            "page is published",
+        ):
+            execute_single_step(
+                CMSPagesConfigurationStep,
+                object_source={
+                    "cms_pages_config_enable": True,
+                    "cms_pages_config": {
+                        "homepage": {"enabled": True, "categories": {}},
+                    },
+                },
+            )
+
+        # the step runs in a transaction, so the failure rolls back the homepage
+        self.assertFalse(Page.objects.exists())
+
+    def test_homepage_plugin_with_apphook_page_from_an_earlier_run_succeeds(self):
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            object_source={
+                "cms_pages_config_enable": True,
+                "cms_pages_config": {
+                    "homepage": {"enabled": True},
+                    "products": {"enabled": True},
+                },
+            },
+        )
+
+        execute_single_step(
+            CMSPagesConfigurationStep,
+            object_source={
+                "cms_pages_config_enable": True,
+                "cms_pages_config": {
+                    "homepage": {"enabled": True, "categories": {}},
+                },
+            },
+        )
+
+        page = Page.objects.get(reverse_id="home")
+        self.assertTrue(
+            CMSPlugin.objects.filter(
+                placeholder=_published_content_placeholder(page, "content"),
+                plugin_type="CategoriesPlugin",
+            ).exists()
+        )
+
     def _banner_image_config(self, path) -> dict:
         return {
             "cms_pages_config_enable": True,
