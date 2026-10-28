@@ -39,7 +39,6 @@ class MigrateToMaykinCommonCSPMigrationTest(TestSuccessfulMigrations):
                     "migrated-from-custom-csp",
                 ),
                 ("img-src", PDOK_ACHTERGRONDKAART, "migrated-from-settings"),
-                ("script-src", PDOK_ACHTERGRONDKAART, "migrated-from-settings"),
                 (
                     "script-src",
                     "https://www.googletagmanager.com",

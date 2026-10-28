@@ -6,8 +6,8 @@ PDOK_ACHTERGRONDKAART = (
 
 # sources which used to be part of the policy in the settings
 SETTINGS_IDENTIFIER = "migrated-from-settings"
+# the map tiles are images, so PDOK is only needed in img-src
 SETTINGS_OVERRIDES = [
-    ("script-src", PDOK_ACHTERGRONDKAART),
     ("img-src", PDOK_ACHTERGRONDKAART),
 ]
 

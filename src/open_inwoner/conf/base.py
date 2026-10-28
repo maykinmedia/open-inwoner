@@ -540,7 +540,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     *_structlog_middleware,
     "open_inwoner.custom_csp.middleware.CSPMiddleware",
-    "open_inwoner.custom_csp.middleware.SkipStaffCSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -1902,6 +1901,12 @@ ACCOUNTS_SMS_GATEWAY = {
 }
 
 from .app.csp import *  # noqa
+
+# upgrading to HTTPS would break local development over plain HTTP
+(CONTENT_SECURITY_POLICY or CONTENT_SECURITY_POLICY_REPORT_ONLY)["DIRECTIVES"][
+    "upgrade-insecure-requests"
+] = IS_HTTPS
+
 from .app.permissions_policy import *  # noqa
 from .app.reporting_api import *  # noqa
 

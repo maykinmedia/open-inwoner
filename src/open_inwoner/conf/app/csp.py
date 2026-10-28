@@ -54,27 +54,27 @@ _csp_report_percentage = config(
 
 _csp_policy = {
     "EXCLUDE_URL_PREFIXES": (
-        # ReDoc/Swagger pull in external sources, so don't enforce CSP on API endpoints/documentation.
-        "/api/",
+        # ReDoc pulls in external sources, so don't enforce CSP on the API documentation
+        "/api/docs/",
+        # (third party) admin widgets are not compatible with our policy
         "/admin/",
     ),
     # django-csp expects a percentage (0-100), the envvar is a fraction (0-1)
     "REPORT_PERCENTAGE": _csp_report_percentage * 100,
     "DIRECTIVES": {
-        # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
-        "default-src": [SELF],
-        "base-uri": [SELF],
+        # everything we load has its own directive, anything else is blocked
+        "default-src": [NONE],
+        "base-uri": [NONE],
         "font-src": [SELF, OPEN_FORMS_SDK_DOMAIN],
         "frame-ancestors": [SELF],
         "frame-src": [SELF],
         "object-src": [NONE],
-        # See if the unsafe-eval can be removed....
         "script-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
-        # Fix this. I do not want to have the unsafe-inline here....
         "style-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
         "img-src": [SELF, "data:", OPEN_FORMS_SDK_DOMAIN],
         "connect-src": [SELF, OPEN_FORMS_API_DOMAIN],
-        "upgrade-insecure-requests": False,  # TODO enable on production?
+        # set in base.py, as it depends on IS_HTTPS
+        "upgrade-insecure-requests": False,
         "report-uri": [reverse_lazy("report_csp")],
     },
 }
