@@ -283,7 +283,6 @@
       "models": [
         ["configurations", "siteconfiguration"],
         ["configurations", "siteconfigurationpage"],
-        ["custom_csp", "cspsetting"],
         ["mail_editor", "mailtemplate"],
         ["sites", "site"],
         ["upgrade_check", "version"]
@@ -302,6 +301,17 @@
         ["admin_index", "appgroup"],
         ["admin_index", "contenttypeproxy"]
       ]
+    }
+  },
+  {
+    "model": "admin_index.appgroup",
+    "fields": {
+      "order": 5,
+      "translations": {},
+      "name": "CSP",
+      "slug": "csp",
+      "parent": ["beheer"],
+      "models": [["maykin_common_csp", "cspsetting"]]
     }
   },
   {

@@ -6,6 +6,8 @@ from django.test import tag
 from django.urls import reverse
 
 from cms.models import CMSPlugin
+from maykin_common.csp.constants import CSPDirective
+from maykin_common.csp.models import CSPSetting
 from playwright.sync_api import FrameLocator, Page as BrowserPage, expect
 
 from open_inwoner.cms.tests.playwright import CMSAdminTests
@@ -19,6 +21,11 @@ class HomepageEditingTests(CMSAdminTests):
 
     def setUp(self):
         super().setUp()
+
+        # like any installation using the video plugin, which embeds Vimeo
+        CSPSetting.objects.create(
+            directive=CSPDirective.FRAME_SRC, value="https://player.vimeo.com"
+        )
 
         self.page = self.get_context().new_page()
         self.log_in_to_admin(self.page)

@@ -443,6 +443,7 @@ INSTALLED_APPS = [
     "privates",
     "timeline_logger",
     "csp",
+    "maykin_common.csp",
     "cspreports",
     "mozilla_django_oidc",
     "mozilla_django_oidc_db",
@@ -538,10 +539,7 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     *_structlog_middleware,
-    "csp.contrib.rate_limiting.RateLimitedCSPMiddleware",
-    "csp.middleware.CSPMiddleware",
-    "open_inwoner.custom_csp.middleware.SkipStaffCSPMiddleware",
-    "open_inwoner.custom_csp.middleware.UpdateCSPMiddleware",
+    "open_inwoner.custom_csp.middleware.CSPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
@@ -1903,6 +1901,12 @@ ACCOUNTS_SMS_GATEWAY = {
 }
 
 from .app.csp import *  # noqa
+
+# upgrading to HTTPS would break local development over plain HTTP
+(CONTENT_SECURITY_POLICY or CONTENT_SECURITY_POLICY_REPORT_ONLY)["DIRECTIVES"][
+    "upgrade-insecure-requests"
+] = IS_HTTPS
+
 from .app.permissions_policy import *  # noqa
 from .app.reporting_api import *  # noqa
 

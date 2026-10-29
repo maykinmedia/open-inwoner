@@ -358,10 +358,11 @@ django-cors-headers==3.10.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-django-csp==3.7
+django-csp==4.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
+    #   maykin-common
 django-csp-reports==1.10.0
     # via
     #   -c requirements/ci.txt
@@ -872,7 +873,7 @@ maykin-2fa==1.0.2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-maykin-common[cli, docs, health-checks, otel, pdf]==0.21.0
+maykin-common[cli, csp, docs, health-checks, otel, pdf] @ git+https://github.com/maykinmedia/django-common@21940aaa10617b0d8d3c9c64d4b2b5dad78582c2
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1085,6 +1086,7 @@ packaging==26.0
     #   -r requirements/ci.txt
     #   commitizen
     #   django-cms
+    #   django-csp
     #   djangocms-versioning
     #   kombu
     #   opentelemetry-instrumentation

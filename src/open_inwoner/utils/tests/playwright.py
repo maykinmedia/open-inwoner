@@ -29,6 +29,20 @@ BROWSER_DRIVERS = {
 }
 BROWSER_DEFAULT = "chromium"
 
+# reports violations of the Content Security Policy back to the test
+CSP_VIOLATION_LISTENER = """
+document.addEventListener("securitypolicyviolation", (event) => {
+    window.reportCSPViolation({
+        directive: event.effectiveDirective,
+        blockedURI: event.blockedURI,
+        documentURI: event.documentURI,
+        source: `${event.sourceFile}:${event.lineNumber}:${event.columnNumber}`,
+        // inline violations are dispatched at the offending element
+        element: event.target.outerHTML?.slice(0, 200) ?? "",
+    });
+});
+"""
+
 
 def get_driver_name() -> str:
     return os.environ.get("E2E_DRIVER", BROWSER_DEFAULT)
@@ -78,13 +92,25 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
             # user_state now has the cookies (etc) for the logged-in user and can be (re)used to get new contexts
             context = self.get_context(storage_state=user_state)
             ...
+
+    tests fail when the Content Security Policy blocks anything in a context from
+    get_context(), set allow_csp_violations = True on the test case to allow it, or
+    list the scripts whose violations are known to be harmless in
+    ignored_csp_violation_sources.
     """
 
     playwright: Playwright
     browser: Browser
 
+    allow_csp_violations = False
+    # The CMS toolbar is shown to staff users on every page. Its jQuery probes for
+    # inline event handler support, and its pointer events polyfill adds a <style>
+    # without nonce, neither of which the toolbar needs to work.
+    ignored_csp_violation_sources: tuple[str, ...] = ("/static/cms/js/",)
+
     _old_async_unsafe: str
     _traced_contexts: list[BrowserContext]
+    _csp_violations: list[dict[str, str]]
 
     @classmethod
     def launch_browser(cls, playwright: Playwright) -> Browser:
@@ -133,6 +159,7 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
     def setUp(self):
         super().setUp()
         self._traced_contexts = []
+        self._csp_violations = []
         os.makedirs(PLAYWRIGHT_TRACE_DIR, exist_ok=True)
 
     def get_context(self, **kwargs) -> BrowserContext:
@@ -146,7 +173,26 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
         context = self.browser.new_context(**kwargs)
         context.tracing.start(screenshots=True, snapshots=True, sources=True)
         self._traced_contexts.append(context)
+
+        # playwright sets attributes on the callback, so it can't be a (bound) method
+        context.expose_function(
+            "reportCSPViolation",
+            lambda violation: self._record_csp_violation(violation),
+        )
+        context.add_init_script(CSP_VIOLATION_LISTENER)
+
         return context
+
+    def _record_csp_violation(self, violation: dict[str, str]) -> None:
+        # the listener also runs in third party frames, which have their own policy
+        if not violation["documentURI"].startswith(self.live_server_url):
+            return
+        if any(
+            source in violation["source"]
+            for source in self.ignored_csp_violation_sources
+        ):
+            return
+        self._csp_violations.append(violation)
 
     def tearDown(self):
         test_id = f"{self.__class__.__name__}.{self._testMethodName}"
@@ -175,6 +221,13 @@ class PlaywrightSyncLiveServerTestCase(StaticLiveServerTestCase):
                     pass
 
         super().tearDown()
+
+        if not self.allow_csp_violations:
+            self.assertEqual(
+                self._csp_violations,
+                [],
+                "The Content Security Policy blocked resources on the page",
+            )
 
     @classmethod
     def live_url(cls, path="/", star=False):

@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 
+from csp.constants import NONCE, NONE, SELF
 from maykin_common.config import DocumentationParams, config
 
 # The Open Forms SDK files might differ from the API domain.
@@ -23,48 +24,10 @@ OPEN_FORMS_SDK_DOMAIN = OPEN_FORMS_API_DOMAIN
 # explanation of directives: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 # and how to specify them: https://django-csp.readthedocs.io/en/latest/configuration.html
 #
-# NOTE: make sure values are a tuple or list, and to quote special values like 'self'
-CSP_DEFAULT_SRC = (
-    "'self'",
-)  # ideally we'd use BASE_URI but it'd have to be lazy or cause issues
-CSP_BASE_URI = ("'self'",)
-CSP_FONT_SRC = ("'self'", OPEN_FORMS_SDK_DOMAIN)
-CSP_FRAME_ANCESTORS = ["'self'"]
-CSP_FRAME_SRC = ["'self'"]
-CSP_OBJECT_SRC = "'none'"
-CSP_SCRIPT_SRC = (
-    "'self'",
-    "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
-    OPEN_FORMS_SDK_DOMAIN,
-)  # See if the unsafe-eval can be removed....
-CSP_STYLE_SRC = (
-    "'self'",
-    OPEN_FORMS_SDK_DOMAIN,
-)  # Fix this. I do not want to have the unsafe-inline here....
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/",
-    OPEN_FORMS_SDK_DOMAIN,
-)
-CSP_CONNECT_SRC = ("'self'", OPEN_FORMS_API_DOMAIN)
-
-CSP_UPGRADE_INSECURE_REQUESTS = False  # TODO enable on production?
-CSP_INCLUDE_NONCE_IN = [
-    "script-src",
-    "style-src",
-]  # Want to have "style-src" here too.... but does not work with unsafe-inline
-
-CSP_EXCLUDE_URL_PREFIXES = (
-    # ReDoc/Swagger pull in external sources, so don't enforce CSP on API endpoints/documentation.
-    "/api/",
-    "/admin/",
-)
-
+# These are the sources every installation needs. Anything installation specific is
+# managed in the admin (maykin_common.csp), and merged into this policy per request.
 #
-# Django CSP-report settings
-#
-CSP_REPORT_ONLY = config(
+_csp_report_only = config(
     "CSP_REPORT_ONLY",
     default=False,
     documentation=DocumentationParams(
@@ -76,7 +39,52 @@ CSP_REPORT_ONLY = config(
         group="Security",
     ),
 )
-CSP_REPORT_URI = reverse_lazy("report_csp")
+_csp_report_percentage = config(
+    "CSP_REPORT_PERCENTAGE",
+    default=1.0,
+    documentation=DocumentationParams(
+        help_text=(
+            "Fraction of responses (0.0–1.0) for which the CSP report-uri directive is "
+            "included. Values below 1.0 sample reports to reduce load on the reporting "
+            "endpoint."
+        ),
+        group="Security",
+    ),
+)
+
+_csp_policy = {
+    "EXCLUDE_URL_PREFIXES": (
+        # ReDoc pulls in external sources, so don't enforce CSP on the API documentation
+        "/api/docs/",
+        # (third party) admin widgets are not compatible with our policy
+        "/admin/",
+    ),
+    # django-csp expects a percentage (0-100), the envvar is a fraction (0-1)
+    "REPORT_PERCENTAGE": _csp_report_percentage * 100,
+    "DIRECTIVES": {
+        # everything we load has its own directive, anything else is blocked
+        "default-src": [NONE],
+        "base-uri": [NONE],
+        "font-src": [SELF, OPEN_FORMS_SDK_DOMAIN],
+        "frame-ancestors": [SELF],
+        "frame-src": [SELF],
+        "object-src": [NONE],
+        "script-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
+        "style-src": [SELF, NONCE, OPEN_FORMS_SDK_DOMAIN],
+        "img-src": [SELF, "data:", OPEN_FORMS_SDK_DOMAIN],
+        "connect-src": [SELF, OPEN_FORMS_API_DOMAIN],
+        # set in base.py, as it depends on IS_HTTPS
+        "upgrade-insecure-requests": False,
+        "report-uri": [reverse_lazy("report_csp")],
+    },
+}
+
+CONTENT_SECURITY_POLICY = None if _csp_report_only else _csp_policy
+CONTENT_SECURITY_POLICY_REPORT_ONLY = _csp_policy if _csp_report_only else None
+
+#
+# Django CSP-report settings
+#
 CSP_REPORTS_SAVE = config(
     "CSP_REPORTS_SAVE",
     default=True,
@@ -95,16 +103,4 @@ CSP_REPORTS_LOG = config(
 )
 CSP_REPORTS_LOG_LEVEL = "warning"
 CSP_REPORTS_EMAIL_ADMINS = False
-CSP_REPORT_PERCENTAGE = config(
-    "CSP_REPORT_PERCENTAGE",
-    default=1.0,
-    documentation=DocumentationParams(
-        help_text=(
-            "Fraction of responses (0.0–1.0) for which the CSP report-uri directive is "
-            "included. Values below 1.0 sample reports to reduce load on the reporting "
-            "endpoint."
-        ),
-        group="Security",
-    ),
-)
 CSP_REPORTS_FILTER_FUNCTION = "cspreports.filters.filter_browser_extensions"

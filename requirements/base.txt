@@ -211,8 +211,10 @@ django-colorfield==0.4.5
     # via -r requirements/base.in
 django-cors-headers==3.10.0
     # via -r requirements/base.in
-django-csp==3.7
-    # via -r requirements/base.in
+django-csp==4.0
+    # via
+    #   -r requirements/base.in
+    #   maykin-common
 django-csp-reports==1.10.0
     # via -r requirements/base.in
 django-digid-eherkenning[oidc] @ git+https://github.com/maykinmedia/django-digid-eherkenning@090e31589ca2b79b81ff741d851e31dfb7df0e0c
@@ -452,7 +454,7 @@ markupsafe==3.0.3
     # via jinja2
 maykin-2fa==1.0.2
     # via -r requirements/base.in
-maykin-common[cli, docs, health-checks, otel, pdf]==0.21.0
+maykin-common[cli, csp, docs, health-checks, otel, pdf] @ git+https://github.com/maykinmedia/django-common@21940aaa10617b0d8d3c9c64d4b2b5dad78582c2
     # via -r requirements/base.in
 maykin-django-prosemirror[images]==0.13.0
     # via -r requirements/base.in
@@ -573,6 +575,7 @@ orderedmultidict==1.0.1
 packaging==26.0
     # via
     #   django-cms
+    #   django-csp
     #   djangocms-versioning
     #   kombu
     #   opentelemetry-instrumentation

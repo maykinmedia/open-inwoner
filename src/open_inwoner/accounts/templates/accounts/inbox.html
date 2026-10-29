@@ -32,9 +32,7 @@
         {% endrender_column %}
 
         {% render_column start=5 span=8 %}
-            {% if conversation_messages or other_user %}
-                {% messages message_list=conversation_messages user=request.user form=form other_user=other_user status=status %}
-            {% endif %}
+            {% include "accounts/inbox_messages.html" %}
         {% endrender_column %}
     {% endrender_grid %}
 {% endblock %}

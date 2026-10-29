@@ -26,7 +26,7 @@ django-treebeard
 maykin-2fa
 phonenumbers
 maykin-django-prosemirror[images]
-maykin-common[otel,cli,health-checks,docs,pdf]
+maykin-common[otel,cli,health-checks,docs,pdf,csp] @ git+https://github.com/maykinmedia/django-common@21940aaa10617b0d8d3c9c64d4b2b5dad78582c2
 django-localflavor
 django-privates
 django-cors-headers

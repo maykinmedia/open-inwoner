@@ -71,6 +71,20 @@ class InboxPageTests(WebTest):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].id, self.message1.id)
 
+    def test_poll_messages(self):
+        response = self.app.get(self.contact1_url, headers={"HX-Request": "true"})
+
+        self.assertTemplateUsed(response, "accounts/inbox_messages.html")
+        self.assertTemplateNotUsed(response, "master.html")
+        self.assertEqual(
+            [
+                item.text_content().strip()
+                for item in response.pyquery(".messages__days .messages__list-item")
+            ],
+            [self.message1.content],
+        )
+        self.assertIn("HX-Request", response.headers["Vary"])
+
     def test_send_message(self):
         response = self.app.get(self.contact1_url, auto_follow=True)
         self.assertEqual(response.status_code, 200)
