@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/preact';
 import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import DataSummary, { ListItem } from './DataSummary';
 import { DATASUMMARY_DEFINITION } from '.';
-import { isDate } from '@react/lib/compare';
+import { isDateString } from '@react/lib/web-component/compare/compare';
 import { WebComponentLoader } from '@react/lib/web-component';
 
 describe('DataSummary', () => {
@@ -25,7 +25,7 @@ describe('DataSummary', () => {
       if (label) {
         expect(screen.getByText(label)).toBeInTheDocument();
       }
-      if (value != null && !isDate(value)) {
+      if (value != null && !isDateString(value)) {
         expect(screen.getByText(String(value))).toBeInTheDocument();
       }
     });
