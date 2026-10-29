@@ -20,6 +20,7 @@ def render_grid(parser, token):
 
     Variables:
         - compact: bool | Whether to use compact mode (no gutters).
+        - stack_tablet: bool | Whether to use tablet mode (768px).
 
     Extra context:
         - contents: string (HTML) | this is the context between the render_grid and endrender_grid tags
