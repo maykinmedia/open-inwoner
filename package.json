@@ -84,7 +84,7 @@
     "@preact/preset-vite": "^2.10.2",
     "@storybook/addon-a11y": "^10.5.0",
     "@storybook/addon-docs": "^10.5.0",
-    "@storybook/addon-vitest": "^10.5.0",
+    "@storybook/addon-vitest": "^10.6.2",
     "@storybook/preact-vite": "^10.5.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
