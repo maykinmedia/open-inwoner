@@ -7,13 +7,12 @@
     <nav class="primary-navigation primary-navigation--desktop primary-navigation__authenticated" aria-label="Navigatie na inloggen">
         <ul class="primary-navigation__list">
             <li class="primary-navigation__list-item">
-                <span class="nav-login__icon">{% icon icon="how_to_reg" icon_position="before" outlined=True %}</span>
                 {% if user.is_eherkenning_user and user.vestiging %}
-                    {% button text=user.branch_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
+                    {% button text=user.branch_name type="button" text_icon="how_to_reg" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% elif user.is_eherkenning_user %}
-                    {% button text=user.company_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
+                    {% button text=user.company_name type="button" text_icon="how_to_reg" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% else %}
-                    {% button text=user.display_name type="button" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
+                    {% button text=user.display_name type="button" text_icon="how_to_reg" icon="expand_more" icon_position="after" icon_outlined=True transparent=True extra_classes="primary-navigation--toggle" ariaExpanded="false" ariaControls="authenticated-navigation-submenu" %}
                 {% endif %}
 
                 {% if request.user.num_indicators %}
