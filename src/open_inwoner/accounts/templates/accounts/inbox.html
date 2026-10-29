@@ -7,7 +7,7 @@
         {% trans "Mijn berichten" %}
     </h1>
 
-    {% render_grid tablet=True %}
+    {% render_grid stack_tablet=True %}
         {% render_column start=1 span=4 extra_classes="inbox__conversations" %}
         <div class="messages__sidebar">
          {% button primary=True href='inbox:start' text=_('Nieuw bericht versturen') %}
