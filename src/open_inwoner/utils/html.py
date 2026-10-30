@@ -54,6 +54,7 @@ def get_rendered_content(content) -> str:
             element.attrs["class"] = class_name
             if element.name == "a" and element.attrs.get("href", "").startswith("http"):
                 # icon & screenreader support
+                element.attrs.update({"target": "_blank"})
                 icon = soup.new_tag("span")
                 icon.attrs.update(
                     {
@@ -144,6 +145,7 @@ def get_product_rendered_content(product):
             elif element.name == "a" and element.attrs.get("href", "").startswith(
                 "http"
             ):
+                element.attrs.update({"target": "_blank"})
                 icon = soup.new_tag("span")
                 icon.attrs.update(
                     {
