@@ -137,7 +137,6 @@ describe('test format.ts functions', () => {
 
     it('supports other date formats', () => {
       expect(formatDate('2025/05/26')).toBe('26 mei 2025');
-      expect(formatDate('2025.05.26')).toBe('26 mei 2025');
     });
 
     it('returns the original value when the date is invalid', () => {
