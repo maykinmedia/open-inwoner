@@ -22,15 +22,18 @@ You need the following libraries and/or programs:
 * `Node.js`_ 24.15
 * `npm`_
 * `Elastic Search`_ 7.9.2 or above
+* `Redis`_, used as cache and Celery broker
 
-You will also need the `Libxml2`_ and `GDAL`_ development libraries.
-For Linux (Debian) they are following:
+You will also need the `Libxml2`_ and `GDAL`_ development libraries, and
+`Pango`_ for generating PDF exports. For Linux (Debian) they are following:
 
 * libxml2-dev
 * libxmlsec1-dev
 * libxmlsec1-openssl
 * libgdal-dev
 * gdal-bin
+* libpango-1.0-0
+* libpangoft2-1.0-0
 
 .. _Python: https://www.python.org/
 .. _Virtualenv: https://virtualenv.pypa.io/en/stable/
@@ -39,6 +42,8 @@ For Linux (Debian) they are following:
 .. _Node.js: http://nodejs.org/
 .. _npm: https://www.npmjs.com/
 .. _Elastic Search: https://www.elastic.co/
+.. _Redis: https://redis.io/
+.. _Pango: https://pango.gnome.org/
 .. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 .. _GDAL: https://gdal.org/
 
@@ -197,31 +202,35 @@ To run the test suite:
 Configuration via environment variables
 ---------------------------------------
 
-A number of common settings/configurations can be modified by setting
-environment variables. You can persist these in your ``local.py`` settings
-file or as part of the ``(post)activate`` of your virtualenv.
+Settings can be changed with environment variables, see
+:ref:`configuration_env_vars` for the full list. You can persist these in a
+``.env`` file, in your ``local.py`` settings file or as part of the
+``(post)activate`` of your virtualenv.
 
-* ``SECRET_KEY``: the secret key to use. A default is set in ``dev.py``
-* ``DIGID_MOCK``: determines if a mock-DigiD interface is to be shown on the frontend, if configured in the admin this has to be set to ``True`` to avoid switching to the mock-authentication by accident.
-* ``EHERKENNING_MOCK``: determines if a mock-eHerkenning interface is to be shown on the frontend, if configured in the admin this has to be set to ``True`` to avoid switching to the mock-authentication by accident.
+The development settings (``conf/dev.py``) assume the backing services from
+``bin/stack.sh up --localhost`` (see
+:ref:`installation_docker_compose_host_mode`), which are published on
+non-standard ports. For a native install, override these in ``local.py`` or
+``.env``:
 
-* ``DB_NAME``: name of the database for the project. Defaults to ``open_inwoner``.
-* ``DB_USER``: username to connect to the database with. Defaults to ``open_inwoner``.
-* ``DB_PASSWORD``: password to use to connect to the database. Defaults to ``open_inwoner``.
-* ``DB_HOST``: database host. Defaults to ``localhost``
-* ``DB_PORT``: database port. Defaults to ``5432``.
+* ``DB_PORT`` defaults to ``5433``, a native PostgreSQL uses ``5432``.
+* ``CACHE_DEFAULT`` and ``CELERY_BROKER_URL`` default to Redis on port ``6380``,
+  a native Redis uses ``6379``.
+* ``ES_HOST`` defaults to ``http://localhost:9202``, ``bin/start_elasticsearch.sh``
+  publishes Elasticsearch on ``http://localhost:9200``.
 
-* ``SENTRY_DSN``: the DSN of the project in Sentry. If set, enabled Sentry SDK as
-  logger and will send errors/logging to Sentry. If unset, Sentry SDK will be
-  disabled.
+Two-factor authentication
+-------------------------
 
-* ``TWO_FACTOR_FORCE_OTP_ADMIN``: Enforce 2 Factor Authentication in the admin or not.
-  Defaults to ``True``.
-* ``TWO_FACTOR_PATCH_ADMIN``: Whether to use the 2 Factor Authentication login flow for
-  the admin or not. Defaults to ``True``.
+Logging in to the admin normally requires two-factor authentication. For
+development, ``DISABLE_2FA`` lets every login method skip it:
 
-* ``ES_HOST``: Elasticsearch host URL. Defaults to ``http://localhost:9200``.
-* ``ES_USERNAME``: Elasticsearch username for basic authentication. When both
-  ``ES_USERNAME`` and ``ES_PASSWORD`` are set, the client will authenticate using
-  HTTP basic auth. Leave unset to connect without authentication.
-* ``ES_PASSWORD``: Elasticsearch password for basic authentication. See ``ES_USERNAME``.
+* ``conf/dev.py`` defaults ``DISABLE_2FA`` to ``True``, so 2FA is off when you
+  run Open Inwoner on the host. Set it to ``False`` to test the 2FA flow.
+* ``conf/docker.py`` defaults it to ``False``. The docker-compose stack sets it
+  to ``True`` (see :ref:`installation_docker_compose`).
+
+.. warning::
+
+   ``DISABLE_2FA`` is also read by the settings of the production image. Never
+   set it in a production environment.

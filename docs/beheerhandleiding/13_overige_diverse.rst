@@ -14,7 +14,7 @@ Onder application groups vindt u de hoofditems van het topmenu. U kunt nieuwe it
 13.1.1. Application group toevoegen
 -----------------------------------
 
-Door in het overzicht op de knop [application group toevoegen +] rechts bovenin uw scherm te klikken kunt u een nieuwe mail template toevoegen. Er wordt een nieuw scherm geopend waar u enkele gegevens dient in te vullen. Wanneer alle gegevens zijn ingevuld klikt u op [opslaan].
+Door in het overzicht op de knop [application group toevoegen +] rechts bovenin uw scherm te klikken kunt u een nieuwe application group toevoegen. Er wordt een nieuw scherm geopend waar u enkele gegevens dient in te vullen. Wanneer alle gegevens zijn ingevuld klikt u op [opslaan].
 
 13.1.2. Application group verplaatsen
 -------------------------------------
@@ -109,7 +109,7 @@ Onder geavanceerd vindt u enkele technische details van de afbeelding/het bestan
 
 
 **Locatie van onderwerp**
-De locatie van het onderwerp geeft het brandpunt van de afbeelding aan. Hier worden de x en y-coördinaten weergegeven. Om het brandpunt van de afbeelding te wijzigen is het beter gebruik te maken van de visuele manier. Zie 11.3.4.
+De locatie van het onderwerp geeft het brandpunt van de afbeelding aan. Hier worden de x en y-coördinaten weergegeven. Om het brandpunt van de afbeelding te wijzigen is het beter gebruik te maken van de visuele manier. Zie 13.2.4.
 
 
 **Opslaan**
@@ -174,11 +174,7 @@ Hier kunt u een exacte datum en tijd aangeven vanaf wanneer de periodieke taak i
 
 
 **Datum en tijd laatste uitvoering**
-Hier wordt exact aangegeven wanneer de periodieke taak voor het laatst  is uitgevoerd.
-
-
-**Datum en tijd laatste uitvoering**
-Hier wordt exact aangegeven wanneer
+Hier wordt exact aangegeven wanneer de periodieke taak voor het laatst is uitgevoerd.
 
 
 **One-off task**

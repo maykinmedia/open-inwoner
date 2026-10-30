@@ -92,7 +92,7 @@ Dit is de configuratie voor de koppeling van het Open Inwoner platform met de KV
    :width: 624px
 
 **API root**
-De API root is verschillend voor de testomgeving en de productieomgeving van Open Inwoner. Bij de testomgeving moet de root https://developers.kvk.nl/test/api/ zijn en bij de productieomgeving https://api.kvk.nl/api/v2
+De API root is verschillend voor de testomgeving en de productieomgeving van Open Inwoner. Bij de testomgeving moet de root https://api.kvk.nl/test/api/ zijn en bij de productieomgeving https://api.kvk.nl/api/. Vul de root in zonder versienummer of endpoint (dus niet ``.../api/v2``); anders wordt de waarde bij het opslaan geweigerd.
 
 Let op! Er is een abonnement noodzakelijk om gebruik te kunnen maken van deze API. Meer informatie over de KVK API kunt u vinden op: https://developers.kvk.nl/documentation
 
@@ -239,7 +239,7 @@ bereikbaar is) door die van uw eigen omgeving:
 
    De legacy per-provider callback-URL's hierboven voor ``oidc-digid``,
    ``oidc-eherkenning`` en ``oidc-eidas`` worden gebruikt zolang de
-   (vervallen) omgevingsvariabele ``OIDC_USE_LEGACY_ENDPOINTS`` op zijn
+   verouderde omgevingsvariabele ``OIDC_USE_LEGACY_ENDPOINTS`` op zijn
    standaardwaarde ``True`` staat. Is de whitelist bij uw identity broker
    al bijgewerkt met de generieke callback-URL
    (``https://mijn.gemeente.nl/oidc/callback/``, dezelfde die ``admin-oidc``
