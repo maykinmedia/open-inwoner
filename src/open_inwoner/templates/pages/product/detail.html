@@ -103,7 +103,7 @@
                         <ul class="link-list__list">
                             {% for link in product_links %}
                                 <li class="link-list__list-item link-list__list-item--wrap">
-                                    {% link href=link.url secondary=True text=link.name %}
+                                    {% link href=link.url secondary=True text=link.name blank=True %}
                                 </li>
                             {% endfor %}
                         </ul>
