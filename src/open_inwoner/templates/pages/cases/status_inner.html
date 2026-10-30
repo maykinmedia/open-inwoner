@@ -11,9 +11,14 @@
 {% if zaak %}
     {% render_grid %}
         {% render_column span=12 %}
-            {# Title/dashboard #}
+            {# Title/Data Summary component #}
             <h1 class="utrecht-heading-1" id="title">{{ zaak.description }}</h1>
-            {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
+            {% if metrics %}
+            {{ metrics|json_script:"dashboard_data" }}
+            <oip-data-summary items-id="dashboard_data"></oip-data-summary>
+            {% endif %}
+
+
         {% endrender_column %}
 
         {% render_column start=1 span=6 %}

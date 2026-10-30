@@ -39,6 +39,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "@gemeente-denhaag/action": "^4.0.1",
+    "@gemeente-denhaag/descriptionlist": "^4.1.2",
     "@gemeente-denhaag/file": "^2.3.0",
     "@gemeente-denhaag/side-navigation": "^4.0.2",
     "@maykinmedia/preact-custom-element": "github:maykinmedia/preact-custom-element#5b3701126d62a7de458099f1186f66d34878766d",
