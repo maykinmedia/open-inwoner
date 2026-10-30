@@ -1625,7 +1625,8 @@ class TestCaseDetailView(
         # Assert link is rendered with correct classes (get_rendered_content adds them)
         self.assertContains(response, '<p class="nl-paragraph">')
         self.assertContains(
-            response, '<a class="link link--secondary" href="https://example.com">'
+            response,
+            '<a class="link link--secondary" href="https://example.com" target="_blank">',
         )
         self.assertContains(response, "our website")
         # Verify HTML is NOT escaped
@@ -2487,7 +2488,8 @@ class TestCaseDetailView(
         self.assertContains(response, "<em>all required documents</em>")
         # get_rendered_content adds "link link--secondary" class to external links
         self.assertContains(
-            response, '<a class="link link--secondary" href="https://help.example.com">'
+            response,
+            '<a class="link link--secondary" href="https://help.example.com" target="_blank">',
         )
 
         # Verify HTML is NOT escaped
