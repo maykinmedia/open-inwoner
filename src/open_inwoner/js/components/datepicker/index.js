@@ -5,6 +5,10 @@ const instance = flatpickr('.datefield', {
   weekNumbers: true,
   dateFormat: 'd-m-Y',
   locale: Dutch,
+  // Position the calendar with CSS below the input. Otherwise flatpickr positions it
+  // itself, which can add a <style> without nonce that the CSP blocks (Safari does so
+  // on page load).
+  static: true,
   onReady: function (dateObj, dateStr, instance) {
     let cal = instance.calendarContainer;
     if (cal.querySelectorAll('.flatpickr-clear').length < 1) {
