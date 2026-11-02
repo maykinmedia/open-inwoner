@@ -693,7 +693,7 @@ faker==27.0.0
     #   factory-boy
     #   polyfactory
     #   zgw-consumers-oas
-filelock==3.29.0
+filelock==4.2.6
     # via
     #   python-discovery
     #   virtualenv
