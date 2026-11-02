@@ -359,6 +359,19 @@ class PlanViewTests(WebTest):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_plan_file_add_svg_with_spoofed_content_type_is_rejected(self):
+        response = self.app.get(self.file_add_url, user=self.user)
+        form = response.forms["document-upload"]
+        form["file"] = Upload(
+            "evil.svg",
+            b'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
+            "image/png",
+        )
+        response = form.submit(user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.plan.documents.count(), 0)
+
     def test_plan_file_cannot_be_downloaded_by_non_contact(self):
         doc = DocumentFactory(owner=self.user, plan=self.plan)
         new_user = UserFactory()

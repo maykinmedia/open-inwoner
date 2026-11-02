@@ -147,8 +147,16 @@ class LimitedUploadFileField(forms.FileField):
                     _error_messages["max_size"],
                     params={"size": filesizeformat(self.max_upload_size)},
                 )
-            # checking file type limits
-            if f.content_type not in self.allowed_mime_types:
+            # checking file type limits. The content type is supplied by the client,
+            # so also check the type implied by the extension, which determines how
+            # the file is served when downloaded (e.g. an .svg as image/svg+xml).
+            # Compressed files (e.g. .txt.gz) would be served with a content encoding
+            guessed_mime_type, encoding = mimetypes.guess_type(f.name)
+            if (
+                f.content_type not in self.allowed_mime_types
+                or guessed_mime_type not in self.allowed_mime_types
+                or encoding is not None
+            ):
                 raise forms.ValidationError(
                     _error_messages["file_type"]
                     % {"file_extensions": ", ".join(self.allowed_extensions)}
