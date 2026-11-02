@@ -1,5 +1,6 @@
 import base64
 import concurrent.futures
+import mimetypes
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Literal, Mapping, Type, TypeAlias, TypeVar, cast
@@ -648,9 +649,10 @@ class DocumentenClient(ZgwAPIClient):
             "indicatieGebruiksrecht": False,
             "taal": "dut",
             "informatieobjecttype": informatieobjecttype_url,
+            # the content type is supplied by the client, so derive the format from
+            # the (validated) extension instead
+            "formaat": mimetypes.guess_type(file.name)[0] or "application/octet-stream",
         }
-        if file.content_type:
-            document_body["formaat"] = file.content_type
 
         response = self.post("enkelvoudiginformatieobjecten", json=document_body)
         self.raise_for_status(response)

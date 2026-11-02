@@ -641,7 +641,43 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         self.assertEqual(created_document, self.informatie_object)
 
         post_body = m.last_request.json()
-        self.assertEqual(post_body["formaat"], file.content_type)
+        self.assertEqual(post_body["formaat"], "text/plain")
+
+    def test_document_upload_format_is_derived_from_extension(self, m):
+        self._setUpMocks(m)
+
+        zaak_type_config = ZaakTypeConfigFactory(
+            identificatie=self.zaaktype["identificatie"]
+        )
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=zaak_type_config,
+            informatieobjecttype_url=self.informatie_object["url"],
+            zaaktype_uuids=[self.zaaktype["uuid"]],
+            document_upload_enabled=True,
+        )
+        (documenten_client, _) = build_documenten_clients()
+
+        for filename, content_type, expected_format in (
+            ("evil.png", "text/html", "image/png"),
+            ("evil.png", "image/svg+xml", "image/png"),
+            ("no_extension", "text/html", "application/octet-stream"),
+        ):
+            with self.subTest(filename=filename, content_type=content_type):
+                io = BytesIO(b"<svg></svg>")
+                file = InMemoryUploadedFile(
+                    io, None, filename, content_type, len(io.getvalue()), None
+                )
+
+                documenten_client.upload_document(
+                    self.user,
+                    file,
+                    "my_document",
+                    zaak_type_iotc.id,
+                    self.zaak["bronorganisatie"],
+                )
+
+                post_body = m.last_request.json()
+                self.assertEqual(post_body["formaat"], expected_format)
 
     def test_document_upload_multiple_backends(self, m):
         self._setUpMocks(m)
