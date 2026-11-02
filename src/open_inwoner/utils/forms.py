@@ -46,7 +46,7 @@ class PrivateFileWidget(forms.ClearableFileInput):
     def __init__(self, *args, **kwargs):
         self.url_name = kwargs.pop("url_name")
         super().__init__(*args, **kwargs)
-        self.attrs.update({"accept": settings.UPLOAD_FILE_TYPES})
+        self.attrs.update({"accept": ",".join(settings.UPLOAD_FILE_TYPES)})
 
     def get_context(self, name, value, attrs):
         """
@@ -118,23 +118,16 @@ class LimitedUploadFileField(forms.FileField):
         return self._max_upload_size or settings.MAX_UPLOAD_SIZE
 
     @property
-    def allowed_mime_types(self):
-        return (
-            ",".join(self._allowed_mime_types)
-            if self._allowed_mime_types
-            else settings.UPLOAD_FILE_TYPES
-        )
+    def allowed_mime_types(self) -> list[str]:
+        return self._allowed_mime_types or settings.UPLOAD_FILE_TYPES
 
     @property
     def allowed_extensions(self):
-        return [
-            mimetypes.guess_extension(mt)[1:]
-            for mt in self.allowed_mime_types.split(",")
-        ]
+        return [mimetypes.guess_extension(mt)[1:] for mt in self.allowed_mime_types]
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
-        attrs.update({"accept": self.allowed_mime_types})
+        attrs.update({"accept": ",".join(self.allowed_mime_types)})
         return attrs
 
     def clean(self, *args, **kwargs):
@@ -155,7 +148,7 @@ class LimitedUploadFileField(forms.FileField):
                     params={"size": filesizeformat(self.max_upload_size)},
                 )
             # checking file type limits
-            if f.content_type not in self.allowed_mime_types.split(","):
+            if f.content_type not in self.allowed_mime_types:
                 raise forms.ValidationError(
                     _error_messages["file_type"]
                     % {"file_extensions": ", ".join(self.allowed_extensions)}
