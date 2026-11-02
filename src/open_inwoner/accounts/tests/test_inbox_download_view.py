@@ -23,6 +23,9 @@ class InboxDownloadTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, "text/plain")
         self.assertEqual(response.content, b"test content")
+        self.assertEqual(
+            response.headers["Content-Disposition"], 'attachment; filename="file.txt"'
+        )
 
     def test_download_file_sender(self):
         response = self.app.get(self.download_url, user=self.message.sender)
@@ -30,6 +33,9 @@ class InboxDownloadTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, "text/plain")
         self.assertEqual(response.content, b"test content")
+        self.assertEqual(
+            response.headers["Content-Disposition"], 'attachment; filename="file.txt"'
+        )
 
     def test_download_login_required(self):
         response = self.app.get(self.download_url)

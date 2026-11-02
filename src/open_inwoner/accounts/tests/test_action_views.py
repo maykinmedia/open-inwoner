@@ -222,6 +222,10 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, "text/plain")
         self.assertEqual(response.content, b"test content")
+        self.assertEqual(
+            response.headers["Content-Disposition"],
+            f'attachment; filename="{self.action.file.name}"',
+        )
 
     def test_action_download_login_required(self):
         response = self.app.get(self.download_url)
