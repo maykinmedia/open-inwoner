@@ -721,7 +721,9 @@ class InboxForm(forms.ModelForm):
     file = LimitedUploadFileField(
         required=False,
         label="",
-        widget=MessageFileInputWidget(attrs={"accept": settings.UPLOAD_FILE_TYPES}),
+        widget=MessageFileInputWidget(
+            attrs={"accept": ",".join(settings.UPLOAD_FILE_TYPES)}
+        ),
     )
 
     class Meta:
