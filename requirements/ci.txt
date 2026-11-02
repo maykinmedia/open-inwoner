@@ -988,7 +988,7 @@ orderedmultidict==1.0.1
     #   -c requirements/base.txt
     #   -r requirements/base.txt
     #   furl
-packaging==26.0
+packaging==26.3
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
