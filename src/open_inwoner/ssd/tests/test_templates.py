@@ -2,10 +2,11 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from django.conf import settings
-from django.templatetags.static import static
 from django.test import TestCase, override_settings
 
 import weasyprint
+from django_vite.core.asset_loader import DjangoViteAssetLoader
+from django_vite.templatetags.django_vite import vite_asset_url
 from maykin_common.pdf import UrlFetcher
 from pyquery import PyQuery
 
@@ -182,8 +183,10 @@ class ReportStylesheetTest(TestCase):
         self.assertEqual(
             fetched_stylesheets,
             [
-                build_absolute_url(static("bundles/pdf-p.css")),
-                build_absolute_url(static("bundles/open_inwoner-css.css")),
+                build_absolute_url(
+                    vite_asset_url("src/open_inwoner/scss/pdf/pdf_portrait.scss")
+                ),
+                build_absolute_url(vite_asset_url("src/open_inwoner/scss/screen.scss")),
             ],
         )
         network_fetch.assert_not_called()
@@ -215,11 +218,19 @@ class ReportStylesheetTest(TestCase):
 
 @patch("open_inwoner.ssd.client.render_pdf", new=render_html)
 @patch.object(SSDBaseClient, "templated_request", new=Mock())
+@patch.object(
+    DjangoViteAssetLoader,
+    "generate_vite_asset_url",
+    new=lambda self, path, app=None: f"/static/vite/{path}",
+)
 @patch("open_inwoner.ssd.xml._get_report_info")
 class ReportSnapshotTest(HTMLSnapshotMixin, TestCase):
     """
     Render the reports through the clients (minus the SOAP request and the PDF
     conversion) and compare the HTML against the snapshots.
+
+    The Vite asset URLs are stubbed, because the content hashes in the real
+    ones change with every frontend build.
     """
 
     def setUp(self):

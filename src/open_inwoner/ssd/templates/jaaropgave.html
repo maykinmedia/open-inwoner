@@ -1,4 +1,4 @@
-{% load ssd_tags utils static l10n %}
+{% load ssd_tags utils l10n django_vite %}
 
 <!DOCTYPE html>
 <html lang="nl">
@@ -8,8 +8,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Jaaropgave {{ spec.dienstjaar|unlocalize }}</title>
-        <link href="{% static 'bundles/pdf-p.css' %}" media="all" rel="stylesheet" />
-        <link href="{% static 'bundles/open_inwoner-css.css' %}" media="all" rel="stylesheet" />
+        <link href="{% vite_asset_url 'src/open_inwoner/scss/pdf/pdf_portrait.scss' %}" media="all" rel="stylesheet" />
+        <link href="{% vite_asset_url 'src/open_inwoner/scss/screen.scss' %}" media="all" rel="stylesheet" />
     </head>
     <body>
     <div class="yearly-report">
