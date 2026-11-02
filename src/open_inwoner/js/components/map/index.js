@@ -1,6 +1,22 @@
 import 'leaflet';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 import { RD_CRS } from './rd';
 import { isMobile } from '../../lib/device/is-mobile';
+
+/**
+ * The default marker, with the image URLs resolved by the bundler. Leaflet
+ * guesses the location of its default images from the URL in leaflet.css, which
+ * fails for the hashed file names in the bundle (the browser then requests
+ * `marker-icon.png` relative to the page).
+ */
+const MARKER_ICON = L.icon({
+  ...L.Icon.Default.prototype.options,
+  iconUrl,
+  iconRetinaUrl,
+  shadowUrl,
+});
 
 /**
  * Creates an element, setting attributes and children without parsing HTML.
@@ -26,7 +42,7 @@ const LEAFLET_MAPS = document.querySelectorAll('.map__leaflet');
 /**
  * Renders a (Leaflet) map.
  */
-class Map {
+export class Map {
   /**
    * Constructor method.
    * @param {HTMLElement} node
@@ -80,6 +96,8 @@ class Map {
 
     const data = JSON.parse(this.geoJSON);
     L.geoJSON(data, {
+      pointToLayer: (feature, latlng) =>
+        L.marker(latlng, { icon: MARKER_ICON }),
       onEachFeature: (feature, layer) =>
         layer.bindPopup(this.featureToHTML(feature), {
           maxWidth: 300,
