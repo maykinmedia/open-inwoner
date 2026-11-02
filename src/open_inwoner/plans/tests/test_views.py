@@ -1,6 +1,7 @@
 import json
 from datetime import date, timedelta
 from http import HTTPStatus
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 from django.contrib.messages import get_messages
@@ -358,6 +359,10 @@ class PlanViewTests(WebTest):
             user=self.contact,
         )
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["Content-Disposition"],
+            f'attachment; filename="{Path(doc.file.name).name}"',
+        )
 
     def test_plan_file_add_svg_with_spoofed_content_type_is_rejected(self):
         response = self.app.get(self.file_add_url, user=self.user)

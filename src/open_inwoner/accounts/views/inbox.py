@@ -282,6 +282,8 @@ class InboxPrivateMediaView(LogMixin, PrivateMediaView):
     slug_field = "uuid"
     slug_url_kwarg = "uuid"
     file_field = "file"
+    # serve as attachment, so user uploads are never rendered inline
+    sendfile_options = {"attachment": True}
 
     def has_permission(self):
         """
