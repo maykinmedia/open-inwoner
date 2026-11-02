@@ -904,7 +904,7 @@ mozilla-django-oidc-db[setup-configuration]==2.0.1
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   django-digid-eherkenning
-msgpack==1.1.2
+msgpack==1.2.4
     # via locust
 msgspec==0.22.0
     # via
