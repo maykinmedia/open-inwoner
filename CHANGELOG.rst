@@ -1,3 +1,282 @@
+2.4.9 (2026-10-29)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.9`.
+
+Beveiliging
+-----------
+
+* [:gh:`3054`]: De pop-ups van locaties op de kaart binnen de CMS plugin
+  "Product Location" worden nu opgebouwd uit DOM-elementen in plaats van uit
+  HTML-tekst. Voorheen werden de gegevens van een locatie (zoals de naam) als
+  HTML in de pop-up geplaatst, wat ondanks het escapen ruimte liet voor XSS.
+  De locatiegegevens konden alleen door beheerders worden toegevoegd, en
+  vereiste verder dat de plugin was geactiveerd.
+
+Bugfixes
+--------
+
+* [:gh:`3143`]: De PDF-exports van de jaaropgave en de maandspecificatie
+  (uitkeringen) waren hun opmaak verloren. De opmaak is hersteld.
+* [:gh:`3131`, :gh:`3148`]: De weergave van balie-afspraken in de tegels van
+  de 'Mijn afspraken'-plugin op de homepage is verbeterd: de titel toont nu de
+  naam van de dienst (zoals 'Paspoort') in plaats van de algemene titel van de
+  afspraak, en tussen de tijd en de locatie staat nu een spatie.
+* [:gh:`3164`]: Op de CMS pagina 'Mijn afspraken' liep de tekst van de link om een
+  afspraak te wijzigen of te annuleren buiten de kaart. De linktekst is
+  ingekort tot "Wijzig of annuleer".
+
+Onderhoud
+---------
+
+* [:gh:`3017`]: ``PyJWT`` bijgewerkt van ``2.13.0`` naar ``2.15.1``.
+* [:gh:`3020`]: ``urllib3`` bijgewerkt van ``2.7.0`` naar ``2.8.0``.
+* [:gh:`3063`]: ``geopy`` bijgewerkt van ``2.2.0`` naar ``2.5.0``.
+
+2.4.8 (2026-10-26)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.8`.
+
+.. note::
+
+   Dit is een hotfix-release met beveiligingsupdates voor een aantal
+   afhankelijkheden. We adviseren u zo snel mogelijk te upgraden.
+
+Beveiliging
+-----------
+
+* [:gh:`3119`]: ``certifi`` is bijgewerkt naar versie ``2026.10.19``. Hiermee
+  zijn de gecompromitteerde emSign-rootcertificaten verwijderd uit de lijst met
+  vertrouwde certificaten (`GHSA-6q48-6c7w-9gw2
+  <https://github.com/advisories/GHSA-6q48-6c7w-9gw2>`_). Het algemene
+  aanvalsscenario is een adversary-in-the-middle-aanval, waarbij een aanvaller
+  zich voordoet als een externe dienst waarmee Open Inwoner verbinding maakt.
+  Een via deze roots uitgegeven certificaat alleen is daarvoor niet voldoende:
+  de aanvaller moet ook het netwerkverkeer tussen Open Inwoner en die dienst
+  kunnen onderscheppen of omleiden. In een gebruikelijke configuratie schatten
+  wij de kans daarop laag in.
+* [:gh:`3122`]: ``pillow`` bijgewerkt naar ``13.0.0``.
+* ``djangorestframework`` bijgewerkt naar ``3.18.3``.
+* [:gh:`3134`]: ``brotli`` bijgewerkt naar ``1.2.1``.
+* [:gh:`3025`]: ``Django`` bijgewerkt naar ``5.2.18``.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`3119`]: Na de upgrade worden certificaten die zijn uitgegeven onder een
+  emSign-root niet langer vertrouwd. Controleer na de upgrade of de verbindingen
+  met externe diensten (zoals ZGW-API's, Haal Centraal, Open Klant en
+  e-mail/SMS-providers) nog werken. Mocht een dienst een certificaat gebruiken
+  dat onder een emSign-root valt, dan moet de beheerder van die dienst het
+  certificaat laten vervangen.
+
+Onderhoud
+---------
+
+* [:gh:`3119`]: ``certifi`` bijgewerkt van ``2025.11.12`` naar ``2026.10.19``.
+
+2.4.7 (2026-10-14)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.7`.
+
+.. note::
+
+   Deze release bevat een beveiligingsupdate voor de editor die beheerders en
+   redacteuren gebruiken. We adviseren u zo snel mogelijk te upgraden.
+
+Beveiliging
+-----------
+
+* ``maykin-django-prosemirror`` is bijgewerkt naar versie ``0.12.0``. Deze
+  versie bevat een fix voor de kwetsbaarheid `GHSA-c8x8-7fp4-3x9w
+  <https://github.com/advisories/GHSA-c8x8-7fp4-3x9w>`_ (CVE-2026-104847) in
+  ``prosemirror-view``: wanneer een gebruiker door een kwaadwillende
+  aangeleverde HTML in een ProseMirror-editor plakt, kan JavaScript van die
+  kwaadwillende worden uitgevoerd in het browservenster met de editor.
+
+  Alleen beheerders en redacteuren lopen risico: de editor wordt alleen in de
+  beheeromgeving en het CMS gebruikt.
+
+Bugfixes
+--------
+
+* [:gh:`3059`]: In de structuurweergave van het CMS toonde de keuzelijst voor
+  het toevoegen van een plugin alleen de tekstplugin. Bij placeholders die de
+  tekstplugin niet toestaan bleef de keuzelijst leeg, bij de overige werd
+  direct een tekstplugin toegevoegd. Alle plugins die een placeholder toestaat
+  zijn nu weer beschikbaar.
+* [:gh:`3075`]: Apphook-pagina's (zoals 'Samenwerken' en 'Mijn profiel')
+  konden in de bewerkmodus niet naar de structuurmodus worden geschakeld of
+  worden gepubliceerd: de toolbar toonde alleen 'Maken'. Dit is hersteld.
+* [:gh:`3088`]: Het aanmaken van een pagina via de wizard van het CMS mislukte
+  na het kiezen van het soort pagina met een foutmelding (``TypeError``). Dit
+  is hersteld door ``django-formtools`` bij te werken.
+
+Onderhoud
+---------
+
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.12.0``.
+* [:gh:`3088`]: ``django-formtools`` bijgewerkt van ``2.3`` naar ``2.7``.
+
+2.4.6 (2026-10-06)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.6`.
+
+.. warning::
+
+   Deze release bevat een beveiligingsupdate. Werk zo snel mogelijk bij, en volg
+   daarna de stappen onder **Deployment aandachtspunten** om bestaande uploads op
+   misbruik te controleren.
+
+Beveiliging
+-----------
+
+* ``maykin-django-prosemirror`` is bijgewerkt naar versie ``0.11.0``. Hiermee
+  is een kwetsbaarheid in de afbeeldingsendpoints van de editor
+  (``/prosemirror/filer-image-upload/``) opgelost. Voorheen kon iedere
+  ingelogde gebruiker, dus ook een inwoner of bedrijf ingelogd via DigiD of
+  eHerkenning:
+
+  * bestanden van elk type uploaden, waaronder HTML- en SVG-bestanden met
+    JavaScript. Deze werden als publieke afbeelding opgeslagen en vanuit
+    ``/media/`` geserveerd, wat kon leiden tot stored XSS op het domein van
+    Open Inwoner;
+  * de metadata van iedere filer-afbeelding opvragen, ook van privé
+    afbeeldingen;
+  * de naam, beschrijving en het bijschrift van iedere filer-afbeelding
+    wijzigen.
+
+  De endpoints zijn nu alleen beschikbaar voor medewerkers (staff) met de
+  juiste filer-permissies, en uploads worden gecontroleerd op het bestandstype.
+  Alle installaties vanaf versie ``2.0.0`` zijn kwetsbaar, ongeacht de
+  configuratie.
+
+Deployment aandachtspunten
+--------------------------
+
+* **Controleer na het bijwerken de bestaande afbeeldingen op misbruik.** Voer
+  hiervoor het volgende commando uit:
+
+  .. code-block:: bash
+
+      python src/manage.py check_filer_images
+
+  Het commando controleert alle filer-afbeeldingen en geeft elke afbeelding een
+  oordeel:
+
+  * ``SUSPICIOUS``: moet bekeken worden. Het bestand is geen afbeelding
+    (bijvoorbeeld HTML), het is een SVG met scripts, event handlers of
+    ingebedde data, het zou met een ander content type dan een afbeelding
+    worden geserveerd, of het wordt om een andere reden door de
+    uploadvalidatie geweigerd.
+  * ``UNCHECKED``: het bestand bestaat, maar kon niet worden gelezen
+    (bijvoorbeeld door een fout in de opslag). Voer het commando later opnieuw
+    uit.
+  * ``NOTE``: zou nu niet als upload worden geaccepteerd, maar kan geen code
+    uitvoeren, zoals een SVG zonder scripts, een beschadigde afbeelding of een
+    bestand dat ontbreekt in de opslag. Ook afbeeldingen die verder in orde
+    zijn, maar zijn geüpload door iemand die nu geen actieve medewerker is.
+  * ``OK``: voldoet aan de uploadvalidatie en is geüpload door een actieve
+    medewerker.
+
+  Standaard toont het commando een tabel met alleen de afbeeldingen die
+  aandacht nodig hebben, de ernstigste eerst, met per afbeelding het ID, de
+  uploaddatum, de uploader, de bestandsnaam, de reden en een link naar de
+  admin. De samenvatting wordt naar stderr geschreven. Met ``--all`` worden ook
+  de afbeeldingen getoond die in orde zijn. Gebruik ``--format csv --output
+  <bestand>`` voor een volledig overzicht van alle afbeeldingen, inclusief de
+  URL van het bestand. Kan het commando de admin- en bestands-URL's niet
+  volledig maken, geef dan het domein mee met
+  ``--base-url https://<domein>/``.
+
+  Het commando eindigt met exitcode ``3`` als er verdachte afbeeldingen zijn,
+  en anders met exitcode ``4`` als er afbeeldingen niet konden worden
+  gecontroleerd. Exitcode ``1`` betekent dat het commando is mislukt.
+
+  **Alleen als de virusscan (ClamAV) is ingeschakeld** in de algemene
+  configuratie, kunt u de afbeeldingen daarnaast op virussen scannen. Geef
+  hiervoor de validator van Open Inwoner mee aan hetzelfde commando:
+
+  .. code-block:: bash
+
+      python src/manage.py check_filer_images \
+          --validator open_inwoner.utils.virus_scan.filer_image_virus_validator
+
+  Geïnfecteerde afbeeldingen, en afbeeldingen die niet konden worden gescand,
+  worden dan als ``SUSPICIOUS`` gemarkeerd, met de naam van het virus of de
+  foutmelding als reden. Gebruik ``--validator`` alleen als de virusscan is
+  ingeschakeld en ClamAV bereikbaar is: anders stopt het commando met een
+  foutmelding (bijvoorbeeld ``CommandError: Virus scanning is not enabled in
+  the site configuration.``) en exitcode ``1``, zonder rapport. Valt ClamAV
+  tijdens het controleren weg, dan worden alle afbeeldingen die daarna nog
+  worden gecontroleerd als ``SUSPICIOUS`` gemarkeerd, met de reden
+  ``Could not be scanned: ...``. Herstel in dat geval de verbinding met ClamAV
+  en voer het commando opnieuw uit.
+
+  ``check_filer_images`` controleert alleen afbeeldingen. Scan met de virusscan
+  ingeschakeld ook alle overige filer-bestanden:
+
+  .. code-block:: bash
+
+      python src/manage.py scan_filer_files
+
+  Als er geen virussen worden gevonden, toont dit
+  ``Scanned N items and no viruses found``. Anders toont het per bestand het
+  ID, de bestandsnaam, de URL en het resultaat van de scan, en eindigt het
+  commando met exitcode ``1``. Is de virusscan niet ingeschakeld of is ClamAV
+  niet bereikbaar, dan eindigt het met exitcode ``2``.
+
+  Bekijk vervolgens alle afbeeldingen met ``SUSPICIOUS`` en ``UNCHECKED``:
+
+  * Open deze bestanden **niet** in een browser waarin u bent ingelogd op
+    Open Inwoner, ook niet via de link naar het bestand in de admin. Download
+    ze bijvoorbeeld met ``curl -o <bestand> <URL>`` (zonder sessiecookie) en
+    bekijk ze in een teksteditor.
+  * Bij SVG-bestanden: let op ``<script>``-elementen, event handlers (zoals
+    ``onload=`` of ``onclick=``), ``javascript:``-links, ``<foreignObject>``,
+    ``<iframe>``, ingebedde HTML en verwijzingen naar externe bronnen.
+  * Bij niet-afbeeldingen: controleer wat voor bestand het werkelijk is
+    (bijvoorbeeld met ``file <bestand>``). HTML-, JavaScript- en andere
+    bestanden die geen echte afbeelding zijn, horen hier niet thuis.
+  * Bestanden die via de editor zijn geüpload, staan in de filer-admin onder
+    "Unsorted Uploads" en hebben de uploadende gebruiker als eigenaar. Een
+    eigenaar die geen medewerker (staff) is, wijst op misbruik.
+
+  Verwijder bestanden die geen echte afbeelding zijn via de filer-admin en
+  controleer of ze ook uit de opslag (``MEDIA_ROOT/filer_public/``) en uit een
+  eventuele CDN of cache zijn verwijderd. Controleer ook de access logs op
+  ``POST``- en ``PATCH``-verzoeken naar ``/prosemirror/filer-image-upload/``
+  en op onverwacht gewijzigde namen, beschrijvingen en bijschriften van
+  afbeeldingen. Zijn er aanwijzingen dat een beheerder een geüpload bestand
+  heeft geopend, beschouw dat account dan als gecompromitteerd: beëindig de
+  sessies, reset het wachtwoord en de 2FA, en roteer de geheimen die in de
+  admin zichtbaar zijn.
+* Uploaden en bewerken van afbeeldingen in de editor is nu beperkt tot
+  medewerkers (staff) met de permissies ``filer.add_image`` (uploaden) en
+  ``filer.change_image`` (bewerken). Zorg dat de groepen van redacteuren die
+  producten en categorieën beheren deze permissies hebben.
+* In de editor kunnen alleen nog JPEG-, PNG-, GIF- en WebP-afbeeldingen van
+  maximaal 10 MiB worden geüpload. De inhoud van het bestand moet passen bij
+  de extensie. SVG-bestanden kunnen niet meer via de editor worden geüpload.
+
+Nieuwe features
+---------------
+
+* Nieuw management commando ``scan_filer_files``, dat alle filer-bestanden
+  (inclusief afbeeldingen) met de bestaande ClamAV-integratie op virussen
+  scant.
+* Nieuwe validator ``open_inwoner.utils.virus_scan.filer_image_virus_validator``
+  voor het commando ``check_filer_images``, die afbeeldingen met de bestaande
+  ClamAV-integratie op virussen scant.
+
+Onderhoud
+---------
+
+* ``maykin-django-prosemirror`` bijgewerkt naar versie ``0.11.0``.
+
 2.4.5 (2026-09-29)
 ==================
 
