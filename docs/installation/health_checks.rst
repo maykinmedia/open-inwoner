@@ -15,11 +15,11 @@ Available Endpoints
 ``/_healthz/``
 --------------
 
-Reports all configured checks, including:
+Reports on the following checks:
 
-* Database connection and permissions
-* Configured caches
-* Verification that all migrations have been executed
+* Database connection (default database)
+* Cache (default cache)
+* File storage (default storage)
 
 This is the most expensive check and suitable for the **Kubernetes startup probe**.
 

@@ -26,13 +26,39 @@ settings, so they must be set on the worker container:
     Worker node name, used in monitoring. Defaults to ``<queue>@%n``.
 
 ``CELERY_LOGLEVEL``
-    Log level. Defaults to ``INFO``.
+    Log level. Defaults to ``INFO``. The same variable is read by
+    ``bin/celery_beat.sh`` and ``bin/celery_monitor.sh``.
+
+The worker, beat and monitor scripts also set a default ``OTEL_SERVICE_NAME``
+(``openinwoner-celery-worker``, ``openinwoner-celery-beat`` and
+``openinwoner-celery-monitor``), see :ref:`configuration_env_vars_scripts`.
 
 Besides workers there are two supporting processes:
 
 * ``bin/celery_beat.sh`` runs the scheduler for periodic tasks. Run **exactly one**
   instance; multiple beats will schedule duplicate tasks.
 * ``bin/celery_monitor.sh`` records task events for monitoring.
+
+
+Health checks
+=============
+
+Workers can be checked with ``maykin-common worker-health-check``, see the
+warning under `Recommended production setup`_ below.
+
+Beat is checked with:
+
+.. code-block:: bash
+
+    maykin-common beat-health-check --max-age 1200
+
+This passes as long as beat has published a task within the last
+``--max-age`` seconds. To make sure that happens regularly, the periodic task
+schedule includes a no-op "Beat health sentinel" task that beat publishes every
+minute; without it, the check could only pass as often as the least frequent
+real periodic task runs. The sentinel is consumed by the worker on the default
+queue like any other task. The ``celery-beat`` service in ``docker-compose.yml``
+shows a working health check configuration.
 
 
 Cache seeding for the case list
