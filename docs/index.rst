@@ -39,3 +39,4 @@ Documentation
     testing
     versioning_policy
     changelog
+    changelog_archive
