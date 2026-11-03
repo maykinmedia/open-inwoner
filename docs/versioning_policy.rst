@@ -11,7 +11,7 @@ released version continues to receive updates.
 
 This policy applies from the ``2.4.x`` line onwards. Earlier versions
 weren't governed by any documented support window --- see the
-:doc:`changelog` for the full release history.
+:doc:`changelog_archive` for their release history.
 
 Release types
 -------------
@@ -157,4 +157,4 @@ Current support status
 .. note::
 
     Versions prior to ``2.4.x`` are not covered by this policy; see the
-    :doc:`changelog` for the full release history.
+    :doc:`changelog_archive` for their release history.
