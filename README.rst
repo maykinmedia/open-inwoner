@@ -138,7 +138,7 @@ References
 * `Code <https://github.com/maykinmedia/open-inwoner>`_
 * `Docker image <https://hub.docker.com/r/maykinmedia/open-inwoner>`_
 
-.. |build-status| image:: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml/badge.svg?branch=develop
+.. |build-status| image:: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml/badge.svg?branch=main
     :alt: Build status
     :target: https://github.com/maykinmedia/open-inwoner/actions/workflows/ci.yml
 

@@ -3,10 +3,10 @@ name: Frontend
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     branches:
-      - develop
+      - main
     types:
       - opened
       - reopened
@@ -112,7 +112,7 @@ jobs:
       cancel-in-progress: true
 
     runs-on: ubuntu-26.04
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push' # Exclude PRs
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Exclude PRs
     needs: storybook
     steps:
       - name: Setup Pages

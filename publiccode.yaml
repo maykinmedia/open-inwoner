@@ -21,7 +21,7 @@ developmentStatus: beta
 description:
   en:
     shortDescription: Provide digital services to the residents
-    documentation: 'https://github.com/maykinmedia/open-inwoner/blob/develop/README.rst'
+    documentation: 'https://github.com/maykinmedia/open-inwoner/blob/main/README.rst'
     features:
       - Display information about available products
       - Search for the applicable products
