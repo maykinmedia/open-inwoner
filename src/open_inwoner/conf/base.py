@@ -1412,7 +1412,7 @@ SENTRY_DSN = config(
         group="Monitoring",
     ),
 )
-RELEASE = "v2.5.0"  # get_current_version()
+RELEASE = "oip-next"  # get_current_version()
 
 # Django Upgrade Check
 UPGRADE_CHECK_PATHS = {}
