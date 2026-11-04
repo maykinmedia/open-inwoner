@@ -177,7 +177,9 @@ never actually calls them, so it doesn't need any of them reachable to run).
 It waits for the database/redis/elasticsearch and the image build to finish,
 starts the main app stack, then waits for Open Zaak/Objects before
 triggering a ZGW data import, which does call them for real. Run
-``bin/stack.sh up --logs`` to also follow the app's logs afterwards, and
+``bin/stack.sh up --logs`` to also follow the app's logs afterwards,
+``bin/stack.sh up --no-build`` to reuse an already-present
+``maykinmedia/open-inwoner:${TAG:-latest}`` image instead of building it, and
 ``bin/stack.sh down`` (optionally with ``-v`` to also wipe volumes) to bring
 it all down again. Anything else, e.g. ``bin/stack.sh ps`` or
 ``bin/stack.sh exec web bash``, is forwarded straight to ``docker compose``
