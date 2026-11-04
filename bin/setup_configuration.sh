@@ -31,6 +31,8 @@ else
     src/manage.py setup_configuration \
         --yaml-file /app/setup_configuration/data.yaml
 
+    src/manage.py loaddata /app/setup_configuration/fixtures/superuser.json
+
     # CatalogusConfig/ZaakTypeConfig/ZaakType*TypeConfig are normally
     # populated by the `zgw_import_data` management command (also run daily
     # via Celery beat, see CELERY_BEAT_SCHEDULE in conf/base.py), which

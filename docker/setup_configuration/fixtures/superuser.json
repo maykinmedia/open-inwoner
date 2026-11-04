@@ -1,0 +1,16 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 9000,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009000",
+      "password": "pbkdf2_sha256$1000000$7PzF5LQNIHKWWJ3ZXwCIWV$i5CUE1TSaMWrLes4tGSnvkoqRFsstCyTbnHdQK8AITA=",
+      "first_name": "Admin",
+      "email": "admin",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "login_type": "default"
+    }
+  }
+]
