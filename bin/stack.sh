@@ -23,6 +23,9 @@ Commands:
                    the command to start it once everything is ready. Can't
                    be combined with `--logs` (there is no app container to
                    follow the logs of).
+  up --mock        Disable the DigiD/eHerkenning OIDC clients, so the login
+                   page uses the mock IdPs instead of Keycloak. Combines with
+                   the options above. Plain `up` re-enables them.
   down [args]      Stop and remove containers. Forwarded to
                    `docker compose down` (e.g. `bin/stack.sh down -v` to
                    also remove volumes).
@@ -78,6 +81,13 @@ COMPOSE=(
 # .host/ dir that bin/generate_setup_configuration.py generates into.
 HOST_SETUP_MARKER=docker/setup_configuration/.host/.completed
 
+# Enables the DigiD/eHerkenning OIDC clients, or with `up --mock` disables them so
+# the login page falls back to the mocks. Takes "True"/"False".
+set_oidc_logins_snippet() {
+    echo "from mozilla_django_oidc_db.models import OIDCClient
+OIDCClient.objects.filter(identifier__in=['oidc-digid', 'oidc-eherkenning']).update(enabled=$1)"
+}
+
 wait_for_completion() {
     # Polls a one-shot container until it exits, failing on a non-zero exit
     # code. `docker compose up --wait` treats an already-exited container as
@@ -130,7 +140,7 @@ EOF
 print_urls() {
     cat <<'EOF'
   Open Inwoner              http://localhost:8000/        (behind nginx: http://localhost:9000/)
-  Open Inwoner admin        http://localhost:8000/admin/  (click "Login with OIDC", Keycloak admin / admin)
+  Open Inwoner admin        http://localhost:8000/admin/  (click "Login with OIDC", Keycloak admin / admin; or admin / admin)
 EOF
     print_satellite_urls
     cat <<'EOF'
@@ -140,6 +150,10 @@ EOF
   eIDAS login               http://localhost:8000/eidas-oidc/authenticate/
   (any Keycloak test user works -- see docker/keycloak/README.md for the
   full list, including DigiD machtigen and eHerkenning bewindvoering/vestiging)
+
+  DigiD login (mock)        http://localhost:8000/digid/login/        (any valid BSN, e.g. 111222333)
+  eHerkenning login (mock)  http://localhost:8000/eherkenning/login/  (any valid KvK, e.g. 12345678)
+  (`up --mock` points the login page's buttons at these instead of Keycloak)
 EOF
 }
 
@@ -150,10 +164,15 @@ case "$cmd" in
     up)
         logs=false
         localhost=false
+        mock=false
         while [ $# -gt 0 ]; do
             case "$1" in
                 --logs)
                     logs=true
+                    shift
+                    ;;
+                --mock)
+                    mock=true
                     shift
                     ;;
                 --localhost)
@@ -176,6 +195,11 @@ case "$cmd" in
 
         if [ "$localhost" = true ]; then
             COMPOSE+=(-f docker/docker-compose.hostdev.yml)
+        fi
+
+        oidc_enabled=True
+        if [ "$mock" = true ]; then
+            oidc_enabled=False
         fi
 
         # Enable OTEL by default
@@ -268,6 +292,7 @@ case "$cmd" in
                 echo "==> Running setup_configuration"
                 python src/manage.py setup_configuration \
                     --yaml-file docker/setup_configuration/.host/data.yaml
+                python src/manage.py loaddata docker/setup_configuration/fixtures/superuser.json
                 python src/manage.py loaddata docker/setup_configuration/.host/openzaak_config.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
@@ -277,9 +302,15 @@ case "$cmd" in
             fi
 
             echo
+            echo "==> Setting the DigiD/eHerkenning OIDC clients to enabled=$oidc_enabled in the background"
+            python src/manage.py shell -c "$(set_oidc_logins_snippet "$oidc_enabled")" &
+            oidc_pid=$!
+
+            echo
             echo "==> Triggering a ZGW data import and search index rebuild"
             python src/manage.py zgw_import_data
             python src/manage.py search_index --rebuild -f
+            wait "$oidc_pid" || exit 1
 
             echo
             echo "==> Open Inwoner is configured and seeded. Start it yourself:"
@@ -299,6 +330,11 @@ case "$cmd" in
         "${COMPOSE[@]}" up -d
 
         echo
+        echo "==> Setting the DigiD/eHerkenning OIDC clients to enabled=$oidc_enabled in the background"
+        "${COMPOSE[@]}" exec -T web src/manage.py shell -c "$(set_oidc_logins_snippet "$oidc_enabled")" &
+        oidc_pid=$!
+
+        echo
         echo "==> Waiting for Open Zaak/Objects APIs before triggering the ZGW import below"
         "${COMPOSE[@]}" up -d --wait openzaak-web objecttypes-web objects-web
 
@@ -311,6 +347,8 @@ case "$cmd" in
             call open_inwoner.openzaak.tasks.import_zgw_data
         "${COMPOSE[@]}" exec -T web celery --workdir src --app "open_inwoner.celery" \
             call open_inwoner.search.tasks.rebuild_search_index
+
+        wait "$oidc_pid" || exit 1
 
         echo
         echo "==> Stack is up."

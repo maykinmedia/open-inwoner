@@ -1,7 +1,7 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Five unrelated things live here, all loaded by `bin/setup_configuration.sh`
-right after `manage.py setup_configuration` (and mirrored in
+Six unrelated things live here, all loaded by `bin/setup_configuration.sh` right
+after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
 ## `openzaak_config.json`
@@ -94,9 +94,14 @@ homepage map (`cms_pages_config.homepage.product_locations` in `data.yaml`) and
 the products' location lists. Their `geometry` is set directly, so loading them
 doesn't need the PDOK geocoder that saving one through the admin uses.
 
+## `superuser.json`
+
+Local superuser `admin` / `admin`. Development only.
+
 ## Load fixtures manually
 
 ```bash
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/superuser.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/samenwerken.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
@@ -106,6 +111,7 @@ docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures
 or, for `up --localhost`:
 
 ```bash
+python src/manage.py loaddata docker/setup_configuration/fixtures/superuser.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json

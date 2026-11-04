@@ -267,11 +267,16 @@ below), goes through the same Keycloak test realm for every login type:
 =============  ====================================================  ===============================================
 Log in as      URL                                                   Notes
 =============  ====================================================  ===============================================
-Admin (staff)  http://localhost:8000/admin/                          Click "Log in met een organisatieaccount", Keycloak admin / admin; or admin@user.nl / change_me
+Admin (staff)  http://localhost:8000/admin/                          Click "Log in met een organisatieaccount", Keycloak admin / admin; or admin / admin (or admin@user.nl / change_me)
 DigiD          http://localhost:8000/digid-oidc/authenticate/        any BSN test user
 eHerkenning    http://localhost:8000/eherkenning-oidc/authenticate/  any eHerkenning test user
 eIDAS          http://localhost:8000/eidas-oidc/authenticate/        any eIDAS test user
+DigiD          http://localhost:8000/digid/login/                    mock: any valid BSN, e.g. ``111222333``
+eHerkenning    http://localhost:8000/eherkenning/login/              mock: any valid KvK number, e.g. ``12345678``
 =============  ====================================================  ===============================================
+
+Use ``bin/stack.sh up --mock`` to point the login page at the DigiD/eHerkenning
+mocks instead of Keycloak.
 
 See ``docker/keycloak/README.md`` for the full list of test users (DigiD
 machtigen, eHerkenning vestiging/rechtspersoon, eIDAS natural
