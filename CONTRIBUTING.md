@@ -107,7 +107,7 @@ sure to also add tests to the existing Django testsuite.
 ### Making a pull request
 
 If all changes have been committed, you can push the branch to your fork of the
-repository and create a pull request to the `develop` branch of this project's
+repository and create a pull request to the `main` branch of this project's
 repository. Your pull request will be reviewed, if applicable, feedback will be
 given and if everything is approved, it will be merged.
 

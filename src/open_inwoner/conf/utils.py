@@ -57,7 +57,7 @@ def _get_version_from_file(base_dir=None):
         logger.warning("Unable to read commit hash from git files")
         return ""
 
-    for filename in ("master", "main", "develop"):
+    for filename in ("master", "main"):
         if filename in heads:
             try:
                 with open(os.path.join(heads_dir, filename)) as file:

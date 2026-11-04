@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
     tags:
       - '**'
   pull_request:
@@ -288,7 +287,7 @@ jobs:
           [[ "${GITHUB_REF}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "develop" ] && VERSION=latest
+          [ "$VERSION" == "main" ] && VERSION=latest
 
           echo ::set-output name=tag::${VERSION}
 
