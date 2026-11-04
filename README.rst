@@ -6,7 +6,7 @@ Open Inwoner
     :height: 100px
     :alt: Open Inwoner
 
-:Version: 2.5.0
+:Version: oip-next
 :Demo: https://openinwoner.nl
 :Source: https://github.com/maykinmedia/open-inwoner
 :Documentation: https://docs.openinwoner.nl
