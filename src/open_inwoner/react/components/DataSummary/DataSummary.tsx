@@ -15,9 +15,10 @@ export interface ListItem {
 export interface IDataSummaryProps {
   items?: ListItem[];
   itemsId?: string;
+  caption?: string;
 }
 
-const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId }) => {
+const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId, caption }) => {
   const data = usePropsOrScriptData<ListItem[]>(items, itemsId);
 
   if (!data?.length) return <></>;
@@ -27,7 +28,7 @@ const DataSummary: AC<IDataSummaryProps> = ({ items, itemsId }) => {
     detail: isDateString(value) ? formatDate(value) : (value ?? ''),
   })) satisfies DescriptionListProps['items'];
 
-  return <DescriptionList items={listItems} />;
+  return <DescriptionList items={listItems} caption={caption} />;
 };
 
 export default DataSummary;

@@ -10,7 +10,7 @@ describe('DataSummary', () => {
     document.documentElement.lang = '';
   });
 
-  it('renders the list if a dt or dd is missing', () => {
+  it('renders the list when a label or value is missing', () => {
     const items: ListItem[] = [
       { label: 'Zaaknummer', value: '1234' },
       { label: null as unknown as string, value: '1 Januari 2027' },
@@ -41,7 +41,7 @@ describe('DataSummary', () => {
     expect(screen.getByText('20 augustus 2026')).toBeInTheDocument();
   });
 
-  it('shows a number as is when type is date', () => {
+  it('shows a number as plain text instead of reading it as a date', () => {
     const items: ListItem[] = [{ label: 'Datum', value: 123456 }];
 
     render(<DataSummary items={items} />);
@@ -49,13 +49,30 @@ describe('DataSummary', () => {
     expect(screen.getByText('123456')).toBeInTheDocument();
   });
 
-  it('does not crash when the date is invalid', () => {
-    const items: ListItem[] = [{ label: 'Datum', value: 'abc' }];
+  it('shows an invalid date string unchanged', () => {
+    const items: ListItem[] = [{ label: 'Datum', value: '2026-13-21' }];
 
     render(<DataSummary items={items} />);
 
     expect(screen.getByText('Datum')).toBeInTheDocument();
-    expect(screen.getByText('abc')).toBeInTheDocument();
+    expect(screen.getByText('2026-13-21')).toBeInTheDocument();
+  });
+
+  it('shows plain text unchanged', () => {
+    const items: ListItem[] = [{ label: 'Datum', value: '26 mei' }];
+
+    render(<DataSummary items={items} />);
+
+    expect(screen.getByText('Datum')).toBeInTheDocument();
+    expect(screen.getByText('26 mei')).toBeInTheDocument();
+  });
+
+  it('shows the caption when provided', () => {
+    const items: ListItem[] = [{ label: 'Datum', value: '2026-08-20' }];
+
+    render(<DataSummary items={items} caption="Afspraak" />);
+
+    expect(screen.getByText('Afspraak')).toBeInTheDocument();
   });
 
   describe('Web Component', () => {
@@ -74,23 +91,25 @@ describe('DataSummary', () => {
         expect(DATASUMMARY_DEFINITION.tagName).toBe('oip-data-summary');
       });
 
-      it('has no props (slot-only component)', () => {
+      it('defines items and itemsId as supported props', () => {
         expect(DATASUMMARY_DEFINITION.propNames).toEqual(['items', 'itemsId']);
       });
 
-      it('uses shadow DOM', () => {
+      it('does not use shadow DOM', () => {
         expect(DATASUMMARY_DEFINITION.options?.shadow).toBe(false);
       });
     });
 
     describe('rendering', () => {
-      it('renders a dl into shadow DOM', () => {
+      it('renders a dl inside the custom element', () => {
         const element = document.createElement(
           'oip-data-summary'
         ) as HTMLElement & { items: ListItem[] };
         element.items = [{ label: 'Zaaknummer', value: '1234' }];
         document.body.appendChild(element);
         expect(element.querySelector('dl')).toBeInTheDocument();
+        expect(element).toHaveTextContent('Zaaknummer');
+        expect(element).toHaveTextContent('1234');
         element.remove();
       });
     });

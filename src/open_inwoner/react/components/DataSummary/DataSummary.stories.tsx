@@ -19,6 +19,7 @@ DataSummary is a pure React component that renders a list of title and detail pa
 
 **Props:**
 - \`items\`: Array of ListItem objects with label and value.
+- \`caption\`: Caption shown above the list (optional).
         `,
       },
     },
@@ -39,6 +40,14 @@ export const Default: Story = {
   name: 'Default',
   args: {
     items: MOCK_DATA_SUMMARY_DATA,
+  },
+};
+
+export const WithCaption: Story = {
+  name: 'With Caption',
+  args: {
+    ...Default.args,
+    caption: 'Zichtbare zaak',
   },
 };
 
