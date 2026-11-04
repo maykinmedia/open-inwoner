@@ -113,30 +113,73 @@ given and if everything is approved, it will be merged.
 
 ### Updating the changelog
 
-In most cases, you should also update the CHANGELOG.rst file to document your
-changes. Add an entry under the current release section in the appropriate
-category:
+In most cases, you should also document your changes in the release notes. Do
+not edit `CHANGELOG.rst` directly: add a reStructuredText fragment to
+`.release-notes/`, named `<issue>.<type>.rst`, for example
+`.release-notes/1234.fix.rst`. The fragments are combined into the changelog
+with [towncrier](https://towncrier.readthedocs.io/) when a release is made.
 
-- **Nieuwe features** - New functionality, features, or significant
-  enhancements. This will usually map to a Taiga story in the current sprint.
-- **Bugfixes** - Bug fixes, error corrections, or issue resolutions, which will
-  usually be in response to Taiga issues raised separately from the current
-  sprint.
-- **Onderhoud** - Maintenance work, dependency updates, refactoring, or
-  technical improvements
+The easiest way to create a fragment is the interactive flow:
 
-Each entry should reference both the GitHub pull request and related Taiga issue
-using Sphinx extlink shortcodes: `` :pr:`123` `` for pull requests,
-`` :taiga-us:`456` `` for Taiga user stories, `` :taiga-is:`789` `` for Taiga
-issues and `` :taiga-dimpact:`123` `` for Taiga Dimpact issues. See the root
-`CHANGELOG.rst` file for examples of the proper format.
+```bash
+towncrier create
+```
 
-The entry should preferably be written in Dutch, though English is fine if you
-are not comfortable in Dutch. The English issues will be translated as part of
-preparing the release.
+It asks for the issue number (`+` if there is none) and the type, and then opens
+your `$EDITOR` to write the entry. You can also create the file by hand, or skip
+the prompts:
 
-If your PR contains multiple commits, add a separate commit for the changelog
-update. Otherwise, feel free to include in a single commit for minor changes.
+```bash
+towncrier create 1234.fix.rst --content "Korte beschrijving van de wijziging."
+```
+
+- **Language**: the entry should preferably be written in Dutch, though English
+  is fine if you are not comfortable in Dutch. English entries will be
+  translated as part of preparing the release.
+- **Markup**: fragments must be reStructuredText, not Markdown. The text is
+  copied as-is into `CHANGELOG.rst`, so use double backticks for code,
+  `` `text <https://...>`_ `` for links and `` :gh:`1234` `` for issues. Nested
+  lists and `.. code-block::` directives are allowed.
+- **One change per fragment.** If a change relates to several issues, add a
+  fragment with _identical_ text for each issue; towncrier merges them into a
+  single entry (`[#2886, #2922]: ...`).
+- **No issue**: enter `+` as the issue number in `towncrier create`, which
+  generates a unique name such as `+1a2b3c4d.fix.rst`. By hand, use `+` and a
+  short unique name, e.g. `+upload-logging.fix.rst`. The entry is rendered
+  without an issue link.
+
+The type determines where the entry ends up. In order of appearance:
+
+| Type                       | Section                                                         | Use for                                                                                                                  |
+| -------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `security-fix`             | Beveiligingsfixes (red box at the top)                          | Fixes for high-severity vulnerabilities; installations should upgrade urgently                                           |
+| `pre-upgrade`              | Upgrade informatie → Pre-upgrade aandachtspunten                | Breaking or disruptive changes, and actions required _before_ upgrading (configuration to convert, long migrations)      |
+| `post-upgrade-technisch`   | Upgrade informatie → Post-upgrade → Voor technisch beheerders   | Checks or changes for system administrators after upgrading (new env vars, CSP)                                          |
+| `post-upgrade-functioneel` | Upgrade informatie → Post-upgrade → Voor functioneel beheerders | Checks for functional administrators after upgrading (content, CMS, admin)                                               |
+| `deprecation`              | Upgrade informatie → Uitfaseringen                              | Changes that will be made in the next feature release                                                                    |
+| `highlight`                | Belangrijkste verbeteringen                                     | Highlights of the release                                                                                                |
+| `security-improvement`     | Beveiligingsverbeteringen                                       | Hardening, and precautionary upgrades for lower-severity advisories                                                      |
+| `feat`                     | Nieuwe functies                                                 | New functionality                                                                                                        |
+| `fix`                      | Bugfixes                                                        | Bug fixes                                                                                                                |
+| `maintenance`              | Onderhoud                                                       | Changes relevant to installations that are not features or fixes, e.g. dependency updates or changes to the Docker image |
+
+Release notes are written for the people running and managing installations.
+Changes that only affect development, such as refactoring, tests, CI and
+developer tooling, do not need a fragment: they are covered by the commit
+messages.
+
+A single change can need more than one fragment, e.g. a `feat` describing the
+feature and a `post-upgrade-technisch` describing a new environment variable.
+
+**Dependency bumps** (e.g. from Dependabot) go in exactly one type, the first
+that applies:
+
+1. A high or critical advisory that affects Open Inwoner: `security-fix`.
+2. An advisory with a lower severity, or one that does not affect Open Inwoner
+   but we upgrade to be safe: `security-improvement`. Mention the advisory and
+   its severity.
+3. No advisory: no fragment is needed, routine bumps are summarised in a single
+   `maintenance` entry when preparing the release.
 
 ### Reviews on releases
 
