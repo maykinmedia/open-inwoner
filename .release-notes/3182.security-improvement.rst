@@ -1,0 +1,1 @@
+npm package ``@vitest/mocker`` is bijgewerkt van ``4.1.11`` naar ``4.1.12``
