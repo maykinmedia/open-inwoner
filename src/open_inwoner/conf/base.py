@@ -483,6 +483,7 @@ INSTALLED_APPS = [
     "open_inwoner.configurations",
     "open_inwoner.haalcentraal",
     "open_inwoner.openklant",
+    "open_inwoner.gesprekken",
     "open_inwoner.soap",
     "open_inwoner.ssd",
     "open_inwoner.questionnaire",

@@ -1,0 +1,116 @@
+{% load i18n icon_tags utils %}
+{# "Mijn gesprekken" on the zaak detail page. Rendered and refreshed with htmx: polling gets a 204 while nothing changed. #}
+<section class="gesprekken" id="gesprekken"
+    hx-get="{{ poll_url }}"
+    hx-trigger="every {{ poll_interval }}s [!document.querySelector('#gesprekken textarea:focus, #gesprekken details[open]')]"
+    hx-swap="outerHTML">
+    <h2 class="utrecht-heading-2">{% trans "Mijn gesprekken" %}</h2>
+
+    <div class="gesprekken__tabs" role="tablist">
+        <button type="button" role="tab" class="gesprekken__tab{% if tab == 'open' %} gesprekken__tab--active{% endif %}"
+            aria-selected="{% if tab == 'open' %}true{% else %}false{% endif %}"
+            hx-get="{{ section_url }}?tab=open" hx-target="#gesprekken" hx-swap="outerHTML">{% trans "Open" %}</button>
+        <button type="button" role="tab" class="gesprekken__tab{% if tab == 'gesloten' %} gesprekken__tab--active{% endif %}"
+            aria-selected="{% if tab == 'gesloten' %}true{% else %}false{% endif %}"
+            hx-get="{{ section_url }}?tab=gesloten" hx-target="#gesprekken" hx-swap="outerHTML">{% trans "Gesloten" %}</button>
+    </div>
+
+    {% if fout %}<nl-paragraph class="gesprekken__fout" role="alert">{{ fout }}</nl-paragraph>{% endif %}
+
+    {% if zaak_gesloten %}
+        <div class="gesprekken__melding" role="status">
+            {% icon icon="warning_amber" outlined=True %}
+            <div>
+                <h3 class="utrecht-heading-4">{% trans "Zaak is gesloten" %}</h3>
+                <nl-paragraph>{% trans "U kunt hier geen gesprek starten of reageren. Heeft u nog vragen over deze zaak, neem dan contact met ons op." %}</nl-paragraph>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if kan_starten and tab == 'open' %}
+        <details class="gesprekken__start"{% if start_form.is_bound %} open{% endif %}>
+            <summary>{% trans "Nieuw gesprek" %} <small class="gesprekken__ontwerp">{% trans "(ontwerp volgt)" %}</small></summary>
+            <form method="post" enctype="multipart/form-data"
+                hx-post="{{ section_url }}start/" hx-target="#gesprekken" hx-swap="outerHTML" hx-encoding="multipart/form-data">
+                {% csrf_token %}
+                <label for="gesprek-start-onderwerp">{% trans "Onderwerp" %}</label>
+                <input type="text" id="gesprek-start-onderwerp" name="onderwerp" maxlength="200" required value="{{ start_form.onderwerp.value|default:'' }}">
+                <label for="gesprek-start-tekst">{% trans "Uw bericht" %}</label>
+                <textarea id="gesprek-start-tekst" name="tekst" rows="4" maxlength="5000" required>{{ start_form.tekst.value|default:'' }}</textarea>
+                {% if bijlage_toegestaan %}
+                    <label for="gesprek-start-bijlage">{% trans "Bijlage (optioneel)" %}</label>
+                    <input type="file" id="gesprek-start-bijlage" name="bijlage">
+                {% endif %}
+                <button type="submit" class="button button--primary">{% trans "Start gesprek" %}</button>
+            </form>
+        </details>
+    {% endif %}
+
+    {% if error %}
+        <nl-paragraph>{% trans "We kunnen uw gesprekken op dit moment niet ophalen. Probeer het later opnieuw." %}</nl-paragraph>
+    {% elif not gesprekken %}
+        <nl-paragraph>
+            {% if tab == 'open' %}{% trans "U heeft op dit moment geen open gesprekken." %}{% else %}{% trans "U heeft op dit moment geen gesprekken die gesloten zijn." %}{% endif %}
+        </nl-paragraph>
+    {% endif %}
+
+    <ul class="gesprekken__lijst">
+    {% for gesprek in gesprekken %}
+        <li class="gesprekken__gesprek">
+            <button type="button" class="gesprekken__kop"
+                aria-expanded="{% if gesprek.uuid == open_gesprek %}true{% else %}false{% endif %}"
+                aria-controls="gesprek-{{ gesprek.uuid }}"
+                hx-get="{{ section_url }}?tab={{ tab }}&open={% if gesprek.uuid != open_gesprek %}{{ gesprek.uuid }}{% else %}-{% endif %}"
+                hx-target="#gesprekken" hx-swap="outerHTML">
+                <span>
+                    <strong class="gesprekken__onderwerp">{{ gesprek.onderwerp }}</strong>
+                    <span class="gesprekken__gestart">{% trans "Gestart op:" %} {{ gesprek.gestart_op|date:"d/m/Y" }}</span>
+                </span>
+                {% if gesprek.uuid == open_gesprek %}{% icon icon="expand_less" outlined=True %}{% else %}{% icon icon="expand_more" outlined=True %}{% endif %}
+            </button>
+
+            {% if gesprek.uuid == open_gesprek %}
+            <div class="gesprekken__chat" id="gesprek-{{ gesprek.uuid }}">
+                <ol class="gesprekken__bijdragen">
+                {% for bijdrage in gesprek.bijdragen %}
+                    <li class="gesprekken__bijdrage {% if bijdrage.automatisch %}gesprekken__bijdrage--automatisch {% endif %}{% if bijdrage.is_eigen %}gesprekken__bijdrage--eigen{% else %}gesprekken__bijdrage--ander{% endif %}">
+                        <span class="gesprekken__afzender">{% if bijdrage.is_eigen %}{% trans "Jij" %}{% else %}{{ bijdrage.afzender }}{% endif %}</span>
+                        <div class="gesprekken__ballon">{{ bijdrage.tekst|linebreaksbr }}
+                            {% for bijlage in bijdrage.bijlagen %}
+                                <a class="gesprekken__bijlage" href="{{ section_url }}{{ gesprek.uuid }}/bijlage/{{ bijlage.file_id }}/">{% icon icon=bijlage.icon outlined=True %} {{ bijlage.naam }}{% if bijlage.bestandsomvang %} ({{ bijlage.bestandsomvang|readable_size }}){% endif %}</a>
+                            {% endfor %}
+                        </div>
+                        <span class="gesprekken__moment">{{ bijdrage.moment|date:"d/m/Y - H:i" }}</span>
+                    </li>
+                {% endfor %}
+                </ol>
+
+                {% if gesprek.is_open and not zaak_gesloten and gesprek.eigen_deelname %}
+                <form class="gesprekken__invoer" method="post" enctype="multipart/form-data"
+                    hx-post="{{ section_url }}{{ gesprek.uuid }}/bijdrage/" hx-target="#gesprekken" hx-swap="outerHTML" hx-encoding="multipart/form-data">
+                    {% csrf_token %}
+                    <label class="sr-only" for="gesprek-tekst-{{ gesprek.uuid }}">{% trans "Schrijf uw bericht" %}</label>
+                    <textarea id="gesprek-tekst-{{ gesprek.uuid }}" name="tekst" rows="2" placeholder="{% trans 'Schrijf uw bericht' %}" required>{% if form.is_bound %}{{ form.tekst.value }}{% endif %}</textarea>
+                    {% if bijlage_toegestaan %}
+                        <label class="gesprekken__knop" title="{% trans 'Bijlage toevoegen' %}">
+                            {% icon icon="attach_file" outlined=True %}<span class="sr-only">{% trans "Bijlage toevoegen" %}</span>
+                            <input type="file" name="bijlage" class="sr-only">
+                        </label>
+                    {% endif %}
+                    <button type="submit" class="gesprekken__knop" title="{% trans 'Verstuur' %}">
+                        {% icon icon="send" outlined=True %}<span class="sr-only">{% trans "Verstuur" %}</span>
+                    </button>
+                </form>
+                <form class="gesprekken__afsluiten" method="post"
+                    hx-post="{{ section_url }}{{ gesprek.uuid }}/eindigen/" hx-target="#gesprekken" hx-swap="outerHTML"
+                    hx-confirm="{% trans 'Is uw vraag beantwoord? Het gesprek wordt dan afgesloten en u kunt niet meer reageren.' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="button button--primary button--transparent">{% trans "Vraag beantwoord" %}</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</section>
