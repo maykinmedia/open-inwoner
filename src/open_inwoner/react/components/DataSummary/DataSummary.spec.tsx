@@ -67,14 +67,6 @@ describe('DataSummary', () => {
     expect(screen.getByText('26 mei')).toBeInTheDocument();
   });
 
-  it('shows the caption when provided', () => {
-    const items: ListItem[] = [{ label: 'Datum', value: '2026-08-20' }];
-
-    render(<DataSummary items={items} caption="Afspraak" />);
-
-    expect(screen.getByText('Afspraak')).toBeInTheDocument();
-  });
-
   describe('Web Component', () => {
     beforeAll(async () => {
       await WebComponentLoader.importWebComponent(
