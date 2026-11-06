@@ -6,7 +6,10 @@
         {% render_grid %}
             {% render_column span=12 %}
                 <h1 class="utrecht-heading-1" id="title">{{ question.subject }}</h1>
-                {% include "components/Dashboard/Dashboard.html" with metrics=metrics only %}
+                {% if metrics %}
+                {{ metrics|json_script:"datasummary_data" }}
+                <oip-data-summary items-id="datasummary_data"></oip-data-summary>
+                {% endif %}
             {% endrender_column %}
         {% endrender_grid %}
 
@@ -31,7 +34,7 @@
                                 <nl-paragraph>{{ answer.text }}</nl-paragraph>
                             </div>
                         {% empty %}
-                            <nl-paragraph>{% trans "Nog geen antwoord beschijkbaar" %}</nl-paragraph>
+                            <nl-paragraph>{% trans "Nog geen antwoord beschikbaar" %}</nl-paragraph>
                         {% endfor %}
                     </div>
                     <div>
