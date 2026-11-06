@@ -25,8 +25,9 @@
 
       .list:last-of-type {
         padding-bottom: 0;
+
         @media (min-width: 500px) {
-          padding-bottom: calc(2 * var(--card-spacing-vertical));
+          padding-bottom: var(--card-spacing);
         }
       }
 
@@ -49,16 +50,8 @@
 
       .link--primary {
         order: 4;
-        padding: 0 var(--card-spacing-horizontal);
-      }
-    }
-
-    &--stretch .list + .link:first-of-type:last-of-type {
-      padding-bottom: var(--card-spacing-vertical);
-
-      @media (min-width: 500px) {
-        padding-bottom: 0;
-        position: absolute;
+        margin-top: auto;
+        padding: 0 var(--card-spacing-horizontal) var(--card-spacing-vertical);
       }
     }
   }

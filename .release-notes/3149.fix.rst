@@ -1,0 +1,1 @@
+De link onderaan een afspraken card valt niet meer over de tekst heen, omdat de card nu meegroeit met de inhoud.

@@ -382,25 +382,18 @@
 
   /// On a stretched card, the one and only link after a list should be placed on above the bottom border.
   &--stretch &__body {
-    padding-bottom: var(--card-spacing);
-
-    @media (min-width: 768px) {
-      padding-bottom: 0;
-    }
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   &--stretch &__body .list:last-of-type {
-    padding-bottom: calc(2 * var(--card-spacing-vertical));
+    padding-bottom: var(--card-spacing);
   }
 
   &--stretch .list + .link:first-of-type:last-of-type,
   &--stretch .profile-card__button {
-    bottom: var(--card-spacing-vertical);
-    position: static;
-
-    @media (min-width: 768px) {
-      position: absolute;
-    }
+    margin-top: auto;
   }
 
   &.hidden {
