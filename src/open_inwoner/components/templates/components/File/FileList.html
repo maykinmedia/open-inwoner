@@ -11,7 +11,7 @@
     <ul class="file-list__list">
         {% for file_info in files %}
             <li class="file-list__list-item">
-                {% file_item file_info allow_delete=allow_delete show_download=show_download %}
+                {% file_item file_info allow_delete=allow_delete show_download=show_download download_attribute=download_attribute %}
             </li>
         {% empty %}
             <li><nl-paragraph>{% trans "Er zijn nog geen bestanden geüpload" %}</nl-paragraph></li>
