@@ -180,6 +180,34 @@ class VolgGesprekkenEventsTests(ClearCachesMixin, TestCase):
         self.assertEqual(get_versie(ZAAK_URL), "0")
         self.assertEqual(GesprekkenEventStroom.get_solo().cursor, "44")
 
+    def test_a_malformed_event_is_skipped_and_the_next_one_is_processed(
+        self, m, mock_email
+    ):
+        m.get(f"{GESPREKKEN_ROOT}gesprekken/{GESPREK_UUID}", json=gesprek_detail())
+        zonder_subject = bijdrage_event(46, ACTOR_DEELNAME).replace(
+            f'"subject": "{GESPREK_URL}", ', ""
+        )
+        self.assertNotIn('"subject"', zonder_subject)
+        m.get(
+            EVENTS_URL,
+            text="id: 45\ndata: {geen json\n\n"
+            + zonder_subject
+            + bijdrage_event(47, ACTOR_DEELNAME).replace(
+                '"2026-07-13T07:30:00.000Z"', '"gisteren"'
+            )
+            + bijdrage_event(48, ACTOR_DEELNAME),
+            headers={"Content-Type": "text/event-stream"},
+        )
+
+        self.run_command()
+
+        self.assertEqual(GesprekkenEventStroom.get_solo().cursor, "48")
+        self.assertEqual(
+            list(VerwerktGesprekEvent.objects.values_list("event_id", flat=True)),
+            ["event-48"],
+        )
+        mock_email.assert_called_once()
+
     def test_an_expired_cursor_continues_from_a_new_snapshot(self, m, mock_email):
         GesprekkenEventStroom.objects.update_or_create(defaults={"cursor": "3"})
         m.get(

@@ -111,11 +111,17 @@ def handle_cloud_event(cloud_event: dict, verzender_type) -> str:
     """
     Process a CloudEvent from the event stream. `verzender_type(gesprek_url,
     deelname_url)` tells whether a bijdrage came from an actor or a partij; it is
-    only called for new bijdragen.
+    only called for new bijdragen. An event without subject or a valid time
+    raises KeyError, TypeError or ValueError.
     """
     zaak_url = cloud_event.get("aanleidingzaak")
     if not zaak_url:
         return "ignored: event has no aanleidingzaak"
+
+    gesprek_url = cloud_event["subject"]
+    moment = parse_datetime(cloud_event["time"])
+    if moment is None:
+        raise ValueError(f"Invalid event time: {cloud_event['time']!r}")
 
     data = cloud_event.get("data") or {}
     nieuwe_bijdrage_van_gemeente = (
@@ -126,9 +132,9 @@ def handle_cloud_event(cloud_event: dict, verzender_type) -> str:
     return verwerk_wijziging(
         event_id=cloud_event.get("id"),
         zaak_url=zaak_url,
-        gesprek_url=cloud_event["subject"],
+        gesprek_url=gesprek_url,
         nieuwe_bijdrage_van_gemeente=nieuwe_bijdrage_van_gemeente,
-        moment=parse_datetime(cloud_event["time"]),
+        moment=moment,
     )
 
 
@@ -136,6 +142,7 @@ def follow(client: GesprekkenClient, *, timeout: float = 60) -> int:
     """
     Reads the stream from the stored cursor until the connection ends, processing
     and storing the cursor event by event. Returns the number of events processed.
+    A malformed event is logged and skipped, so it cannot block the stream.
 
     A cursor the API no longer has (410) is replaced, as patterns/event-stream
     prescribes, by the Feed-Cursor of a new snapshot, and the stream is opened
@@ -162,10 +169,15 @@ def follow(client: GesprekkenClient, *, timeout: float = 60) -> int:
     processed = 0
     with response:
         for sse in parse_sse(response.iter_lines(decode_unicode=True)):
-            outcome = handle_cloud_event(json.loads(sse.data), verzender_types)
-            logger.info("Processed gesprekken event", id=sse.id, outcome=outcome)
+            try:
+                outcome = handle_cloud_event(json.loads(sse.data), verzender_types)
+            except (ValueError, KeyError, TypeError, AttributeError):
+                # json.JSONDecodeError is a ValueError
+                logger.exception("Skipped malformed gesprekken event", id=sse.id)
+            else:
+                logger.info("Processed gesprekken event", id=sse.id, outcome=outcome)
+                processed += 1
             if sse.id:
                 stroom.cursor = sse.id
                 stroom.save(update_fields=["cursor", "bijgewerkt_op"])
-            processed += 1
     return processed

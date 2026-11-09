@@ -116,7 +116,7 @@ class GesprekkenViewTestBase(ClearCachesMixin, TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 @requests_mock.Mocker()
 class GesprekkenSectionTests(GesprekkenViewTestBase):
-    def test_shows_own_bijdragen_as_jij_and_staff_as_the_organisation(self, m):
+    def test_shows_own_bijdragen_as_u_and_staff_as_the_organisation(self, m):
         self.mock_api(m)
 
         response = self.client.get(self.url)
@@ -125,7 +125,8 @@ class GesprekkenSectionTests(GesprekkenViewTestBase):
         content = response.content.decode()
         self.assertIn("Onderwerp van het gesprek", content)
         self.assertIn("Gestart op: 12/06/2026", content)
-        self.assertIn("Jij", content)
+        self.assertIn('<span class="gesprekken__afzender">U</span>', content)
+        self.assertNotIn("ontwerp volgt", content)
         self.assertIn("Gemeente Voorbeeld", content)
         self.assertNotIn("M. Medewerker", content)
         self.assertIn("13/07/2026", content)

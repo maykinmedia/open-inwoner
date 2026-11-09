@@ -113,10 +113,15 @@ def eigen_deelname(gesprek: dict, partij_uuid: str | None) -> str | None:
     """
     The URL of the active deelname of the user in this gesprek.
 
-    With a known Partij it is the deelname of that Partij. Without one (no Klanten
-    API configured) the portal falls back to the only active partij-deelname:
-    enough for a PoC where only the resident takes part on the partij side.
+    With a known Partij it is the deelname of that Partij. Without a Klanten API
+    the portal falls back to the only active partij-deelname: enough for a PoC
+    where only the resident takes part on the partij side. With a Klanten API but
+    no known Partij (none found, or the lookup failed) the user has no deelname
+    and only reads: the deelname may belong to someone else, e.g. the resident
+    when the user is a gemachtigde.
     """
+    from open_inwoner.openklant.models import OpenKlant2Config
+
     actief = [
         d
         for d in gesprek.get("gespreksdeelnames", [])
@@ -127,6 +132,8 @@ def eigen_deelname(gesprek: dict, partij_uuid: str | None) -> str | None:
         for deelname in actief:
             if uuid_from_url(deelname.get("partij")) == partij_uuid:
                 return deelname["url"]
+        return None
+    if OpenKlant2Config.get_solo().service:
         return None
     return actief[0]["url"] if len(actief) == 1 else None
 

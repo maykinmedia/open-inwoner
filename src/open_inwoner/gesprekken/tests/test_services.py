@@ -15,6 +15,7 @@ from open_inwoner.gesprekken.services import (
     eigen_deelname,
     mark_seen,
 )
+from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.openzaak.tests.factories import ServiceFactory
 
 from .shared import (
@@ -41,8 +42,15 @@ class ReferenceTests(TestCase):
         self.assertIsNone(
             eigen_deelname(gesprek, "dddddddd-dddd-dddd-dddd-dddddddddddd")
         )
-        # Without a Klanten API: the only active partij-deelname
-        self.assertEqual(eigen_deelname(gesprek, None), PARTIJ_DEELNAME)
+
+    def test_without_a_klanten_api_the_only_partij_deelname_is_the_users(self):
+        self.assertEqual(eigen_deelname(gesprek_detail(), None), PARTIJ_DEELNAME)
+
+    def test_with_a_klanten_api_but_no_known_partij_there_is_no_eigen_deelname(self):
+        # The lookup failed or found nothing: the deelname may be someone else's
+        OpenKlant2ConfigFactory()
+
+        self.assertIsNone(eigen_deelname(gesprek_detail(), None))
 
     def test_own_bijdragen_are_recognised_by_the_verzender_url(self):
         view = build_gesprek_view(

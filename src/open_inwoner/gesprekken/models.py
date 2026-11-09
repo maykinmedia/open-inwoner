@@ -52,8 +52,7 @@ class MijnGesprekkenConfig(SingletonModel):
         default="",
         help_text=_(
             "URL van de Actor (Klantinteracties API) die een gesprek ontvangt dat "
-            "de inwoner start. Voorlopig één vaste Actor: wie per zaak de ontvanger "
-            "is, is nog een open vraag (C1)."
+            "de inwoner start. Dit is één vaste Actor voor alle zaken."
         ),
     )
     ontvanger_actor_naam = models.CharField(

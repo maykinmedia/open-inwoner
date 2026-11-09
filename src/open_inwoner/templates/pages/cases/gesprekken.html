@@ -29,7 +29,7 @@
 
     {% if kan_starten and tab == 'open' %}
         <details class="gesprekken__start"{% if start_form.is_bound %} open{% endif %}>
-            <summary>{% trans "Nieuw gesprek" %} <small class="gesprekken__ontwerp">{% trans "(ontwerp volgt)" %}</small></summary>
+            <summary>{% trans "Nieuw gesprek" %}</summary>
             <form method="post" enctype="multipart/form-data"
                 hx-post="{{ section_url }}start/" hx-target="#gesprekken" hx-swap="outerHTML" hx-encoding="multipart/form-data">
                 {% csrf_token %}
@@ -74,7 +74,7 @@
                 <ol class="gesprekken__bijdragen">
                 {% for bijdrage in gesprek.bijdragen %}
                     <li class="gesprekken__bijdrage {% if bijdrage.automatisch %}gesprekken__bijdrage--automatisch {% endif %}{% if bijdrage.is_eigen %}gesprekken__bijdrage--eigen{% else %}gesprekken__bijdrage--ander{% endif %}">
-                        <span class="gesprekken__afzender">{% if bijdrage.is_eigen %}{% trans "Jij" %}{% else %}{{ bijdrage.afzender }}{% endif %}</span>
+                        <span class="gesprekken__afzender">{% if bijdrage.is_eigen %}{% trans "U" %}{% else %}{{ bijdrage.afzender }}{% endif %}</span>
                         <div class="gesprekken__ballon">{{ bijdrage.tekst|linebreaksbr }}
                             {% for bijlage in bijdrage.bijlagen %}
                                 <a class="gesprekken__bijlage" href="{{ section_url }}{{ gesprek.uuid }}/bijlage/{{ bijlage.file_id }}/">{% icon icon=bijlage.icon outlined=True %} {{ bijlage.naam }}{% if bijlage.bestandsomvang %} ({{ bijlage.bestandsomvang|readable_size }}){% endif %}</a>

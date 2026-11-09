@@ -8,13 +8,14 @@ from django.utils import timezone
 import requests_mock
 
 from open_inwoner.accounts.tests.factories import DigidUserFactory
+from open_inwoner.gesprekken.client import GesprekkenAPIError
 from open_inwoner.gesprekken.models import GesprekGezien
 from open_inwoner.gesprekken.services import resident_email
 from open_inwoner.gesprekken.tasks import MAIL_TEMPLATE, send_gesprek_bijdrage_email
 from open_inwoner.openklant.tests.factories import OpenKlant2ConfigFactory
 from open_inwoner.utils.test import ClearCachesMixin, paginated_response
 
-from .shared import GESPREK_URL, PARTIJ_UUID, ZAAK_URL
+from .shared import GESPREK_URL, PARTIJ_UUID, ZAAK_URL, gesprek_detail
 
 GELEVERD = timezone.make_aware(dt.datetime(2026, 7, 13, 7, 30))
 
@@ -28,6 +29,10 @@ GELEVERD = timezone.make_aware(dt.datetime(2026, 7, 13, 7, 30))
 class SendGesprekBijdrageEmailTests(TestCase):
     def setUp(self):
         self.user = DigidUserFactory(bsn="100000001", email="piet@example.com")
+        client = patch("open_inwoner.gesprekken.tasks.build_gesprekken_client")
+        self.client = client.start()
+        self.addCleanup(client.stop)
+        self.client.return_value.get_gesprek.return_value = gesprek_detail()
 
     def run_task(self, resolve, zgw_service, users, send, *, gebruikers):
         resolve.return_value = MagicMock()
@@ -72,6 +77,49 @@ class SendGesprekBijdrageEmailTests(TestCase):
         self.run_task(resolve, zgw_service, users, send, gebruikers=[self.user])
 
         send.assert_called_once()
+
+    def test_no_email_when_the_resident_turned_off_case_notifications(
+        self, resolve, zgw_service, users, send
+    ):
+        self.user.cases_notifications = False
+        self.user.save()
+
+        result = self.run_task(
+            resolve, zgw_service, users, send, gebruikers=[self.user]
+        )
+
+        send.assert_not_called()
+        self.assertEqual(result, "sent 0 e-mail(s)")
+
+    @patch("open_inwoner.gesprekken.tasks.resident_email", return_value="x@example.com")
+    @patch("open_inwoner.gesprekken.tasks.resolve_partij_uuid")
+    def test_only_users_taking_part_in_the_gesprek_are_emailed(
+        self, partij_uuid, _email, resolve, zgw_service, users, send
+    ):
+        OpenKlant2ConfigFactory()
+        gemachtigde = DigidUserFactory(bsn="100000002", email="gemachtigde@example.com")
+        partij_uuid.side_effect = lambda user: (
+            PARTIJ_UUID if user == self.user else "dddddddd-dddd-dddd-dddd-dddddddddddd"
+        )
+
+        self.run_task(
+            resolve, zgw_service, users, send, gebruikers=[gemachtigde, self.user]
+        )
+
+        send.assert_called_once()
+        self.assertEqual(send.call_args.args[0], self.user)
+
+    def test_no_email_when_the_gesprek_cannot_be_retrieved(
+        self, resolve, zgw_service, users, send
+    ):
+        self.client.return_value.get_gesprek.side_effect = GesprekkenAPIError()
+
+        result = self.run_task(
+            resolve, zgw_service, users, send, gebruikers=[self.user]
+        )
+
+        send.assert_not_called()
+        self.assertEqual(result, "ignored: cannot retrieve gesprek")
 
     def test_residents_without_email_are_skipped(
         self, resolve, zgw_service, users, send
