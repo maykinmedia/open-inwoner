@@ -1,3 +1,4 @@
+import gzip
 from datetime import date
 from io import BytesIO
 
@@ -552,7 +553,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def test_document_download_with_size_mismatch_shows_error(self, m):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
-        # Content-Length differs from informatie_object["bestandsomvang"], triggering the mismatch
+        # body size differs from informatie_object["bestandsomvang"], triggering the mismatch
         content_wrong_length = b"wrong content"
         m.get(
             self.informatie_object["inhoud"],
@@ -592,20 +593,72 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         self.assertEqual(response.body, self.informatie_object_content)
 
-    def test_document_download_malformed_content_length_header_still_returns_file(
-        self, m
-    ):
+    def test_document_download_gzip_encoded_returns_decoded_file(self, m):
+        # Content-Length of a gzip encoded response is the compressed size, which
+        # differs from bestandsomvang even though the decoded file is complete
+        content = b"my document content " * 100
+        compressed = gzip.compress(content)
         self._setUpAccessMocks(m)
-        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["url"],
+            json={**self.informatie_object, "bestandsomvang": len(content)},
+        )
         m.get(
             self.informatie_object["inhoud"],
-            content=self.informatie_object_content,
-            headers={"Content-Length": "not-a-number"},
+            content=compressed,
+            headers={
+                "Content-Encoding": "gzip",
+                "Content-Length": str(len(compressed)),
+            },
         )
 
         response = self.app.get(self.informatie_object_file.url, user=self.user)
 
-        self.assertEqual(response.body, self.informatie_object_content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.body, content)
+        self.assertEqual(response.headers["Content-Length"], str(len(content)))
+
+    def test_document_download_gzip_encoded_with_size_mismatch_shows_error(self, m):
+        content = b"wrong content"
+        compressed = gzip.compress(content)
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["inhoud"],
+            content=compressed,
+            headers={
+                "Content-Encoding": "gzip",
+                "Content-Length": str(len(compressed)),
+            },
+        )
+
+        response = self.app.get(
+            self.informatie_object_file.url,
+            user=self.user,
+            status=302,
+            auto_follow=False,
+        )
+
+        self.assertEqual(
+            response.location, f"/cases/{self.api_group.id}/{self.zaak['uuid']}/status/"
+        )
+
+    def test_document_download_chunked_with_size_mismatch_shows_error(self, m):
+        # without a Content-Length header (chunked transfer) the size is still checked
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], content=b"wrong content")
+
+        response = self.app.get(
+            self.informatie_object_file.url,
+            user=self.user,
+            status=302,
+            auto_follow=False,
+        )
+
+        self.assertEqual(
+            response.location, f"/cases/{self.api_group.id}/{self.zaak['uuid']}/status/"
+        )
 
     def test_document_download_missing_content_length_header_still_returns_file(
         self, m
