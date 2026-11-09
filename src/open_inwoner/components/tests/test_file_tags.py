@@ -3,9 +3,11 @@ from datetime import date, datetime
 
 from django.core.files import File as DjangoFile
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase
 
 from filer.models.filemodels import File as FilerFile
+from pyquery import PyQuery
 
 from open_inwoner.components.file_item import FileItem
 from open_inwoner.components.templatetags.file_tags import file_item as file_tag
@@ -220,6 +222,7 @@ class TestFileItemTag(SimpleTestCase):
                 "created": None,
                 "description": None,
                 "show_download": True,
+                "download_attribute": True,
             },
         )
 
@@ -228,6 +231,29 @@ class TestFileItemTag(SimpleTestCase):
         result = file_tag(fi, show_download=False, allow_delete=True)
         self.assertEqual(result["show_download"], False)
         self.assertEqual(result["allow_delete"], True)
+
+    def _render_download_links(self, template: str) -> list[tuple[str, bool]]:
+        html = Template("{% load file_tags %}" + template).render(
+            Context({"files": [self._make_file_info()]})
+        )
+        return [
+            (link.attrib["href"], "download" in link.attrib)
+            for link in PyQuery(html)("a.file__download")
+        ]
+
+    def test_file_list_renders_download_attribute_by_default(self):
+        self.assertEqual(
+            self._render_download_links("{% file_list files=files %}"),
+            [("/download/rapport/", True)],
+        )
+
+    def test_file_list_without_download_attribute(self):
+        self.assertEqual(
+            self._render_download_links(
+                "{% file_list files=files download_attribute=False %}"
+            ),
+            [("/download/rapport/", False)],
+        )
 
     def test_raises_for_unknown_type(self):
         with self.assertRaises(TypeError):
