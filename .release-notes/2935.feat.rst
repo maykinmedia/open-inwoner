@@ -1,0 +1,1 @@
+De detailpagina’s Mijn zaken en Mijn vragen hebben een nieuw design gekregen vanwege de toevoeging van de zijnavigatie. Hierbij is ook het bestaande dashboard vervangen door het NLDS component DataSummary.
