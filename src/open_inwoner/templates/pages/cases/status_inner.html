@@ -66,7 +66,8 @@
                         <h2 class="utrecht-heading-2 {% if zaak.new_docs %}indicator{% endif %}" id="documents">{% trans 'Eerder toegevoegde documenten' %}</h2>
                         {% if zaak.new_docs %}{% icon icon="fiber_manual_record" outlined=False extra_classes="file__file--recent" %}{% endif %}
                     </div>
-                    {% file_list files=zaak.documents %}
+                    {# no download attribute: the download view redirects on errors #}
+                    {% file_list files=zaak.documents download_attribute=False %}
                 </section>
             {% endif %}
 

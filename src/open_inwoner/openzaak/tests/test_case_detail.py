@@ -1909,6 +1909,21 @@ class TestCaseDetailView(
             [self.informatie_object_file_2, self.informatie_object_file],
         )
 
+    def test_case_document_links_have_no_download_attribute(self, m):
+        # the download view redirects on errors, which the browser would save as file
+        self._setUpMocks(m)
+
+        response = self.app.get(self.case_detail_url, user=self.user)
+
+        links = PyQuery(response.text)("a.file__download")
+        self.assertEqual(
+            [(link.attrib["href"], "download" in link.attrib) for link in links],
+            [
+                (self.informatie_object_file_2.url, False),
+                (self.informatie_object_file.url, False),
+            ],
+        )
+
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
