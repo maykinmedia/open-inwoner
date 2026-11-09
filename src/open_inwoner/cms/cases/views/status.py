@@ -717,33 +717,21 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         except ZgwAPIError as exc:
             raise Http404 from exc
 
-        # Validate the actual content length matches the expected size. Note that this
-        # is best-effort: if somehow content-length is malformed or bestandsomvang is
-        # missing, we revert to just streaming the file and hoping for the best (the
-        # behavior prior to introducing this check).
-        actual_content_length = content_stream.headers.get("Content-Length")
-        try:
-            parsed_content_length = (
-                int(actual_content_length) if actual_content_length else None
-            )
-        except (ValueError, TypeError):
-            logger.warning(
-                "Document content-length header is malformed",
-                info_object_uuid=info_object_uuid,
-                actual_content_length=actual_content_length,
-            )
-            parsed_content_length = None
-
+        # Check the size of the **decoded body**, not the Content-Length header, which
+        # is the size of the encoded body, e.g. when gzip is enabled.
+        actual_size = len(content_stream.content)
         if (
-            parsed_content_length is not None
-            and info_object.bestandsomvang is not None
-            and parsed_content_length != info_object.bestandsomvang
+            info_object.bestandsomvang is not None
+            and actual_size != info_object.bestandsomvang
         ):
             logger.warning(
-                "Document size mismatch",
+                "case_download_document_size_mismatch",
                 info_object_uuid=info_object_uuid,
                 expected_size=info_object.bestandsomvang,
-                actual_size=parsed_content_length,
+                actual_size=actual_size,
+                content_encoding=content_stream.headers.get("Content-Encoding"),
+                content_length=content_stream.headers.get("Content-Length"),
+                transfer_encoding=content_stream.headers.get("Transfer-Encoding"),
             )
             messages.error(
                 request,
