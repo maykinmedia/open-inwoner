@@ -1,0 +1,5 @@
+Documenten van een zaak downloaden geeft niet langer een foutmelding (of een
+HTML-bestand in plaats van het document) wanneer de Documenten API of een
+tussenliggende gateway het bestand gecomprimeerd (bijv. gzip) verstuurt. De
+bestandsgrootte wordt nu gecontroleerd op de gedecomprimeerde inhoud in plaats
+van op de ``Content-Length`` header.
