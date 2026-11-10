@@ -16,7 +16,6 @@ from django.views.generic import FormView, TemplateView, UpdateView
 
 import requests
 import structlog
-from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 
 from open_inwoner.accounts.brp import BRPData
@@ -35,6 +34,7 @@ from open_inwoner.accounts.forms import (
     UserNotificationsForm,
 )
 from open_inwoner.accounts.models import Action, User
+from open_inwoner.cms.utils.apphook_config import ApphookConfigMixin
 from open_inwoner.cms.utils.page_display import (
     benefits_page_is_published,
     case_page_is_published,
@@ -64,7 +64,7 @@ class MyProfileView(
     LoginRequiredMixin,
     CommonPageMixin,
     BaseBreadcrumbMixin,
-    AppConfigMixin,
+    ApphookConfigMixin,
     FormView,
 ):
     template_name = "pages/profile/me.html"

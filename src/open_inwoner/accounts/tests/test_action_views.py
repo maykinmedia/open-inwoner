@@ -10,9 +10,12 @@ from django.utils.translation import gettext as _
 from django_webtest import WebTest
 from playwright.sync_api import expect
 from privates.test import temp_private_root
+from structlog.testing import capture_logs
 
 from open_inwoner.accounts.choices import StatusChoices
 from open_inwoner.accounts.models import Action
+from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
+from open_inwoner.cms.profile.cms_apps import ProfileApphook
 from open_inwoner.cms.tests import cms_tools
 from open_inwoner.configurations.models import SiteConfiguration
 from open_inwoner.utils.tests.playwright import (
@@ -70,6 +73,31 @@ class ActionViewTests(WebTest):
 
     def test_queryset_visible(self):
         self.assertEqual(list(Action.objects.visible()), [self.action])
+
+    def test_action_list_logs_warning_when_no_config_matches_page_namespace(self):
+        profile_page = cms_tools.create_apphook_page(ProfileApphook)
+        ProfileConfig.objects.filter(namespace=ProfileApphook.app_name).update(
+            namespace="Mijn Profiel", actions=False
+        )
+
+        with capture_logs() as logs:
+            # Without a matching config the actions toggle is not consulted, so
+            # the page stays reachable even though actions are disabled
+            response = self.app.get(self.list_url, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            {
+                "event": "apphook_config_not_found",
+                "namespace": "profile",
+                "path": self.list_url,
+                "page_id": profile_page.pk,
+                "apphook": "ProfileApphook",
+                "available_namespaces": ["Mijn Profiel"],
+                "log_level": "warning",
+            },
+            logs,
+        )
 
     def test_action_list_login_required(self):
         response = self.app.get(self.list_url)

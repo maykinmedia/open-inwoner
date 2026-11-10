@@ -13,6 +13,7 @@ import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
+from structlog.testing import capture_logs
 from webtest import Upload
 
 from open_inwoner.accounts.brp import BRPData
@@ -98,7 +99,36 @@ class ProfileViewTests(WebTest):
         self.profile_app = ProfileConfig.objects.create(
             namespace=ProfileApphook.app_name
         )
-        cms_tools.create_apphook_page(ProfileApphook)
+        self.profile_page = cms_tools.create_apphook_page(ProfileApphook)
+
+    def test_warning_logged_when_no_config_matches_page_namespace(self):
+        # Page keeps namespace "profile", the config gets a name that does not match
+        self.profile_app.namespace = "Mijn Profiel"
+        self.profile_app.save()
+
+        with capture_logs() as logs:
+            response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            {
+                "event": "apphook_config_not_found",
+                "namespace": "profile",
+                "path": self.url,
+                "page_id": self.profile_page.pk,
+                "apphook": "ProfileApphook",
+                "available_namespaces": ["Mijn Profiel"],
+                "log_level": "warning",
+            },
+            logs,
+        )
+
+    def test_no_warning_logged_when_config_matches_page_namespace(self):
+        with capture_logs() as logs:
+            response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("apphook_config_not_found", [log["event"] for log in logs])
 
     def test_login_required(self):
         login_url = reverse("login")
