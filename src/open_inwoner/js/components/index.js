@@ -18,6 +18,7 @@ import { AnchorMobile } from './anchor-menu/anchor-menu-mobile';
 import { CreateGumshoe } from './anchor-menu/anchor-menu';
 import './autocomplete-search';
 import './autocomplete';
+import './gesprekken';
 import './autosumbit';
 import { BfcacheReloader } from './bfcache-reload';
 import './cases';

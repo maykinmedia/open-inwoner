@@ -2,7 +2,7 @@
 {# "Mijn gesprekken" on the zaak detail page. Rendered and refreshed with htmx: polling gets a 204 while nothing changed. #}
 <section class="gesprekken" id="gesprekken"
     hx-get="{{ poll_url }}"
-    hx-trigger="every {{ poll_interval }}s [!document.querySelector('#gesprekken textarea:focus, #gesprekken details[open]')]"
+    hx-trigger="every {{ poll_interval }}s"
     hx-swap="outerHTML">
     <h2 class="utrecht-heading-2">{% trans "Mijn gesprekken" %}</h2>
 

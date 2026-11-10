@@ -1,3 +1,4 @@
+import re
 import uuid
 from unittest.mock import MagicMock, patch
 
@@ -164,6 +165,18 @@ class GesprekkenSectionTests(GesprekkenViewTestBase):
         response = self.client.get(self.url, {"versie": oud})
 
         self.assertEqual(response.status_code, 200)
+
+    def test_polling_trigger_needs_no_htmx_eval(self, m):
+        # OIP sets htmx.config.allowEval = false, so a [filter] in hx-trigger
+        # raises htmx:evalDisallowedError (and the generic error banner).
+        self.mock_api(m)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        trigger = re.search(r'hx-trigger="([^"]*)"', response.content.decode())
+        self.assertIsNotNone(trigger)
+        self.assertNotIn("[", trigger[1])
 
     def test_a_closed_zaak_shows_the_message_and_no_input(self, m):
         self.mock_api(m)
