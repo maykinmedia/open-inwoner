@@ -243,6 +243,69 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, "1 acties staan open")
         self.assertContains(response, reverse("products:questionnaire_list"))
 
+    @patch(
+        "open_inwoner.accounts.views.profile.products_page_is_published",
+        return_value=True,
+    )
+    @patch(
+        "open_inwoner.accounts.views.profile.case_page_is_published",
+        return_value=True,
+    )
+    @patch(
+        "open_inwoner.accounts.views.profile.benefits_page_is_published",
+        return_value=True,
+    )
+    def test_overview_cards_follow_profile_config(self, *mocks):
+        # Selectors per config field. Questions and selfdiagnose are matched on
+        # their link, as both cards share the id "profile-section-questions".
+        cards = {
+            "selected_categories": "#profile-selected-categories",
+            "mentors": "#profile-section-mentors",
+            "my_contacts": "#profile-section-contacts",
+            "actions": "#profile-section-actions",
+            "ssd": "#profile-section-ssd",
+            "questions": f'a[href="{reverse("cases:contactmoment_list")}"]',
+            "selfdiagnose": f'a[href="{reverse("products:questionnaire_list")}"]',
+            "appointments": "#profile-section-appointments",
+        }
+        # Other gates on these cards, so that only the config decides
+        QuestionnaireStepFactory(published=True)
+
+        # Each toggle is switched off with all others on: the overview section
+        # itself is only rendered when at least one of its cards is enabled
+        for field in cards:
+            with self.subTest(disabled=field):
+                for other in cards:
+                    setattr(self.profile_app, other, other != field)
+                self.profile_app.save()
+
+                response = self.app.get(self.url, user=self.user)
+
+                overview = response.pyquery(".profile-section__overview")
+                self.assertEqual(
+                    {
+                        name: bool(overview.find(selector))
+                        for name, selector in cards.items()
+                    },
+                    {name: name != field for name in cards},
+                )
+
+    def test_mydata_not_shown_when_disabled_in_profile_config(self):
+        self.profile_app.my_data = False
+        self.profile_app.save()
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+
+        response = self.app.get(self.url, user=user)
+
+        self.assertNotContains(response, _("Bekijk alle gegevens"))
+        self.assertNotContains(response, reverse("profile:data"))
+
     def test_only_open_actions(self):
         ActionFactory(created_by=self.user, status=StatusChoices.closed)
         response = self.app.get(self.url, user=self.user)
@@ -1774,6 +1837,16 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         response = self.app.get(self.profile_url, user=self.user)
 
         self.assertNotIn("newsletter-form", response.forms)
+
+    def test_do_not_render_form_if_disabled_in_profile_config(self, m):
+        self.setUpMocks(m)
+        self.profile_app.newsletters = False
+        self.profile_app.save()
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+        self.assertEqual(response.pyquery("#profile-newsletters"), [])
 
     def test_do_not_render_form_if_no_newsletters_are_found(self, m):
         m.get("https://laposta.local/api/v2/list", json=[])
