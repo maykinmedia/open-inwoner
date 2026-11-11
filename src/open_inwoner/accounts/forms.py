@@ -233,16 +233,20 @@ class BaseDigitalAddressFormSet(BaseInlineFormSet):
     Inline formset for a single DigitalAddress type (email or phone).
 
     Validates:
-    - No duplicate values within the formset.
+    - No duplicate values within the formset (case-insensitive).
     - Exactly one active entry is marked is_standard_for_type when any entries exist.
+    - Any per-address checks implemented by subclasses in ``clean_address``.
     """
+
+    def clean_address(self, form, value: str) -> None:
+        """Hook for subclasses to validate a single (new or changed) address."""
 
     def clean(self):
         super().clean()
         if any(self.errors):
             return
 
-        seen_values = []
+        seen_values = set()
         standard_count = 0
         active_count = 0
 
@@ -253,11 +257,15 @@ class BaseDigitalAddressFormSet(BaseInlineFormSet):
             if not value:
                 continue
             active_count += 1
-            if value in seen_values:
+            if value.casefold() in seen_values:
                 raise forms.ValidationError(_("Duplicate addresses are not allowed."))
-            seen_values.append(value)
+            seen_values.add(value.casefold())
             if form.cleaned_data.get("is_standard_for_type"):
                 standard_count += 1
+            # Unchanged addresses are skipped, so that a pre-existing conflict
+            # in the data doesn't block the user from saving unrelated changes.
+            if form.instance.pk is None or "value" in form.changed_data:
+                self.clean_address(form, value)
 
         if active_count > 0 and standard_count == 0:
             raise forms.ValidationError(
@@ -276,8 +284,18 @@ _da_formset_kwargs = dict(
     can_delete_extra=False,
 )
 
+
+class BaseEmailDigitalAddressFormSet(BaseDigitalAddressFormSet):
+    def clean_address(self, form, value: str) -> None:
+        if self.instance.email_taken_by_other_user(value):
+            form.add_error("value", _("This email is already taken."))
+
+
 EmailDigitalAddressFormSet = inlineformset_factory(
-    User, DigitalAddress, form=EmailDigitalAddressForm, **_da_formset_kwargs
+    User,
+    DigitalAddress,
+    form=EmailDigitalAddressForm,
+    **{**_da_formset_kwargs, "formset": BaseEmailDigitalAddressFormSet},
 )
 
 PhoneDigitalAddressFormSet = inlineformset_factory(
