@@ -1,0 +1,3 @@
+Er wordt nu gelogd waarom het downloaden van een document van een zaak is
+geweigerd. De nieuwe OpenTelemetry metric
+``oip.cases.document_download_refusals`` telt deze weigeringen per reden.

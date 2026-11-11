@@ -45,7 +45,12 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.exceptions import ZgwAPIError
+from open_inwoner.openzaak.exceptions import (
+    ZgwAPIClientError,
+    ZgwAPIError,
+    ZgwAPINetworkError,
+    ZgwAPIServerError,
+)
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -59,7 +64,12 @@ from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.views import CommonPageMixin
 
-from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+from .mixins import (
+    CaseAccessMixin,
+    CaseLogMixin,
+    DocumentDownloadRefusalReason,
+    OuterCaseAccessMixin,
+)
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -678,13 +688,18 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
+        log = logger.bind(
+            case_uuid=str(self.zaak.uuid), info_object_uuid=info_object_uuid
+        )
         service = ZGWService()
         try:
             info_object = service.fetch_information_object_by_uuid(
                 info_object_uuid, api_group
             )
         except ZgwAPIError as exc:
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.fetch_failed, exc
+            )
 
         # check if this info_object belongs to this zaak
         try:
@@ -694,8 +709,13 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
                 )
             )
         except ZgwAPIError as exc:
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.link_check_failed, exc
+            )
         if not zaak_info_objects:
+            self._log_refusal(
+                log.info, DocumentDownloadRefusalReason.not_linked_to_case
+            )
             raise PermissionDenied()
 
         # check if this info_object should be visible
@@ -705,13 +725,23 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             config.document_max_confidentiality,
             config.document_visible_statuses,
         ):
+            self._log_refusal(
+                log.info,
+                DocumentDownloadRefusalReason.not_visible,
+                info_object_status=info_object.status,
+                info_object_confidentiality=info_object.vertrouwelijkheidaanduiding,
+                document_visible_statuses=config.document_visible_statuses,
+                document_max_confidentiality=config.document_max_confidentiality,
+            )
             raise PermissionDenied()
 
         # retrieve and stream content
         try:
             content_stream = service.download_document(info_object.inhoud, api_group)
         except ZgwAPIError as exc:
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.content_fetch_failed, exc
+            )
 
         # Check the size of the **decoded body**, not the Content-Length header, which
         # is the size of the encoded body, e.g. when gzip is enabled.
@@ -720,28 +750,18 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             info_object.bestandsomvang is not None
             and actual_size != info_object.bestandsomvang
         ):
-            logger.warning(
-                "case_download_document_size_mismatch",
-                info_object_uuid=info_object_uuid,
+            self._log_refusal(
+                log.warning,
+                DocumentDownloadRefusalReason.size_mismatch,
                 expected_size=info_object.bestandsomvang,
                 actual_size=actual_size,
                 content_encoding=content_stream.headers.get("Content-Encoding"),
                 content_length=content_stream.headers.get("Content-Length"),
                 transfer_encoding=content_stream.headers.get("Transfer-Encoding"),
             )
-            messages.error(
-                request,
+            return self._redirect_to_case(
                 _(
                     "Het document kon niet worden gedownload vanwege een fout in de gegevens."
-                ),
-            )
-            return HttpResponseRedirect(
-                reverse(
-                    "cases:case_detail",
-                    kwargs={
-                        "api_group_id": self.kwargs["api_group_id"],
-                        "object_id": self.zaak.uuid,
-                    },
                 )
             )
 
@@ -756,6 +776,47 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
+
+    def _log_refusal(
+        self, log_method, reason: DocumentDownloadRefusalReason, **fields
+    ) -> None:
+        log_method(f"case_download_document_{reason}", **fields)
+        self.log_case_document_download_refused(reason)
+
+    def _api_error_response(
+        self, log, reason: DocumentDownloadRefusalReason, exc: ZgwAPIError
+    ) -> HttpResponseRedirect:
+        fields = {"error_type": type(exc).__name__}
+        # only set for HTTP error responses
+        if exc.status_code is not None:
+            fields["status_code"] = exc.status_code
+
+        # A 404 means the link on the case page is broken: unexpected, but not an API
+        # failure
+        is_not_found = isinstance(exc, ZgwAPIClientError) and exc.status_code == 404
+        self._log_refusal(log.warning if is_not_found else log.error, reason, **fields)
+
+        # the API being down is not a missing document
+        if isinstance(exc, (ZgwAPIServerError, ZgwAPINetworkError)):
+            return self._redirect_to_case(
+                _(
+                    "Het document kon tijdelijk niet worden gedownload. "
+                    "Probeer het later opnieuw."
+                )
+            )
+        raise Http404 from exc
+
+    def _redirect_to_case(self, error_message) -> HttpResponseRedirect:
+        messages.error(self.request, error_message)
+        return HttpResponseRedirect(
+            reverse(
+                "cases:case_detail",
+                kwargs={
+                    "api_group_id": self.kwargs["api_group_id"],
+                    "object_id": self.zaak.uuid,
+                },
+            )
+        )
 
     def handle_no_permission(self):
         # plain error and no redirect

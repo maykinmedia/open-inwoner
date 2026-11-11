@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from enum import StrEnum
+
 from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
 from django.http import Http404, HttpRequest
 from django.template.response import TemplateResponse
@@ -10,6 +12,7 @@ import structlog
 from open_inwoner.cms.cases.metrics import (
     case_contact_form_registrations,
     case_detail_views,
+    case_document_download_refusals,
     case_document_downloads,
     case_document_uploads,
     case_list_views,
@@ -33,6 +36,15 @@ class ServiceUnavailableResponse(TemplateResponse):
 
     def __init__(self, request):
         super().__init__(request, "pages/cases/service_unavailable.html")
+
+
+class DocumentDownloadRefusalReason(StrEnum):
+    fetch_failed = "fetch_failed"
+    link_check_failed = "link_check_failed"
+    not_linked_to_case = "not_linked_to_case"
+    not_visible = "not_visible"
+    content_fetch_failed = "content_fetch_failed"
+    size_mismatch = "size_mismatch"
 
 
 class CaseLogMixin(LogMixin):
@@ -63,6 +75,9 @@ class CaseLogMixin(LogMixin):
             ),
         )
         case_document_downloads.add(1)
+
+    def log_case_document_download_refused(self, reason: DocumentDownloadRefusalReason):
+        case_document_download_refusals.add(1, {"reason": reason.value})
 
     def log_case_document_uploaded(self, case: UniformCase, filename: str):
         self.log_user_action(
