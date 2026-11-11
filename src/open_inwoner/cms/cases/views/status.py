@@ -45,7 +45,7 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.exceptions import ZgwAPIError
+from open_inwoner.openzaak.exceptions import ZgwAPIClientError, ZgwAPIError
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -684,12 +684,14 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
+        log = logger.bind(case_uuid=self.zaak.uuid, info_object_uuid=info_object_uuid)
         service = ZGWService()
         try:
             info_object = service.fetch_information_object_by_uuid(
                 info_object_uuid, api_group
             )
         except ZgwAPIError as exc:
+            self._log_api_error(log, "case_download_document_fetch_failed", exc)
             raise Http404 from exc
 
         # check if this info_object belongs to this zaak
@@ -698,8 +700,10 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
                 self.zaak.url, info_object.url, api_group
             )
         except ZgwAPIError as exc:
+            self._log_api_error(log, "case_download_document_link_check_failed", exc)
             raise Http404 from exc
         if not is_linked:
+            log.info("case_download_document_not_linked_to_case")
             raise PermissionDenied()
 
         # check if this info_object should be visible
@@ -709,12 +713,20 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             config.document_max_confidentiality,
             config.document_visible_statuses,
         ):
+            log.info(
+                "case_download_document_not_visible",
+                info_object_status=info_object.status,
+                info_object_confidentiality=info_object.vertrouwelijkheidaanduiding,
+                document_visible_statuses=config.document_visible_statuses,
+                document_max_confidentiality=config.document_max_confidentiality,
+            )
             raise PermissionDenied()
 
         # retrieve and stream content
         try:
             content_stream = service.download_document(info_object.inhoud, api_group)
         except ZgwAPIError as exc:
+            self._log_api_error(log, "case_download_document_content_fetch_failed", exc)
             raise Http404 from exc
 
         # Check the size of the **decoded body**, not the Content-Length header, which
@@ -724,9 +736,8 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             info_object.bestandsomvang is not None
             and actual_size != info_object.bestandsomvang
         ):
-            logger.warning(
+            log.warning(
                 "case_download_document_size_mismatch",
-                info_object_uuid=info_object_uuid,
                 expected_size=info_object.bestandsomvang,
                 actual_size=actual_size,
                 content_encoding=content_stream.headers.get("Content-Encoding"),
@@ -760,6 +771,19 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
+
+    def _log_api_error(self, log, event: str, exc: ZgwAPIError) -> None:
+        fields = {"error_type": type(exc).__name__}
+        # only set for HTTP error responses
+        if exc.status_code is not None:
+            fields["status_code"] = exc.status_code
+
+        # A 404 means the link on the case page is broken: unexpected, but not an API
+        # failure
+        if isinstance(exc, ZgwAPIClientError) and exc.status_code == 404:
+            log.warning(event, **fields)
+        else:
+            log.error(event, **fields)
 
     def handle_no_permission(self):
         # plain error and no redirect
