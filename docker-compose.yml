@@ -91,7 +91,6 @@ services:
     image: postgis/postgis:${PG_VERSION:-14-master}
     # no arm64 image
     platform: linux/amd64
-    container_name: open-inwoner-db
     environment:
       - POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
       - POSTGRES_DB=${POSTGRES_DB:-open_inwoner}
@@ -104,7 +103,6 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
-    container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - cluster.routing.allocation.disk.threshold_enabled=false
@@ -175,7 +173,6 @@ services:
       args:
         RELEASE: ${TAG:-latest}
         COMMIT_HASH: ${COMMIT_HASH:-}
-    container_name: open-inwoner-web
     image: maykinmedia/open-inwoner:${TAG:-latest}
     environment: *x-app-env
     healthcheck:
@@ -219,7 +216,6 @@ services:
 
   web-init:
     <<: *web-service
-    container_name: open-inwoner-web-init
     ports: []
     command: /setup_configuration.sh
     # the inherited healthcheck probes the webserver, which this one-shot
@@ -343,7 +339,6 @@ services:
     image: clamav/clamav:stable
     # no arm64 image
     platform: linux/amd64
-    container_name: open-inwoner-clamav
     # ClamAV exposes its TCP socket on port 3310
     ports:
       - '3310:3310'
