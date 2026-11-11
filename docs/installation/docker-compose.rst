@@ -86,7 +86,7 @@ Getting started
 
    .. code:: bash
 
-        docker exec -it open-inwoner-web src/manage.py createsuperuser
+        docker compose exec web src/manage.py createsuperuser
 
 6. To stop the containers, press *CTRL-C* or if you used the ``-d`` option:
 
@@ -182,6 +182,23 @@ triggering a ZGW data import, which does call them for real. Run
 it all down again. Anything else, e.g. ``bin/stack.sh ps`` or
 ``bin/stack.sh exec web bash``, is forwarded straight to ``docker compose``
 with the right ``-f`` chain already applied.
+
+The Compose project is named after the checkout's directory, so separate
+checkouts or git worktrees each get their own containers and volumes. Only
+one stack can run at a time (they share host ports), so ``bin/stack.sh down``
+one before bringing up another. Every container ``bin/stack.sh`` creates is
+labelled ``nl.maykinmedia.open-inwoner.dev-stack=true``, so you can remove
+the containers of all of them at once, running or not, e.g. leftovers from a
+checkout you have since deleted:
+
+.. code:: bash
+
+     bin/stack.sh purge            # containers only
+     bin/stack.sh purge --volumes  # also remove those stacks' volumes
+
+``--volumes`` finds the volumes through the containers it removes, so a stack
+whose containers are already gone keeps its volumes. Remove those with
+``docker volume ls`` and ``docker volume rm``.
 
 .. note::
 

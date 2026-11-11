@@ -36,6 +36,12 @@ Commands:
                    marker and restarts it.
   reset-config     Same, but for `up --localhost`: clears its marker only,
   --localhost      without touching web-init or starting any app container.
+  purge [--volumes]
+                   Remove the containers of *every* Open Inwoner dev stack,
+                   i.e. of all checkouts/worktrees (found via the label
+                   bin/stack.sh puts on them), running or not -- e.g.
+                   leftovers from a worktree you have since deleted.
+                   `--volumes` also removes those stacks' volumes.
   urls             Print the service URLs shown at the end of `up`, without
                    bringing anything up or down.
   <anything else>  Forwarded to `docker compose` as-is, e.g.:
@@ -73,6 +79,23 @@ COMPOSE=(
     -f docker/docker-compose.openafval.yml
     -f docker/docker-compose.observability.yml
 )
+
+# Compose has no project-wide labels, so generate an override that labels
+# every service. Lets you purge the dev stacks of all checkouts/worktrees at
+# once -- see docs/installation/docker-compose.rst.
+STACK_LABEL=nl.maykinmedia.open-inwoner.dev-stack
+STACK_LABELS_FILE=docker/.stack-labels.yml
+
+write_stack_labels() {
+    local services service
+    services=$("${COMPOSE[@]}" config --services)
+    {
+        echo "services:"
+        for service in $services; do
+            printf '  %s:\n    labels:\n      %s: "true"\n' "$service" "$STACK_LABEL"
+        done
+    } >"$STACK_LABELS_FILE"
+}
 
 # Marker for the one-off setup_configuration/loaddata step in `up
 # --localhost`, mirroring web-init's own marker (see
@@ -159,6 +182,14 @@ EOF
 
 cmd=${1:-}
 [ $# -gt 0 ] && shift
+
+case "$cmd" in
+    ""|-h|--help|urls|purge) ;;
+    *)
+        write_stack_labels
+        COMPOSE+=(-f "$STACK_LABELS_FILE")
+        ;;
+esac
 
 case "$cmd" in
     up)
@@ -374,6 +405,46 @@ case "$cmd" in
         echo "The shared open-inwoner-dev network is left in place (it's external to"
         echo "every compose file here). Remove it yourself if you need to, with:"
         echo "  docker network rm open-inwoner-dev"
+        ;;
+
+    purge)
+        volumes=false
+        while [ $# -gt 0 ]; do
+            case "$1" in
+                --volumes)
+                    volumes=true
+                    shift
+                    ;;
+                *)
+                    echo "==> Unknown option for 'purge': $1" >&2
+                    exit 1
+                    ;;
+            esac
+        done
+
+        containers=$(docker ps -aq --filter "label=$STACK_LABEL")
+        # Compose labels the volumes it creates with their project, not with
+        # STACK_LABEL, so find them via the projects of the labelled containers.
+        projects=$(docker ps -a --filter "label=$STACK_LABEL" \
+            --format '{{.Label "com.docker.compose.project"}}' | sort -u)
+
+        if [ -z "$containers" ]; then
+            echo "==> No dev stack containers found"
+        else
+            echo "==> Removing dev stack containers of project(s):" $projects
+            echo "$containers" | xargs docker rm -f >/dev/null
+        fi
+
+        if [ "$volumes" = true ]; then
+            for project in $projects; do
+                project_volumes=$(docker volume ls -q \
+                    --filter "label=com.docker.compose.project=$project")
+                if [ -n "$project_volumes" ]; then
+                    echo "==> Removing volumes of project $project"
+                    echo "$project_volumes" | xargs docker volume rm >/dev/null
+                fi
+            done
+        fi
         ;;
 
     reset-config)
