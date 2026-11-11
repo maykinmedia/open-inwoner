@@ -495,6 +495,117 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertFalse(response.context["phone_formset"].is_valid())
 
     # -------------------------------------------------------------------------
+    # Email uniqueness across users
+    # -------------------------------------------------------------------------
+
+    def _post_emails(self, user, entries, initial_pks=None):
+        self.client.force_login(user)
+        data = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+        data.update(self._da_formset_data("email_addresses", entries, initial_pks))
+        data.update(self._da_formset_data("phone_addresses", []))
+        return self.client.post(self.url, data=data)
+
+    def assertEmailTaken(self, response, expected_form_errors):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["email_formset"].errors, expected_form_errors)
+
+    def test_email_formset_rejects_login_email_of_other_user(self):
+        other = UserFactory(email="taken@example.com")
+
+        response = self._post_emails(self.user, [("taken@example.com", True)])
+
+        self.assertEmailTaken(
+            response, [{"value": [_("This email is already taken.")]}]
+        )
+        self.user.refresh_from_db()
+        self.assertNotEqual(self.user.email, other.email)
+
+    def test_email_formset_rejects_case_variant_of_other_users_email(self):
+        UserFactory(email="Taken@Example.com")
+
+        response = self._post_emails(self.user, [("taken@example.com", True)])
+
+        self.assertEmailTaken(
+            response, [{"value": [_("This email is already taken.")]}]
+        )
+
+    def test_email_formset_rejects_non_standard_address_of_other_user(self):
+        DigitalAddressFactory(value="secondary@example.com")
+
+        response = self._post_emails(
+            self.user,
+            [("mine@example.com", True), ("secondary@example.com", False)],
+        )
+
+        self.assertEmailTaken(
+            response, [{}, {"value": [_("This email is already taken.")]}]
+        )
+        self.assertFalse(
+            self.user.digital_addresses.filter(value="secondary@example.com").exists()
+        )
+
+    def test_email_formset_rejects_regular_users_email_for_digid_user(self):
+        UserFactory(email="taken@example.com")
+        digid_user = DigidUserFactory()
+
+        response = self._post_emails(digid_user, [("taken@example.com", True)])
+
+        self.assertEmailTaken(
+            response, [{"value": [_("This email is already taken.")]}]
+        )
+
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
+    def test_email_formset_allows_digid_users_to_share_email(self, mock_update):
+        DigidUserFactory(email="shared@example.com", bsn="111222333")
+        digid_user = DigidUserFactory()
+
+        response = self._post_emails(digid_user, [("shared@example.com", True)])
+
+        self.assertRedirects(response, self.return_url, fetch_redirect_response=False)
+        digid_user.refresh_from_db()
+        self.assertEqual(digid_user.email, "shared@example.com")
+
+    def test_email_formset_rejects_case_insensitive_duplicates_within_formset(self):
+        response = self._post_emails(
+            self.user,
+            [("mine@example.com", True), ("Mine@Example.com", False)],
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["email_formset"].non_form_errors(),
+            [_("Duplicate addresses are not allowed.")],
+        )
+
+    @patch(
+        "open_inwoner.accounts.views.profile.EditProfileView.update_klant_via_esuite"
+    )
+    def test_existing_email_conflict_does_not_block_unrelated_changes(
+        self, mock_update
+    ):
+        # Pre-existing (legacy) case-variant duplicate of the user's email
+        UserFactory(email=self.user.email.upper())
+        self.user.update_email(self.user.email)
+        standard = self.user.digital_addresses.get(is_standard_for_type=True)
+
+        response = self._post_emails(
+            self.user,
+            [(standard.value, True), ("new@example.com", False)],
+            initial_pks=[standard.pk, None],
+        )
+
+        self.assertRedirects(response, self.return_url, fetch_redirect_response=False)
+        self.assertEqual(
+            set(self.user.digital_addresses.values_list("value", flat=True)),
+            {standard.value, "new@example.com"},
+        )
+
+    # -------------------------------------------------------------------------
     # Saving address changes
     # -------------------------------------------------------------------------
 
