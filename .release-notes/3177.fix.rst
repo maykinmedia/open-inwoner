@@ -1,0 +1,5 @@
+Bij het opslaan van het profiel wordt nu gecontroleerd of een e-mailadres al
+door een andere gebruiker wordt gebruikt (ook als extra e-mailadres en
+ongeacht hoofdletters), zodat dit een foutmelding geeft in plaats van een
+serverfout. Wijzigingen van het e-mailadres via de beheeromgeving worden nu
+ook doorgevoerd in de digitale adressen van de gebruiker.
