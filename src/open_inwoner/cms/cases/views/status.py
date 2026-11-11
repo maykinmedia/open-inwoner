@@ -13,6 +13,7 @@ from django.core.exceptions import (
 from django.http import (
     Http404,
     HttpRequest,
+    HttpResponse,
     HttpResponseRedirect,
     StreamingHttpResponse,
 )
@@ -45,7 +46,12 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.exceptions import ZgwAPIClientError, ZgwAPIError
+from open_inwoner.openzaak.exceptions import (
+    ZgwAPIClientError,
+    ZgwAPIError,
+    ZgwAPINetworkError,
+    ZgwAPIServerError,
+)
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -59,7 +65,13 @@ from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
-from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+from .mixins import (
+    CaseAccessMixin,
+    CaseLogMixin,
+    DocumentDownloadRefusalReason,
+    OuterCaseAccessMixin,
+    ServiceUnavailableResponse,
+)
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -691,8 +703,9 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
                 info_object_uuid, api_group
             )
         except ZgwAPIError as exc:
-            self._log_api_error(log, "case_download_document_fetch_failed", exc)
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.fetch_failed, exc
+            )
 
         # check if this info_object belongs to this zaak
         try:
@@ -700,10 +713,13 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
                 self.zaak.url, info_object.url, api_group
             )
         except ZgwAPIError as exc:
-            self._log_api_error(log, "case_download_document_link_check_failed", exc)
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.link_check_failed, exc
+            )
         if not is_linked:
-            log.info("case_download_document_not_linked_to_case")
+            self._log_refusal(
+                log.info, DocumentDownloadRefusalReason.not_linked_to_case
+            )
             raise PermissionDenied()
 
         # check if this info_object should be visible
@@ -713,8 +729,9 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             config.document_max_confidentiality,
             config.document_visible_statuses,
         ):
-            log.info(
-                "case_download_document_not_visible",
+            self._log_refusal(
+                log.info,
+                DocumentDownloadRefusalReason.not_visible,
                 info_object_status=info_object.status,
                 info_object_confidentiality=info_object.vertrouwelijkheidaanduiding,
                 document_visible_statuses=config.document_visible_statuses,
@@ -726,8 +743,9 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         try:
             content_stream = service.download_document(info_object.inhoud, api_group)
         except ZgwAPIError as exc:
-            self._log_api_error(log, "case_download_document_content_fetch_failed", exc)
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.content_fetch_failed, exc
+            )
 
         # Check the size of the **decoded body**, not the Content-Length header, which
         # is the size of the encoded body, e.g. when gzip is enabled.
@@ -736,8 +754,9 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             info_object.bestandsomvang is not None
             and actual_size != info_object.bestandsomvang
         ):
-            log.warning(
-                "case_download_document_size_mismatch",
+            self._log_refusal(
+                log.warning,
+                DocumentDownloadRefusalReason.size_mismatch,
                 expected_size=info_object.bestandsomvang,
                 actual_size=actual_size,
                 content_encoding=content_stream.headers.get("Content-Encoding"),
@@ -772,7 +791,15 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
 
-    def _log_api_error(self, log, event: str, exc: ZgwAPIError) -> None:
+    def _log_refusal(
+        self, log_method, reason: DocumentDownloadRefusalReason, **fields
+    ) -> None:
+        log_method(f"case_download_document_{reason}", **fields)
+        self.log_case_document_download_refused(reason)
+
+    def _api_error_response(
+        self, log, reason: DocumentDownloadRefusalReason, exc: ZgwAPIError
+    ) -> HttpResponse:
         fields = {"error_type": type(exc).__name__}
         # only set for HTTP error responses
         if exc.status_code is not None:
@@ -780,10 +807,13 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         # A 404 means the link on the case page is broken: unexpected, but not an API
         # failure
-        if isinstance(exc, ZgwAPIClientError) and exc.status_code == 404:
-            log.warning(event, **fields)
-        else:
-            log.error(event, **fields)
+        is_not_found = isinstance(exc, ZgwAPIClientError) and exc.status_code == 404
+        self._log_refusal(log.warning if is_not_found else log.error, reason, **fields)
+
+        # same handling as CaseAccessMixin: the API being down is not a missing document
+        if isinstance(exc, (ZgwAPIServerError, ZgwAPINetworkError)):
+            return ServiceUnavailableResponse(self.request)
+        raise Http404 from exc
 
     def handle_no_permission(self):
         # plain error and no redirect

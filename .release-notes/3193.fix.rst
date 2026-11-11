@@ -5,3 +5,6 @@ bestandsgrootte wordt nu gecontroleerd op de gedecomprimeerde inhoud in plaats
 van op de ``Content-Length`` header. Als een document echt niet gedownload kan
 worden, ziet de gebruiker nu de foutmelding op de zaakpagina in plaats van een
 gedownload HTML-bestand.
+Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
+gebruiker nu dat de service tijdelijk niet beschikbaar is, in plaats van een
+"pagina niet gevonden"-melding.
