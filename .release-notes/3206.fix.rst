@@ -1,0 +1,1 @@
+Op de Mijn zaken-pagina was er geen witruimte tussen de tekst en de cards wanneer de filter of notificatie niet aanwezig was. Dit is nu aangepast, zodat de witruimte weer overeenkomt met de oorspronkelijke situatie.
