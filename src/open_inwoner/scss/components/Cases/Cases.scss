@@ -71,3 +71,13 @@
 .spinner-target--loading {
   display: none;
 }
+
+nl-paragraph + .cases__notification,
+nl-paragraph + .notification--warning {
+  margin-block-start: var(--spacing-extra-large);
+}
+
+.cases__notification ~ .filter-bar__backdrop,
+.notification--warning ~ .filter-bar__backdrop {
+  margin-block-start: var(--spacing-extra-large);
+}
