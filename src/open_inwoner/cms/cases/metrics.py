@@ -24,6 +24,15 @@ case_document_downloads = meter.create_counter(
     description="Number of times users download case documents",
 )
 
+case_document_download_refusals = meter.create_counter(
+    "oip.cases.document_download_refusals",
+    unit="{download}",
+    description=(
+        "Number of times a case document download is refused. "
+        "Attributes: reason (DocumentDownloadRefusalReason)"
+    ),
+)
+
 case_document_uploads = meter.create_counter(
     "oip.cases.document_uploads",
     unit="{upload}",
