@@ -188,7 +188,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     def has_verified_email(self):
-        return self.verified_email != "" and self.email == self.verified_email
+        # Email addresses are treated as case-insensitive (as for login and
+        # uniqueness), so a change in capitalisation keeps the verification.
+        return (
+            self.verified_email != ""
+            and self.email.casefold() == self.verified_email.casefold()
+        )
 
     preferred_address = models.ForeignKey(
         "accounts.DigitalAddress",

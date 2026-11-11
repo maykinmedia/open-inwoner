@@ -402,7 +402,8 @@ class eSuiteKlantenService(
         with transaction.atomic():
             if (
                 klant.emailadres
-                and klant.emailadres != user.email
+                # A difference in capitalisation only is not a change
+                and klant.emailadres.casefold() != user.email.casefold()
                 and not user.email_taken_by_other_user(klant.emailadres)
             ):
                 user.update_email(klant.emailadres)

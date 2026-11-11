@@ -333,6 +333,21 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertEqual(da.value, "new@example.com")
         self.assertTrue(da.is_standard_for_type)
 
+    def test_inbound_email_with_only_different_capitalisation_is_ignored(self):
+        user = DigidUserFactory(
+            email="user@example.com", verified_email="user@example.com"
+        )
+        klant = self._make_klant(emailadres="User@Example.com")
+
+        self.service.update_user_from_klant(klant, user)
+
+        user.refresh_from_db()
+        self.assertEqual(
+            (user.email, user.verified_email),
+            ("user@example.com", "user@example.com"),
+        )
+        self.assertFalse(user.digital_addresses.exists())
+
     def test_inbound_primary_phone_creates_standard_digital_address(self):
         user = DigidUserFactory(phonenumber="0600000000")
         klant = self._make_klant(telefoonnummer="0611111111")
