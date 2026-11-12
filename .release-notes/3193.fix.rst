@@ -8,3 +8,5 @@ gedownload HTML-bestand.
 Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
 gebruiker nu dat de service tijdelijk niet beschikbaar is, in plaats van een
 "pagina niet gevonden"-melding.
+Documenten waarvan het formaat geen geldig MIME-type is, worden nu altijd
+gedownload in plaats van in de browser getoond.

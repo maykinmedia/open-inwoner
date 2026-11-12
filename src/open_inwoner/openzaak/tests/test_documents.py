@@ -387,6 +387,36 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             response.headers["Content-Length"], str(len(self.informatie_object_content))
         )
 
+    def test_document_download_falls_back_to_octet_stream_for_invalid_format(self, m):
+        url = reverse(
+            "cases:document_download",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "info_id": self.informatie_object["uuid"],
+                "api_group_id": self.api_group.id,
+            },
+        )
+        for formaat, expected_content_type in (
+            ("text/plain; charset=utf-8", "text/plain; charset=utf-8"),
+            ("", "application/octet-stream"),
+            ("txt", "application/octet-stream"),
+            ("Platte tekst", "application/octet-stream"),
+            ("text/plain\r\nX-Injected: 1", "application/octet-stream"),
+            ("text/plain\n; x", "application/octet-stream"),
+            ("text/plain; a\rX-Injected: 1", "application/octet-stream"),
+            (" application/pdf ", "application/pdf"),
+            ("APPLICATION/PDF", "APPLICATION/PDF"),
+        ):
+            with self.subTest(formaat=formaat):
+                self.informatie_object["formaat"] = formaat
+                self._setUpMocks(m)
+
+                response = self.app.get(url, user=self.user)
+
+                self.assertEqual(
+                    response.headers["Content-Type"], expected_content_type
+                )
+
     def test_document_retrieval_logs_case_identification_and_file(self, m):
         self._setUpMocks(m)
         url = reverse(

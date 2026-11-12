@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+import re
 from dataclasses import dataclass
 from typing import Iterable, Protocol, cast
 
@@ -74,6 +75,12 @@ from .mixins import (
 )
 
 logger = structlog.stdlib.get_logger(__name__)
+
+# type "/" subtype using RFC 6838 section 4.2 restricted-names, optionally
+# followed by parameters (RFC 9110, section 8.3.1). Parameters are only checked
+# for line breaks, which would make the header invalid. Use with fullmatch().
+_NAME = r"[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,126}"
+MIME_TYPE_PATTERN = re.compile(rf"{_NAME}/{_NAME}([ \t]*;[^\r\n]*)?")
 
 
 @dataclass
@@ -781,9 +788,15 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         self.log_case_document_downloaded(self.zaak, info_object.bestandsnaam)
 
+        # without a valid type the browser may render the content instead of
+        # downloading it
+        content_type = (info_object.formaat or "").strip()
+        if not MIME_TYPE_PATTERN.fullmatch(content_type):
+            content_type = "application/octet-stream"
+
         headers = {
             "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
-            "Content-Type": info_object.formaat,
+            "Content-Type": content_type,
         }
         if info_object.bestandsomvang is not None:
             headers["Content-Length"] = str(info_object.bestandsomvang)
