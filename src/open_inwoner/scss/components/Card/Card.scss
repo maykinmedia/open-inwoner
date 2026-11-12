@@ -405,3 +405,7 @@
     color: var(--oip-color-fg);
   }
 }
+
+nl-paragraph + .card__grid {
+  margin-block-start: var(--spacing-extra-large);
+}
