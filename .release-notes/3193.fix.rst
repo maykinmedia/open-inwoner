@@ -9,3 +9,7 @@ gedownload HTML-bestand.
 Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
 gebruiker nu op de zaakpagina dat het document tijdelijk niet gedownload kan
 worden, in plaats van een "pagina niet gevonden"-melding.
+
+Documenten waarvan het formaat geen geldig MIME-type is, worden nu aangeboden
+als ``application/octet-stream``, in plaats van met een ongeldige
+``Content-Type`` header of een serverfout.
