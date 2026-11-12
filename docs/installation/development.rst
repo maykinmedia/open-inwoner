@@ -43,7 +43,7 @@ You will also need the `Libxml2`_ and `GDAL`_ development libraries, and
 .. _npm: https://www.npmjs.com/
 .. _Elastic Search: https://www.elastic.co/
 .. _Redis: https://redis.io/
-.. _Pango: https://pango.gnome.org/
+.. _Pango: https://www.pango.org/
 .. _Libxml2: https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 .. _GDAL: https://gdal.org/
 
