@@ -2,9 +2,9 @@
  * Note: users can upload multiple faulty files with their respective errors, and can delete them one by one,
  * Tracking should only happen on newly added errors, not the entire occurring set.
  */
-if (window.IS_DEV && typeof _sz === 'undefined') {
-  /** Mock SiteImprove `_sz` object for testing - only used during development */
-  var _sz = {
+if (window.IS_DEV && typeof window._sz === 'undefined') {
+  /** Mock SiteImprove `window._sz` object for testing - only used during development */
+  window._sz = {
     push: function (data) {
       try {
         console.log('Event pushed to _sz:', data);
@@ -62,8 +62,8 @@ class DynamicFileInputErrors {
     );
 
     currentErrors.forEach((message, id) => {
-      if (!this.previousErrorState.has(id) && typeof _sz !== 'undefined')
-        _sz.push(['event', 'Mijn zaken', 'Error', message]);
+      if (!this.previousErrorState.has(id) && typeof window._sz !== 'undefined')
+        window._sz.push(['event', 'Mijn zaken', 'Error', message]);
     });
 
     // Update previous error state only with persistent errors
