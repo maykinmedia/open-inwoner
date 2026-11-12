@@ -356,6 +356,9 @@ class InnerCaseDetailView(
             context["hxpost_document_action"] = reverse(
                 "cases:case_detail_document_form", kwargs=self.kwargs
             )
+            context["hxget_gesprekken"] = reverse(
+                "cases:case_detail_gesprekken", kwargs=self.kwargs
+            )
             context["metrics"] = [
                 {
                     "label": openzaak_config.zaak_identificatie_label,

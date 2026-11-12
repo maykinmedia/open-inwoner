@@ -82,6 +82,12 @@
                 {% endif %}
             {% endif %}
 
+            {# Mijn gesprekken: loaded and refreshed as a separate fragment #}
+            {% get_solo 'gesprekken.MijnGesprekkenConfig' as gesprekken_config %}
+            {% if gesprekken_config.is_active %}
+                <div hx-get="{{ hxget_gesprekken }}" hx-trigger="load" hx-swap="outerHTML"></div>
+            {% endif %}
+
             {#  Contact form #}
             {% if zaak.contact_form_enabled %}
             <section id="cases-contact-form" class="form_contact">

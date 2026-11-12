@@ -5,6 +5,13 @@ from open_inwoner.accounts.views.contactmoments import (
     KlantContactMomentListView,
     KlantContactMomentRedirectView,
 )
+from open_inwoner.gesprekken.views import (
+    GesprekBijdrageView,
+    GesprekBijlageDownloadView,
+    GesprekEindigenView,
+    GesprekkenSectionView,
+    GesprekStartView,
+)
 
 from .views import (
     CaseContactFormView,
@@ -54,6 +61,31 @@ urlpatterns = [
         "<str:api_group_id>/<str:object_id>/status/contact-form/",
         CaseContactFormView.as_view(),
         name="case_detail_contact_form",
+    ),
+    path(
+        "<str:api_group_id>/<str:object_id>/status/gesprekken/",
+        GesprekkenSectionView.as_view(),
+        name="case_detail_gesprekken",
+    ),
+    path(
+        "<str:api_group_id>/<str:object_id>/status/gesprekken/start/",
+        GesprekStartView.as_view(),
+        name="case_detail_gesprek_start",
+    ),
+    path(
+        "<str:api_group_id>/<str:object_id>/status/gesprekken/<uuid:gesprek_uuid>/eindigen/",
+        GesprekEindigenView.as_view(),
+        name="case_detail_gesprek_eindigen",
+    ),
+    path(
+        "<str:api_group_id>/<str:object_id>/status/gesprekken/<uuid:gesprek_uuid>/bijdrage/",
+        GesprekBijdrageView.as_view(),
+        name="case_detail_gesprek_bijdrage",
+    ),
+    path(
+        "<str:api_group_id>/<str:object_id>/status/gesprekken/<uuid:gesprek_uuid>/bijlage/<uuid:file_id>/",
+        GesprekBijlageDownloadView.as_view(),
+        name="case_detail_gesprek_bijlage",
     ),
     path(
         "<str:api_group_id>/<str:object_id>/status/document-form/",
