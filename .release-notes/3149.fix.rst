@@ -1,1 +1,1 @@
-De link onderaan een afspraken card valt niet meer over de tekst heen, omdat de card nu meegroeit met de inhoud.
+Op de Mijn Afspraken pagina valt de link onderaan de tegel niet meer over de tekst heen, dit komt omdat de tegel nu mee schaalt met de inhoud.
