@@ -1,0 +1,34 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 9101,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009101",
+      "password": "!eherkenning-kvk-has-no-local-password",
+      "email": "kvk@test.nl",
+      "verified_email": "kvk@test.nl",
+      "is_staff": false,
+      "is_active": true,
+      "kvk": "68750110",
+      "vestiging": "",
+      "company_name": "Test BV Donald",
+      "login_type": "eherkenning"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 9102,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009102",
+      "password": "!eherkenning-vestiging-has-no-local-password",
+      "email": "vestiging@test.nl",
+      "verified_email": "vestiging@test.nl",
+      "is_staff": false,
+      "is_active": true,
+      "kvk": "68750110",
+      "vestiging": "000037178598",
+      "company_name": "Test BV Donald",
+      "login_type": "eherkenning"
+    }
+  }
+]

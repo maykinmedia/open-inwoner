@@ -65,7 +65,7 @@ oidc_db_config_admin_auth:
         identity_settings:
           bsn_claim_path:
             - bsn
-    # eHerkenning (legal subject via legalSubjectID; claims live in the `bsn` scope)
+    # eHerkenning, using the default (eToegang) claim names; claims live in the `bsn` scope
     - identifier: oidc-eherkenning
       enabled: true
       oidc_provider_identifier: keycloak-provider
@@ -79,13 +79,13 @@ oidc_db_config_admin_auth:
       options:
         identity_settings:
           identifier_type_claim_path:
-            - name_qualifier
+            - namequalifier
           legal_subject_claim_path:
-            - legalSubjectID
+            - urn:etoegang:core:LegalSubjectID
           acting_subject_claim_path:
-            - actingSubjectID
+            - urn:etoegang:core:ActingSubjectID
           branch_number_claim_path:
-            - vestiging
+            - urn:etoegang:1.9:ServiceRestriction:Vestigingsnr
     # eIDAS (natural person + company, single combined flow)
     - identifier: oidc-eidas
       enabled: true

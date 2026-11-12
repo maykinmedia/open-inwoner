@@ -503,7 +503,7 @@
     {
       "id": "44be45f6-a7ae-42c2-9486-30f078cf5b39",
       "createdTimestamp": 1719999585061,
-      "username": "eherkenning-vestiging",
+      "username": "vestiging",
       "enabled": true,
       "totp": false,
       "emailVerified": false,
@@ -518,12 +518,9 @@
       },
       "credentials": [
         {
-          "id": "5e4a5b82-f5b1-48b6-9335-e25d3b417cef",
           "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1719999593682,
-          "secretData": "{\"value\":\"etDGywOL01Nr9RD1tG2x95/A37HEsf0zk2Kol8GNIJ0=\",\"salt\":\"pnnxOICMkQRoCM/ywGSOww==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+          "value": "vestiging",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
@@ -535,7 +532,7 @@
     {
       "id": "c1ec7a5e-0000-4000-8000-000000000001",
       "createdTimestamp": 1719999585061,
-      "username": "eherkenning-rechtspersoon",
+      "username": "kvk",
       "enabled": true,
       "totp": false,
       "emailVerified": false,
@@ -549,7 +546,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "eherkenning-rechtspersoon",
+          "value": "kvk",
           "temporary": false
         }
       ],
@@ -1794,6 +1791,70 @@
             "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "vestiging",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "757059a0-39e3-4905-918d-c8fdad29c2b7",
+          "name": "urn:etoegang:core:LegalSubjectID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "legalSubjectID",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "urn:etoegang:core:LegalSubjectID",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "978bd081-152f-441a-aa0f-c859e31bd1ce",
+          "name": "urn:etoegang:core:ActingSubjectID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "actingSubjectID",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "urn:etoegang:core:ActingSubjectID",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "04553cea-29ea-4d5e-b73b-3e3d470ed8ae",
+          "name": "urn:etoegang:1.9:ServiceRestriction:Vestigingsnr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "vestiging",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "urn:etoegang:1\\.9:ServiceRestriction:Vestigingsnr",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "0419186b-071f-48cf-9398-209a26378334",
+          "name": "namequalifier",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "name_qualifier",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "namequalifier",
             "jsonType.label": "String"
           }
         },

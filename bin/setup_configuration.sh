@@ -70,6 +70,18 @@ with transaction.atomic():
     # live in Open Inwoner's own database like the demo data above.
     src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
 
+    # Pre-registered eHerkenning users for the Keycloak `kvk` and `vestiging`
+    # users, so logging in skips the registration flow. As with the citizen
+    # above, first delete any other user with the same kvk/vestiging (e.g.
+    # from an earlier login); the (kvk, vestiging) pair must be unique.
+    src/manage.py shell -c "
+from django.db import transaction
+from open_inwoner.accounts.models import User
+with transaction.atomic():
+    User.objects.filter(kvk='68750110').exclude(pk__in=[9101, 9102]).delete()
+"
+    src/manage.py loaddata /app/setup_configuration/fixtures/eherkenning.json
+
     mkdir -p "$MARKER_DIR"
     touch "$MARKER"
 fi
