@@ -1,0 +1,1 @@
+Als gebruikers de website gebruikten, werden hun handelingen niet meer doorgegeven aan Siteimprove. Dit kwam doordat na een eerdere update van de website de koppeling met Siteimprove niet meer goed werkte. Dit is nu aangepast, zodat Siteimprove de handelingen weer correct meet.
