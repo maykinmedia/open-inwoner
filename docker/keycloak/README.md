@@ -50,13 +50,12 @@ session" for as long as the previous session lives.
   is pre-registered instead.
 - `digid-machtigen` / `digid-machtigen`, has the `aanvrager.bsn`,
   `gemachtigde.bsn` and `service_id` attributes (for DigiD machtigen)
-- `eherkenning-vestiging` / `eherkenning-vestiging`, has the `legalSubjectID`
-  (kvk), `actingSubjectID` (pseudo ID), `representeeBSN`, `service_id`,
-  `service_uuid`, `name_qualifier` and `vestiging` attributes (for eHerkenning
-  with a branch restriction).
-- `eherkenning-rechtspersoon` / `eherkenning-rechtspersoon`, a legal entity with
-  the `legalSubjectID` (kvk), `actingSubjectID` and `name_qualifier` attributes
-  but NO `vestiging` claim (for eHerkenning without a branch restriction).
+- `vestiging` / `vestiging`, has the `legalSubjectID` (kvk), `actingSubjectID`
+  (pseudo ID), `representeeBSN`, `service_id`, `service_uuid`, `name_qualifier`
+  and `vestiging` attributes (for eHerkenning with a branch restriction).
+- `kvk` / `kvk`, a legal entity with the `legalSubjectID` (kvk),
+  `actingSubjectID` and `name_qualifier` attributes but NO `vestiging` claim
+  (for eHerkenning without a branch restriction).
 - `admin` / `admin`, intended to create as django user (can be made staff). The
   email address is `admin@example.com`. Should get the `employeeId` claim (See
   below for how to add the custom claim).
@@ -74,6 +73,12 @@ session" for as long as the previous session lives.
   `person_bsn_identifier`, `company_identifier`, `company_identifier_type`,
   `company_name`, `first_name`, `family_name`, `birthdate`, `service_id` and
   `service_uuid` attributes (for eIDAS with company)
+
+The `bsn` client scope also exposes the eHerkenning attributes under the default
+claim names of the eHerkenning OIDC configuration
+(`urn:etoegang:core:LegalSubjectID`, `urn:etoegang:core:ActingSubjectID`,
+`urn:etoegang:1.9:ServiceRestriction:Vestigingsnr` and `namequalifier`), so the
+eHerkenning client works without overriding its claim paths.
 
 ## Exporting the Realm
 

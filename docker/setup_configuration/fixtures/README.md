@@ -1,7 +1,7 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Six unrelated things live here, all loaded by `bin/setup_configuration.sh` right
-after `manage.py setup_configuration` (and mirrored in
+Seven unrelated things live here, all loaded by `bin/setup_configuration.sh`
+right after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
 ## `openzaak_config.json`
@@ -59,6 +59,20 @@ and a new-message notification.
 Log in via DigiD as `testuser`/`testuser` and open the homepage to see them
 under "Openstaande acties".
 
+## `eherkenning.json`
+
+Two pre-registered eHerkenning users, matching the Keycloak `kvk` and
+`vestiging` users (see `docker/keycloak/README.md`), so logging in with them
+skips the registration ("necessary fields") form:
+
+- KvK `68750110` without a vestiging (`kvk` / `kvk`);
+- KvK `68750110` with vestiging `000037178598` (`vestiging` / `vestiging`).
+
+Both have a verified email address, and an unusable password (they can only log
+in through eHerkenning). `company_name` is pre-filled, but is refreshed from the
+KvK sandbox on every login. Not templated, for the same reason as
+`samenwerken.json`.
+
 ## `notifications.json`
 
 A `Subscription` (plus a placeholder `zgw_consumers.Service` for its required
@@ -106,6 +120,7 @@ docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/eherkenning.json
 ```
 
 or, for `up --localhost`:
@@ -116,4 +131,5 @@ python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.js
 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/producten.json
+python src/manage.py loaddata docker/setup_configuration/fixtures/eherkenning.json
 ```

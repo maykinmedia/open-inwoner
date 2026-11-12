@@ -276,11 +276,11 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self._assert_active_session(page.context, user)
 
     def test_eherkenning_vestiging_login(self):
-        """eHerkenning branch login via `eherkenning-vestiging` -> kvk + vestiging."""
+        """eHerkenning branch login via `vestiging` -> kvk + vestiging."""
         page = self._login(
             link_selector=".link--eherkenning",
-            username="eherkenning-vestiging",
-            password="eherkenning-vestiging",
+            username="vestiging",
+            password="vestiging",
             callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
@@ -291,15 +291,15 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self._assert_active_session(page.context, user)
 
     def test_eherkenning_rechtspersoon_login(self):
-        """eHerkenning legal-entity login via `eherkenning-rechtspersoon`.
+        """eHerkenning legal-entity login via `kvk`.
 
         This realm user carries kvk (legalSubjectID) but no `vestiging` claim, so
         the resulting user has a kvk and an empty vestiging (not branch-restricted).
         """
         page = self._login(
             link_selector=".link--eherkenning",
-            username="eherkenning-rechtspersoon",
-            password="eherkenning-rechtspersoon",
+            username="kvk",
+            password="kvk",
             callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
@@ -376,8 +376,8 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
 
         self._login(
             link_selector=".link--eherkenning",
-            username="eherkenning-vestiging",
-            password="eherkenning-vestiging",
+            username="vestiging",
+            password="vestiging",
             callback_path="/eherkenning-oidc/callback/",
             activate_zakelijk=True,
         )
