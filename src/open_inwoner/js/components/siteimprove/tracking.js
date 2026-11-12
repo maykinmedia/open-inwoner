@@ -1,15 +1,15 @@
 /**
- * Note from Siteimprove documentation: the _sz push object has this structure:
- * "_sz.push(['event', 'CATEGORY', 'ACTION', 'LABEL']);"
+ * Note from Siteimprove documentation: the window._sz push object has this structure:
+ * "window._sz.push(['event', 'CATEGORY', 'ACTION', 'LABEL']);"
  * In this code we are setting both generic eventlisteners for tracking interactions,
  * and overwriting very specific parts of the object, like the category, label etc.,
  * in order to organize them for the Siteimprove Dashboard where they are grouped by category
  */
 
-if (window.IS_DEV && typeof _sz === 'undefined') {
+if (window.IS_DEV && typeof window._sz === 'undefined') {
   console.log('*** Running in development mode. ***');
-  /** Mock SiteImprove `_sz` object for testing - only used during development */
-  var _sz = {
+  /** Mock SiteImprove `window._sz` object for testing - only used during development */
+  window._sz = {
     push: function (data) {
       try {
         console.log('Event pushed to _sz:', data);
@@ -573,8 +573,8 @@ const keydownSelectors = {
     function handleSelectors(eventType, target, selectors) {
       for (const [selector, data] of Object.entries(selectors)) {
         if (target.matches(selector)) {
-          if (typeof _sz !== 'undefined') {
-            _sz.push(data);
+          if (typeof window._sz !== 'undefined') {
+            window._sz.push(data);
           } else {
             console.warn('_sz is not defined');
           }
@@ -683,14 +683,14 @@ const keydownSelectors = {
         }
       }
 
-      if (eventData && typeof _sz !== 'undefined') {
-        _sz.push(eventData);
+      if (eventData && typeof window._sz !== 'undefined') {
+        window._sz.push(eventData);
       } else if (eventData) {
         console.warn('_sz is not defined');
       }
     }
 
-    if (typeof _sz !== 'undefined') {
+    if (typeof window._sz !== 'undefined') {
       window.addEventListener('click', trackEvent);
       window.addEventListener('change', trackEvent);
       window.addEventListener('keydown', (event) => {
