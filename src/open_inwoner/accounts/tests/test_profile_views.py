@@ -13,6 +13,7 @@ import requests_mock
 from django_webtest import WebTest
 from freezegun import freeze_time
 from pyquery import PyQuery
+from structlog.testing import capture_logs
 from webtest import Upload
 
 from open_inwoner.accounts.brp import BRPData
@@ -98,7 +99,36 @@ class ProfileViewTests(WebTest):
         self.profile_app = ProfileConfig.objects.create(
             namespace=ProfileApphook.app_name
         )
-        cms_tools.create_apphook_page(ProfileApphook)
+        self.profile_page = cms_tools.create_apphook_page(ProfileApphook)
+
+    def test_warning_logged_when_no_config_matches_page_namespace(self):
+        # Page keeps namespace "profile", the config gets a name that does not match
+        self.profile_app.namespace = "Mijn Profiel"
+        self.profile_app.save()
+
+        with capture_logs() as logs:
+            response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            {
+                "event": "apphook_config_not_found",
+                "namespace": "profile",
+                "path": self.url,
+                "page_id": self.profile_page.pk,
+                "apphook": "ProfileApphook",
+                "available_namespaces": ["Mijn Profiel"],
+                "log_level": "warning",
+            },
+            logs,
+        )
+
+    def test_no_warning_logged_when_config_matches_page_namespace(self):
+        with capture_logs() as logs:
+            response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("apphook_config_not_found", [log["event"] for log in logs])
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -212,6 +242,69 @@ class ProfileViewTests(WebTest):
         )
         self.assertContains(response, "1 acties staan open")
         self.assertContains(response, reverse("products:questionnaire_list"))
+
+    @patch(
+        "open_inwoner.accounts.views.profile.products_page_is_published",
+        return_value=True,
+    )
+    @patch(
+        "open_inwoner.accounts.views.profile.case_page_is_published",
+        return_value=True,
+    )
+    @patch(
+        "open_inwoner.accounts.views.profile.benefits_page_is_published",
+        return_value=True,
+    )
+    def test_overview_cards_follow_profile_config(self, *mocks):
+        # Selectors per config field. Questions and selfdiagnose are matched on
+        # their link, as both cards share the id "profile-section-questions".
+        cards = {
+            "selected_categories": "#profile-selected-categories",
+            "mentors": "#profile-section-mentors",
+            "my_contacts": "#profile-section-contacts",
+            "actions": "#profile-section-actions",
+            "ssd": "#profile-section-ssd",
+            "questions": f'a[href="{reverse("cases:contactmoment_list")}"]',
+            "selfdiagnose": f'a[href="{reverse("products:questionnaire_list")}"]',
+            "appointments": "#profile-section-appointments",
+        }
+        # Other gates on these cards, so that only the config decides
+        QuestionnaireStepFactory(published=True)
+
+        # Each toggle is switched off with all others on: the overview section
+        # itself is only rendered when at least one of its cards is enabled
+        for field in cards:
+            with self.subTest(disabled=field):
+                for other in cards:
+                    setattr(self.profile_app, other, other != field)
+                self.profile_app.save()
+
+                response = self.app.get(self.url, user=self.user)
+
+                overview = response.pyquery(".profile-section__overview")
+                self.assertEqual(
+                    {
+                        name: bool(overview.find(selector))
+                        for name, selector in cards.items()
+                    },
+                    {name: name != field for name in cards},
+                )
+
+    def test_mydata_not_shown_when_disabled_in_profile_config(self):
+        self.profile_app.my_data = False
+        self.profile_app.save()
+        user = UserFactory(
+            bsn="999993847",
+            first_name="name",
+            last_name="surname",
+            is_prepopulated=True,
+            login_type=LoginTypeChoices.digid,
+        )
+
+        response = self.app.get(self.url, user=user)
+
+        self.assertNotContains(response, _("Bekijk alle gegevens"))
+        self.assertNotContains(response, reverse("profile:data"))
 
     def test_only_open_actions(self):
         ActionFactory(created_by=self.user, status=StatusChoices.closed)
@@ -1744,6 +1837,16 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         response = self.app.get(self.profile_url, user=self.user)
 
         self.assertNotIn("newsletter-form", response.forms)
+
+    def test_do_not_render_form_if_disabled_in_profile_config(self, m):
+        self.setUpMocks(m)
+        self.profile_app.newsletters = False
+        self.profile_app.save()
+
+        response = self.app.get(self.profile_url, user=self.user)
+
+        self.assertNotIn("newsletter-form", response.forms)
+        self.assertEqual(response.pyquery("#profile-newsletters"), [])
 
     def test_do_not_render_form_if_no_newsletters_are_found(self, m):
         m.get("https://laposta.local/api/v2/list", json=[])

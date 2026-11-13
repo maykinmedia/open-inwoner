@@ -12,10 +12,10 @@ from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 import structlog
-from aldryn_apphooks_config.mixins import AppConfigMixin
 from view_breadcrumbs import BaseBreadcrumbMixin
 from zgw_consumers.client import build_client as build_zgw_client
 
+from open_inwoner.cms.utils.apphook_config import ApphookConfigMixin
 from open_inwoner.utils.views import get_cms_page_title
 
 from .api_models import AfvalProfiel
@@ -27,7 +27,7 @@ logger = structlog.stdlib.get_logger(__name__)
 
 
 class AfvalProfielView(
-    LoginRequiredMixin, BaseBreadcrumbMixin, AppConfigMixin, TemplateView
+    LoginRequiredMixin, BaseBreadcrumbMixin, ApphookConfigMixin, TemplateView
 ):
     template_name = "pages/mijn_afval/afval-profiel.html"
 
