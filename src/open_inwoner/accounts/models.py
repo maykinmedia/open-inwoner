@@ -57,6 +57,10 @@ if TYPE_CHECKING:
 # Content
 ###
 
+# Users with these login types may share an email address with each other
+# (but not with users of any other login type).
+EMAIL_SHAREABLE_LOGIN_TYPES = (LoginTypeChoices.digid, LoginTypeChoices.eherkenning)
+
 
 def generate_uuid_image_name(instance, filename):
     filename, file_extension = os.path.splitext(filename)
@@ -213,6 +217,32 @@ class User(AbstractBaseUser, PermissionsMixin):
             .first()
         )
         return da or ""
+
+    def email_taken_by_other_user(self, value: str) -> bool:
+        """
+        Whether ``value`` is already in use as an email by another user.
+
+        This is the single source of truth for email uniqueness. It compares
+        case-insensitively against both ``User.email`` and every email
+        ``DigitalAddress`` (standard or not) of all other users, because the
+        database enforces uniqueness on both tables.
+
+        Users with a login type in ``EMAIL_SHAREABLE_LOGIN_TYPES`` may share an
+        email with each other, but never with a user of another login type.
+        Users of any other login type may not share an email with anyone.
+        """
+        matches = User.objects.filter(
+            Q(email__iexact=value)
+            | Q(
+                digital_addresses__type=DigitalAddressType.email,
+                digital_addresses__value__iexact=value,
+            )
+        )
+        if self.pk:
+            matches = matches.exclude(pk=self.pk)
+        if self.login_type in EMAIL_SHAREABLE_LOGIN_TYPES:
+            matches = matches.exclude(login_type__in=EMAIL_SHAREABLE_LOGIN_TYPES)
+        return matches.exists()
 
     @transaction.atomic
     def update_email(self, value: str) -> None:
@@ -520,13 +550,21 @@ class User(AbstractBaseUser, PermissionsMixin):
                 }
             )
 
+        if self.pk:
+            stored_email = (
+                User.objects.filter(pk=self.pk).values_list("email", flat=True).first()
+            )
+            # Only validate uniqueness when the email actually changes. Model
+            # forms that don't include the email field (e.g. the profile and
+            # notification forms) still run this clean(), and an error keyed
+            # on "email" there crashes the form with a ValueError instead of
+            # showing a validation error.
+            if stored_email == self.email:
+                return
+
         existing_users = User.objects.filter(email__iexact=self.email)
         if self.pk:
             existing_users = existing_users.exclude(pk=self.pk)
-
-        # no duplicates
-        if not existing_users:
-            return
 
         # account has been deactivated
         for user in existing_users:
@@ -535,22 +573,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                     {"email": ValidationError(_("This account has been deactivated"))}
                 )
 
-        # all accounts with duplicate emails have login_type digid or eHerkenning
-        if self.login_type in (
-            LoginTypeChoices.digid,
-            LoginTypeChoices.eherkenning,
-        ):
-            for user in existing_users:
-                if user.login_type not in (
-                    LoginTypeChoices.digid,
-                    LoginTypeChoices.eherkenning,
-                ):
-                    # some account does not have login_type digid or eHerkenning
-                    raise ValidationError(
-                        {"email": ValidationError(_("This email is already taken."))}
-                    )
-        else:
-            # non-digid must be unique
+        if self.email_taken_by_other_user(self.email):
             raise ValidationError(
                 {"email": ValidationError(_("This email is already taken."))}
             )

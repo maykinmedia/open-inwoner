@@ -403,7 +403,7 @@ class eSuiteKlantenService(
             if (
                 klant.emailadres
                 and klant.emailadres != user.email
-                and (not User.objects.filter(email__iexact=klant.emailadres).exists())
+                and not user.email_taken_by_other_user(klant.emailadres)
             ):
                 user.update_email(klant.emailadres)
                 changed_fields.append("email")
@@ -1967,9 +1967,7 @@ class OpenKlant2Service(
                 # UUID unknown -> create new address + mapping, unless the email is owned by another user
                 if (
                     digital_address_type == DigitalAddressType.email
-                    and User.objects.filter(email__iexact=value)
-                    .exclude(pk=user.pk)
-                    .exists()
+                    and user.email_taken_by_other_user(value)
                 ):
                     logger.debug(
                         "skipping remote email address: already owned by another user",
@@ -2038,10 +2036,9 @@ class OpenKlant2Service(
             # user.preferred_address) in sync with the remote standard addresses.
             email_uuid = remote_standard_uuid_by_type[DigitalAddressType.email]
             if email_uuid and (email_address := local_by_uuid.get(email_uuid)):
-                if email_address.value != user.email and not (
-                    User.objects.filter(email__iexact=email_address.value)
-                    .exclude(pk=user.pk)
-                    .exists()
+                if (
+                    email_address.value != user.email
+                    and not user.email_taken_by_other_user(email_address.value)
                 ):
                     user.email = email_address.value
                     result.user_fields_updated.add("email")

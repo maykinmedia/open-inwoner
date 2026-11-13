@@ -68,11 +68,9 @@ class _UserChangeForm(UserChangeForm):
         ):
             raise ValidationError(_("Only a 'begeleider' user can add an image."))
 
-        if cleaned_data.get("email") and (
-            User.objects.filter(email__iexact=cleaned_data["email"])
-            and self.instance.email != cleaned_data["email"]
-        ):
-            raise ValidationError(_("The user with this email already exists."))
+        # Email uniqueness is validated by User.clean(), which runs as part of
+        # the model form validation.
+        return cleaned_data
 
 
 class _UserCreationForm(UserCreationForm):
@@ -222,6 +220,13 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "groups",
         "user_permissions",
     )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Writing User.email directly leaves the standard email DigitalAddress
+        # (which the profile page and OpenKlant sync read from) out of sync.
+        if obj.email and "email" in form.changed_data:
+            obj.update_email(obj.email)
 
 
 admin.site.unregister(Group)
