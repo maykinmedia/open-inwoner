@@ -1,0 +1,12 @@
+Documenten van een zaak downloaden geeft niet langer een foutmelding (of een
+HTML-bestand in plaats van het document) wanneer de Documenten API of een
+tussenliggende gateway het bestand gecomprimeerd (bijv. gzip) verstuurt. De
+bestandsgrootte wordt nu gecontroleerd op de gedecomprimeerde inhoud in plaats
+van op de ``Content-Length`` header. Als een document echt niet gedownload kan
+worden, ziet de gebruiker nu de foutmelding op de zaakpagina in plaats van een
+gedownload HTML-bestand.
+Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
+gebruiker nu dat de service tijdelijk niet beschikbaar is, in plaats van een
+"pagina niet gevonden"-melding.
+Documenten waarvan het formaat geen geldig MIME-type is, worden nu altijd
+gedownload in plaats van in de browser getoond.

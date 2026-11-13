@@ -1,5 +1,9 @@
+import gzip
+from contextlib import contextmanager
 from datetime import date
 from io import BytesIO
+from unittest.mock import patch
+from uuid import UUID
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -7,9 +11,11 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+import requests
 import requests_mock
 from django_webtest import TransactionWebTest
 from privates.test import temp_private_root
+from structlog.testing import capture_logs
 from timeline_logger.models import TimelineLog
 from zgw_consumers.api_models.constants import (
     RolOmschrijving,
@@ -20,6 +26,7 @@ from zgw_consumers.constants import AuthTypes
 
 from open_inwoner.accounts.choices import LoginTypeChoices
 from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.cases.metrics import case_document_download_refusals
 from open_inwoner.components.file_item import FileItem
 from open_inwoner.openzaak.clients import build_documenten_clients, build_zaken_clients
 from open_inwoner.openzaak.exceptions import ZgwAPIClientError, ZgwAPIServerError
@@ -50,6 +57,17 @@ def get_temporary_text_file():
     )
     text_file.seek(0)
     return text_file
+
+
+@contextmanager
+def capture_download_logs():
+    # capture_logs() also picks up unrelated logs, e.g. the request logs
+    download_logs = []
+    with capture_logs() as logs:
+        yield download_logs
+    download_logs.extend(
+        log for log in logs if log["event"].startswith("case_download_document_")
+    )
 
 
 @temp_private_root()
@@ -369,6 +387,36 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             response.headers["Content-Length"], str(len(self.informatie_object_content))
         )
 
+    def test_document_download_falls_back_to_octet_stream_for_invalid_format(self, m):
+        url = reverse(
+            "cases:document_download",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "info_id": self.informatie_object["uuid"],
+                "api_group_id": self.api_group.id,
+            },
+        )
+        for formaat, expected_content_type in (
+            ("text/plain; charset=utf-8", "text/plain; charset=utf-8"),
+            ("", "application/octet-stream"),
+            ("txt", "application/octet-stream"),
+            ("Platte tekst", "application/octet-stream"),
+            ("text/plain\r\nX-Injected: 1", "application/octet-stream"),
+            ("text/plain\n; x", "application/octet-stream"),
+            ("text/plain; a\rX-Injected: 1", "application/octet-stream"),
+            (" application/pdf ", "application/pdf"),
+            ("APPLICATION/PDF", "APPLICATION/PDF"),
+        ):
+            with self.subTest(formaat=formaat):
+                self.informatie_object["formaat"] = formaat
+                self._setUpMocks(m)
+
+                response = self.app.get(url, user=self.user)
+
+                self.assertEqual(
+                    response.headers["Content-Type"], expected_content_type
+                )
+
     def test_document_retrieval_logs_case_identification_and_file(self, m):
         self._setUpMocks(m)
         url = reverse(
@@ -390,7 +438,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         )
         self.assertEqual(log.extra_data["message"], expected)
 
-    def test_document_content_with_bad_status_is_http_403(self, m):
+    @patch.object(case_document_download_refusals, "add")
+    def test_document_content_with_bad_status_is_http_403(self, m, mock_refusals):
         self._setUpAccessMocks(m)
 
         info_object = generate_oas_component_cached(
@@ -412,7 +461,25 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
                 "api_group_id": self.api_group.id,
             },
         )
-        self.app.get(url, user=self.user, status=403)
+        with capture_download_logs() as logs:
+            self.app.get(url, user=self.user, status=403)
+
+        self.assertEqual(
+            logs,
+            [
+                {
+                    "event": "case_download_document_not_visible",
+                    "log_level": "info",
+                    "case_uuid": UUID(self.zaak["uuid"]),
+                    "info_object_uuid": info_object["uuid"],
+                    "info_object_status": "archief",
+                    "info_object_confidentiality": VertrouwelijkheidsAanduidingen.openbaar,
+                    "document_visible_statuses": self.config.document_visible_statuses,
+                    "document_max_confidentiality": self.config.document_max_confidentiality,
+                }
+            ],
+        )
+        mock_refusals.assert_called_once_with(1, {"reason": "not_visible"})
 
     def test_document_content_with_bad_confidentiality_is_http_403(self, m):
         self._setUpAccessMocks(m)
@@ -482,7 +549,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         m.get(self.zaaktype["url"], json=zaaktype_intern)
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
-    def test_no_data_is_retrieved_when_no_matching_case_info_object_is_found(self, m):
+    @patch.object(case_document_download_refusals, "add")
+    def test_no_data_is_retrieved_when_no_matching_case_info_object_is_found(
+        self, m, mock_refusals
+    ):
         m.get(self.zaak["url"], json=self.zaak)
         m.get(
             f"{ZAKEN_ROOT}rollen?zaak={self.zaak['url']}",
@@ -495,7 +565,21 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             # no case info objects found
             json=[],
         )
-        self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+        with capture_download_logs() as logs:
+            self.app.get(self.informatie_object_file.url, user=self.user, status=403)
+
+        self.assertEqual(
+            logs,
+            [
+                {
+                    "event": "case_download_document_not_linked_to_case",
+                    "log_level": "info",
+                    "case_uuid": UUID(self.zaak["uuid"]),
+                    "info_object_uuid": self.informatie_object["uuid"],
+                }
+            ],
+        )
+        mock_refusals.assert_called_once_with(1, {"reason": "not_linked_to_case"})
 
     def test_no_data_is_retrieved_when_backend_ignores_info_object_filter(self, m):
         m.get(self.zaak["url"], json=self.zaak)
@@ -523,36 +607,120 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             )
         )
 
-    def test_no_data_is_retrieved_when_info_object_http_404(self, m):
+    @patch.object(case_document_download_refusals, "add")
+    def test_no_data_is_retrieved_when_info_object_http_404(self, m, mock_refusals):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], status_code=404)
 
-        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
+        with capture_download_logs() as logs:
+            self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
-    def test_no_data_is_retrieved_when_info_object_http_500(self, m):
+        self.assertEqual(
+            logs,
+            [
+                {
+                    "event": "case_download_document_fetch_failed",
+                    "log_level": "warning",
+                    "case_uuid": UUID(self.zaak["uuid"]),
+                    "info_object_uuid": self.informatie_object["uuid"],
+                    "error_type": "ZgwAPIClientError",
+                    "status_code": 404,
+                }
+            ],
+        )
+        mock_refusals.assert_called_once_with(1, {"reason": "fetch_failed"})
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_service_unavailable_when_info_object_http_500(self, m, mock_refusals):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], status_code=500)
 
-        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
+        with capture_download_logs() as logs:
+            self.app.get(self.informatie_object_file.url, user=self.user, status=503)
 
-    def test_no_data_is_retrieved_when_document_download_data_http_404(self, m):
+        self.assertEqual(
+            logs,
+            [
+                {
+                    "event": "case_download_document_fetch_failed",
+                    "log_level": "error",
+                    "case_uuid": UUID(self.zaak["uuid"]),
+                    "info_object_uuid": self.informatie_object["uuid"],
+                    "error_type": "ZgwAPIServerError",
+                    "status_code": 500,
+                }
+            ],
+        )
+        mock_refusals.assert_called_once_with(1, {"reason": "fetch_failed"})
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_no_data_is_retrieved_when_document_download_data_http_404(
+        self, m, mock_refusals
+    ):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], status_code=404)
 
         self.app.get(self.informatie_object_file.url, user=self.user, status=404)
 
-    def test_no_data_is_retrieved_when_document_download_data_http_500(self, m):
+        mock_refusals.assert_called_once_with(1, {"reason": "content_fetch_failed"})
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_service_unavailable_when_document_download_data_http_500(
+        self, m, mock_refusals
+    ):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
         m.get(self.informatie_object["inhoud"], status_code=500)
 
-        self.app.get(self.informatie_object_file.url, user=self.user, status=404)
+        self.app.get(self.informatie_object_file.url, user=self.user, status=503)
 
-    def test_document_download_with_size_mismatch_shows_error(self, m):
+        mock_refusals.assert_called_once_with(1, {"reason": "content_fetch_failed"})
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_service_unavailable_when_document_download_data_network_error(
+        self, m, mock_refusals
+    ):
         self._setUpAccessMocks(m)
         m.get(self.informatie_object["url"], json=self.informatie_object)
-        # Content-Length differs from informatie_object["bestandsomvang"], triggering the mismatch
+        m.get(
+            self.informatie_object["inhoud"],
+            exc=requests.exceptions.ConnectTimeout("connect timed out"),
+        )
+
+        with capture_download_logs() as logs:
+            self.app.get(self.informatie_object_file.url, user=self.user, status=503)
+
+        # no status_code, as there was no HTTP response
+        self.assertEqual(
+            logs,
+            [
+                {
+                    "event": "case_download_document_content_fetch_failed",
+                    "log_level": "error",
+                    "case_uuid": UUID(self.zaak["uuid"]),
+                    "info_object_uuid": self.informatie_object["uuid"],
+                    "error_type": "ZgwAPINetworkError",
+                }
+            ],
+        )
+        mock_refusals.assert_called_once_with(1, {"reason": "content_fetch_failed"})
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_successful_download_is_not_counted_as_refused(self, m, mock_refusals):
+        self._setUpMocks(m)
+
+        with capture_download_logs() as logs:
+            self.app.get(self.informatie_object_file.url, user=self.user)
+
+        self.assertEqual(logs, [])
+        mock_refusals.assert_not_called()
+
+    @patch.object(case_document_download_refusals, "add")
+    def test_document_download_with_size_mismatch_shows_error(self, m, mock_refusals):
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        # body size differs from informatie_object["bestandsomvang"], triggering the mismatch
         content_wrong_length = b"wrong content"
         m.get(
             self.informatie_object["inhoud"],
@@ -577,6 +745,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
             "Het document kon niet worden gedownload vanwege een fout in de gegevens.",
             messages,
         )
+        mock_refusals.assert_called_once_with(1, {"reason": "size_mismatch"})
 
     def test_document_download_missing_bestandsomvang_still_returns_file(self, m):
         informatie_object_no_size = {**self.informatie_object, "bestandsomvang": None}
@@ -592,20 +761,72 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
         self.assertEqual(response.body, self.informatie_object_content)
 
-    def test_document_download_malformed_content_length_header_still_returns_file(
-        self, m
-    ):
+    def test_document_download_gzip_encoded_returns_decoded_file(self, m):
+        # Content-Length of a gzip encoded response is the compressed size, which
+        # differs from bestandsomvang even though the decoded file is complete
+        content = b"my document content " * 100
+        compressed = gzip.compress(content)
         self._setUpAccessMocks(m)
-        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["url"],
+            json={**self.informatie_object, "bestandsomvang": len(content)},
+        )
         m.get(
             self.informatie_object["inhoud"],
-            content=self.informatie_object_content,
-            headers={"Content-Length": "not-a-number"},
+            content=compressed,
+            headers={
+                "Content-Encoding": "gzip",
+                "Content-Length": str(len(compressed)),
+            },
         )
 
         response = self.app.get(self.informatie_object_file.url, user=self.user)
 
-        self.assertEqual(response.body, self.informatie_object_content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.body, content)
+        self.assertEqual(response.headers["Content-Length"], str(len(content)))
+
+    def test_document_download_gzip_encoded_with_size_mismatch_shows_error(self, m):
+        content = b"wrong content"
+        compressed = gzip.compress(content)
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(
+            self.informatie_object["inhoud"],
+            content=compressed,
+            headers={
+                "Content-Encoding": "gzip",
+                "Content-Length": str(len(compressed)),
+            },
+        )
+
+        response = self.app.get(
+            self.informatie_object_file.url,
+            user=self.user,
+            status=302,
+            auto_follow=False,
+        )
+
+        self.assertEqual(
+            response.location, f"/cases/{self.api_group.id}/{self.zaak['uuid']}/status/"
+        )
+
+    def test_document_download_chunked_with_size_mismatch_shows_error(self, m):
+        # without a Content-Length header (chunked transfer) the size is still checked
+        self._setUpAccessMocks(m)
+        m.get(self.informatie_object["url"], json=self.informatie_object)
+        m.get(self.informatie_object["inhoud"], content=b"wrong content")
+
+        response = self.app.get(
+            self.informatie_object_file.url,
+            user=self.user,
+            status=302,
+            auto_follow=False,
+        )
+
+        self.assertEqual(
+            response.location, f"/cases/{self.api_group.id}/{self.zaak['uuid']}/status/"
+        )
 
     def test_document_download_missing_content_length_header_still_returns_file(
         self, m

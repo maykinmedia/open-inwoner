@@ -50,7 +50,7 @@
                 {% enddropdown %}
             {% elif show_download %}
                 {% trans "Download" as download %}
-                {% link href=url text=download|add:" "|add:name primary=True download=True hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
+                {% link href=url text=download|add:" "|add:name primary=True download=download_attribute hide_text=True extra_classes="file__download" icon="download" icon_outlined=True icon_position="before" %}
             {% endif %}
             {% if description %}<nl-paragraph class-name="nl-paragraph--oip nl-paragraph--oip-small">{{ description }}</nl-paragraph>{% endif %}
         </div>

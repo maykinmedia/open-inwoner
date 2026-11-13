@@ -23,11 +23,18 @@ def file_list(files, **kwargs):
         + files: list[FileItem] | pre-converted FileItem objects to render.
         - h1: bool | render the title in a h1 instead of a h4.
         - title: string | the title that should be used.
+        - download_attribute: bool | render the download link with the HTML
+          `download` attribute (default True).
 
     Extra context:
         + show_download: bool | We enable the download button for the files.
     """
-    return {**kwargs, "files": files, "show_download": True}
+    return {
+        "download_attribute": True,
+        **kwargs,
+        "files": files,
+        "show_download": True,
+    }
 
 
 @register.inclusion_tag("components/File/FileTable.html")
@@ -58,6 +65,9 @@ def file_item(file: FileItem, **kwargs):
         + file: FileItem | the pre-converted file info to display.
         - allow_delete: bool | If you want to show a delete button.
         - show_download: bool | If you want to show the download button.
+        - download_attribute: bool | render the download link with the HTML
+          `download` attribute (default True). Disable it for views that may
+          respond with a redirect, which the browser would otherwise save as file.
     """
     if not isinstance(file, FileItem):
         raise TypeError(f"Expected a FileItem instance, got {type(file).__name__!r}")
@@ -71,5 +81,6 @@ def file_item(file: FileItem, **kwargs):
 
     if "show_download" not in context:
         context["show_download"] = True
+    context.setdefault("download_attribute", True)
 
     return context

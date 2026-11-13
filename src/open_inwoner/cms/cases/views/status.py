@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+import re
 from dataclasses import dataclass
 from typing import Iterable, Protocol, cast
 
@@ -13,6 +14,7 @@ from django.core.exceptions import (
 from django.http import (
     Http404,
     HttpRequest,
+    HttpResponse,
     HttpResponseRedirect,
     StreamingHttpResponse,
 )
@@ -45,7 +47,12 @@ from open_inwoner.openklant.services import (
     eSuiteVragenService,
 )
 from open_inwoner.openzaak.api_models import Status, StatusType, Zaak
-from open_inwoner.openzaak.exceptions import ZgwAPIError
+from open_inwoner.openzaak.exceptions import (
+    ZgwAPIClientError,
+    ZgwAPIError,
+    ZgwAPINetworkError,
+    ZgwAPIServerError,
+)
 from open_inwoner.openzaak.models import (
     OpenZaakConfig,
     ZaakTypeConfig,
@@ -59,9 +66,21 @@ from open_inwoner.utils.glom import glom_multiple
 from open_inwoner.utils.time import has_new_elements
 from open_inwoner.utils.views import CommonPageMixin, get_cms_page_title
 
-from .mixins import CaseAccessMixin, CaseLogMixin, OuterCaseAccessMixin
+from .mixins import (
+    CaseAccessMixin,
+    CaseLogMixin,
+    DocumentDownloadRefusalReason,
+    OuterCaseAccessMixin,
+    ServiceUnavailableResponse,
+)
 
 logger = structlog.stdlib.get_logger(__name__)
+
+# type "/" subtype using RFC 6838 section 4.2 restricted-names, optionally
+# followed by parameters (RFC 9110, section 8.3.1). Parameters are only checked
+# for line breaks, which would make the header invalid. Use with fullmatch().
+_NAME = r"[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]{0,126}"
+MIME_TYPE_PATTERN = re.compile(rf"{_NAME}/{_NAME}([ \t]*;[^\r\n]*)?")
 
 
 @dataclass
@@ -684,13 +703,16 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             raise Http404 from exc
 
         info_object_uuid = kwargs["info_id"]
+        log = logger.bind(case_uuid=self.zaak.uuid, info_object_uuid=info_object_uuid)
         service = ZGWService()
         try:
             info_object = service.fetch_information_object_by_uuid(
                 info_object_uuid, api_group
             )
         except ZgwAPIError as exc:
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.fetch_failed, exc
+            )
 
         # check if this info_object belongs to this zaak
         try:
@@ -698,8 +720,13 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
                 self.zaak.url, info_object.url, api_group
             )
         except ZgwAPIError as exc:
-            raise Http404 from exc
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.link_check_failed, exc
+            )
         if not is_linked:
+            self._log_refusal(
+                log.info, DocumentDownloadRefusalReason.not_linked_to_case
+            )
             raise PermissionDenied()
 
         # check if this info_object should be visible
@@ -709,41 +736,39 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             config.document_max_confidentiality,
             config.document_visible_statuses,
         ):
+            self._log_refusal(
+                log.info,
+                DocumentDownloadRefusalReason.not_visible,
+                info_object_status=info_object.status,
+                info_object_confidentiality=info_object.vertrouwelijkheidaanduiding,
+                document_visible_statuses=config.document_visible_statuses,
+                document_max_confidentiality=config.document_max_confidentiality,
+            )
             raise PermissionDenied()
 
         # retrieve and stream content
         try:
             content_stream = service.download_document(info_object.inhoud, api_group)
         except ZgwAPIError as exc:
-            raise Http404 from exc
-
-        # Validate the actual content length matches the expected size. Note that this
-        # is best-effort: if somehow content-length is malformed or bestandsomvang is
-        # missing, we revert to just streaming the file and hoping for the best (the
-        # behavior prior to introducing this check).
-        actual_content_length = content_stream.headers.get("Content-Length")
-        try:
-            parsed_content_length = (
-                int(actual_content_length) if actual_content_length else None
+            return self._api_error_response(
+                log, DocumentDownloadRefusalReason.content_fetch_failed, exc
             )
-        except (ValueError, TypeError):
-            logger.warning(
-                "Document content-length header is malformed",
-                info_object_uuid=info_object_uuid,
-                actual_content_length=actual_content_length,
-            )
-            parsed_content_length = None
 
+        # Check the size of the **decoded body**, not the Content-Length header, which
+        # is the size of the encoded body, e.g. when gzip is enabled.
+        actual_size = len(content_stream.content)
         if (
-            parsed_content_length is not None
-            and info_object.bestandsomvang is not None
-            and parsed_content_length != info_object.bestandsomvang
+            info_object.bestandsomvang is not None
+            and actual_size != info_object.bestandsomvang
         ):
-            logger.warning(
-                "Document size mismatch",
-                info_object_uuid=info_object_uuid,
+            self._log_refusal(
+                log.warning,
+                DocumentDownloadRefusalReason.size_mismatch,
                 expected_size=info_object.bestandsomvang,
-                actual_size=parsed_content_length,
+                actual_size=actual_size,
+                content_encoding=content_stream.headers.get("Content-Encoding"),
+                content_length=content_stream.headers.get("Content-Length"),
+                transfer_encoding=content_stream.headers.get("Transfer-Encoding"),
             )
             messages.error(
                 request,
@@ -763,15 +788,45 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
 
         self.log_case_document_downloaded(self.zaak, info_object.bestandsnaam)
 
+        # without a valid type the browser may render the content instead of
+        # downloading it
+        content_type = (info_object.formaat or "").strip()
+        if not MIME_TYPE_PATTERN.fullmatch(content_type):
+            content_type = "application/octet-stream"
+
         headers = {
             "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
-            "Content-Type": info_object.formaat,
+            "Content-Type": content_type,
         }
         if info_object.bestandsomvang is not None:
             headers["Content-Length"] = str(info_object.bestandsomvang)
 
         response = StreamingHttpResponse(content_stream, headers=headers)
         return response
+
+    def _log_refusal(
+        self, log_method, reason: DocumentDownloadRefusalReason, **fields
+    ) -> None:
+        log_method(f"case_download_document_{reason}", **fields)
+        self.log_case_document_download_refused(reason)
+
+    def _api_error_response(
+        self, log, reason: DocumentDownloadRefusalReason, exc: ZgwAPIError
+    ) -> HttpResponse:
+        fields = {"error_type": type(exc).__name__}
+        # only set for HTTP error responses
+        if exc.status_code is not None:
+            fields["status_code"] = exc.status_code
+
+        # A 404 means the link on the case page is broken: unexpected, but not an API
+        # failure
+        is_not_found = isinstance(exc, ZgwAPIClientError) and exc.status_code == 404
+        self._log_refusal(log.warning if is_not_found else log.error, reason, **fields)
+
+        # same handling as CaseAccessMixin: the API being down is not a missing document
+        if isinstance(exc, (ZgwAPIServerError, ZgwAPINetworkError)):
+            return ServiceUnavailableResponse(self.request)
+        raise Http404 from exc
 
     def handle_no_permission(self):
         # plain error and no redirect
