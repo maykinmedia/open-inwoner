@@ -26,6 +26,8 @@ Commands:
   up --mock        Disable the DigiD/eHerkenning OIDC clients, so the login
                    page uses the mock IdPs instead of Keycloak. Combines with
                    the options above. Plain `up` re-enables them.
+  up --no-build    Use the already-present app image instead of building it
+                   (e.g. one built and loaded by CI).
   down [args]      Stop and remove containers. Forwarded to
                    `docker compose down` (e.g. `bin/stack.sh down -v` to
                    also remove volumes).
@@ -196,6 +198,7 @@ case "$cmd" in
         logs=false
         localhost=false
         mock=false
+        build=true
         while [ $# -gt 0 ]; do
             case "$1" in
                 --logs)
@@ -208,6 +211,10 @@ case "$cmd" in
                     ;;
                 --localhost)
                     localhost=true
+                    shift
+                    ;;
+                --no-build)
+                    build=false
                     shift
                     ;;
                 *)
@@ -239,7 +246,13 @@ case "$cmd" in
         echo "==> Ensuring the shared open-inwoner-dev network exists"
         bin/ensure_dev_network.sh
 
-        if [ "$localhost" = false ]; then
+        up_args=()
+        if [ "$build" = false ]; then
+            up_args+=(--no-build)
+        fi
+
+        build_pid=""
+        if [ "$localhost" = false ] && [ "$build" = true ]; then
             echo
             echo "==> Building the app image in the background"
             # Explicit rebuild so a stale image never silently runs
@@ -353,13 +366,15 @@ case "$cmd" in
             exit 0
         fi
 
-        echo
-        echo "==> Waiting for the app image build to finish"
-        wait "$build_pid" || exit 1
+        if [ -n "$build_pid" ]; then
+            echo
+            echo "==> Waiting for the app image build to finish"
+            wait "$build_pid" || exit 1
+        fi
 
         echo
         echo "==> Starting the main app stack (web-init will now configure it)"
-        "${COMPOSE[@]}" up -d
+        "${COMPOSE[@]}" up -d "${up_args[@]}"
 
         echo
         echo "==> Setting the DigiD/eHerkenning OIDC clients to enabled=$oidc_enabled in the background"
