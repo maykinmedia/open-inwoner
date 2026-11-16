@@ -44,6 +44,10 @@ services:
       - CELERY_BROKER_URL=redis://openzaak-redis:6379/1
       - CELERY_RESULT_BACKEND=redis://openzaak-redis:6379/1
       - NOTIFICATIONS_DISABLED=true
+      # The image defaults to the nginx backend, which answers document
+      # downloads with an X-Accel-Redirect header and no body. There is no
+      # nginx in front of this container, so let Django serve the file.
+      - SENDFILE_BACKEND=django_sendfile.backends.simple
       - JWT_EXPIRY=99999999999
       - JWT_LEEWAY=99999999999
       - CELERY_WORKER_CONCURRENCY=${CELERY_WORKER_CONCURRENCY:-2}
