@@ -1960,6 +1960,19 @@ class OpenKlant2Service(
                 local_address = local_by_uuid.get(remote_ok_uuid)
                 if local_address is not None:
                     if local_address.value != value:
+                        # Keep the current local value if the new one is owned
+                        # by another user.
+                        if (
+                            digital_address_type == DigitalAddressType.email
+                            and user.email_taken_by_other_user(value)
+                        ):
+                            logger.debug(
+                                "skipping remote email address update: already owned by another user",
+                                partij_uuid=partij_uuid,
+                                adres_uuid=remote_ok_uuid,
+                            )
+                            result.email_conflicts_skipped += 1
+                            continue
                         local_address.value = value
                         local_address.save(update_fields=["value"])
                         result.addresses_updated += 1
@@ -2037,6 +2050,10 @@ class OpenKlant2Service(
             # user.preferred_address) in sync with the remote standard addresses.
             email_uuid = remote_standard_uuid_by_type[DigitalAddressType.email]
             if email_uuid and (email_address := local_by_uuid.get(email_uuid)):
+                # Compared exactly (unlike the eSuite sync): the standard
+                # address was already updated in place in Phase 1, so a change
+                # in capitalisation has to be mirrored to keep user.email
+                # identical to its DigitalAddress.
                 if (
                     email_address.value != user.email
                     and not user.email_taken_by_other_user(email_address.value)

@@ -253,11 +253,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     def update_email(self, value: str) -> None:
         """Update email field and keep the standard email DigitalAddress in sync."""
         # Remove any non-standard email DA with this value first to avoid
-        # violating unique_digital_address_per_user_type_value.
+        # violating unique_digital_address_per_user_type_value. The match is
+        # case-insensitive, so the user doesn't end up with two capitalisations
+        # of the same address (which the profile form rejects as duplicates).
         self.digital_addresses.filter(
             type=DigitalAddressType.email,
             is_standard_for_type=False,
-            value=value,
+            value__iexact=value,
         ).delete()
         self.email = value
         self.save(update_fields=["email"])
@@ -556,15 +558,18 @@ class User(AbstractBaseUser, PermissionsMixin):
             )
 
         if self.pk:
-            stored_email = (
-                User.objects.filter(pk=self.pk).values_list("email", flat=True).first()
+            stored = (
+                User.objects.filter(pk=self.pk)
+                .values_list("email", "login_type")
+                .first()
             )
-            # Only validate uniqueness when the email actually changes. Model
-            # forms that don't include the email field (e.g. the profile and
-            # notification forms) still run this clean(), and an error keyed
-            # on "email" there crashes the form with a ValueError instead of
-            # showing a validation error.
-            if stored_email == self.email:
+            # Only validate uniqueness when the email or the login type (which
+            # determines whether the email may be shared) actually changes.
+            # Model forms that don't include the email field (e.g. the profile
+            # and notification forms) still run this clean(), and an error
+            # keyed on "email" there crashes the form with a ValueError instead
+            # of showing a validation error.
+            if stored == (self.email, self.login_type):
                 return
 
         existing_users = User.objects.filter(email__iexact=self.email)
