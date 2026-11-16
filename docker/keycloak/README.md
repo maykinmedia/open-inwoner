@@ -42,20 +42,49 @@ session" for as long as the previous session lives.
 
 **Users**
 
-- `testuser` / `testuser`, has the `bsn`, `kvk`, `name_qualifier`,
-  `legalSubjectID` and `actingSubjectID` attributes
-- `newuser` / `newuser`, same attributes as `testuser` but with BSN `444555666`
-  and KvK `087654321`, which no seeded user or satellite service knows about.
-  Use it to walk through first-login registration from a blank state; `testuser`
-  is pre-registered instead.
+Every user's password is the same as its username.
+
+The DigiD and eHerkenning users come in three classes: pre-registered ones (an
+Open Inwoner user already exists, so login goes straight to the homepage), a
+second pre-registered one to compare against, and "new" ones that no seeded user
+or satellite service knows about, for walking through first-login registration
+from a blank state. The pre-registered Open Inwoner users are loaded from
+`docker/setup_configuration/fixtures/`; see the README there for those and for
+which cases each user has in Open Zaak.
+
+DigiD (the `bsn` claim):
+
+| User     | BSN         | Registered | Notes                                                                                                                             |
+| -------- | ----------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `bsn`    | `111222333` | yes        | The main citizen: all seeded demo data (cases, plans, messages, appointments, waste calendar, ...) hangs off this BSN.            |
+| `bsn2`   | `123456782` | yes        | A second citizen, to check that one citizen does not see another's data.                                                          |
+| `bsnnew` | `444555666` | no         | Unknown everywhere; registration starts with an empty form.                                                                       |
+| `bsnbrp` | `999993847` | no         | Unknown to Open Inwoner, but present in the test set of the BRP mock (`personen-mock`), so registration is pre-filled from there. |
+
+eHerkenning (the `legalSubjectID`, `actingSubjectID`, `name_qualifier`,
+`service_id` and `service_uuid` attributes; branch users also have `vestiging`
+and `representeeBSN`):
+
+| User           | KvK        | Vestiging      | Registered | Notes                                                       |
+| -------------- | ---------- | -------------- | ---------- | ----------------------------------------------------------- |
+| `kvk`          | `68750110` | -              | yes        | Legal entity without a branch restriction (Test BV Donald). |
+| `kvk2`         | `68727720` | -              | yes        | A second, unrelated company (Test NV Katrien).              |
+| `vestiging`    | `68750110` | `000037178598` | yes        | Restricted to the main branch of the `kvk` company.         |
+| `vestiging2`   | `68750110` | `000037178601` | yes        | Restricted to the other branch of the `kvk` company.        |
+| `kvknew`       | `69599084` | -              | no         | Unknown to Open Inwoner and Open Zaak (Test EMZ Dagobert).  |
+| `vestigingnew` | `69599084` | `000038509504` | no         | Same company as `kvknew`, with a branch restriction.        |
+
+The KvK numbers are companies from the KvK sandbox, which Open Inwoner queries
+for the company and branch name on login.
+
+`bsn` and `bsnnew` also still have a `kvk` and a `legalSubjectID` attribute
+(`12345678` and `87654321`), so they can log in through eHerkenning too; prefer
+the dedicated users above.
+
+Others:
+
 - `digid-machtigen` / `digid-machtigen`, has the `aanvrager.bsn`,
   `gemachtigde.bsn` and `service_id` attributes (for DigiD machtigen)
-- `vestiging` / `vestiging`, has the `legalSubjectID` (kvk), `actingSubjectID`
-  (pseudo ID), `representeeBSN`, `service_id`, `service_uuid`, `name_qualifier`
-  and `vestiging` attributes (for eHerkenning with a branch restriction).
-- `kvk` / `kvk`, a legal entity with the `legalSubjectID` (kvk),
-  `actingSubjectID` and `name_qualifier` attributes but NO `vestiging` claim
-  (for eHerkenning without a branch restriction).
 - `admin` / `admin`, intended to create as django user (can be made staff). The
   email address is `admin@example.com`. Should get the `employeeId` claim (See
   below for how to add the custom claim).

@@ -11,5 +11,4 @@ under `/app/fixtures/` on every start -- no `*-seed` service needed.
   `src/open_inwoner/cms/plugins/api_models/externe_formulier_taak.json`).
 - `fixtures/objects_api_fixtures.json` holds the API tokens/permissions plus
   three demo "Extern Formulier Taak" objects for BSN `111222333` (the DigiD-mock
-  `testuser`) -- log in locally and open the homepage to see them under "Mijn
-  taken".
+  `bsn`) -- log in locally and open the homepage to see them under "Mijn taken".

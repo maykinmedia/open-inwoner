@@ -263,11 +263,11 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
     # -- login creates a user + establishes a session --------------------------
 
     def test_digid_login(self):
-        """DigiD (BSN) via `testuser` -> bsn 111222333, logged in."""
+        """DigiD (BSN) via `bsn` -> bsn 111222333, logged in."""
         page = self._login(
             link_selector=".link--digid",
-            username="testuser",
-            password="testuser",
+            username="bsn",
+            password="bsn",
             callback_path="/digid-oidc/callback/",
         )
 
@@ -362,8 +362,8 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
 
         self._login(
             link_selector=".link--digid",
-            username="testuser",
-            password="testuser",
+            username="bsn",
+            password="bsn",
             callback_path="/digid-oidc/callback/",
         )
 

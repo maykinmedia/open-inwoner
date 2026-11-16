@@ -126,7 +126,7 @@ shared acceptance environments:
 - ``docker/docker-compose.qmatic-mock.yml`` -- a small Flask-based mock of the
   Qmatic Orchestra Calendar API backing the "Mijn afspraken" profile page
   (see ``open_inwoner.qmatic``), with upcoming appointments for the DigiD
-  ``testuser``
+  ``bsn``
 - ``docker/docker-compose.openklant.yml`` -- Open Klant (Klantinteracties and
   Contactmomenten APIs)
 - ``docker/docker-compose.openafval.yml`` -- `Open Afval
