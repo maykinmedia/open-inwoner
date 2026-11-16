@@ -13,3 +13,7 @@ worden, in plaats van een "pagina niet gevonden"-melding.
 Documenten waarvan het formaat geen geldig MIME-type is, worden nu aangeboden
 als ``application/octet-stream``, in plaats van met een ongeldige
 ``Content-Type`` header of een serverfout.
+
+Documenten met een bestandsnaam met bijzondere tekens (bijv. ``€`` of
+aanhalingstekens) worden nu gedownload met de juiste bestandsnaam, in plaats van
+in de browser geopend.
