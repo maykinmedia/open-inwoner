@@ -1,0 +1,1 @@
+De metric ``oip.accounts.user_count`` herstelt zich nu vanzelf nadat de databaseverbinding is weggevallen. Voorheen bleef de applicatie na bijvoorbeeld een herstart van de database elke minuut de foutmelding ``connection already closed`` loggen, totdat de applicatie zelf werd herstart.

@@ -1,5 +1,6 @@
 from collections.abc import Collection
 
+from django.db import connections
 from django.db.models import Count, Q
 
 from opentelemetry import metrics
@@ -11,17 +12,23 @@ meter = metrics.get_meter("open_inwoner.accounts")
 
 
 def count_users(options: metrics.CallbackOptions) -> Collection[metrics.Observation]:
-    counts: dict[str, int] = User.objects.aggregate(
-        total=Count("id"),
-        staff=Count("id", filter=Q(is_staff=True)),
-        superuser=Count("id", filter=Q(is_superuser=True)),
-        login_default=Count("id", filter=Q(login_type=LoginTypeChoices.default)),
-        login_digid=Count("id", filter=Q(login_type=LoginTypeChoices.digid)),
-        login_eherkenning=Count(
-            "id", filter=Q(login_type=LoginTypeChoices.eherkenning)
-        ),
-        login_oidc=Count("id", filter=Q(login_type=LoginTypeChoices.oidc)),
-    )
+    # This runs on the metric reader thread, where nothing closes dead or
+    # expired connections, so a connection kept between runs is never replaced
+    # once the database drops it.
+    try:
+        counts: dict[str, int] = User.objects.aggregate(
+            total=Count("id"),
+            staff=Count("id", filter=Q(is_staff=True)),
+            superuser=Count("id", filter=Q(is_superuser=True)),
+            login_default=Count("id", filter=Q(login_type=LoginTypeChoices.default)),
+            login_digid=Count("id", filter=Q(login_type=LoginTypeChoices.digid)),
+            login_eherkenning=Count(
+                "id", filter=Q(login_type=LoginTypeChoices.eherkenning)
+            ),
+            login_oidc=Count("id", filter=Q(login_type=LoginTypeChoices.oidc)),
+        )
+    finally:
+        connections.close_all()
     return (
         metrics.Observation(
             counts["total"],
