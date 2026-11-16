@@ -420,6 +420,37 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
                     response.headers["Content-Type"], expected_content_type
                 )
 
+    def test_document_download_escapes_filename_in_content_disposition(self, m):
+        url = reverse(
+            "cases:document_download",
+            kwargs={
+                "object_id": self.zaak["uuid"],
+                "info_id": self.informatie_object["uuid"],
+                "api_group_id": self.api_group.id,
+            },
+        )
+        for bestandsnaam, expected_content_disposition in (
+            ("my document.txt", 'attachment; filename="my document.txt"'),
+            ('my "document".txt', 'attachment; filename="my \\"document\\".txt"'),
+            # not latin-1: Django would MIME-encode the whole header value
+            ("brief €.txt", "attachment; filename*=utf-8''brief%20%E2%82%AC.txt"),
+            ("brief é.txt", "attachment; filename*=utf-8''brief%20%C3%A9.txt"),
+            ("my\ndocument.txt", "attachment; filename*=utf-8''my%0Adocument.txt"),
+            ("", "attachment"),
+        ):
+            with self.subTest(bestandsnaam=bestandsnaam):
+                # the informatieobject is cached between requests
+                self.clear_caches()
+                self.informatie_object["bestandsnaam"] = bestandsnaam
+                self._setUpMocks(m)
+
+                response = self.app.get(url, user=self.user)
+
+                self.assertEqual(
+                    response.headers["Content-Disposition"],
+                    expected_content_disposition,
+                )
+
     def test_document_retrieval_logs_case_identification_and_file(self, m):
         self._setUpMocks(m)
         url = reverse(
@@ -769,6 +800,9 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         response = self.app.get(self.informatie_object_file.url, user=self.user)
 
         self.assertEqual(response.body, self.informatie_object_content)
+        self.assertEqual(
+            response.headers["Content-Length"], str(len(self.informatie_object_content))
+        )
 
     def test_document_download_gzip_encoded_returns_decoded_file(self, m):
         # Content-Length of a gzip encoded response is the compressed size, which

@@ -2,6 +2,7 @@ import datetime as dt
 import os
 import re
 from dataclasses import dataclass
+from io import BytesIO
 from typing import Iterable, Protocol, cast
 
 from django.conf import settings
@@ -12,10 +13,10 @@ from django.core.exceptions import (
     PermissionDenied,
 )
 from django.http import (
+    FileResponse,
     Http404,
     HttpRequest,
     HttpResponseRedirect,
-    StreamingHttpResponse,
 )
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -743,7 +744,7 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
             )
             raise PermissionDenied()
 
-        # retrieve and stream content
+        # retrieve content
         try:
             content_stream = service.download_document(info_object.inhoud, api_group)
         except ZgwAPIError as exc:
@@ -781,15 +782,13 @@ class CaseDocumentDownloadView(CaseLogMixin, CaseAccessMixin, View):
         if not MIME_TYPE_PATTERN.fullmatch(content_type):
             content_type = "application/octet-stream"
 
-        headers = {
-            "Content-Disposition": f'attachment; filename="{info_object.bestandsnaam}"',
-            "Content-Type": content_type,
-        }
-        if info_object.bestandsomvang is not None:
-            headers["Content-Length"] = str(info_object.bestandsomvang)
-
-        response = StreamingHttpResponse(content_stream, headers=headers)
-        return response
+        # sets Content-Length and an escaped Content-Disposition
+        return FileResponse(
+            BytesIO(content_stream.content),
+            as_attachment=True,
+            filename=info_object.bestandsnaam,
+            content_type=content_type,
+        )
 
     def _log_refusal(
         self, log_method, reason: DocumentDownloadRefusalReason, **fields
