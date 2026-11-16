@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.models import Group
 from django.forms import ValidationError
 from django.urls import reverse
@@ -73,18 +73,6 @@ class _UserChangeForm(UserChangeForm):
         return cleaned_data
 
 
-class _UserCreationForm(UserCreationForm):
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean(*args, **kwargs)
-
-        if cleaned_data.get("email"):
-            # we use both queries in order to avoid the duplicate validation errors
-            if User.objects.filter(
-                email__iexact=cleaned_data["email"]
-            ) and not User.objects.filter(email=cleaned_data["email"]):
-                raise ValidationError(_("The user with this email already exists."))
-
-
 class DigitalAddressInline(admin.TabularInline):
     model = DigitalAddress
     extra = 0
@@ -103,7 +91,6 @@ class DigitalAddressInline(admin.TabularInline):
 @with_config_checks(FetchUserfeedCheck)
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
-    add_form = _UserCreationForm
     hijack_success_url = "/"
     list_display_links = (
         "email",

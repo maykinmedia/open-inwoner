@@ -65,8 +65,26 @@ class TestAdminUser(WebTest):
         form["password2"] = "Abc123!@#"
         response = form.submit("_save")
 
-        self.assertContains(response, _("The user with this email already exists."))
+        self.assertContains(response, _("This email is already taken."))
         self.assertEqual(User.objects.count(), 1)
+
+    def test_user_is_created_with_standard_digital_address(self):
+        response = self.app.get(reverse("admin:accounts_user_add"), user=self.user)
+        form = response.forms["user_form"]
+        form["email"] = "john2@example.com"
+        form["password1"] = "Abc123!@#"
+        form["password2"] = "Abc123!@#"
+        form.submit("_save")
+
+        new_user = User.objects.get(email="john2@example.com")
+        self.assertEqual(
+            list(
+                new_user.digital_addresses.values_list(
+                    "type", "value", "is_standard_for_type"
+                )
+            ),
+            [(DigitalAddressType.email, "john2@example.com", True)],
+        )
 
     def test_user_can_change_case_of_own_email(self):
         response = self.app.get(

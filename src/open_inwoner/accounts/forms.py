@@ -264,7 +264,18 @@ class BaseDigitalAddressFormSet(BaseInlineFormSet):
                 standard_count += 1
             # Unchanged addresses are skipped, so that a pre-existing conflict
             # in the data doesn't block the user from saving unrelated changes.
-            if form.instance.pk is None or "value" in form.changed_data:
+            # An existing address that is newly marked as primary does count
+            # as a change: it is about to be written to the user's flat field
+            # (for email: the address the user logs in with).
+            made_standard = (
+                form.cleaned_data.get("is_standard_for_type")
+                and "is_standard_for_type" in form.changed_data
+            )
+            if (
+                form.instance.pk is None
+                or "value" in form.changed_data
+                or made_standard
+            ):
                 self.clean_address(form, value)
 
         if active_count > 0 and standard_count == 0:

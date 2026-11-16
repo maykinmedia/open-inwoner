@@ -348,6 +348,31 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         )
         self.assertFalse(user.digital_addresses.exists())
 
+    def test_inbound_email_used_by_other_user_is_ignored(self):
+        other = UserFactory(email="other@example.com")
+        DigitalAddressFactory(user=other, value="other.secondary@example.com")
+        user = DigidUserFactory(email="user@example.com")
+
+        for emailadres in ("Other@Example.com", "Other.Secondary@example.com"):
+            with self.subTest(emailadres):
+                klant = self._make_klant(emailadres=emailadres)
+
+                self.service.update_user_from_klant(klant, user)
+
+                user.refresh_from_db()
+                self.assertEqual(user.email, "user@example.com")
+                self.assertFalse(user.digital_addresses.exists())
+
+    def test_inbound_email_may_be_shared_between_digid_users(self):
+        DigidUserFactory(email="shared@example.com", bsn="111222333")
+        user = DigidUserFactory(email="user@example.com")
+        klant = self._make_klant(emailadres="shared@example.com")
+
+        self.service.update_user_from_klant(klant, user)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, "shared@example.com")
+
     def test_inbound_primary_phone_creates_standard_digital_address(self):
         user = DigidUserFactory(phonenumber="0600000000")
         klant = self._make_klant(telefoonnummer="0611111111")

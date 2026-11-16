@@ -605,6 +605,27 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             {standard.value, "new@example.com"},
         )
 
+    def test_email_formset_rejects_making_address_of_other_user_primary(self):
+        # Pre-existing (legacy) additional address that conflicts with the
+        # login email of another user: keeping it is tolerated, but it may not
+        # become this user's login email.
+        UserFactory(email="taken@example.com")
+        self.user.update_email(self.user.email)
+        standard = self.user.digital_addresses.get(is_standard_for_type=True)
+        legacy = DigitalAddressFactory(user=self.user, value="Taken@Example.com")
+
+        response = self._post_emails(
+            self.user,
+            [(standard.value, False), (legacy.value, True)],
+            initial_pks=[standard.pk, legacy.pk],
+        )
+
+        self.assertEmailTaken(
+            response, [{}, {"value": [_("This email is already taken.")]}]
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, standard.value)
+
     # -------------------------------------------------------------------------
     # Saving address changes
     # -------------------------------------------------------------------------
