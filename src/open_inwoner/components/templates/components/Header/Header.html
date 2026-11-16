@@ -44,6 +44,8 @@
                         {% link text=link_text href="/" icon="home" icon_position="before" icon_outlined=True %}
                     </li>
 
+                    {{ rendered_cms_menu__home }}
+
                     {% if cms_apps.products %}
                         {% if request.user.is_authenticated or not config.hide_categories_from_anonymous_users %}
                             <li class="primary-navigation__list-item dropdown-nav__toggle">
@@ -67,8 +69,6 @@
                         {% endif %}
                     {% endif %}
 
-                    {{ rendered_cms_menu__home }}
-
                     {% if has_general_faq_questions %}
                         <li class="primary-navigation__list-item">
                             {% link text=_('Veelgestelde vragen') href='general_faq' icon="question_answer" icon_position="before" icon_outlined=True %}
@@ -77,7 +77,7 @@
                 </ul>
             </nav>
 
-            <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">
+            {% comment %} <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">
                 <div class="header__text-actions">
 
                     {% if request.user.is_authenticated %}
@@ -112,7 +112,7 @@
                 <nl-paragraph>Toegankelijkheid:</nl-paragraph>
                 {% accessibility_header request=request desktop=False %}
                 <span class="spacer"></span>
-            </section>
+            </section> {% endcomment %}
 
         </div>
         {# end of submenu items #}
