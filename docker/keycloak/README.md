@@ -49,8 +49,9 @@ Open Inwoner user already exists, so login goes straight to the homepage), a
 second pre-registered one to compare against, and "new" ones that no seeded user
 or satellite service knows about, for walking through first-login registration
 from a blank state. The pre-registered Open Inwoner users are loaded from
-`docker/setup_configuration/fixtures/`; see the README there for those and for
-which cases each user has in Open Zaak.
+`docker/setup_configuration/fixtures/`; see the README there for those, and
+`docker/open-zaak/fixtures/README.md` for which cases each user has in Open
+Zaak.
 
 DigiD (the `bsn` claim):
 

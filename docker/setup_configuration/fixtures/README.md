@@ -91,7 +91,8 @@ KvK sandbox on every login. Not templated, for the same reason as
 `rsin` is pre-filled as well (`857587973` for KvK `68750110`, `857567433` for
 KvK `68727720`), so "Mijn zaken" does not depend on the KvK sandbox being
 reachable: the stack fetches eHerkenning cases by RSIN
-(`fetch_eherkenning_zaken_with_rsin` in `data.yaml`).
+(`fetch_eherkenning_zaken_with_rsin` in `data.yaml`). See
+`docker/open-zaak/fixtures/README.md` for the cases each user has.
 
 The Keycloak `kvknew` and `vestigingnew` users (KvK `69599084`) have no
 counterpart here and start blank; `bin/setup_configuration.sh` removes any user
