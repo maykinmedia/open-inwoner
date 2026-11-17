@@ -7,7 +7,6 @@ pre-commit
 django-debug-toolbar
 
 # performance testing / profiling
-locust
 django-silk
 
 # VCR

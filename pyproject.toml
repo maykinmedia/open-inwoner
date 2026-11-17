@@ -50,7 +50,6 @@ exclude = [
     # Project specific
     "src/maykin_config_checks",
     "src/open_inwoner/conf/local.py",
-    "performance-tests",
     "bootstrap.py",
     "bin",
     "docs"
