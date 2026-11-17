@@ -819,7 +819,7 @@ mail-editor==0.3.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-mail-parser==3.15.0
+mail-parser==4.11.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
@@ -1328,11 +1328,6 @@ shellingham==1.5.4
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
     #   typer
-simplejson==3.19.2
-    # via
-    #   -c requirements/ci.txt
-    #   -r requirements/ci.txt
-    #   mail-parser
 six==1.16.0
     # via
     #   -c requirements/ci.txt
@@ -1341,7 +1336,6 @@ six==1.16.0
     #   django-elasticsearch-dsl
     #   furl
     #   isodate
-    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
