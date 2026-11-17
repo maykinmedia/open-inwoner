@@ -448,7 +448,7 @@ lxml==6.1.1
     #   xmlsec
 mail-editor==0.3.8
     # via -r requirements/base.in
-mail-parser==3.15.0
+mail-parser==4.11.0
     # via django-yubin
 markdown==3.10.2
     # via -r requirements/base.in
@@ -714,15 +714,12 @@ setuptools==80.10.2
     #   django-cms
 shellingham==1.5.4
     # via typer
-simplejson==3.19.2
-    # via mail-parser
 six==1.16.0
     # via
     #   click-repl
     #   django-elasticsearch-dsl
     #   furl
     #   isodate
-    #   mail-parser
     #   orderedmultidict
     #   python-dateutil
     #   qrcode
