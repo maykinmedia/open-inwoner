@@ -51,6 +51,3 @@ class SSDConfigAdmin(SingletonModelAdmin):
 
     class Meta:
         verbose_name = _("SSD configuration")
-
-    class Media:
-        css = {"all": ("css/custom_admin.css",)}
