@@ -10,7 +10,7 @@ from django.test import SimpleTestCase, override_settings
 from django_redis.client import DefaultClient
 from structlog.testing import capture_logs
 
-from open_inwoner.utils.cache_serializers import SignedPickleSerializer
+from open_inwoner.utils.cache.serializers import SignedPickleSerializer
 from open_inwoner.utils.decorators import cache as cache_result
 from open_inwoner.utils.metrics import cache_signature_invalid
 
@@ -106,11 +106,10 @@ class SignedRedisCacheTest(SimpleTestCase):
                         "LOCATION": "redis://redis.invalid:6379/0",
                         "OPTIONS": {
                             "CLIENT_CLASS": (
-                                "open_inwoner.utils.cache_serializers"
-                                ".SignedPickleClient"
+                                "open_inwoner.utils.cache.client.SignedPickleClient"
                             ),
                             "SERIALIZER": (
-                                "open_inwoner.utils.cache_serializers"
+                                "open_inwoner.utils.cache.serializers"
                                 ".SignedPickleSerializer"
                             ),
                             "IGNORE_EXCEPTIONS": True,
