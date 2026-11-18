@@ -2,7 +2,16 @@ import datetime
 
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import BooleanField, Count, ExpressionWrapper, Q
+from django.db.models import (
+    Count,
+    Exists,
+    IntegerField,
+    OuterRef,
+    Q,
+    QuerySet,
+    Subquery,
+)
+from django.db.models.functions import Coalesce
 from django.forms import Form, ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet
 from django.http import HttpResponseRedirect, StreamingHttpResponse
@@ -10,6 +19,7 @@ from django.template.defaultfilters import filesizeformat
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
+from django.utils.text import smart_split, unescape_string_literal
 from django.utils.translation import gettext_lazy as _, ngettext
 
 import structlog
@@ -489,6 +499,20 @@ class ZaakTypeResultaattypeConfigInline(admin.StackedInline):
         return getattr(result_type, "esuite_compat_naam", "")
 
 
+def _count_per_zaaktype_config(queryset: QuerySet) -> Coalesce:
+    return Coalesce(
+        Subquery(
+            queryset.filter(zaaktype_config=OuterRef("pk"))
+            .order_by()
+            .values("zaaktype_config")
+            .annotate(count=Count("pk"))
+            .values("count"),
+            output_field=IntegerField(),
+        ),
+        0,
+    )
+
+
 @admin.register(ZaakTypeConfig)
 class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
     change_list_template = "admin/zaaktypeconfig_change_list.html"
@@ -560,12 +584,15 @@ class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
         "catalogus__domein",
         "catalogus__rsin",
         "contact_subject_code",
-        "zaaktypestatustypeconfig__statustype_url",
-        "zaaktypestatustypeconfig__omschrijving",
-        "zaaktyperesultaattypeconfig__resultaattype_url",
-        "zaaktyperesultaattypeconfig__omschrijving",
-        "zaaktypeinformatieobjecttypeconfig__informatieobjecttype_url",
-        "zaaktypeinformatieobjecttypeconfig__omschrijving",
+    ]
+    # Searched through per-model subqueries in get_search_results (see #3227)
+    related_search_fields = [
+        (ZaakTypeStatusTypeConfig, ["statustype_url", "omschrijving"]),
+        (ZaakTypeResultaatTypeConfig, ["resultaattype_url", "omschrijving"]),
+        (
+            ZaakTypeInformatieObjectTypeConfig,
+            ["informatieobjecttype_url", "omschrijving"],
+        ),
     ]
     ordering = ("identificatie", "catalogus__domein")
 
@@ -588,24 +615,56 @@ class ZaakTypeConfigAdmin(ZGWImportExportMixin, admin.ModelAdmin):
         return request.user.is_superuser
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        qs = qs.annotate(num_infotypes=Count("zaaktypeinformatieobjecttypeconfig"))
-        qs = qs.annotate(num_statustypes=Count("zaaktypestatustypeconfig"))
-        qs = qs.annotate(num_resulttypes=Count("zaaktyperesultaattypeconfig"))
-        qs = qs.annotate(
-            num_doc_notify=Count(
-                "zaaktypeinformatieobjecttypeconfig",
-                filter=Q(
-                    zaaktypeinformatieobjecttypeconfig__document_notification_enabled=True
+        # Subqueries rather than joins: joining several multi-valued relations
+        # multiplies rows per zaaktype (and inflates the counts).
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                num_infotypes=_count_per_zaaktype_config(
+                    ZaakTypeInformatieObjectTypeConfig.objects.all()
+                ),
+                num_statustypes=_count_per_zaaktype_config(
+                    ZaakTypeStatusTypeConfig.objects.all()
+                ),
+                num_resulttypes=_count_per_zaaktype_config(
+                    ZaakTypeResultaatTypeConfig.objects.all()
+                ),
+                has_doc_notify=Exists(
+                    ZaakTypeInformatieObjectTypeConfig.objects.filter(
+                        zaaktype_config=OuterRef("pk"),
+                        document_notification_enabled=True,
+                    )
                 ),
             )
         )
-        qs = qs.annotate(
-            has_doc_notify=ExpressionWrapper(
-                Q(num_doc_notify__gt=0), output_field=BooleanField()
+
+    def get_search_results(self, request, queryset, search_term):
+        # Like Django's search, but related fields are matched in subqueries
+        # instead of joins (see get_queryset). Every term must match some field.
+        if not search_term:
+            return queryset, False
+
+        search_fields = self.get_search_fields(request)
+        term_queries = []
+        for bit in smart_split(search_term):
+            if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
+                bit = unescape_string_literal(bit)
+            term_query = Q.create(
+                [(f"{field}__icontains", bit) for field in search_fields],
+                connector=Q.OR,
             )
-        )
-        return qs
+            for model, fields in self.related_search_fields:
+                matching = model.objects.filter(
+                    Q.create(
+                        [(f"{field}__icontains", bit) for field in fields],
+                        connector=Q.OR,
+                    )
+                )
+                term_query |= Q(pk__in=matching.values("zaaktype_config"))
+            term_queries.append(term_query)
+
+        return queryset.filter(*term_queries), False
 
     def num_infotypes(self, obj=None):
         if not obj or not obj.pk:
