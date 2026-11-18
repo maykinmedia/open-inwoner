@@ -79,7 +79,15 @@ sources.
 Rotating ``SECRET_KEY``
 -----------------------
 
-Cached data is signed with ``SECRET_KEY``, and the application refuses cached
-data with an invalid signature. When rotating the key, set the previous value
-as ``SECRET_KEY_FALLBACK``. Otherwise, cached data signed with the old key,
-including sessions, is refused until it expires, which can take up to a day.
+Cached data is signed with ``SECRET_KEY``. The application ignores cached data
+with an invalid signature, treats it as missing and logs a
+``cache_signature_invalid`` warning. When rotating the key, set the previous
+value as ``SECRET_KEY_FALLBACK``. Otherwise, all cached data is discarded at
+once: every user is logged out, and the caches are rebuilt, which temporarily
+puts more load on the connected systems.
+
+Each refused value is also counted in the OpenTelemetry metric
+``oip.cache.signature_invalid``. Refused values without a key rotation can mean
+that someone is writing to Redis, or that processes sharing the same Redis
+database use different values for ``SECRET_KEY``. We recommend alerting on any
+increase of this metric outside a planned key rotation.
