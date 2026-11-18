@@ -55,6 +55,7 @@ class Header extends Component {
    * Clears the dismissed state, (prevents overriding focus/toggle).
    */
   toggleMobileNavOpen() {
+    document.body.classList.remove('body--settings-open');
     document.body.classList.toggle('body--open');
     // Safari specific - close all when main menu closes
     themesToggle.forEach((elem) => {
@@ -118,3 +119,56 @@ class Header extends Component {
 
 // Start!
 [...HEADERS].forEach((node) => new Header(node, { dismissed: false }));
+
+class SettingsHeader extends Component {
+  bindEvents() {
+    this.node.addEventListener(
+      'click',
+      this.toggleMobileSettingsOpen.bind(this)
+    );
+    window.addEventListener('keyup', this.onEscape.bind(this));
+
+    const closeMobileSettings = document.getElementById('closeMobileSettings'); // Use ID to reference the close button
+    if (closeMobileSettings) {
+      closeMobileSettings.addEventListener(
+        'click',
+        this.closeSettingsMenu.bind(this)
+      );
+    }
+  }
+
+  closeSettingsMenu() {
+    if (document.body.classList.contains('body--settings-open')) {
+      document.body.classList.remove('body--settings-open');
+    }
+  }
+
+  toggleMobileSettingsOpen() {
+    document.body.classList.remove('body--open');
+    document.body.classList.toggle('body--settings-open');
+    this.node.setAttribute(
+      'aria-expanded',
+      this.node.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'
+    );
+    window.scrollTo(0, 0);
+
+    const firstNavItem = document.querySelector('.header__settings .link');
+    if (firstNavItem) {
+      firstNavItem.focus();
+    }
+  }
+
+  onEscape(event) {
+    if (event.key === 'Escape') {
+      this.node.blur();
+      document.body.classList.remove('body--settings-open');
+    }
+  }
+
+  render() {}
+}
+
+const settingsButton = document.getElementById('openMobileSettings');
+if (settingsButton) {
+  new SettingsHeader(settingsButton, {});
+}
