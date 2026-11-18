@@ -20,6 +20,7 @@
     "storybook": "npx storybook dev --port 6006",
     "storybook:debug": "STORYBOOK_LOGLEVEL=debug npm run storybook",
     "test": "TZ=Europe/Amsterdam npm-run-all test:*",
+    "test:e2e": "npx playwright test",
     "test:storybook": "vitest --run --project=storybook",
     "test:vitest": "vitest --run --project=unit",
     "vitest:ui": "vitest --ui --coverage",
