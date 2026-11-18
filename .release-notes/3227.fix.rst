@@ -1,0 +1,9 @@
+Zoeken in de admin bij de zaaktype-configuraties kon bij veelvoorkomende
+zoektermen (bijv. "afgerond") minutenlang duren en zoveel geheugen van de
+database vragen dat de database herstartte, waardoor ook andere applicaties op
+dezelfde database tijdelijk geen verbinding hadden. Zoeken en het laden van de
+lijst zijn nu veel sneller en belasten de database niet meer op deze manier.
+
+Daarnaast tonen de kolommen met het aantal informatieobjecttypen, statustypen en
+resultaattypen in deze lijst nu de juiste aantallen; voorheen konden deze te hoog
+zijn.
