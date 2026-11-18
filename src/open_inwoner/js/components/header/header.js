@@ -120,6 +120,9 @@ class Header extends Component {
 // Start!
 [...HEADERS].forEach((node) => new Header(node, { dismissed: false }));
 
+/**
+ * Controls the settings/profile header and interaction with the mobile menu
+ */
 class SettingsHeader extends Component {
   bindEvents() {
     this.node.addEventListener(
