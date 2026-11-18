@@ -393,6 +393,7 @@ INSTALLED_APPS = [
     "sekizai",
     # "djangocms_admin_style",
     "djangocms_versioning",
+    "parler",  # required by djangocms_alias
     "djangocms_alias",
     "open_inwoner.djangocms_4_migration",
     "djangocms_link",
