@@ -242,7 +242,9 @@ ENABLE_INTERACTIVE_CHECKS = config(
 )
 
 # Only unpickle signed data from Redis (RCE if Redis is reachable by others).
+# The client treats refused data as a cache miss, instead of failing the request.
 # The version bump keeps unsigned entries from older releases from being read.
+REDIS_CACHE_CLIENT = "open_inwoner.utils.cache_serializers.SignedPickleClient"
 REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache_serializers.SignedPickleSerializer"
 REDIS_CACHE_VERSION = 2
 
@@ -252,7 +254,7 @@ CACHES = {
         "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(help_text='Redis connection string for the default cache, in host:port/db format.', group='Cache'))}",
         "VERSION": REDIS_CACHE_VERSION,
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
             "SERIALIZER": REDIS_CACHE_SERIALIZER,
             "IGNORE_EXCEPTIONS": True,
         },
@@ -262,7 +264,7 @@ CACHES = {
         "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
         "VERSION": REDIS_CACHE_VERSION,
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
             "SERIALIZER": REDIS_CACHE_SERIALIZER,
             "IGNORE_EXCEPTIONS": True,
         },
