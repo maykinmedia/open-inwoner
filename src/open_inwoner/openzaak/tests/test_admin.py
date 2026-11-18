@@ -18,7 +18,12 @@ from webtest import Upload
 
 from open_inwoner.accounts.tests.factories import UserFactory
 from open_inwoner.openzaak.api_models import ResultaatType
-from open_inwoner.openzaak.models import OpenZaakConfig
+from open_inwoner.openzaak.models import (
+    OpenZaakConfig,
+    ZaakTypeInformatieObjectTypeConfig,
+    ZaakTypeResultaatTypeConfig,
+    ZaakTypeStatusTypeConfig,
+)
 
 from .factories import (
     CatalogusConfigFactory,
@@ -260,6 +265,102 @@ class TestZaakTypeConfigAdmin(WebTest):
         )
 
         self.assertEqual(list(response.context["cl"].result_list), [])
+
+    def test_changelist_counts_related_configs_per_zaaktype(self):
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=self.ztc, document_notification_enabled=True
+        )
+        ZaakTypeStatusTypeConfigFactory.create_batch(3, zaaktype_config=self.ztc)
+        ZaakTypeResultaatTypeConfigFactory.create_batch(4, zaaktype_config=self.ztc)
+        other_ztc = ZaakTypeConfigFactory()
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            user=self.user,
+        )
+
+        self.assertCountEqual(
+            [
+                (
+                    ztc,
+                    ztc.num_infotypes,
+                    ztc.num_statustypes,
+                    ztc.num_resulttypes,
+                    ztc.has_doc_notify,
+                )
+                for ztc in response.context["cl"].result_list
+            ],
+            [(self.ztc, 2, 3, 4, True), (other_ztc, 0, 0, 0, False)],
+        )
+
+    def test_search_does_not_join_related_configs(self):
+        # Regression for #3227: joining these multi-valued relations multiplied
+        # rows per zaaktype and took down the database
+        ZaakTypeStatusTypeConfigFactory.create_batch(2, zaaktype_config=self.ztc)
+        ZaakTypeResultaatTypeConfigFactory.create_batch(2, zaaktype_config=self.ztc)
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": "afgerond"},
+            user=self.user,
+        )
+
+        sql = str(response.context["cl"].queryset.query)
+        for model in (
+            ZaakTypeInformatieObjectTypeConfig,
+            ZaakTypeStatusTypeConfig,
+            ZaakTypeResultaatTypeConfig,
+        ):
+            with self.subTest(model=model):
+                self.assertNotIn(f'JOIN "{model._meta.db_table}"', sql)
+
+    def test_search_requires_every_term_to_match_any_field(self):
+        self.ztc.identificatie = "ZT-106"
+        self.ztc.save()
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.ztc, omschrijving="Zaak afgerond"
+        )
+        other_ztc = ZaakTypeConfigFactory(identificatie="ZT-107")
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=other_ztc, omschrijving="Zaak afgerond"
+        )
+
+        for search_term, expected in [
+            ("afgerond", [self.ztc, other_ztc]),
+            ("afgerond ZT-106", [self.ztc]),
+            ('"Zaak afgerond" ZT-107', [other_ztc]),
+            ("afgerond ZT-999", []),
+        ]:
+            with self.subTest(search_term=search_term):
+                response = self.app.get(
+                    reverse("admin:openzaak_zaaktypeconfig_changelist"),
+                    {"q": search_term},
+                    user=self.user,
+                )
+
+                self.assertCountEqual(
+                    list(response.context["cl"].result_list), expected
+                )
+
+    def test_search_is_combined_with_list_filters(self):
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=self.ztc, omschrijving="Zaak afgerond"
+        )
+        other_ztc = ZaakTypeConfigFactory()
+        ZaakTypeStatusTypeConfigFactory(
+            zaaktype_config=other_ztc, omschrijving="Zaak afgerond"
+        )
+        ZaakTypeInformatieObjectTypeConfigFactory(
+            zaaktype_config=other_ztc, document_notification_enabled=True
+        )
+
+        response = self.app.get(
+            reverse("admin:openzaak_zaaktypeconfig_changelist"),
+            {"q": "afgerond", "doc_notify": "yes"},
+            user=self.user,
+        )
+
+        self.assertEqual(list(response.context["cl"].result_list), [other_ztc])
 
 
 @disable_admin_mfa()
