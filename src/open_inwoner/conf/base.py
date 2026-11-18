@@ -250,8 +250,8 @@ ENABLE_INTERACTIVE_CHECKS = config(
 # Only unpickle signed data from Redis (RCE if Redis is reachable by others).
 # The client treats refused data as a cache miss, instead of failing the request.
 # The version bump keeps unsigned entries from older releases from being read.
-REDIS_CACHE_CLIENT = "open_inwoner.utils.cache_serializers.SignedPickleClient"
-REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache_serializers.SignedPickleSerializer"
+REDIS_CACHE_CLIENT = "open_inwoner.utils.cache.client.SignedPickleClient"
+REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache.serializers.SignedPickleSerializer"
 REDIS_CACHE_VERSION = 2
 
 CACHES = {
