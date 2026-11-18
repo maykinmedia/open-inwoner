@@ -1,8 +1,12 @@
-Na de upgrade worden alle gebruikers eenmalig uitgelogd, omdat de gegevens in
-de cache (waaronder sessies) een nieuw formaat hebben. Om dezelfde reden worden
+Alleen bij een upgrade vanaf een versie vóór 2.4.10, of vanaf 2.5.0: na de
+upgrade worden alle gebruikers eenmalig uitgelogd, omdat de gegevens in de
+cache (waaronder sessies) een nieuw formaat hebben. Om dezelfde reden worden
 geblokkeerde inlogpogingen en de limieten voor notificaties gereset. Oude
-cache-items blijven in Redis staan tot ze verlopen (maximaal ongeveer een dag).
+cache-items blijven in Redis staan tot ze verlopen (maximaal ongeveer een
+dag). Bij een upgrade vanaf 2.4.10 of een latere 2.4.x-versie, of vanaf 2.5.1
+of hoger, is dit al gebeurd.
 
 Stel bij het wijzigen van de ``SECRET_KEY`` voortaan altijd de vorige waarde in
-als ``SECRET_KEY_FALLBACK``. Anders weigert de applicatie gecachte gegevens die
-met de oude sleutel zijn ondertekend, waaronder sessies, totdat deze verlopen.
+als ``SECRET_KEY_FALLBACK``. Anders negeert de applicatie alle gecachte gegevens
+die met de oude sleutel zijn ondertekend: alle gebruikers worden uitgelogd en de
+caches worden opnieuw opgebouwd.

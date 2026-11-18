@@ -1,6 +1,12 @@
 Gegevens in de Redis-caches (waaronder sessies) worden nu ondertekend met de
-``SECRET_KEY``. De applicatie weigert gecachte gegevens zonder geldige
-handtekening. Hierdoor kan een partij die naar Redis kan schrijven, maar geen
+``SECRET_KEY``. De applicatie negeert gecachte gegevens zonder geldige
+handtekening en logt hiervoor een waarschuwing (``cache_signature_invalid``).
+Geweigerde gegevens worden ook geteld in de OpenTelemetry-metric ``oip.cache.signature_invalid``.
+Hierdoor kan een partij die naar Redis kan schrijven, maar geen
 toegang heeft tot de ``SECRET_KEY``, de applicatie geen eigen gegevens meer
 laten inlezen. Zie de nieuwe documentatiepagina "Securing Redis" voor
 aanbevelingen om Redis af te schermen.
+
+Deze fix is ook uitgebracht in 2.4.10 en 2.5.1. Draait u al 2.4.10 of een
+latere 2.4.x-versie, of 2.5.1 of hoger, dan heeft u deze fix al. Versie 2.5.0
+bevat de fix niet.
