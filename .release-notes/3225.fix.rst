@@ -1,0 +1,3 @@
+De beheerpagina's voor de SSD-configuratie (Mijn Uitkeringen) en voor
+alias-categorieën (Django CMS) gaven in productie een serverfout door
+ontbrekende stylesheets. Deze pagina's zijn nu weer normaal te openen.
