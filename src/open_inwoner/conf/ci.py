@@ -30,16 +30,23 @@ LOGGING = {
     },
 }
 
-CACHES.update(
-    {
-        "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
-        "notification_throttle": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
-        },
-        # See: https://github.com/jazzband/django-axes/blob/master/docs/configuration.rst#cache-problems
-        "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
-    }
-)
+# The end-to-end tests keep the Redis caches from base.py, so they run against the
+# cache setup used in production (django-redis with the signed pickle serializer).
+if not config(
+    "CI_USE_REDIS_CACHES",
+    default=False,
+    documentation=DocumentationParams(add_to_docs=False),
+):
+    CACHES.update(
+        {
+            "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+            "notification_throttle": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
+            },
+            # See: https://github.com/jazzband/django-axes/blob/master/docs/configuration.rst#cache-problems
+            "axes": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
+        }
+    )
 
 # Allow logging in with both username+password and email+password
 AUTHENTICATION_BACKENDS = [
