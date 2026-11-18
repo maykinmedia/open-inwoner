@@ -114,6 +114,8 @@ jobs:
           if-no-files-found: error
 
   upload_coverage:
+    # Never upload from the private security repo: it may hold embargoed fixes
+    if: github.repository == 'maykinmedia/open-inwoner'
     needs: tests
     name: Upload coverage information to codecov
     runs-on: ubuntu-26.04
