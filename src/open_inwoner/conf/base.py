@@ -241,20 +241,29 @@ ENABLE_INTERACTIVE_CHECKS = config(
     ),
 )
 
+# Only unpickle signed data from Redis (RCE if Redis is reachable by others).
+# The version bump keeps unsigned entries from older releases from being read.
+REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache_serializers.SignedPickleSerializer"
+REDIS_CACHE_VERSION = 2
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(help_text='Redis connection string for the default cache, in host:port/db format.', group='Cache'))}",
+        "VERSION": REDIS_CACHE_VERSION,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SERIALIZER": REDIS_CACHE_SERIALIZER,
             "IGNORE_EXCEPTIONS": True,
         },
     },
     "axes": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
+        "VERSION": REDIS_CACHE_VERSION,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SERIALIZER": REDIS_CACHE_SERIALIZER,
             "IGNORE_EXCEPTIONS": True,
         },
     },
@@ -289,7 +298,9 @@ CACHES["notification_throttle"] = {
         ),
     ),
     "KEY_PREFIX": "notification_throttle",
+    "VERSION": REDIS_CACHE_VERSION,
     "OPTIONS": {
+        "SERIALIZER": REDIS_CACHE_SERIALIZER,
         "CLIENT_CLASS": config(
             "CACHE_NOTIFICATION_THROTTLE_CLIENT_CLASS",
             default=CACHES["default"]["OPTIONS"]["CLIENT_CLASS"],
