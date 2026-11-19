@@ -10,9 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  # Must match the `web` service's `image:` in docker-compose.yml -- that's
-  # what `bin/stack.sh up` actually builds and tags, and what the docker commands
-  # below reference.
+  # Must match the `web` service's `image:` in docker-compose.yml, so
+  # `bin/stack.sh up --no-build` finds the image loaded below.
   IMAGE_NAME: maykinmedia/open-inwoner
 
 permissions: {}
@@ -261,22 +260,20 @@ jobs:
           retention-days: 7
 
   #
-  # Full application stack
+  # Docker image builds
   #
-  full-app-stack-test:
-    name: Full Docker application stack
-    runs-on: maykin-runner # Many containers, much resources
-    timeout-minutes: 20
-    permissions:
-      contents: read
+  # Built with BuildKit up front, in parallel with the test suites, and exported
+  # as an OCI archive. Outside PRs the archive holds both platforms; the stack
+  # test runs on its amd64 image and the docker job pushes it unchanged. PRs
+  # only build amd64 for the stack test, and check arm64 separately so the
+  # slow emulated build doesn't hold up the stack test.
+  docker-metadata:
+    name: Determine Docker image tag
+    runs-on: ubuntu-26.04
+    permissions: {}
     outputs:
       tag: ${{ steps.vars.outputs.tag }}
-
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
       - name: Set tag
         id: vars
         run: |
@@ -289,17 +286,135 @@ jobs:
           # Use Docker `latest` tag convention
           [ "$VERSION" == "main" ] && VERSION=latest
 
-          echo ::set-output name=tag::${VERSION}
+          echo "tag=${VERSION}" >> "$GITHUB_OUTPUT"
 
-      # `bin/stack.sh up` always runs `docker compose build web`. We use
-      # TAG/COMMIT_HASH to ensure that build produces exactly the image the
-      # `docker` job will push, tagged the same way, so this is the only build:
-      # no separate/duplicate build later.
+  docker-build:
+    needs: docker-metadata
+    name: Build Docker image
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ needs.docker-metadata.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up QEMU
+        if: github.event_name != 'pull_request'
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+        with:
+          platforms: arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # linux/arm64 also covers Apple Silicon (macOS arm64) Docker hosts.
+      - name: Build the image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms:
+            ${{ github.event_name != 'pull_request' && 'linux/amd64,linux/arm64'
+            || 'linux/amd64' }}
+          build-args: |
+            RELEASE=${{ env.TAG }}
+            COMMIT_HASH=${{ github.sha }}
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          provenance: false
+          sbom: false
+          outputs: type=oci,dest=${{ runner.temp }}/open-inwoner.oci.tar
+          cache-from: type=gha,scope=open-inwoner
+          cache-to: type=gha,mode=max,scope=open-inwoner
+
+      - name: Upload the image
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docker-image
+          path: ${{ runner.temp }}/open-inwoner.oci.tar
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-build-arm64:
+    needs: docker-metadata
+    if: github.event_name == 'pull_request'
+    name: Check Docker image builds (linux/arm64)
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ needs.docker-metadata.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+        with:
+          platforms: arm64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build the image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/arm64
+          build-args: |
+            RELEASE=${{ env.TAG }}
+            COMMIT_HASH=${{ github.sha }}
+          provenance: false
+          sbom: false
+          outputs: type=cacheonly
+          cache-from: |
+            type=gha,scope=open-inwoner
+            type=gha,scope=open-inwoner-arm64
+          cache-to: type=gha,mode=max,scope=open-inwoner-arm64
+
+  #
+  # Full application stack
+  #
+  full-app-stack-test:
+    needs: [docker-metadata, docker-build]
+    name: Full Docker application stack
+    runs-on: maykin-runner # Many containers, much resources
+    timeout-minutes: 20
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download the image built by docker-build
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docker-image
+          path: ${{ runner.temp }}
+
+      - name: Install skopeo
+        run:
+          command -v skopeo || (sudo apt-get update && sudo apt-get install -y
+          skopeo)
+
+      # Loads the amd64 image out of the (possibly multi-platform) archive.
+      - name: Load the image
+        env:
+          TAG: ${{ needs.docker-metadata.outputs.tag }}
+        run:
+          skopeo copy --override-os linux --override-arch amd64
+          "oci-archive:$RUNNER_TEMP/open-inwoner.oci.tar"
+          "docker-daemon:$IMAGE_NAME:$TAG"
+
+      # `--no-build` runs the stack on the image loaded above, i.e. exactly the
+      # one the `docker` job pushes, instead of rebuilding it.
       - name: Bring up the full stack
         env:
-          TAG: ${{ steps.vars.outputs.tag }}
+          TAG: ${{ needs.docker-metadata.outputs.tag }}
           COMMIT_HASH: ${{ github.sha }}
-        run: bin/stack.sh up
+        run: bin/stack.sh up --no-build
 
       - name: Wait for the app containers to come up healthy
         run: |
@@ -338,19 +453,6 @@ jobs:
           # report "running" (docker inspect never returns a Health.Status
           # for it) -- just needs to still be running, not crashed.
           wait_for celery-monitor running
-
-      - name: Save the image for the docker job to push
-        env:
-          TAG: ${{ steps.vars.outputs.tag }}
-        run: docker save "$IMAGE_NAME:$TAG" | gzip > open-inwoner-image.tar.gz
-
-      - name: Upload the image
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: docker-image
-          path: open-inwoner-image.tar.gz
-          if-no-files-found: error
-          retention-days: 1
 
       - name: Dump service status and logs on failure
         if: failure()
@@ -426,7 +528,7 @@ jobs:
   # Docker
   #
   docker:
-    needs: [tests, full-app-stack-test]
+    needs: [tests, docker-metadata, docker-build, full-app-stack-test]
     if: github.event_name == 'push'
 
     name: Push Docker image
@@ -435,23 +537,32 @@ jobs:
       contents: read
 
     env:
-      TAG: ${{ needs.full-app-stack-test.outputs.tag }}
+      TAG: ${{ needs.docker-metadata.outputs.tag }}
 
+    # Pushes the archive built by docker-build unchanged; nothing is rebuilt.
     steps:
-      # The image itself was already built (and proven healthy), so nothing
-      # here rebuilds it.
-      - name: Download the image built by full-app-stack-test
+      - name: Download the image built by docker-build
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: docker-image
+          path: ${{ runner.temp }}
 
-      - name: Load the image
-        run: gunzip -c open-inwoner-image.tar.gz | docker load
+      - name: Install skopeo
+        run:
+          command -v skopeo || (sudo apt-get update && sudo apt-get install -y
+          skopeo)
 
       - name: Log into registry
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run:
-          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u ${{
-          secrets.DOCKER_USERNAME }} --password-stdin
+          echo "$DOCKER_TOKEN" | skopeo login docker.io --username
+          "$DOCKER_USERNAME" --password-stdin
 
+      # `--preserve-digests` fails rather than altering any image on the way.
       - name: Push the Docker image
-        run: docker push "$IMAGE_NAME:$TAG"
+        run:
+          skopeo copy --all --preserve-digests
+          "oci-archive:$RUNNER_TEMP/open-inwoner.oci.tar"
+          "docker://docker.io/$IMAGE_NAME:$TAG"
