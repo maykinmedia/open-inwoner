@@ -172,7 +172,7 @@ EOF
   eHerkenning login         http://localhost:8000/eherkenning-oidc/authenticate/
   eIDAS login               http://localhost:8000/eidas-oidc/authenticate/
   (any Keycloak test user works -- see docker/keycloak/README.md for the
-  full list, including DigiD machtigen and eHerkenning bewindvoering/vestiging)
+  full list, e.g. bsn / bsn for DigiD and kvk / kvk for eHerkenning)
 
   DigiD login (mock)        http://localhost:8000/digid/login/        (any valid BSN, e.g. 111222333)
   eHerkenning login (mock)  http://localhost:8000/eherkenning/login/  (any valid KvK, e.g. 12345678)
@@ -329,6 +329,7 @@ case "$cmd" in
                 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/producten.json
+                python src/manage.py loaddata docker/setup_configuration/fixtures/digid.json
                 python src/manage.py loaddata docker/setup_configuration/fixtures/eherkenning.json
                 touch "$HOST_SETUP_MARKER"
             fi

@@ -10,7 +10,7 @@ a local instance with enough data to exercise that page for real.
 
 - an admin account (admin / `admin`);
 - the API token `data.yaml`'s `openafval-test` service authenticates with;
-- one klant with BSN `111222333` -- the DigiD-mock `testuser`, the same BSN
+- one klant with BSN `111222333` -- the DigiD-mock `bsn`, the same BSN
   `docker/openklant/seed_conversations.py` seeds Open Klant against;
 - two addresses, five containers (restafval/GFT/medisch afval at the first
   address, restafval/GFT at the second) and their ledigingen, fortnightly

@@ -1,0 +1,18 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 9003,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009003",
+      "password": "!digid-bsn2-has-no-local-password",
+      "first_name": "Test",
+      "last_name": "User Twee",
+      "email": "bsn2@test.nl",
+      "verified_email": "bsn2@test.nl",
+      "is_staff": false,
+      "is_active": true,
+      "bsn": "123456782",
+      "login_type": "digid"
+    }
+  }
+]

@@ -35,7 +35,7 @@ from openklant_client.types.resources.klant_contact import KlantContact
 DEFAULT_BASE_URL = "http://localhost:8338/klantinteracties/api/v1"
 DEFAULT_TOKEN = "9b17346dbb9493f967e6653bbcdb03ac2f7009fa"  # noqa: S105 -- fixture token, not a secret
 
-# BSN of `testuser` in the Keycloak realm (docker/keycloak/fixtures/realm.json), the
+# BSN of `bsn` in the Keycloak realm (docker/keycloak/fixtures/realm.json), the
 # account DigiD-mock login authenticates as. Reuses the partij if one already exists.
 DEFAULT_BSN = "111222333"
 
