@@ -252,9 +252,10 @@ def send_case_update_email(
     api_group: ZGWApiGroupConfig,
     status: Status | None = None,
     extra_context: dict = None,
+    recipient: str | None = None,
 ):
     """
-    send the actual mail
+    send the actual mail, to the e-mail address of the user unless a recipient is given
     """
     case_detail_url = build_absolute_url(
         reverse(
@@ -284,7 +285,7 @@ def send_case_update_email(
         )
     if extra_context:
         context.update(extra_context)
-    template.send_email([user.email], context)
+    template.send_email([recipient or user.email], context)
 
 
 def _wrap_join(iter, glue="") -> str:
