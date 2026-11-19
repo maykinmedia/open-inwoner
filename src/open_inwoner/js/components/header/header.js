@@ -16,6 +16,33 @@ export const themesToggle = document.querySelectorAll('.dropdown-nav__toggle');
 /** Controls aria-expanded state for accessibility */
 export const interactiveButton = document.querySelectorAll('.header__button');
 
+function trapFocus(element) {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    const focusable = Array.from(
+      element.querySelectorAll('a[href], button:not([disabled])')
+    ).filter((item) => item.offsetParent !== null);
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+}
+
 /**
  * Controls the main header and interaction with the mobile menu and dismissing it using the escape key.
  */
@@ -38,6 +65,8 @@ class Header extends Component {
     if (closeMobileNav) {
       closeMobileNav.addEventListener('click', this.closeMenu.bind(this));
     }
+
+    trapFocus(document.querySelector('.header__submenu'));
   }
 
   /**
@@ -55,6 +84,11 @@ class Header extends Component {
    * Clears the dismissed state, (prevents overriding focus/toggle).
    */
   toggleMobileNavOpen() {
+    document.body.classList.remove('body--settings-open');
+    const settingsIcon = document.getElementById('openMobileSettings');
+    if (settingsIcon) {
+      settingsIcon.setAttribute('aria-expanded', 'false');
+    }
     document.body.classList.toggle('body--open');
     // Safari specific - close all when main menu closes
     themesToggle.forEach((elem) => {
@@ -118,3 +152,63 @@ class Header extends Component {
 
 // Start!
 [...HEADERS].forEach((node) => new Header(node, { dismissed: false }));
+
+/**
+ * Controls the settings/profile header and interaction with the mobile menu
+ */
+class SettingsHeader extends Component {
+  bindEvents() {
+    this.node.setAttribute('aria-expanded', 'false');
+    this.node.addEventListener(
+      'click',
+      this.toggleMobileSettingsOpen.bind(this)
+    );
+    window.addEventListener('keyup', this.onEscape.bind(this));
+
+    const closeMobileSettings = document.getElementById('closeMobileSettings'); // Use ID to reference the close button
+    if (closeMobileSettings) {
+      closeMobileSettings.addEventListener(
+        'click',
+        this.closeSettingsMenu.bind(this)
+      );
+    }
+
+    trapFocus(document.querySelector('.header__settings'));
+  }
+
+  closeSettingsMenu() {
+    if (document.body.classList.contains('body--settings-open')) {
+      document.body.classList.remove('body--settings-open');
+      this.node.setAttribute('aria-expanded', 'false');
+      this.node.focus();
+    }
+  }
+
+  toggleMobileSettingsOpen() {
+    document.body.classList.remove('body--open');
+    interactiveButton.forEach((elem) => {
+      elem.setAttribute('aria-expanded', 'false');
+    });
+    const isOpen = document.body.classList.toggle('body--settings-open');
+    this.node.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    window.scrollTo(0, 0);
+
+    const firstNavItem = document.querySelector('.header__settings .link');
+    if (firstNavItem) {
+      firstNavItem.focus();
+    }
+  }
+
+  onEscape(event) {
+    if (event.key === 'Escape') {
+      this.closeSettingsMenu();
+    }
+  }
+
+  render() {}
+}
+
+const settingsButton = document.getElementById('openMobileSettings');
+if (settingsButton) {
+  new SettingsHeader(settingsButton, {});
+}
