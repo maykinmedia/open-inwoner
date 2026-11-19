@@ -10,4 +10,5 @@ urlpatterns = [
     path("collaborate/", include("open_inwoner.cms.collaborate.urls")),
     path("uitkeringen/", include("open_inwoner.cms.benefits.urls")),
     path("openklant/", include("open_inwoner.openklant.urls")),
+    path("mijn_afval/", include("open_inwoner.mijn_afval.urls")),
 ] + root_urlpatterns

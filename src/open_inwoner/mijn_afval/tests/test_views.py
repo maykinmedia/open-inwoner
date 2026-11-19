@@ -1,7 +1,14 @@
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.utils.translation import gettext as _
 
+from django_webtest import WebTest
+from structlog.testing import capture_logs
+
+from open_inwoner.accounts.tests.factories import UserFactory
+from open_inwoner.cms.tests import cms_tools
 from open_inwoner.mijn_afval.api_models import (
     AfvalContainer,
     AfvalContainerLocatie,
@@ -9,6 +16,8 @@ from open_inwoner.mijn_afval.api_models import (
     AfvalProfiel,
     Klant,
 )
+from open_inwoner.mijn_afval.cms.cms_appconfig import MijnAfvalApphookConfig
+from open_inwoner.mijn_afval.cms.cms_apps import MijnAfvalApphook
 from open_inwoner.mijn_afval.views import (
     _convert_period_to_dates,
     _extract_filter_options,
@@ -298,3 +307,50 @@ class FormatAddressTest(TestCase):
         # Should have single spaces only
         self.assertEqual(formatted, "Kerkweg 45 B, 5678 CD, Utrecht")
         self.assertNotIn("  ", formatted)  # No double spaces
+
+
+@override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
+class AfvalProfielViewConfigTests(WebTest):
+    def setUp(self):
+        cms_tools.create_homepage()
+        self.page = cms_tools.create_apphook_page(
+            MijnAfvalApphook,
+            config_args={
+                "page_heading": "Afvalkalender",
+                "page_description": "Bekijk hier uw containers",
+            },
+        )
+        self.url = reverse("mijn_afval:afval-profiel")
+        # Staff without a BSN may view the page, but no API calls are made
+        self.user = UserFactory(is_staff=True, bsn="")
+
+    def test_heading_and_description_from_config(self):
+        response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.pyquery("h1#title").text(), "Afvalkalender")
+        self.assertEqual(
+            response.pyquery("nl-paragraph").eq(0).text(), "Bekijk hier uw containers"
+        )
+
+    def test_default_heading_and_warning_when_no_config_matches_page_namespace(self):
+        MijnAfvalApphookConfig.objects.filter(
+            namespace=MijnAfvalApphook.app_name
+        ).update(namespace="Mijn Afval")
+
+        with capture_logs() as logs:
+            response = self.app.get(self.url, user=self.user)
+
+        self.assertEqual(response.pyquery("h1#title").text(), _("Mijn Afval"))
+        self.assertNotContains(response, "Bekijk hier uw containers")
+        self.assertIn(
+            {
+                "event": "apphook_config_not_found",
+                "namespace": MijnAfvalApphook.app_name,
+                "path": self.url,
+                "page_id": self.page.pk,
+                "apphook": "MijnAfvalApphook",
+                "available_namespaces": ["Mijn Afval"],
+                "log_level": "warning",
+            },
+            logs,
+        )
