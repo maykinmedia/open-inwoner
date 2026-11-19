@@ -151,7 +151,8 @@ jobs:
   # End-to-end tests
   #
   e2etests:
-    runs-on: ubuntu-26.04
+    # playwright 1.50 doesn't support ubuntu 26.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     strategy:
