@@ -253,28 +253,33 @@ ENABLE_INTERACTIVE_CHECKS = config(
 REDIS_CACHE_CLIENT = "open_inwoner.utils.cache.client.SignedPickleClient"
 REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache.serializers.SignedPickleSerializer"
 REDIS_CACHE_VERSION = 2
+REDIS_CACHE_LOCATION = "redis://" + config(
+    "CACHE_DEFAULT",
+    default="localhost:6379/0",
+    documentation=DocumentationParams(
+        help_text="Redis connection string for the default cache, in host:port/db format.",
+        group="Cache",
+    ),
+)
+
+
+def _redis_cache() -> dict:
+    # A new dict per alias, so changing one alias's settings can't affect another
+    return {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_CACHE_LOCATION,
+        "VERSION": REDIS_CACHE_VERSION,
+        "OPTIONS": {
+            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
+            "SERIALIZER": REDIS_CACHE_SERIALIZER,
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+
 
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(help_text='Redis connection string for the default cache, in host:port/db format.', group='Cache'))}",
-        "VERSION": REDIS_CACHE_VERSION,
-        "OPTIONS": {
-            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
-            "SERIALIZER": REDIS_CACHE_SERIALIZER,
-            "IGNORE_EXCEPTIONS": True,
-        },
-    },
-    "axes": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
-        "VERSION": REDIS_CACHE_VERSION,
-        "OPTIONS": {
-            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
-            "SERIALIZER": REDIS_CACHE_SERIALIZER,
-            "IGNORE_EXCEPTIONS": True,
-        },
-    },
+    "default": _redis_cache(),
+    "axes": _redis_cache(),
     "django-solo": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         # LocMem caches with the same (or no) location share their storage
