@@ -4,8 +4,10 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from open_inwoner.accounts.choices import LoginTypeChoices
+from open_inwoner.accounts.forms import CustomRegistrationForm, NecessaryUserForm
 from open_inwoner.accounts.models import User
 from open_inwoner.haalcentraal.api_models import (
     BRP2xPersoon,
@@ -21,7 +23,13 @@ from open_inwoner.haalcentraal.api_models import (
 from open_inwoner.plans.tests.factories import PlanFactory
 from open_inwoner.utils.hash import generate_email_from_string
 
-from .factories import UserFactory, eHerkenningVestigingUserFactory
+from .factories import (
+    DigidUserFactory,
+    DigitalAddressFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+    eHerkenningVestigingUserFactory,
+)
 
 
 class UserTests(TestCase):
@@ -126,6 +134,132 @@ class UserTests(TestCase):
 
         user.clear_plan_contact_new_count()
         self.assertEqual(0, user.get_plan_contact_new_count())
+
+    def test_email_taken_by_other_user(self):
+        user = UserFactory(email="me@example.com")
+        DigitalAddressFactory(user=user, value="me.secondary@example.com")
+        UserFactory(email="other@example.com")
+        DigitalAddressFactory(value="other.secondary@example.com")
+
+        cases = (
+            # own addresses
+            ("me@example.com", False),
+            ("Me@Example.com", False),
+            ("me.secondary@example.com", False),
+            # other users' addresses, case-insensitive
+            ("other@example.com", True),
+            ("OTHER@example.com", True),
+            ("other.secondary@example.com", True),
+            ("Other.Secondary@example.com", True),
+            ("free@example.com", False),
+        )
+        for value, expected in cases:
+            with self.subTest(value):
+                self.assertEqual(user.email_taken_by_other_user(value), expected)
+
+    def test_email_taken_by_other_user_shareable_login_types(self):
+        regular = UserFactory(email="regular@example.com")
+        DigidUserFactory(email="digid@example.com", bsn="111222333")
+        digid = DigidUserFactory()
+        eherkenning = eHerkenningUserFactory(email="eh@example.com")
+
+        cases = (
+            # DigiD/eHerkenning may share among each other...
+            (digid, "digid@example.com", False),
+            (digid, "eh@example.com", False),
+            (eherkenning, "digid@example.com", False),
+            # ...but not with a regular user...
+            (digid, "regular@example.com", True),
+            # ...and a regular user may not share with anyone.
+            (regular, "digid@example.com", True),
+            (regular, "eh@example.com", True),
+        )
+        for user, value, expected in cases:
+            with self.subTest(user=user.login_type, value=value):
+                self.assertEqual(user.email_taken_by_other_user(value), expected)
+
+    def test_clean_rejects_email_used_as_digital_address_by_other_user(self):
+        DigitalAddressFactory(value="taken@example.com")
+        user = UserFactory()
+
+        user.email = "Taken@example.com"
+        with self.assertRaises(ValidationError) as cm:
+            user.clean()
+
+        self.assertEqual(
+            cm.exception.message_dict, {"email": [_("This email is already taken.")]}
+        )
+
+    def test_clean_skips_uniqueness_check_for_unchanged_email(self):
+        # Pre-existing (legacy) case-variant duplicates must not make every
+        # save of either user fail validation.
+        user = UserFactory(email="dupe@example.com")
+        UserFactory(email="Dupe@example.com")
+
+        user.first_name = "Changed"
+        user.clean()
+
+    def test_clean_validates_email_when_login_type_changes(self):
+        # DigiD users may share an email with each other, but a regular user
+        # may not share it with anyone.
+        DigidUserFactory(email="shared@example.com", bsn="111222333")
+        user = DigidUserFactory(email="Shared@example.com")
+
+        user.login_type = LoginTypeChoices.default
+        with self.assertRaises(ValidationError) as cm:
+            user.clean()
+
+        self.assertEqual(
+            cm.exception.message_dict, {"email": [_("This email is already taken.")]}
+        )
+
+    def test_update_email_replaces_case_variant_of_non_standard_address(self):
+        user = UserFactory(email="old@example.com")
+        DigitalAddressFactory(user=user, value="New@Example.com")
+
+        user.update_email("new@example.com")
+
+        self.assertEqual(
+            list(user.digital_addresses.values_list("value", "is_standard_for_type")),
+            [("new@example.com", True)],
+        )
+
+    def test_registration_form_rejects_email_used_by_other_user(self):
+        UserFactory(email="jane@example.com")
+        DigitalAddressFactory(value="jane.secondary@example.com")
+
+        for email in ("Jane@Example.com", "Jane.Secondary@example.com"):
+            with self.subTest(email):
+                form = CustomRegistrationForm(
+                    data={
+                        "email": email,
+                        "first_name": "Jane",
+                        "last_name": "Doe",
+                        "password1": "Abc123!@#",
+                        "password2": "Abc123!@#",
+                    }
+                )
+
+                self.assertEqual(
+                    form.errors, {"email": [_("This email is already taken.")]}
+                )
+
+    def test_necessary_fields_form_rejects_email_used_by_other_user(self):
+        UserFactory(email="jane@example.com")
+        DigitalAddressFactory(value="jane.secondary@example.com")
+        user = UserFactory()
+
+        for email in ("Jane@Example.com", "Jane.Secondary@example.com"):
+            with self.subTest(email):
+                form = NecessaryUserForm(
+                    user=user,
+                    instance=user,
+                    data={"email": email, "first_name": "John", "last_name": "Doe"},
+                )
+
+                self.assertEqual(
+                    form.errors, {"email": [_("This email is already taken.")]}
+                )
 
     def test_eherkenning_user_requires_kvk(self):
         with self.assertRaises(IntegrityError):

@@ -1,0 +1,6 @@
+Bestaande gebruikers die een e-mailadres delen dat alleen in hoofdletters
+verschilt, kunnen niet inloggen met e-mailadres en wachtwoord. Nieuwe gevallen
+worden nu voorkomen, maar bestaande gevallen worden niet automatisch opgelost.
+Met ``python src/manage.py find_duplicate_emails`` krijgt u een overzicht van
+de betrokken e-mailadressen en gebruikers (er wordt niets gewijzigd), waarna
+u de e-mailadressen via de beheeromgeving kunt corrigeren.

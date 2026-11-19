@@ -30,7 +30,7 @@ def generate_email_verification_token(user: User) -> str:
         raise BadToken("user doesn't have email")
     if not user.is_active:
         raise BadToken("user not active")
-    if user.email == user.verified_email:
+    if user.has_verified_email():
         raise BadToken("already verified")
 
     payload: Payload = {
@@ -75,12 +75,12 @@ def validate_email_verification_token(user: User, token: str) -> bool:
         return False
     if payload["u"] != str(user.uuid):
         return False
-    if payload["e"] != user.email:
+    if payload["e"].casefold() != user.email.casefold():
         return False
 
     # payload is good, let's apply it
     if user.verified_email != user.email:
-        user.verified_email = payload["e"]
+        user.verified_email = user.email
         user.save(update_fields=["verified_email"])
 
     return True
