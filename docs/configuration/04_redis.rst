@@ -55,8 +55,8 @@ The following environment variables configure the connections, see
     for the caches.
 
 ``CACHE_NOTIFICATION_THROTTLE_LOCATION``
-    The cache used to rate limit notifications, as a full URL. Defaults to
-    the location of the default cache.
+    The Redis cache used to rate limit notifications, as a full URL. It always
+    uses the same settings as the default cache, and defaults to its location.
 
 ``CELERY_BROKER_URL``
     The Celery broker, as a full URL (``redis://`` or ``rediss://`` for TLS).

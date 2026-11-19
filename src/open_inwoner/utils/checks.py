@@ -1,7 +1,9 @@
 import os
 
 from django.conf import settings
-from django.core.checks import Warning, register
+from django.core.checks import Tags, Warning, register
+
+from maykin_common.config import DocumentationParams, config
 
 
 def get_subclasses(cls):
@@ -42,3 +44,35 @@ def check_missing_init_files(app_configs, **kwargs):
         )
 
     return errors
+
+
+# Settings of the notification rate limiting cache that can no longer be changed
+REMOVED_NOTIFICATION_THROTTLE_SETTINGS = (
+    "CACHE_NOTIFICATION_THROTTLE_BACKEND",
+    "CACHE_NOTIFICATION_THROTTLE_CLIENT_CLASS",
+    "CACHE_NOTIFICATION_THROTTLE_IGNORE_EXCEPTIONS",
+)
+
+
+@register(Tags.caches)
+def check_removed_notification_throttle_settings(app_configs, **kwargs):
+    """
+    Warn about settings of the notification rate limiting cache that are ignored.
+    """
+    return [
+        Warning(
+            f"{name} is set, but is no longer used.",
+            hint=(
+                "The cache used to rate limit notifications is always a Redis cache "
+                "with the same settings as the default cache; only its location can "
+                "be set, with CACHE_NOTIFICATION_THROTTLE_LOCATION. Remove "
+                f"{name} from the configuration."
+            ),
+            id="utils.W002",
+        )
+        for name in REMOVED_NOTIFICATION_THROTTLE_SETTINGS
+        if config(
+            name, default=None, documentation=DocumentationParams(add_to_docs=False)
+        )
+        is not None
+    ]

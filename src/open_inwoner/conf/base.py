@@ -287,60 +287,25 @@ CACHES = {
     },
 }
 
-# Rate limiting of notifications (e.g. emails) sent on behalf of users. Each
-# option falls back to the corresponding value of the default cache.
+# Rate limiting of notifications (e.g. emails) sent on behalf of users: a Redis
+# cache like the default cache, of which only the location can be changed.
+# Settings that could be changed before are flagged by the utils.W002 check.
 CACHES["notification_throttle"] = {
-    "BACKEND": config(
-        "CACHE_NOTIFICATION_THROTTLE_BACKEND",
-        default=CACHES["default"]["BACKEND"],
-        documentation=DocumentationParams(
-            help_text=(
-                "Cache backend used to rate limit notifications sent on behalf of "
-                "users. Defaults to the backend of the default cache."
-            ),
-            group="Cache",
-        ),
-    ),
+    **_redis_cache(),
     "LOCATION": config(
         "CACHE_NOTIFICATION_THROTTLE_LOCATION",
-        default=CACHES["default"]["LOCATION"],
+        default=REDIS_CACHE_LOCATION,
         documentation=DocumentationParams(
             help_text=(
-                "Full location (e.g. redis://host:port/db) of the cache used to rate "
-                "limit notifications. Defaults to the location of the default cache."
+                "Location of the Redis cache used to rate limit notifications, as a "
+                "full URL (e.g. redis://host:port/db). It always uses the same "
+                "settings as the default cache. Defaults to the location of the "
+                "default cache."
             ),
             group="Cache",
         ),
     ),
     "KEY_PREFIX": "notification_throttle",
-    "VERSION": REDIS_CACHE_VERSION,
-    "OPTIONS": {
-        "SERIALIZER": REDIS_CACHE_SERIALIZER,
-        "CLIENT_CLASS": config(
-            "CACHE_NOTIFICATION_THROTTLE_CLIENT_CLASS",
-            default=CACHES["default"]["OPTIONS"]["CLIENT_CLASS"],
-            documentation=DocumentationParams(
-                help_text=(
-                    "django-redis client class of the notification rate limiting "
-                    "cache. Defaults to the client class of the default cache."
-                ),
-                group="Cache",
-            ),
-        ),
-        "IGNORE_EXCEPTIONS": config(
-            "CACHE_NOTIFICATION_THROTTLE_IGNORE_EXCEPTIONS",
-            default=CACHES["default"]["OPTIONS"]["IGNORE_EXCEPTIONS"],
-            documentation=DocumentationParams(
-                help_text=(
-                    "Ignore connection errors of the notification rate limiting "
-                    "cache. If enabled, notifications are not rate limited while "
-                    "the cache is unavailable. Defaults to the setting of the "
-                    "default cache."
-                ),
-                group="Cache",
-            ),
-        ),
-    },
 }
 
 # Django solo caching
