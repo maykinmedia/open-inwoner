@@ -33,7 +33,7 @@ cat openklant/fixtures/db.json | docker exec -i docker-openklant-web-1 src/manag
 This creates an admin account (admin / `admin`), the API token
 `seed_conversations.py` uses, and a few base `klantinteracties.partij` records.
 It also includes a batch of klantcontacten for BSN `111222333` (the DigiD-mock
-`testuser`), seeded by running `python docker/openklant/seed_conversations.py`
+`bsn`), seeded by running `python docker/openklant/seed_conversations.py`
 against a running instance -- log in locally with that BSN and open "Mijn
 vragen" to see them.
 

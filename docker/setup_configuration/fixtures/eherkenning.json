@@ -10,6 +10,7 @@
       "is_staff": false,
       "is_active": true,
       "kvk": "68750110",
+      "rsin": "857587973",
       "vestiging": "",
       "company_name": "Test BV Donald",
       "login_type": "eherkenning"
@@ -26,8 +27,43 @@
       "is_staff": false,
       "is_active": true,
       "kvk": "68750110",
+      "rsin": "857587973",
       "vestiging": "000037178598",
       "company_name": "Test BV Donald",
+      "login_type": "eherkenning"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 9103,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009103",
+      "password": "!eherkenning-vestiging2-has-no-local-password",
+      "email": "vestiging2@test.nl",
+      "verified_email": "vestiging2@test.nl",
+      "is_staff": false,
+      "is_active": true,
+      "kvk": "68750110",
+      "rsin": "857587973",
+      "vestiging": "000037178601",
+      "company_name": "Test BV Donald",
+      "login_type": "eherkenning"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 9104,
+    "fields": {
+      "uuid": "10000000-0000-0000-0000-000000009104",
+      "password": "!eherkenning-kvk2-has-no-local-password",
+      "email": "kvk2@test.nl",
+      "verified_email": "kvk2@test.nl",
+      "is_staff": false,
+      "is_active": true,
+      "kvk": "68727720",
+      "rsin": "857567433",
+      "vestiging": "",
+      "company_name": "Test NV Katrien",
       "login_type": "eherkenning"
     }
   }
