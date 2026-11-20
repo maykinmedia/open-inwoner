@@ -14,14 +14,6 @@
   }
 
   &__contact-form {
-    .form-container {
-      margin: auto;
-
-      @media (min-width: 768px) {
-        width: 80%;
-      }
-    }
-
     .form-heading {
       padding-bottom: var(--spacing-giant);
       text-align: left;
