@@ -1,0 +1,1 @@
+Er is een nieuwe versie van het open-inwoner-design-tokens package. Hierin is de rode kleur van meldingen iets donkerder gemaakt, zodat teksten en badges beter zichtbaar zijn en voldoen aan de eisen voor toegankelijkheid.
