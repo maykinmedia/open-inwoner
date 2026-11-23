@@ -91,16 +91,15 @@
             <section class="header__actions" aria-label="Navigatie mobiel voor inloggen en uitloggen">
                 <div class="header__text-actions">
 
-                    <nav class="primary-navigation primary-navigation--mobile" aria-label="Profiel navigatie">
-                        <ul class="primary-navigation__list">
-                            <li class="primary-navigation__list-item">
-                                {% trans "Mijn profiel" as link_text %}
-                                {% link text=link_text href="profile:detail" icon="person" icon_position="before" icon_outlined=True %}
-                            </li>
-                        </ul>
-                    </nav>
-
                     {% if request.user.is_authenticated %}
+                       <nav class="primary-navigation primary-navigation--mobile" aria-label="Profiel navigatie">
+                            <ul class="primary-navigation__list">
+                                <li class="primary-navigation__list-item">
+                                    {% trans "Mijn profiel" as link_text %}
+                                    {% link text=link_text href="profile:detail" icon="person" icon_position="before" icon_outlined=True %}
+                                </li>
+                            </ul>
+                        </nav>
                         <ul class="header__list">
                             {% if user.is_eherkenning_user %}
                                 {% session_is_branch_restricted as is_branch_restricted %}
