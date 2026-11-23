@@ -81,7 +81,7 @@ class SideNavMenuData:
             target_nodes, namespace=None, root_id=self.root_id, post_cut=True
         )
 
-        return self._process_nodes_to_json(target_nodes)
+        return self._process_nodes_to_json([node] + target_nodes)
 
     def _extract_icon(self, node: NavigationNode) -> str | None:
         if not (node_id := getattr(node, "id", None)):
