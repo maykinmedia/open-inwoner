@@ -1,6 +1,10 @@
-Bestaande gebruikers die een e-mailadres delen dat alleen in hoofdletters
-verschilt, kunnen niet inloggen met e-mailadres en wachtwoord. Nieuwe gevallen
-worden nu voorkomen, maar bestaande gevallen worden niet automatisch opgelost.
+Bestaande gebruikers met inlogtype e-mail en wachtwoord die een e-mailadres
+delen dat alleen in hoofdletters verschilt, kunnen niet inloggen met
+e-mailadres en wachtwoord. Daarnaast kunnen er gebruikers zijn die een
+e-mailadres delen op een manier die niet is toegestaan (bijvoorbeeld via een
+extra e-mailadres of tussen verschillende inlogtypes); zij kunnen dat adres
+niet opnieuw opslaan op de profielpagina. Nieuwe gevallen worden nu voorkomen,
+maar bestaande gevallen worden niet automatisch opgelost.
 Met ``python src/manage.py find_duplicate_emails`` krijgt u een overzicht van
-de betrokken e-mailadressen en gebruikers (er wordt niets gewijzigd), waarna
+alle betrokken e-mailadressen en gebruikers (er wordt niets gewijzigd), waarna
 u de e-mailadressen via de beheeromgeving kunt corrigeren.

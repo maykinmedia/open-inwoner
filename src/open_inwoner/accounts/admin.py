@@ -214,6 +214,11 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         # (which the profile page and OpenKlant sync read from) out of sync.
         if obj.email and "email" in form.changed_data:
             obj.update_email(obj.email)
+        # DigitalAddress.login_type is denormalised from the user and drives
+        # the database uniqueness constraint on email addresses, so it has to
+        # follow login type changes.
+        if "login_type" in form.changed_data:
+            obj.digital_addresses.update(login_type=obj.login_type)
 
 
 admin.site.unregister(Group)

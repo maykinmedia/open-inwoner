@@ -14,8 +14,10 @@ class Command(BaseCommand):
     help = (
         "Lists email addresses that are used by more than one user in a way that "
         "is not allowed (ignoring capitalisation, and including additional email "
-        "addresses). Users with a duplicated login email cannot log in until the "
-        "duplicate is resolved. Nothing is modified."
+        "addresses). Email/password users whose login email differs from "
+        "another email/password user's only in capitalisation cannot log in "
+        "until the duplicate is resolved; other listed duplicates block saving "
+        "that address on the profile page. Nothing is modified."
     )
 
     def handle(self, *args, **options):

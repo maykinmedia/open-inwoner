@@ -157,6 +157,12 @@ class UserTests(TestCase):
             with self.subTest(value):
                 self.assertEqual(user.email_taken_by_other_user(value), expected)
 
+    def test_email_taken_by_other_user_empty_value(self):
+        user = UserFactory(email="me@example.com")
+        UserFactory(email="")
+
+        self.assertFalse(user.email_taken_by_other_user(""))
+
     def test_email_taken_by_other_user_shareable_login_types(self):
         regular = UserFactory(email="regular@example.com")
         DigidUserFactory(email="digid@example.com", bsn="111222333")

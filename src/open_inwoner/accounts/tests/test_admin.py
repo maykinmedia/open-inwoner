@@ -5,7 +5,11 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
-from open_inwoner.accounts.choices import ContactTypeChoices, DigitalAddressType
+from open_inwoner.accounts.choices import (
+    ContactTypeChoices,
+    DigitalAddressType,
+    LoginTypeChoices,
+)
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
@@ -144,6 +148,30 @@ class TestAdminUser(WebTest):
                 )
             ),
             [(DigitalAddressType.email, "john2@example.com", True)],
+        )
+
+    def test_login_type_change_updates_digital_addresses(self):
+        other = UserFactory(email="jane@example.com")
+        other.update_email(other.email)
+        DigitalAddressFactory(user=other, value="jane.secondary@example.com")
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": other.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["login_type"] = LoginTypeChoices.oidc
+        form.submit("_save")
+
+        self.assertEqual(
+            list(
+                other.digital_addresses.values_list("value", "login_type").order_by(
+                    "value"
+                )
+            ),
+            [
+                ("jane.secondary@example.com", LoginTypeChoices.oidc),
+                ("jane@example.com", LoginTypeChoices.oidc),
+            ],
         )
 
     def test_validation_error_is_raised_when_wrong_format_email(self):

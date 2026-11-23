@@ -227,15 +227,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Whether ``value`` is already in use as an email by another user.
 
-        This is the single source of truth for email uniqueness. It compares
+        This is the application-level email uniqueness policy. It compares
         case-insensitively against both ``User.email`` and every email
-        ``DigitalAddress`` (standard or not) of all other users, because the
-        database enforces uniqueness on both tables.
+        ``DigitalAddress`` (standard or not) of all other users.
 
         Users with a login type in ``EMAIL_SHAREABLE_LOGIN_TYPES`` may share an
         email with each other, but never with a user of another login type.
         Users of any other login type may not share an email with anyone.
+
+        This is stricter than the database, which only backs it up partially:
+        the unique constraints on ``User.email`` and ``DigitalAddress.value``
+        are case-sensitive and only cover rows with ``login_type=default``
+        (for ``DigitalAddress`` that is the address's own, denormalised
+        ``login_type``, not the user's). Uniqueness for other login types,
+        case-insensitive uniqueness, and uniqueness between one user's
+        ``User.email`` and another user's ``DigitalAddress`` are enforced
+        only here. The check is not atomic with the subsequent write.
+
+        Collisions with the user's *own* addresses (constraint
+        ``unique_digital_address_per_user_type_value``) are not checked.
         """
+        if not value:
+            return False
+
         matches = User.objects.filter(
             Q(email__iexact=value)
             | Q(
