@@ -188,6 +188,10 @@
     padding-left: var(--spacing-tiny);
     vertical-align: sub;
     //make asterisks invisible by default, only make them visible if component has the caption
+    display: none;
+  }
+
+  &.form--show-required .label__label--required {
     display: inline;
   }
 
