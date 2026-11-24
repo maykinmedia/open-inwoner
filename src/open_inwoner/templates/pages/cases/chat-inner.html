@@ -17,6 +17,11 @@
 
             {#  Chat dialog #}
 
+
+            {{ message|json_script:"chat-message-1" }}
+            <oip-chat-message message-id="chat-message-1"></oip-chat-message>
+
+
         {% endrender_grid %}
     {% else %}
         <nl-paragraph><strong>{% trans 'There is no available data at the moment.' %}</strong></nl-paragraph>

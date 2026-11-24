@@ -6,7 +6,7 @@ export const CHATMESSAGE_DEFINITION: WebComponentDefinition<
   IChatMessageProps
 > = {
   tagName: 'oip-chat-message',
-  propNames: ['items', 'itemsId'],
+  propNames: ['message', 'jsonScriptId'],
   options: { shadow: false },
   importer: () => import('./ChatMessage'),
 };
