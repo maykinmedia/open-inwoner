@@ -1,0 +1,24 @@
+{% load i18n utils anchor_menu_tags card_tags file_tags form_tags grid_tags link_tags button_tags icon_tags notification_tags render_tags %}
+
+{# Notifications #}
+<div class="container container--no-margin" id="chat-status-messages-oob" hx-swap-oob="true">
+    {% notifications messages closable=True %}
+</div>
+
+{# TODO: Chat connected to zaak data? #}
+{% get_solo 'openzaak.OpenZaakConfig' as openzaak_config %}
+
+<div class="case__grid">
+    {% if zaak %}
+        {% render_grid %}
+            {% render_column span=12 %}
+                <h1 class="utrecht-heading-1" id="title">{{ zaak.description }}</h1>
+            {% endrender_column %}
+
+            {#  Chat dialog #}
+
+        {% endrender_grid %}
+    {% else %}
+        <nl-paragraph><strong>{% trans 'There is no available data at the moment.' %}</strong></nl-paragraph>
+    {% endif %}
+</div>

@@ -1,0 +1,24 @@
+{% extends 'master.html' %}
+{% load i18n %}
+
+{% block notifications %}
+    <div id="spinner-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="chat-status-messages-oob"></div>
+{% endblock notifications %}
+
+{% block content %}
+    {# TODO: Chat connected to zaak data? #}
+    <div class="case-detail" id="any-error" data-error-message="{% trans 'We kunnen op dit moment de gegevens niet ophalen, probeer het later opnieuw.' %}"></div>
+
+    <div class="main" id="chat-detail-content">
+        <oip-chat-dialog
+            loading-text="{% trans 'Gegevens laden...' %}"
+            loaded-text="{% trans 'Gegevens zijn geladen.' %}"
+            hx-get="{{ hxget }}"
+            hx-trigger="load"
+            hx-target="#chat-detail-content"
+            data-spinner-live-region="spinner-live-region"
+            data-spinner-for="chat-detail-content">
+        </oip-chat-dialog>
+    </div>
+{% endblock content %}
