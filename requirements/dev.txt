@@ -1582,7 +1582,7 @@ xsdata==23.8
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
-zgw-consumers==2.0.2
+zgw-consumers==2.2.0
     # via
     #   -c requirements/ci.txt
     #   -r requirements/ci.txt
