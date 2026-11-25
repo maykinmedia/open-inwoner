@@ -106,7 +106,7 @@ django-celery-beat
 git+https://github.com/maykinmedia/django-celery-monitor@74b1252#egg=django_celery_monitor
 
 # Common Ground integration
-zgw-consumers
+zgw-consumers @ git+https://github.com/maykinmedia/zgw-consumers/@3d1a654165fca3c5b3a43b2749d1e2232f910367
 zgw-consumers-oas
 notifications-api-common
 objects-api-client-django
