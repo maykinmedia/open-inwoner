@@ -17,6 +17,9 @@ class NotificationRecordUUIDPrimaryKeyMigrationTest(TestSuccessfulMigrations):
     migrate_from = "0003_notificationprocessingconfig_notificationrecord"
     migrate_to = "0004_notificationrecord_uuid_pk"
     app = "notifications"
+    extra_migrate_from = [
+        ("zgw_consumers", "0030_service_oauth2_token_endpoint_auth_method")
+    ]
 
     def setUpBeforeMigration(self, apps):
         Service = apps.get_model("zgw_consumers", "Service")
