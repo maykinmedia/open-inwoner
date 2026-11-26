@@ -27,7 +27,7 @@ class VersionAdminTest(WebTest):
         # otherwise cms assumes the previous user is logged in, who is often deleted
         set_current_user(None)
         super().setUp()
-        self.admin_user = UserFactory(is_staff=True, is_superuser=True)
+        self.admin_user = UserFactory.create(is_staff=True, is_superuser=True)
 
     def _create_version(self, author, state=DRAFT, title="Foo", language="nl"):
         page = api.create_page(
@@ -53,7 +53,7 @@ class VersionAdminTest(WebTest):
         return page, Version.objects.get(pk=version.pk)
 
     def test_user_delete_confirmation_links_to_version(self):
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         page, version = self._create_version(author)
 
         url = reverse("admin:accounts_user_delete", kwargs={"object_id": author.pk})
@@ -73,7 +73,7 @@ class VersionAdminTest(WebTest):
         Version.created_by is PROTECT, so the versions must show up as protected
         rather than as a permissions problem.
         """
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         self._create_version(author)
 
         url = reverse("admin:accounts_user_delete", kwargs={"object_id": author.pk})
@@ -83,7 +83,7 @@ class VersionAdminTest(WebTest):
         self.assertFalse(response.context["perms_lacking"])
 
     def test_version_detail_identifies_the_page_it_belongs_to(self):
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         page, version = self._create_version(author, title="Findable page")
 
         url = reverse(
@@ -97,7 +97,7 @@ class VersionAdminTest(WebTest):
         self.assertContains(response, escape(version_list_url(version.content)))
 
     def test_version_detail_is_read_only(self):
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         page, version = self._create_version(author)
 
         url = reverse(
@@ -112,7 +112,7 @@ class VersionAdminTest(WebTest):
     def test_delete_button_hidden_for_draft_and_published(self):
         for state in (DRAFT, PUBLISHED):
             with self.subTest(state=state):
-                author = UserFactory(is_staff=True)
+                author = UserFactory.create(is_staff=True)
                 page, version = self._create_version(author, state=state)
 
                 url = reverse(
@@ -132,7 +132,7 @@ class VersionAdminTest(WebTest):
     def test_delete_button_shown_for_archived_and_unpublished(self):
         for state in (ARCHIVED, UNPUBLISHED):
             with self.subTest(state=state):
-                author = UserFactory(is_staff=True)
+                author = UserFactory.create(is_staff=True)
                 page, version = self._create_version(author, state=state)
 
                 url = reverse(
@@ -152,7 +152,7 @@ class VersionAdminTest(WebTest):
     def test_deleting_draft_or_published_version_is_refused(self):
         for state in (DRAFT, PUBLISHED):
             with self.subTest(state=state):
-                author = UserFactory(is_staff=True)
+                author = UserFactory.create(is_staff=True)
                 page, version = self._create_version(author, state=state)
 
                 url = reverse(
@@ -173,7 +173,7 @@ class VersionAdminTest(WebTest):
     def test_deleting_archived_or_unpublished_version_is_allowed(self):
         for state in (ARCHIVED, UNPUBLISHED):
             with self.subTest(state=state):
-                author = UserFactory(is_staff=True)
+                author = UserFactory.create(is_staff=True)
                 page, version = self._create_version(author, state=state)
 
                 url = reverse(
@@ -186,7 +186,7 @@ class VersionAdminTest(WebTest):
 
     @override_settings(DJANGOCMS_VERSIONING_ALLOW_DELETING_VERSIONS=False)
     def test_delete_button_hidden_when_deleting_versions_is_disabled(self):
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         page, version = self._create_version(author, state=ARCHIVED)
 
         url = reverse(
@@ -209,7 +209,7 @@ class VersionAdminTest(WebTest):
         Otherwise this admin would be a way around the project wide kill switch,
         which is checked by djangocms-versioning but only on its own version admin.
         """
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         page, version = self._create_version(author, state=ARCHIVED)
 
         url = reverse(
@@ -233,7 +233,7 @@ class VersionAdminTest(WebTest):
         resolves its template by app label, which lands on the one djangocms-versioning
         ships for its own version admin and cannot render from here.
         """
-        author = UserFactory(is_staff=True)
+        author = UserFactory.create(is_staff=True)
         self._create_version(author)
 
         url = reverse("admin:djangocms_versioning_version_changelist")

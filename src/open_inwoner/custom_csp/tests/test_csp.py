@@ -103,13 +103,13 @@ class CSPTest(WebTest):
         self.assertEqual(csp_headers(response), {CSP_HEADER: self.policy})
 
     def test_csp_enforced_for_digid_login(self):
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
         response = self.app.get("/", user=user)
 
         self.assertEqual(csp_headers(response), {CSP_HEADER: self.policy})
 
     def test_csp_enforced_for_staff_login(self):
-        user = UserFactory(is_staff=True)
+        user = UserFactory.create(is_staff=True)
         response = self.app.get("/", user=user)
 
         self.assertEqual(csp_headers(response), {CSP_HEADER: self.policy})
@@ -154,7 +154,7 @@ class CSPTest(WebTest):
         )
 
     def test_csp_excluded_for_admin(self):
-        user = UserFactory(is_staff=True)
+        user = UserFactory.create(is_staff=True)
         response = self.app.get("/admin/", user=user)
 
         self.assertEqual(csp_headers(response), {})

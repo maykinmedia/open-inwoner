@@ -20,7 +20,7 @@ MIJN_AFVAL_CONFIG_STEP_FULL_YAML = str(BASE_DIR / "mijn_afval_config_step_full.y
 
 class MijnAfvalConfigurationStepTest(TestCase):
     def test_configure(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="openafval-service",
             api_root=OPENAFVAL_SERVICE_API_ROOT,
             api_type=APITypes.orc,
@@ -48,7 +48,7 @@ class MijnAfvalConfigurationStepTest(TestCase):
         )
 
     def test_configure_fails_with_wrong_service_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="openafval-service",
             api_root=OPENAFVAL_SERVICE_API_ROOT,
             api_type=APITypes.zrc,
@@ -67,7 +67,7 @@ class MijnAfvalConfigurationStepTest(TestCase):
         )
 
     def test_configure_is_idempotent(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="openafval-service",
             api_root=OPENAFVAL_SERVICE_API_ROOT,
             api_type=APITypes.orc,

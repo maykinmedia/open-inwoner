@@ -37,8 +37,8 @@ from open_inwoner.openzaak.tests.shared import (
 class ClientFactoryTestCase(TestCase):
     def setUp(self):
         self.api_groups = [
-            ZGWApiGroupConfigFactory(name="Default API"),
-            ZGWApiGroupConfigFactory(name="Second API"),
+            ZGWApiGroupConfigFactory.create(name="Default API"),
+            ZGWApiGroupConfigFactory.create(name="Second API"),
         ]
 
     def test_originating_service_is_persisted_on_all_clients(self):
@@ -63,14 +63,14 @@ class ClientFactoryTestCase(TestCase):
 class ZGWApiGroupConfigFilterTests(TestCase):
     def setUp(self):
         self.api_groups = [
-            ZGWApiGroupConfigFactory(
+            ZGWApiGroupConfigFactory.create(
                 name="Default API",
                 ztc_service__api_root=CATALOGI_ROOT,
                 zrc_service__api_root=ZAKEN_ROOT,
                 drc_service__api_root=DOCUMENTEN_ROOT,
                 form_service__api_root="http://some.forms.nl",
             ),
-            ZGWApiGroupConfigFactory(name="Second API"),
+            ZGWApiGroupConfigFactory.create(name="Second API"),
         ]
 
     def test_groups_can_be_filtered_by_client(self):
@@ -111,8 +111,8 @@ class ZGWApiGroupConfigFilterTests(TestCase):
                 )
 
     def test_with_forms_service_excludes_groups_without_a_form_service(self):
-        with_form = ZGWApiGroupConfigFactory()
-        without_form = ZGWApiGroupConfigFactory(form_service=None)
+        with_form = ZGWApiGroupConfigFactory.create()
+        without_form = ZGWApiGroupConfigFactory.create(form_service=None)
 
         result = list(ZGWApiGroupConfig.objects.with_forms_service())
 
@@ -235,7 +235,7 @@ class ZGWApiGroupConfigFilterTests(TestCase):
 
     def test_resolving_to_multiple_objects_raises(self):
         service_already_used = self.api_groups[0].ztc_service
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             ztc_service=service_already_used,
         )
 
@@ -606,7 +606,7 @@ class MultiZgwClientProxyTests(PlainTestCase):
 @requests_mock.Mocker()
 class FetchZakenForCompanyTests(TestCase):
     def setUp(self):
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
         )
         config = OpenZaakConfig.get_solo()

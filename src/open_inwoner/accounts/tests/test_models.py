@@ -7,8 +7,8 @@ from .factories import InviteFactory, UserFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InviteAcceptTests(TestCase):
     def test_accept_establishes_contact_relationship(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
 
         result = invite.accept(invitee)
@@ -18,8 +18,8 @@ class InviteAcceptTests(TestCase):
         self.assertIn(inviter, invitee.user_contacts.all())
 
     def test_accept_returns_false_when_already_accepted(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
         invite.accept(invitee)
 
@@ -28,8 +28,8 @@ class InviteAcceptTests(TestCase):
         self.assertFalse(result)
 
     def test_send_accepted_emails_sends_to_both_parties(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
         invite.accept(invitee)
 
@@ -38,8 +38,8 @@ class InviteAcceptTests(TestCase):
         self.assertIn(invitee.email, recipients)
 
     def test_accepted_emails_not_sent_twice_on_double_accept(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
 
         invite.accept(invitee)
@@ -53,8 +53,8 @@ class InviteAcceptTests(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class UserApproveContactTests(TestCase):
     def test_approve_contact_establishes_relationship(self):
-        sender = UserFactory()
-        receiver = UserFactory()
+        sender = UserFactory.create()
+        receiver = UserFactory.create()
         sender.contacts_for_approval.add(receiver)
 
         result = receiver.approve_contact(sender)
@@ -65,8 +65,8 @@ class UserApproveContactTests(TestCase):
         self.assertNotIn(receiver, sender.contacts_for_approval.all())
 
     def test_approve_contact_sends_notifications_to_both_parties(self):
-        sender = UserFactory()
-        receiver = UserFactory()
+        sender = UserFactory.create()
+        receiver = UserFactory.create()
         sender.contacts_for_approval.add(receiver)
 
         mail.outbox.clear()
@@ -78,8 +78,8 @@ class UserApproveContactTests(TestCase):
         self.assertIn(receiver.email, recipients)
 
     def test_approve_contact_returns_false_when_already_approved(self):
-        sender = UserFactory()
-        receiver = UserFactory()
+        sender = UserFactory.create()
+        receiver = UserFactory.create()
         sender.contacts_for_approval.add(receiver)
 
         receiver.approve_contact(sender)
@@ -92,8 +92,8 @@ class UserApproveContactTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_reject_contact_request_removes_from_pending(self):
-        sender = UserFactory()
-        receiver = UserFactory()
+        sender = UserFactory.create()
+        receiver = UserFactory.create()
         sender.contacts_for_approval.add(receiver)
 
         receiver.reject_contact_request(sender)

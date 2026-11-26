@@ -21,10 +21,10 @@ OBJECTS_API_CONFIG_STEP_FULL_YAML = str(BASE_DIR / "objects_api_config_step_full
 
 class ObjectsAPIConfigurationStepTest(TestCase):
     def test_configure(self):
-        objects_service = ServiceFactory(
+        objects_service = ServiceFactory.create(
             slug="objecten-test", api_root=OBJECTS_API_ROOT, api_type=APITypes.orc
         )
-        objecttypes_service = ServiceFactory(
+        objecttypes_service = ServiceFactory.create(
             slug="objecttypen-test",
             api_root=OBJECTTYPES_API_ROOT,
             api_type=APITypes.orc,
@@ -53,10 +53,10 @@ class ObjectsAPIConfigurationStepTest(TestCase):
         )
 
     def test_configure_fails_with_wrong_service_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="objecten-test", api_root=OBJECTS_API_ROOT, api_type=APITypes.zrc
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="objecttypen-test",
             api_root=OBJECTTYPES_API_ROOT,
             api_type=APITypes.orc,
@@ -75,10 +75,10 @@ class ObjectsAPIConfigurationStepTest(TestCase):
         )
 
     def test_configure_is_idempotent(self):
-        objects_service = ServiceFactory(
+        objects_service = ServiceFactory.create(
             slug="objecten-test", api_root=OBJECTS_API_ROOT, api_type=APITypes.orc
         )
-        objecttypes_service = ServiceFactory(
+        objecttypes_service = ServiceFactory.create(
             slug="objecttypen-test",
             api_root=OBJECTTYPES_API_ROOT,
             api_type=APITypes.orc,

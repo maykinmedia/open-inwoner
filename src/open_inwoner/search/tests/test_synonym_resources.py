@@ -51,7 +51,7 @@ class TestSynonymImportResource(TestCase):
 
 class TestSynonymExportResource(TestCase):
     def setUp(self):
-        self.synonym = SynonymFactory()
+        self.synonym = SynonymFactory.create()
         self.resource = SynonymResource()
 
     def test_export_returns_expected_row(self):

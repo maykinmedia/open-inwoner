@@ -20,21 +20,21 @@ from open_inwoner.configurations.models import SiteConfiguration
 class ExpiringActionsNotificationTest(TestCase):
     def test_collected_notifications_are_json_serializable(self):
         # regression test for #2765
-        ActionFactory(end_date=date.today())
+        ActionFactory.create(end_date=date.today())
 
         notifications = collect_notifications_about_expiring_actions()
 
         celery_dumps(notifications)
 
     def test_send_emails_about_expiring_actions(self):
-        harry = UserFactory()
-        sally = UserFactory()
-        joe = UserFactory()
-        schmoe = UserFactory()
-        ActionFactory(end_date=date.today(), created_by=harry, is_for=joe)
-        ActionFactory(end_date=date.today(), created_by=sally, is_for=schmoe)
+        harry = UserFactory.create()
+        sally = UserFactory.create()
+        joe = UserFactory.create()
+        schmoe = UserFactory.create()
+        ActionFactory.create(end_date=date.today(), created_by=harry, is_for=joe)
+        ActionFactory.create(end_date=date.today(), created_by=sally, is_for=schmoe)
         # contrast: no email for user without action
-        UserFactory()
+        UserFactory.create()
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
@@ -52,7 +52,9 @@ class ExpiringActionsNotificationTest(TestCase):
             self.assertEqual(email.to, [recipient.email])
 
     def test_no_email_about_expiring_action_when_disabled_by_user(self):
-        ActionFactory(end_date=date.today(), created_by__plans_notifications=False)
+        ActionFactory.create(
+            end_date=date.today(), created_by__plans_notifications=False
+        )
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
@@ -63,35 +65,35 @@ class ExpiringActionsNotificationTest(TestCase):
         config.notifications_actions_enabled = False
         config.save()
 
-        ActionFactory(end_date=date.today())
+        ActionFactory.create(end_date=date.today())
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_action_not_yet_expiring(self):
-        ActionFactory(end_date=date.today() + timedelta(days=1))
+        ActionFactory.create(end_date=date.today() + timedelta(days=1))
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_action_already_expired(self):
-        ActionFactory(end_date=date.today() - timedelta(days=1))
+        ActionFactory.create(end_date=date.today() - timedelta(days=1))
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_closed_action(self):
-        ActionFactory(end_date=date.today(), status=StatusChoices.closed)
+        ActionFactory.create(end_date=date.today(), status=StatusChoices.closed)
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_expiring_action_inactive_user(self):
-        ActionFactory(end_date=date.today(), created_by__is_active=False)
+        ActionFactory.create(end_date=date.today(), created_by__is_active=False)
 
         schedule_user_notifications.delay(notify_about="actions", channel="email")
 

@@ -100,7 +100,7 @@ class ContactFormIntegrationTest(
         config.save()
 
         config = ESuiteKlantConfig.get_solo()
-        subject = ContactFormSubjectFactory(esuite_config=config)
+        subject = ContactFormSubjectFactory.create(esuite_config=config)
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -143,9 +143,9 @@ class ContactFormIntegrationTest(
         config.save()
 
         esuite_config = ESuiteKlantConfig.get_solo()
-        subject = ContactFormSubjectFactory(esuite_config=esuite_config)
+        subject = ContactFormSubjectFactory.create(esuite_config=esuite_config)
 
-        user = UserFactory()
+        user = UserFactory.create()
 
         response = self.app.get(self.url, user=user)
         form = response.forms["contactmoment-form"]
@@ -173,8 +173,8 @@ class ContactFormIntegrationTest(
         config.save()
 
         config = ESuiteKlantConfig.get_solo()
-        subject_1 = ContactFormSubjectFactory(esuite_config=config)
-        subject_2 = ContactFormSubjectFactory(esuite_config=config)
+        subject_1 = ContactFormSubjectFactory.create(esuite_config=config)
+        subject_2 = ContactFormSubjectFactory.create(esuite_config=config)
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -215,7 +215,7 @@ class ContactFormIntegrationTest(
         config.save()
 
         esuite_config = ESuiteKlantConfig.get_solo()
-        subject = ContactFormSubjectFactory(esuite_config=esuite_config)
+        subject = ContactFormSubjectFactory.create(esuite_config=esuite_config)
 
         response = self.app.get(self.url)
         form = response.forms["contactmoment-form"]
@@ -273,7 +273,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_anon(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -330,7 +330,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_openklant(m)
 
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
@@ -338,7 +338,7 @@ class ContactFormIntegrationTest(
         config.send_email_confirmation = True
         config.save()
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag", esuite_subject_code=None
         )
 
@@ -389,7 +389,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_anon_without_klant(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -452,7 +452,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_digid(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -533,7 +533,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_digid(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -619,7 +619,7 @@ class ContactFormIntegrationTest(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
 
-                    subject = ContactFormSubjectFactory(
+                    subject = ContactFormSubjectFactory.create(
                         subject="Aanvraag document",
                         esuite_subject_code="afdeling-xyz",
                         esuite_config=esuite_config,
@@ -713,7 +713,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_digid_missing_contact_info(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -836,7 +836,7 @@ class ContactFormIntegrationTest(
                         m, use_rsin=use_rsin_for_innNnpId_query_parameter
                     )
 
-                    subject = ContactFormSubjectFactory(
+                    subject = ContactFormSubjectFactory.create(
                         subject="Aanvraag document",
                         esuite_subject_code="afdeling-xyz",
                         esuite_config=esuite_config,
@@ -933,7 +933,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_anon(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,
@@ -969,7 +969,7 @@ class ContactFormIntegrationTest(
         MockAPICreateData.setUpServices()
 
         # Create user without BSN/KVK
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="",
             kvk="",
             email="test@example.com",
@@ -981,7 +981,7 @@ class ContactFormIntegrationTest(
         config_data = MockAPICreateData()
         config_data.install_mocks_openklant_no_bsn_kvk(m)
 
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
@@ -989,7 +989,7 @@ class ContactFormIntegrationTest(
         config.send_email_confirmation = True
         config.save()
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag", esuite_subject_code=None
         )
 
@@ -1058,7 +1058,7 @@ class ContactFormIntegrationTest(
         MockAPICreateData.setUpServices()
 
         # Create user without BSN/KVK
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="",
             kvk="",
             email="test@example.com",
@@ -1082,7 +1082,7 @@ class ContactFormIntegrationTest(
         data = MockAPICreateData()
         data.install_mocks_anon_without_klant(m)
 
-        subject = ContactFormSubjectFactory(
+        subject = ContactFormSubjectFactory.create(
             subject="Aanvraag document",
             esuite_subject_code="afdeling-xyz",
             esuite_config=esuite_config,

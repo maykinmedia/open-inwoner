@@ -15,7 +15,7 @@ class ViewTest(WebTest):
         self.assertEqual(response.content, b"")
 
     def test_when_logged_in(self):
-        user = UserFactory()
+        user = UserFactory.create()
         response = self.app.get(self.url, user=user)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"restarted")

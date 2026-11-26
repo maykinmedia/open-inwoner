@@ -25,7 +25,7 @@ from .factories import (
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedProducts(WebTest):
     def test_product_referrer_policy_header(self):
-        product = ProductFactory()
+        product = ProductFactory.create()
 
         response = self.client.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -34,19 +34,23 @@ class TestPublishedProducts(WebTest):
         self.assertEqual(response.headers["Referrer-Policy"], "same-origin")
 
     def test_only_published_products_exist_on_categories_page_when_anonymous(self):
-        category = CategoryFactory(path="0001", name="First one", slug="first-one")
-        product1 = ProductFactory(categories=(category,))
-        product2 = ProductFactory(categories=(category,), published=False)
+        category = CategoryFactory.create(
+            path="0001", name="First one", slug="first-one"
+        )
+        product1 = ProductFactory.create(categories=(category,))
+        product2 = ProductFactory.create(categories=(category,), published=False)
         response = self.app.get(
             reverse("products:category_detail", kwargs={"slug": category.slug})
         )
         self.assertEqual(list(response.context["products"]), [product1])
 
     def test_only_published_products_exist_on_categories_page_when_logged_in(self):
-        user = UserFactory()
-        category = CategoryFactory(path="0001", name="First one", slug="first-one")
-        product1 = ProductFactory(categories=(category,))
-        product2 = ProductFactory(categories=(category,), published=False)
+        user = UserFactory.create()
+        category = CategoryFactory.create(
+            path="0001", name="First one", slug="first-one"
+        )
+        product1 = ProductFactory.create(categories=(category,))
+        product2 = ProductFactory.create(categories=(category,), published=False)
         response = self.app.get(
             reverse("products:category_detail", kwargs={"slug": category.slug}),
             user=user,
@@ -54,9 +58,9 @@ class TestPublishedProducts(WebTest):
         self.assertEqual(list(response.context["products"]), [product1])
 
     def test_only_published_related_products_exist_on_product_page_when_anonymous(self):
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
-        product3 = ProductFactory(related_products=(product1, product2))
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
+        product3 = ProductFactory.create(related_products=(product1, product2))
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product1.slug})
         )
@@ -64,10 +68,10 @@ class TestPublishedProducts(WebTest):
         self.assertNotContains(response, product2.name)
 
     def test_only_published_related_products_exist_on_product_page_when_logged_in(self):
-        user = UserFactory()
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
-        product3 = ProductFactory(related_products=(product1, product2))
+        user = UserFactory.create()
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
+        product3 = ProductFactory.create(related_products=(product1, product2))
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product1.slug}),
             user=user,
@@ -76,9 +80,11 @@ class TestPublishedProducts(WebTest):
         self.assertNotContains(response, product2.name)
 
     def test_only_published_products_exist_on_zelfdiagnose_when_anoynymous(self):
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
-        questionnaire = QuestionnaireStepFactory(related_products=(product1, product2))
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
+        questionnaire = QuestionnaireStepFactory.create(
+            related_products=(product1, product2)
+        )
         response = self.app.get(
             reverse("products:root_step", kwargs={"slug": questionnaire.slug})
         )
@@ -86,10 +92,12 @@ class TestPublishedProducts(WebTest):
         self.assertNotContains(response, product2.name)
 
     def test_only_published_products_exist_on_zelfdiagnose_when_logged_in(self):
-        user = UserFactory()
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
-        questionnaire = QuestionnaireStepFactory(related_products=(product1, product2))
+        user = UserFactory.create()
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
+        questionnaire = QuestionnaireStepFactory.create(
+            related_products=(product1, product2)
+        )
         response = self.app.get(
             reverse("products:root_step", kwargs={"slug": questionnaire.slug}),
             user=user,
@@ -98,8 +106,8 @@ class TestPublishedProducts(WebTest):
         self.assertNotContains(response, product2.name)
 
     def test_only_published_products_exist_on_product_finder_page_when_anonymous(self):
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
         response = self.app.get(reverse("products:product_finder"))
         matched_products = list(response.context["matched_products"])
         possible_products = list(response.context["possible_products"])
@@ -109,9 +117,9 @@ class TestPublishedProducts(WebTest):
         self.assertNotIn(product2, possible_products)
 
     def test_only_published_products_exist_on_product_finder_page_when_logged_in(self):
-        user = UserFactory()
-        product1 = ProductFactory()
-        product2 = ProductFactory(published=False)
+        user = UserFactory.create()
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create(published=False)
         response = self.app.get(reverse("products:product_finder"), user=user)
         matched_products = list(response.context["matched_products"])
         possible_products = list(response.context["possible_products"])
@@ -121,9 +129,11 @@ class TestPublishedProducts(WebTest):
         self.assertNotIn(product2, possible_products)
 
     def test_products_are_ordered(self):
-        category = CategoryFactory(path="0001", name="First one", slug="first-one")
-        product1 = ProductFactory(categories=(category,))
-        product2 = ProductFactory(categories=(category,))
+        category = CategoryFactory.create(
+            path="0001", name="First one", slug="first-one"
+        )
+        product1 = ProductFactory.create(categories=(category,))
+        product2 = ProductFactory.create(categories=(category,))
 
         response = self.app.get(
             reverse("products:category_detail", kwargs={"slug": category.slug})
@@ -141,12 +151,14 @@ class TestPublishedProducts(WebTest):
 
     def test_product_in_nested_category(self):
         # regression test for Taiga #1402
-        category1 = CategoryFactory(path="0001", name="First one", slug="first-one")
+        category1 = CategoryFactory.create(
+            path="0001", name="First one", slug="first-one"
+        )
         category2 = category1.add_child(
             path="0002", name="Second one", slug="second-one"
         )
         # add product to category2 and access it through that (so category1 is a parent)
-        product1 = ProductFactory(categories=(category2,))
+        product1 = ProductFactory.create(categories=(category2,))
         response = self.app.get(
             reverse("products:category_detail", kwargs={"slug": category2.slug})
         )
@@ -155,7 +167,7 @@ class TestPublishedProducts(WebTest):
     def test_detail_page_for_unpublished_product_redirects(self):
         # regression test for Taiga #2523
 
-        product = ProductFactory(published=False)
+        product = ProductFactory.create(published=False)
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
         )
@@ -167,16 +179,16 @@ class TestPublishedProducts(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductFAQ(WebTest):
     def test_product_detail_shows_product_faq(self):
-        product = ProductFactory()
-        question_1 = QuestionFactory(
+        product = ProductFactory.create()
+        question_1 = QuestionFactory.create(
             question="Does this sort to the bottom?", order=10, product=product
         )
-        question_2 = QuestionFactory(
+        question_2 = QuestionFactory.create(
             question="Sorting to the top", order=1, product=product
         )
 
-        other_product = ProductFactory()
-        other_question = QuestionFactory(product=other_product)
+        other_product = ProductFactory.create()
+        other_question = QuestionFactory.create(product=other_product)
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -202,7 +214,7 @@ class TestProductFAQ(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductContent(WebTest):
     def test_button_is_rendered_inside_content_when_link_and_cta_exist(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content [CTABUTTON]", link="http://www.example.com"
         )
 
@@ -215,7 +227,7 @@ class TestProductContent(WebTest):
         self.assertIn(product.link, cta_button[0].values())
 
     def test_button_is_rendered_inside_content_when_form_and_cta_exist(self):
-        product = ProductFactory(content="Some content [CTABUTTON]", form="demo")
+        product = ProductFactory.create(content="Some content [CTABUTTON]", form="demo")
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -226,7 +238,7 @@ class TestProductContent(WebTest):
         self.assertIn(product.form_link, cta_button[0].values())
 
     def test_button_is_rendered_inside_content_when_form_and_link_and_cta_exist(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content [CTABUTTON]",
             link="http://www.example.com",
             form="demo",
@@ -241,7 +253,9 @@ class TestProductContent(WebTest):
         self.assertIn(product.link, cta_button[0].values())
 
     def test_button_is_not_rendered_inside_content_when_no_cta(self):
-        product = ProductFactory(content="Some content", link="http://www.example.com")
+        product = ProductFactory.create(
+            content="Some content", link="http://www.example.com"
+        )
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -251,7 +265,7 @@ class TestProductContent(WebTest):
         self.assertFalse(cta_button)
 
     def test_button_is_not_rendered_inside_content_when_no_form_or_link(self):
-        product = ProductFactory(content="Some content [CTABUTTON]")
+        product = ProductFactory.create(content="Some content [CTABUTTON]")
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -264,7 +278,7 @@ class TestProductContent(WebTest):
         """
         Assert that button text can be modified + aria-labels are changed accordingly
         """
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content [CTABUTTON]",
             link="http://www.example.com",
             button_text="click me!",
@@ -283,7 +297,7 @@ class TestProductContent(WebTest):
         self.assertEqual(cta_button_span.attrib["aria-label"], "click me!")
 
     def test_sidemenu_button_is_not_rendered_when_cta_inside_product_content(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content=r"Some content \[CTABUTTON\]",
             link="http://www.example.com",  # noqa
         )
@@ -298,7 +312,9 @@ class TestProductContent(WebTest):
         self.assertFalse(sidemenu_cta_button)
 
     def test_sidemenu_button_is_rendered_when_no_cta_inside_product_content(self):
-        product = ProductFactory(content="Some content", link="http://www.example.com")
+        product = ProductFactory.create(
+            content="Some content", link="http://www.example.com"
+        )
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -314,7 +330,7 @@ class TestProductContent(WebTest):
         # Test that content with HTML tags and markdown is properly rendered
         # After migration to ProseMirror: \\<b> and **text** both become strong marks
         # ProseMirror normalizes adjacent strong marks, so "world" and "test" merge
-        product = ProductFactory(content="hello \\<b>world\\</b> **test**")
+        product = ProductFactory.create(content="hello \\<b>world\\</b> **test**")
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -332,15 +348,15 @@ class TestProductContent(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ProductConditionTest(WebTest):
     def test_product_with_conditions(self):
-        condition1 = ProductConditionFactory(
+        condition1 = ProductConditionFactory.create(
             positive_text="when the stars align",
             negative_text="when you're out of luck",
         )
-        condition2 = ProductConditionFactory(
+        condition2 = ProductConditionFactory.create(
             positive_text="when it's bright and sunny",
             negative_text="when it's dark and gloomy",
         )
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content",
             link="http://www.example.com",
         )
@@ -359,7 +375,7 @@ class ProductConditionTest(WebTest):
         self.assertEqual(conditions_negative[1].tail.lstrip(), condition2.negative_text)
 
     def test_product_no_conditions(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content",
             link="http://www.example.com",
         )
@@ -377,8 +393,8 @@ class ProductConditionTest(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductVideo(WebTest):
     def test_product_video_is_rendered(self):
-        video = VideoFactory()
-        product = ProductFactory(
+        video = VideoFactory.create()
+        product = ProductFactory.create(
             content="Some content",
             link="http://www.example.com",
             video=video,
@@ -395,7 +411,7 @@ class TestProductVideo(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestProductDetailView(WebTest):
     def test_subheadings_in_sidebar(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="##First subheading\rlorem ipsum...\r##Second subheading",
             link="http://www.example.com",
         )
@@ -422,7 +438,7 @@ class TestProductDetailView(WebTest):
         self.assertEqual(links[3].attrib["href"], "#subheading-second-subheading")
 
     def test_auto_redirect_to_link(self):
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="##First subheading\rlorem ipsum...\r##Second subheading",
             auto_redirect_to_link="http://www.example.com",
         )
@@ -442,7 +458,7 @@ class ProductPagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestC
     def test_click_cta_button(self, mock_solo):
         mock_solo.return_value.cookiebanner_enabled = False
 
-        product = ProductFactory(
+        product = ProductFactory.create(
             content="Some content [CTABUTTON]", link="https://www.example.com"
         )
 

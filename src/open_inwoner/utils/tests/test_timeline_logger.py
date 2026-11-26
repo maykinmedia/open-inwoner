@@ -21,7 +21,7 @@ class TestAdminTimelineLogging(WebTest):
     csrf_checks = False
 
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
         self.plan = PlanFactory.build()
 
     def add_instance(self):
@@ -54,7 +54,7 @@ class TestAdminTimelineLogging(WebTest):
 
     @freeze_time("2021-10-18 13:00:00")
     def test_changed_object_is_logged(self):
-        plan = PlanFactory(created_by=self.user)
+        plan = PlanFactory.create(created_by=self.user)
         url = reverse("admin:plans_plan_change", kwargs={"object_id": plan.id})
         form = self.app.get(url, user=self.user).forms.get("plan_form")
         form["title"] = "Updated"
@@ -79,7 +79,7 @@ class TestAdminTimelineLogging(WebTest):
 
     @freeze_time("2021-10-18 13:00:00")
     def test_deleted_object_is_logged(self):
-        plan = PlanFactory(created_by=self.user)
+        plan = PlanFactory.create(created_by=self.user)
         url = reverse("admin:plans_plan_delete", kwargs={"object_id": plan.id})
         delete_form = self.app.get(url, user=self.user).forms[1]
         delete_form.submit()
@@ -158,7 +158,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEqual(action, _("Aangemaakt"))
 
     def test_get_action_returns_change_when_object_is_modified(self):
-        plan = PlanFactory()
+        plan = PlanFactory.create()
         url = reverse("admin:plans_plan_change", kwargs={"object_id": plan.id})
         form = self.app.get(url, user=self.user).forms.get("plan_form")
         form["title"] = "Updated"
@@ -171,7 +171,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEqual(action, _("Gewijzigd"))
 
     def test_get_action_returns_delete_when_object_is_deleted(self):
-        plan = PlanFactory()
+        plan = PlanFactory.create()
         url = reverse("admin:plans_plan_delete", kwargs={"object_id": plan.id})
         form = self.app.get(url, user=self.user).forms[1]
         form.submit()
@@ -183,7 +183,7 @@ class TestAdminTimelineLogging(WebTest):
         self.assertEqual(action, _("Verwijderd"))
 
     def test_get_action_returns_empty_string_when_no_extra_data_exists(self):
-        plan = PlanFactory()
+        plan = PlanFactory.create()
         TimelineLog.objects.create(content_object=plan, user=self.user)
 
         log_entry = TimelineLog.objects.last()
@@ -205,7 +205,7 @@ class TestAdminTimelineLogging(WebTest):
 class TestTimelineLogExport(WebTest):
     @freeze_time("2021-10-18 13:00:00")
     def test_proper_data_is_exported(self):
-        user = UserFactory(is_superuser=True, is_staff=True)
+        user = UserFactory.create(is_superuser=True, is_staff=True)
         export_url = reverse("admin:timeline_logger_timelinelog_export")
         response = self.app.get(export_url, user=user)
         form = next(f for f in response.forms.values() if "file_format" in f.fields)

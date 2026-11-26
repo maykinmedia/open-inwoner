@@ -35,12 +35,12 @@ KLANTENSYSTEEM_CONFIG_STEP_WITH_OPENKLANT2_YAML = str(
 
 class KlantenSysteemConfigurationStepTest(TestCase):
     def test_configure_basic_klantensysteem_without_nested_configs(self):
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        cmc = ServiceFactory(
+        cmc = ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -73,12 +73,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_with_nested_esuite_config(self):
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        cmc = ServiceFactory(
+        cmc = ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -124,12 +124,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         re-run must clear those too, not just the ones already tied to this
         config, or the eventual subject list won't match what was configured.
         """
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -156,12 +156,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_esuite_fails_with_nonexistent_service_identifiers(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service-different-from-yaml",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="contactmomenten-service-different-from-yaml",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -183,12 +183,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_esuite_fails_with_wrong_klanten_service_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.orc,
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -209,12 +209,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_esuite_fails_with_wrong_contactmomenten_service_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.orc,
@@ -236,12 +236,12 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_esuite_is_idempotent_and_overwrites_modified_values(self):
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        cmc = ServiceFactory(
+        cmc = ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,
@@ -282,7 +282,7 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         assert_values()
 
     def test_configure_with_nested_openklant2_config(self):
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
@@ -331,7 +331,7 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         appending to it -- and rather than leaving it as the admin may have
         edited it, the same rule the rest of this step follows.
         """
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
@@ -361,7 +361,7 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         the same "omitted means leave it alone" rule as everywhere else in
         setup-configuration that doesn't overwrite unconditionally.
         """
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
@@ -394,7 +394,7 @@ class KlantenSysteemConfigurationStepTest(TestCase):
         )
 
     def test_configure_openklant2_is_idempotent_and_overwrites_modified_values(self):
-        kc = ServiceFactory(
+        kc = ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
@@ -455,7 +455,7 @@ class SyncSubjectsBackendMismatchTest(TestCase):
     def test_configure_openklant2_fails_when_a_subject_has_an_esuite_subject_code(
         self,
     ):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
@@ -493,12 +493,12 @@ class SyncSubjectsBackendMismatchTest(TestCase):
     def test_configure_esuite_fails_when_a_subject_is_missing_an_esuite_subject_code(
         self,
     ):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="klanten-service",
             api_root=KLANTEN_SERVICE_API_ROOT,
             api_type=APITypes.kc,
         )
-        ServiceFactory(
+        ServiceFactory.create(
             slug="contactmomenten-service",
             api_root=CONTACTMOMENTEN_SERVICE_API_ROOT,
             api_type=APITypes.cmc,

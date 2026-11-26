@@ -13,8 +13,8 @@ from open_inwoner.pdc.tests.factories import ProductFactory, ProductLocationFact
 class TestLocationViewThroughMap(WebTest):
     def test_product_location_link_is_rendered_in_plugin(self):
         cms_tools.create_apphook_page(ProductsApphook)
-        product = ProductFactory()
-        product_location = ProductLocationFactory()
+        product = ProductFactory.create()
+        product_location = ProductLocationFactory.create()
         product.locations.add(product_location)
 
         html, context = cms_tools.render_plugin(ProductLocationPlugin)
@@ -25,8 +25,8 @@ class TestLocationViewThroughMap(WebTest):
         self.assertIn(url, html)
 
     def test_no_output_generated_without_apphook(self):
-        product = ProductFactory()
-        product_location = ProductLocationFactory()
+        product = ProductFactory.create()
+        product_location = ProductLocationFactory.create()
         product.locations.add(product_location)
 
         html, context = cms_tools.render_plugin(ProductLocationPlugin)

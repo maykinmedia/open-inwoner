@@ -25,7 +25,7 @@ HAALCENTRAAL_CONFIG_STEP_MINIMAL_YAML = str(
 
 class HaalCentraalConfigurationStepTest(TestCase):
     def test_configure_with_full_config(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="brp-service",
             api_root=BRP_SERVICE_API_ROOT,
             api_type=APITypes.orc,
@@ -48,7 +48,7 @@ class HaalCentraalConfigurationStepTest(TestCase):
         )
 
     def test_configure_with_minimal_config_leaves_omitted_fields_untouched(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="brp-service",
             api_root=BRP_SERVICE_API_ROOT,
             api_type=APITypes.orc,
@@ -84,7 +84,7 @@ class HaalCentraalConfigurationStepTest(TestCase):
         )
 
     def test_configure_fails_with_wrong_service_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="brp-service",
             api_root=BRP_SERVICE_API_ROOT,
             api_type=APITypes.zrc,
@@ -103,7 +103,7 @@ class HaalCentraalConfigurationStepTest(TestCase):
         )
 
     def test_configure_is_idempotent(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="brp-service",
             api_root=BRP_SERVICE_API_ROOT,
             api_type=APITypes.orc,

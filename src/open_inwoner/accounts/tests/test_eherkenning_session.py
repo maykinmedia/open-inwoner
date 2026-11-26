@@ -14,8 +14,8 @@ from open_inwoner.utils.test import SessionMiddleware
 
 class EHerkenningSessionContextTests(TestCase):
     def setUp(self):
-        self.user = eHerkenningUserFactory()
-        self.vestiging_user = eHerkenningVestigingUserFactory(kvk=self.user.kvk)
+        self.user = eHerkenningUserFactory.create()
+        self.vestiging_user = eHerkenningVestigingUserFactory.create(kvk=self.user.kvk)
 
     def make_request_with_session(self):
         request = RequestFactory().get("/")
@@ -97,7 +97,7 @@ class EHerkenningSessionContextTests(TestCase):
         request.session["_auth_user_backend"] = (
             EHerkenningSessionContext._expected_auth_backends()[0]
         )
-        request.user = DigidUserFactory()
+        request.user = DigidUserFactory.create()
 
         context = EHerkenningSessionContext(request)
         with self.assertRaises(ValueError) as ctx:
@@ -135,7 +135,7 @@ class EHerkenningSessionContextTests(TestCase):
             EHerkenningSessionContext._expected_auth_backends()[0]
         )
         request.user = self.user
-        different_kvk_user = eHerkenningUserFactory(kvk="38804926")
+        different_kvk_user = eHerkenningUserFactory.create(kvk="38804926")
 
         context = EHerkenningSessionContext(request)
         with self.assertRaises(ValueError) as ctx:

@@ -36,12 +36,16 @@ class ContactViewTests(WebTest):
     def setUp(self) -> None:
         caches["notification_throttle"].clear()
 
-        self.user = UserFactory(first_name="Joe", infix="van de", last_name="Doe")
-        self.digid_user = DigidUserFactory(
+        self.user = UserFactory.create(
+            first_name="Joe", infix="van de", last_name="Doe"
+        )
+        self.digid_user = DigidUserFactory.create(
             first_name="Jane", infix="van de", last_name="Roe"
         )
 
-        self.contact = UserFactory(first_name="Harry", infix="van de", last_name="Moe")
+        self.contact = UserFactory.create(
+            first_name="Harry", infix="van de", last_name="Moe"
+        )
         self.user.user_contacts.add(self.contact)
         self.login_url = reverse("login")
         self.list_url = reverse("profile:contact_list")
@@ -59,12 +63,12 @@ class ContactViewTests(WebTest):
         self.assertContains(response, self.contact.first_name)
 
     def test_contact_list_only_show_personal_contacts(self):
-        other_user = UserFactory(first_name="Luke")
+        other_user = UserFactory.create(first_name="Luke")
         response = self.app.get(self.list_url, user=other_user)
         self.assertNotContains(response, self.contact.first_name)
 
     def test_list_shows_pending_invitations(self):
-        existing_user = UserFactory(first_name="UniqueName")
+        existing_user = UserFactory.create(first_name="UniqueName")
         self.user.contacts_for_approval.add(existing_user)
         response = self.app.get(self.list_url, user=self.user)
 
@@ -72,7 +76,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.email)
 
     def test_contact_filter(self):
-        begeleider = UserFactory(
+        begeleider = UserFactory.create(
             first_name="Luke", contact_type=ContactTypeChoices.begeleider
         )
         self.user.user_contacts.add(begeleider)
@@ -130,7 +134,9 @@ class ContactViewTests(WebTest):
         self.assertEqual(_("Stuur bericht"), message_button_text)
 
     def test_contact_list_show_reversed(self):
-        other_contact = UserFactory(first_name="reverse_contact_user_should_be_found")
+        other_contact = UserFactory.create(
+            first_name="reverse_contact_user_should_be_found"
+        )
         other_contact.user_contacts.add(self.user)
 
         response = self.app.get(self.list_url, user=self.user)
@@ -168,8 +174,10 @@ class ContactViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_existing_users_with_shared_email_all_receive_approval_request(self):
-        regular_user = UserFactory(email="shared@example.com")
-        digid_user = DigidUserFactory(email="shared@example.com", bsn="111111111")
+        regular_user = UserFactory.create(email="shared@example.com")
+        digid_user = DigidUserFactory.create(
+            email="shared@example.com", bsn="111111111"
+        )
 
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
@@ -195,7 +203,7 @@ class ContactViewTests(WebTest):
             )
 
     def test_existing_user_contact(self):
-        existing_user = UserFactory(first_name="Luke")
+        existing_user = UserFactory.create(first_name="Luke")
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 
@@ -219,8 +227,8 @@ class ContactViewTests(WebTest):
         return form.submit(user=sender)
 
     def test_second_contact_request_within_minute_fails(self):
-        first_receiver = UserFactory()
-        second_receiver = UserFactory()
+        first_receiver = UserFactory.create()
+        second_receiver = UserFactory.create()
 
         with freeze_time() as frozen_time:
             self.submit_contact_form(self.user, first_receiver)
@@ -235,8 +243,8 @@ class ContactViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_second_contact_request_after_minute_succeeds(self):
-        first_receiver = UserFactory()
-        second_receiver = UserFactory()
+        first_receiver = UserFactory.create()
+        second_receiver = UserFactory.create()
 
         with freeze_time() as frozen_time:
             self.submit_contact_form(self.user, first_receiver)
@@ -250,8 +258,8 @@ class ContactViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 2)
 
     def test_contact_request_throttle_is_per_user(self):
-        other_sender = UserFactory()
-        receiver = UserFactory()
+        other_sender = UserFactory.create()
+        receiver = UserFactory.create()
 
         self.submit_contact_form(self.user, receiver)
         response = self.submit_contact_form(other_sender, receiver)
@@ -261,7 +269,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(len(mail.outbox), 2)
 
     def test_invalid_contact_request_is_not_throttled(self):
-        receiver = UserFactory()
+        receiver = UserFactory.create()
 
         response = self.submit_contact_form(self.user, self.contact)
         self.assertEqual(len(response.context["form"].errors["__all__"]), 1)
@@ -272,7 +280,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(list(self.user.contacts_for_approval.all()), [receiver])
 
     def test_existing_user_contact_with_case_sensitive_email(self):
-        existing_user = UserFactory(email="user@example.com", bsn="111111111")
+        existing_user = UserFactory.create(email="user@example.com", bsn="111111111")
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 
@@ -305,7 +313,7 @@ class ContactViewTests(WebTest):
         self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_adding_inactive_contact_fails(self):
-        inactive_user = UserFactory(is_active=False)
+        inactive_user = UserFactory.create(is_active=False)
         response = self.app.get(self.create_url, user=self.user)
         form = response.forms["contact-form"]
 
@@ -389,7 +397,7 @@ class ContactViewTests(WebTest):
     def test_digid_contact_with_duplicate_email_success(self, m):
         m.return_value = self.digid_user
 
-        existing_user = DigidUserFactory(
+        existing_user = DigidUserFactory.create(
             first_name="Luke",
             last_name="Skywalker",
             bsn="111111111",
@@ -416,7 +424,7 @@ class ContactViewTests(WebTest):
     def test_digid_contact_duplicate_email_case_insensitive_success(self, m):
         m.return_value = self.digid_user
 
-        existing_user = DigidUserFactory(
+        existing_user = DigidUserFactory.create(
             first_name="Luke",
             last_name="Skywalker",
             bsn="111111111",
@@ -465,11 +473,11 @@ class ContactViewTests(WebTest):
         self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_user_cannot_delete_other_users_contact(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.post(self.delete_url, user=other_user, status=404)
 
     def test_approve_with_existing_user(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
 
@@ -494,7 +502,7 @@ class ContactViewTests(WebTest):
         self.assertIn(self.user, existing_user.user_contacts.all())
 
     def test_reject_with_existing_user(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
 
@@ -519,7 +527,7 @@ class ContactViewTests(WebTest):
         self.assertNotIn(self.user, existing_user.user_contacts.all())
 
     def test_approve_action_redirects_to_contact_list_page(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
         self.user.contacts_for_approval.add(existing_user)
@@ -530,7 +538,7 @@ class ContactViewTests(WebTest):
         self.assertRedirects(response, reverse("profile:contact_list"))
 
     def test_approve_contact_sends_notifications_to_both_parties(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
         self.user.contacts_for_approval.add(existing_user)
@@ -546,14 +554,14 @@ class ContactViewTests(WebTest):
         self.assertIn(existing_user.email, recipients)
 
     def test_user_cannot_approve_other_users_contact(self):
-        other_user = UserFactory()
-        contact = UserFactory()
+        other_user = UserFactory.create()
+        contact = UserFactory.create()
         self.user.contacts_for_approval.add(contact)
         url = reverse("profile:contact_approval", kwargs={"uuid": contact.uuid})
         response = self.app.post(url, user=other_user, status=404)
 
     def test_pending_approval_shows_only_email_in_creator_page(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke",
             last_name="Skywalker",
             email="ex@example.com",
@@ -567,7 +575,7 @@ class ContactViewTests(WebTest):
         self.assertNotContains(response, existing_user.last_name)
 
     def test_accepted_contact_appears_in_both_contact_lists(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
         self.user.contacts_for_approval.add(existing_user)
@@ -589,7 +597,7 @@ class ContactViewTests(WebTest):
         self.assertContains(response, existing_user.last_name)
 
     def test_post_with_no_params_in_contact_approval_returns_bad_request(self):
-        existing_user = UserFactory(email="ex@example.com")
+        existing_user = UserFactory.create(email="ex@example.com")
         self.user.contacts_for_approval.add(existing_user)
         url = reverse("profile:contact_approval", kwargs={"uuid": self.user.uuid})
         response = self.app.post(url, user=existing_user, status=400)
@@ -599,7 +607,7 @@ class ContactViewTests(WebTest):
 
     # TODO: fix
     def test_notification_email_for_approval_is_sent(self):
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             first_name="Luke", last_name="Skywalker", email="ex@example.com"
         )
 
@@ -630,7 +638,7 @@ class ContactViewTests(WebTest):
         image = ImageFile(io.BytesIO(img_bytes), name="foo.jpg")
 
         # update user's type and image
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             email="ex@example.com",
             contact_type=ContactTypeChoices.begeleider,
             image=image,
@@ -648,7 +656,7 @@ class ContactViewTests(WebTest):
 
     def test_no_image_is_shown_in_contact_approval_section_when_no_image_set(self):
         # update user's type
-        existing_user = UserFactory(
+        existing_user = UserFactory.create(
             email="ex@example.com", contact_type=ContactTypeChoices.begeleider
         )
         self.user.contact_type = ContactTypeChoices.begeleider

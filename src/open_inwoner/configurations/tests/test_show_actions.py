@@ -11,8 +11,8 @@ from open_inwoner.cms.profile.cms_appconfig import ProfileConfig
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestShowActions(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.action = ActionFactory(created_by=self.user)
+        self.user = UserFactory.create()
+        self.action = ActionFactory.create(created_by=self.user)
         self.profile_url = reverse("profile:detail")
         self.actions_list_url = reverse("profile:action_list")
 

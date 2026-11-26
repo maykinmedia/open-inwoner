@@ -29,13 +29,13 @@ class TestRedirectTo(WebTest):
         self.assertEqual(response.location, self.config.redirect_to)
 
     def test_no_path_redirect_when_user_logged_in(self):
-        user = UserFactory()
+        user = UserFactory.create()
         self.config.redirect_to = "/accounts/login/"
         self.config.save()
         self.app.get("/", user=user, status=200)
 
     def test_no_url_redirect_when_user_logged_in(self):
-        user = UserFactory()
+        user = UserFactory.create()
         self.config.redirect_to = "https://www.example.com"
         self.config.save()
         self.app.get("/", user=user, status=200)

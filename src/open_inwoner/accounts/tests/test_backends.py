@@ -30,9 +30,9 @@ class OIDCBackendTestCase(OIDCMixin, TestCase):
         super().setUpTestData()
 
         cls.user = UserFactory.create()
-        OIDCClientFactory(with_admin=True)
-        OIDCClientFactory(with_digid=True)
-        OIDCClientFactory(with_eherkenning=True)
+        OIDCClientFactory.create(with_admin=True)
+        OIDCClientFactory.create(with_digid=True)
+        OIDCClientFactory.create(with_eherkenning=True)
 
     @override_settings(
         AUTHENTICATION_BACKENDS=[
@@ -113,8 +113,8 @@ class OIDCBackendTestCase(OIDCMixin, TestCase):
 
 class EHerkenningSAMLBackendTestCase(TestCase):
     def setUp(self):
-        self.user = eHerkenningUserFactory()
-        self.vestiging_user = eHerkenningVestigingUserFactory(kvk=self.user.kvk)
+        self.user = eHerkenningUserFactory.create()
+        self.vestiging_user = eHerkenningVestigingUserFactory.create(kvk=self.user.kvk)
 
     def make_request_with_session(self):
         request = RequestFactory().get("/")
@@ -235,7 +235,7 @@ class EIDASOIDCBackendTest(OIDCMixin, TestCase):
         # The with_eidas trait provides identity_settings using these same simple
         # claim keys (pseudo_id, bsn, first_name, family_name, company_name,
         # legal_entity), matching the claim payloads sent below.
-        self.oidc_client = OIDCClientFactory(with_eidas=True)
+        self.oidc_client = OIDCClientFactory.create(with_eidas=True)
 
         self.backend = EIDASOIDCBackend()
         # create_user / filter_users_by_claims are normally called after
@@ -514,7 +514,7 @@ class EIDASOIDCBackendTest(OIDCMixin, TestCase):
         self.assertEqual(user2.eidas_pseudo_id, "user2-pseudo")
 
     def test_update_user_with_invalid_field_value_raises_error(self):
-        user = UserFactory(
+        user = UserFactory.create(
             eidas_pseudo_id="test-pseudo-validation",
             login_type=LoginTypeChoices.eidas_person_pseudo_id,
             first_name="Original",

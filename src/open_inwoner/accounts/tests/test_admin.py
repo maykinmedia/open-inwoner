@@ -15,7 +15,7 @@ from .factories import UserFactory
 @disable_admin_mfa()
 class TestAdminUser(WebTest):
     def setUp(self):
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             is_superuser=True, is_staff=True, email="john@example.com"
         )
         self.assertEqual(User.objects.count(), 1)

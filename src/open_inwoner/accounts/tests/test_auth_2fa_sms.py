@@ -27,7 +27,7 @@ signer = TimestampSigner()
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestSMSVerificationLogin(WebTest):
     def setUp(self):
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             email="ex@example.com", password="secret", phonenumber="0612345678"
         )
 
@@ -204,7 +204,7 @@ class TestSMSVerificationLogin(WebTest):
 
             # check a new user can log in
             frozen_time.tick(delta=datetime.timedelta(minutes=-1))
-            other_user = UserFactory(
+            other_user = UserFactory.create(
                 email="ex2@example.com",
                 password="secret2",
                 phonenumber="0687654321",

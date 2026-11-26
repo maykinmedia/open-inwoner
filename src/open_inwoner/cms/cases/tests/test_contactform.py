@@ -78,10 +78,10 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086", email="foo@example.com")
+        self.user = DigidUserFactory.create(bsn="900222086", email="foo@example.com")
 
         # services
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -105,17 +105,17 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self.klant_config.send_email_confirmation = True
         self.klant_config.save()
 
-        self.openklant_config = OpenKlant2ConfigFactory()
+        self.openklant_config = OpenKlant2ConfigFactory.create()
 
         self.esuite_config = ESuiteKlantConfig.get_solo()
         self.esuite_config.register_bronorganisatie_rsin = "123456788"
         self.esuite_config.register_type = "Melding"
         self.esuite_config.register_employee_id = "FooVonBar"
         self.esuite_config.register_channel = "the-designated-channel"
-        self.esuite_config.klanten_service = ServiceFactory(
+        self.esuite_config.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
-        self.esuite_config.contactmomenten_service = ServiceFactory(
+        self.esuite_config.contactmomenten_service = ServiceFactory.create(
             api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
         )
         self.esuite_config.save()
@@ -276,7 +276,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         )
 
         # contact form
-        self.zaak_type_config = ZaakTypeConfigFactory(
+        self.zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             contact_form_enabled=True,
@@ -513,7 +513,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 
         CatalogusConfig.objects.all().delete()
         self.zaak_type_config.delete()
-        self.zaak_type_config = ZaakTypeConfigFactory(
+        self.zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             contact_form_enabled=False,
@@ -709,7 +709,9 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
         self._setUpMocks(m)
         self._setUpExtraMocks(m)
         self._setUpOpenKlantMocks(m)
-        eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="000000000")
+        eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678", rsin="000000000"
+        )
 
         for use_rsin_for_innNnpId_query_parameter in [True, False]:
             with self.subTest(
@@ -901,7 +903,7 @@ class CasesContactFormTestCase(AssertMockMatchersMixin, ClearCachesMixin, WebTes
 class CasesContactFormInvalidParamsTestCase(TestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.user = DigidUserFactory(bsn="900222086", email="foo@example.com")
+        self.user = DigidUserFactory.create(bsn="900222086", email="foo@example.com")
         self.client = Client()
         self.client.force_login(self.user)
 

@@ -20,8 +20,8 @@ class KvKLoginMiddlewareTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         user = eHerkenningUserFactory.create()
 

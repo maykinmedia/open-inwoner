@@ -16,7 +16,7 @@ from .utils import ESMixin
 @freeze_time("2021-10-18 13:00:00")
 class TestLogging(ESMixin, WebTest):
     def test_search_query_of_logged_in_user_is_logged(self):
-        user = UserFactory()
+        user = UserFactory.create()
         form = self.app.get(reverse("search:search"), user=user).forms["search-form"]
         form["query"] = "search for something"
         form.submit()

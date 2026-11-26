@@ -40,7 +40,7 @@ class FeedHookTest(TestCase):
         status = factory(Status, data.status_initial)
         status.statustype = factory(StatusType, data.status_type_initial)
 
-        ztc = ZaakTypeConfigFactory(
+        ztc = ZaakTypeConfigFactory.create(
             identificatie=case.zaaktype.identificatie,
             catalogus__url=case.zaaktype.catalogus,
             catalogus__service=self.api_group.ztc_service,
@@ -136,12 +136,12 @@ class FeedHookTest(TestCase):
         status = factory(Status, data.status_initial)
         status.statustype = factory(StatusType, data.status_type_initial)
 
-        ztc = ZaakTypeConfigFactory(
+        ztc = ZaakTypeConfigFactory.create(
             identificatie=case.zaaktype.identificatie,
             catalogus__url=case.zaaktype.catalogus,
             catalogus__service=self.api_group.ztc_service,
         )
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=ztc,
             statustype_url=status.statustype.url,
             status_indicator=StatusIndicators.warning,

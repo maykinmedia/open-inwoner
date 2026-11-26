@@ -184,7 +184,7 @@ class DigiDRegistrationTest(
     def test_digid_fail_with_invite_redirects_to_register_page(self, m):
         # disable mock form validation to check redirect
         m.return_value = True
-        invite = InviteFactory()
+        invite = InviteFactory.create()
         session = self.client.session
         session["invite_url"] = (
             f"{reverse('django_registration_register')}?invite={invite.key}"
@@ -212,7 +212,7 @@ class DigiDRegistrationTest(
 
     @skip(_DIGID_MOCK_SKIP_REASON)
     def test_invite_url_not_in_session_after_successful_login(self):
-        invite = InviteFactory()
+        invite = InviteFactory.create()
         session = self.client.session
         session["invite_url"] = (
             f"{reverse('django_registration_register')}?invite={invite.key}"
@@ -297,7 +297,7 @@ class DigiDRegistrationTest(
             parent_page=self.homepage,
         )
 
-        invite = InviteFactory()
+        invite = InviteFactory.create()
 
         url = reverse("digid-mock:password")
         params = {
@@ -438,7 +438,7 @@ class DigiDRegistrationTest(
     def test_existing_user_digid_login_updates_brp_fields(self, m):
         self._setUpService()
 
-        user = DigidUserFactory(is_prepopulated=False)
+        user = DigidUserFactory.create(is_prepopulated=False)
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
@@ -479,7 +479,7 @@ class DigiDRegistrationTest(
     @requests_mock.Mocker()
     @skip(_DIGID_MOCK_SKIP_REASON)
     def test_existing_user_digid_login_fails_brp_update_when_no_brp_service(self, m):
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
@@ -522,7 +522,7 @@ class DigiDRegistrationTest(
     def test_existing_user_digid_login_fails_brp_update_when_brp_http_404(self, m):
         self._setUpService()
 
-        user = DigidUserFactory(is_prepopulated=False)
+        user = DigidUserFactory.create(is_prepopulated=False)
         m.get(
             "https://personen/api/schema/openapi.yaml?v=3",
             status_code=200,
@@ -566,7 +566,7 @@ class DigiDRegistrationTest(
         m.reset_mock()
         self.clearTimelineLogs()
 
-        invite = InviteFactory()
+        invite = InviteFactory.create()
 
         url = reverse("digid-mock:password")
         params = {
@@ -839,7 +839,7 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
     def test_eherkenning_fail_with_invite_redirects_to_register_page(self, m):
         # disable mock form validation to check redirect
         m.return_value = True
-        invite = InviteFactory()
+        invite = InviteFactory.create()
         session = self.client.session
         session["invite_url"] = (
             f"{reverse('django_registration_register')}?invite={invite.key}"
@@ -895,10 +895,10 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
-        invite = InviteFactory()
+        invite = InviteFactory.create()
         session = self.client.session
         session["invite_url"] = (
             f"{reverse('django_registration_register')}?invite={invite.key}"
@@ -954,8 +954,8 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         user = eHerkenningUserFactory.create(
             kvk="12345678", rsin="123456789", email="user-12345678@localhost"
@@ -1006,8 +1006,8 @@ class eHerkenningRegistrationTest(AssertRedirectsMixin, WebTest):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         user = eHerkenningUserFactory.create(kvk="12345678", email="example@localhost")
 
@@ -1167,7 +1167,7 @@ class EmailPasswordRegistrationTest(WebTest):
                 self.assertEqual(response.context["form"].errors, expected_errors)
 
     def test_registration_with_invite(self):
-        user = UserFactory()
+        user = UserFactory.create()
         contact = UserFactory.build(email="test@testemail.com")
         invite = InviteFactory.create(
             inviter=user,
@@ -1206,7 +1206,7 @@ class EmailPasswordRegistrationTest(WebTest):
         self.assertEqual(list(user.user_contacts.all()), [new_user])
 
     def test_invite_url_not_in_session_after_successful_registration(self):
-        user = UserFactory()
+        user = UserFactory.create()
         contact = UserFactory.build(email="test@testemail.com")
         invite = InviteFactory.create(
             inviter=user,
@@ -1614,7 +1614,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         config.registration_text = "Hello registration text http://foo.bar/"
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.digid,
@@ -1624,7 +1624,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertContains(response, ' href="http://foo.bar/" ')
 
     def test_any_page_for_digid_user_redirect_to_necessary_fields(self):
-        user = NewDigidUserFactory()
+        user = NewDigidUserFactory.create()
         urls = [
             reverse("pages-root"),
             reverse("products:category_list"),
@@ -1646,7 +1646,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
                 self.assertRedirects(response, redirect.url)
 
     def test_logout_confirm_not_blocked_by_necessary_fields(self):
-        user = NewDigidUserFactory()
+        user = NewDigidUserFactory.create()
         self.assertTrue(user.require_necessary_fields())
         response = self.app.get(reverse("logout_confirm"), user=user)
         self.assertEqual(response.status_code, 200)
@@ -1657,7 +1657,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         config.enable_notification_channel_choice = True
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="test@example.org",
@@ -1692,7 +1692,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         # Regression: the email entered during registration must also be stored
         # as a standard email DigitalAddress, otherwise it stays empty on the
         # profile page and is never synced to the OpenKlant digitale adressen.
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="test@example.org",
@@ -1714,7 +1714,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(address.value, "john@smith.com")
 
     def test_submit_with_invite(self):
-        user = UserFactory()
+        user = UserFactory.create()
         contact = UserFactory.build(email="test@example.org")
         invite = InviteFactory.create(
             inviter=user,
@@ -1745,7 +1745,7 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self.assertEqual(list(user.user_contacts.all()), [user_contact])
 
     def test_brp_user_with_diacritics_in_name_can_submit_necessary_form(self):
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             first_name="Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
             infix="Isiah dé Maria de las Mercedes Rosalía",
             last_name="J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
@@ -1893,13 +1893,13 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
     def test_update_klant_via_openklant_successful(self, mock_service_class):
         """Test successful update of user data via OpenKlant"""
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -1935,13 +1935,13 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
     @patch("open_inwoner.accounts.views.registration.OpenKlant2Service")
     def test_update_klant_via_openklant_with_existing_partij(self, mock_service_class):
         """Test update when partij already exists (not created)"""
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -1980,13 +1980,13 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self, mock_openklant_class, mock_esuite_class
     ):
         """Test that both eSuite and OpenKlant services are called when both are configured"""
-        ESuiteConfigFactory()
-        OpenKlant2ConfigFactory()
+        ESuiteConfigFactory.create()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.ESUITE.value
         config.save()
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -2029,13 +2029,13 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self, mock_logger, mock_service_class
     ):
         """Test handling when OpenKlant service is not properly configured"""
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
 
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -2064,12 +2064,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self, mock_logger, mock_service_class
     ):
         """Test error handling when partij creation fails"""
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -2104,12 +2104,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self, mock_service_class
     ):
         """An unexpected exception from the OpenKlant2 service must not block registration."""
-        OpenKlant2ConfigFactory()
+        OpenKlant2ConfigFactory.create()
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.OPENKLANT2.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -2135,12 +2135,12 @@ class TestRegistrationNecessary(ClearCachesMixin, WebTest):
         self, mock_service_class
     ):
         """An unexpected exception from the eSuite service must not block registration."""
-        ESuiteConfigFactory()
+        ESuiteConfigFactory.create()
         config = KlantenSysteemConfig.get_solo()
         config.primary_backend = KlantenServiceType.ESUITE.value
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             email="old@example.com",
@@ -2326,7 +2326,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         # DigiD users always post to the DigiD OIDC logout view; whether it does an
         # IdP round-trip or just a local logout (e.g. when the client is disabled
         # because the user authenticated via SAML) is handled by the view itself.
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
         self.client.force_login(user)
         response = self.client.get(reverse("logout_confirm"))
         self.assertEqual(
@@ -2335,7 +2335,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         )
 
     def test_logout_confirm_form_action_for_eherkenning_user(self):
-        user = eHerkenningUserFactory()
+        user = eHerkenningUserFactory.create()
         self.client.force_login(user)
         # Satisfy KvKLoginMiddleware: mark branch selection as done so the
         # middleware does not redirect before the confirm view can render.
@@ -2349,7 +2349,7 @@ class TestLoginLogoutFunctionality(AssertRedirectsMixin, WebTest):
         )
 
     def test_logout_confirm_form_action_for_eidas_user(self):
-        user = UserFactory(
+        user = UserFactory.create(
             login_type=LoginTypeChoices.eidas_person_bsn,
             bsn="123456789",
             eidas_pseudo_id="eidas-test",
@@ -2378,7 +2378,7 @@ class TestPasswordResetFunctionality(WebTest):
     csrf_checks = False
 
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_password_reset_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_reset"))
@@ -2422,7 +2422,7 @@ class TestPasswordResetFunctionality(WebTest):
         self.assertEqual(len(mail.outbox), 1)
 
     def test_custom_password_reset_form_does_not_send_email_when_user_is_digid(self):
-        digid_user = UserFactory(
+        digid_user = UserFactory.create(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
         self.app.post(reverse("password_reset"), {"email": digid_user.email})
@@ -2432,7 +2432,7 @@ class TestPasswordResetFunctionality(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPasswordChange(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_password_change_form_custom_template_is_rendered(self):
         response = self.app.get(reverse("password_change"), user=self.user)
@@ -2450,7 +2450,7 @@ class TestPasswordChange(WebTest):
         self.assertTrue(doc(link).is_("a"))
 
     def test_password_change_button_is_not_rendered_with_digid_login_type(self):
-        digid_user = UserFactory(
+        digid_user = UserFactory.create(
             login_type=LoginTypeChoices.digid, email="john@smith.nl"
         )
         response = self.app.get(reverse("profile:detail"), user=digid_user)

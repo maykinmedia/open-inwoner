@@ -36,13 +36,13 @@ class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
     def setUpBeforeMigration(self, apps):
         QuestionnaireStep = apps.get_model("questionnaire", "QuestionnaireStep")
 
-        real_step = QuestionnaireStepFactory()
+        real_step = QuestionnaireStepFactory.create()
         self.step = QuestionnaireStep.objects.get(id=real_step.id)
         QuestionnaireStep.objects.filter(pk=self.step.pk).update(
             content=_text_with_link("click", "javascript:alert(document.cookie)")
         )
 
-        real_safe_step = QuestionnaireStepFactory(path="0002")
+        real_safe_step = QuestionnaireStepFactory.create(path="0002")
         self.safe_step = QuestionnaireStep.objects.get(id=real_safe_step.id)
         QuestionnaireStep.objects.filter(pk=self.safe_step.pk).update(
             content=_text_with_link("click", "#anchor")

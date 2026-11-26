@@ -100,7 +100,7 @@ class SiteConfigurationStepTests(TestCase):
         A run that doesn't mention a field resets it to the model default,
         the same as it does for every other field this step manages.
         """
-        SiteConfigurationFactory(name="Baseline Municipality", clamav_port=9999)
+        SiteConfigurationFactory.create(name="Baseline Municipality", clamav_port=9999)
 
         execute_single_step(SiteConfigurationStep, yaml_source=SITE_CONFIG_STEP_MINIMAL)
 

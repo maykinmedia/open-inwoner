@@ -38,8 +38,8 @@ class TestSideNavigationMenuFactory(CMSTestCase):
     def setUp(self):
         super().setUp()
         self.factory = RequestFactory()
-        self.regular_user = UserFactory(is_staff=False)
-        self.staff_user = UserFactory(is_staff=True)
+        self.regular_user = UserFactory.create(is_staff=False)
+        self.staff_user = UserFactory.create(is_staff=True)
 
         # Create home page with correct reverse_id
         self.home_page = api.create_page(

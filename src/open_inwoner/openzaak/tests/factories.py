@@ -148,7 +148,7 @@ class ZaakTypeInformatieObjectTypeConfigFactory(factory.django.DjangoModelFactor
             )
         if extra_kwargs:
             kwargs.update(extra_kwargs)
-        return ZaakTypeInformatieObjectTypeConfigFactory(**kwargs)
+        return ZaakTypeInformatieObjectTypeConfigFactory.create(**kwargs)
 
 
 class ZaakTypeStatusTypeConfigFactory(factory.django.DjangoModelFactory):

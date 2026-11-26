@@ -358,7 +358,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self.assertEqual(User.objects.get(**lookup).pk, existing_pk)
 
     def test_digid_login_reuses_existing_user(self):
-        existing = DigidUserFactory(bsn="111222333")
+        existing = DigidUserFactory.create(bsn="111222333")
 
         self._login(
             link_selector=".link--digid",
@@ -370,7 +370,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self._assert_reused(existing.pk, bsn="111222333")
 
     def test_eherkenning_login_reuses_existing_user(self):
-        existing = eHerkenningVestigingUserFactory(
+        existing = eHerkenningVestigingUserFactory.create(
             kvk="68750110", vestiging="000037178598"
         )
 
@@ -385,7 +385,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self._assert_reused(existing.pk, kvk="68750110")
 
     def test_eidas_login_reuses_existing_user(self):
-        existing = UserFactory(
+        existing = UserFactory.create(
             login_type=LoginTypeChoices.eidas_person_pseudo_id,
             eidas_pseudo_id="4B75A0EA107B3D36",
         )
@@ -400,7 +400,7 @@ class OIDCLoginFlowsE2ETest(PlaywrightSyncLiveServerTestCase):
         self._assert_reused(existing.pk, eidas_pseudo_id="4B75A0EA107B3D36")
 
     def test_admin_login_reuses_existing_user(self):
-        existing = UserFactory(
+        existing = UserFactory.create(
             oidc_id=KEYCLOAK_ADMIN_SUB, login_type=LoginTypeChoices.oidc
         )
 

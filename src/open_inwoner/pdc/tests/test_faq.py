@@ -13,16 +13,16 @@ from .factories import CategoryFactory, ProductFactory, QuestionFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestGeneralFAQ(WebTest):
     def test_model_constraints_disallows_both_product_and_category(self):
-        product = ProductFactory()
-        category = CategoryFactory()
+        product = ProductFactory.create()
+        category = CategoryFactory.create()
         question = Question(product=product, category=category)
 
         with self.assertRaises(IntegrityError):
             question.save()
 
     def test_model_clean_disallows_both_product_and_category(self):
-        product = ProductFactory()
-        category = CategoryFactory()
+        product = ProductFactory.create()
+        category = CategoryFactory.create()
         question = Question(product=product, category=category)
 
         with self.assertRaises(ValidationError) as context:
@@ -33,13 +33,13 @@ class TestGeneralFAQ(WebTest):
         )
 
     def test_general_faq_view_only_lists_general_questions(self):
-        question = QuestionFactory(question="General question")
+        question = QuestionFactory.create(question="General question")
 
-        product = ProductFactory()
-        QuestionFactory(question="Product question", product=product)
+        product = ProductFactory.create()
+        QuestionFactory.create(question="Product question", product=product)
 
-        category = CategoryFactory()
-        QuestionFactory(question="Category question", category=category)
+        category = CategoryFactory.create()
+        QuestionFactory.create(question="Category question", category=category)
 
         response = self.app.get(reverse("general_faq"))
 

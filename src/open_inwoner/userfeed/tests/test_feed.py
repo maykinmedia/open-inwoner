@@ -14,7 +14,7 @@ from open_inwoner.userfeed.tests.factories import FeedItemDataFactory
 class FeedTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
+        cls.user = UserFactory.create()
 
     def test_get_feed__and__simple_message(self):
         # our record
@@ -22,7 +22,7 @@ class FeedTests(TestCase):
         data = FeedItemData.objects.get()
 
         # extra data
-        FeedItemDataFactory(user=UserFactory())
+        FeedItemDataFactory.create(user=UserFactory.create())
 
         feed = get_feed(self.user)
         self.assertEqual(feed.total_items, 1)

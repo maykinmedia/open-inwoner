@@ -19,7 +19,7 @@ QMATIC_CONFIG_STEP_MINIMAL_YAML = str(BASE_DIR / "qmatic_config_step_minimal.yam
 
 class QmaticConfigurationStepTest(TestCase):
     def test_configure_with_full_config(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="qmatic-service", api_root=QMATIC_API_ROOT, api_type=APITypes.orc
         )
 
@@ -33,7 +33,7 @@ class QmaticConfigurationStepTest(TestCase):
         self.assertEqual(config.booking_base_url, "https://qmatic.local/afspraak/")
 
     def test_configure_with_minimal_config_leaves_omitted_fields_untouched(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="qmatic-service", api_root=QMATIC_API_ROOT, api_type=APITypes.orc
         )
 
@@ -65,7 +65,7 @@ class QmaticConfigurationStepTest(TestCase):
         )
 
     def test_configure_fails_with_wrong_api_type(self):
-        ServiceFactory(
+        ServiceFactory.create(
             slug="qmatic-service", api_root=QMATIC_API_ROOT, api_type=APITypes.zrc
         )
 
@@ -82,7 +82,7 @@ class QmaticConfigurationStepTest(TestCase):
         )
 
     def test_configure_is_idempotent(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             slug="qmatic-service", api_root=QMATIC_API_ROOT, api_type=APITypes.orc
         )
 

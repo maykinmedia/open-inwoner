@@ -136,7 +136,7 @@ class TestCategoryImportResource(TestCase):
 
 class TestCategoryExportResource(TestCase):
     def setUp(self):
-        self.category = CategoryFactory()
+        self.category = CategoryFactory.create()
         self.resource = CategoryExportResource()
 
     def test_export_returns_expected_row(self):

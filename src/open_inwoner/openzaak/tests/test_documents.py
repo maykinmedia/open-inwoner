@@ -76,16 +76,16 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
         )
-        self.api_group_alt = ZGWApiGroupConfigFactory(
+        self.api_group_alt = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
@@ -541,7 +541,7 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
 
     def test_response_is_http_403_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
@@ -912,8 +912,8 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         self.assertEqual(response.body, self.informatie_object_content)
 
     def test_document_download_request_uses_service_credentials(self, m):
-        server = CertificateFactory(label="server", cert_only=True)
-        client = CertificateFactory(label="client", key_pair=True)
+        server = CertificateFactory.create(label="server", cert_only=True)
+        client = CertificateFactory.create(label="client", key_pair=True)
 
         self.api_group.drc_service.server_certificate = server
         self.api_group.drc_service.client_certificate = client
@@ -937,10 +937,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def test_document_is_uploaded(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie=self.zaaktype["identificatie"]
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -962,10 +962,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def test_document_upload_format_is_derived_from_extension(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie=self.zaaktype["identificatie"]
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -999,10 +999,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
         self._setUpMocks(m)
         self._setUpAdditionalMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie=self.zaaktype["identificatie"]
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -1069,10 +1069,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def test_document_response_is_none_when_http_404(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie=self.zaaktype["identificatie"]
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -1092,10 +1092,10 @@ class TestDocumentDownloadUpload(ClearCachesMixin, TransactionWebTest):
     def test_document_response_is_none_when_http_500(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie=self.zaaktype["identificatie"]
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],

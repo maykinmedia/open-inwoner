@@ -51,23 +51,23 @@ class TestHighlightedCategories(WebTest):
         cms_tools.create_apphook_page(ProductsApphook)
 
     def test_only_highlighted_categories_exist_in_context_when_they_exist(self):
-        CategoryFactory(name="Should be first")
-        highlighted_category1 = CategoryFactory(
+        CategoryFactory.create(name="Should be first")
+        highlighted_category1 = CategoryFactory.create(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
         )
-        highlighted_category2 = CategoryFactory(
+        highlighted_category2 = CategoryFactory.create(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
         )
-        highlighted_category3 = CategoryFactory(
+        highlighted_category3 = CategoryFactory.create(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
         )
-        highlighted_category4 = CategoryFactory(
+        highlighted_category4 = CategoryFactory.create(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
@@ -80,10 +80,10 @@ class TestHighlightedCategories(WebTest):
         )
 
     def test_highlighted_categories_are_ordered_by_alphabetically(self):
-        highlighted_category1 = CategoryFactory(
+        highlighted_category1 = CategoryFactory.create(
             name="should be first", highlighted=True
         )
-        highlighted_category2 = CategoryFactory(
+        highlighted_category2 = CategoryFactory.create(
             name="should be second", highlighted=True
         )
         html, context = cms_tools.render_plugin(CategoriesPlugin)
@@ -93,30 +93,30 @@ class TestHighlightedCategories(WebTest):
         )
 
     def test_only_highlighted_categories_are_shown_when_they_exist_digid_user(self):
-        user = DigidUserFactory()
-        category = CategoryFactory(name="Should be first")
-        highlighted_category1 = CategoryFactory(
+        user = DigidUserFactory.create()
+        category = CategoryFactory.create(name="Should be first")
+        highlighted_category1 = CategoryFactory.create(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        highlighted_category2 = CategoryFactory(
+        highlighted_category2 = CategoryFactory.create(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        highlighted_category3 = CategoryFactory(
+        highlighted_category3 = CategoryFactory.create(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
             visible_for_citizens=False,
             visible_for_companies=True,
         )
-        highlighted_category4 = CategoryFactory(
+        highlighted_category4 = CategoryFactory.create(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
@@ -134,30 +134,30 @@ class TestHighlightedCategories(WebTest):
     def test_only_highlighted_categories_are_shown_when_they_exist_eherkenning_user(
         self,
     ):
-        user = eHerkenningUserFactory()
-        category = CategoryFactory(name="Should be first")
-        highlighted_category1 = CategoryFactory(
+        user = eHerkenningUserFactory.create()
+        category = CategoryFactory.create(name="Should be first")
+        highlighted_category1 = CategoryFactory.create(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        highlighted_category2 = CategoryFactory(
+        highlighted_category2 = CategoryFactory.create(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        highlighted_category3 = CategoryFactory(
+        highlighted_category3 = CategoryFactory.create(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
             visible_for_citizens=False,
             visible_for_companies=True,
         )
-        highlighted_category4 = CategoryFactory(
+        highlighted_category4 = CategoryFactory.create(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
@@ -178,27 +178,27 @@ class TestHighlightedCategories(WebTest):
     ):
         mock_solo.return_value.enable_categories_filtering_with_zaken = False
 
-        user = DigidUserFactory()
-        category = CategoryFactory(name="Should be first")
-        highlighted_category1 = CategoryFactory(
+        user = DigidUserFactory.create()
+        category = CategoryFactory.create(name="Should be first")
+        highlighted_category1 = CategoryFactory.create(
             name="This should be second",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=True,
         )
-        highlighted_category2 = CategoryFactory(
+        highlighted_category2 = CategoryFactory.create(
             path="0002",
             highlighted=True,
             visible_for_anonymous=True,
             visible_for_citizens=False,
         )
-        highlighted_category3 = CategoryFactory(
+        highlighted_category3 = CategoryFactory.create(
             path="0003",
             highlighted=True,
             visible_for_anonymous=False,
             visible_for_citizens=True,
         )
-        highlighted_category4 = CategoryFactory(
+        highlighted_category4 = CategoryFactory.create(
             path="0004",
             highlighted=True,
             visible_for_anonymous=False,
@@ -216,9 +216,9 @@ class TestHighlightedCategories(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPublishedCategories(WebTest):
     def setUp(self):
-        self.digid_user = DigidUserFactory()
-        self.eherkenning_user = eHerkenningUserFactory()
-        self.published1 = CategoryFactory(
+        self.digid_user = DigidUserFactory.create()
+        self.eherkenning_user = eHerkenningUserFactory.create()
+        self.published1 = CategoryFactory.create(
             path="0001",
             name="First one",
             slug="first-one",
@@ -226,7 +226,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        self.published2 = CategoryFactory(
+        self.published2 = CategoryFactory.create(
             path="0002",
             name="Second one",
             slug="second-one",
@@ -234,7 +234,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=True,
         )
-        self.published3 = CategoryFactory(
+        self.published3 = CategoryFactory.create(
             path="0003",
             name="Third one",
             slug="third-one",
@@ -242,7 +242,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        self.published4 = CategoryFactory(
+        self.published4 = CategoryFactory.create(
             path="0004",
             name="Fourth one",
             slug="foruth-one",
@@ -250,7 +250,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        self.published5 = CategoryFactory(
+        self.published5 = CategoryFactory.create(
             path="0005",
             name="Fifth one",
             slug="fifth-one",
@@ -258,13 +258,13 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        self.draft1 = CategoryFactory(
+        self.draft1 = CategoryFactory.create(
             path="0003",
             name="sixth one",
             slug="sixth-one",
             published=False,
         )
-        self.draft2 = CategoryFactory(
+        self.draft2 = CategoryFactory.create(
             path="0004",
             name="Seventh one",
             slug="seventh-one",
@@ -327,42 +327,42 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
         cms_tools.create_apphook_page(ProductsApphook)
         cms_tools.create_apphook_page(ProfileApphook)
 
-        self.category1 = CategoryFactory(
+        self.category1 = CategoryFactory.create(
             name="0001",
             path="0001",
             highlighted=False,
             zaaktypen=[],
             visible_for_citizens=True,
         )
-        self.category2 = CategoryFactory(
+        self.category2 = CategoryFactory.create(
             name="0002",
             path="0002",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000001", "ZAAKTYPE-2020-0000000003"],
             visible_for_citizens=True,
         )
-        self.category3 = CategoryFactory(
+        self.category3 = CategoryFactory.create(
             name="0003",
             path="0003",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000001"],
             visible_for_citizens=False,
         )
-        self.category4 = CategoryFactory(
+        self.category4 = CategoryFactory.create(
             name="0004",
             path="0004",
             highlighted=False,
             zaaktypen=["ZAAKTYPE-2020-0000000002"],
             visible_for_citizens=True,
         )
-        self.category5 = CategoryFactory(
+        self.category5 = CategoryFactory.create(
             name="0005",
             path="0005",
             highlighted=False,
             zaaktypen=["unknown-zaaktype"],
             visible_for_citizens=True,
         )
-        self.category7 = CategoryFactory(
+        self.category7 = CategoryFactory.create(
             name="bar",
             highlighted=True,
             zaaktypen=[],
@@ -383,16 +383,18 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
         self.category6.save()
         self.category7.save()
 
-        self.user = DigidUserFactory()
-        self.eherkenning_user = eHerkenningUserFactory(kvk="12345678", rsin="123456789")
-        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory(
+        self.user = DigidUserFactory.create()
+        self.eherkenning_user = eHerkenningUserFactory.create(
+            kvk="12345678", rsin="123456789"
+        )
+        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory.create(
             kvk="12345678",
             rsin="123456789",
             vestiging="987654321",
         )
 
         # services
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -540,19 +542,19 @@ class TestCategoriesCaseFiltering(ClearCachesMixin, TransactionWebTest):
             beginGeldigheid="2020-09-25",
             versiedatum="2020-09-25",
         )
-        self.zaaktype_config1 = ZaakTypeConfigFactory(
+        self.zaaktype_config1 = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             urls=[self.zaaktype["url"]],
             identificatie=self.zaaktype["identificatie"],
             relevante_zaakperiode=None,
         )
-        self.zaaktype_config2 = ZaakTypeConfigFactory(
+        self.zaaktype_config2 = ZaakTypeConfigFactory.create(
             catalogus__url=self.zaaktype_config1.catalogus,
             urls=[self.zaaktype2["url"]],
             identificatie=self.zaaktype2["identificatie"],
             relevante_zaakperiode=1,
         )
-        self.zaaktype_config3 = ZaakTypeConfigFactory(
+        self.zaaktype_config3 = ZaakTypeConfigFactory.create(
             catalogus=self.zaaktype_config1.catalogus,
             urls=[self.zaaktype3["url"]],
             identificatie=self.zaaktype3["identificatie"],

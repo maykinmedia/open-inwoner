@@ -18,9 +18,9 @@ from .factories import QuestionnaireStepFactory
 class QuestionnaireExportTests(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.export_url = reverse("products:questionnaire_export")
-        self.questionnaire = QuestionnaireStepFactory(path="0001")
+        self.questionnaire = QuestionnaireStepFactory.create(path="0001")
         self.session = self.client.session
         self.session[QUESTIONNAIRE_SESSION_KEY] = self.questionnaire.slug
         self.session.save()
@@ -51,7 +51,7 @@ class QuestionnaireExportTests(TestCase):
         self.assertTrue(Document.objects.filter(name=filename).exists())
 
     def test_response_contains_right_data(self):
-        product = ProductFactory()
+        product = ProductFactory.create()
         child = self.questionnaire.add_child(path="00030001", code="foo", slug="foo")
         grandchild = child.add_child(path="000300010001", code="bar", slug="bar")
         grandchild.related_products.add(product)

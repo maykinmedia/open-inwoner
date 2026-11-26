@@ -16,7 +16,7 @@ class DigitalAddressModelTests(TestCase):
         self.assertEqual(str(addr), "E-mailadres: test@example.com")
 
     def test_create_email_address(self):
-        addr = DigitalAddressFactory(
+        addr = DigitalAddressFactory.create(
             type=DigitalAddressType.email, value="test@example.com"
         )
         self.assertEqual(addr.type, DigitalAddressType.email)
@@ -24,11 +24,13 @@ class DigitalAddressModelTests(TestCase):
         self.assertIsNotNone(addr.created_at)
 
     def test_create_phone_address(self):
-        addr = DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
+        addr = DigitalAddressFactory.create(
+            type=DigitalAddressType.phone, value="0612345678"
+        )
         self.assertEqual(addr.type, DigitalAddressType.phone)
 
     def test_cascade_delete_with_user(self):
-        addr = DigitalAddressFactory()
+        addr = DigitalAddressFactory.create()
         addr_pk = addr.pk
         addr.user.delete()
         self.assertFalse(DigitalAddress.objects.filter(pk=addr_pk).exists())
@@ -73,27 +75,27 @@ class DigitalAddressValueValidationTests(TestCase):
 
 class DigitalAddressUniqueConstraintTests(TestCase):
     def test_unique_constraint_prevents_duplicate_email_for_regular_users(self):
-        DigitalAddressFactory(
+        DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             value="shared@example.com",
             login_type=LoginTypeChoices.default,
         )
         with self.assertRaises(IntegrityError):
-            DigitalAddressFactory(
+            DigitalAddressFactory.create(
                 type=DigitalAddressType.email,
                 value="shared@example.com",
                 login_type=LoginTypeChoices.default,
             )
 
     def test_unique_constraint_allows_duplicate_email_for_different_digid_users(self):
-        DigitalAddressFactory(
-            user=DigidUserFactory(),
+        DigitalAddressFactory.create(
+            user=DigidUserFactory.create(),
             type=DigitalAddressType.email,
             value="shared@example.com",
             login_type=LoginTypeChoices.digid,
         )
-        addr = DigitalAddressFactory(
-            user=DigidUserFactory(),
+        addr = DigitalAddressFactory.create(
+            user=DigidUserFactory.create(),
             type=DigitalAddressType.email,
             value="shared@example.com",
             login_type=LoginTypeChoices.digid,
@@ -101,16 +103,18 @@ class DigitalAddressUniqueConstraintTests(TestCase):
         self.assertIsNotNone(addr.pk)
 
     def test_unique_constraint_does_not_apply_to_phone(self):
-        DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
-        addr = DigitalAddressFactory(type=DigitalAddressType.phone, value="0612345678")
+        DigitalAddressFactory.create(type=DigitalAddressType.phone, value="0612345678")
+        addr = DigitalAddressFactory.create(
+            type=DigitalAddressType.phone, value="0612345678"
+        )
         self.assertIsNotNone(addr.pk)
 
     def test_unique_constraint_prevents_duplicate_per_user_type_value(self):
-        existing = DigitalAddressFactory(
+        existing = DigitalAddressFactory.create(
             type=DigitalAddressType.email, value="test@example.com"
         )
         with self.assertRaises(IntegrityError):
-            DigitalAddressFactory(
+            DigitalAddressFactory.create(
                 user=existing.user,
                 type=DigitalAddressType.email,
                 value="test@example.com",
@@ -118,14 +122,14 @@ class DigitalAddressUniqueConstraintTests(TestCase):
             )
 
     def test_unique_constraint_allows_same_value_different_user(self):
-        DigitalAddressFactory(
-            user=DigidUserFactory(),
+        DigitalAddressFactory.create(
+            user=DigidUserFactory.create(),
             type=DigitalAddressType.email,
             value="same@example.com",
             login_type=LoginTypeChoices.digid,
         )
-        addr = DigitalAddressFactory(
-            user=DigidUserFactory(),
+        addr = DigitalAddressFactory.create(
+            user=DigidUserFactory.create(),
             type=DigitalAddressType.email,
             value="same@example.com",
             login_type=LoginTypeChoices.digid,
@@ -133,10 +137,10 @@ class DigitalAddressUniqueConstraintTests(TestCase):
         self.assertIsNotNone(addr.pk)
 
     def test_unique_constraint_allows_same_value_different_type(self):
-        existing = DigitalAddressFactory(
+        existing = DigitalAddressFactory.create(
             type=DigitalAddressType.email, value="test@example.com"
         )
-        addr = DigitalAddressFactory(
+        addr = DigitalAddressFactory.create(
             user=existing.user,
             type=DigitalAddressType.phone,
             value="test@example.com",
@@ -146,7 +150,7 @@ class DigitalAddressUniqueConstraintTests(TestCase):
 
 class PreferredAddressTests(TestCase):
     def test_preferred_address_set_null_on_address_delete(self):
-        addr = DigitalAddressFactory()
+        addr = DigitalAddressFactory.create()
         addr.user.preferred_address = addr
         addr.user.save()
 
@@ -155,12 +159,12 @@ class PreferredAddressTests(TestCase):
         self.assertIsNone(addr.user.preferred_address)
 
     def test_preferred_address_defaults_to_null(self):
-        user = UserFactory()
+        user = UserFactory.create()
         self.assertIsNone(user.preferred_address)
 
     def test_clean_rejects_preferred_address_belonging_to_other_user(self):
-        user1 = UserFactory()
-        addr = DigitalAddressFactory(user=UserFactory())
+        user1 = UserFactory.create()
+        addr = DigitalAddressFactory.create(user=UserFactory.create())
         user1.preferred_address = addr
         with self.assertRaises(ValidationError) as ctx:
             user1.clean()
@@ -174,27 +178,27 @@ class PreferredAddressTests(TestCase):
         )
 
     def test_clean_allows_preferred_address_belonging_to_same_user(self):
-        addr = DigitalAddressFactory()
+        addr = DigitalAddressFactory.create()
         addr.user.preferred_address = addr
         addr.user.clean()  # should not raise
 
 
 class DigitalAddressIsStandardTests(TestCase):
     def test_is_standard_for_type_defaults_to_false(self):
-        addr = DigitalAddressFactory()
+        addr = DigitalAddressFactory.create()
         self.assertFalse(addr.is_standard_for_type)
 
     def test_can_set_one_standard_per_user_type(self):
-        addr = DigitalAddressFactory(is_standard_for_type=True)
+        addr = DigitalAddressFactory.create(is_standard_for_type=True)
         self.assertTrue(addr.is_standard_for_type)
 
     def test_unique_constraint_prevents_two_standards_same_user_type(self):
-        existing = DigitalAddressFactory(
+        existing = DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             is_standard_for_type=True,
         )
         with self.assertRaises(IntegrityError):
-            DigitalAddressFactory(
+            DigitalAddressFactory.create(
                 user=existing.user,
                 type=DigitalAddressType.email,
                 value="other@example.com",
@@ -202,11 +206,11 @@ class DigitalAddressIsStandardTests(TestCase):
             )
 
     def test_unique_constraint_allows_standard_per_different_type(self):
-        user_addr = DigitalAddressFactory(
+        user_addr = DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             is_standard_for_type=True,
         )
-        phone_addr = DigitalAddressFactory(
+        phone_addr = DigitalAddressFactory.create(
             user=user_addr.user,
             type=DigitalAddressType.phone,
             value="0612345678",
@@ -215,11 +219,11 @@ class DigitalAddressIsStandardTests(TestCase):
         self.assertTrue(phone_addr.is_standard_for_type)
 
     def test_unique_constraint_allows_standard_per_different_user(self):
-        DigitalAddressFactory(
+        DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             is_standard_for_type=True,
         )
-        addr = DigitalAddressFactory(
+        addr = DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             value="other@example.com",
             is_standard_for_type=True,
@@ -227,11 +231,11 @@ class DigitalAddressIsStandardTests(TestCase):
         self.assertTrue(addr.is_standard_for_type)
 
     def test_unique_constraint_allows_multiple_non_standard_same_user_type(self):
-        existing = DigitalAddressFactory(
+        existing = DigitalAddressFactory.create(
             type=DigitalAddressType.email,
             is_standard_for_type=False,
         )
-        addr = DigitalAddressFactory(
+        addr = DigitalAddressFactory.create(
             user=existing.user,
             type=DigitalAddressType.email,
             value="second@example.com",
@@ -242,14 +246,14 @@ class DigitalAddressIsStandardTests(TestCase):
 
 class DigitalAddressOrderingTests(TestCase):
     def test_standard_address_is_first(self):
-        user = UserFactory()
-        alt = DigitalAddressFactory(
+        user = UserFactory.create()
+        alt = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="alt@example.com",
             is_standard_for_type=False,
         )
-        standard = DigitalAddressFactory(
+        standard = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="standard@example.com",

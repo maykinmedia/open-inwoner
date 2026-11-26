@@ -46,11 +46,11 @@ def generate_auth_header_value(client_id, secret):
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPAGATES=True)
 class NotificationSubscriptionAuthTest(TestCase):
     def test_valid_auth_retrieves_subscription(self):
-        subscription = SubscriptionFactory(client_id="foo", secret="password")
+        subscription = SubscriptionFactory.create(client_id="foo", secret="password")
 
-        SubscriptionFactory(client_id="foo", secret="not_password")
-        SubscriptionFactory(client_id="not_foo", secret="not_password")
-        SubscriptionFactory(client_id="not_foo", secret="password")
+        SubscriptionFactory.create(client_id="foo", secret="not_password")
+        SubscriptionFactory.create(client_id="not_foo", secret="not_password")
+        SubscriptionFactory.create(client_id="not_foo", secret="password")
 
         auth_value = generate_auth_header_value("foo", "password")
 
@@ -58,7 +58,7 @@ class NotificationSubscriptionAuthTest(TestCase):
         self.assertEqual(actual, subscription)
 
     def test_unknown_client_id_raises_exception(self):
-        SubscriptionFactory(client_id="foo", secret="password")
+        SubscriptionFactory.create(client_id="foo", secret="password")
 
         auth_value = generate_auth_header_value("bar", "not_password")
 
@@ -66,7 +66,7 @@ class NotificationSubscriptionAuthTest(TestCase):
             get_valid_subscriptions_from_bearer(auth_value)
 
     def test_known_client_id_with_bad_secret_raises_exception(self):
-        SubscriptionFactory(client_id="foo", secret="password")
+        SubscriptionFactory.create(client_id="foo", secret="password")
 
         auth_value = generate_auth_header_value("foo", "not_password")
 
@@ -74,7 +74,7 @@ class NotificationSubscriptionAuthTest(TestCase):
             get_valid_subscriptions_from_bearer(auth_value)
 
     def test_invalid_auth_header_raises_exception(self):
-        SubscriptionFactory(client_id="foo", secret="password")
+        SubscriptionFactory.create(client_id="foo", secret="password")
 
         auth_value = "not a valid bearer token"
 

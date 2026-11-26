@@ -42,7 +42,7 @@ class FooterPagesPluginTest(ClearCachesMixin, TestCase):
         self.assertFalse(klant_config.contact_registration_enabled)
 
         esuite_config = ESuiteKlantConfig.get_solo()
-        ContactFormSubjectFactory(esuite_config=esuite_config)
+        ContactFormSubjectFactory.create(esuite_config=esuite_config)
 
         klant_config.register_contact_email = "example@example.com"
         klant_config.save()

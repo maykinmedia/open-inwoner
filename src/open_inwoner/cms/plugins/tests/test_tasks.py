@@ -27,13 +27,13 @@ class TasksPluginTest(TestCase):
         TaakMockData.setUpServices()
         mock_data = TaakMockData().install_mocks(m)
 
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             bsn=mock_data.mock_task_data_externformulier_1["betrokkene"]["authorizee"][
                 "legalSubject"
             ]["identifier"]
         )
         # should be filtered out (BSN)
-        DigidUserFactory(
+        DigidUserFactory.create(
             bsn=mock_data.mock_task_data_externformulier_2["betrokkene"]["authorizee"][
                 "legalSubject"
             ]["identifier"]
@@ -82,13 +82,13 @@ class TasksPluginTest(TestCase):
         TaakMockData.setUpServices()
         mock_data = TaakMockData().install_mocks(m)
 
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             bsn=mock_data.mock_task_data_externformulier_1["betrokkene"]["authorizee"][
                 "legalSubject"
             ]["identifier"]
         )
         # should be filtered out (BSN) - using a different BSN
-        DigidUserFactory(
+        DigidUserFactory.create(
             bsn=mock_data.mock_task_data_externformulier_2["betrokkene"]["authorizee"][
                 "legalSubject"
             ]["identifier"]
@@ -123,11 +123,11 @@ class TasksPluginTest(TestCase):
         """
         Test that TasksPlugin correctly fetches and displays ZGW tasks
         """
-        ZGWApiGroupConfigFactory(form_service__api_root=FORMS_ROOT)
+        ZGWApiGroupConfigFactory.create(form_service__api_root=FORMS_ROOT)
 
         ESuiteTaskData().install_mocks(m)
 
-        user = DigidUserFactory(bsn="111222333")
+        user = DigidUserFactory.create(bsn="111222333")
 
         html, context = cms_tools.render_plugin(
             TasksPlugin,
@@ -155,11 +155,11 @@ class TasksPluginTest(TestCase):
         """
         Test that ZGW API errors don't break the plugin
         """
-        ZGWApiGroupConfigFactory(form_service__api_root=FORMS_ROOT)
+        ZGWApiGroupConfigFactory.create(form_service__api_root=FORMS_ROOT)
 
         m.get(f"{FORMS_ROOT}openstaande-taken", exc=RequestsConnectionError)
 
-        user = DigidUserFactory(bsn="111222333")
+        user = DigidUserFactory.create(bsn="111222333")
 
         html, context = cms_tools.render_plugin(
             TasksPlugin,
@@ -178,10 +178,10 @@ class TasksPluginTest(TestCase):
         TaakMockData.setUpServices()
         mock_data = TaakMockData().install_mocks(m)
 
-        ZGWApiGroupConfigFactory(form_service__api_root=FORMS_ROOT)
+        ZGWApiGroupConfigFactory.create(form_service__api_root=FORMS_ROOT)
         ESuiteTaskData().install_mocks(m)
 
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             bsn=mock_data.mock_task_data_externformulier_1["betrokkene"]["authorizee"][
                 "legalSubject"
             ]["identifier"]
@@ -224,11 +224,11 @@ class TasksPluginTest(TestCase):
         """
         Test that ZGW tasks are only fetched for users with BSN
         """
-        ZGWApiGroupConfigFactory(form_service__api_root=FORMS_ROOT)
+        ZGWApiGroupConfigFactory.create(form_service__api_root=FORMS_ROOT)
         ESuiteTaskData().install_mocks(m)
 
         # Create eHerkenning user
-        user = eHerkenningUserFactory(kvk="12345678")
+        user = eHerkenningUserFactory.create(kvk="12345678")
 
         html, context = cms_tools.render_plugin(
             TasksPlugin,

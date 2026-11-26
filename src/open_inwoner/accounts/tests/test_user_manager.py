@@ -27,13 +27,15 @@ class UserManagerTests(TestCase):
 class UserQueryTests(TestCase):
     def test_having_usable_email(self):
         expected = [
-            UserFactory(first_name="usable_1", email="usable@example.com"),
-            UserFactory(first_name="usable_2", email="org-domain@prefix-example.org"),
+            UserFactory.create(first_name="usable_1", email="usable@example.com"),
+            UserFactory.create(
+                first_name="usable_2", email="org-domain@prefix-example.org"
+            ),
         ]
 
         # bad
-        UserFactory(first_name="placeholder", email="placeholder@example.org")
-        UserFactory(first_name="empty", email="")
+        UserFactory.create(first_name="placeholder", email="placeholder@example.org")
+        UserFactory.create(first_name="empty", email="")
 
         actual = User.objects.having_usable_email()
         self.assertEqual(set(list(actual)), set(expected))
@@ -41,21 +43,21 @@ class UserQueryTests(TestCase):
 
 class TestEHerkenningManager(TestCase):
     def setUp(self):
-        self.user_kvk_without_vestiging = eHerkenningUserFactory(
+        self.user_kvk_without_vestiging = eHerkenningUserFactory.create(
             kvk="12345678",
             vestiging="",
         )
-        self.user_kvk_with_vestiging = eHerkenningUserFactory(
+        self.user_kvk_with_vestiging = eHerkenningUserFactory.create(
             kvk="12345678",
             vestiging="00123456789",
         )
-        self.another_user_without_kvk_vestiging = eHerkenningUserFactory(
+        self.another_user_without_kvk_vestiging = eHerkenningUserFactory.create(
             kvk="87654321",
             vestiging="",
         )
 
         # Create a regular user (not eHerkenning)
-        self.regular_user = UserFactory(
+        self.regular_user = UserFactory.create(
             kvk="12345678", vestiging="", login_type=LoginTypeChoices.default
         )
 

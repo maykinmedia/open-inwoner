@@ -22,7 +22,7 @@ class OIDCConfigTest(OIDCMixin, ClearCachesMixin, WebTest):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             identifier=OIDC_ADMIN_CONFIG_IDENTIFIER,
             enabled=True,
             with_admin_options=True,
@@ -78,7 +78,7 @@ class OIDCConfigTest(OIDCMixin, ClearCachesMixin, WebTest):
         if and only if `make_users_staff` is enabled in the admin OIDC configuration.
         """
 
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
         self.client.force_login(self.user)
 
         oidc_client = OIDCClient.objects.get(identifier=OIDC_ADMIN_CONFIG_IDENTIFIER)

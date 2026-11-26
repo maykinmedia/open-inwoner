@@ -152,7 +152,8 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         cls.config = OpenZaakConfig.get_solo()
         cls.roots = (CATALOGI_ROOT, ANOTHER_CATALOGI_ROOT)
         cls.api_groups = [
-            ZGWApiGroupConfigFactory(ztc_service__api_root=root) for root in cls.roots
+            ZGWApiGroupConfigFactory.create(ztc_service__api_root=root)
+            for root in cls.roots
         ]
 
     def test_zgw_catalogus_importer_import_all(self, m):

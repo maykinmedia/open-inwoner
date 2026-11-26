@@ -24,7 +24,7 @@ class AdminTwoFactorWizardTests(WebTest):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory(is_staff=True, password="secret")
+        self.user = UserFactory.create(is_staff=True, password="secret")
 
     def log_in_with_password(self):
         login_page = self.app.get(reverse("admin:login"))

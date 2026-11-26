@@ -82,7 +82,7 @@ class YubinQueuedEmailTests(TestCase):
 class YubinMessageAdminTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory(is_superuser=True, is_staff=True)
+        cls.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def setUp(self):
         self.client.force_login(self.user)

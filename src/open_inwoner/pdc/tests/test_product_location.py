@@ -154,8 +154,10 @@ class ProductLocationTestCase(TestCase):
             phonenumber="+31666767676",
             geometry=Point(4.883400, 52.380260),
         )
-        product_1 = ProductFactory(locations=(product_location_1,))
-        product_2 = ProductFactory(locations=(product_location_1, product_location_2))
+        product_1 = ProductFactory.create(locations=(product_location_1,))
+        product_2 = ProductFactory.create(
+            locations=(product_location_1, product_location_2)
+        )
         self.assertEqual(
             json.dumps(
                 {
@@ -227,7 +229,7 @@ class TestLocationFormInput(WebTest):
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(
         self, mock_geocoding
     ):
-        user = UserFactory(is_superuser=True, is_staff=True)
+        user = UserFactory.create(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_productlocation_add"), user=user)
         form = response.forms["productlocation_form"]
@@ -247,8 +249,8 @@ class TestLocationFormInput(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationDetailView(WebTest):
     def test_shown_products_in_location_detail(self):
-        published_product = ProductFactory()
-        product_location = ProductLocationFactory()
+        published_product = ProductFactory.create()
+        product_location = ProductLocationFactory.create()
         published_product.locations.add(product_location)
 
         response = self.app.get(
@@ -266,7 +268,7 @@ class TestLocationDetailView(WebTest):
         self.assertContains(response, product_location.email)
 
         # adding a draft product
-        draft_product = ProductFactory(published=False)
+        draft_product = ProductFactory.create(published=False)
         draft_product.locations.add(product_location)
 
         response = self.app.get(
@@ -282,8 +284,8 @@ class TestLocationDetailView(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestLocationViewThroughMap(WebTest):
     def test_product_location_link_is_rendered_on_product_page(self):
-        product = ProductFactory()
-        product_location = ProductLocationFactory()
+        product = ProductFactory.create()
+        product_location = ProductLocationFactory.create()
         product.locations.add(product_location)
 
         response = self.app.get(

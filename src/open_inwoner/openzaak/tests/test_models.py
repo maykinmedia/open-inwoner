@@ -30,7 +30,7 @@ from open_inwoner.openzaak.tests.shared import CATALOGI_ROOT
 
 class CatalogusConfigManagerTestCase(TestCase):
     def test_get_by_natural_key_returns_expected_instance(self):
-        config = CatalogusConfigFactory()
+        config = CatalogusConfigFactory.create()
 
         self.assertEqual(
             CatalogusConfig.objects.get_by_natural_key(*config.natural_key()),
@@ -44,7 +44,7 @@ class CatalogusConfigManagerTestCase(TestCase):
 
 class ZaakTypeConfigModelTestCase(TestCase):
     def test_get_by_natural_key_returns_expected_instance(self):
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             identificatie="AAAA",
         )
 
@@ -63,10 +63,10 @@ class ZaakTypeConfigModelTestCase(TestCase):
             )
 
     def test_queryset_filter_case_type_with_catalog(self):
-        catalog = CatalogusConfigFactory(
+        catalog = CatalogusConfigFactory.create(
             url=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         )
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus=catalog,
             identificatie="AAAA",
         )
@@ -88,8 +88,8 @@ class ZaakTypeConfigModelTestCase(TestCase):
 
 class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
     def test_get_by_natural_key_returns_expected_instance(self):
-        zt = ZaakTypeConfigFactory()
-        zt_status_type_config = ZaakTypeStatusTypeConfigFactory(
+        zt = ZaakTypeConfigFactory.create()
+        zt_status_type_config = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=zt,
             omschrijving="test",
         )
@@ -105,7 +105,7 @@ class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
         )
 
     def test_get_by_natural_key_not_found(self):
-        unused_zt = ZaakTypeConfigFactory()
+        unused_zt = ZaakTypeConfigFactory.create()
         with self.assertRaises(ZaakTypeStatusTypeConfig.DoesNotExist):
             ZaakTypeStatusTypeConfig.objects.get_by_natural_key(
                 omschrijving="test",
@@ -117,8 +117,8 @@ class ZaakTypeStatusTypeConfigModelTestCase(TestCase):
 
 class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
     def test_get_by_natural_key_returns_expected_instance(self):
-        zt = ZaakTypeConfigFactory()
-        zt_status_type_config = ZaakTypeResultaatTypeConfigFactory(
+        zt = ZaakTypeConfigFactory.create()
+        zt_status_type_config = ZaakTypeResultaatTypeConfigFactory.create(
             zaaktype_config=zt,
             omschrijving="test",
         )
@@ -134,7 +134,7 @@ class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
         )
 
     def test_get_by_natural_key_not_found(self):
-        zt = ZaakTypeConfigFactory()
+        zt = ZaakTypeConfigFactory.create()
         with self.assertRaises(ZaakTypeResultaatTypeConfig.DoesNotExist):
             ZaakTypeResultaatTypeConfig.objects.get_by_natural_key(
                 omschrijving="bogus",
@@ -146,8 +146,8 @@ class ZaakTypeResultaatTypeConfigModelTestCase(TestCase):
 
 class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
     def test_get_by_natural_key_returns_expected_instance(self):
-        zt = ZaakTypeConfigFactory()
-        zt_io_type = ZaakTypeInformatieObjectTypeConfigFactory(
+        zt = ZaakTypeConfigFactory.create()
+        zt_io_type = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zt, omschrijving="test"
         )
 
@@ -162,7 +162,7 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
         )
 
     def test_get_by_natural_key_not_found(self):
-        zt = ZaakTypeConfigFactory()
+        zt = ZaakTypeConfigFactory.create()
         with self.assertRaises(ZaakTypeInformatieObjectTypeConfig.DoesNotExist):
             ZaakTypeInformatieObjectTypeConfig.objects.get_by_natural_key(
                 omschrijving="bogus",
@@ -172,29 +172,29 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
             )
 
     def test_queryset_filter_case_type_with_catalog(self):
-        catalog = CatalogusConfigFactory(
+        catalog = CatalogusConfigFactory.create(
             url=f"{CATALOGI_ROOT}catalogussen/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         )
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus=catalog,
             identificatie="AAAA",
         )
-        a1 = ZaakTypeInformatieObjectTypeConfigFactory(
+        a1 = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url="https://example.com/v1/infoobject/a1",
             zaaktype_uuids=["aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"],
         )
-        a2 = ZaakTypeInformatieObjectTypeConfigFactory(
+        a2 = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url="https://example.com/v1/infoobject/a2",
             zaaktype_uuids=[],
         )
-        b = ZaakTypeInformatieObjectTypeConfigFactory(
+        b = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url="https://example.com/v1/infoobject/bbb",
             zaaktype_uuids=["aaaaaaaa-aaaa-bbbb-aaaa-aaaaaaaaaaaa"],
         )
-        c = ZaakTypeInformatieObjectTypeConfigFactory(
+        c = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config__catalogus=catalog,
             zaaktype_config__identificatie="CCC",
             informatieobjecttype_url="https://example.com/v1/infoobject/bbb",
@@ -220,24 +220,24 @@ class ZaakTypeInformatieObjectTypeConfigFactoryModelTestCase(TestCase):
 
 class UserCaseStatusNotificationTests(TestCase):
     def test_status_has_received_similar_notes_within(self):
-        user = UserFactory()
+        user = UserFactory.create()
         zaak_uuid = uuid4()
         other_case_uuid = uuid4()
 
         with freeze_time("2023-01-01 01:00:00"):
             # create unrelated sent note for different case
-            UserCaseStatusNotificationFactory(
+            UserCaseStatusNotificationFactory.create(
                 user=user, status_uuid=other_case_uuid, is_sent=True
             )
             # create a related note we didn't send
-            UserCaseStatusNotificationFactory(
+            UserCaseStatusNotificationFactory.create(
                 user=user,
                 case_uuid=zaak_uuid,
                 is_sent=False,
                 collision_key="case_status_notification",
             )
             # create our note
-            note = UserCaseStatusNotificationFactory(
+            note = UserCaseStatusNotificationFactory.create(
                 user=user,
                 case_uuid=zaak_uuid,
                 is_sent=True,
@@ -252,7 +252,7 @@ class UserCaseStatusNotificationTests(TestCase):
 
         # advance half hour
         with freeze_time("2023-01-01 01:30:00"):
-            note = UserCaseStatusNotificationFactory(
+            note = UserCaseStatusNotificationFactory.create(
                 user=user, case_uuid=zaak_uuid, is_sent=True
             )
             # nothing is past 10 minutes
@@ -269,27 +269,27 @@ class UserCaseStatusNotificationTests(TestCase):
             )
 
     def test_case_info_has_received_similar_notes_within(self):
-        user = UserFactory()
+        user = UserFactory.create()
         zaak_uuid = uuid4()
         other_case_uuid = uuid4()
 
         with freeze_time("2023-01-01 01:00:00"):
             # create unrelated sent note for different case
-            UserCaseInfoObjectNotificationFactory(
+            UserCaseInfoObjectNotificationFactory.create(
                 user=user,
                 case_uuid=other_case_uuid,
                 is_sent=True,
                 collision_key="case_document_notification",
             )
             # create a related note we didn't send
-            UserCaseInfoObjectNotificationFactory(
+            UserCaseInfoObjectNotificationFactory.create(
                 user=user,
                 case_uuid=zaak_uuid,
                 is_sent=False,
                 collision_key="case_document_notification",
             )
             # create our note
-            note = UserCaseInfoObjectNotificationFactory(
+            note = UserCaseInfoObjectNotificationFactory.create(
                 user=user,
                 case_uuid=zaak_uuid,
                 is_sent=True,
@@ -304,7 +304,7 @@ class UserCaseStatusNotificationTests(TestCase):
 
         # advance half hour
         with freeze_time("2023-01-01 01:30:00"):
-            note = UserCaseInfoObjectNotificationFactory(
+            note = UserCaseInfoObjectNotificationFactory.create(
                 user=user,
                 case_uuid=zaak_uuid,
                 is_sent=True,

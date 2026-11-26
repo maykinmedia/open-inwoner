@@ -19,7 +19,7 @@ from .utils import ESMixin
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestFeedbackFunctionality(ESMixin, WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.product1 = ProductFactory.create(
             name="Name",
             summary="Some summary",
@@ -112,10 +112,10 @@ class TestFeedbackFunctionality(ESMixin, WebTest):
         self.assertIsNone(feedback.searched_by)
 
     def test_positive_feedback_is_saved_with_authenticated_user_and_with_filters(self):
-        category1 = CategoryFactory()
-        category2 = CategoryFactory()
-        tag1 = TagFactory()
-        tag2 = TagFactory()
+        category1 = CategoryFactory.create()
+        category2 = CategoryFactory.create()
+        tag1 = TagFactory.create()
+        tag2 = TagFactory.create()
         self.product1.tags.add(tag1, tag2)
         self.product1.categories.add(category1, category2)
 

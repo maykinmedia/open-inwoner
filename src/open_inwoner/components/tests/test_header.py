@@ -22,7 +22,7 @@ from open_inwoner.pdc.tests.factories import CategoryFactory
 class HeaderTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
+        cls.user = UserFactory.create()
         cls.user.set_password("12345")
         cls.user.email = "test@email.com"
         cls.user.save()
@@ -35,7 +35,7 @@ class HeaderTest(TestCase):
 
         # PrimaryNavigation.html requires apphook + categories
         create_apphook_page(ProductsApphook)
-        cls.published1 = CategoryFactory(
+        cls.published1 = CategoryFactory.create(
             path="0001",
             name="First one",
             slug="first-one",
@@ -43,7 +43,7 @@ class HeaderTest(TestCase):
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        cls.published2 = CategoryFactory(
+        cls.published2 = CategoryFactory.create(
             path="0002",
             name="Second one",
             slug="second-one",
@@ -51,7 +51,7 @@ class HeaderTest(TestCase):
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        cls.published3 = CategoryFactory(
+        cls.published3 = CategoryFactory.create(
             path="0003",
             name="Third one",
             slug="third-one",
@@ -59,7 +59,7 @@ class HeaderTest(TestCase):
             visible_for_citizens=False,
             visible_for_companies=True,
         )
-        cls.published4 = CategoryFactory(
+        cls.published4 = CategoryFactory.create(
             path="0004",
             name="Fourth one",
             slug="fourth-one",
@@ -233,7 +233,7 @@ class DisplaySearchTemplateTagTest(TestCase):
         config.save()
 
         request = self.factory.get("/")
-        request.user = UserFactory()
+        request.user = UserFactory.create()
         context = Context({"request": request})
 
         self.assertFalse(
@@ -268,7 +268,7 @@ class DisplaySearchTemplateTagTest(TestCase):
         config.save()
 
         request = self.factory.get("/")
-        request.user = UserFactory()
+        request.user = UserFactory.create()
         context = Context({"request": request})
 
         self.assertTrue(
@@ -283,7 +283,7 @@ class DisplaySearchTemplateTagTest(TestCase):
         config.save()
 
         request = self.factory.get("/")
-        request.user = UserFactory()
+        request.user = UserFactory.create()
         context = Context({"request": request})
 
         self.assertTrue(

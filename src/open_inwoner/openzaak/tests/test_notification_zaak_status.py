@@ -194,7 +194,7 @@ class StatusNotificationHandlerTestCase(
         opted_out.cases_notifications = False
         opted_out.save()
 
-        opted_in = DigidUserFactory(bsn="100000002", email="second@example.com")
+        opted_in = DigidUserFactory.create(bsn="100000002", email="second@example.com")
         self._add_second_initiator(data, opted_in)
         data.install_mocks(m)
         self._configure_status_notifications(data)
@@ -216,7 +216,7 @@ class StatusNotificationHandlerTestCase(
         opted_out.cases_notifications = False
         opted_out.save()
 
-        also_opted_out = DigidUserFactory(
+        also_opted_out = DigidUserFactory.create(
             bsn="100000002", email="second@example.com", cases_notifications=False
         )
         self._add_second_initiator(data, also_opted_out)
@@ -243,7 +243,7 @@ class StatusNotificationHandlerTestCase(
         self.assertIn("no API group configured for zaak", str(outcome))
 
     def test_status_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
-        notification = NotificationFactory(kanaal="not_zaken")
+        notification = NotificationFactory.create(kanaal="not_zaken")
         with self.assertRaisesRegex(
             Exception, r"^handler expects kanaal 'zaken' but received 'not_zaken'"
         ):
@@ -252,7 +252,7 @@ class StatusNotificationHandlerTestCase(
         mock_handle.assert_not_called()
 
     def test_status_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
-        notification = NotificationFactory(resource="not_status")
+        notification = NotificationFactory.create(resource="not_status")
 
         outcome = handle_zaken_notification(notification)
 

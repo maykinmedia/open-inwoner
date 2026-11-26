@@ -22,7 +22,7 @@ class PlansHTMXTest(PlaywrightSyncLiveServerTestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086")
+        self.user = DigidUserFactory.create(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         self.plan_factory = PlanFactory

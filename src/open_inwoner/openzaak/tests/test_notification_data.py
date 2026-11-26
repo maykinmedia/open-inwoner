@@ -54,11 +54,11 @@ class MockAPIData:
     """
 
     def __init__(self):
-        self.user_initiator = DigidUserFactory(
+        self.user_initiator = DigidUserFactory.create(
             bsn="100000001",
             email="initiator@example.com",
         )
-        self.eherkenning_user_initiator = eHerkenningUserFactory(
+        self.eherkenning_user_initiator = eHerkenningUserFactory.create(
             kvk="12345678",
             rsin="000000000",
             email="initiator_kvk@example.com",
@@ -205,19 +205,19 @@ class MockAPIData:
         ]
         self.status_history = [self.status_initial, self.status_final]
 
-        self.status_notification = NotificationFactory(
+        self.status_notification = NotificationFactory.create(
             resource="status",
             actie="update",
             resource_url=self.status_final["url"],
             hoofd_object=self.zaak["url"],
         )
-        self.zio_notification = NotificationFactory(
+        self.zio_notification = NotificationFactory.create(
             resource="zaakinformatieobject",
             actie="create",
             resource_url=self.zaak_informatie_object["url"],
             hoofd_object=self.zaak["url"],
         )
-        self.zio_notification2 = NotificationFactory(
+        self.zio_notification2 = NotificationFactory.create(
             resource="zaakinformatieobject",
             actie="create",
             resource_url=self.zaak_informatie_object2["url"],
@@ -276,7 +276,7 @@ class MockAPIData:
 
     @classmethod
     def setUpServices(cls):
-        cls.api_group = ZGWApiGroupConfigFactory(
+        cls.api_group = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -293,11 +293,11 @@ class MockAPIDataAlt:
     """
 
     def __init__(self):
-        self.user_initiator_alt = DigidUserFactory(
+        self.user_initiator_alt = DigidUserFactory.create(
             bsn="200000002",
             email="initiator_alt@example.com",
         )
-        self.eherkenning_user_initiator_alt = eHerkenningUserFactory(
+        self.eherkenning_user_initiator_alt = eHerkenningUserFactory.create(
             kvk="87654321",
             rsin="000000000",
             email="initiator_alt_kvk@example.com",
@@ -443,19 +443,19 @@ class MockAPIDataAlt:
         ]
         self.status_history_alt = [self.status_initial_alt, self.status_final_alt]
 
-        self.status_notification_alt = NotificationFactory(
+        self.status_notification_alt = NotificationFactory.create(
             resource="status",
             actie="update",
             resource_url=self.status_final_alt["url"],
             hoofd_object=self.zaak_alt["url"],
         )
-        self.zio_notification_alt = NotificationFactory(
+        self.zio_notification_alt = NotificationFactory.create(
             resource="zaakinformatieobject",
             actie="create",
             resource_url=self.zaak_informatie_object_alt["url"],
             hoofd_object=self.zaak_alt["url"],
         )
-        self.zio_notification2_alt = NotificationFactory(
+        self.zio_notification2_alt = NotificationFactory.create(
             resource="zaakinformatieobject",
             actie="create",
             resource_url=self.zaak_informatie_object2_alt["url"],
@@ -519,7 +519,7 @@ class MockAPIDataAlt:
 
     @classmethod
     def setUpServices(cls):
-        cls.api_group_alt = ZGWApiGroupConfigFactory(
+        cls.api_group_alt = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,

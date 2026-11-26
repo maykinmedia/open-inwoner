@@ -33,7 +33,7 @@ class eSuiteVragenServiceTestCase(ClearCachesMixin, TestCase):
         super().setUp()
         MockAPIReadData.setUpServices()
         self.service = eSuiteVragenService()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         klanten_config = ESuiteKlantConfig.get_solo()
         klanten_config.exclude_contactmoment_kanalen = ["intern_initiatief"]
         klanten_config.save()

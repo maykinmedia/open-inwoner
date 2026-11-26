@@ -7,7 +7,7 @@ from open_inwoner.media.tests.factories import VideoFactory
 
 class TestVideoPlayerPlugin(TestCase):
     def test_plugin(self):
-        video = VideoFactory()
+        video = VideoFactory.create()
         html, context = cms_tools.render_plugin(
             VideoPlayerPlugin, plugin_data={"video": video}
         )

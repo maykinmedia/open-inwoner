@@ -28,7 +28,7 @@ from .test_notification_data import MockAPIData
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class NotificationHandlerUtilsTestCase(TestCase):
     def setUp(self):
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             fetch_eherkenning_zaken_with_rsin=False,
         )
@@ -205,15 +205,15 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
     def test_get_initiator_users_from_roles(self):
         # users we're interested in
-        user_1 = DigidUserFactory(
+        user_1 = DigidUserFactory.create(
             bsn="100000001", first_name="user_1", email="user_1@example.com"
         )
-        user_2 = DigidUserFactory(
+        user_2 = DigidUserFactory.create(
             bsn="100000002", first_name="user_2", email="user_2@example.com"
         )
 
         # not active
-        user_not_active = DigidUserFactory(
+        user_not_active = DigidUserFactory.create(
             bsn="404000003",
             is_active=False,
             first_name="not_active",
@@ -221,19 +221,19 @@ class NotificationHandlerUtilsTestCase(TestCase):
         )
 
         # bad role
-        user_bad_role = DigidUserFactory(
+        user_bad_role = DigidUserFactory.create(
             bsn="404000006", first_name="bad_role", email="user_bad_role@example.com"
         )
 
         # not part of roles
-        user_not_a_role = DigidUserFactory(
+        user_not_a_role = DigidUserFactory.create(
             bsn="404000007",
             first_name="not_a_role",
             email="user_not_a_role@example.com",
         )
 
         # not a digid user
-        user_no_bsn = UserFactory(
+        user_no_bsn = UserFactory.create(
             bsn="", first_name="no_bsn", email="user_no_bsn@example.com"
         )
 
@@ -327,8 +327,8 @@ class NotificationHandlerUtilsTestCase(TestCase):
 
     def test_get_initiator_users_from_roles__limit_access_to_role(self):
         """When limit_access_to_role is set, medeinitiator users are excluded."""
-        user_initiator = DigidUserFactory(bsn="100000001")
-        user_medeinitiator = DigidUserFactory(bsn="100000002")
+        user_initiator = DigidUserFactory.create(bsn="100000001")
+        user_medeinitiator = DigidUserFactory.create(bsn="100000002")
 
         roles = [
             generate_rol(

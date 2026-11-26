@@ -101,7 +101,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
         super().setUp()
 
         # services
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             form_service=None,
@@ -109,7 +109,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
 
     def test_user_access_is_forbidden_when_not_logged_in_via_digid(self):
         # User's bsn is None when logged in by email (default method)
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
@@ -124,7 +124,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
         self.assertRedirectsLogin(response, next=self.outer_url)
 
     def test_bad_request_when_no_htmx_in_inner_urls(self):
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
@@ -134,7 +134,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
 
     @requests_mock.Mocker()
     def test_no_zaken_are_retrieved_when_http_404(self, m):
-        user = UserFactory(
+        user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
         m.get(
@@ -150,7 +150,7 @@ class CaseListAccessTests(AssertRedirectsMixin, ClearCachesMixin, TransactionWeb
 
     @requests_mock.Mocker()
     def test_no_zaken_are_retrieved_when_http_500(self, m):
-        user = UserFactory(
+        user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
         m.get(
@@ -178,12 +178,12 @@ class OuterCaseListHxGetTests(ClearCachesMixin, TransactionWebTest):
     def setUp(self):
         super().setUp()
 
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             form_service=None,
         )
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
 
@@ -539,10 +539,10 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
-        self.eidas_bsn_user = UserFactory(
+        self.eidas_bsn_user = UserFactory.create(
             login_type=LoginTypeChoices.eidas_person_bsn,
             bsn="900222086",
             eidas_pseudo_id="pseudo-id-1",
@@ -575,7 +575,7 @@ class CaseListViewTests(AssertTimelineLogMixin, ClearCachesMixin, TransactionTes
         self.api_groups = []
         for zaken_root, catalogi_root in self.roots:
             self.api_groups.append(
-                ZGWApiGroupConfigFactory(
+                ZGWApiGroupConfigFactory.create(
                     zrc_service__api_root=zaken_root,
                     ztc_service__api_root=catalogi_root,
                     form_service=None,
@@ -1523,12 +1523,12 @@ class FormulierTest(TransactionWebTest):
     inner_url = reverse_lazy("cases:cases_content")
 
     def setUp(self):
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             form_service__api_root=FORMS_ROOT,
             fetch_eherkenning_zaken_with_rsin=False,
         )
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             form_service__api_root=ANOTHER_FORMS_ROOT,
             fetch_eherkenning_zaken_with_rsin=False,
@@ -1536,7 +1536,7 @@ class FormulierTest(TransactionWebTest):
 
     @requests_mock.Mocker()
     def test_get_formulieren_by_bsn(self, m):
-        digid_user = UserFactory(
+        digid_user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
         data = ESuiteSubmissionData(
@@ -1588,7 +1588,9 @@ class FormulierTest(TransactionWebTest):
     def test_get_formulieren_by_kvk(self, m, mock_kvk_redirect):
         mock_kvk_redirect.return_value = False
 
-        user = UserFactory(login_type=LoginTypeChoices.eherkenning, kvk="68750110")
+        user = UserFactory.create(
+            login_type=LoginTypeChoices.eherkenning, kvk="68750110"
+        )
         data = ESuiteSubmissionData(
             zaken_root=ZAKEN_ROOT, forms_root=FORMS_ROOT, user=user
         ).install_eherkenning_mocks(m)
@@ -1645,7 +1647,7 @@ class CaseListSearchAccessTest(ClearCachesMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
 
@@ -1656,7 +1658,7 @@ class CaseListSearchAccessTest(ClearCachesMixin, TransactionTestCase):
         self.config.limit_user_visible_cases_to_role = ZaakBetrokkeneRol.initiator
         self.config.save()
 
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             form_service=None,
@@ -1795,7 +1797,7 @@ class CaseListVisibleFromDateTest(ClearCachesMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
 
@@ -1805,7 +1807,7 @@ class CaseListVisibleFromDateTest(ClearCachesMixin, TransactionTestCase):
         )
         self.config.save()
 
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             form_service=None,

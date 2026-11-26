@@ -12,10 +12,10 @@ from open_inwoner.plans.tests.factories import PlanFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActivePlansPlugin(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.plan = PlanFactory.create(plan_contacts=[self.user])
 
-        PlanFactory.create(plan_contacts=[UserFactory()])
+        PlanFactory.create(plan_contacts=[UserFactory.create()])
 
     def test_connected_plans_are_rendered_when_logged_in(self):
         cms_tools.create_apphook_page(CollaborateApphook)

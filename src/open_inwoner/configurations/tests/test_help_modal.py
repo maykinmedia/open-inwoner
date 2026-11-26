@@ -15,8 +15,8 @@ from .factories import SiteConfigurationFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHelpContext(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.product = ProductFactory()
+        self.user = UserFactory.create()
+        self.product = ProductFactory.create()
 
         cms_tools.create_homepage()
 
@@ -32,7 +32,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_home_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("pages-root"))
         help_text = response.context.get("help_text")
@@ -51,7 +51,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_categories_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("products:category_list"))
         help_text = response.context.get("help_text")
@@ -72,7 +72,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_products_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": self.product.slug})
@@ -91,7 +91,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_search_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("search:search"))
         help_text = response.context.get("help_text")
@@ -110,7 +110,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_profile_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("profile:detail"), user=self.user)
         help_text = response.context.get("help_text")
@@ -129,7 +129,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_questionnaire_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("products:questionnaire_list"))
         help_text = response.context.get("help_text")
@@ -148,7 +148,7 @@ class TestHelpContext(WebTest):
         )
 
     def test_custom_help_text_on_plan_page(self):
-        SiteConfigurationFactory()
+        SiteConfigurationFactory.create()
         config = SiteConfiguration.get_solo()
         response = self.app.get(reverse("collaborate:plan_list"), user=self.user)
         help_text = response.context.get("help_text")

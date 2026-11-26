@@ -54,7 +54,7 @@ class ContactMomentViewsTestCase(
     maxDiff = None
 
     def setUp(self):
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             email="test@example.com",
             phonenumber="0100000000",
         )
@@ -1029,7 +1029,7 @@ class ContactMomentViewsTestCase(
         self.klant_config.register_bronorganisatie_rsin = "123456789"
         self.klant_config.save()
 
-        user = UserFactory()
+        user = UserFactory.create()
         list_url = reverse("cases:contactmoment_list")
         response = self.app.get(list_url, user=user)
         self.assertRedirects(response, reverse("pages-root"))
@@ -1037,7 +1037,7 @@ class ContactMomentViewsTestCase(
     def test_contactmoment_list_accessible_for_staff_without_bsn_or_kvk(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
-        user = UserFactory(bsn="", kvk="", is_staff=True)
+        user = UserFactory.create(bsn="", kvk="", is_staff=True)
 
         with patch.object(
             eSuiteVragenService, "list_questions", autospec=True
@@ -1054,7 +1054,7 @@ class ContactMomentViewsTestCase(
     def test_contactmoment_detail_requires_bsn_or_kvk_for_staff(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
-        user = UserFactory(bsn="", kvk="", is_staff=True)
+        user = UserFactory.create(bsn="", kvk="", is_staff=True)
         url = reverse(
             "cases:contactmoment_detail",
             kwargs={"api_service": KlantenServiceType.ESUITE, "kcm_uuid": uuid4()},
@@ -1074,7 +1074,7 @@ class ContactMomentViewsTestCase(
     def test_contactmoment_detail_requires_bsn_or_kvk(
         self, m, mock_openklant2_service, mock_get_kcm_answer_mapping
     ):
-        user = UserFactory()
+        user = UserFactory.create()
 
         for service in [KlantenServiceType.ESUITE, KlantenServiceType.OPENKLANT2]:
             with self.subTest(api_service=service):
@@ -1203,7 +1203,7 @@ class ContactMomentViewsTestCase(
         # ContactFormView.__init__ (a base of the list view) builds a real,
         # unmocked OpenKlant2Service for whichever backend is primary.
         openklant2_config = OpenKlant2Config.get_solo()
-        openklant2_config.service = ServiceFactory(
+        openklant2_config.service = ServiceFactory.create(
             api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
         )
         openklant2_config.save()
@@ -1370,7 +1370,7 @@ class ContactMomentViewsTestCase(
         the user has to be told the list is short rather than shown it as final.
         """
         openklant2_config = OpenKlant2Config.get_solo()
-        openklant2_config.service = ServiceFactory(
+        openklant2_config.service = ServiceFactory.create(
             api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
         )
         openklant2_config.save()

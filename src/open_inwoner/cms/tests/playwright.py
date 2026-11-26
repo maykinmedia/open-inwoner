@@ -49,7 +49,7 @@ class CMSAdminTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase):
         # see the helper's docstring: without this the CMS toolbar 500s
         cms_tools.reset_versionables_content_type_cache()
 
-        self.user = UserFactory(is_staff=True, is_superuser=True)
+        self.user = UserFactory.create(is_staff=True, is_superuser=True)
 
         # avoid the cookie banner overlapping/intercepting clicks
         config = SiteConfiguration.get_solo()

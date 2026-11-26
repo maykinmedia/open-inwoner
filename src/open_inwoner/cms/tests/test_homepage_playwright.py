@@ -28,7 +28,7 @@ class HomepagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086")
+        self.user = DigidUserFactory.create(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         self.homepage = cms_tools.create_homepage()
@@ -61,7 +61,7 @@ class HomepagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase
         """
         Build a formulier submission mock as returned by `ZGWService.get_formulieren`.
         """
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_submission = MagicMock()
         mock_submission.process_data.return_value = {
@@ -83,7 +83,7 @@ class HomepagePlaywrightTests(ClearCachesMixin, PlaywrightSyncLiveServerTestCase
         can build the expected detail URL from that concrete instance
         instead of reading it back off the mock.
         """
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         mock_zaak.process_data.return_value = {

@@ -126,7 +126,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True)
+        OIDCClientFactory.create(with_admin=True)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -178,7 +178,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True, make_users_staff=False)
+        OIDCClientFactory.create(with_admin=True, make_users_staff=False)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -230,7 +230,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_admin=True, make_users_staff=False, first_name_claim=["first_name"]
         )
         # set up a user with a colliding email address
@@ -286,7 +286,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True, make_users_staff=False)
+        OIDCClientFactory.create(with_admin=True, make_users_staff=False)
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -342,7 +342,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True)
+        OIDCClientFactory.create(with_admin=True)
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {
             "email": "new_user@example.com",
@@ -392,7 +392,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True, make_users_staff=False)
+        OIDCClientFactory.create(with_admin=True, make_users_staff=False)
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {
             "email": "new_user@example.com",
@@ -447,7 +447,7 @@ class OIDCFlowTests(OIDCMixin, TestCase):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_admin=True)
+        OIDCClientFactory.create(with_admin=True)
         mock_get_userinfo.return_value = {
             "email": "nocollision@example.com",
             "sub": "some_username",
@@ -506,7 +506,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         callback URL: customers have whitelisted these URLs in their IdP
         configuration (see LegacyCallbackURLMixin).
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -523,7 +523,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         Setting the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` to False must restore
         the generic /oidc/callback/ endpoint as the advertised redirect_uri.
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -547,7 +547,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_get_userinfo,
         mock_brp,
     ):
-        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
+        OIDCClientFactory.create(with_digid=True, bsn_claim=["sub"])
         # set up a user with a colliding email address
         # sub is the oidc_id field in our db
         mock_get_userinfo.return_value = {
@@ -607,7 +607,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_get_userinfo,
         mock_brp,
     ):
-        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
+        OIDCClientFactory.create(with_digid=True, bsn_claim=["sub"])
         # set up a user with a non existing email address
         mock_get_userinfo.return_value = {"sub": "000000000"}
         DigidUserFactory.create(bsn="123456782", email="existing_user@example.com")
@@ -642,7 +642,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         self.assertEqual(new_user.login_type, LoginTypeChoices.digid)
 
     def test_frontend_logout_redirects_to_correct_url_with_optional_hints(self):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_logout_endpoint="http://localhost:8080/logout",
         )
@@ -692,7 +692,9 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
                 self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
     def test_logout_without_sso_logout_configured(self):
-        OIDCClientFactory(with_digid=True, oidc_provider__oidc_op_logout_endpoint="")
+        OIDCClientFactory.create(
+            with_digid=True, oidc_provider__oidc_op_logout_endpoint=""
+        )
         # set up a user with a non existing email address
         user = DigidUserFactory.create(
             bsn="123456782", email="existing_user@example.com"
@@ -728,7 +730,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         # A DigiD login_type can also be obtained via SAML, in which case the OIDC
         # client is disabled. Even with a logout endpoint configured we must not try
         # to sign out at the IdP, but just kill our own session.
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             enabled=False,
             oidc_provider__oidc_op_logout_endpoint="http://localhost:8080/logout",
@@ -778,7 +780,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_digid=True)
+        OIDCClientFactory.create(with_digid=True)
         user = DigidUserFactory.create(bsn="123456782")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -829,7 +831,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_digid=True)
+        OIDCClientFactory.create(with_digid=True)
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -882,7 +884,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_digid=True)
+        OIDCClientFactory.create(with_digid=True)
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "bsn": "123456782",
@@ -935,7 +937,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_digid=True)
+        OIDCClientFactory.create(with_digid=True)
         mock_verify_token.side_effect = ValidationError("Something went wrong")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -987,7 +989,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         """
         Full authentication flow with redirect after successful login and registration
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -1054,7 +1056,7 @@ class DigiDOIDCFlowTests(OIDCMixin, WebTest):
         """
         Full authentication flow with redirect after successful login
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -1109,7 +1111,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         callback URL: customers have whitelisted these URLs in their IdP
         configuration (see LegacyCallbackURLMixin).
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -1126,7 +1128,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         Setting the deprecated ``OIDC_USE_LEGACY_ENDPOINTS`` to False must restore
         the generic /oidc/callback/ endpoint as the advertised redirect_uri.
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
         )
@@ -1163,7 +1165,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_get_userinfo.return_value = {
             "email": "existing_user@example.com",
         }
@@ -1205,7 +1207,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["sub"],
             branch_number_claim=["branch"],
@@ -1287,7 +1289,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Stichting"}}
         }
@@ -1350,7 +1352,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["sub"],
             branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
@@ -1426,7 +1428,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["sub"],
             branch_number_claim=["urn:etoegang:1.9:ServiceRestriction:Vestigingsnr"],
@@ -1481,7 +1483,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         )
 
     def test_logout(self):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["kvk"],
             oidc_provider__oidc_op_logout_endpoint="http://localhost:8080/logout",
@@ -1525,7 +1527,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
 
     def test_logout_without_sso_logout_configured(self):
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["kvk"],
             oidc_provider__oidc_op_logout_endpoint="",
@@ -1602,7 +1604,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_retrieve_rsin_with_kvk,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1657,7 +1659,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1710,7 +1712,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_store_tokens,
         mock_get_userinfo,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_get_userinfo.return_value = {
             "sub": "some_username",
             "kvk": "12345678",
@@ -1765,7 +1767,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         mock_get_userinfo,
         mock_get_basisprofiel,
     ):
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["kvk"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["kvk"])
         mock_verify_token.side_effect = ValidationError("Something went wrong")
         mock_get_userinfo.return_value = {
             "sub": "some_username",
@@ -1840,7 +1842,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         to fetch resources using RSIN (from Open Zaak or Open Klant) enabled, we cannot
         let eenmanszaken log in using eHerkenning
         """
-        OIDCClientFactory(with_eherkenning=True, legal_subject_claim=["sub"])
+        OIDCClientFactory.create(with_eherkenning=True, legal_subject_claim=["sub"])
         mock_retrieve_rsin_with_kvk.return_value = ""
         mock_get_basisprofiel.return_value = {
             "_embedded": {"eigenaar": {"rechtsvorm": "Eenmanszaak"}}
@@ -2109,7 +2111,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         """
         Full authentication flow with redirect after successful login
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["kvk"],
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
@@ -2188,7 +2190,7 @@ class eHerkenningOIDCFlowTests(OIDCMixin, WebTest):
         """
         KVK branch selection should be skipped
         """
-        OIDCClientFactory(
+        OIDCClientFactory.create(
             with_eherkenning=True,
             legal_subject_claim=["kvk"],
             oidc_provider__oidc_op_authorization_endpoint="http://idp.local/auth",
@@ -2252,7 +2254,7 @@ class EIDASOIDCFlowTests(OIDCMixin, WebTest):
         super().setUp()
         # Create and configure the eIDAS OIDC client. Claim paths match the claim
         # keys used by this class's userinfo payloads.
-        self.oidc_client = OIDCClientFactory(
+        self.oidc_client = OIDCClientFactory.create(
             with_eidas=True,
             options={
                 "identity_settings": {

@@ -11,7 +11,7 @@ from open_inwoner.utils.tests.factories import FilerImageFactory
 @temp_media_root()
 class TestBannerImage(TestCase):
     def test_banner_image_is_rendered_in_plugin(self):
-        image = FilerImageFactory()
+        image = FilerImageFactory.create()
         html, context = cms_tools.render_plugin(
             BannerImagePlugin, plugin_data={"image": image}
         )
@@ -19,7 +19,7 @@ class TestBannerImage(TestCase):
         self.assertIn('<aside class="banner"', html)
 
     def test_banner_image_with_specific_height(self):
-        image = FilerImageFactory()
+        image = FilerImageFactory.create()
         image_height = 40
         html, context = cms_tools.render_plugin(
             BannerImagePlugin,

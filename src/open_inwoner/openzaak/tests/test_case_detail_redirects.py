@@ -11,7 +11,7 @@ from open_inwoner.openzaak.tests.factories import ZGWApiGroupConfigFactory
 )
 class LegacyCaseDetailUrlRedirectTest(TestCase):
     def test_legacy_url_redirects_to_only_api_group_prefix(self):
-        sole_api_group = ZGWApiGroupConfigFactory()
+        sole_api_group = ZGWApiGroupConfigFactory.create()
 
         object_id = "test_object_id"
         legacy_handler_url = reverse(
@@ -28,7 +28,7 @@ class LegacyCaseDetailUrlRedirectTest(TestCase):
         self.assertEqual(response["Location"], target_url)
 
     def test_legacy_url_redirects_to_case_list_when_multiple_api_groups(self):
-        ZGWApiGroupConfigFactory(), ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create(), ZGWApiGroupConfigFactory.create()
 
         object_id = "test_object_id"
         legacy_handler_url = reverse(

@@ -29,7 +29,7 @@ class ThumbnailTests(TestCase):
             ("GIF", "RGB", "JPEG"),
         ):
             with self.subTest(image_format=image_format, palette=palette):
-                image = FilerImageFactory(
+                image = FilerImageFactory.create(
                     file=factory.django.ImageField(
                         width=800, height=1000, format=image_format, palette=palette
                     )

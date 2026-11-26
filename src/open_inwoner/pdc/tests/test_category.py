@@ -26,10 +26,10 @@ PATCHED_MIDDLEWARE = [
 )
 class TestPublishedCategories(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.digid_user = DigidUserFactory()
-        self.eherkenning_user = eHerkenningUserFactory()
-        self.published1 = CategoryFactory(
+        self.user = UserFactory.create()
+        self.digid_user = DigidUserFactory.create()
+        self.eherkenning_user = eHerkenningUserFactory.create()
+        self.published1 = CategoryFactory.create(
             path="0001",
             name="First one",
             slug="first-one",
@@ -37,7 +37,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        self.published2 = CategoryFactory(
+        self.published2 = CategoryFactory.create(
             path="0002",
             name="Second one",
             slug="second-one",
@@ -45,7 +45,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        self.published3 = CategoryFactory(
+        self.published3 = CategoryFactory.create(
             path="0003",
             name="Third one",
             slug="third-one",
@@ -53,7 +53,7 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=False,
             visible_for_companies=True,
         )
-        self.published4 = CategoryFactory(
+        self.published4 = CategoryFactory.create(
             path="0004",
             name="Fourth one",
             slug="fourth-one",
@@ -61,10 +61,10 @@ class TestPublishedCategories(WebTest):
             visible_for_citizens=True,
             visible_for_companies=True,
         )
-        self.draft1 = CategoryFactory(
+        self.draft1 = CategoryFactory.create(
             path="0005", name="Fifth one", slug="fifth-one", published=False
         )
-        self.draft2 = CategoryFactory(
+        self.draft2 = CategoryFactory.create(
             path="0006", name="Sixth one", slug="sixth-one", published=False
         )
         self.subcategory = CategoryFactory.build(
@@ -175,7 +175,7 @@ class TestPublishedCategories(WebTest):
         self.assertEqual(list(response.context["subcategories"]), [descendent1])
 
     def test_auto_redirect_to_link(self):
-        category = CategoryFactory(
+        category = CategoryFactory.create(
             path="1234",
             name="redirect",
             slug="redirect",
@@ -206,17 +206,17 @@ class TestPublishedCategories(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):
     def setUp(self):
-        self.category = CategoryFactory()
-        self.questionnaire = QuestionnaireStepFactory(
+        self.category = CategoryFactory.create()
+        self.questionnaire = QuestionnaireStepFactory.create(
             path="0001", category=self.category
         )
-        self.highlighted_questionnaire_1 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_1 = QuestionnaireStepFactory.create(
             path="0003", category=self.category, highlighted=True
         )
-        self.highlighted_questionnaire_2 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_2 = QuestionnaireStepFactory.create(
             path="0004", category=self.category, highlighted=True
         )
-        self.highlighted_questionnaire_3 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_3 = QuestionnaireStepFactory.create(
             path="0005", category=self.category, highlighted=True
         )
 
@@ -235,7 +235,7 @@ class TestHighlightedQuestionnaire(WebTest):
         )
 
     def test_all_questionnaires_are_shown_on_user_category_detailed_page(self):
-        user = UserFactory()
+        user = UserFactory.create()
         response = self.app.get(
             reverse("products:category_detail", kwargs={"slug": self.category.slug}),
             user=user,

@@ -27,25 +27,25 @@ def fix_inline_formsets(form):
 @disable_admin_mfa()
 class TestAdminProductForm(WebTest):
     def test_access_limited_to_linked_auth_groups(self):
-        super_user = UserFactory(is_superuser=True, is_staff=True)
+        super_user = UserFactory.create(is_superuser=True, is_staff=True)
 
-        group = GroupFactory()
-        group_user = UserFactory(is_staff=True)
+        group = GroupFactory.create()
+        group_user = UserFactory.create(is_staff=True)
         group_user.user_permissions.add(Permission.objects.get(codename="view_product"))
         group_user.groups.add(group)
 
-        category_general = CategoryFactory(
+        category_general = CategoryFactory.create(
             path="everyone", name="everyone", published=True
         )
-        category_grouped = CategoryFactory(
+        category_grouped = CategoryFactory.create(
             path="grouped", name="grouped", published=True
         )
         category_grouped.access_groups.add(group)
 
-        product_general = ProductFactory(name="General Product")
+        product_general = ProductFactory.create(name="General Product")
         category_general.products.add(product_general)
 
-        product_grouped = ProductFactory(name="Grouped Product")
+        product_grouped = ProductFactory.create(name="Grouped Product")
         category_grouped.products.add(product_grouped)
 
         with self.subTest("superuser sees all in list"):
@@ -77,27 +77,29 @@ class TestAdminProductForm(WebTest):
             self.assertEqual(response.follow().request.path, "/admin/")
 
     def test_product_keeps_mixed_restricted_and_unrestricted_categories(self):
-        super_user = UserFactory(is_superuser=True, is_staff=True)
+        super_user = UserFactory.create(is_superuser=True, is_staff=True)
 
-        group = GroupFactory()
-        group_user = UserFactory(is_staff=True)
+        group = GroupFactory.create()
+        group_user = UserFactory.create(is_staff=True)
         group_user.user_permissions.add(
             Permission.objects.get(codename="view_product"),
             Permission.objects.get(codename="change_product"),
         )
         group_user.groups.add(group)
 
-        category_general = CategoryFactory(
+        category_general = CategoryFactory.create(
             path="everyone", name="everyone", published=True
         )
-        category_grouped = CategoryFactory(
+        category_grouped = CategoryFactory.create(
             path="grouped", name="grouped", published=True
         )
-        category_extra = CategoryFactory(path="grouped", name="extra", published=True)
+        category_extra = CategoryFactory.create(
+            path="grouped", name="extra", published=True
+        )
         group.managed_categories.add(category_grouped)
         group.managed_categories.add(category_extra)
 
-        product = ProductFactory(name="Product")
+        product = ProductFactory.create(name="Product")
         product.categories.add(category_general)
         product.categories.add(category_grouped)
 

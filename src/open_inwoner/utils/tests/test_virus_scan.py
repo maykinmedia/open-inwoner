@@ -58,7 +58,7 @@ class ScanFilerFilesTests(TestCase):
             scan_filer_files()
 
     def test_scans_all_files_including_images(self):
-        clean, infected = FilerFileFactory(), FilerImageFactory()
+        clean, infected = FilerFileFactory.create(), FilerImageFactory.create()
         scanner = MagicMock()
         scanner.instream.side_effect = [
             {"stream": ("OK", None)},
@@ -73,7 +73,7 @@ class ScanFilerFilesTests(TestCase):
         )
 
     def test_missing_file_is_reported_as_error(self):
-        filer_file = FilerFileFactory()
+        filer_file = FilerFileFactory.create()
         filer_file.file.storage.delete(filer_file.file.name)
 
         results = list(scan_filer_files(scanner=MagicMock()))
@@ -92,8 +92,8 @@ class ScanFilerFilesCommandTests(TestCase):
 
     def test_no_viruses_found(self, mock_clamd_cls):
         _enable_virus_scan()
-        FilerFileFactory()
-        FilerImageFactory()
+        FilerFileFactory.create()
+        FilerImageFactory.create()
         mock_clamd_cls.return_value.instream.return_value = {"stream": ("OK", None)}
         stdout = StringIO()
 
@@ -103,8 +103,8 @@ class ScanFilerFilesCommandTests(TestCase):
 
     def test_lists_infected_files(self, mock_clamd_cls):
         _enable_virus_scan()
-        FilerImageFactory()
-        infected = FilerFileFactory()
+        FilerImageFactory.create()
+        infected = FilerFileFactory.create()
         mock_clamd_cls.return_value.instream.side_effect = [
             {"stream": ("OK", None)},
             {"stream": ("FOUND", "Eicar-Test-Signature")},

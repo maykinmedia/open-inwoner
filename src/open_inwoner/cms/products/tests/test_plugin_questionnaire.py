@@ -20,17 +20,17 @@ class TestPluginBasics(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestHighlightedQuestionnaire(WebTest):
     def setUp(self):
-        self.category = CategoryFactory()
-        self.questionnaire = QuestionnaireStepFactory(
+        self.category = CategoryFactory.create()
+        self.questionnaire = QuestionnaireStepFactory.create(
             path="0001", category=self.category
         )
-        self.highlighted_questionnaire_1 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_1 = QuestionnaireStepFactory.create(
             path="0003", category=self.category, highlighted=True
         )
-        self.highlighted_questionnaire_2 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_2 = QuestionnaireStepFactory.create(
             path="0004", category=self.category, highlighted=True
         )
-        self.highlighted_questionnaire_3 = QuestionnaireStepFactory(
+        self.highlighted_questionnaire_3 = QuestionnaireStepFactory.create(
             path="0005", category=self.category, highlighted=True
         )
         cms_tools.create_apphook_page(ProductsApphook)
@@ -47,7 +47,7 @@ class TestHighlightedQuestionnaire(WebTest):
         )
 
     def test_only_highlighted_questionnaires_are_shown_on_user_plugin(self):
-        user = UserFactory()
+        user = UserFactory.create()
         html, context = cms_tools.render_plugin(QuestionnairePlugin, user=user)
         self.assertEqual(
             list(context["questionnaire_roots"]),
@@ -62,8 +62,10 @@ class TestHighlightedQuestionnaire(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireTestCase(WebTest):
     def setUp(self):
-        QuestionnaireStepFactory(code="foo", slug="foo", path="0001", highlighted=True)
-        QuestionnaireStepFactory(
+        QuestionnaireStepFactory.create(
+            code="foo", slug="foo", path="0001", highlighted=True
+        )
+        QuestionnaireStepFactory.create(
             code="foo-bar", slug="foo-bar", path="0002", highlighted=True
         )
         self.root_nodes = QuestionnaireStep.get_root_nodes()
@@ -79,7 +81,7 @@ class QuestionnaireTestCase(WebTest):
         self.assertIn(self.root_nodes[1].get_absolute_url(), html)
 
     def test_user_home_page_contains_highlighted_root_nodes(self):
-        user = UserFactory()
+        user = UserFactory.create()
         html, context = cms_tools.render_plugin(QuestionnairePlugin, user=user)
 
         self.assertIn(self.root_nodes[0].get_absolute_url(), html)
@@ -95,7 +97,7 @@ class QuestionnaireTestCase(WebTest):
     def test_user_home_page_doesnt_show_unpublished_nodes(self):
         QuestionnaireStep.objects.update(published=False)
 
-        user = UserFactory()
+        user = UserFactory.create()
         html, context = cms_tools.render_plugin(QuestionnairePlugin, user=user)
         self.assertNotIn(self.root_nodes[0].get_absolute_url(), html)
         self.assertNotIn(self.root_nodes[1].get_absolute_url(), html)

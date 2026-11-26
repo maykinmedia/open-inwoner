@@ -138,8 +138,8 @@ class FetchBRPCheckTests(TestCase):
 class FetchBRPViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
-        self.user = UserFactory()
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create()
         self.config = HaalCentraalConfig.get_solo()
 
     def get_url(self):
@@ -156,7 +156,7 @@ class FetchBRPViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_permission_denied_for_staff_user_with_model_access(self):
-        staff_user = UserFactory(is_staff=True, is_superuser=False)
+        staff_user = UserFactory.create(is_staff=True, is_superuser=False)
         staff_user.user_permissions.add(
             *Permission.objects.filter(
                 content_type__app_label="haalcentraal",
@@ -202,7 +202,7 @@ class FetchBRPViewTests(TestCase):
 class FetchBRPStandaloneTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_standalone_runs_check(self):
         self.client.force_login(self.superuser)

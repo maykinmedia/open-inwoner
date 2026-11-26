@@ -42,7 +42,7 @@ class TestProfile(WebTest):
         cms_tools.create_static_aliases(
             ["footer_left", "footer_center", "footer_right"]
         )
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
         self.config = SiteConfiguration.get_solo()
         self.config.login_allow_registration = True
@@ -104,8 +104,8 @@ class TestProfile(WebTest):
         )
 
     def test_categories_modification_is_logged(self):
-        CategoryFactory()
-        CategoryFactory()
+        CategoryFactory.create()
+        CategoryFactory.create()
         form = self.app.get(reverse("profile:categories"), user=self.user).forms[
             "change-categories"
         ]
@@ -192,7 +192,7 @@ class TestProfile(WebTest):
         )
 
     def test_login_via_frontend_using_digid_is_logged(self):
-        user = UserFactory(login_type=LoginTypeChoices.digid)
+        user = UserFactory.create(login_type=LoginTypeChoices.digid)
         self.app.get(reverse("digid:acs"), {"bsn": "123123222"}, user=user)
         log_entry = TimelineLog.objects.first()
 
@@ -246,7 +246,9 @@ class TestProfile(WebTest):
         )
 
     def test_password_change_is_logged(self):
-        user = UserFactory(password="test", first_name="Alice", last_name="Smith")
+        user = UserFactory.create(
+            password="test", first_name="Alice", last_name="Smith"
+        )
         form = self.app.get(reverse("password_change"), user=user).forms[
             "password-change-form"
         ]
@@ -326,10 +328,10 @@ class TestProfile(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestInvites(WebTest):
     def setUp(self):
-        self.invitee = UserFactory(is_active=False)
+        self.invitee = UserFactory.create(is_active=False)
 
     def test_accepted_invite_is_logged(self):
-        invite = InviteFactory(invitee=self.invitee)
+        invite = InviteFactory.create(invitee=self.invitee)
         url = invite.get_absolute_url()
 
         form = self.app.get(url).forms["invite-form"]
@@ -385,8 +387,8 @@ class TestContacts(WebTest):
     csrf_checks = False
 
     def setUp(self):
-        self.user = UserFactory()
-        self.contact = UserFactory()
+        self.user = UserFactory.create()
+        self.contact = UserFactory.create()
         self.user.user_contacts.add(self.contact)
 
     def test_contact_without_account_is_not_logged(self):
@@ -403,7 +405,7 @@ class TestContacts(WebTest):
         self.assertFalse(Invite.objects.exists())
 
     def test_existing_user_contact_approval_is_logged(self):
-        existing_user = UserFactory()
+        existing_user = UserFactory.create()
         form = self.app.get(reverse("profile:contact_create"), user=self.user).forms[
             "contact-form"
         ]
@@ -453,8 +455,8 @@ class TestDocuments(WebTest):
     csrf_checks = False
 
     def setUp(self):
-        self.user = UserFactory()
-        self.document = DocumentFactory(owner=self.user)
+        self.user = UserFactory.create()
+        self.document = DocumentFactory.create(owner=self.user)
 
     def test_document_download_is_logged(self):
         self.app.get(
@@ -502,8 +504,8 @@ class TestDocuments(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActions(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.action = ActionFactory(created_by=self.user)
+        self.user = UserFactory.create()
+        self.action = ActionFactory.create(created_by=self.user)
 
     def test_action_addition_is_logged(self):
         action = ActionFactory.build(created_by=self.user)
@@ -629,8 +631,8 @@ class TestActions(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMessages(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.other_user = UserFactory()
+        self.user = UserFactory.create()
+        self.other_user = UserFactory.create()
         self.user.user_contacts.add(self.other_user)
 
     def test_created_message_action_from_contacts_is_logged(self):
@@ -688,7 +690,7 @@ class TestMessages(WebTest):
 
     @temp_private_root()
     def test_download_file_from_messages_is_logged(self):
-        message = MessageFactory(
+        message = MessageFactory.create(
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
         download_url = reverse("inbox:download", args=[message.uuid])

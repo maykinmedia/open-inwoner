@@ -80,10 +80,10 @@ class OIDCClientFactory(_OIDCClientFactory):
     payload. Per-flow knobs (declared as Params) let tests tweak the config
     without mutating the options dict in place, e.g.:
 
-        OIDCClientFactory(with_digid=True)
-        OIDCClientFactory(with_digid=True, bsn_claim=["sub"])
-        OIDCClientFactory(with_admin=True, make_users_staff=False)
-        OIDCClientFactory(
+        OIDCClientFactory.create(with_digid=True)
+        OIDCClientFactory.create(with_digid=True, bsn_claim=["sub"])
+        OIDCClientFactory.create(with_admin=True, make_users_staff=False)
+        OIDCClientFactory.create(
             with_digid=True,
             oidc_provider__oidc_op_logout_endpoint="https://idp/logout",
         )

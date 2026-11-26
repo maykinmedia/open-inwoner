@@ -89,7 +89,7 @@ class ZgwCachingUnitTest(ClearCachesMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
         )
@@ -218,7 +218,7 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
         )
@@ -238,7 +238,7 @@ class ZgwCachingIntegrationTest(ClearCachesMixin, TestCase):
             json=paginated_response([zaak_dict]),
         )
 
-        user = DigidUserFactory(bsn=BSN)
+        user = DigidUserFactory.create(bsn=BSN)
         request = RequestFactory().get("/")
         request.user = user
 
@@ -279,7 +279,7 @@ class WarmCacheForUserIncompleteFetchLoggingTests(ClearCachesMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
         )

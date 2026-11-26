@@ -21,7 +21,7 @@ class OuterCaseListAccessTests(TestCase):
     outer_url = reverse_lazy("cases:index")
 
     def test_non_staff_user_without_bsn_or_kvk_is_denied(self):
-        self.client.force_login(UserFactory(bsn="", kvk=""))
+        self.client.force_login(UserFactory.create(bsn="", kvk=""))
 
         response = self.client.get(self.outer_url)
 
@@ -29,7 +29,7 @@ class OuterCaseListAccessTests(TestCase):
         self.assertTemplateNotUsed(response, "pages/cases/list_outer.html")
 
     def test_staff_user_without_bsn_or_kvk_gets_outer_page(self):
-        self.client.force_login(UserFactory(bsn="", kvk="", is_staff=True))
+        self.client.force_login(UserFactory.create(bsn="", kvk="", is_staff=True))
 
         response = self.client.get(self.outer_url)
 
@@ -38,7 +38,7 @@ class OuterCaseListAccessTests(TestCase):
         self.assertTemplateNotUsed(response, "pages/cases/403.html")
 
     def test_staff_user_without_bsn_or_kvk_is_denied_case_data(self):
-        self.client.force_login(UserFactory(bsn="", kvk="", is_staff=True))
+        self.client.force_login(UserFactory.create(bsn="", kvk="", is_staff=True))
 
         response = self.client.get(
             reverse("cases:cases_content"), HTTP_HX_REQUEST="true"

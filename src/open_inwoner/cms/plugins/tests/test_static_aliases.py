@@ -29,7 +29,7 @@ class StaticAliasPluginRestrictionTests(TestCase):
         super().setUp()
         cms_tools.create_static_aliases(["footer_left", "login_banner"])
 
-        user = UserFactory(is_staff=True, is_superuser=True)
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         self.renderer = StructureRenderer(request=cms_tools.get_request(user=user))
 
     def get_offered_plugins(self, alias_content: AliasContent) -> list[str]:

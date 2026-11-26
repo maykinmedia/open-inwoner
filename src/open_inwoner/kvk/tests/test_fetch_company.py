@@ -122,8 +122,8 @@ class FetchCompanyViewTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
-        self.user = UserFactory()
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create()
         self.config = KvKConfig.get_solo()
 
     def get_url(self):

@@ -14,7 +14,7 @@ class TestProductFinder(WebTest):
     def test_product_location_link_is_rendered_in_plugin(self):
         cms_tools.create_apphook_page(ProductsApphook)
 
-        condition = ProductConditionFactory(question="Question 1")
+        condition = ProductConditionFactory.create(question="Question 1")
 
         html, context = cms_tools.render_plugin(ProductFinderPlugin)
 

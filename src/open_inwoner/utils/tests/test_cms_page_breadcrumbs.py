@@ -34,7 +34,7 @@ class GetCMSPageTitleTests(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CMSPageBreadcrumbsTests(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         cms_tools.create_homepage()
         ProfileConfig.objects.create(namespace=ProfileApphook.app_name)
         cms_tools.create_apphook_page(ProfileApphook, title="Mijn omgeving")
@@ -53,7 +53,7 @@ class CMSPageBreadcrumbsTests(WebTest):
         self.assertIn("Mijn omgeving", crumbs[1].text_content())
 
     def test_plan_detail_uses_cms_page_title(self):
-        plan = PlanFactory(created_by=self.user)
+        plan = PlanFactory.create(created_by=self.user)
         plan.plan_contacts.add(self.user)
 
         response = self.app.get(

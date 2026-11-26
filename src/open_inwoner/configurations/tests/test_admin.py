@@ -49,7 +49,7 @@ class TestAdminSite(WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory(is_superuser=True, is_staff=True)
+        cls.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_site_add_prevented_if_one_exists(self):
         """Test that adding a site is prevented if one already exists."""
@@ -88,7 +88,7 @@ class TestAdminSite(WebTest):
 @disable_admin_mfa()
 class TestAdminForm(WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
         self.form = self.app.get(
             reverse("admin:configurations_siteconfiguration_change"), user=self.user
         ).forms["siteconfiguration_form"]
@@ -566,7 +566,7 @@ class JavaScriptAdminRenderingTests(WebTest):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory(is_superuser=True, is_staff=True)
+        cls.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     @override_settings(ALLOW_CUSTOM_JS=True)
     def test_admin_renders_with_javascript_enabled(self):
@@ -594,8 +594,8 @@ class JavaScriptAdminRenderingTests(WebTest):
 @disable_admin_mfa()
 class AdminPermissionTest(WebTest):
     def setUp(self):
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
-        self.beheerder = UserFactory(is_staff=True)
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.beheerder = UserFactory.create(is_staff=True)
 
         siteconfig_ct = ContentType.objects.get_for_model(SiteConfiguration)
         perm_warning, _ = Permission.objects.get_or_create(

@@ -62,7 +62,7 @@ class CMSLinkPluginTest(TestCase):
             icon="check",
         )
 
-        user = UserFactory()
+        user = UserFactory.create()
         request = cms_tools.get_request(user=user)
 
         # Get plugins - this loads the tree structure including child plugins

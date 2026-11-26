@@ -23,7 +23,7 @@ class QuestionAnswerMigrationTest(TestSuccessfulMigrations):
         Question = apps.get_model("pdc", "Question")
         Category = apps.get_model("pdc", "Category")
 
-        real_category = CategoryFactory()
+        real_category = CategoryFactory.create()
         category = Category.objects.get(id=real_category.id)
 
         self.question_with_content = Question.objects.create(
@@ -135,21 +135,21 @@ class SanitizeProsemirrorLinkHrefsMigrationTest(TestSuccessfulMigrations):
         Product = apps.get_model("pdc", "Product")
         Question = apps.get_model("pdc", "Question")
 
-        real_category = CategoryFactory()
+        real_category = CategoryFactory.create()
         category = Category.objects.get(id=real_category.id)
         Category.objects.filter(pk=category.pk).update(
             description=_text_with_link("click", "javascript:alert(1)")
         )
         self.category = category
 
-        real_safe_category = CategoryFactory()
+        real_safe_category = CategoryFactory.create()
         safe_category = Category.objects.get(id=real_safe_category.id)
         Category.objects.filter(pk=safe_category.pk).update(
             description=_text_with_link("click", "https://example.com")
         )
         self.safe_category = safe_category
 
-        real_product = ProductFactory(categories=[real_category])
+        real_product = ProductFactory.create(categories=[real_category])
         product = Product.objects.get(id=real_product.id)
         Product.objects.filter(pk=product.pk).update(
             content=_table_with_link("click", "javascript:alert(document.cookie)")

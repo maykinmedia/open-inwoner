@@ -33,13 +33,13 @@ class ActionViewTests(WebTest):
         self.config.cookie_info_text = ""
         self.config.save()
 
-        self.user = UserFactory()
-        self.action = ActionFactory(
+        self.user = UserFactory.create()
+        self.action = ActionFactory.create(
             name="action_that_should_be_found",
             created_by=self.user,
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
-        self.action_deleted = ActionFactory(
+        self.action_deleted = ActionFactory.create(
             name="action_that_was_deleted",
             created_by=self.user,
             is_deleted=True,
@@ -82,14 +82,14 @@ class ActionViewTests(WebTest):
         self.assertEqual(list(response.context["actions"]), [self.action])
 
     def test_action_list_filter_is_for(self):
-        user = UserFactory()
-        action = ActionFactory(
+        user = UserFactory.create()
+        action = ActionFactory.create(
             created_by=self.user,
             status=StatusChoices.closed,
             end_date=date.today(),
             is_for=user,
         )
-        action2 = ActionFactory(
+        action2 = ActionFactory.create(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
         self.assertNotEqual(action.is_for_id, self.user.id)
@@ -100,10 +100,10 @@ class ActionViewTests(WebTest):
         self.assertEqual(list(response.context["actions"]), [action2, self.action])
 
     def test_action_list_filter_status(self):
-        action = ActionFactory(
+        action = ActionFactory.create(
             created_by=self.user, status=StatusChoices.closed, end_date=date.today()
         )
-        action2 = ActionFactory(
+        action2 = ActionFactory.create(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
         response = self.app.get(
@@ -113,10 +113,10 @@ class ActionViewTests(WebTest):
         self.assertEqual(list(response.context["actions"]), [action2, self.action])
 
     def test_action_list_filter_end_date(self):
-        action = ActionFactory(
+        action = ActionFactory.create(
             created_by=self.user, status=StatusChoices.closed, end_date=date.today()
         )
-        action2 = ActionFactory(
+        action2 = ActionFactory.create(
             end_date="2021-04-02", status=StatusChoices.open, is_for=self.user
         )
         response = self.app.get(f"{self.list_url}?end_date=02-04-2021", user=self.user)
@@ -124,7 +124,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(list(response.context["actions"]), [action2])
 
     def test_action_list_only_show_personal_actions(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.action.name)
@@ -140,7 +140,7 @@ class ActionViewTests(WebTest):
         self.assertContains(response, self.action.name)
 
     def test_action_edit_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.edit_url, user=other_user, status=404)
 
     def test_action_edit_deleted_action(self):
@@ -172,7 +172,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(str(messages[0]), expected)
 
     def test_action_delete_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.client.force_login(other_user)
         response = self.client.post(self.delete_url)
         self.assertEqual(response.status_code, 404)
@@ -195,7 +195,7 @@ class ActionViewTests(WebTest):
         self.assertRedirects(response, f"{self.login_url}?next={self.export_url}")
 
     def test_action_export_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.export_url, user=other_user, status=404)
 
     def test_action_export_deleted_action(self):
@@ -232,7 +232,7 @@ class ActionViewTests(WebTest):
         self.assertRedirects(response, f"{self.login_url}?next={self.download_url}")
 
     def test_action_download_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.download_url, user=other_user, status=403)
 
     def test_action_download_deleted_action(self):
@@ -253,7 +253,7 @@ class ActionViewTests(WebTest):
         self.assertIn(_("Mijn acties"), crumbs[2].text_content())
 
     def test_action_history_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.history_url, user=other_user, status=404)
 
     def test_action_history_login_required(self):
@@ -311,7 +311,7 @@ class ActionViewTests(WebTest):
         self.assertEqual(response.status_code, 403)
 
     def test_action_status_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.client.force_login(other_user)
         response = self.client.post(
             self.edit_status_url,
@@ -336,7 +336,7 @@ class ActionsPlaywrightTests(PlaywrightSyncLiveServerTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.action = ActionFactory(
+        self.action = ActionFactory.create(
             name="my_action",
             created_by=self.user,
             status=StatusChoices.open,

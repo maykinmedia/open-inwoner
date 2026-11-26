@@ -62,8 +62,8 @@ class MessagesNotificationTest(TestCase):
         config.notifications_messages_enabled = False
         config.save()
 
-        user = UserFactory()
-        sender = UserFactory()
+        user = UserFactory.create()
+        sender = UserFactory.create()
         message = MessageFactory.create(receiver=user, sender=sender)
 
         schedule_user_notifications.delay(notify_about="messages", channel="email")
@@ -75,8 +75,8 @@ class MessagesNotificationTest(TestCase):
         self.assertFalse(message.sent)
 
     def test_no_email_about_received_message_when_disabled_by_user(self):
-        user = UserFactory(messages_notifications=False)
-        sender = UserFactory()
+        user = UserFactory.create(messages_notifications=False)
+        sender = UserFactory.create()
         message = MessageFactory.create(receiver=user, sender=sender)
 
         self.assertFalse(message.sent)

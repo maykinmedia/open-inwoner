@@ -23,7 +23,7 @@ class NewsletterSubscriptionFormTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory.create()
         self.user.verified_email = self.user.email
         self.user.save()
         self.assertTrue(self.user.has_verified_email())
