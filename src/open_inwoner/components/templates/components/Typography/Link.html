@@ -5,6 +5,7 @@
     {% if id %}id="{{ id }}"{% endif %}
     {% if download %}download{% endif %}
     {% if blank is True %}target="_blank"{% endif %}
+    {% if active %}aria-current="page"{% endif %}
     class="{{ classes }}{% if extra_classes %} {{ extra_classes }}{% endif %}"
     {% if data_text %}data-text="{{ data_text }}"{% endif %}
     {% if data_alt_text %}data-alt-text="{{ data_alt_text }}"{% endif %}
