@@ -259,7 +259,7 @@ class ZGWImportTest(ClearCachesMixin, TestCase):
         cls.config = OpenZaakConfig.get_solo()
         cls.roots = (CATALOGI_ROOT, ANOTHER_CATALOGI_ROOT)
         cls.api_groups_for_root = {
-            root: ZGWApiGroupConfigFactory(ztc_service__api_root=root)
+            root: ZGWApiGroupConfigFactory.create(ztc_service__api_root=root)
             for root in cls.roots
         }
         cls.api_groups = list(cls.api_groups_for_root.values())

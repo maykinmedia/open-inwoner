@@ -33,14 +33,14 @@ class ZGWExportImportMockData:
     def __init__(self, count=0, with_dupes=False):
         self.original_url = f"https://foo.{count}.maykinmedia.nl"
         self.original_uuid = "a1591906-3368-470a-a957-4b8634c275a1"
-        self.service = ServiceFactory(slug=f"service-{count}")
-        self.catalogus = CatalogusConfigFactory(
+        self.service = ServiceFactory.create(slug=f"service-{count}")
+        self.catalogus = CatalogusConfigFactory.create(
             url=self.original_url,
             domein=f"DM-{count}",
             rsin="123456789",
             service=self.service,
         )
-        self.ztc = ZaakTypeConfigFactory(
+        self.ztc = ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie=f"ztc-id-a-{count}",
             omschrijving="zaaktypeconfig",
@@ -52,7 +52,7 @@ class ZGWExportImportMockData:
             relevante_zaakperiode=None,
             urls=[self.original_url],
         )
-        self.ztc_status = ZaakTypeStatusTypeConfigFactory(
+        self.ztc_status = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             statustype_url=self.original_url,
             omschrijving="status omschrijving",
@@ -69,21 +69,21 @@ class ZGWExportImportMockData:
             call_to_action_text="",
             case_link_text="",
         )
-        self.ztc_resultaat = ZaakTypeResultaatTypeConfigFactory(
+        self.ztc_resultaat = ZaakTypeResultaatTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             resultaattype_url=self.original_url,
             omschrijving="resultaat",
             zaaktype_uuids=[self.original_uuid],
             description="",
         )
-        self.ztiotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        self.ztiotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             informatieobjecttype_url=self.original_url,
             omschrijving="informatieobject",
             zaaktype_uuids=[self.original_uuid],
         )
         if with_dupes:
-            self.ztc_resultaat_2 = ZaakTypeResultaatTypeConfigFactory(
+            self.ztc_resultaat_2 = ZaakTypeResultaatTypeConfigFactory.create(
                 zaaktype_config=self.ztc,
                 resultaattype_url=self.original_url,
                 omschrijving="status omschrijving",  # test dupes across models
@@ -535,7 +535,7 @@ class TestCatalogusImport(TestCase):
     def test_import_jsonl_update_reports_duplicate_db_records(self):
         mocks = ZGWExportImportMockData()
 
-        ZaakTypeResultaatTypeConfigFactory(
+        ZaakTypeResultaatTypeConfigFactory.create(
             resultaattype_url=mocks.ztc_resultaat.resultaattype_url,
             zaaktype_config=mocks.ztc_resultaat.zaaktype_config,
             omschrijving=mocks.ztc_resultaat.omschrijving,
@@ -606,8 +606,8 @@ class TestCatalogusImport(TestCase):
         self.assertEqual(import_result, import_expected)
 
     def test_import_jsonl_fails_with_catalogus_domein_rsin_mismatch(self):
-        service = ServiceFactory(slug="service-0")
-        CatalogusConfigFactory(
+        service = ServiceFactory.create(slug="service-0")
+        CatalogusConfigFactory.create(
             url="https://foo.0.maykinmedia.nl",
             domein="FOO",
             rsin="123456789",

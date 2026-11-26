@@ -18,14 +18,14 @@ class VideoAdminTests(WebTest):
         return super().setUp()
 
     def test_get_changelist(self):
-        user = UserFactory(is_staff=True, is_superuser=True)
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         url = reverse("admin:media_video_changelist")
         response = self.app.get(url, user=user)
         self.assertEqual(response.status_code, 200)
 
     def test_get_changelist_with_videos(self):
-        video = VideoFactory()
-        user = UserFactory(is_staff=True, is_superuser=True)
+        video = VideoFactory.create()
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         url = reverse("admin:media_video_changelist")
         response = self.app.get(url, user=user)
         self.assertEqual(response.status_code, 200)
@@ -33,8 +33,8 @@ class VideoAdminTests(WebTest):
         self.assertContains(response, video.external_url)
 
     def test_get_change(self):
-        video = VideoFactory()
-        user = UserFactory(is_staff=True, is_superuser=True)
+        video = VideoFactory.create()
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         url = reverse("admin:media_video_change", kwargs={"object_id": video.id})
         response = self.app.get(url, user=user)
         self.assertEqual(response.status_code, 200)

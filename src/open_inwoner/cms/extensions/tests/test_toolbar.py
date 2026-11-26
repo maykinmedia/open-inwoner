@@ -24,7 +24,7 @@ class PageContentObjectToolbarTests(TestCase):
         # see the helper's docstring: otherwise versioning can't find the versions
         cms_tools.reset_versionables_content_type_cache()
 
-        cls.user = UserFactory(is_staff=True, is_superuser=True)
+        cls.user = UserFactory.create(is_staff=True, is_superuser=True)
         cms_tools.create_homepage()
         # the apphook only resolves once the page is published
         cls.page = cms_tools.create_apphook_page(ProductsApphook)
@@ -66,7 +66,7 @@ class ApphookPagePlaceholderTests(TestCase):
     def setUp(self):
         super().setUp()
         cms_tools.reset_versionables_content_type_cache()
-        self.user = UserFactory(is_staff=True, is_superuser=True)
+        self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.page = cms_tools.create_apphook_page(ProductsApphook)
 
     def add_text(self, page_content: PageContent, text: str):

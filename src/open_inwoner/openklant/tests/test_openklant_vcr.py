@@ -30,13 +30,13 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
     def setUp(self):
         super().setUp()
 
-        self.openklant2_config = OpenKlant2ConfigFactory()
+        self.openklant2_config = OpenKlant2ConfigFactory.create()
         self.service = OpenKlant2Service(config=self.openklant2_config)
-        self.digid_user = DigidUserFactory(
+        self.digid_user = DigidUserFactory.create(
             first_name="John", last_name="Doe", bsn="521311408"
         )
-        self.kvk_only_user = eHerkenningUserFactory(kvk="12345678")
-        self.vestiging_user = eHerkenningVestigingUserFactory(
+        self.kvk_only_user = eHerkenningUserFactory.create(kvk="12345678")
+        self.vestiging_user = eHerkenningVestigingUserFactory.create(
             kvk=self.kvk_only_user.kvk, vestiging="123456789123"
         )
 
@@ -222,7 +222,7 @@ class PartijGetOrCreateTestCase(Openklant2ServiceTestCase):
     def test_get_or_create_partij_for_user_without_bsn_kvk(self):
         """Test that users without BSN/KVK get a persoon created without identificatoren"""
         # Create user without BSN/KVK
-        user_without_ids = UserFactory(
+        user_without_ids = UserFactory.create(
             first_name="Jane", last_name="Anonymous", bsn="", kvk=""
         )
 
@@ -332,11 +332,11 @@ class QuestionAnswerTestCase(Openklant2ServiceTestCase):
 
         # Requests made off the calling thread bypass VCR, so they are neither
         # recorded nor replayed. One worker keeps the walk on this thread.
-        self.openklant2_config = OpenKlant2ConfigFactory(
+        self.openklant2_config = OpenKlant2ConfigFactory.create(
             mijn_vragen_actor=self.designated_actor["uuid"], vragen_num_workers=1
         )
         self.service = OpenKlant2Service(config=self.openklant2_config)
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory.create()
 
     def test_designated_actor_is_required_to_create_question(self):
         self.openklant2_config.mijn_vragen_actor = None

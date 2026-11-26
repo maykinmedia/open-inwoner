@@ -64,7 +64,7 @@ class CasesPlaywrightTests(
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086")
+        self.user = DigidUserFactory.create(bsn="900222086")
         self.user_login_state = self.get_user_bsn_login_state(self.user)
 
         # cookiebanner
@@ -74,7 +74,7 @@ class CasesPlaywrightTests(
         self.config.save()
 
         # services
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
@@ -102,10 +102,10 @@ class CasesPlaywrightTests(
         self.esuite_config.register_bronorganisatie_rsin = "123456788"
         self.esuite_config.register_type = "Melding"
         self.esuite_config.register_employee_id = "FooVonBar"
-        self.esuite_config.klanten_service = ServiceFactory(
+        self.esuite_config.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
-        self.esuite_config.contactmomenten_service = ServiceFactory(
+        self.esuite_config.contactmomenten_service = ServiceFactory.create(
             api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
         )
         self.esuite_config.save()
@@ -314,24 +314,24 @@ class CasesPlaywrightTests(
         )
 
         # enable upload and contact form
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             contact_form_enabled=True,
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
         # enable upload for new and last status
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             statustype_url=self.status_type_new["url"],
             document_upload_enabled=True,
         )
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             statustype_url=self.status_type_finish["url"],
             document_upload_enabled=True,

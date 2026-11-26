@@ -153,7 +153,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         self.assertIn("no API group configured for zaak", str(outcome))
 
     def test_zio_bails_when_bad_notification_channel(self, m, mock_handle: Mock):
-        notification = NotificationFactory(kanaal="not_zaken")
+        notification = NotificationFactory.create(kanaal="not_zaken")
         with self.assertRaisesRegex(
             Exception, r"^handler expects kanaal 'zaken' but received 'not_zaken'"
         ):
@@ -162,7 +162,7 @@ class ZaakInformatieObjectNotificationHandlerTestCase(
         mock_handle.assert_not_called()
 
     def test_zio_bails_when_bad_notification_resource(self, m, mock_handle: Mock):
-        notification = NotificationFactory(resource="not_status")
+        notification = NotificationFactory.create(resource="not_status")
 
         outcome = handle_zaken_notification(notification)
 

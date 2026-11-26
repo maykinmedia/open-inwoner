@@ -146,7 +146,7 @@ class TestFileItemFromFilerFile(TestCase):
         )
 
     def test_image_file(self):
-        f = FilerImageFactory(name="Foto")
+        f = FilerImageFactory.create(name="Foto")
         self.assertEqual(
             FileItem.from_filer_file(f),
             FileItem(

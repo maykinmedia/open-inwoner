@@ -12,7 +12,7 @@ from open_inwoner.utils.test import ClearCachesMixin
 @disable_admin_mfa()
 class CustomFontsTest(ClearCachesMixin, WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
         self.config = SiteConfiguration.get_solo()
         self.config.custom_fonts = CustomFontSet()

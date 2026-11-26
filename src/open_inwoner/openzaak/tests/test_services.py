@@ -64,7 +64,7 @@ _TINY_TIMEOUTS = {
 
 class FormulierenClientFactoryTest(ClearCachesMixin, TestCase):
     def test_raises_for_a_group_without_a_form_service(self):
-        group = ZGWApiGroupConfigFactory(form_service=None)
+        group = ZGWApiGroupConfigFactory.create(form_service=None)
 
         with self.assertRaises(ValueError):
             ZGWService._formulieren_client_factory(group)
@@ -93,7 +93,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
     """
 
     def setUp(self):
-        self.api_group = ZGWApiGroupConfigFactory()
+        self.api_group = ZGWApiGroupConfigFactory.create()
         self.service = ZGWService()
 
     def _make_blocking_fetch(self, release: threading.Event):
@@ -107,7 +107,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         # A second API group + a single worker guarantees at least one
         # group's fetch is still queued (never started) when the timeout
         # elapses, regardless of which of the two the sole worker picks up.
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         self.service._max_workers = 1
         release = threading.Event()
         timer = threading.Timer(_RELEASE_DELAY, release.set)
@@ -140,7 +140,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         )
 
     def test_get_visible_zaken_logs_timeout_warning_on_raw_fetch(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         self.service._max_workers = 1
         release = threading.Event()
         timer = threading.Timer(_RELEASE_DELAY, release.set)
@@ -176,7 +176,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         )
 
     def test_get_formulieren_logs_timeout_warning(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         self.service._max_workers = 1
         release = threading.Event()
         timer = threading.Timer(_RELEASE_DELAY, release.set)
@@ -208,7 +208,7 @@ class IncompleteZakenResultTest(ClearCachesMixin, TestCase):
         )
 
     def test_search_zaken_propagates_raw_fetch_timeout(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         self.service._max_workers = 1
         release = threading.Event()
         timer = threading.Timer(_RELEASE_DELAY, release.set)
@@ -466,7 +466,7 @@ class ResolutionFailureTest(ClearCachesMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory()
+        self.api_group = ZGWApiGroupConfigFactory.create()
         self.service = ZGWService()
         self.zaken_client = Mock()
         self.catalogi_client = Mock()
@@ -661,10 +661,10 @@ class ResolutionFailureTest(ClearCachesMixin, TestCase):
 class GetZaakByUuidTests(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.api_group_1 = ZGWApiGroupConfigFactory(
+        self.api_group_1 = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT, form_service=None
         )
-        self.api_group_2 = ZGWApiGroupConfigFactory(
+        self.api_group_2 = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT, form_service=None
         )
         self.service = ZGWService()
@@ -784,7 +784,7 @@ class GetZaakByUuidTests(ClearCachesMixin, TestCase):
 class ZaakDocumentLinkTest(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT, form_service=None
         )
         self.service = ZGWService()
@@ -886,7 +886,7 @@ class ZaakDocumentLinkTest(ClearCachesMixin, TestCase):
 class ZaakDocumentListTest(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
@@ -1101,7 +1101,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
         config.show_cases_without_status = True
         config.save()
 
-        self.catalogus = CatalogusConfigFactory(
+        self.catalogus = CatalogusConfigFactory.create(
             url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a"
         )
         self.zaaktype = factory(
@@ -1134,7 +1134,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
         return zaak
 
     def test_visible_when_no_date_configured(self):
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie=self.zaaktype.identificatie,
             zaken_visible_from=None,
@@ -1150,7 +1150,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
         self.assertEqual(result, (True, None))
 
     def test_visible_when_startdatum_on_or_after_configured_date(self):
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie=self.zaaktype.identificatie,
             zaken_visible_from=date(2026, 5, 1),
@@ -1163,7 +1163,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
                 self.assertEqual(result, (True, None))
 
     def test_invisible_when_startdatum_before_configured_date(self):
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie=self.zaaktype.identificatie,
             zaken_visible_from=date(2026, 5, 1),
@@ -1176,7 +1176,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
                 self.assertEqual(result, (False, SkipReason.BEFORE_VISIBLE_FROM_DATE))
 
     def test_date_of_other_zaaktype_does_not_apply(self):
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie="SOME-OTHER-ZAAKTYPE",
             zaken_visible_from=date(2026, 5, 1),
@@ -1188,8 +1188,8 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
 
     def test_date_of_same_identificatie_in_other_catalogus_does_not_apply(self):
         """Zaaktype identificaties are only unique within a catalogus."""
-        ZaakTypeConfigFactory(
-            catalogus=CatalogusConfigFactory(
+        ZaakTypeConfigFactory.create(
+            catalogus=CatalogusConfigFactory.create(
                 url=f"{CATALOGI_ROOT}catalogussen/8a4b1a2c-0000-0000-0000-000000000000"
             ),
             identificatie=self.zaaktype.identificatie,
@@ -1202,7 +1202,7 @@ class ZaakVisibleFromDateTest(ClearCachesMixin, TestCase):
 
     def test_reads_configuration_only_once_per_service_instance(self):
         """The case list checks every zaak, so the lookup must not be an N+1."""
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=self.catalogus,
             identificatie=self.zaaktype.identificatie,
             zaken_visible_from=date(2026, 5, 1),
@@ -1235,7 +1235,7 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             form_service=None,
@@ -1413,8 +1413,8 @@ class SearchZakenAccessTest(ClearCachesMixin, TestCase):
         self.assertNotIn(self.zaaktype["url"], requested)
 
     def _configure_visible_from(self, visible_from: date):
-        return ZaakTypeConfigFactory(
-            catalogus=CatalogusConfigFactory(url=self.zaaktype["catalogus"]),
+        return ZaakTypeConfigFactory.create(
+            catalogus=CatalogusConfigFactory.create(url=self.zaaktype["catalogus"]),
             identificatie=self.zaaktype["identificatie"],
             zaken_visible_from=visible_from,
         )

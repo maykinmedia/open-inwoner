@@ -12,7 +12,7 @@ from .factories import MessageFactory, UserFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class InboxDownloadTests(WebTest):
     def setUp(self) -> None:
-        self.message = MessageFactory(
+        self.message = MessageFactory.create(
             file=SimpleUploadedFile("file.txt", b"test content"),
         )
         self.download_url = reverse("inbox:download", args=[self.message.uuid])
@@ -44,6 +44,6 @@ class InboxDownloadTests(WebTest):
         self.assertRedirects(response, f"{login_url}?next={self.download_url}")
 
     def test_download_not_your_message(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
 
         response = self.app.get(self.download_url, user=other_user, status=403)

@@ -10,7 +10,7 @@ from open_inwoner.userfeed.hooks.common import simple_message
 
 class TestUserFeedPlugin(TestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_plugin(self):
         simple_message(self.user, "Hello", title="Test message", url="http://foo.bar")

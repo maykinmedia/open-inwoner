@@ -22,7 +22,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self._setUpMocks_v_2(m)
         self._setUpService()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -43,7 +43,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self._setUpService()
         self._setUpVersion("1.3")
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -71,7 +71,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
         self._setUpService()
         self._setUpVersion("1.3")
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -84,7 +84,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
     def test_user_is_not_updated_without_defining_service(self, m):
         self._setUpMocks_v_2(m)
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -104,7 +104,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
     def test_user_is_not_updated_when_not_logged_in_via_digid(self, m):
         self._setUpMocks_v_2(m)
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.default
         )
         user.bsn = "999993847"
@@ -133,7 +133,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
             status_code=200,
             json={"personen": [], "type": "RaadpleegMetBurgerservicenummer"},
         )
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -174,7 +174,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
                 }
             },
         )
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -203,7 +203,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
             status_code=404,
         )
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -232,7 +232,7 @@ class TestPreSaveSignal(ClearCachesMixin, HaalCentraalMixin, TestCase):
             status_code=500,
         )
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", infix="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -265,13 +265,13 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         )
 
         config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             api_root="https://personen/api/brp",
         )
         config.service = service
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="", last_name="", login_type=LoginTypeChoices.digid
         )
         user.bsn = "999993847"
@@ -299,13 +299,13 @@ class TestLogging(HaalCentraalMixin, AssertTimelineLogMixin, TestCase):
         )
 
         config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             api_root="https://personen/api/brp",
         )
         config.service = service
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.digid,

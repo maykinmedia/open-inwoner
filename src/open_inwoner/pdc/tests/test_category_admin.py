@@ -18,7 +18,7 @@ from .factories import CategoryFactory
 @disable_admin_mfa()
 class TestAdminCategoryForm(WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_user_can_publish_root_category_on_add_form(self):
         form = self.app.get(reverse("admin:pdc_category_add"), user=self.user).forms[
@@ -39,7 +39,7 @@ class TestAdminCategoryForm(WebTest):
         self.assertTrue(category.published)
 
     def test_user_can_publish_child_category_with_root_published_on_add_form(self):
-        root = CategoryFactory(path="0002", slug="foo2")
+        root = CategoryFactory.create(path="0002", slug="foo2")
         form = self.app.get(reverse("admin:pdc_category_add"), user=self.user).forms[
             "category_form"
         ]
@@ -59,7 +59,7 @@ class TestAdminCategoryForm(WebTest):
     def test_user_cannot_publish_child_category_without_root_published_on_add_form(
         self,
     ):
-        category = CategoryFactory(path="0003", slug="foo3", published=False)
+        category = CategoryFactory.create(path="0003", slug="foo3", published=False)
         form = self.app.get(reverse("admin:pdc_category_add"), user=self.user).forms[
             "category_form"
         ]
@@ -74,7 +74,7 @@ class TestAdminCategoryForm(WebTest):
         self.assertEqual(categories.count(), 0)
 
     def test_user_can_publish_root_category_on_list_page(self):
-        CategoryFactory(path="0004", slug="foo4", published=False)
+        CategoryFactory.create(path="0004", slug="foo4", published=False)
         form = self.app.get(
             reverse("admin:pdc_category_changelist"), user=self.user
         ).forms["changelist-form"]
@@ -84,7 +84,7 @@ class TestAdminCategoryForm(WebTest):
         self.assertTrue(updated_category.published)
 
     def test_user_can_publish_child_category_with_root_published_on_list_page(self):
-        root = CategoryFactory(path="0005", slug="foo5")
+        root = CategoryFactory.create(path="0005", slug="foo5")
         root.add_child(path="00050001", slug="bar3", published=False)
         form = self.app.get(
             reverse("admin:pdc_category_changelist"), user=self.user
@@ -97,7 +97,7 @@ class TestAdminCategoryForm(WebTest):
     def test_user_cannot_publish_child_category_without_root_published_on_list_page(
         self,
     ):
-        root = CategoryFactory(path="0006", slug="foo6", published=False)
+        root = CategoryFactory.create(path="0006", slug="foo6", published=False)
         root.add_child(path="00060001", slug="bar4", published=False)
         form = self.app.get(
             reverse("admin:pdc_category_changelist"), user=self.user
@@ -108,10 +108,10 @@ class TestAdminCategoryForm(WebTest):
         self.assertFalse(updated_category.published)
 
     def test_access_limited_to_linked_auth_groups(self):
-        super_user = UserFactory(is_superuser=True, is_staff=True)
+        super_user = UserFactory.create(is_superuser=True, is_staff=True)
 
-        group = GroupFactory()
-        group_user = UserFactory(is_staff=True)
+        group = GroupFactory.create()
+        group_user = UserFactory.create(is_staff=True)
         group_user.user_permissions.add(
             Permission.objects.get(
                 codename="view_category", content_type__app_label="pdc"
@@ -119,10 +119,10 @@ class TestAdminCategoryForm(WebTest):
         )
         group_user.groups.add(group)
 
-        category_general = CategoryFactory(
+        category_general = CategoryFactory.create(
             path="everyone", name="everyone", published=True
         )
-        category_grouped = CategoryFactory(
+        category_grouped = CategoryFactory.create(
             path="grouped", name="grouped", published=True
         )
         category_grouped.access_groups.add(group)
@@ -156,8 +156,8 @@ class TestAdminCategoryForm(WebTest):
             self.assertEqual(response.follow().request.path, "/admin/")
 
     def test_access_categories_cannot_be_edited_by_restricted(self):
-        group = GroupFactory()
-        group_user = UserFactory(is_staff=True)
+        group = GroupFactory.create()
+        group_user = UserFactory.create(is_staff=True)
         group_user.user_permissions.add(
             Permission.objects.get(
                 codename="change_category", content_type__app_label="pdc"
@@ -165,7 +165,9 @@ class TestAdminCategoryForm(WebTest):
         )
         group_user.groups.add(group)
 
-        category = CategoryFactory(path="grouped", name="grouped", published=True)
+        category = CategoryFactory.create(
+            path="grouped", name="grouped", published=True
+        )
         category.access_groups.add(group)
         response = self.app.get(
             reverse(
@@ -185,7 +187,7 @@ class TestAdminCategoryForm(WebTest):
 
         ZaakTypeConfigFactory.create(identificatie="001")
 
-        category = CategoryFactory(path="0006", slug="foo6", published=False)
+        category = CategoryFactory.create(path="0006", slug="foo6", published=False)
         response_get = self.app.get(
             reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
             user=self.user,
@@ -219,7 +221,7 @@ class TestAdminCategoryForm(WebTest):
 
         ZaakTypeConfigFactory.create(identificatie="001")
 
-        category = CategoryFactory(path="0006", slug="foo6", published=False)
+        category = CategoryFactory.create(path="0006", slug="foo6", published=False)
         response_get = self.app.get(
             reverse("admin:pdc_category_change", kwargs={"object_id": category.pk}),
             user=self.user,

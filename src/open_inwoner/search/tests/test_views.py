@@ -39,11 +39,11 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086", email="johm@smith.nl")
-        self.user2 = DigidUserFactory(bsn="123456782", email="jane@doe.nl")
+        self.user = DigidUserFactory.create(bsn="900222086", email="johm@smith.nl")
+        self.user2 = DigidUserFactory.create(bsn="123456782", email="jane@doe.nl")
 
         # services
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT, ztc_service__api_root=CATALOGI_ROOT
         )
 
@@ -391,7 +391,7 @@ class TestSearchView(ClearCachesMixin, ESMixin, TransactionTestCase):
         self.assertEqual(response.request["PATH_INFO"], search_url)
 
     def test_search_case_found_in_two_backends_redirects_to_first(self, m):
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
         )

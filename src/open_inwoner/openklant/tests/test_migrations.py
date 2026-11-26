@@ -33,7 +33,7 @@ class SeenAnswerMigrationTest(TestSuccessfulMigrations):
         KlantContactMomentAnswer = apps.get_model(
             "openklant", "KlantContactMomentAnswer"
         )
-        user = UserFactory()
+        user = UserFactory.create()
 
         def _answer(url, is_seen):
             return KlantContactMomentAnswer.objects.create(
@@ -87,7 +87,7 @@ def _make_openklant2_config(apps, service=None):
 
 def _make_service(apps, **kwargs):
     Service = apps.get_model("zgw_consumers", "Service")
-    service_obj = ServiceFactory(**kwargs)
+    service_obj = ServiceFactory.create(**kwargs)
     return Service.objects.get(id=service_obj.id)
 
 

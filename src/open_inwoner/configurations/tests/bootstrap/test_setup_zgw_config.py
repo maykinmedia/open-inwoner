@@ -32,25 +32,25 @@ ZGW_API_STEP_YAML_MISSING_GROUPS = str(BASE_DIR / "zgw_api_step_missing_groups.y
 @temp_private_root()
 class ZGWConfigurationTests(TestCase):
     def setUp(self):
-        self.zaak_service = ServiceFactory(
+        self.zaak_service = ServiceFactory.create(
             api_type=APITypes.zrc, slug="zaak-api", api_root=ZAAK_SERVICE_API_ROOT
         )
-        self.catalogi_service = ServiceFactory(
+        self.catalogi_service = ServiceFactory.create(
             api_type=APITypes.ztc,
             slug="catalogus-api",
             api_root=CATALOGI_SERVICE_API_ROOT,
         )
-        self.document_service = ServiceFactory(
+        self.document_service = ServiceFactory.create(
             api_type=APITypes.drc,
             slug="document-api",
             api_root=DOCUMENTEN_SERVICE_API_ROOT,
         )
-        self.form_service = ServiceFactory(
+        self.form_service = ServiceFactory.create(
             api_type=APITypes.orc, slug="form-api", api_root=FORM_SERVICE_API_ROOT
         )
         # Some other services
         for _ in range(10):
-            ServiceFactory()
+            ServiceFactory.create()
 
     def assert_openzaak_config_defaults(self):
         config = OpenZaakConfig.get_solo()

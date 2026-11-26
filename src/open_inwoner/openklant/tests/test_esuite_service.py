@@ -24,7 +24,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         self.data = MockAPIReadData()
         self.data.setUpServices()
         self.service = eSuiteKlantenService()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_create_klant_can_only_specify_valid_identifier_combinations(self):
         for params in (
@@ -205,7 +205,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         )
 
     def test_update_klant_from_user(self):
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             email="old@example.com",
             phonenumber="0100000000",
             phonenumber_alternative="",
@@ -232,7 +232,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
             self.assertIsNone(m.last_request.json()["telefoonnummerAlternatief"])
 
     def test_update_klant_from_user_sends_alternative_phone_from_digital_address(self):
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             phonenumber="0611111111",
             phonenumber_alternative="0655555555",
         )
@@ -273,7 +273,9 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         self,
     ):
         """If klant sends the same number for both fields, alternative is dropped."""
-        user = DigidUserFactory(phonenumber="0100000000", phonenumber_alternative="")
+        user = DigidUserFactory.create(
+            phonenumber="0100000000", phonenumber_alternative=""
+        )
         klant = self._make_klant(
             telefoonnummer="0611111111",
             telefoonnummer_alternatief="0611111111",
@@ -289,7 +291,7 @@ class eSuiteServiceTestCase(TestCase, DisableRequestLogMixin):
         self,
     ):
         """If klant's primary number matches the user's existing alternative, alternative is dropped."""
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             phonenumber="0100000000", phonenumber_alternative="0611111111"
         )
         klant = self._make_klant(
@@ -324,7 +326,7 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         )
 
     def test_inbound_email_creates_standard_digital_address(self):
-        user = DigidUserFactory(email="old@example.com")
+        user = DigidUserFactory.create(email="old@example.com")
         klant = self._make_klant(emailadres="new@example.com")
 
         self.service.update_user_from_klant(klant, user)
@@ -334,7 +336,7 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertTrue(da.is_standard_for_type)
 
     def test_inbound_primary_phone_creates_standard_digital_address(self):
-        user = DigidUserFactory(phonenumber="0600000000")
+        user = DigidUserFactory.create(phonenumber="0600000000")
         klant = self._make_klant(telefoonnummer="0611111111")
 
         self.service.update_user_from_klant(klant, user)
@@ -345,7 +347,9 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertEqual(da.value, "0611111111")
 
     def test_inbound_alternative_phone_creates_non_standard_digital_address(self):
-        user = DigidUserFactory(phonenumber="0611111111", phonenumber_alternative="")
+        user = DigidUserFactory.create(
+            phonenumber="0611111111", phonenumber_alternative=""
+        )
         klant = self._make_klant(
             telefoonnummer="0611111111",
             telefoonnummer_alternatief="0622222222",
@@ -359,7 +363,7 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertEqual(da.value, "0622222222")
 
     def test_inbound_alternative_phone_deleted_when_esuite_removes_it(self):
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             phonenumber="0611111111", phonenumber_alternative="0622222222"
         )
         klant = self._make_klant(
@@ -376,7 +380,7 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         )
 
     def test_inbound_alternative_phone_replaced_when_esuite_changes_it(self):
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             phonenumber="0611111111", phonenumber_alternative="0622222222"
         )
         klant = self._make_klant(
@@ -394,8 +398,8 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertEqual(alts, ["0633333333"])
 
     def test_push_back_standard_email_when_esuite_has_no_email(self):
-        user = DigidUserFactory(email="user@example.com")
-        DigitalAddressFactory(
+        user = DigidUserFactory.create(email="user@example.com")
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="user@example.com",
@@ -411,7 +415,7 @@ class UpdateUserFromKlantDigitalAddressTestCase(TestCase, DisableRequestLogMixin
         self.assertEqual(m.request_history[0].json()["emailadres"], "user@example.com")
 
     def test_no_push_back_when_esuite_has_email(self):
-        user = DigidUserFactory(email="user@example.com")
+        user = DigidUserFactory.create(email="user@example.com")
         klant = self._make_klant(emailadres="user@example.com")
 
         with requests_mock.mock() as m:

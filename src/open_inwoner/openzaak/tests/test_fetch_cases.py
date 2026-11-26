@@ -53,7 +53,7 @@ class FetchCasesCheckTests(TestCase):
         self.assertEqual(result.extra["not_visible"], {})
 
     def test_no_cases_returned_shows_skip_reasons(self):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
         form = FetchCasesForm(data={"bsn": "123456789"})
         self.assertTrue(form.is_valid())
 
@@ -89,8 +89,8 @@ class FetchCasesCheckTests(TestCase):
         )
 
     def test_breakdown_per_api_group(self):
-        group_a = ZGWApiGroupConfigFactory(name="Group A")
-        group_b = ZGWApiGroupConfigFactory(name="Group B")
+        group_a = ZGWApiGroupConfigFactory.create(name="Group A")
+        group_b = ZGWApiGroupConfigFactory.create(name="Group B")
         form = FetchCasesForm(data={"bsn": "123456789"})
         self.assertTrue(form.is_valid())
 
@@ -127,7 +127,7 @@ class FetchCasesCheckTests(TestCase):
         self.assertEqual(by_group[str(group_b)]["not_visible"], {"no_status": 1})
 
     def test_cases_found(self):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
         mock_zaak = MagicMock()
         mock_zaak.api_group = api_group
 
@@ -164,8 +164,8 @@ class FetchCasesViewTests(TestCase):
     def setUp(self):
         self.client = Client()
 
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
-        self.user = UserFactory()
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create()
         self.config = OpenZaakConfig.get_solo()
 
     def get_url(self):
@@ -222,7 +222,7 @@ class FetchCasesViewTests(TestCase):
 class FetchCasesStandaloneTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_standalone_runs_check(self):
         self.client.force_login(self.superuser)

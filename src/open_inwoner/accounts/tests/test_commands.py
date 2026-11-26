@@ -12,7 +12,7 @@ from .factories import InviteFactory, UserFactory
 class DeleteContactInvitationsTest(AssertTimelineLogMixin, TestCase):
     def test_delete_expired_invitations(self):
         with freeze_time("2023-09-26") as frozen_time:
-            user = UserFactory(
+            user = UserFactory.create(
                 first_name="Johann Maria Salvadore",
                 infix="van de",
                 last_name="Eenzaameiland",

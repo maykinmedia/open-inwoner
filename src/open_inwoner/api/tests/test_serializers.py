@@ -11,8 +11,8 @@ class TestPDCLocation(APITestCase):
         self.client = APIClient()
 
     def test_products_endpoint_returns_location_coordinates(self):
-        location = ProductLocationFactory()
-        ProductFactory(locations=(location,))
+        location = ProductLocationFactory.create()
+        ProductFactory.create(locations=(location,))
 
         response = self.client.get(reverse("api:products-list"), format="json")
 

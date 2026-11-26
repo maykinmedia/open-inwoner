@@ -61,8 +61,8 @@ class TemplatesCSPTest(WebTest):
         self.assertEqual(blocked_by_csp(response), [])
 
     def test_product_with_map_and_video(self):
-        product = ProductFactory(video=VideoFactory())
-        product.locations.add(ProductLocationFactory())
+        product = ProductFactory.create(video=VideoFactory.create())
+        product.locations.add(ProductLocationFactory.create())
 
         response = self.app.get(
             reverse("products:product_detail", kwargs={"slug": product.slug})
@@ -77,6 +77,8 @@ class TemplatesCSPTest(WebTest):
         ProfileConfig.objects.create(namespace=ProfileApphook.app_name)
         cms_tools.create_apphook_page(ProfileApphook)
 
-        response = self.app.get(reverse("profile:detail"), user=DigidUserFactory())
+        response = self.app.get(
+            reverse("profile:detail"), user=DigidUserFactory.create()
+        )
 
         self.assertEqual(blocked_by_csp(response), [])

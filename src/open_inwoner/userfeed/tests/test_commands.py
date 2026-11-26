@@ -19,7 +19,7 @@ from open_inwoner.userfeed.tests.factories import FeedItemDataFactory
 class CommandTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
+        cls.user = UserFactory.create()
 
     def test_command_process_feed_updates(self):
         """
@@ -34,11 +34,11 @@ class CommandTests(TestCase):
 
     @freeze_time("2000-01-01")
     def test_auto_expire(self):
-        user = UserFactory()
+        user = UserFactory.create()
 
         d = make_aware(datetime(2001, 1, 1))
-        item_do_expire = FeedItemDataFactory(user=user, auto_expire_at=d)
-        item_not_expire = FeedItemDataFactory(user=user)
+        item_do_expire = FeedItemDataFactory.create(user=user, auto_expire_at=d)
+        item_not_expire = FeedItemDataFactory.create(user=user)
 
         auto_expire_items()
 

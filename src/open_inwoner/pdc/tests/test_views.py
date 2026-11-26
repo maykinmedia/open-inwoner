@@ -27,25 +27,25 @@ class CategoryListViewTest(TestCase):
     def setUp(self):
         super().setUp()
 
-        self.category_anonymous = CategoryFactory(
+        self.category_anonymous = CategoryFactory.create(
             name="0001",
             visible_for_anonymous=True,
             visible_for_citizens=False,
             visible_for_companies=False,
         )
-        self.category_all = CategoryFactory(
+        self.category_all = CategoryFactory.create(
             name="0002",
             visible_for_anonymous=True,
             visible_for_citizens=True,
             visible_for_companies=True,
         )
-        self.category_citizens = CategoryFactory(
+        self.category_citizens = CategoryFactory.create(
             name="0003",
             visible_for_anonymous=False,
             visible_for_citizens=True,
             visible_for_companies=False,
         )
-        self.category_companies = CategoryFactory(
+        self.category_companies = CategoryFactory.create(
             name="0004",
             visible_for_anonymous=False,
             visible_for_citizens=False,
@@ -59,7 +59,7 @@ class CategoryListViewTest(TestCase):
 
         url = reverse("products:category_list")
 
-        user = UserFactory()
+        user = UserFactory.create()
 
         # request with anonymous user
         response = self.client.get(url)
@@ -105,7 +105,7 @@ class CategoryListViewTest(TestCase):
     def test_category_list_view_visibility_for_digid_user(self):
         url = reverse("products:category_list")
 
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
         self.client.force_login(user)
 
         # request with DigiD user
@@ -121,7 +121,7 @@ class CategoryListViewTest(TestCase):
     def test_category_list_view_visibility_for_eherkenning_user(self):
         url = reverse("products:category_list")
 
-        user = eHerkenningUserFactory()
+        user = eHerkenningUserFactory.create()
         self.client.force_login(user)
 
         response = self.client.get(url)
@@ -135,7 +135,7 @@ class CategoryListViewTest(TestCase):
     def test_category_list_view_visibility_for_staff_user(self):
         url = reverse("products:category_list")
 
-        user = UserFactory(is_staff=True)
+        user = UserFactory.create(is_staff=True)
         self.client.force_login(user)
 
         response = self.client.get(url)
@@ -159,7 +159,7 @@ class CategoryDetailViewTest(TestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory()
+        self.user = DigidUserFactory.create()
 
         self.category = CategoryFactory.create(
             name="test cat",
@@ -206,7 +206,7 @@ class CategoryDetailViewTest(TestCase):
             description="A <em>descriptive</em> description",
             visible_for_citizens=False,
         )
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
         self.client.force_login(user)
 
         url = reverse("products:category_detail", kwargs={"slug": category.slug})
@@ -222,7 +222,7 @@ class CategoryDetailViewTest(TestCase):
             description="A <em>descriptive</em> description",
             visible_for_companies=False,
         )
-        user = eHerkenningVestigingUserFactory()
+        user = eHerkenningVestigingUserFactory.create()
         self.client.force_login(user)
 
         url = reverse("products:category_detail", kwargs={"slug": category.slug})

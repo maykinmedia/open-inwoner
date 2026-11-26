@@ -11,7 +11,7 @@ from open_inwoner.pdc.tests.factories import ProductFactory
 class SocialMediaButtonsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.product = ProductFactory()
+        cls.product = ProductFactory.create()
         cls.client = Client()
 
     def test_social_media_buttons_enabled(self):

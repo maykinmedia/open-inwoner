@@ -165,7 +165,7 @@ class TestSendVerificationEmail(WebTest):
             self.fail("could not locate URL in html")
 
     def test_send_user_email_verification_mail(self):
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
 
         send_user_email_verification_mail(user)
 
@@ -182,7 +182,7 @@ class TestSendVerificationEmail(WebTest):
         self.assertRedirects(response, reverse("pages-root"))
 
     def test_send_user_email_verification_mail__with_next_url(self):
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
 
         target_url = reverse("profile:detail")
         send_user_email_verification_mail(user, target_url)
@@ -204,7 +204,7 @@ class TestSendVerificationEmail(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMailVerificationView(WebTest):
     def test_mail_verification_view(self):
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
         self.assertFalse(user.has_verified_email())
 
         url = generate_email_verification_url(user)
@@ -214,7 +214,7 @@ class TestMailVerificationView(WebTest):
         self.assertTrue(user.has_verified_email())
 
     def test_mail_verification_view__login_required(self):
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
         url = generate_email_verification_url(user)
         response = self.app.get(url, status=302)
         expected = set_next_url_param(settings.LOGIN_URL, url)
@@ -237,7 +237,9 @@ class TestMailVerificationMiddlewareFlow(WebTest):
     )
     def test_verified_user_does_not_redirects(self, mock_send):
         config = SiteConfiguration.get_solo()
-        user = UserFactory(email="foo@example.com", verified_email="foo@example.com")
+        user = UserFactory.create(
+            email="foo@example.com", verified_email="foo@example.com"
+        )
         self.assertTrue(user.has_verified_email())
 
         # not required
@@ -258,7 +260,7 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         config.email_verification_message = "Test email for {email}"
         config.save()
 
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
         self.assertFalse(user.has_verified_email())
 
         # no redirect when not required
@@ -300,7 +302,7 @@ class TestMailVerificationMiddlewareFlow(WebTest):
         config.email_verification_required = True
         config.save()
 
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
         self.assertFalse(user.has_verified_email())
 
         # try to non-default page
@@ -336,7 +338,7 @@ class TestMailVerificationMiddlewareFlow(WebTest):
     )
     def test_verification_email_dupes(self, mock_send):
         request_factory = RequestFactory()
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
 
         request = request_factory.get("/")
         request.session = {}

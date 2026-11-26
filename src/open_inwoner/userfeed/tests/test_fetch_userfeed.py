@@ -14,7 +14,7 @@ from open_inwoner.userfeed.tests.factories import FeedItemDataFactory
 class FetchUserfeedCheckTests(TestCase):
     def setUp(self):
         self.check = FetchUserfeedCheck()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_no_items(self):
         result = self.check.run({}, instance=self.user)
@@ -29,7 +29,7 @@ class FetchUserfeedCheckTests(TestCase):
     def test_items_found(self):
         simple_message(self.user, "Hello", title="Test message")
         # noise for another user, should not be counted
-        FeedItemDataFactory(user=UserFactory())
+        FeedItemDataFactory.create(user=UserFactory.create())
 
         result = self.check.run({}, instance=self.user)
 
@@ -68,9 +68,9 @@ class FetchUserfeedCheckTests(TestCase):
 class FetchUserfeedViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.superuser = UserFactory(is_superuser=True, is_staff=True)
-        self.user = UserFactory()
-        self.target_user = UserFactory()
+        self.superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create()
+        self.target_user = UserFactory.create()
 
     def get_url(self):
         return reverse(
@@ -86,7 +86,7 @@ class FetchUserfeedViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_permission_denied_for_staff_user_with_model_access(self):
-        staff_user = UserFactory(is_staff=True, is_superuser=False)
+        staff_user = UserFactory.create(is_staff=True, is_superuser=False)
         staff_user.user_permissions.add(
             *Permission.objects.filter(
                 content_type__app_label="accounts",

@@ -71,7 +71,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             json=paginated_response([self.klant_bsn]),
         )
 
-        user = UserFactory(
+        user = UserFactory.create(
             phonenumber="0123456789",
             email="old@example.com",
             login_type=LoginTypeChoices.digid,
@@ -93,7 +93,7 @@ class UpdateUserFromLoginSignalAPITestCase(
         )
 
     def test_update_notification_channel_choice_after_login(self, m):
-        user = UserFactory(
+        user = UserFactory.create(
             phonenumber="0123456789",
             email="old@example.com",
             login_type=LoginTypeChoices.digid,
@@ -140,7 +140,7 @@ class UpdateUserFromLoginSignalAPITestCase(
         config.enable_notification_channel_choice = False
         config.save()
 
-        user = UserFactory(
+        user = UserFactory.create(
             phonenumber="0123456789",
             email="old@example.com",
             login_type=LoginTypeChoices.digid,
@@ -175,7 +175,7 @@ class UpdateUserFromLoginSignalAPITestCase(
                 )
 
     def test_update_eherkenning_user_after_login(self, m):
-        user = eHerkenningUserFactory(
+        user = eHerkenningUserFactory.create(
             phonenumber="0123456789",
             email="old@example.com",
             kvk="12345678",
@@ -228,13 +228,13 @@ class UpdateUserFromLoginSignalAPITestCase(
             json=paginated_response([self.klant_bsn]),
         )
 
-        user = UserFactory(
+        user = UserFactory.create(
             phonenumber="0123456789",
             email="old@example.com",
             login_type=LoginTypeChoices.digid,
             bsn="999993847",
         )
-        other_user = UserFactory(
+        other_user = UserFactory.create(
             phonenumber="0101010101",
             # uses same email as klant resource
             email="new@example.com",
@@ -263,7 +263,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             )
             m.post(f"{KLANTEN_ROOT}klanten", json=self.klant_bsn)
 
-            user = UserFactory(
+            user = UserFactory.create(
                 login_type=LoginTypeChoices.digid,
                 bsn="123456789",
             )
@@ -306,7 +306,7 @@ class UpdateUserFromLoginSignalAPITestCase(
             )
             m.post(f"{KLANTEN_ROOT}klanten", json=klant_eherkenning)
 
-            user = UserFactory(
+            user = UserFactory.create(
                 login_type=LoginTypeChoices.eherkenning,
                 kvk="87654321",
             )

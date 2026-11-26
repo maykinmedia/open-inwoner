@@ -16,7 +16,7 @@ class SessionBackendTest(WebTest):
         self.assertEqual(self.app.session._get_session().get("_session_expiry"), 900)
 
     def test_default_session_length_when_regular_user(self):
-        user = UserFactory(is_staff=False)
+        user = UserFactory.create(is_staff=False)
         response = self.app.get(self.url, user=user)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -25,7 +25,7 @@ class SessionBackendTest(WebTest):
         )
 
     def test_extended_session_length_when_staff_user(self):
-        user = UserFactory(is_staff=True)
+        user = UserFactory.create(is_staff=True)
         response = self.app.get(self.url, user=user)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(

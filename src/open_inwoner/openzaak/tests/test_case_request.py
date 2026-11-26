@@ -17,7 +17,7 @@ class TestFetchSpecificCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
 
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             form_service=None,
         )

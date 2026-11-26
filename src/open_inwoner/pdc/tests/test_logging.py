@@ -24,13 +24,13 @@ from .factories import CategoryFactory, ProductFactory
 @freeze_time("2021-10-18 13:00:00")
 class TestProductLogging(WebTest):
     def setUp(self):
-        self.category = CategoryFactory()
+        self.category = CategoryFactory.create()
         self.product = ProductFactory.build(categories=(self.category,))
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_addition(self):
         # Create product directly since admin form with inlines is complex in WebTest
-        product = ProductFactory(
+        product = ProductFactory.create(
             name="Test Product",
             slug="test-product",
             summary="Test summary",
@@ -57,7 +57,7 @@ class TestProductLogging(WebTest):
             self.assertIsNotNone(product)
 
     def test_change(self):
-        product = ProductFactory(categories=(self.category,))
+        product = ProductFactory.create(categories=(self.category,))
 
         # Update product content
         product.content = {
@@ -164,7 +164,7 @@ class TestProductLogging(WebTest):
         )
 
     def test_export_is_logged(self):
-        ProductFactory(categories=(self.category,))
+        ProductFactory.create(categories=(self.category,))
         response = self.app.get(reverse("admin:pdc_product_export"), user=self.user)
         form = next(f for f in response.forms.values() if "file_format" in f.fields)
         form["file_format"] = 1
@@ -191,10 +191,10 @@ class TestProductLogging(WebTest):
 class TestCategoryLogging(WebTest):
     def setUp(self):
         self.category = CategoryFactory.build()
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_addition(self):
-        category = CategoryFactory()
+        category = CategoryFactory.create()
 
         # Create a Django admin log entry (simulating what admin does)
         LogEntry.objects.log_action(
@@ -229,7 +229,7 @@ class TestCategoryLogging(WebTest):
         from django.contrib.admin.models import CHANGE, LogEntry
         from django.contrib.contenttypes.models import ContentType
 
-        category = CategoryFactory()
+        category = CategoryFactory.create()
 
         # Update category description
         category.description = {
@@ -273,7 +273,7 @@ class TestCategoryLogging(WebTest):
         )
 
     def test_deletion(self):
-        category = CategoryFactory()
+        category = CategoryFactory.create()
         response = self.app.get(
             reverse("admin:pdc_category_delete", kwargs={"object_id": category.id}),
             user=self.user,
@@ -322,7 +322,7 @@ class TestCategoryLogging(WebTest):
         )
 
     def test_export_is_logged(self):
-        CategoryFactory()
+        CategoryFactory.create()
         response = self.app.get(reverse("admin:pdc_category_export"), user=self.user)
         form = next(f for f in response.forms.values() if "file_format" in f.fields)
         form["file_format"] = 1

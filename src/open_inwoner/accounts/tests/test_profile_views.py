@@ -80,13 +80,13 @@ class ProfileViewTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:detail")
         self.return_url = reverse("logout_confirm")
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             first_name="Erik", street="MyStreet", messages_notifications=True
         )
-        self.digid_user = DigidUserFactory()
-        self.eherkenning_user = eHerkenningUserFactory()
+        self.digid_user = DigidUserFactory.create()
+        self.eherkenning_user = eHerkenningUserFactory.create()
 
-        self.action_deleted = ActionFactory(
+        self.action_deleted = ActionFactory.create(
             name="deleted action, should not show up",
             created_by=self.user,
             is_deleted=True,
@@ -108,7 +108,7 @@ class ProfileViewTests(WebTest):
     def test_show_logout_link_in_header(self):
         """All login types show a link to the logout confirm page in the header."""
         confirm_url = reverse("logout_confirm")
-        eidas_user = UserFactory(
+        eidas_user = UserFactory.create(
             login_type=LoginTypeChoices.eidas_person_bsn,
             bsn="123456789",
             eidas_pseudo_id="eidas-test",
@@ -124,19 +124,19 @@ class ProfileViewTests(WebTest):
         "open_inwoner.cms.utils.page_display.inbox_page_is_published", return_value=True
     )
     def test_user_information_profile_page(self, m):
-        email_da = DigitalAddressFactory(
+        email_da = DigitalAddressFactory.create(
             user=self.user,
             type=DigitalAddressType.email,
             value=self.user.email,
             is_standard_for_type=True,
         )
-        alt_email_da = DigitalAddressFactory(
+        alt_email_da = DigitalAddressFactory.create(
             user=self.user,
             type=DigitalAddressType.email,
             value="alt@example.com",
             is_standard_for_type=False,
         )
-        phone_da = DigitalAddressFactory(
+        phone_da = DigitalAddressFactory.create(
             user=self.user,
             type=DigitalAddressType.phone,
             value="0612345678",
@@ -195,12 +195,12 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, reverse("products:questionnaire_list"))
 
     def test_get_filled_profile_page(self):
-        ActionFactory(created_by=self.user)
-        contact = UserFactory()
+        ActionFactory.create(created_by=self.user)
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
-        category = CategoryFactory()
+        category = CategoryFactory.create()
         self.user.selected_categories.add(category)
-        QuestionnaireStepFactory(published=True)
+        QuestionnaireStepFactory.create(published=True)
         cms_tools.create_apphook_page(ProductsApphook)
 
         response = self.app.get(self.url, user=self.user)
@@ -214,12 +214,12 @@ class ProfileViewTests(WebTest):
         self.assertContains(response, reverse("products:questionnaire_list"))
 
     def test_only_open_actions(self):
-        ActionFactory(created_by=self.user, status=StatusChoices.closed)
+        ActionFactory.create(created_by=self.user, status=StatusChoices.closed)
         response = self.app.get(self.url, user=self.user)
         self.assertIn("0 acties staan open", response)
 
     def test_mydata_shown_with_digid_and_brp(self):
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="999993847",
             first_name="name",
             last_name="surname",
@@ -233,7 +233,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, "Bedrijfsgegevens")
 
     def test_mydata_not_shown_with_digid_and_no_brp(self):
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="999993847",
             first_name="name",
             last_name="surname",
@@ -248,7 +248,7 @@ class ProfileViewTests(WebTest):
         self.assertNotContains(response, _("My details"))
 
     def test_info_eherkenning_user(self):
-        user = eHerkenningUserFactory(
+        user = eHerkenningUserFactory.create(
             kvk="11111111",
             company_name="Makers and Shakers",
             street="Fantasiestraat",
@@ -273,7 +273,7 @@ class ProfileViewTests(WebTest):
 
     @patch("open_inwoner.cms.utils.page_display._is_published", return_value=True)
     def test_active_user_notifications_are_shown(self, mock_page_display):
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="999993847",
             first_name="name",
             last_name="surname",
@@ -297,7 +297,7 @@ class ProfileViewTests(WebTest):
     def test_messages_enabled_disabled(self):
         """Assert that `Stuur een bericht` is displayed if and only if the message page is published"""
 
-        begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        begeleider = UserFactory.create(contact_type=ContactTypeChoices.begeleider)
         self.user.user_contacts.add(begeleider)
 
         # case 1: no message page
@@ -330,7 +330,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def setUp(self):
         self.url = reverse("profile:edit")
         self.return_url = reverse("profile:detail")
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     # -------------------------------------------------------------------------
     # Helpers
@@ -399,7 +399,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         self.assertEqual(type(response.context["form"]), UserForm)
 
         # digid-brp user
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="999993847",
             first_name="name",
             last_name="surname",
@@ -588,7 +588,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     def test_modify_contact_details_eherkenning_succeeds(self, mock_update):
         mock_update.return_value = True
 
-        eherkenning_user = eHerkenningUserFactory()
+        eherkenning_user = eHerkenningUserFactory.create()
         response = self.app.get(self.url, user=eherkenning_user)
         form = response.forms["profile-edit"]
         form["email_addresses-0-value"] = "user@example.com"
@@ -627,7 +627,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     )
     def test_form_for_digid_brp_user_saves_data(self, mock_update):
         mock_update.return_value = True
-        user = UserFactory(
+        user = UserFactory.create(
             bsn="999993847",
             first_name="name",
             last_name="surname",
@@ -661,7 +661,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
     ):
         mock_update.return_value = True
 
-        user = DigidUserFactory(
+        user = DigidUserFactory.create(
             first_name="Liselotte-Anne Daniëlle Celèste Elise 26 Avril Stéphane Maroni jr.",
             infix="Isiah dé Maria de las Mercedes Rosalía",
             last_name="J'adore Grace a Dieu Rhiannon San-che-he-ray Lou'Lou Elona L'vovna d'Alessandra Ariëlle",
@@ -998,7 +998,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
         data = MockAPIReadPatchData().install_mocks_openklant(m)
 
-        email_addr = DigitalAddressFactory(
+        email_addr = DigitalAddressFactory.create(
             user=data.digid_user,
             type=DigitalAddressType.email,
             value=data.digid_user.email,
@@ -1006,7 +1006,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
             is_standard_for_type=True,
         )
         REMOTE_UUID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=email_addr, ok_uuid=REMOTE_UUID
         )
 
@@ -1054,7 +1054,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
         data = MockAPIReadPatchData().install_mocks_openklant(m)
 
-        email_addr = DigitalAddressFactory(
+        email_addr = DigitalAddressFactory.create(
             user=data.digid_user,
             type=DigitalAddressType.email,
             value=data.digid_user.email,
@@ -1099,14 +1099,14 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks_openklant(m)
 
         REMOTE_UUID = "cccccccc-cccc-cccc-cccc-cccccccccccc"
-        email_addr = DigitalAddressFactory(
+        email_addr = DigitalAddressFactory.create(
             user=data.digid_user,
             type=DigitalAddressType.email,
             value=data.digid_user.email,
             login_type=LoginTypeChoices.digid,
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=email_addr, ok_uuid=REMOTE_UUID
         )
         delete_matcher = m.delete(
@@ -1138,14 +1138,14 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         data = MockAPIReadPatchData().install_mocks_openklant(m)
 
         REMOTE_UUID = "cccccccc-cccc-cccc-cccc-cccccccccccc"
-        email_addr = DigitalAddressFactory(
+        email_addr = DigitalAddressFactory.create(
             user=data.digid_user,
             type=DigitalAddressType.email,
             value=data.digid_user.email,
             login_type=LoginTypeChoices.digid,
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=email_addr, ok_uuid=REMOTE_UUID
         )
 
@@ -1189,7 +1189,7 @@ class EditProfileTests(AssertTimelineLogMixin, WebTest):
         )
         data = MockAPIReadPatchData().install_mocks_openklant(m)
         user = data.digid_user
-        email_addr = DigitalAddressFactory(
+        email_addr = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value=user.email,
@@ -1273,7 +1273,7 @@ class ProfileDeleteTest(WebTest):
         return User.objects.exclude(pk__in=self._infra_user_pks)
 
     def test_delete_regular_user_success(self):
-        user = UserFactory()
+        user = UserFactory.create()
 
         # get profile page
         response = self.app.get(self.url, user=user)
@@ -1292,7 +1292,7 @@ class ProfileDeleteTest(WebTest):
         )
 
     def test_delete_user_with_digid_login_success(self):
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
 
         # get profile page
         response = self.app.get(self.url, user=user)
@@ -1311,7 +1311,7 @@ class ProfileDeleteTest(WebTest):
         )
 
     def test_delete_regular_user_as_plan_contact_fail(self):
-        user = UserFactory()
+        user = UserFactory.create()
         PlanFactory.create(plan_contacts=[user])
 
         # get profile page
@@ -1331,7 +1331,7 @@ class ProfileDeleteTest(WebTest):
         )
 
     def test_delete_staff_user_via_frontend_does_not_work(self):
-        user = UserFactory(is_staff=True)
+        user = UserFactory.create(is_staff=True)
 
         # get profile page
         response = self.app.get(self.url, user=user)
@@ -1371,7 +1371,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
     )
 
     def setUp(self):
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             bsn="999993847",
             first_name="Merel",
             infix="de",
@@ -1478,7 +1478,7 @@ class MyDataTests(AssertTimelineLogMixin, HaalCentraalMixin, WebTest):
 class EditIntrestsTests(WebTest):
     def setUp(self):
         self.url = reverse("profile:categories")
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_login_required(self):
         login_url = reverse("login")
@@ -1486,9 +1486,9 @@ class EditIntrestsTests(WebTest):
         self.assertRedirects(response, f"{login_url}?next={self.url}")
 
     def test_preselected_values(self):
-        category = CategoryFactory(name="a")
-        CategoryFactory(name="b")
-        CategoryFactory(name="c")
+        category = CategoryFactory.create(name="a")
+        CategoryFactory.create(name="b")
+        CategoryFactory.create(name="c")
         self.user.selected_categories.add(category)
         response = self.app.get(self.url, user=self.user)
         form = response.forms["change-categories"]
@@ -1508,7 +1508,7 @@ class EditNotificationsTests(AssertTimelineLogMixin, WebTest):
         self.config.save()
 
         self.url = reverse("profile:notifications")
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_login_required(self, mock_page_display):
         login_url = reverse("login")
@@ -1618,7 +1618,7 @@ class NotificationsDisplayTests(WebTest):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("profile:notifications")
-        cls.user = UserFactory()
+        cls.user = UserFactory.create()
 
         config = SiteConfiguration.get_solo()
         config.notifications_messages_enabled = True
@@ -1708,7 +1708,7 @@ class NewsletterSubscriptionTests(ClearCachesMixin, WebTest):
         cms_tools.create_apphook_page(ProfileApphook)
 
         self.profile_url = reverse("profile:detail")
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             email="news@example.com", verified_email="news@example.com"
         )
         self.assertTrue(self.user.has_verified_email())

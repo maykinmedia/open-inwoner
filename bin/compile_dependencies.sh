@@ -36,10 +36,11 @@ uv pip compile --no-strip-extras --python 3.13 \
     requirements/test-tools.in \
     requirements/docs.in
 
-# Dev dependencies - exact same set as CI + some extra tooling
+# Dev dependencies - exact same set as CI + some extra tooling and type checking
 uv pip compile --no-strip-extras --python 3.13 \
     --no-emit-index-url \
     --output-file requirements/dev.txt \
     "$@" \
     requirements/ci.txt \
-    requirements/dev.in
+    requirements/dev.in \
+    requirements/type-checking.in

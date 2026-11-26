@@ -39,15 +39,17 @@ class PlanViewTests(WebTest):
     csrf_checks = False
 
     def setUp(self) -> None:
-        self.user = UserFactory()
-        self.contact = UserFactory()
+        self.user = UserFactory.create()
+        self.contact = UserFactory.create()
         self.user.user_contacts.add(self.contact)
-        self.plan = PlanFactory(title="plan_that_should_be_found", created_by=self.user)
+        self.plan = PlanFactory.create(
+            title="plan_that_should_be_found", created_by=self.user
+        )
         self.plan.plan_contacts.add(self.user)
         self.plan.plan_contacts.add(self.contact)
 
-        self.action = ActionFactory(plan=self.plan, created_by=self.user)
-        self.action_deleted = ActionFactory(
+        self.action = ActionFactory.create(plan=self.plan, created_by=self.user)
+        self.action_deleted = ActionFactory.create(
             plan=self.plan, created_by=self.user, is_deleted=True
         )
 
@@ -99,7 +101,7 @@ class PlanViewTests(WebTest):
     def test_template_choice_view_redirects_to_plan_create_from_template_with_valid_pk(
         self,
     ):
-        plan_template = PlanTemplateFactory(file=None)
+        plan_template = PlanTemplateFactory.create(file=None)
         response = self.app.get(self.choose_template_url, user=self.user)
 
         form = response.forms["template-choice-form"]
@@ -117,7 +119,7 @@ class PlanViewTests(WebTest):
     def test_template_choice_with_non_existing_template_does_not_redirect(
         self,
     ):
-        plan_template = PlanTemplateFactory(file=None)
+        plan_template = PlanTemplateFactory.create(file=None)
         response = self.app.post(
             self.choose_template_url,
             user=self.user,
@@ -138,21 +140,21 @@ class PlanViewTests(WebTest):
 
     def test_template_plans_are_ordered_based_on_interests(self):
         # Set up categories
-        opleiding = CategoryFactory(name="Opleiding")
-        inburgering = CategoryFactory(name="Inburgering")
+        opleiding = CategoryFactory.create(name="Opleiding")
+        inburgering = CategoryFactory.create(name="Inburgering")
 
         # Set up three Plan Templates
-        cv_plan_template = PlanTemplateFactory(file=None, name="CV maken")
+        cv_plan_template = PlanTemplateFactory.create(file=None, name="CV maken")
         cv_plan_template.related_categories.add(opleiding)
         cv_plan_template.save()
 
-        nederlands_plan_template = PlanTemplateFactory(
+        nederlands_plan_template = PlanTemplateFactory.create(
             file=None, name="Nederlands leren"
         )
         nederlands_plan_template.related_categories.add(inburgering)
         nederlands_plan_template.save()
 
-        PlanTemplateFactory(file=None, name="Bijscholing")
+        PlanTemplateFactory.create(file=None, name="Bijscholing")
 
         # Baseline: without interest selected, the CV template is in front
         response = self.app.get(self.choose_template_url, user=self.user)
@@ -219,7 +221,7 @@ class PlanViewTests(WebTest):
 
         # Contact for one user, but not the other
         # Check if all users can see eachother in the plan
-        new_contact = UserFactory()
+        new_contact = UserFactory.create()
         self.user.user_contacts.add(new_contact)
         self.plan.plan_contacts.add(new_contact)
 
@@ -241,7 +243,7 @@ class PlanViewTests(WebTest):
         new_contact.delete()
 
         # Verify that without being added to the plan the contact isn't visible
-        new_contact = UserFactory()
+        new_contact = UserFactory.create()
         self.user.user_contacts.add(new_contact)
 
         response = self.app.get(self.detail_url, user=self.user)
@@ -268,7 +270,7 @@ class PlanViewTests(WebTest):
         self.assertContains(response, self.plan.title)
 
     def test_plan_list_only_show_personal_actions(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         response = self.app.get(self.list_url, user=other_user)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.plan.title)
@@ -335,7 +337,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.description, "editted description")
 
     def test_plan_goal_edit_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.goal_edit_url, user=other_user, status=404)
 
     def test_plan_file_add_login_required(self):
@@ -353,7 +355,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.documents.count(), 1)
 
     def test_plan_file_can_be_downloaded_by_contact(self):
-        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        doc = DocumentFactory.create(owner=self.user, plan=self.plan)
         response = self.app.get(
             reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
             user=self.contact,
@@ -378,8 +380,8 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.documents.count(), 0)
 
     def test_plan_file_cannot_be_downloaded_by_non_contact(self):
-        doc = DocumentFactory(owner=self.user, plan=self.plan)
-        new_user = UserFactory()
+        doc = DocumentFactory.create(owner=self.user, plan=self.plan)
+        new_user = UserFactory.create()
         self.app.get(
             reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
             user=new_user,
@@ -490,7 +492,7 @@ class PlanViewTests(WebTest):
         self.assertIn("Contact note content.", self.plan.note)
 
     def test_plan_file_add_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         response = self.app.get(self.file_add_url, user=other_user, status=404)
 
     def test_plan_action_create_login_required(self):
@@ -520,7 +522,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(self.plan.actions.visible().count(), 2)
 
     def test_plan_action_create_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.action_add_url, user=other_user, status=404)
 
     def test_plan_create_login_required(self):
@@ -565,8 +567,8 @@ class PlanViewTests(WebTest):
         )
 
     def test_plan_create_contains_expected_contacts(self):
-        plan_template = PlanTemplateFactory(file=None)
-        another_contact = UserFactory()
+        plan_template = PlanTemplateFactory.create(file=None)
+        another_contact = UserFactory.create()
         self.user.user_contacts.add(another_contact)
         for url in (self.create_url, self.create_from_template_url(plan_template.pk)):
             with self.subTest(url):
@@ -581,7 +583,7 @@ class PlanViewTests(WebTest):
                 self.assertIn(another_contact.get_full_name(), rendered_contacts)
 
     def test_plan_create_from_template_fails_with_no_collaborators(self):
-        plan_template = PlanTemplateFactory(file=None)
+        plan_template = PlanTemplateFactory.create(file=None)
         self.assertEqual(Plan.objects.count(), 1)
         response = self.app.get(
             self.create_from_template_url(plan_template.pk), user=self.user
@@ -616,7 +618,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.description, "Description")
 
     def test_plan_create_plan_with_template(self):
-        plan_template = PlanTemplateFactory(file=None)
+        plan_template = PlanTemplateFactory.create(file=None)
         self.assertEqual(Plan.objects.count(), 1)
         response = self.app.get(
             self.create_from_template_url(plan_template.pk), user=self.user
@@ -635,7 +637,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.actions.count(), 0)
 
     def test_plan_create_plan_with_template_and_field_overrides(self):
-        plan_template = PlanTemplateFactory(file=None)
+        plan_template = PlanTemplateFactory.create(file=None)
         self.assertEqual(Plan.objects.count(), 1)
         response = self.app.get(
             self.create_from_template_url(plan_template.pk), user=self.user
@@ -655,7 +657,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(plan.actions.count(), 0)
 
     def test_plan_create_plan_with_template_and_file(self):
-        plan_template = PlanTemplateFactory()
+        plan_template = PlanTemplateFactory.create()
         self.assertEqual(Plan.objects.count(), 1)
         response = self.app.get(
             self.create_from_template_url(plan_template.pk), user=self.user
@@ -676,8 +678,8 @@ class PlanViewTests(WebTest):
 
     @freeze_time("2021-12-01")
     def test_plan_create_no_template_plan_with_template_and_actions(self):
-        plan_template = PlanTemplateFactory(file=None)
-        ActionTemplateFactory(plan_template=plan_template)
+        plan_template = PlanTemplateFactory.create(file=None)
+        ActionTemplateFactory.create(plan_template=plan_template)
 
         # Necessary to make sure the end date of the actions
         # is before the end date of the plan itself
@@ -706,8 +708,8 @@ class PlanViewTests(WebTest):
     def test_plan_create_no_template_plan_validation_error_reselects_template_and_contact(
         self,
     ):
-        plan_template = PlanTemplateFactory(file=None)
-        ActionTemplateFactory(plan_template=plan_template)
+        plan_template = PlanTemplateFactory.create(file=None)
+        ActionTemplateFactory.create(plan_template=plan_template)
         # make sure we have only one plan
         self.assertEqual(Plan.objects.count(), 1)
 
@@ -735,8 +737,8 @@ class PlanViewTests(WebTest):
 
     @freeze_time("2025-02-23 12:00:00")
     def test_plan_create_plan_end_date_cannot_precede_action_end_dates(self):
-        plan_template = PlanTemplateFactory(file=None)
-        ActionTemplateFactory(plan_template=plan_template)
+        plan_template = PlanTemplateFactory.create(file=None)
+        ActionTemplateFactory.create(plan_template=plan_template)
         # make sure we have only one plan
         self.assertEqual(Plan.objects.count(), 1)
 
@@ -913,7 +915,7 @@ class PlanViewTests(WebTest):
         self.assertIn(plan_url, body)
 
     def test_plan_action_delete_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.client.force_login(other_user)
         response = self.client.post(self.action_delete_url)
         self.assertEqual(response.status_code, 404)
@@ -933,7 +935,7 @@ class PlanViewTests(WebTest):
         self.assertRedirects(response, f"{self.login_url}?next={self.export_url}")
 
     def test_plan_export_not_your_plan(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.app.get(self.export_url, user=other_user, status=404)
 
     def test_plan_action_status(self):
@@ -981,7 +983,7 @@ class PlanViewTests(WebTest):
         self.assertEqual(response.status_code, 403)
 
     def test_plan_action_status_not_your_action(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         self.client.force_login(other_user)
         response = self.client.post(
             self.action_edit_status_url,
@@ -995,15 +997,15 @@ class PlanViewTests(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class PlanBegeleiderListViewTests(WebTest):
     def setUp(self):
-        self.contact = UserFactory()
-        self.begeleider = UserFactory(contact_type=ContactTypeChoices.begeleider)
+        self.contact = UserFactory.create()
+        self.begeleider = UserFactory.create(contact_type=ContactTypeChoices.begeleider)
         self.begeleider.user_contacts.add(self.contact)
-        self.begeleider_plan = PlanFactory(
+        self.begeleider_plan = PlanFactory.create(
             title="begeleider plan_that_should_be_found", created_by=self.begeleider
         )
         self.begeleider_plan.plan_contacts.add(self.begeleider)
         self.begeleider_plan.plan_contacts.add(self.contact)
-        self.begeleider_action = ActionFactory(
+        self.begeleider_action = ActionFactory.create(
             plan=self.begeleider_plan, created_by=self.begeleider
         )
         self.login_url = reverse("login")
@@ -1097,7 +1099,7 @@ class PlanBegeleiderListViewTests(WebTest):
         self.assertEqual(rendered_action_required, [])
 
     def test_plan_list_filters_contacts(self):
-        another_plan = PlanFactory(
+        another_plan = PlanFactory.create(
             title="begeleider_plan_that_should_not_be_found", created_by=self.begeleider
         )
         response = self.app.get(
@@ -1115,7 +1117,7 @@ class PlanBegeleiderListViewTests(WebTest):
         self.assertEqual(contact_name, self.contact.get_full_name())
 
     def test_plan_list_filters_contacts_in_multiple_plans(self):
-        another_plan = PlanFactory(
+        another_plan = PlanFactory.create(
             title="begeleider_plan_that_should_not_be_found", created_by=self.begeleider
         )
         another_plan.plan_contacts.add(self.begeleider, self.contact)
@@ -1152,7 +1154,7 @@ class PlanBegeleiderListViewTests(WebTest):
 
     @freeze_time("2022-01-01")
     def test_plan_list_filters_status_open(self):
-        another_plan = PlanFactory(
+        another_plan = PlanFactory.create(
             title="begeleider_plan_that_should_not_be_found",
             created_by=self.begeleider,
             end_date=date(2021, 1, 1),
@@ -1177,7 +1179,7 @@ class PlanBegeleiderListViewTests(WebTest):
 
     @freeze_time("2022-01-01")
     def test_plan_list_filters_status_closed(self):
-        open_plan = PlanFactory(
+        open_plan = PlanFactory.create(
             title="begeleider_plan_that_should_not_be_found",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
@@ -1204,25 +1206,25 @@ class PlanBegeleiderListViewTests(WebTest):
     def test_plans_sorting(self):
         self.begeleider_plan.delete()
 
-        open_plan1 = PlanFactory(
+        open_plan1 = PlanFactory.create(
             title="open - should be first",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
             plan_contacts=[self.begeleider],
         )
-        open_plan2 = PlanFactory(
+        open_plan2 = PlanFactory.create(
             title="open - should be second",
             created_by=self.begeleider,
             end_date=date(2022, 1, 15),
             plan_contacts=[self.begeleider],
         )
-        closed_plan1 = PlanFactory(
+        closed_plan1 = PlanFactory.create(
             title="closed - should be third",
             created_by=self.begeleider,
             end_date=date(2021, 12, 6),
             plan_contacts=[self.begeleider],
         )
-        closed_plan2 = PlanFactory(
+        closed_plan2 = PlanFactory.create(
             title="closed - should be fourth",
             created_by=self.begeleider,
             end_date=date(2021, 11, 1),
@@ -1242,25 +1244,25 @@ class PlanBegeleiderListViewTests(WebTest):
     def test_plans_sorting_with_filtering_status_open(self):
         self.begeleider_plan.delete()
 
-        open_plan1 = PlanFactory(
+        open_plan1 = PlanFactory.create(
             title="open - should be first",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
             plan_contacts=[self.begeleider],
         )
-        open_plan2 = PlanFactory(
+        open_plan2 = PlanFactory.create(
             title="open - should be second",
             created_by=self.begeleider,
             end_date=date(2022, 1, 15),
             plan_contacts=[self.begeleider],
         )
-        closed_plan1 = PlanFactory(
+        closed_plan1 = PlanFactory.create(
             title="closed - should be third",
             created_by=self.begeleider,
             end_date=date(2021, 12, 6),
             plan_contacts=[self.begeleider],
         )
-        closed_plan2 = PlanFactory(
+        closed_plan2 = PlanFactory.create(
             title="closed - should be fourth",
             created_by=self.begeleider,
             end_date=date(2021, 11, 1),
@@ -1281,19 +1283,19 @@ class PlanBegeleiderListViewTests(WebTest):
     def test_plans_sorting_with_filtering_status_closed(self):
         self.begeleider_plan.delete()
 
-        open_plan1 = PlanFactory(
+        open_plan1 = PlanFactory.create(
             title="open - should not be rendered",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
             plan_contacts=[self.begeleider],
         )
-        closed_plan1 = PlanFactory(
+        closed_plan1 = PlanFactory.create(
             title="closed - should be first",
             created_by=self.begeleider,
             end_date=date(2021, 12, 6),
             plan_contacts=[self.begeleider],
         )
-        closed_plan2 = PlanFactory(
+        closed_plan2 = PlanFactory.create(
             title="closed - should be second",
             created_by=self.begeleider,
             end_date=date(2021, 11, 1),
@@ -1312,27 +1314,27 @@ class PlanBegeleiderListViewTests(WebTest):
 
     def test_plans_sorting_with_filtering_contacts(self):
         self.begeleider_plan.delete()
-        another_contact = UserFactory()
+        another_contact = UserFactory.create()
 
-        open_plan1 = PlanFactory(
+        open_plan1 = PlanFactory.create(
             title="open - should be first",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
             plan_contacts=[self.begeleider, self.contact],
         )
-        open_plan2 = PlanFactory(
+        open_plan2 = PlanFactory.create(
             title="open - should not be rendered",
             created_by=self.begeleider,
             end_date=date(2022, 1, 10),
             plan_contacts=[self.begeleider, another_contact],
         )
-        closed_plan1 = PlanFactory(
+        closed_plan1 = PlanFactory.create(
             title="closed - should be second",
             created_by=self.begeleider,
             end_date=date(2021, 12, 6),
             plan_contacts=[self.begeleider, self.contact],
         )
-        closed_plan2 = PlanFactory(
+        closed_plan2 = PlanFactory.create(
             title="closed - should be third",
             created_by=self.begeleider,
             end_date=date(2021, 11, 1),
@@ -1355,10 +1357,10 @@ class PlanBegeleiderListViewTests(WebTest):
         self.begeleider.last_name = "expected_last_name"
         self.begeleider.save()
 
-        another_contact = UserFactory(
+        another_contact = UserFactory.create(
             first_name="expected_first_name", last_name="expected_last_name"
         )
-        another_plan = PlanFactory(created_by=self.begeleider)
+        another_plan = PlanFactory.create(created_by=self.begeleider)
         another_plan.plan_contacts.add(self.begeleider, another_contact)
 
         response = self.app.get(
@@ -1377,7 +1379,7 @@ class PlanBegeleiderListViewTests(WebTest):
         self.begeleider_plan.title = "expected_title"
         self.begeleider_plan.save()
 
-        another_plan = PlanFactory(
+        another_plan = PlanFactory.create(
             created_by=self.begeleider, title="another_expected_title"
         )
         another_plan.plan_contacts.add(self.begeleider)
@@ -1408,11 +1410,11 @@ class NewPlanContactCounterTest(WebTest):
             parent_page=homepage,
         )
 
-        owner = UserFactory()
-        plan_1 = PlanFactory(created_by=owner)
-        plan_2 = PlanFactory(created_by=owner)
+        owner = UserFactory.create()
+        plan_1 = PlanFactory.create(created_by=owner)
+        plan_2 = PlanFactory.create(created_by=owner)
 
-        user = UserFactory()
+        user = UserFactory.create()
 
         root_url = reverse("pages-root")
         list_url = reverse("collaborate:plan_list")
@@ -1474,7 +1476,7 @@ class PlanActionStatusPlaywrightTests(ActionsPlaywrightTests):
         super().setUp()
 
         # update the action to belong to our plan
-        self.plan = PlanFactory(created_by=self.user)
+        self.plan = PlanFactory.create(created_by=self.user)
         self.plan.plan_contacts.add(self.user)
         self.action.plan = self.plan
         self.action.save()

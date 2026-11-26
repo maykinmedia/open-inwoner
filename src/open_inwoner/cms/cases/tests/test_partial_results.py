@@ -48,10 +48,10 @@ class CaseListPartialResultsTests(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="john@smith.nl"
         )
-        self.api_group = ZGWApiGroupConfigFactory()
+        self.api_group = ZGWApiGroupConfigFactory.create()
         self.client.force_login(self.user)
 
     def _patch_service(

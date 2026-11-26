@@ -23,7 +23,7 @@ class WizardCreateViewTests(TestCase):
         # see the helper's docstring: otherwise versioning can't find the versions
         cms_tools.reset_versionables_content_type_cache()
 
-        cls.user = UserFactory(is_staff=True, is_superuser=True)
+        cls.user = UserFactory.create(is_staff=True, is_superuser=True)
 
     def setUp(self):
         super().setUp()

@@ -27,7 +27,7 @@ class MenuModifierVisibilityTests(TestCase):
         ]
 
     def test_bsn_or_kvk_page_hidden_for_user_without_bsn_or_kvk(self):
-        user = UserFactory(bsn="", kvk="")
+        user = UserFactory.create(bsn="", kvk="")
 
         self.assertNotIn(self.cases_url, self._menu_hrefs(user))
 
@@ -35,9 +35,9 @@ class MenuModifierVisibilityTests(TestCase):
         self.assertNotIn(self.cases_url, self._menu_hrefs())
 
     def test_bsn_or_kvk_page_shown_for_digid_user(self):
-        self.assertIn(self.cases_url, self._menu_hrefs(DigidUserFactory()))
+        self.assertIn(self.cases_url, self._menu_hrefs(DigidUserFactory.create()))
 
     def test_bsn_or_kvk_page_shown_for_staff_user_without_bsn_or_kvk(self):
-        user = UserFactory(bsn="", kvk="", is_staff=True)
+        user = UserFactory.create(bsn="", kvk="", is_staff=True)
 
         self.assertIn(self.cases_url, self._menu_hrefs(user))

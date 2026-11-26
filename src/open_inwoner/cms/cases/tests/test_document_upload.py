@@ -28,8 +28,8 @@ def _make_view(user, api_group_id, zaak):
 class CaseDocumentUploadTitleTest(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.user = DigidUserFactory(bsn="900222086")
-        self.api_group = ZGWApiGroupConfigFactory()
+        self.user = DigidUserFactory.create(bsn="900222086")
+        self.api_group = ZGWApiGroupConfigFactory.create()
 
         self.mock_zaak = MagicMock()
         self.mock_zaak.bronorganisatie = "123456789"

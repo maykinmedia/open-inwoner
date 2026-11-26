@@ -22,22 +22,24 @@ from open_inwoner.plans.tests.factories import PlanFactory
 class ExpiringPlansNotificationTest(TestCase):
     def test_collected_notifications_are_json_serializable(self):
         # regression test for #2765
-        harry = UserFactory(first_name="Harry")
-        PlanFactory(end_date=date.today(), created_by=harry, title="Harry's plan")
+        harry = UserFactory.create(first_name="Harry")
+        PlanFactory.create(
+            end_date=date.today(), created_by=harry, title="Harry's plan"
+        )
 
         notifications = collect_notifications_about_expiring_plans()
 
         celery_dumps(notifications)
 
     def test_send_emails_about_expiring_plans(self):
-        harry = UserFactory(first_name="Harry")
-        sally = UserFactory(first_name="Sally")
+        harry = UserFactory.create(first_name="Harry")
+        sally = UserFactory.create(first_name="Sally")
         # contrast: not associated with plan, should not trigger email
-        UserFactory()
-        plan_harry = PlanFactory(
+        UserFactory.create()
+        plan_harry = PlanFactory.create(
             end_date=date.today(), created_by=harry, title="Harry's plan"
         )
-        plan_sally = PlanFactory(
+        plan_sally = PlanFactory.create(
             end_date=date.today(), created_by=sally, title="Sally's plan"
         )
 
@@ -65,7 +67,7 @@ class ExpiringPlansNotificationTest(TestCase):
 
     @patch("open_inwoner.userfeed.hooks.plan_expiring", autospec=True)
     def test_notify_about_expiring_plan_userfeed_hook(self, mock_plan_expiring: Mock):
-        PlanFactory(end_date=date.today())
+        PlanFactory.create(end_date=date.today())
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
@@ -76,44 +78,44 @@ class ExpiringPlansNotificationTest(TestCase):
         config.notifications_plans_enabled = False
         config.save()
 
-        PlanFactory(end_date=date.today())
+        PlanFactory.create(end_date=date.today())
 
         schedule_user_notifications.delay(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_expiring_plan_when_disabled_by_user(self):
-        PlanFactory(end_date=date.today(), created_by__plans_notifications=False)
+        PlanFactory.create(end_date=date.today(), created_by__plans_notifications=False)
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_plan_not_expiring(self):
-        PlanFactory(end_date=date.today() + timedelta(days=1))
+        PlanFactory.create(end_date=date.today() + timedelta(days=1))
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_expired_plan(self):
-        PlanFactory(end_date=date.today() - timedelta(days=1))
+        PlanFactory.create(end_date=date.today() - timedelta(days=1))
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_no_email_about_expiring_plan_inactive_user(self):
-        PlanFactory(end_date=date.today(), created_by__is_active=False)
+        PlanFactory.create(end_date=date.today(), created_by__is_active=False)
 
         schedule_user_notifications(notify_about="plans", channel="email")
 
         self.assertEqual(len(mail.outbox), 0)
 
     def test_send_emails_about_expiring_plan_email_contact(self):
-        user = UserFactory()
-        contact = UserFactory()
-        plan = PlanFactory(end_date=date.today(), created_by=user)
+        user = UserFactory.create()
+        contact = UserFactory.create()
+        plan = PlanFactory.create(end_date=date.today(), created_by=user)
         plan.plan_contacts.add(contact)
 
         schedule_user_notifications(notify_about="plans", channel="email")
@@ -144,9 +146,9 @@ class ExpiringPlansNotificationTest(TestCase):
         self.assertIn(reverse("collaborate:plan_list"), html_body2)
 
     def test_notify_only_user_with_active_notifications(self):
-        user = UserFactory()
-        contact = UserFactory(plans_notifications=False)
-        plan = PlanFactory(end_date=date.today(), created_by=user)
+        user = UserFactory.create()
+        contact = UserFactory.create(plans_notifications=False)
+        plan = PlanFactory.create(end_date=date.today(), created_by=user)
         plan.plan_contacts.add(contact)
 
         schedule_user_notifications(notify_about="plans", channel="email")

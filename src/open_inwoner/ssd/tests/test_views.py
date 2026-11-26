@@ -34,13 +34,13 @@ from open_inwoner.ssd.tests.mocks import (
 class TestMonthlyBenefitsFormView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.config = SSDConfigFactory(
+        cls.config = SSDConfigFactory.create(
             service__url="https://example.com/soap-service/",
         )
         cls.ssd_client = UitkeringClient()
 
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.user.set_password("12345")
         self.user.email = "test@email.com"
         self.user.save()
@@ -186,7 +186,7 @@ class TestMonthlyBenefitsFormView(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestYearlyBenefitsFormView(TestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.user.set_password("12345")
         self.user.email = "test@email.com"
         self.user.save()
@@ -211,7 +211,7 @@ class TestYearlyBenefitsFormView(TestCase):
     @requests_mock.Mocker()
     @freeze_time("1985-12-25")
     def test_jaaropgave_post_success(self, request_mock):
-        config = SSDConfigFactory(
+        config = SSDConfigFactory.create(
             service__url="https://example.com/soap-service/",
         )
         request_mock.post(

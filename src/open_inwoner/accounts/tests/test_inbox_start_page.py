@@ -25,8 +25,8 @@ class InboxPageTests(WebTest):
         self.url = reverse("inbox:start")
 
     def test_contact_choices_include_only_active_contacts(self):
-        active_contact = UserFactory()
-        inactive_contact = UserFactory(is_active=False)
+        active_contact = UserFactory.create()
+        inactive_contact = UserFactory.create(is_active=False)
         self.user.user_contacts.add(active_contact, inactive_contact)
 
         response = self.app.get(self.url)
@@ -45,7 +45,7 @@ class InboxPageTests(WebTest):
         )
 
     def test_send_message(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
 
         response = self.app.get(self.url)
@@ -72,7 +72,7 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_send_file(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
 
         response = self.app.get(self.url)
@@ -102,7 +102,7 @@ class InboxPageTests(WebTest):
         self.assertEqual(file.read(), b"test content")
 
     def test_send_empty_message(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
 
         response = self.app.get(self.url)
@@ -124,7 +124,7 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_send_init_file(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
         document = DocumentFactory.create(owner=self.user)
         url = furl(self.url).add({"file": document.uuid}).url
@@ -151,7 +151,7 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_get_with_other_users_document_returns_404(self):
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         document = DocumentFactory.create(owner=other_user)
         url = furl(self.url).add({"file": document.uuid}).url
 
@@ -159,9 +159,9 @@ class InboxPageTests(WebTest):
 
     @temp_private_root()
     def test_post_with_other_users_document_init_does_not_attach_file(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
-        other_user = UserFactory()
+        other_user = UserFactory.create()
         document = DocumentFactory.create(owner=other_user)
 
         response = self.app.get(self.url)
@@ -179,7 +179,7 @@ class InboxPageTests(WebTest):
         self.assertFalse(message.file)
 
     def test_send_empty_message_with_sharing_disabled(self):
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
         config = SiteConfiguration.get_solo()
         config.allow_messages_file_sharing = False
@@ -219,7 +219,7 @@ class InboxPageTests(WebTest):
         config.allow_messages_file_sharing = False
         config.save()
 
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
 
         img_bytes = create_image_bytes()

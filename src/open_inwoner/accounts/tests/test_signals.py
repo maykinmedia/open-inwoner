@@ -18,10 +18,10 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         self,
     ):
         for user, expected_mock_call in (
-            (eHerkenningUserFactory(), True),
-            (eHerkenningVestigingUserFactory(), True),
-            (DigidUserFactory(), False),
-            (UserFactory(), False),
+            (eHerkenningUserFactory.create(), True),
+            (eHerkenningVestigingUserFactory.create(), True),
+            (DigidUserFactory.create(), False),
+            (UserFactory.create(), False),
         ):
             with (
                 self.subTest(f"{user=} {expected_mock_call=}"),
@@ -57,7 +57,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mocck_get_vestigingsprofiel.return_value = {
             "eersteHandelsnaam": "AcmeCorp vestiging"
         }
-        user = eHerkenningVestigingUserFactory(rsin="12345")
+        user = eHerkenningVestigingUserFactory.create(rsin="12345")
         request = request = RequestFactory().get("/")
         request.user = user
 
@@ -86,7 +86,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
             "naam": "AcmeCorp Ltd",
             "handelsnamen": [{"naam": "AcmeCorp hoofdvestiging", "volgorde": 0}],
         }
-        user = eHerkenningUserFactory(rsin="12345")
+        user = eHerkenningUserFactory.create(rsin="12345")
         request = request = RequestFactory().get("/")
         request.user = user
 
@@ -116,7 +116,9 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
             "naam": "AcmeCorp Ltd",
             "handelsnamen": [{"naam": "AcmeCorp hoofdvestiging", "volgorde": 0}],
         }
-        user = eHerkenningUserFactory(rsin="", branch_name="AcmeCorp hoofdvestiging")
+        user = eHerkenningUserFactory.create(
+            rsin="", branch_name="AcmeCorp hoofdvestiging"
+        )
         request = request = RequestFactory().get("/")
         request.user = user
 
@@ -143,7 +145,7 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_get_basisprofiel.return_value = {}
         mocck_get_vestigingsprofiel.return_value = {}
         mock_retrieve_rsin_with_kvk.return_value = "12345"
-        user = eHerkenningVestigingUserFactory(rsin="")
+        user = eHerkenningVestigingUserFactory.create(rsin="")
         request = request = RequestFactory().get("/")
         request.user = user
 
@@ -170,8 +172,8 @@ class PostLoginSignalEHerkenningUserTestCase(TestCase, AssertTimelineLogMixin):
         mock_get_basisprofiel.return_value = {}
         mocck_get_vestigingsprofiel.return_value = {}
         for user in (
-            eHerkenningUserFactory(rsin="12345"),
-            eHerkenningVestigingUserFactory(rsin="12345"),
+            eHerkenningUserFactory.create(rsin="12345"),
+            eHerkenningVestigingUserFactory.create(rsin="12345"),
         ):
             with self.subTest(user):
                 request = request = RequestFactory().get("/")

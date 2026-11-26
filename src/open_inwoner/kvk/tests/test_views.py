@@ -38,13 +38,13 @@ class KvKViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_post_as_non_eherkenning_user_throws_401(self):
-        self.client.force_login(DigidUserFactory())
+        self.client.force_login(DigidUserFactory.create())
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 401)
 
     def test_post_as_branch_restricted_user_throws_401(self):
-        self.client.force_login(eHerkenningVestigingUserFactory())
+        self.client.force_login(eHerkenningVestigingUserFactory.create())
 
         # Note: we have to persist the session in a separate variable because every
         # property access on self.client insantiates a new session
@@ -72,8 +72,8 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         self.client.force_login(
             user=self.user,
@@ -110,10 +110,10 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
-        vestiging_user = eHerkenningVestigingUserFactory(kvk=self.user.kvk)
+        vestiging_user = eHerkenningVestigingUserFactory.create(kvk=self.user.kvk)
         self.client.force_login(
             user=vestiging_user,
             backend=EHerkenningSessionContext._expected_auth_backends()[0],
@@ -150,8 +150,8 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         self.client.force_login(
             user=self.user,
@@ -193,8 +193,8 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         self.client.force_login(
             user=self.user,
@@ -244,8 +244,8 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         self.client.force_login(
             user=self.user,
@@ -308,8 +308,8 @@ class KvKViewsTestCase(TestCase):
 
         mock_solo.return_value.api_key = "123"
         mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-        mock_solo.return_value.client_certificate = CertificateFactory()
-        mock_solo.return_value.server_certificate = CertificateFactory()
+        mock_solo.return_value.client_certificate = CertificateFactory.create()
+        mock_solo.return_value.server_certificate = CertificateFactory.create()
 
         self.client.force_login(
             user=self.user,

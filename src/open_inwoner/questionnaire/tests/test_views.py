@@ -33,7 +33,7 @@ class QuestionnaireResetViewTestCase(WebTest):
         self.assertIsNone(self.app.session[QUESTIONNAIRE_SESSION_KEY])
 
     def test_authenticated_user_redirects(self):
-        user = UserFactory()
+        user = UserFactory.create()
         path = reverse("products:reset")
         response = self.app.get(path, user=user)
         self.assertEqual(302, response.status_code)
@@ -280,10 +280,10 @@ class QuestionnaireStepViewTestCase(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class QuestionnaireStepListViewTestCase(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_render_root_nodes_when_user_is_logged_in(self):
-        questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
+        questionnaire = QuestionnaireStepFactory.create(code="foo", slug="foo")
         path = reverse("products:questionnaire_list")
         response = self.app.get(path, user=self.user)
         self.assertTrue(
@@ -294,7 +294,7 @@ class QuestionnaireStepListViewTestCase(WebTest):
         self.assertContains(response, questionnaire.slug)
 
     def test_render_root_nodes_when_user_is_anonymous(self):
-        questionnaire = QuestionnaireStepFactory(code="foo", slug="foo")
+        questionnaire = QuestionnaireStepFactory.create(code="foo", slug="foo")
         path = reverse("products:questionnaire_list")
         response = self.app.get(path)
         self.assertTrue(
@@ -310,7 +310,7 @@ class QuestionnaireStepListViewTestCase(WebTest):
         cms_tools.create_apphook_page(ProfileApphook)
         cms_tools.create_apphook_page(ProductsApphook)
 
-        QuestionnaireStepFactory()
+        QuestionnaireStepFactory.create()
         path = reverse("profile:detail")
         response = self.app.get(path, user=self.user)
         self.assertContains(response, "Start zelftest")

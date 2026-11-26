@@ -36,7 +36,7 @@ class SitemapCategoryDataTest(TestCase):
     def test_display_categories_simple(self):
         """No children, no products"""
         anon_user = AnonymousUser()
-        category = CategoryFactory()
+        category = CategoryFactory.create()
 
         res = _get_category_data_for_user(category, anon_user)
 
@@ -56,7 +56,7 @@ class SitemapCategoryDataTest(TestCase):
         ]
         for published, visible, result in scenarios:
             with self.subTest(f"published: {published}, visible: {visible}"):
-                root_category = CategoryFactory()
+                root_category = CategoryFactory.create()
                 # sanity check: one category is always visible
                 root_category.add_child(
                     slug=get_random_string(length=8),
@@ -80,13 +80,13 @@ class SitemapCategoryDataTest(TestCase):
         scenarios = [(True, 2), (False, 1)]
         for published, result in scenarios:
             with self.subTest(f"published: {published}"):
-                root_category = CategoryFactory()
+                root_category = CategoryFactory.create()
                 # sanity check: one product is always visible
-                ProductFactory(
+                ProductFactory.create(
                     name=get_random_string(length=8),
                     categories=(root_category,),
                 )
-                ProductFactory(
+                ProductFactory.create(
                     name=get_random_string(length=8),
                     categories=(root_category,),
                     published=published,
@@ -100,7 +100,7 @@ class SitemapCategoryDataTest(TestCase):
         """Test display of nested category structure"""
         anon_user = AnonymousUser()
 
-        root_category = CategoryFactory()
+        root_category = CategoryFactory.create()
         # children
         root_child1 = root_category.add_child(
             name="root child 1",
@@ -134,12 +134,12 @@ class SitemapCategoryDataTest(TestCase):
             visible_for_anonymous=True,
         )
         # products
-        prod1 = ProductFactory(
+        prod1 = ProductFactory.create(
             name="prod1",
             categories=(nested_child_1,),
             published=True,
         )
-        ProductFactory(
+        ProductFactory.create(
             name="prod2",
             categories=(nested_child_1,),
             published=False,
@@ -183,8 +183,8 @@ class SitemapCategoryDataTest(TestCase):
     def test_display_category_visibility(self):
         """Test restriction of visibility for different users"""
         anon_user = AnonymousUser()
-        digid_user = DigidUserFactory()
-        eherkenning_user = eHerkenningUserFactory()
+        digid_user = DigidUserFactory.create()
+        eherkenning_user = eHerkenningUserFactory.create()
 
         scenarios_anon = [
             (True, True, True, 2),
@@ -200,7 +200,7 @@ class SitemapCategoryDataTest(TestCase):
             with self.subTest(
                 f"Scenario for anon user: {visible_anon}, {visible_citizen}, {visible_eh}"
             ):
-                root_category = CategoryFactory()
+                root_category = CategoryFactory.create()
                 root_category.add_child(
                     name="root child 1",
                     slug=get_random_string(length=8),
@@ -236,7 +236,7 @@ class SitemapCategoryDataTest(TestCase):
             with self.subTest(
                 f"Scenario for anon user: {visible_anon}, {visible_citizen}, {visible_eh}"
             ):
-                root_category = CategoryFactory()
+                root_category = CategoryFactory.create()
                 root_category.add_child(
                     name="root child 1",
                     slug=get_random_string(length=8),
@@ -272,7 +272,7 @@ class SitemapCategoryDataTest(TestCase):
             with self.subTest(
                 f"Scenario for anon user: {visible_anon}, {visible_citizen}, {visible_eh}"
             ):
-                root_category = CategoryFactory()
+                root_category = CategoryFactory.create()
                 root_category.add_child(
                     name="root child 1",
                     slug=get_random_string(length=8),
@@ -298,7 +298,7 @@ class SitemapCategoryDataTest(TestCase):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class SitemapViewTest(TestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
         # Homepage is required for sitemap
         create_homepage()
@@ -322,7 +322,7 @@ class SitemapViewTest(TestCase):
 
     def test_sitemap_includes_categories(self):
         cms_tools.create_apphook_page(ProductsApphook)
-        category = CategoryFactory(published=True, visible_for_anonymous=True)
+        category = CategoryFactory.create(published=True, visible_for_anonymous=True)
 
         response = self.client.get(reverse("sitemap"))
 

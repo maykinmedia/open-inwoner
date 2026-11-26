@@ -23,7 +23,7 @@ class SidebarContentTests(WebTest):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.home_page = create_homepage()
 
         ProfileConfig.objects.create(namespace=ProfileApphook.app_name)
@@ -80,7 +80,7 @@ class SidenavHiddenTest(WebTest):
         self.assertFalse(sidebar.find(".side-navigation--oip"))
 
     def test_sidenav_hidden_on_kvk_branch_selection(self):
-        user = eHerkenningUserFactory(kvk="12345678")
+        user = eHerkenningUserFactory.create(kvk="12345678")
 
         with (
             patch(
@@ -100,29 +100,29 @@ class SidenavHiddenTest(WebTest):
         ):
             mock_solo.return_value.api_key = "123"
             mock_solo.return_value.api_root = "http://foo.bar/api/v1/"
-            mock_solo.return_value.client_certificate = CertificateFactory()
-            mock_solo.return_value.server_certificate = CertificateFactory()
+            mock_solo.return_value.client_certificate = CertificateFactory.create()
+            mock_solo.return_value.server_certificate = CertificateFactory.create()
 
             response = self.app.get(reverse("kvk:branches"), user=user)
 
         self._assert_sidenav_hidden(response)
 
     def test_sidenav_hidden_on_registration_necessary(self):
-        user = UserFactory()
+        user = UserFactory.create()
 
         response = self.app.get(reverse("profile:registration_necessary"), user=user)
 
         self._assert_sidenav_hidden(response)
 
     def test_sidenav_hidden_on_email_verification(self):
-        user = UserFactory(email="foo@example.com")
+        user = UserFactory.create(email="foo@example.com")
 
         response = self.app.get(reverse("profile:email_verification_user"), user=user)
 
         self._assert_sidenav_hidden(response)
 
     def test_sidenav_hidden_on_logout_confirmation(self):
-        user = UserFactory()
+        user = UserFactory.create()
 
         response = self.app.get(reverse("logout_confirm"), user=user)
 

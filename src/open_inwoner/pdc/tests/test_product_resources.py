@@ -16,7 +16,7 @@ from .factories import CategoryFactory, ProductFactory
 
 class TestProductImportResource(TestCase):
     def setUp(self):
-        self.category = CategoryFactory()
+        self.category = CategoryFactory.create()
         self.product = ProductFactory.build(categories=(self.category,))
         self.resource = ProductImportResource()
 
@@ -178,7 +178,7 @@ class TestProductImportResource(TestCase):
 
     def test_import_updates_product_when_slug_field_is_given(self):
         # Save product with explicit content to ensure it's valid
-        existing_product = ProductFactory(
+        existing_product = ProductFactory.create(
             categories=(self.category,), content="<p>Original content</p>"
         )
         updated_product = ProductFactory.build(categories=(self.category,))
@@ -255,8 +255,8 @@ class TestProductImportResource(TestCase):
 class TestProductExportResource(TestCase):
     @freeze_time("2021-10-18 13:00:00")
     def setUp(self):
-        self.category = CategoryFactory()
-        self.product = ProductFactory(categories=(self.category,))
+        self.category = CategoryFactory.create()
+        self.product = ProductFactory.create(categories=(self.category,))
         self.resource = ProductExportResource()
 
     def test_export_returns_expected_row(self):

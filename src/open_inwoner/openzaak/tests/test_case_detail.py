@@ -97,7 +97,7 @@ class TestCaseDetailView(
     def setUp(self):
         super().setUp()
 
-        self.user = UserFactory(
+        self.user = UserFactory.create(
             login_type=LoginTypeChoices.digid, bsn="900222086", email="johm@smith.nl"
         )
         self.eherkenning_user = eHerkenningUserFactory.create(
@@ -112,17 +112,17 @@ class TestCaseDetailView(
             login_type=LoginTypeChoices.eherkenning,
         )
         # services
-        self.contactmoment_service = ServiceFactory(
+        self.contactmoment_service = ServiceFactory.create(
             api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
         )
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=CATALOGI_ROOT,
             zrc_service__api_root=ZAKEN_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,
             form_service=None,
             klant_backend=KlantenServiceType.ESUITE.value,
         )
-        self.api_group_alt = ZGWApiGroupConfigFactory(
+        self.api_group_alt = ZGWApiGroupConfigFactory.create(
             ztc_service__api_root=ANOTHER_CATALOGI_ROOT,
             zrc_service__api_root=ANOTHER_ZAKEN_ROOT,
             drc_service__api_root=ANOTHER_DOCUMENTEN_ROOT,
@@ -1099,7 +1099,7 @@ class TestCaseDetailView(
     ):
         self.maxDiff = None
 
-        self.esuite_config.klanten_service = ServiceFactory(
+        self.esuite_config.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
         self.esuite_config.save()
@@ -1313,7 +1313,7 @@ class TestCaseDetailView(
     ):
         self.maxDiff = None
 
-        self.esuite_config.klanten_service = ServiceFactory(
+        self.esuite_config.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
         self.esuite_config.save()
@@ -1506,21 +1506,21 @@ class TestCaseDetailView(
             "schemas/ZaakType",
             identificatie="Bogus zaaktype",
         )
-        bogus_zt_config = ZaakTypeConfigFactory(
+        bogus_zt_config = ZaakTypeConfigFactory.create(
             identificatie=bogus_zaaktype["identificatie"],
         )
 
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             status_indicator_text="foo",
         )
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=bogus_zt_config,
             statustype_url=self.status_type_new["url"],
             status_indicator_text="bogus",
         )
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_finish["url"],
             status_indicator_text="bar",
@@ -1587,7 +1587,7 @@ class TestCaseDetailView(
         correctly using |prosemirror_content|safe filter in statuses.html template
         """
         # Test using .html assignment pattern
-        config = ZaakTypeStatusTypeConfigFactory(
+        config = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -1611,7 +1611,7 @@ class TestCaseDetailView(
         """
         Regression test: status.description should render links correctly
         """
-        config = ZaakTypeStatusTypeConfigFactory(
+        config = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -1642,7 +1642,7 @@ class TestCaseDetailView(
         """
         self._setUpMocks(m)
 
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.zaaktype_config,
             statustype_url=self.status_type_new["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -1927,7 +1927,7 @@ class TestCaseDetailView(
     def test_user_is_redirected_to_root_when_not_logged_in_via_digid(self, m):
         self._setUpMocks(m)
 
-        user = UserFactory(
+        user = UserFactory.create(
             first_name="",
             last_name="",
             login_type=LoginTypeChoices.default,
@@ -2391,11 +2391,11 @@ class TestCaseDetailView(
     ):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2420,7 +2420,7 @@ class TestCaseDetailView(
         html_content = "<p>Foo</p>\n<p>bar</p>"
         doc_data = html_to_doc(html_content, schema=config.schema)
 
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             statustype_url=self.status_type_finish["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2466,11 +2466,11 @@ class TestCaseDetailView(
         """
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2478,7 +2478,7 @@ class TestCaseDetailView(
         )
 
         # Use .html assignment pattern to set ProseMirror content
-        config = ZaakTypeStatusTypeConfigFactory(
+        config = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             statustype_url=self.status_type_finish["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2526,17 +2526,17 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc1 = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc1 = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
-        zaak_type_iotc2 = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc2 = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=f"{DOCUMENTEN_ROOT}enkelvoudiginformatieobjecten/705364ff-385a-4d60-b0da-a8cf5d18e6bb",
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2581,10 +2581,10 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        catalogus = CatalogusConfigFactory(
+        catalogus = CatalogusConfigFactory.create(
             url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
         )
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus=catalogus,
             identificatie=self.zaaktype["identificatie"],
             document_upload_enabled=False,
@@ -2613,10 +2613,10 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        catalogus = CatalogusConfigFactory(
+        catalogus = CatalogusConfigFactory.create(
             url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
         )
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus=catalogus,
             identificatie=self.zaaktype["identificatie"],
             document_upload_enabled=False,
@@ -2686,21 +2686,21 @@ class TestCaseDetailView(
         self._setUpAdditionalMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
             document_upload_enabled=True,
         )
-        zaak_type_config_alt = ZaakTypeConfigFactory(
+        zaak_type_config_alt = ZaakTypeConfigFactory.create(
             catalogus__url=f"{ANOTHER_CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype_alt["identificatie"],
         )
-        zaak_type_iotc_alt = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc_alt = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config_alt,
             informatieobjecttype_url=self.informatie_object_alt["url"],
             zaaktype_uuids=[self.zaaktype_alt["uuid"]],
@@ -2756,11 +2756,11 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2816,11 +2816,11 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2859,11 +2859,11 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        zaak_type_iotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -2904,7 +2904,7 @@ class TestCaseDetailView(
     def test_external_upload_section_is_rendered(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
@@ -2931,7 +2931,7 @@ class TestCaseDetailView(
     def test_case_type_config_description_is_rendered_when_external_upload(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
@@ -2955,7 +2955,7 @@ class TestCaseDetailView(
     def test_fixed_text_is_rendered_when_no_description_in_external_upload(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
@@ -2984,7 +2984,7 @@ class TestCaseDetailView(
     def test_external_upload_section_is_not_rendered_when_upload_disabled(self, m):
         self._setUpMocks(m)
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="https://test.example.com",
@@ -3009,7 +3009,7 @@ class TestCaseDetailView(
     def test_external_upload_section_is_not_rendered_when_no_url_specified(self, m):
         self._setUpMocks(m)
 
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="",
@@ -3036,7 +3036,7 @@ class TestCaseDetailView(
     ):
         self._setUpMocks(m)
 
-        ZaakTypeConfigFactory(
+        ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
             external_document_upload_url="",
@@ -3065,11 +3065,11 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -3122,11 +3122,11 @@ class TestCaseDetailView(
         self._setUpMocks(m)
         upload.return_value = True
 
-        zaak_type_config = ZaakTypeConfigFactory(
+        zaak_type_config = ZaakTypeConfigFactory.create(
             catalogus__url=f"{CATALOGI_ROOT}catalogussen/1b643db-81bb-d71bd5a2317a",
             identificatie=self.zaaktype["identificatie"],
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=zaak_type_config,
             informatieobjecttype_url=self.informatie_object["url"],
             zaaktype_uuids=[self.zaaktype["uuid"]],
@@ -3165,7 +3165,7 @@ class TestCaseDetailView(
         #
         # extra configs + mocks
         #
-        self.klanten_service = ServiceFactory(
+        self.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
         self.esuite_config.klanten_service = self.klanten_service
@@ -3240,7 +3240,7 @@ class TestCaseDetailView(
         #
         # extra configs + mocks
         #
-        self.klanten_service = ServiceFactory(
+        self.klanten_service = ServiceFactory.create(
             api_root=KLANTEN_ROOT, api_type=APITypes.kc
         )
         self.openklant_config.service = self.klanten_service
@@ -3468,10 +3468,10 @@ class StoreStatustypeMappingTest(TestCase):
         return view
 
     def test_mapping_scoped_to_current_api_group(self):
-        api_group = ZGWApiGroupConfigFactory()
-        catalogus = CatalogusConfigFactory(service=api_group.ztc_service)
-        ztc = ZaakTypeConfigFactory(catalogus=catalogus, identificatie="ZT-001")
-        config = ZaakTypeStatusTypeConfigFactory(
+        api_group = ZGWApiGroupConfigFactory.create()
+        catalogus = CatalogusConfigFactory.create(service=api_group.ztc_service)
+        ztc = ZaakTypeConfigFactory.create(catalogus=catalogus, identificatie="ZT-001")
+        config = ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=ztc,
             statustype_url=f"{api_group.ztc_service.api_root}statustypen/abc",
         )
@@ -3485,21 +3485,23 @@ class StoreStatustypeMappingTest(TestCase):
         )
 
     def test_mapping_excludes_other_api_group(self):
-        api_group = ZGWApiGroupConfigFactory()
-        other_api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
+        other_api_group = ZGWApiGroupConfigFactory.create()
 
-        catalogus = CatalogusConfigFactory(service=api_group.ztc_service)
-        ztc = ZaakTypeConfigFactory(catalogus=catalogus, identificatie="ZT-001")
-        ZaakTypeStatusTypeConfigFactory(
+        catalogus = CatalogusConfigFactory.create(service=api_group.ztc_service)
+        ztc = ZaakTypeConfigFactory.create(catalogus=catalogus, identificatie="ZT-001")
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=ztc,
             statustype_url=f"{api_group.ztc_service.api_root}statustypen/abc",
         )
 
-        other_catalogus = CatalogusConfigFactory(service=other_api_group.ztc_service)
-        other_ztc = ZaakTypeConfigFactory(
+        other_catalogus = CatalogusConfigFactory.create(
+            service=other_api_group.ztc_service
+        )
+        other_ztc = ZaakTypeConfigFactory.create(
             catalogus=other_catalogus, identificatie="ZT-001"
         )
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=other_ztc,
             statustype_url=f"{other_api_group.ztc_service.api_root}statustypen/abc",
         )
@@ -3513,7 +3515,7 @@ class StoreStatustypeMappingTest(TestCase):
         )
 
     def test_empty_mapping_logs_warning(self):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
         view = self._make_view_with_api_group(api_group)
 
         with self.assertLogs(

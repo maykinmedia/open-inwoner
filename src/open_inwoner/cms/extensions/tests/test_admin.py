@@ -17,7 +17,7 @@ class MenuIconsAdminViewTests(WebTest):
         return super().setUp()
 
     def test_get_menu_icons(self):
-        user = UserFactory(is_staff=True, is_superuser=True)
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         url = reverse("admin:cms_extensions_menu_icons")
 
         response = self.app.get(url, user=user)
@@ -28,7 +28,7 @@ class MenuIconsAdminViewTests(WebTest):
             self.assertContains(response, label)
 
     def test_menu_icon_help_text_links_to_menu_icons_page(self):
-        user = UserFactory(is_staff=True, is_superuser=True)
+        user = UserFactory.create(is_staff=True, is_superuser=True)
         url = reverse("admin:extensions_commonextension_add")
 
         response = self.app.get(url, user=user)

@@ -23,7 +23,7 @@ class SoapServiceConfigurationStepTest(TestCase):
         self.assertEqual(service.url, "http://ssd.internal/")
 
     def test_configure_updates_existing_service_with_same_identifier(self):
-        service = SoapServiceFactory(
+        service = SoapServiceFactory.create(
             slug="ssd-service", url="http://ssd.internal:1234/stale/"
         )
 

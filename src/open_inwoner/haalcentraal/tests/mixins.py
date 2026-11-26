@@ -17,7 +17,7 @@ class HaalCentraalMixin:
 
     def _setUpService(self):
         config = HaalCentraalConfig.get_solo()
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             api_root="https://personen/api/brp",
             api_type=APITypes.orc,
         )

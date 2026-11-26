@@ -38,9 +38,9 @@ from .factories import (
 @disable_admin_mfa()
 class TestZaakTypeConfigAdmin(WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
-        self.ztc = ZaakTypeConfigFactory()
-        self.ztiotc = ZaakTypeInformatieObjectTypeConfigFactory(
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
+        self.ztc = ZaakTypeConfigFactory.create()
+        self.ztiotc = ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=self.ztc
         )
 
@@ -139,7 +139,7 @@ class TestZaakTypeConfigAdmin(WebTest):
         "open_inwoner.openzaak.services.ZGWService.fetch_single_resultaat_type_for_service"
     )
     def test_display_esuite_compat_naam(self, m, mock_fetch):
-        ZaakTypeResultaatTypeConfigFactory(
+        ZaakTypeResultaatTypeConfigFactory.create(
             zaaktype_config=self.ztc,
         )
         resultaat_type = ResultaatType(
@@ -169,7 +169,7 @@ class TestZaakTypeConfigAdmin(WebTest):
 
     def test_search_by_nested_statustype_uuid(self):
         statustype_uuid = uuid.uuid4()
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             statustype_url=f"https://example.com/statustypen/{statustype_uuid}",
         )
@@ -184,7 +184,7 @@ class TestZaakTypeConfigAdmin(WebTest):
 
     def test_search_by_nested_resultaattype_uuid(self):
         resultaattype_uuid = uuid.uuid4()
-        ZaakTypeResultaatTypeConfigFactory(
+        ZaakTypeResultaatTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             resultaattype_url=f"https://example.com/resultaattypen/{resultaattype_uuid}",
         )
@@ -213,7 +213,7 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
 
     def test_search_by_nested_statustype_omschrijving(self):
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             omschrijving="In behandeling genomen",
         )
@@ -227,7 +227,7 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
 
     def test_search_by_nested_resultaattype_omschrijving(self):
-        ZaakTypeResultaatTypeConfigFactory(
+        ZaakTypeResultaatTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             omschrijving="Verleend",
         )
@@ -253,7 +253,7 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertEqual(list(response.context["cl"].result_list), [self.ztc])
 
     def test_search_by_unrelated_uuid_returns_no_results(self):
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc,
             statustype_url=f"https://example.com/statustypen/{uuid.uuid4()}",
         )
@@ -267,12 +267,12 @@ class TestZaakTypeConfigAdmin(WebTest):
         self.assertEqual(list(response.context["cl"].result_list), [])
 
     def test_changelist_counts_related_configs_per_zaaktype(self):
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=self.ztc, document_notification_enabled=True
         )
         ZaakTypeStatusTypeConfigFactory.create_batch(3, zaaktype_config=self.ztc)
         ZaakTypeResultaatTypeConfigFactory.create_batch(4, zaaktype_config=self.ztc)
-        other_ztc = ZaakTypeConfigFactory()
+        other_ztc = ZaakTypeConfigFactory.create()
 
         response = self.app.get(
             reverse("admin:openzaak_zaaktypeconfig_changelist"),
@@ -317,11 +317,11 @@ class TestZaakTypeConfigAdmin(WebTest):
     def test_search_requires_every_term_to_match_any_field(self):
         self.ztc.identificatie = "ZT-106"
         self.ztc.save()
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc, omschrijving="Zaak afgerond"
         )
-        other_ztc = ZaakTypeConfigFactory(identificatie="ZT-107")
-        ZaakTypeStatusTypeConfigFactory(
+        other_ztc = ZaakTypeConfigFactory.create(identificatie="ZT-107")
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=other_ztc, omschrijving="Zaak afgerond"
         )
 
@@ -343,14 +343,14 @@ class TestZaakTypeConfigAdmin(WebTest):
                 )
 
     def test_search_is_combined_with_list_filters(self):
-        ZaakTypeStatusTypeConfigFactory(
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=self.ztc, omschrijving="Zaak afgerond"
         )
-        other_ztc = ZaakTypeConfigFactory()
-        ZaakTypeStatusTypeConfigFactory(
+        other_ztc = ZaakTypeConfigFactory.create()
+        ZaakTypeStatusTypeConfigFactory.create(
             zaaktype_config=other_ztc, omschrijving="Zaak afgerond"
         )
-        ZaakTypeInformatieObjectTypeConfigFactory(
+        ZaakTypeInformatieObjectTypeConfigFactory.create(
             zaaktype_config=other_ztc, document_notification_enabled=True
         )
 
@@ -371,9 +371,9 @@ class TestCatalogusConfigExportAdmin(WebTest):
     csrf_checks = False
 
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
-        self.service = ServiceFactory(slug="service-1")
-        self.catalogus = CatalogusConfigFactory(
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
+        self.service = ServiceFactory.create(slug="service-1")
+        self.catalogus = CatalogusConfigFactory.create(
             url="https://foo.maykinmedia.nl",
             domein="DM",
             rsin="123456789",
@@ -588,7 +588,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
         )
 
     def test_import_view_requires_change_permission(self):
-        user_without_permission = UserFactory(is_staff=True)
+        user_without_permission = UserFactory.create(is_staff=True)
 
         response = self.app.get(
             reverse("admin:upload_catalogus_import_file"),
@@ -602,7 +602,7 @@ class TestCatalogusConfigExportAdmin(WebTest):
 @disable_admin_mfa()
 class TestZaakTypeConfigImportAdmin(WebTest):
     def test_import_view_requires_change_permission(self):
-        user_without_permission = UserFactory(is_staff=True)
+        user_without_permission = UserFactory.create(is_staff=True)
 
         response = self.app.get(
             reverse("admin:upload_zaaktype_import_file"),
@@ -616,7 +616,7 @@ class TestZaakTypeConfigImportAdmin(WebTest):
 @disable_admin_mfa()
 class TestOpenZaakConfigAdmin(WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
         self.form = self.app.get(
             reverse("admin:openzaak_openzaakconfig_change"), user=self.user
         ).forms["openzaakconfig_form"]

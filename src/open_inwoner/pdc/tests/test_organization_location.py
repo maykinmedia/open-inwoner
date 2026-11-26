@@ -17,8 +17,8 @@ class TestLocationFormInput(WebTest):
     def test_exception_is_handled_when_city_and_postcode_are_not_provided(
         self, mock_geocoding
     ):
-        organization = OrganizationFactory()
-        user = UserFactory(is_superuser=True, is_staff=True)
+        organization = OrganizationFactory.create()
+        user = UserFactory.create(is_superuser=True, is_staff=True)
 
         response = self.app.get(reverse("admin:pdc_organization_add"), user=user)
         form = response.forms["organization_form"]

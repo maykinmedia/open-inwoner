@@ -82,24 +82,24 @@ class FetchKlantDataTestCase(ClearCachesMixin, DisableRequestLogMixin, TestCase)
 
 class KlantFetchParametersTest(TestCase):
     def test_fetch_params_bsn(self):
-        service = OpenKlant2Service(config=OpenKlant2ConfigFactory())
-        user = DigidUserFactory()
+        service = OpenKlant2Service(config=OpenKlant2ConfigFactory.create())
+        user = DigidUserFactory.create()
 
         params = service.get_fetch_parameters(user)
 
         self.assertEqual(params, {"user_bsn": user.bsn})
 
     def test_fetch_params_kvk(self):
-        service = OpenKlant2Service(config=OpenKlant2ConfigFactory())
-        user = eHerkenningUserFactory()
+        service = OpenKlant2Service(config=OpenKlant2ConfigFactory.create())
+        user = eHerkenningUserFactory.create()
 
         params = service.get_fetch_parameters(user)
 
         self.assertEqual(params, {"user_kvk_or_rsin": user.kvk})
 
     def test_fetch_params_vestiging(self):
-        service = OpenKlant2Service(config=OpenKlant2ConfigFactory())
-        user = eHerkenningVestigingUserFactory()
+        service = OpenKlant2Service(config=OpenKlant2ConfigFactory.create())
+        user = eHerkenningVestigingUserFactory.create()
 
         params = service.get_fetch_parameters(user)
 
@@ -109,9 +109,11 @@ class KlantFetchParametersTest(TestCase):
 
     def test_fetch_params_rsin(self):
         service = eSuiteKlantenService(
-            config=ESuiteConfigFactory(use_rsin_for_innNnpId_query_parameter=True)
+            config=ESuiteConfigFactory.create(
+                use_rsin_for_innNnpId_query_parameter=True
+            )
         )
-        user = eHerkenningVestigingUserFactory()
+        user = eHerkenningVestigingUserFactory.create()
 
         params = service.get_fetch_parameters(user)
 

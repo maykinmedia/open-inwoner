@@ -49,13 +49,13 @@ class OpenKlant2ServiceClientAuthTestCase(TestCase):
     """
 
     def test_client_uses_header_value_for_api_key_auth_type(self):
-        service = ServiceFactory(
+        service = ServiceFactory.create(
             api_root=OPENKLANT2_ROOT,
             auth_type=AuthTypes.api_key,
             header_key="Authorization",
             header_value="Token abc123",
         )
-        config = OpenKlant2ConfigFactory(service=service)
+        config = OpenKlant2ConfigFactory.create(service=service)
 
         openklant_service = OpenKlant2Service(config)
 
@@ -70,7 +70,7 @@ class UpdateUserFromPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def _make_adres(self, uuid, soort, adres, is_standaard=False):
         return {
@@ -112,11 +112,11 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory()
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        address = DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.email, value="old@example.com"
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="11111111-1111-1111-1111-111111111111",
         )
@@ -140,7 +140,7 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
 
         service = OpenKlant2Service(config=self.config)
         service.update_user_from_partij(self._partij(), user)
@@ -157,11 +157,11 @@ class UpdateUserFromPartijTestCase(TestCase):
         mock_client_class.return_value = mock_client
         mock_client.digitaal_adres.list.return_value = self._list_response([])
 
-        user = DigidUserFactory()
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        address = DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.phone, value="0612345678"
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="33333333-3333-3333-3333-333333333333",
         )
@@ -180,11 +180,11 @@ class UpdateUserFromPartijTestCase(TestCase):
             new_remote_uuid, "email", "keep@example.com", is_standaard=True
         )
 
-        user = DigidUserFactory(email="keep@example.com")
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="keep@example.com")
+        address = DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.email, value="keep@example.com"
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="44444444-4444-4444-4444-444444444444",
         )
@@ -222,14 +222,14 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory(email="old@example.com")
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="old@example.com")
+        address = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="old@example.com",
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="44444444-4444-4444-4444-444444444444",
         )
@@ -264,7 +264,7 @@ class UpdateUserFromPartijTestCase(TestCase):
         mock_client_class.return_value = mock_client
 
         # Another user already owns the address remote wants to promote.
-        UserFactory(email="shared@example.com")
+        UserFactory.create(email="shared@example.com")
 
         shared_remote_uuid = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
         mock_client.digitaal_adres.list.return_value = self._list_response(
@@ -278,14 +278,14 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory(email="old@example.com")
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="old@example.com")
+        address = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="old@example.com",
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="99999999-9999-9999-9999-999999999999",
         )
@@ -309,7 +309,7 @@ class UpdateUserFromPartijTestCase(TestCase):
         mock_client_class.return_value = mock_client
 
         # Another user already owns this email address
-        UserFactory(email="taken@example.com")
+        UserFactory.create(email="taken@example.com")
 
         mock_client.digitaal_adres.list.return_value = self._list_response(
             [
@@ -321,7 +321,7 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_user_from_partij(self._partij(), user)
@@ -351,7 +351,7 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory(phonenumber="")
+        user = DigidUserFactory.create(phonenumber="")
 
         service = OpenKlant2Service(config=self.config)
         service.update_user_from_partij(self._partij(), user)
@@ -380,14 +380,14 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory(phonenumber="0612345678")
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create(phonenumber="0612345678")
+        address = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0612345678",
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         )
@@ -410,8 +410,8 @@ class UpdateUserFromPartijTestCase(TestCase):
             new_remote_uuid, "email", "user@example.com", is_standaard=True
         )
 
-        user = DigidUserFactory(email="user@example.com")
-        local_email_da = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="user@example.com")
+        local_email_da = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="user@example.com",
@@ -446,8 +446,8 @@ class UpdateUserFromPartijTestCase(TestCase):
             new_remote_uuid, "email", "user@example.com", is_standaard=True
         )
 
-        user = DigidUserFactory(email="user@example.com")
-        local_email_da = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="user@example.com")
+        local_email_da = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="user@example.com",
@@ -483,8 +483,8 @@ class UpdateUserFromPartijTestCase(TestCase):
             new_remote_uuid, "email", "user@example.com", is_standaard=True
         )
 
-        user = DigidUserFactory(email="user@example.com")
-        local_email_da = DigitalAddressFactory(
+        user = DigidUserFactory.create(email="user@example.com")
+        local_email_da = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="user@example.com",
@@ -511,7 +511,7 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
 
         service = OpenKlant2Service(config=self.config)
         service.update_user_from_partij(
@@ -537,11 +537,11 @@ class UpdateUserFromPartijTestCase(TestCase):
             ]
         )
 
-        user = DigidUserFactory()
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        address = DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.email, value="kept@example.com"
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address,
             ok_uuid="99999999-9999-9999-9999-999999999999",
         )
@@ -558,7 +558,7 @@ class UpdateUserFromPartijTestCase(TestCase):
 @patch("open_inwoner.openklant.services.build_zgw_client")
 class CreateKlantcontactTestCase(TestCase):
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def test_raises_error_when_question_is_empty(self, mock_client_class):
         mock_client = Mock()
@@ -619,7 +619,7 @@ class CreateKlantcontactTestCase(TestCase):
 @patch("open_inwoner.openklant.services.build_zgw_client")
 class GetOrCreatePartijForUserTestCase(TestCase):
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def test_find_existing_persoon_by_bsn(self, mock_client_class):
         mock_client = Mock()
@@ -641,7 +641,7 @@ class GetOrCreatePartijForUserTestCase(TestCase):
         }
 
         service = OpenKlant2Service(config=self.config)
-        user = DigidUserFactory(bsn="123456789")
+        user = DigidUserFactory.create(bsn="123456789")
 
         partij, created = service.get_or_create_partij_for_user(user)
 
@@ -673,7 +673,9 @@ class GetOrCreatePartijForUserTestCase(TestCase):
         }
 
         service = OpenKlant2Service(config=self.config)
-        user = DigidUserFactory(first_name="Jane", last_name="Smith", bsn="987654321")
+        user = DigidUserFactory.create(
+            first_name="Jane", last_name="Smith", bsn="987654321"
+        )
 
         partij, created = service.get_or_create_partij_for_user(user)
 
@@ -712,7 +714,9 @@ class GetOrCreatePartijForUserTestCase(TestCase):
         }
 
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory(first_name="Anonymous", last_name="User", bsn="", kvk="")
+        user = UserFactory.create(
+            first_name="Anonymous", last_name="User", bsn="", kvk=""
+        )
 
         partij, created = service.get_or_create_partij_for_user(user)
 
@@ -731,7 +735,7 @@ class GetOrCreatePartijForUserTestCase(TestCase):
 @patch("open_inwoner.openklant.services.build_zgw_client")
 class FindPartijForParamsTestCase(TestCase):
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def test_partij_is_taken_from_the_listing_without_a_second_request(
         self, mock_client_class
@@ -781,7 +785,7 @@ class FindPartijForParamsTestCase(TestCase):
 class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def _mock_client(self, mock_client_class, uuid="partij-uuid"):
         mock_client = Mock()
@@ -800,7 +804,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
 
     def test_second_lookup_is_served_from_cache(self, mock_client_class):
         mock_client = self._mock_client(mock_client_class)
-        user = DigidUserFactory(bsn="123456789")
+        user = DigidUserFactory.create(bsn="123456789")
 
         self.assertEqual(self._resolve(user), "partij-uuid")
         self.assertEqual(self._resolve(user), "partij-uuid")
@@ -811,7 +815,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
         mock_client = self._mock_client(mock_client_class)
         self.config.partij_cache_timeout = None
         self.config.save()
-        user = DigidUserFactory(bsn="123456789")
+        user = DigidUserFactory.create(bsn="123456789")
 
         self.assertEqual(self._resolve(user), "partij-uuid")
         self.assertEqual(self._resolve(user), "partij-uuid")
@@ -821,7 +825,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
     def test_missing_partij_is_not_cached(self, mock_client_class):
         mock_client = self._mock_client(mock_client_class)
         mock_client.partij.list.return_value = {"count": 0, "results": []}
-        user = DigidUserFactory(bsn="123456789")
+        user = DigidUserFactory.create(bsn="123456789")
 
         self.assertIsNone(self._resolve(user))
 
@@ -833,8 +837,8 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
 
     def test_users_do_not_share_a_cache_entry(self, mock_client_class):
         mock_client = self._mock_client(mock_client_class, uuid="first-partij")
-        first = DigidUserFactory(bsn="123456789")
-        second = DigidUserFactory(bsn="987654321")
+        first = DigidUserFactory.create(bsn="123456789")
+        second = DigidUserFactory.create(bsn="987654321")
 
         self.assertEqual(self._resolve(first), "first-partij")
 
@@ -846,7 +850,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
 
     def test_bsn_does_not_appear_in_the_cache_key(self, mock_client_class):
         self._mock_client(mock_client_class)
-        user = DigidUserFactory(bsn="123456789")
+        user = DigidUserFactory.create(bsn="123456789")
         service = OpenKlant2Service(config=self.config)
 
         self.assertNotIn("123456789", service._partij_uuid_cache_key(user))
@@ -856,7 +860,7 @@ class ResolvePartijUuidTestCase(ClearCachesMixin, TestCase):
 class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
     def setUp(self):
         super().setUp()
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def test_answer_property_returns_none_when_no_answers(self, mock_client_class):
         question = OpenKlant2Question(
@@ -1620,7 +1624,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         )
         self._mock_conversation_client(mock_client_class)
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
 
         with (
             patch.object(service, "resolve_partij_uuid", return_value="partij"),
@@ -1643,7 +1647,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         )
         self._mock_conversation_client(mock_client_class)
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
 
         with (
             patch.object(service, "resolve_partij_uuid", return_value="partij"),
@@ -1680,7 +1684,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
                 return_value=[question, older, newest],
             ),
         ):
-            result = service.list_questions({}, UserFactory())
+            result = service.list_questions({}, UserFactory.create())
 
         self.assertEqual(
             [answer["text"] for answer in result.questions[0]["answers"]],
@@ -1706,7 +1710,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         ]
         self._mock_conversation_client(mock_client_class)
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
         KlantContactMomentAnswer.objects.create(
             user=user,
             contactmoment_url=question["url"],
@@ -1735,7 +1739,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         ]
         self._mock_conversation_client(mock_client_class)
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
         KlantContactMomentAnswer.objects.create(
             user=user,
             contactmoment_url=question["url"],
@@ -1765,7 +1769,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         mock_client.onderwerp_object.list_iter.side_effect = OSError("connection reset")
 
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
 
         with (
             patch.object(service, "resolve_partij_uuid", return_value="partij"),
@@ -1878,7 +1882,7 @@ class OpenKlant2QuestionAnswerTestCase(ClearCachesMixin, TestCase):
         mock_client_class.return_value = mock_client
 
         service = OpenKlant2Service(config=self.config)
-        user = UserFactory()
+        user = UserFactory.create()
 
         question_kc = {
             "uuid": "q-uuid-1",
@@ -1940,7 +1944,7 @@ class GetOrCreateDigitaalAdresNormalizationTestCase(TestCase):
     """Deduplication must survive formatting differences in stored vs incoming values."""
 
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def _service_with_existing(self, mock_client_class, existing_adres):
         mock_client = Mock()
@@ -2127,7 +2131,7 @@ class UpdatePartijFromUserDataTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def _make_adres(self, uuid, soort, adres, is_standaard=False):
         return {
@@ -2166,11 +2170,11 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             ),
         ]
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.email, value="test@example.com"
         )
-        DigitalAddressFactory(
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0612345678",
@@ -2186,7 +2190,7 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
 
-        user = DigidUserFactory()
+        user = DigidUserFactory.create()
 
         service = OpenKlant2Service(config=self.config)
         result = service.update_partij_from_user_data(
@@ -2201,14 +2205,14 @@ class UpdatePartijFromUserDataTestCase(TestCase):
         mock_client = Mock()
         mock_client_class.return_value = mock_client
 
-        user = DigidUserFactory()
-        address = DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        address = DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.email,
             value="test@example.com",
             is_standard_for_type=True,
         )
-        DigitaalAdresOpenKlantMappingFactory(
+        DigitaalAdresOpenKlantMappingFactory.create(
             digital_address=address, ok_uuid="cccccccc-cccc-cccc-cccc-cccccccccccc"
         )
 
@@ -2233,8 +2237,8 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             "11111111-1111-1111-1111-111111111111", "email", "new@example.com"
         )
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user, type=DigitalAddressType.email, value="new@example.com"
         )
 
@@ -2257,8 +2261,8 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             is_standaard=True,
         )
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0612345678",
@@ -2283,8 +2287,8 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             is_standaard=False,
         )
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0687654321",
@@ -2323,14 +2327,14 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             ),
         ]
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0612345678",
             is_standard_for_type=True,
         )
-        DigitalAddressFactory(
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0687654321",
@@ -2365,14 +2369,14 @@ class UpdatePartijFromUserDataTestCase(TestCase):
             is_standaard=False,
         )
 
-        user = DigidUserFactory()
-        DigitalAddressFactory(
+        user = DigidUserFactory.create()
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0612345678",
             is_standard_for_type=True,
         )
-        DigitalAddressFactory(
+        DigitalAddressFactory.create(
             user=user,
             type=DigitalAddressType.phone,
             value="0687654321",
@@ -2395,8 +2399,8 @@ class ListQuestionsForZaakTestCase(TestCase):
     ZAAK_UUID = "6d3f2b1a-0c4e-4f8a-9b7c-1e2d3f4a5b6c"
 
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
-        self.user = UserFactory()
+        self.config = OpenKlant2ConfigFactory.create()
+        self.user = UserFactory.create()
         self.zaak = Mock(url=f"http://zaken.nl/api/v1/zaken/{self.ZAAK_UUID}")
 
     def _make_kc(self, uuid, *, initiator=True, parent_uuid=None):
@@ -2477,7 +2481,7 @@ class KlantcontactenForPartijTestCase(TestCase):
     PARTIJ_UUID = "partij-uuid-1234"
 
     def setUp(self):
-        self.config = OpenKlant2ConfigFactory()
+        self.config = OpenKlant2ConfigFactory.create()
 
     def _make_kc(self, uuid, partij_uuid=None, initiator=True, expand_key="_expand"):
         betrokkene = {"initiator": initiator}

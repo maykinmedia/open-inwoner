@@ -19,7 +19,7 @@ class MessageTest(TestCase):
 
     @freeze_time("2021-12-21")
     def test_str(self):
-        message = MessageFactory(sender=self.sender, receiver=self.receiver)
+        message = MessageFactory.create(sender=self.sender, receiver=self.receiver)
         self.assertEqual(
             str(message),
             f"From: {self.sender}, To: {self.receiver} (2021-12-21)",

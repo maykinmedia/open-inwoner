@@ -17,7 +17,7 @@ class InvitePageTests(WebTest):
     def setUp(self):
         super().setUp()
 
-        self.invitee = UserFactory(is_active=False)
+        self.invitee = UserFactory.create(is_active=False)
 
     def test_accept_invite(self):
         invite = InviteFactory.create(invitee=self.invitee)
@@ -47,7 +47,7 @@ class InvitePageTests(WebTest):
         self.assertEqual(response.status_code, 404)
 
     def test_invite_not_automatically_accepted_when_not_loggedin(self):
-        user = UserFactory()
+        user = UserFactory.create()
         invite = InviteFactory.create(invitee=user, invitee_email=user.email)
         url = invite.get_absolute_url()
 
@@ -60,7 +60,7 @@ class InvitePageTests(WebTest):
         self.assertFalse(invite.accepted)
 
     def test_invite_automatically_accepted_when_loggedin(self):
-        user = UserFactory()
+        user = UserFactory.create()
         invite = InviteFactory.create(invitee=user, invitee_email=user.email)
         url = invite.get_absolute_url()
 
@@ -73,8 +73,8 @@ class InvitePageTests(WebTest):
         self.assertTrue(invite.accepted)
 
     def test_contact_relationship_is_automatically_added_when_logged_in(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
         url = invite.get_absolute_url()
         response = self.app.get(url, user=invitee)
@@ -83,7 +83,7 @@ class InvitePageTests(WebTest):
         self.assertEqual(invitee.user_contacts.get(), inviter)
 
     def test_invite_url_is_saved_to_session_after_acceptance(self):
-        invite = InviteFactory()
+        invite = InviteFactory.create()
         url = invite.get_absolute_url()
 
         response = self.app.get(url)
@@ -97,8 +97,8 @@ class InvitePageTests(WebTest):
         )
 
     def test_accepted_emails_sent_to_both_users_when_logged_in(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter, invitee=invitee)
         url = invite.get_absolute_url()
 
@@ -113,7 +113,7 @@ class InvitePageTests(WebTest):
         config.login_allow_registration = True
         config.save()
 
-        inviter = UserFactory()
+        inviter = UserFactory.create()
         invite = InviteFactory.create(inviter=inviter)
         url = f"{reverse('django_registration_register')}?invite={invite.key}"
 
@@ -131,8 +131,8 @@ class InvitePageTests(WebTest):
         self.assertIn(invite.invitee_email, recipients)
 
     def test_accepted_emails_sent_to_both_users_via_necessary_fields(self):
-        inviter = UserFactory()
-        invitee = UserFactory()
+        inviter = UserFactory.create()
+        invitee = UserFactory.create()
         invite = InviteFactory.create(
             inviter=inviter,
             invitee=invitee,

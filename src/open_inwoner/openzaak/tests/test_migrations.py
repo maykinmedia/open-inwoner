@@ -16,7 +16,7 @@ def _make_zaaktype_status_config(
     ZaakTypeConfig = apps.get_model("openzaak", "ZaakTypeConfig")
     ZaakTypeStatusTypeConfig = apps.get_model("openzaak", "ZaakTypeStatusTypeConfig")
 
-    service_obj = ServiceFactory(api_type="ztc")
+    service_obj = ServiceFactory.create(api_type="ztc")
     service = Service.objects.get(id=service_obj.id)
 
     uid = uuid.uuid4()
@@ -152,7 +152,7 @@ class FixEmptyStringProsemirrorFieldsTest(TestSuccessfulMigrations):
         Service = apps.get_model("zgw_consumers", "Service")
 
         # Create a service using factory, then get the historical instance
-        service_factory = ServiceFactory(api_type="ztc")
+        service_factory = ServiceFactory.create(api_type="ztc")
         service = Service.objects.get(id=service_factory.id)
 
         # Create catalogus config with historical model

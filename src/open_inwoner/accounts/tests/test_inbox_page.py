@@ -233,7 +233,7 @@ class InboxPageTests(WebTest):
         config.allow_messages_file_sharing = False
         config.save()
 
-        contact = UserFactory()
+        contact = UserFactory.create()
         self.user.user_contacts.add(contact)
 
         img_bytes = create_image_bytes()

@@ -11,7 +11,7 @@ from open_inwoner.accounts.tests.factories import UserFactory
 class TestConfigurationColors(WebTest):
     def setUp(self):
         super().setUp()
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_contrast_is_checked(self):
         response = self.app.get(

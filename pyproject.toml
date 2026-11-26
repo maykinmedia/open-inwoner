@@ -179,6 +179,19 @@ line-ending = "lf"
 "logging".msg = "Use `structlog.get_logger(__name__)` instead of the stdlib logging module."
 "open_inwoner.openzaak.clients.MultiZgwClientProxy".msg = "Use ZGWService instead of MultiZgwClientProxy directly."
 
+[tool.pyright]
+include = ["src/open_inwoner"]
+exclude = [
+    "**/migrations",
+    "**/node_modules",
+    "**/static",
+    "**/__pycache__",
+    "src/open_inwoner/conf/local.py",
+]
+extraPaths = ["src"]
+pythonVersion = "3.13"
+typeCheckingMode = "standard"
+
 [tool.commitizen]
 name = "cz_customize"
 tag_format = "v$version"

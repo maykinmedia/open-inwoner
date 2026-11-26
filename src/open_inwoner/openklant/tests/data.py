@@ -33,22 +33,22 @@ class MockAPIData:
     ):
         if klanten_service_type == KlantenServiceType.OPENKLANT2:
             cls.config = OpenKlant2Config.get_solo()
-            cls.config.service = ServiceFactory(
+            cls.config.service = ServiceFactory.create(
                 api_root=OPENKLANT2_ROOT, api_type=APITypes.kc
             )
             cls.config.save()
         else:
             config = ESuiteKlantConfig.get_solo()
-            config.klanten_service = ServiceFactory(
+            config.klanten_service = ServiceFactory.create(
                 api_root=KLANTEN_ROOT, api_type=APITypes.kc
             )
-            config.contactmomenten_service = ServiceFactory(
+            config.contactmomenten_service = ServiceFactory.create(
                 api_root=CONTACTMOMENTEN_ROOT, api_type=APITypes.cmc
             )
             config.save()
 
         # services
-        ZGWApiGroupConfigFactory(
+        ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
         )
 
@@ -58,16 +58,16 @@ class MockAPIReadPatchData(MockAPIData):
         # allow specification of KVK number for mocks because KVK must be unique
         self.eherkenning_kvk = eherkenning_kvk or "12345678"
 
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             email="old@example.com",
             phonenumber="0100000000",
         )
-        self.user_without_klant = DigidUserFactory(
+        self.user_without_klant = DigidUserFactory.create(
             email="new@example.com",
             phonenumber="0100000000",
             bsn="665155311",
         )
-        self.eherkenning_user = eHerkenningUserFactory(
+        self.eherkenning_user = eHerkenningUserFactory.create(
             email="old2@example.com",
             kvk=self.eherkenning_kvk,
             rsin="000000000",
@@ -205,7 +205,7 @@ class MockAPIReadPatchData(MockAPIData):
 
     def install_mocks_openklant(self, m) -> "MockAPIReadPatchData":
         self.partij_uuid = "7260ea01-12c0-4750-8fd1-dfa777818837"
-        self.digid_user = DigidUserFactory()
+        self.digid_user = DigidUserFactory.create()
         m.get(
             "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
             headers={"Content-Type": "application/json"},
@@ -445,14 +445,14 @@ class MockAPIReadData(MockAPIData):
         # allow specification of KVK number for mocks because KVK must be unique
         self.eherkenning_kvk = eherkenning_kvk or "12345678"
 
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             bsn="100000001",
         )
-        self.eherkenning_user = eHerkenningUserFactory(
+        self.eherkenning_user = eHerkenningUserFactory.create(
             kvk=self.eherkenning_kvk,
             rsin="000000000",
         )
-        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory(
+        self.eherkenning_user_vestiging = eHerkenningVestigingUserFactory.create(
             kvk=self.eherkenning_kvk,
             rsin="000000000",
             vestiging="1234",
@@ -730,10 +730,10 @@ class MockAPICreateData(MockAPIData):
         # allow specification of KVK number for mocks because KVK must be unique
         self.eherkenning_kvk = eherkenning_kvk or "12345678"
 
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             bsn="100000001",
         )
-        self.eherkenning_user = eHerkenningUserFactory(
+        self.eherkenning_user = eHerkenningUserFactory.create(
             kvk=self.eherkenning_kvk,
             rsin="000000000",
         )
@@ -856,7 +856,7 @@ class MockAPICreateData(MockAPIData):
 
     def install_mocks_openklant(self, m):
         self.partij_uuid = "7260ea01-12c0-4750-8fd1-dfa777818837"
-        self.digid_user = DigidUserFactory()
+        self.digid_user = DigidUserFactory.create()
         m.get(
             "http://localhost:8338/klantinteracties/api/v1/partijen?partijIdentificator__codeSoortObjectId=bsn&partijIdentificator__codeRegister=brp&partijIdentificator__codeObjecttype=natuurlijk_persoon&partijIdentificator__objectId=123456782&soortPartij=persoon",
             headers={"Content-Type": "application/json"},

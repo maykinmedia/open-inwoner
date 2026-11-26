@@ -13,7 +13,7 @@ from open_inwoner.questionnaire.tests.factories import QuestionnaireStepFactory
 @disable_admin_mfa()
 class TestQuestionnaireStepForm(WebTest):
     def setUp(self):
-        self.user = UserFactory(is_superuser=True, is_staff=True)
+        self.user = UserFactory.create(is_superuser=True, is_staff=True)
 
     def test_user_can_highlight_root_questionnaire_from_change_form_page(self):
         form = self.app.get(
@@ -31,7 +31,7 @@ class TestQuestionnaireStepForm(WebTest):
         self.assertEqual(questionnaire.slug, "a-question")
 
     def test_user_cannot_highlight_child_questionnaire_from_change_form_page(self):
-        questionnaire = QuestionnaireStepFactory(path="0001")
+        questionnaire = QuestionnaireStepFactory.create(path="0001")
         form = self.app.get(
             reverse("admin:questionnaire_questionnairestep_add"), user=self.user
         ).forms["questionnairestep_form"]
@@ -47,7 +47,7 @@ class TestQuestionnaireStepForm(WebTest):
         self.assertEqual(questionnaires.count(), 0)
 
     def test_user_can_highlight_root_questionnaire_from_change_list_page(self):
-        QuestionnaireStepFactory(path="0001")
+        QuestionnaireStepFactory.create(path="0001")
         form = self.app.get(
             reverse("admin:questionnaire_questionnairestep_changelist"), user=self.user
         ).forms["changelist-form"]
@@ -60,7 +60,7 @@ class TestQuestionnaireStepForm(WebTest):
         )
 
     def test_user_cannot_highlight_child_questionnaire_from_change_list_page(self):
-        root = QuestionnaireStepFactory(path="0001")
+        root = QuestionnaireStepFactory.create(path="0001")
         root.add_child()
         form = self.app.get(
             reverse("admin:questionnaire_questionnairestep_changelist"), user=self.user
@@ -75,10 +75,10 @@ class TestQuestionnaireStepForm(WebTest):
         )
 
     def test_draft_related_products_are_not_rendered(self):
-        product1 = ProductFactory()
-        product2 = ProductFactory()
-        product3 = ProductFactory(published=False)
-        questionnaire = QuestionnaireStepFactory(
+        product1 = ProductFactory.create()
+        product2 = ProductFactory.create()
+        product3 = ProductFactory.create(published=False)
+        questionnaire = QuestionnaireStepFactory.create(
             related_products=(product1, product2, product3)
         )
 

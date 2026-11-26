@@ -18,7 +18,7 @@ SSD_CONFIG_STEP_MINIMAL_YAML = str(BASE_DIR / "ssd_config_step_minimal.yaml")
 
 class SSDConfigurationStepTest(TestCase):
     def test_configure_with_full_config(self):
-        service = SoapServiceFactory(slug="ssd-service", url=SSD_SERVICE_URL)
+        service = SoapServiceFactory.create(slug="ssd-service", url=SSD_SERVICE_URL)
 
         execute_single_step(
             SSDConfigurationStep,
@@ -32,7 +32,7 @@ class SSDConfigurationStepTest(TestCase):
         self.assertEqual(config.gemeentecode, "0000")
 
     def test_configure_with_minimal_config_leaves_omitted_fields_untouched(self):
-        service = SoapServiceFactory(slug="ssd-service", url=SSD_SERVICE_URL)
+        service = SoapServiceFactory.create(slug="ssd-service", url=SSD_SERVICE_URL)
 
         config = SSDConfig.get_solo()
         config.applicatie_naam = "Existing application"
@@ -66,7 +66,7 @@ class SSDConfigurationStepTest(TestCase):
         )
 
     def test_configure_is_idempotent(self):
-        service = SoapServiceFactory(slug="ssd-service", url=SSD_SERVICE_URL)
+        service = SoapServiceFactory.create(slug="ssd-service", url=SSD_SERVICE_URL)
 
         for _ in range(2):
             execute_single_step(

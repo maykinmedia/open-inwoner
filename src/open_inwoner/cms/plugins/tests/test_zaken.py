@@ -29,10 +29,12 @@ from open_inwoner.openzaak.tests.shared import ZAKEN_ROOT
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class CMSZakenPluginTest(TestCase):
     def setUp(self):
-        self.user = UserFactory(login_type=LoginTypeChoices.digid, bsn="123456789")
+        self.user = UserFactory.create(
+            login_type=LoginTypeChoices.digid, bsn="123456789"
+        )
 
     def test_plugin_renders_for_authenticated_bsn_user(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
 
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
@@ -77,7 +79,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertNotIn("oip-home-plugin-card", html)
 
     def test_plugin_does_not_render_for_anonymous_user(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         anonymous_user = AnonymousUser()
 
         html, context = cms_tools.render_plugin(
@@ -90,8 +92,8 @@ class CMSZakenPluginTest(TestCase):
         self.assertNotIn("hx_get_url", context)
 
     def test_plugin_does_not_render_for_non_bsn_user(self):
-        ZGWApiGroupConfigFactory()
-        non_bsn_user = UserFactory(login_type=LoginTypeChoices.default, bsn="")
+        ZGWApiGroupConfigFactory.create()
+        non_bsn_user = UserFactory.create(login_type=LoginTypeChoices.default, bsn="")
 
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
@@ -103,7 +105,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertNotIn("hx_get_url", context)
 
     def test_plugin_uses_default_num_zaken_value(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
 
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
@@ -116,7 +118,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("num_zaken=4", hx_get_url)
 
     def test_plugin_includes_custom_num_zaken_in_url(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
 
         html, context = cms_tools.render_plugin(
             CMSZakenPlugin,
@@ -128,7 +130,7 @@ class CMSZakenPluginTest(TestCase):
         self.assertIn("num_zaken=7", hx_get_url)
 
     def test_htmx_content_endpoint_requires_htmx(self):
-        ZGWApiGroupConfigFactory()
+        ZGWApiGroupConfigFactory.create()
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
         url = reverse(
@@ -156,8 +158,8 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_returns_empty_state(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        ServiceFactory(api_root=ZAKEN_ROOT)
-        ZGWApiGroupConfigFactory()
+        ServiceFactory.create(api_root=ZAKEN_ROOT)
+        ZGWApiGroupConfigFactory.create()
         plugin_model = cms_tools._init_plugin(CMSZakenPlugin, {"title": "Mijn Zaken"})
 
         url = reverse(
@@ -185,7 +187,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_returns_cases(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         mock_zaak.process_data.return_value = {
@@ -257,7 +259,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_partial_failure(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         # formulieren fail
         mock_formulieren.side_effect = Exception("Formulieren API error")
@@ -304,7 +306,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_partial_failure_zaken(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         # Cases fail
         mock_visible_zaken.side_effect = Exception("Cases API error")
@@ -352,7 +354,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_visible_zaken_timeout_shows_partial_message(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         mock_zaak.process_data.return_value = {
@@ -394,7 +396,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_endpoint_resolve_timeout_shows_partial_message(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_fully_resolve.return_value = ZakenResult(
             zaken=[],
@@ -432,7 +434,7 @@ class CMSZakenPluginTest(TestCase):
     def test_num_zaken_parameter_limits_results(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_cases_list = []
         for i in range(10):
@@ -483,7 +485,7 @@ class CMSZakenPluginTest(TestCase):
     def test_num_zaken_parameter_with_mixed_formulieren_and_cases(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         # 3 mock formulieren
         mock_formulieren_list = []
@@ -561,7 +563,7 @@ class CMSZakenPluginTest(TestCase):
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
         """Test that invalid values for num_zaken fall back to MAX_CASES_DEFAULT"""
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_visible_zaken_list = []
         for i in range(15):
@@ -613,7 +615,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_maps_naam_to_description(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         mock_zaak.process_data.return_value = {
@@ -655,7 +657,7 @@ class CMSZakenPluginTest(TestCase):
     def test_htmx_content_handles_missing_optional_fields(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         # Return minimal data - identification is required for logging
@@ -699,7 +701,7 @@ class CMSZakenPluginTest(TestCase):
         (from regular zaken) are correctly mapped to 'description' in the component output.
         Formulieren should have empty description, cases should show "Zaaknummer" label.
         """
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         # Mock formulier with "naam" field
         mock_submission = MagicMock()
@@ -764,7 +766,7 @@ class CMSZakenPluginTest(TestCase):
     def test_formulier_uses_vervolg_link_as_url(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_submission = MagicMock()
         mock_submission.process_data.return_value = {
@@ -802,7 +804,7 @@ class CMSZakenPluginTest(TestCase):
     def test_formulier_without_vervolg_link_has_empty_url(
         self, mock_formulieren, mock_fully_resolve, mock_visible_zaken
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_submission = MagicMock()
         mock_submission.process_data.return_value = {
@@ -840,7 +842,7 @@ class CMSZakenPluginTest(TestCase):
     def test_zaak_uses_case_detail_url(
         self, mock_visible_zaken, mock_fully_resolve, mock_formulieren
     ):
-        api_group = ZGWApiGroupConfigFactory()
+        api_group = ZGWApiGroupConfigFactory.create()
 
         mock_zaak = MagicMock()
         mock_zaak.process_data.return_value = {

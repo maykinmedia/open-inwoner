@@ -45,9 +45,9 @@ class CaseMetricLabelsTestCase(ClearCachesMixin, WebTest):
     def setUp(self):
         super().setUp()
 
-        self.user = DigidUserFactory(bsn="900222086")
+        self.user = DigidUserFactory.create(bsn="900222086")
 
-        self.api_group = ZGWApiGroupConfigFactory(
+        self.api_group = ZGWApiGroupConfigFactory.create(
             zrc_service__api_root=ZAKEN_ROOT,
             ztc_service__api_root=CATALOGI_ROOT,
             drc_service__api_root=DOCUMENTEN_ROOT,

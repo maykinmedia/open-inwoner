@@ -18,8 +18,8 @@ class FeedHookTest(TestCase):
         "open_inwoner.userfeed.feed.get_active_app_names", return_value=["collaborate"]
     )
     def test_plan_expires(self, mock_get_active_app_names: Mock):
-        user = UserFactory()
-        plan = PlanFactory(end_date=date.today())
+        user = UserFactory.create()
+        plan = PlanFactory.create(end_date=date.today())
 
         plan_expiring(user, plan)
 

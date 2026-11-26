@@ -10,7 +10,7 @@ from open_inwoner.configurations.models import SiteConfiguration
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class ContextProcessorTest(TestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
 
     def test_robots_indexing(self):
         url = reverse("profile:detail")

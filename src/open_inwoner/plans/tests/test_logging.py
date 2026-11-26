@@ -25,10 +25,10 @@ from .factories import PlanFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestPlans(WebTest):
     def setUp(self):
-        self.user = UserFactory()
-        self.contact = UserFactory()
+        self.user = UserFactory.create()
+        self.contact = UserFactory.create()
         self.user.user_contacts.add(self.contact)
-        self.plan = PlanFactory(created_by=self.user)
+        self.plan = PlanFactory.create(created_by=self.user)
 
     def test_created_plan_is_logged(self):
         plan = PlanFactory.build(created_by=self.user)
@@ -134,7 +134,7 @@ class TestPlans(WebTest):
 
     @temp_private_root()
     def test_plan_file_download_is_logged(self):
-        doc = DocumentFactory(owner=self.user, plan=self.plan)
+        doc = DocumentFactory.create(owner=self.user, plan=self.plan)
         self.app.get(
             reverse("profile:documents_download", kwargs={"uuid": doc.uuid}),
             user=self.user,
@@ -183,7 +183,7 @@ class TestPlans(WebTest):
 
     def test_plan_action_modified_is_logged(self):
         self.plan.plan_contacts.add(self.user)
-        action = ActionFactory(created_by=self.user)
+        action = ActionFactory.create(created_by=self.user)
         form = self.app.get(
             reverse(
                 "collaborate:plan_action_edit",
@@ -214,7 +214,7 @@ class TestPlans(WebTest):
 
     def test_plan_action_submitted_but_not_changed_not_logged(self):
         self.plan.plan_contacts.add(self.user)
-        action = ActionFactory(created_by=self.user)
+        action = ActionFactory.create(created_by=self.user)
         form = self.app.get(
             reverse(
                 "collaborate:plan_action_edit",

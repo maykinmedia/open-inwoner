@@ -37,7 +37,7 @@ class ContactFormPluginRenderTest(TestCase):
             "A description for the contactform (anonymous users)"
         )
 
-        user = UserFactory()
+        user = UserFactory.create()
         form = ContactForm(user=user, request_session={})
 
         html, context = cms_tools.render_plugin(
@@ -74,7 +74,7 @@ class ContactFormPluginRenderTest(TestCase):
             "A description for the contactform (anonymous users)"
         )
 
-        user = UserFactory()
+        user = UserFactory.create()
         form = ContactForm(user=user, request_session={})
 
         html, context = cms_tools.render_plugin(

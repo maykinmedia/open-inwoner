@@ -16,7 +16,7 @@ from .factories import UserFactory
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestActionFileUploadLimits(WebTest):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.response = self.app.get(reverse("profile:action_create"), user=self.user)
         self.form = self.response.forms["action-create"]
 
@@ -85,8 +85,8 @@ class TestActionFileUploadLimits(WebTest):
 @override_settings(ROOT_URLCONF="open_inwoner.cms.tests.urls")
 class TestMessageFileUploadLimits(WebTest):
     def setUp(self):
-        self.me = UserFactory()
-        self.contact = UserFactory()
+        self.me = UserFactory.create()
+        self.contact = UserFactory.create()
         self.me.user_contacts.add(self.contact)
         self.response = self.app.get(reverse("inbox:start"), user=self.me)
         self.form = self.response.forms["start-message-form"]

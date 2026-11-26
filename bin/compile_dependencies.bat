@@ -27,4 +27,5 @@ pip-compile^
     --output-file requirements/dev.txt^
     %*^
     requirements/ci.txt^
-    requirements/dev.in
+    requirements/dev.in^
+    requirements/type-checking.in

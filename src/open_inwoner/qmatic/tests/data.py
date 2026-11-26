@@ -15,7 +15,7 @@ from open_inwoner.qmatic.tests.factories import (
 class QmaticMockData:
     def __init__(self):
         self.appointments_url = reverse("profile:appointments")
-        self.user = DigidUserFactory(
+        self.user = DigidUserFactory.create(
             email="qmatic@example.com",
             verified_email="qmatic@example.com",
         )
