@@ -1,3 +1,108 @@
+2.5.1 (2026-11-24)
+==================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.5.1`.
+
+.. admonition:: Beveiligingsfixes
+   :class: warning
+
+   * [:gh:`3230`]: Gegevens in de Redis-caches (waaronder sessies) worden nu
+     ondertekend met de ``SECRET_KEY`` (`GHSA-5px8-8m93-gmgr
+     <https://github.com/maykinmedia/open-inwoner/security/advisories/GHSA-5px8-8m93-gmgr>`_).
+     Voorheen werden deze gegevens met ``pickle`` opgeslagen en zonder
+     controle weer ingelezen. Een partij die naar Redis kon schrijven, kon
+     daardoor in theorie code laten uitvoeren door de applicatie. De
+     handtekening wordt nu gecontroleerd voordat de gegevens worden ingelezen.
+     Gegevens zonder geldige handtekening worden genegeerd en gelogd met een
+     waarschuwing (``cache_signature_invalid``), en geteld in de
+     OpenTelemetry-metric ``oip.cache.signature_invalid``.
+
+     Het risico is laag: alleen partijen met netwerktoegang tot Redis konden
+     dit misbruiken, en in een gebruikelijke installatie zijn dat alleen
+     vertrouwde partijen. Zie de nieuwe documentatiepagina `Securing Redis
+     <https://docs.openinwoner.nl/en/v2.5.1/configuration/04_redis.html>`_
+     voor aanbevelingen om Redis af te schermen.
+
+Upgrade informatie
+------------------
+
+Pre-upgrade aandachtspunten
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* [:gh:`3230`]: Na de upgrade worden alle gebruikers eenmalig uitgelogd, omdat
+  de gegevens in de cache (waaronder sessies) een nieuw formaat hebben. Om
+  dezelfde reden worden geblokkeerde inlogpogingen en de limieten voor
+  notificaties gereset. Oude cache-items blijven in Redis staan tot ze
+  verlopen (maximaal ongeveer een dag).
+
+  Stel bij het wijzigen van de ``SECRET_KEY`` voortaan altijd de vorige waarde
+  in als ``SECRET_KEY_FALLBACK``. Anders negeert de applicatie alle gecachte
+  gegevens die met de oude sleutel zijn ondertekend: alle gebruikers worden
+  uitgelogd en de caches worden opnieuw opgebouwd.
+
+Post-upgrade aandachtspunten
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Voor technisch beheerders
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* [:gh:`3230`]: We raden aan een alert in te stellen op een stijging van de
+  metric ``oip.cache.signature_invalid`` buiten een geplande wijziging van de
+  ``SECRET_KEY``. Dit kan erop wijzen dat iemand naar Redis schrijft, of dat
+  processen die dezelfde Redis-database gebruiken een verschillende
+  ``SECRET_KEY`` hebben.
+
+Nieuwe functies
+---------------
+
+* [:gh:`3193`]: Er wordt nu gelogd waarom het downloaden van een document van
+  een zaak is geweigerd. De nieuwe OpenTelemetry metric
+  ``oip.cases.document_download_refusals`` telt deze weigeringen per reden.
+
+Bugfixes
+--------
+
+* [:gh:`3193`]: Verbeteringen bij het downloaden van documenten van een zaak:
+
+  * Downloaden geeft niet langer een foutmelding (of een HTML-bestand in plaats
+    van het document) wanneer de Documenten API of een tussenliggende gateway
+    het bestand gecomprimeerd (bijv. gzip) verstuurt. De bestandsgrootte wordt
+    nu gecontroleerd op de gedecomprimeerde inhoud in plaats van op de
+    ``Content-Length`` header. Als een document echt niet gedownload kan
+    worden, ziet de gebruiker nu de foutmelding op de zaakpagina in plaats van
+    een gedownload HTML-bestand.
+  * Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
+    gebruiker nu op de zaakpagina dat het document tijdelijk niet gedownload
+    kan worden, in plaats van een "pagina niet gevonden"-melding.
+  * Documenten waarvan het formaat geen geldig MIME-type is, worden nu
+    aangeboden als ``application/octet-stream``, in plaats van met een
+    ongeldige ``Content-Type`` header of een serverfout.
+  * Documenten met een bestandsnaam met bijzondere tekens (bijv. ``€`` of
+    aanhalingstekens) worden nu gedownload met de juiste bestandsnaam, in
+    plaats van in de browser geopend.
+
+* [:gh:`3197`]: Handelingen van gebruikers op de website werden na een eerdere
+  update niet meer doorgegeven aan Siteimprove. De koppeling is hersteld, zodat
+  Siteimprove de handelingen weer correct meet.
+* [:gh:`3218`]: De metric ``oip.accounts.user_count`` herstelt zich nu vanzelf
+  nadat de databaseverbinding is weggevallen. Voorheen bleef de applicatie na
+  bijvoorbeeld een herstart van de database elke minuut de foutmelding
+  ``connection already closed`` loggen, totdat de applicatie zelf werd
+  herstart.
+* [:gh:`3225`]: De beheerpagina's voor de SSD-configuratie (Mijn Uitkeringen)
+  en voor alias-categorieën (Django CMS) gaven in productie een serverfout door
+  ontbrekende stylesheets. Deze pagina's zijn nu weer normaal te openen.
+* [:gh:`3227`]: Zoeken in de admin bij de zaaktype-configuraties kon bij
+  veelvoorkomende zoektermen (bijv. "afgerond") minutenlang duren en zoveel
+  geheugen van de database vragen dat de database herstartte, waardoor ook
+  andere applicaties op dezelfde database tijdelijk geen verbinding hadden.
+  Zoeken en het laden van de lijst zijn nu veel sneller en belasten de
+  database niet meer op deze manier.
+
+  Daarnaast tonen de kolommen met het aantal informatieobjecttypen,
+  statustypen en resultaattypen in deze lijst nu de juiste aantallen; voorheen
+  konden deze te hoog zijn.
+
 2.5.0 (2026-11-03)
 ==================
 
@@ -418,6 +523,108 @@ Onderhoud
 * CI: Dependabot voor GitHub Actions, controle op het verlopen van de
   KvK-certificaatketen, runners op Ubuntu 26.04 (:gh:`3137`), en diverse
   updates van GitHub Actions.
+
+2.4.10 (2026-11-24)
+===================
+
+Voor een volledig overzicht van alle commits, zie :release:`v2.4.10`.
+
+.. note::
+
+   Deze release bevat beveiligingsupdates. We adviseren u zo snel mogelijk te
+   upgraden. Na de upgrade worden alle gebruikers eenmalig uitgelogd, zie
+   **Deployment aandachtspunten**.
+
+Beveiliging
+-----------
+
+* [:gh:`3230`]: Gegevens in de Redis-caches (waaronder sessies) worden nu
+  ondertekend met de ``SECRET_KEY`` (`GHSA-5px8-8m93-gmgr
+  <https://github.com/maykinmedia/open-inwoner/security/advisories/GHSA-5px8-8m93-gmgr>`_).
+  Voorheen werden deze gegevens met ``pickle`` opgeslagen en zonder controle
+  weer ingelezen. Een partij die naar Redis kon schrijven, kon daardoor in
+  theorie code laten uitvoeren door de applicatie. De handtekening wordt nu
+  gecontroleerd voordat de gegevens worden ingelezen. Gegevens zonder geldige
+  handtekening worden genegeerd en gelogd met een waarschuwing
+  (``cache_signature_invalid``), en geteld in de OpenTelemetry-metric
+  ``oip.cache.signature_invalid``.
+
+  Het risico is laag: alleen partijen met netwerktoegang tot Redis konden dit
+  misbruiken, en in een gebruikelijke installatie zijn dat alleen vertrouwde
+  partijen. Zie de nieuwe documentatiepagina `Securing Redis
+  <https://docs.openinwoner.nl/en/v2.4.10/configuration/04_redis.html>`_ voor
+  aanbevelingen om Redis af te schermen.
+* [:gh:`3169`]: Strengere controle van geüploade bestanden. Het bestandstype
+  dat de browser opgeeft kan door een gebruiker worden vervalst, waardoor
+  bijvoorbeeld een SVG- of HTML-bestand als afbeelding kon worden geüpload:
+
+  * Bij uploads (o.a. bij berichten, acties en samenwerkingen) moet ook het
+    bestandstype dat bij de extensie hoort zijn toegestaan; gecomprimeerde
+    bestanden (bv. ``.txt.gz``) worden geweigerd.
+  * Bij het uploaden van een document bij een zaak wordt het ``formaat`` in de
+    Documenten API afgeleid van de extensie, in plaats van van het opgegeven
+    bestandstype.
+  * Documenten, bijlagen bij acties en berichten in de inbox worden altijd als
+    download aangeboden en niet meer in de browser geopend.
+
+Deployment aandachtspunten
+--------------------------
+
+* [:gh:`3230`]: Na de upgrade worden alle gebruikers eenmalig uitgelogd, omdat
+  de gegevens in de cache (waaronder sessies) een nieuw formaat hebben. Om
+  dezelfde reden worden geblokkeerde inlogpogingen gereset. Oude cache-items
+  blijven in Redis staan tot ze verlopen (maximaal ongeveer een dag).
+* [:gh:`3230`]: Stel bij het wijzigen van de ``SECRET_KEY`` voortaan altijd de
+  vorige waarde in als ``SECRET_KEY_FALLBACK``. Anders negeert de applicatie
+  alle gecachte gegevens die met de oude sleutel zijn ondertekend: alle
+  gebruikers worden uitgelogd en de caches worden opnieuw opgebouwd.
+* [:gh:`3230`]: We raden aan een alert in te stellen op een stijging van de
+  metric ``oip.cache.signature_invalid`` buiten een geplande wijziging van de
+  ``SECRET_KEY``. Dit kan erop wijzen dat iemand naar Redis schrijft, of dat
+  processen die dezelfde Redis-database gebruiken een verschillende
+  ``SECRET_KEY`` hebben.
+
+Nieuwe features
+---------------
+
+* [:gh:`3193`]: Er wordt nu gelogd waarom het downloaden van een document van
+  een zaak is geweigerd. De nieuwe OpenTelemetry metric
+  ``oip.cases.document_download_refusals`` telt deze weigeringen per reden.
+
+Bugfixes
+--------
+
+* [:gh:`3193`]: Verbeteringen bij het downloaden van documenten van een zaak:
+
+  * Downloaden geeft niet langer een foutmelding (of een HTML-bestand in plaats
+    van het document) wanneer de Documenten API of een tussenliggende gateway
+    het bestand gecomprimeerd (bijv. gzip) verstuurt. De bestandsgrootte wordt
+    nu gecontroleerd op de gedecomprimeerde inhoud in plaats van op de
+    ``Content-Length`` header. Als een document echt niet gedownload kan
+    worden, ziet de gebruiker nu de foutmelding op de zaakpagina in plaats van
+    een gedownload HTML-bestand.
+  * Als de Documenten API niet bereikbaar is of een serverfout geeft, ziet de
+    gebruiker nu op de zaakpagina dat het document tijdelijk niet gedownload
+    kan worden, in plaats van een "pagina niet gevonden"-melding.
+  * Documenten waarvan het formaat geen geldig MIME-type is, worden nu
+    aangeboden als ``application/octet-stream``, in plaats van met een
+    ongeldige ``Content-Type`` header of een serverfout.
+  * Documenten met een bestandsnaam met bijzondere tekens (bijv. ``€`` of
+    aanhalingstekens) worden nu gedownload met de juiste bestandsnaam, in
+    plaats van in de browser geopend.
+* [:gh:`3197`]: Handelingen van gebruikers op de website werden na een eerdere
+  update niet meer doorgegeven aan Siteimprove. De koppeling is hersteld, zodat
+  Siteimprove de handelingen weer correct meet.
+* [:gh:`3218`]: De metric ``oip.accounts.user_count`` herstelt zich nu vanzelf
+  nadat de databaseverbinding is weggevallen. Voorheen bleef de applicatie na
+  bijvoorbeeld een herstart van de database elke minuut de foutmelding
+  ``connection already closed`` loggen, totdat de applicatie zelf werd
+  herstart.
+* [:gh:`3092`]: Notificaties die direct door de webhook worden afgerond
+  (bijv. bij een ongeldig schema of een niet-geabonneerd kanaal) worden nu
+  ook opgeschoond.
+* [:gh:`2973`]: De keuzelijst bij het uploaden van documenten toont alleen nog
+  de omschrijving van het informatieobjecttype (zonder catalogus-URL).
 
 2.4.9 (2026-10-29)
 ==================
