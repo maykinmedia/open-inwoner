@@ -1,0 +1,11 @@
+celery-types
+decouple-types
+django-stubs<6
+django-stubs-ext
+djangorestframework-stubs
+pyright
+types-factory-boy
+types-lxml
+types-pytz
+types-pyyaml
+types-requests
