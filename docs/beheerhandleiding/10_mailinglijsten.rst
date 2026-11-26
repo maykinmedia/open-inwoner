@@ -33,3 +33,18 @@ De nieuwsbrieven worden alleen getoond aan gebruikers die hun e-mailadres hebben
 .. image:: images/koppelingen-email-verificatie.png
    :alt: Het vinkje "E-mailverificatie vereist" in de Algemene configuratie
    :width: 700px
+
+
+.. _hoofdstuk-10-1-2:
+
+10.1.2. Nieuwsbrieven tonen in Mijn Profiel
+-------------------------------------------
+
+Het onderdeel Nieuwsbrieven in Mijn Profiel staat standaard uit. Open in het CMS de pagina Mijn Profiel, kies in de CMS-werkbalk :guilabel:`Pagina` > :guilabel:`Configuratie Mijn Profiel...`, zet een vinkje bij **Nieuwsbrieven** en klik op :guilabel:`Opslaan` (zie :ref:`hoofdstuk 19.2.2 <hoofdstuk-19-2-2>`).
+
+Ziet u de nieuwsbrieven daarna nog steeds niet in Mijn Profiel, controleer dan:
+
+- of de pagina Mijn Profiel aan deze configuratie gekoppeld is (zie :ref:`hoofdstuk 19.1.9 <hoofdstuk-19-1-9>`);
+- of de gebruiker het e-mailadres heeft bevestigd (zie :ref:`hoofdstuk 10.1.1 <hoofdstuk-10-1-1>`). Na het wijzigen van het e-mailadres moet de gebruiker het nieuwe adres opnieuw bevestigen;
+- of de nieuwsbrieven in Laposta een naam hebben. Nieuwsbrieven zonder naam worden niet getoond;
+- of de nieuwsbrieven bij **Limit list selection to** zijn aangevinkt, als u daar een selectie hebt gemaakt.

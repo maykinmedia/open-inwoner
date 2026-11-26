@@ -233,6 +233,14 @@ U komt bij de geavanceerde instellingen door in het actiemenu (de drie puntjes) 
 | **Applicatie**
 | Hiermee kunt u een applicatie aan de betreffende pagina koppelen, zie :ref:`hoofdstuk 19.4 <hoofdstuk-19-4>`. Afhankelijk van de applicatie verschijnen daaronder ook de velden **Applicatie instance naam** en **Applicatieconfiguraties**.
 
+.. important::
+
+   De applicaties Profiel en Mijn Afval hebben een configuratie nodig. Kies bij **Applicatieconfiguraties** de juiste configuratie en klik op :guilabel:`Opslaan`. Pas bij het opslaan wordt de pagina aan de configuratie gekoppeld.
+
+   Let op: het veld **Applicatieconfiguraties** toont ook een configuratie als de pagina daar (nog) niet aan gekoppeld is. Het scherm laat dan de eerste configuratie uit de lijst zien. Kies de configuratie daarom altijd opnieuw en sla op als u twijfelt. Zonder gekoppelde configuratie worden de onderdelen van Mijn Profiel niet getoond en gebruikt Mijn Afval de standaard titel en beschrijving.
+
+   De naam (namespace) van een configuratie kunt u na het aanmaken niet meer wijzigen. Gebruik voor Mijn Profiel bij voorkeur de naam ``profile`` en voor Mijn Afval ``mijn_afval``.
+
 
 .. _hoofdstuk-19-1-10:
 
@@ -405,7 +413,8 @@ U heeft op de website diverse mogelijkheden om pagina's te bewerken, aan te make
 | Selecteer dit om de huidige pagina te verwijderen. Zie :ref:`hoofdstuk 19.1.10 <hoofdstuk-19-1-10>`.
 
 | **Configuratie Mijn Profiel...**
-| Alleen beschikbaar op de pagina die aan de applicatie Profiel gekoppeld is. U kunt hier de onderdelen van Mijn Profiel in- of uitschakelen: Mijn gegevens, Gekozen onderwerpen, Begeleiders, Mijn netwerkcontacten, Zelfdiagnose, Acties, Mijn meldingen, Mijn vragen, Mijn uitkeringen, Nieuwsbrieven en Mijn afspraken.
+| Alleen beschikbaar op de pagina die aan de applicatie Profiel gekoppeld is. U kunt hier de onderdelen van Mijn Profiel in- of uitschakelen: Mijn gegevens, Gekozen onderwerpen, Begeleiders, Mijn netwerkcontacten, Zelfdiagnose, Acties, Mijn meldingen, Mijn vragen, Mijn uitkeringen, Nieuwsbrieven en Mijn afspraken. Mijn uitkeringen, Nieuwsbrieven en Mijn afspraken staan standaard uit; de overige onderdelen staan standaard aan.
+| Opent deze optie een lijst met configuraties in plaats van de configuratie zelf, dan is de pagina nog niet aan een configuratie gekoppeld. Wijzigingen in een configuratie uit die lijst hebben dan geen effect op de pagina. Koppel eerst de configuratie aan de pagina, zie :ref:`hoofdstuk 19.1.9 <hoofdstuk-19-1-9>`.
 
 | **Configuratie Mijn Afval...**
 | Alleen beschikbaar op de pagina die aan de applicatie Mijn Afval gekoppeld is. U kunt hier de paginatitel en paginabeschrijving van Mijn Afval instellen.
