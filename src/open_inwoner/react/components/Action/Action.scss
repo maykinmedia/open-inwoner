@@ -1,4 +1,5 @@
 @use '@gemeente-denhaag/action/index.css';
+@use '@utrecht/status-badge-css/dist/index.css' as status-badge;
 
 oip-action:first-of-type {
   border-top: var(--denhaag-action-border-width)
@@ -17,9 +18,6 @@ oip-action:first-of-type {
     outline: revert !important;
   }
 
-  &__content span {
-    color: var(--color-black);
-  }
   &__actions .button {
     height: fit-content;
   }
@@ -29,14 +27,8 @@ oip-action:first-of-type {
     height: var(--denhaag-action-link-icon-width);
   }
 
-  /// Open Inwoner modifiers
-
   &__content--oip-message {
     font-weight: bold;
     color: var(--oip-color-fg-heading);
-  }
-
-  &__content--oip-title {
-    color: var(--utrecht-document-color);
   }
 }

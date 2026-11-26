@@ -15,13 +15,15 @@ const meta: Meta<typeof Action> = {
 A single action item that links the user to a relevant page. Renders a title and message inside a Den Haag \`ActionSingle\` link.
 
 **Props:**
-- \`title\`: The section name (e.g. "Mijn Zaken")
 - \`message\`: A short description of the action
 - \`actionUrl\`: The URL the link navigates to
+- \`label\`: Text in the status badge. No label means no badge.
+- \`status\`: Color of the badge: \`info\`, \`warning\`, \`failure\` or \`success\`. Unknown or empty values fall back to \`info\`.
+
 
 **Usage:**
 \`\`\`tsx
-<oip-action title="Mijn Zaken" message="Er is een nieuwe zaak" action-url="/cases"></oip-action>
+<oip-action message="Documenten nodig voor aanvraag bijzondere bijstand" status="warning" label="U moet een document toevoegen"  action-url="/cases"></oip-action>
 \`\`\`
 `,
       },
@@ -39,29 +41,74 @@ export const Default: Story = {
     <oip-action
       action-url={args.actionUrl}
       message={args.message}
-      title={args.title}
+      label={args.label}
+      status={args.status}
     />
-  ),
-};
-
-/**
- * Action rendered without a title — only the message is shown.
- */
-export const NoTitle: Story = {
-  name: 'No Title',
-  args: factoryAction({ title: '' }),
-  render: (args) => (
-    <oip-action action-url={args.actionUrl} message={args.message} title="" />
   ),
 };
 
 /**
  * Action rendered without a message — only the title is shown.
  */
-export const NoMessage: Story = {
-  name: 'No Message',
-  args: factoryAction({ message: '' }),
+export const Info: Story = {
+  name: 'Info',
+  args: factoryAction({ label: 'Bekijk actie', status: 'info' }),
   render: (args) => (
-    <oip-action action-url={args.actionUrl} message="" title={args.title} />
+    <oip-action
+      action-url={args.actionUrl}
+      message={args.message}
+      label={args.label}
+      status={args.status}
+    />
+  ),
+};
+
+export const Warning: Story = {
+  name: 'Warning',
+  args: factoryAction({
+    label: 'U moet een document toevoegen',
+    status: 'warning',
+  }),
+  render: (args) => (
+    <oip-action
+      action-url={args.actionUrl}
+      message={args.message}
+      label={args.label}
+      status={args.status}
+    />
+  ),
+};
+
+export const Failure: Story = {
+  name: 'Failure',
+  args: factoryAction({ label: 'Afgewezen', status: 'failure' }),
+  render: (args) => (
+    <oip-action
+      action-url={args.actionUrl}
+      message={args.message}
+      label={args.label}
+      status={args.status}
+    />
+  ),
+};
+
+export const Success: Story = {
+  name: 'Success',
+  args: factoryAction({ label: 'Afgerond', status: 'success' }),
+  render: (args) => (
+    <oip-action
+      action-url={args.actionUrl}
+      message={args.message}
+      label={args.label}
+      status={args.status}
+    />
+  ),
+};
+
+export const NoLabel: Story = {
+  name: 'No Label',
+  args: factoryAction({ label: undefined }),
+  render: (args) => (
+    <oip-action action-url={args.actionUrl} message={args.message} />
   ),
 };
