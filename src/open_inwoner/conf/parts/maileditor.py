@@ -488,6 +488,73 @@ MAIL_EDITOR_CONF = {
             },
         ],
     },
+    "case_gesprek_notification": {
+        "name": _("Case conversation notification"),
+        "description": _(
+            "This email is used to notify people of a new message from the municipality in a conversation about their case"
+        ),
+        "subject_default": "U heeft een nieuw bericht over uw zaak op {{ site_name }}",
+        "body_default": _readfile("case_gesprek_notification.html"),
+        "subject": [
+            {
+                "name": "site_name",
+                "description": _("Name of the site."),
+            },
+        ],
+        "body": [
+            {
+                "name": "identification",
+                "description": _("The identification of the case"),
+                "example": "ZAAK-1234",
+            },
+            {
+                "name": "zaak_identificatie_label",
+                "description": _(
+                    "The label shown next to the case identification number"
+                ),
+                "example": _("Zaaknummer"),
+            },
+            {
+                "name": "type_description",
+                "description": _("The description of the type of the case"),
+                "example": _("Casetype placeholder"),
+            },
+            {
+                "name": "case_description",
+                "description": _("The description of the particular case"),
+                "example": _("Aanvraag koffie"),
+            },
+            {
+                "name": "start_date",
+                "description": _("The start date of the case"),
+                "example": date(2024, 5, 1),
+            },
+            {
+                "name": "case_link",
+                "description": _("The link to the case details."),
+            },
+            {
+                "name": "site_name",
+                "description": _("Name of the site"),
+            },
+            {
+                "name": "contact_page",
+                "description": _(
+                    "Link to contact page configured in Site Configuration"
+                ),
+            },
+            {
+                "name": "contact_phonenumber",
+                "description": _("The callable link to the configured phonenumber"),
+            },
+            {
+                "name": "profile_notifications",
+                "description": _(
+                    "The link to the notifications and unsubscribe settings"
+                ),
+            },
+        ],
+    },
     "case_status_notification_action_required": {
         "name": _("Case status update notification (action required)"),
         "description": _(
