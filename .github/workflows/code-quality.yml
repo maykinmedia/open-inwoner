@@ -77,6 +77,35 @@ jobs:
       - name: Run pre-commit
         run: pre-commit run --all-files
 
+  pyright:
+    name: Type check with pyright
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: 'pyproject.toml'
+      - name: Install system packages
+        run: |
+          sudo apt-get update \
+          && sudo apt-get install -y --no-install-recommends \
+            libgdal-dev \
+            gdal-bin \
+            libxml2-dev \
+            libxmlsec1-dev
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install -r requirements/dev.txt --system
+      - name: Run pyright
+        # Informational until the existing type errors are resolved
+        continue-on-error: true
+        run: pyright
+
   ruff-version-check:
     name: Check ruff version consistency
     runs-on: ubuntu-26.04
