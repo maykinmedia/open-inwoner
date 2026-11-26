@@ -1,6 +1,6 @@
 # Fixtures loaded alongside `setup_configuration`
 
-Seven unrelated things live here, all loaded by `bin/setup_configuration.sh`
+Eight unrelated things live here, all loaded by `bin/setup_configuration.sh`
 right after `manage.py setup_configuration` (and mirrored in
 `bin/stack.sh up --localhost`):
 
@@ -25,13 +25,13 @@ Contents:
 
 - two users who are each other's contact: a begeleider (`begeleider@user.nl` /
   `samenwerken`) and the citizen, keyed by BSN `111222333` -- the same BSN the
-  DigiD-mock `testuser` logs in with, and that
-  `docker/openklant/fixtures/db.json` and `docker/openafval/fixtures/db.json`
-  already use. The citizen has a real name and email, so `testuser` is
-  pre-registered and skips the "necessary fields" form on first login. The email
-  is also marked as verified, which "Mijn afspraken" requires before it asks the
-  Qmatic mock (`docker/qmatic-mock/`) for appointments. The Keycloak `newuser`
-  (BSN `444555666`) has no counterpart here and starts blank;
+  Keycloak `bsn` user logs in with, and that `docker/openklant/fixtures/db.json`
+  and `docker/openafval/fixtures/db.json` already use. The citizen has a real
+  name and email, so `bsn` is pre-registered and skips the "necessary fields"
+  form on first login. The email is also marked as verified, which "Mijn
+  afspraken" requires before it asks the Qmatic mock (`docker/qmatic-mock/`) for
+  appointments. The Keycloak `bsnnew` (BSN `444555666`) has no counterpart here
+  and starts blank;
 - two `PlanTemplate`s ("Schuldhulpverlening", "Re-integratie naar werk"), each
   with two `ActionTemplate`s, so `collaborate:plan_choose_template` has
   something to offer;
@@ -40,8 +40,8 @@ Contents:
 - a short back-and-forth `Message` conversation between the same two users,
   backing the "Berichten" (inbox) page -- it has no satellite service either.
 
-Log in via DigiD as `testuser`/`testuser` and open "Samenwerken" or "Berichten"
-to see them.
+Log in via DigiD as `bsn`/`bsn` and open "Samenwerken" or "Berichten" to see
+them.
 
 ## `acties.json`
 
@@ -56,22 +56,47 @@ normally created by `userfeed.hooks.common.simple_message()` for
 development/debugging -- a profile-completion reminder, an appointment reminder,
 and a new-message notification.
 
-Log in via DigiD as `testuser`/`testuser` and open the homepage to see them
-under "Openstaande acties".
+Log in via DigiD as `bsn`/`bsn` and open the homepage to see them under
+"Openstaande acties".
+
+## `digid.json`
+
+A second pre-registered citizen, BSN `123456782`, matching the Keycloak `bsn2`
+user (see `docker/keycloak/README.md`). Like the citizen in `samenwerken.json`
+it has a name and a verified email address, so logging in skips the registration
+("necessary fields") form, but none of the demo data in this directory belongs
+to it. Not templated, for the same reason as `samenwerken.json`.
+
+The Keycloak `bsnnew` and `bsnbrp` users have no counterpart here and start
+blank; `bin/setup_configuration.sh` removes any user with their BSN when it
+seeds. `bsnbrp` (BSN `999993847`) is in the test set of the BRP mock, so its
+name and address are filled in from there on first login.
 
 ## `eherkenning.json`
 
-Two pre-registered eHerkenning users, matching the Keycloak `kvk` and
-`vestiging` users (see `docker/keycloak/README.md`), so logging in with them
-skips the registration ("necessary fields") form:
+Four pre-registered eHerkenning users, matching the Keycloak users of the same
+name (see `docker/keycloak/README.md`), so logging in with them skips the
+registration ("necessary fields") form:
 
-- KvK `68750110` without a vestiging (`kvk` / `kvk`);
-- KvK `68750110` with vestiging `000037178598` (`vestiging` / `vestiging`).
+- `kvk`: KvK `68750110` without a vestiging;
+- `vestiging`: KvK `68750110` with vestiging `000037178598`;
+- `vestiging2`: KvK `68750110` with vestiging `000037178601`;
+- `kvk2`: KvK `68727720` without a vestiging.
 
-Both have a verified email address, and an unusable password (they can only log
+All have a verified email address, and an unusable password (they can only log
 in through eHerkenning). `company_name` is pre-filled, but is refreshed from the
 KvK sandbox on every login. Not templated, for the same reason as
 `samenwerken.json`.
+
+`rsin` is pre-filled as well (`857587973` for KvK `68750110`, `857567433` for
+KvK `68727720`), so "Mijn zaken" does not depend on the KvK sandbox being
+reachable: the stack fetches eHerkenning cases by RSIN
+(`fetch_eherkenning_zaken_with_rsin` in `data.yaml`). See
+`docker/open-zaak/fixtures/README.md` for the cases each user has.
+
+The Keycloak `kvknew` and `vestigingnew` users (KvK `69599084`) have no
+counterpart here and start blank; `bin/setup_configuration.sh` removes any user
+with that KvK when it seeds.
 
 ## `notifications.json`
 
@@ -120,6 +145,7 @@ docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/acties.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/notifications.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
+docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/digid.json
 docker compose exec web src/manage.py loaddata /app/setup_configuration/fixtures/eherkenning.json
 ```
 
@@ -131,5 +157,6 @@ python src/manage.py loaddata docker/setup_configuration/fixtures/samenwerken.js
 python src/manage.py loaddata docker/setup_configuration/fixtures/acties.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/notifications.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/producten.json
+python src/manage.py loaddata docker/setup_configuration/fixtures/digid.json
 python src/manage.py loaddata docker/setup_configuration/fixtures/eherkenning.json
 ```

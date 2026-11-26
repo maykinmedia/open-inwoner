@@ -15,7 +15,7 @@ which the client treats as "no appointments". The client sends the logged-in
 user's verified email, so customers.json's testuser@test.nl must match the
 email/verified_email of the citizen in
 docker/setup_configuration/fixtures/samenwerken.json (the user Keycloak's
-DigiD testuser logs in as, by BSN). appointments.json is keyed
+DigiD `bsn` user logs in as, by BSN). appointments.json is keyed
 by customer publicId, and its __DAY_PLUS_N__/__DAY_MINUS_N__ placeholders are
 replaced with dates relative to today on every request, since the client
 drops appointments that start before today.
