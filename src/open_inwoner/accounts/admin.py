@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.models import Group
 from django.forms import ValidationError
 from django.urls import reverse
@@ -68,23 +68,9 @@ class _UserChangeForm(UserChangeForm):
         ):
             raise ValidationError(_("Only a 'begeleider' user can add an image."))
 
-        if cleaned_data.get("email") and (
-            User.objects.filter(email__iexact=cleaned_data["email"])
-            and self.instance.email != cleaned_data["email"]
-        ):
-            raise ValidationError(_("The user with this email already exists."))
-
-
-class _UserCreationForm(UserCreationForm):
-    def clean(self, *args, **kwargs):
-        cleaned_data = super().clean(*args, **kwargs)
-
-        if cleaned_data.get("email"):
-            # we use both queries in order to avoid the duplicate validation errors
-            if User.objects.filter(
-                email__iexact=cleaned_data["email"]
-            ) and not User.objects.filter(email=cleaned_data["email"]):
-                raise ValidationError(_("The user with this email already exists."))
+        # Email uniqueness is validated by User.clean(), which runs as part of
+        # the model form validation.
+        return cleaned_data
 
 
 class DigitalAddressInline(admin.TabularInline):
@@ -105,7 +91,6 @@ class DigitalAddressInline(admin.TabularInline):
 @with_config_checks(FetchUserfeedCheck)
 class _UserAdmin(ImageCroppingMixin, UserAdmin):
     form = _UserChangeForm
-    add_form = _UserCreationForm
     hijack_success_url = "/"
     list_display_links = (
         "email",
@@ -222,6 +207,18 @@ class _UserAdmin(ImageCroppingMixin, UserAdmin):
         "groups",
         "user_permissions",
     )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Writing User.email directly leaves the standard email DigitalAddress
+        # (which the profile page and OpenKlant sync read from) out of sync.
+        if obj.email and "email" in form.changed_data:
+            obj.update_email(obj.email)
+        # DigitalAddress.login_type is denormalised from the user and drives
+        # the database uniqueness constraint on email addresses, so it has to
+        # follow login type changes.
+        if "login_type" in form.changed_data:
+            obj.digital_addresses.update(login_type=obj.login_type)
 
 
 admin.site.unregister(Group)

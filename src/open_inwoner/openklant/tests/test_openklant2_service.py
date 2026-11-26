@@ -329,6 +329,76 @@ class UpdateUserFromPartijTestCase(TestCase):
         self.assertFalse(user.digital_addresses.exists())
         self.assertEqual(result.email_conflicts_skipped, 1)
 
+    def test_email_conflict_with_digital_address_of_other_user_is_skipped(
+        self, mock_client_class
+    ):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        # Another user holds this address as an additional (non-standard)
+        # email, with a different capitalisation.
+        DigitalAddressFactory(value="taken@example.com")
+
+        mock_client.digitaal_adres.list.return_value = self._list_response(
+            [
+                self._make_adres(
+                    "55555555-5555-5555-5555-555555555555",
+                    "email",
+                    "Taken@Example.com",
+                )
+            ]
+        )
+
+        user = DigidUserFactory()
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_user_from_partij(self._partij(), user)
+
+        self.assertFalse(user.digital_addresses.exists())
+        self.assertEqual(result.email_conflicts_skipped, 1)
+
+    def test_known_uuid_is_not_updated_to_email_of_other_user(self, mock_client_class):
+        mock_client = Mock()
+        mock_client_class.return_value = mock_client
+
+        UserFactory(email="taken@example.com")
+
+        remote_uuid = "12121212-1212-1212-1212-121212121212"
+        mock_client.digitaal_adres.list.return_value = self._list_response(
+            [
+                self._make_adres(
+                    remote_uuid, "email", "Taken@Example.com", is_standaard=True
+                )
+            ]
+        )
+
+        user = DigidUserFactory(email="old@example.com")
+        address = DigitalAddressFactory(
+            user=user,
+            type=DigitalAddressType.email,
+            value="old@example.com",
+            is_standard_for_type=True,
+        )
+        DigitaalAdresOpenKlantMappingFactory(
+            digital_address=address, ok_uuid=remote_uuid
+        )
+
+        service = OpenKlant2Service(config=self.config)
+        result = service.update_user_from_partij(self._partij(), user)
+
+        user.refresh_from_db()
+        self.assertEqual(
+            (
+                user.email,
+                list(
+                    user.digital_addresses.values_list("value", "is_standard_for_type")
+                ),
+                result.email_conflicts_skipped,
+                result.addresses_updated,
+            ),
+            ("old@example.com", [("old@example.com", True)], 1, 0),
+        )
+
     def test_standard_remote_address_sets_local_standard_flag_and_flat_field(
         self, mock_client_class
     ):

@@ -1,3 +1,5 @@
+from io import StringIO
+
 from django.core.management import call_command
 from django.test import TestCase
 
@@ -6,7 +8,13 @@ from freezegun import freeze_time
 from open_inwoner.accounts.models import Invite
 from open_inwoner.utils.tests.helpers import AssertTimelineLogMixin
 
-from .factories import InviteFactory, UserFactory
+from .factories import (
+    DigidUserFactory,
+    DigitalAddressFactory,
+    InviteFactory,
+    UserFactory,
+    eHerkenningUserFactory,
+)
 
 
 class DeleteContactInvitationsTest(AssertTimelineLogMixin, TestCase):
@@ -52,3 +60,39 @@ class DeleteContactInvitationsTest(AssertTimelineLogMixin, TestCase):
             )
 
             self.assertNotIn(f"{invite4.invitee_email}", log_dump)
+
+
+class FindDuplicateEmailsTest(TestCase):
+    def test_lists_emails_that_are_not_allowed_to_be_shared(self):
+        # regular users with a different capitalisation of the same email
+        regular = UserFactory(email="dupe@example.com")
+        variant = UserFactory(email="Dupe@Example.com", is_active=False)
+        # login email of one user is an additional address of another
+        digid = DigidUserFactory(email="mixed@example.com")
+        holder = UserFactory(email="holder@example.com")
+        DigitalAddressFactory(user=holder, value="Mixed@example.com")
+        # allowed: shared between DigiD/eHerkenning users only
+        DigidUserFactory(email="shared@example.com", bsn="111222333")
+        eHerkenningUserFactory(email="Shared@example.com")
+
+        stdout = StringIO()
+        call_command("find_duplicate_emails", stdout=stdout)
+
+        self.assertEqual(
+            stdout.getvalue().splitlines(),
+            [
+                f"dupe@example.com: users {regular.pk} (default, active), "
+                f"{variant.pk} (default, inactive)",
+                f"mixed@example.com: users {digid.pk} (digid, active), "
+                f"{holder.pk} (default, active)",
+                "Found 2 duplicated email(s)",
+            ],
+        )
+
+    def test_no_duplicates(self):
+        UserFactory(email="unique@example.com")
+
+        stdout = StringIO()
+        call_command("find_duplicate_emails", stdout=stdout)
+
+        self.assertEqual(stdout.getvalue().splitlines(), ["No duplicated emails found"])

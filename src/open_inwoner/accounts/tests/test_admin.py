@@ -5,11 +5,15 @@ from django_webtest import WebTest
 from maykin_2fa.test import disable_admin_mfa
 from webtest import Upload
 
-from open_inwoner.accounts.choices import ContactTypeChoices
+from open_inwoner.accounts.choices import (
+    ContactTypeChoices,
+    DigitalAddressType,
+    LoginTypeChoices,
+)
 from open_inwoner.accounts.models import User
 from open_inwoner.utils.tests.helpers import create_image_bytes
 
-from .factories import UserFactory
+from .factories import DigitalAddressFactory, UserFactory
 
 
 @disable_admin_mfa()
@@ -65,22 +69,110 @@ class TestAdminUser(WebTest):
         form["password2"] = "Abc123!@#"
         response = form.submit("_save")
 
-        self.assertContains(response, _("The user with this email already exists."))
+        self.assertContains(response, _("This email is already taken."))
         self.assertEqual(User.objects.count(), 1)
 
-    def test_user_not_updated_with_case_sensitive_email(self):
+    def test_user_is_created_with_standard_digital_address(self):
+        response = self.app.get(reverse("admin:accounts_user_add"), user=self.user)
+        form = response.forms["user_form"]
+        form["email"] = "john2@example.com"
+        form["password1"] = "Abc123!@#"
+        form["password2"] = "Abc123!@#"
+        form.submit("_save")
+
+        new_user = User.objects.get(email="john2@example.com")
+        self.assertEqual(
+            list(
+                new_user.digital_addresses.values_list(
+                    "type", "value", "is_standard_for_type"
+                )
+            ),
+            [(DigitalAddressType.email, "john2@example.com", True)],
+        )
+
+    def test_user_can_change_case_of_own_email(self):
         response = self.app.get(
             reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
             user=self.user,
         )
         form = response.forms["user_form"]
         form["email"] = "John@example.com"
+        form.submit("_save")
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, "John@example.com")
+
+    def test_user_not_updated_with_case_variant_of_other_users_email(self):
+        other = UserFactory(email="jane@example.com")
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": other.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["email"] = "John@example.com"
         response = form.submit("_save")
 
-        updated_user = User.objects.get()
+        self.assertContains(response, _("This email is already taken."))
+        other.refresh_from_db()
+        self.assertEqual(other.email, "jane@example.com")
 
-        self.assertContains(response, _("The user with this email already exists."))
-        self.assertEqual(self.user.email, updated_user.email)
+    def test_user_not_updated_with_digital_address_of_other_user(self):
+        DigitalAddressFactory(user=self.user, value="john.secondary@example.com")
+        other = UserFactory(email="jane@example.com")
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": other.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["email"] = "john.secondary@example.com"
+        response = form.submit("_save")
+
+        self.assertContains(response, _("This email is already taken."))
+        other.refresh_from_db()
+        self.assertEqual(other.email, "jane@example.com")
+
+    def test_email_change_updates_standard_digital_address(self):
+        self.user.update_email(self.user.email)
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": self.user.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["email"] = "john2@example.com"
+        form.submit("_save")
+
+        self.assertEqual(
+            list(
+                self.user.digital_addresses.values_list(
+                    "type", "value", "is_standard_for_type"
+                )
+            ),
+            [(DigitalAddressType.email, "john2@example.com", True)],
+        )
+
+    def test_login_type_change_updates_digital_addresses(self):
+        other = UserFactory(email="jane@example.com")
+        other.update_email(other.email)
+        DigitalAddressFactory(user=other, value="jane.secondary@example.com")
+        response = self.app.get(
+            reverse("admin:accounts_user_change", kwargs={"object_id": other.pk}),
+            user=self.user,
+        )
+        form = response.forms["user_form"]
+        form["login_type"] = LoginTypeChoices.oidc
+        form.submit("_save")
+
+        self.assertEqual(
+            list(
+                other.digital_addresses.values_list("value", "login_type").order_by(
+                    "value"
+                )
+            ),
+            [
+                ("jane.secondary@example.com", LoginTypeChoices.oidc),
+                ("jane@example.com", LoginTypeChoices.oidc),
+            ],
+        )
 
     def test_validation_error_is_raised_when_wrong_format_email(self):
         response = self.app.get(

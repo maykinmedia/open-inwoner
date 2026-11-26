@@ -59,6 +59,13 @@ class TestTokenVerification(TestCase):
             with self.assertRaises(BadToken):
                 generate_email_verification_token(user)
 
+        with self.subTest("already verified, different capitalisation"):
+            user = UserFactory.create(
+                email="Foo@Example.com", verified_email="foo@example.com"
+            )
+            with self.assertRaises(BadToken):
+                generate_email_verification_token(user)
+
         with self.subTest("verified email changed"):
             user = UserFactory.create(
                 email="bar@example.com", verified_email="not_bar@example.com"
@@ -124,10 +131,28 @@ class TestTokenVerification(TestCase):
             user.email = "bazz@example.com"
             self.assertFalse(validate_email_verification_token(user, token))
 
+    def test_validate_email_verification_token__email_capitalisation_changed(self):
+        user = UserFactory.create(email="bar@example.com")
+        token = generate_email_verification_token(user)
+        user.email = "Bar@Example.com"
+        user.save()
+
+        self.assertTrue(validate_email_verification_token(user, token))
+
+        user.refresh_from_db()
+        self.assertEqual(user.verified_email, "Bar@Example.com")
+        self.assertTrue(user.has_verified_email())
+
     def test_user_has_verified_email(self):
         with self.subTest("verified"):
             user = UserFactory.create(
                 email="foo@example.com", verified_email="foo@example.com"
+            )
+            self.assertTrue(user.has_verified_email())
+
+        with self.subTest("verified, different capitalisation"):
+            user = UserFactory.create(
+                email="Foo@Example.com", verified_email="foo@example.com"
             )
             self.assertTrue(user.has_verified_email())
 

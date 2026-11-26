@@ -57,6 +57,10 @@ if TYPE_CHECKING:
 # Content
 ###
 
+# Users with these login types may share an email address with each other
+# (but not with users of any other login type).
+EMAIL_SHAREABLE_LOGIN_TYPES = (LoginTypeChoices.digid, LoginTypeChoices.eherkenning)
+
 
 def generate_uuid_image_name(instance, filename):
     filename, file_extension = os.path.splitext(filename)
@@ -184,7 +188,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     def has_verified_email(self):
-        return self.verified_email != "" and self.email == self.verified_email
+        # Email addresses are treated as case-insensitive (as for login and
+        # uniqueness), so a change in capitalisation keeps the verification.
+        return (
+            self.verified_email != ""
+            and self.email.casefold() == self.verified_email.casefold()
+        )
 
     preferred_address = models.ForeignKey(
         "accounts.DigitalAddress",
@@ -214,15 +223,57 @@ class User(AbstractBaseUser, PermissionsMixin):
         )
         return da or ""
 
+    def email_taken_by_other_user(self, value: str) -> bool:
+        """
+        Whether ``value`` is already in use as an email by another user.
+
+        This is the application-level email uniqueness policy. It compares
+        case-insensitively against both ``User.email`` and every email
+        ``DigitalAddress`` (standard or not) of all other users.
+
+        Users with a login type in ``EMAIL_SHAREABLE_LOGIN_TYPES`` may share an
+        email with each other, but never with a user of another login type.
+        Users of any other login type may not share an email with anyone.
+
+        This is stricter than the database, which only backs it up partially:
+        the unique constraints on ``User.email`` and ``DigitalAddress.value``
+        are case-sensitive and only cover rows with ``login_type=default``
+        (for ``DigitalAddress`` that is the address's own, denormalised
+        ``login_type``, not the user's). Uniqueness for other login types,
+        case-insensitive uniqueness, and uniqueness between one user's
+        ``User.email`` and another user's ``DigitalAddress`` are enforced
+        only here. The check is not atomic with the subsequent write.
+
+        Collisions with the user's *own* addresses (constraint
+        ``unique_digital_address_per_user_type_value``) are not checked.
+        """
+        if not value:
+            return False
+
+        matches = User.objects.filter(
+            Q(email__iexact=value)
+            | Q(
+                digital_addresses__type=DigitalAddressType.email,
+                digital_addresses__value__iexact=value,
+            )
+        )
+        if self.pk:
+            matches = matches.exclude(pk=self.pk)
+        if self.login_type in EMAIL_SHAREABLE_LOGIN_TYPES:
+            matches = matches.exclude(login_type__in=EMAIL_SHAREABLE_LOGIN_TYPES)
+        return matches.exists()
+
     @transaction.atomic
     def update_email(self, value: str) -> None:
         """Update email field and keep the standard email DigitalAddress in sync."""
         # Remove any non-standard email DA with this value first to avoid
-        # violating unique_digital_address_per_user_type_value.
+        # violating unique_digital_address_per_user_type_value. The match is
+        # case-insensitive, so the user doesn't end up with two capitalisations
+        # of the same address (which the profile form rejects as duplicates).
         self.digital_addresses.filter(
             type=DigitalAddressType.email,
             is_standard_for_type=False,
-            value=value,
+            value__iexact=value,
         ).delete()
         self.email = value
         self.save(update_fields=["email"])
@@ -520,13 +571,24 @@ class User(AbstractBaseUser, PermissionsMixin):
                 }
             )
 
+        if self.pk:
+            stored = (
+                User.objects.filter(pk=self.pk)
+                .values_list("email", "login_type")
+                .first()
+            )
+            # Only validate uniqueness when the email or the login type (which
+            # determines whether the email may be shared) actually changes.
+            # Model forms that don't include the email field (e.g. the profile
+            # and notification forms) still run this clean(), and an error
+            # keyed on "email" there crashes the form with a ValueError instead
+            # of showing a validation error.
+            if stored == (self.email, self.login_type):
+                return
+
         existing_users = User.objects.filter(email__iexact=self.email)
         if self.pk:
             existing_users = existing_users.exclude(pk=self.pk)
-
-        # no duplicates
-        if not existing_users:
-            return
 
         # account has been deactivated
         for user in existing_users:
@@ -535,22 +597,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                     {"email": ValidationError(_("This account has been deactivated"))}
                 )
 
-        # all accounts with duplicate emails have login_type digid or eHerkenning
-        if self.login_type in (
-            LoginTypeChoices.digid,
-            LoginTypeChoices.eherkenning,
-        ):
-            for user in existing_users:
-                if user.login_type not in (
-                    LoginTypeChoices.digid,
-                    LoginTypeChoices.eherkenning,
-                ):
-                    # some account does not have login_type digid or eHerkenning
-                    raise ValidationError(
-                        {"email": ValidationError(_("This email is already taken."))}
-                    )
-        else:
-            # non-digid must be unique
+        if self.email_taken_by_other_user(self.email):
             raise ValidationError(
                 {"email": ValidationError(_("This email is already taken."))}
             )
