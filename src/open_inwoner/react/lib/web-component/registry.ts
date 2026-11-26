@@ -14,7 +14,7 @@ import { PARAGRAPH_DEFINITION } from '@react/components/Paragraph/constants';
 import { ACTION_DEFINITION } from '@react/components/Action/constants';
 import { SEARCH_DEFINITION } from '@react/components/Search/constants';
 import { DATASUMMARY_DEFINITION } from '@react/components/DataSummary/constants';
-// import { CHATDIALOG_DEFINITION } from '@react/components/ChatDialog/constants';
+import { CHATDIALOG_DEFINITION } from '@react/components/ChatDialog/constants';
 import { CHATMESSAGE_DEFINITION } from '@react/components/ChatMessage/constants';
 
 /**
@@ -45,6 +45,6 @@ export const WEB_COMPONENT_REGISTRY = {
   [ACTION_DEFINITION.tagName]: ACTION_DEFINITION,
   [SEARCH_DEFINITION.tagName]: SEARCH_DEFINITION,
   [DATASUMMARY_DEFINITION.tagName]: DATASUMMARY_DEFINITION,
-  // [CHATDIALOG_DEFINITION.tagName]: CHATDIALOG_DEFINITION,
+  [CHATDIALOG_DEFINITION.tagName]: CHATDIALOG_DEFINITION,
   [CHATMESSAGE_DEFINITION.tagName]: CHATMESSAGE_DEFINITION,
 } as const;

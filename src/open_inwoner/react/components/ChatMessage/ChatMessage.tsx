@@ -1,5 +1,5 @@
 import {
-  ChatMessage as MijnChatMessage,
+  ChatMessage,
   ChatMessageText,
   type ChatMessageAttachmentProps,
   type ChatMessageVariant,
@@ -44,7 +44,7 @@ const parseMessage = (
   }
 };
 
-const ChatMessage = ({ message, jsonScriptId }: IChatMessageProps) => {
+const OipChatMessage = ({ message, jsonScriptId }: IChatMessageProps) => {
   const data = parseMessage(message, jsonScriptId);
 
   if (!data) {
@@ -54,12 +54,12 @@ const ChatMessage = ({ message, jsonScriptId }: IChatMessageProps) => {
   const { paragraphs = [], ...messageProps } = data;
 
   return (
-    <MijnChatMessage {...messageProps}>
+    <ChatMessage {...messageProps}>
       {paragraphs.map((text, index) => (
         <ChatMessageText key={index}>{text}</ChatMessageText>
       ))}
-    </MijnChatMessage>
+    </ChatMessage>
   );
 };
 
-export default ChatMessage;
+export default OipChatMessage;
