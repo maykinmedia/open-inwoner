@@ -34,3 +34,17 @@ timed_parallel_calls = meter.create_counter(
         "name (str): identifies the TimedParallel call site."
     ),
 )
+
+cache_signature_invalid = meter.create_counter(
+    "oip.cache.signature_invalid",
+    unit="{value}",
+    description=(
+        "Number of values read from the Redis caches that were refused because "
+        "they were not signed with SECRET_KEY (or one of SECRET_KEY_FALLBACKS), "
+        "e.g. unsigned, tampered with or signed with another key. Refused values "
+        "are never unpickled, and the read is treated as a cache miss. A spike "
+        "right after rotating SECRET_KEY without a fallback is expected; otherwise "
+        "it can mean that someone is writing to Redis, or that processes sharing "
+        "the Redis database use different values for SECRET_KEY."
+    ),
+)

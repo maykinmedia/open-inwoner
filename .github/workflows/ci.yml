@@ -114,6 +114,8 @@ jobs:
           if-no-files-found: error
 
   upload_coverage:
+    # Never upload from the private security repo: it may hold embargoed fixes
+    if: github.repository == 'maykinmedia/open-inwoner'
     needs: tests
     name: Upload coverage information to codecov
     runs-on: ubuntu-26.04
@@ -191,6 +193,14 @@ jobs:
         options: >-
           --health-cmd "/usr/local/bin/clamdcheck.sh" --health-interval 60s
           --health-timeout 30s --health-retries 5 --health-start-period 120s
+      # The e2e tests use the production cache setup (CI_USE_REDIS_CACHES)
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options:
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
+          5s --health-retries 5 --name redis
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -251,6 +261,16 @@ jobs:
           OTEL_SDK_DISABLED: true
           CLAMAV_HOST: localhost
           CLAMAV_PORT: 3310
+          CI_USE_REDIS_CACHES: true
+          CACHE_DEFAULT: localhost:6379/0
+
+      # Guards against the tests silently falling back to the in-memory caches
+      - name: Check that the tests used the Redis caches
+        run: |
+          if ! docker exec redis redis-cli INFO commandstats | grep -q '^cmdstat_set:'; then
+            echo "The e2e tests did not write to Redis, check CI_USE_REDIS_CACHES" >&2
+            exit 1
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

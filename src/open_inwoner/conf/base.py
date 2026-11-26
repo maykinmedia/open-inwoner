@@ -247,85 +247,70 @@ ENABLE_INTERACTIVE_CHECKS = config(
     ),
 )
 
+# Only unpickle signed data from Redis (RCE if Redis is reachable by others).
+# The client treats refused data as a cache miss, instead of failing the request.
+# The version bump keeps unsigned entries from older releases from being read.
+REDIS_CACHE_CLIENT = "open_inwoner.utils.cache.client.SignedPickleClient"
+REDIS_CACHE_SERIALIZER = "open_inwoner.utils.cache.serializers.SignedPickleSerializer"
+REDIS_CACHE_VERSION = 2
+REDIS_CACHE_LOCATION = "redis://" + config(
+    "CACHE_DEFAULT",
+    default="localhost:6379/0",
+    documentation=DocumentationParams(
+        help_text="Redis connection string for the default cache, in host:port/db format.",
+        group="Cache",
+    ),
+)
+
+
+def _redis_cache() -> dict:
+    # A new dict per alias, so changing one alias's settings can't affect another
+    return {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_CACHE_LOCATION,
+        "VERSION": REDIS_CACHE_VERSION,
+        "OPTIONS": {
+            "CLIENT_CLASS": REDIS_CACHE_CLIENT,
+            "SERIALIZER": REDIS_CACHE_SERIALIZER,
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+
+
 CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(help_text='Redis connection string for the default cache, in host:port/db format.', group='Cache'))}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-        },
-    },
-    "axes": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{config('CACHE_DEFAULT', default='localhost:6379/0', documentation=DocumentationParams(add_to_docs=False))}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-        },
-    },
-    "local": {
+    "default": _redis_cache(),
+    "axes": _redis_cache(),
+    "django-solo": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        # LocMem caches with the same (or no) location share their storage
+        "LOCATION": "django-solo",
     },
 }
 
-# Rate limiting of notifications (e.g. emails) sent on behalf of users. Each
-# option falls back to the corresponding value of the default cache.
+# Rate limiting of notifications (e.g. emails) sent on behalf of users: a Redis
+# cache like the default cache, of which only the location can be changed.
+# Settings that could be changed before are flagged by the utils.W002 check.
 CACHES["notification_throttle"] = {
-    "BACKEND": config(
-        "CACHE_NOTIFICATION_THROTTLE_BACKEND",
-        default=CACHES["default"]["BACKEND"],
-        documentation=DocumentationParams(
-            help_text=(
-                "Cache backend used to rate limit notifications sent on behalf of "
-                "users. Defaults to the backend of the default cache."
-            ),
-            group="Cache",
-        ),
-    ),
+    **_redis_cache(),
     "LOCATION": config(
         "CACHE_NOTIFICATION_THROTTLE_LOCATION",
-        default=CACHES["default"]["LOCATION"],
+        default=REDIS_CACHE_LOCATION,
         documentation=DocumentationParams(
             help_text=(
-                "Full location (e.g. redis://host:port/db) of the cache used to rate "
-                "limit notifications. Defaults to the location of the default cache."
+                "Location of the Redis cache used to rate limit notifications, as a "
+                "full URL (e.g. redis://host:port/db). It always uses the same "
+                "settings as the default cache. Defaults to the location of the "
+                "default cache."
             ),
             group="Cache",
         ),
     ),
     "KEY_PREFIX": "notification_throttle",
-    "OPTIONS": {
-        "CLIENT_CLASS": config(
-            "CACHE_NOTIFICATION_THROTTLE_CLIENT_CLASS",
-            default=CACHES["default"]["OPTIONS"]["CLIENT_CLASS"],
-            documentation=DocumentationParams(
-                help_text=(
-                    "django-redis client class of the notification rate limiting "
-                    "cache. Defaults to the client class of the default cache."
-                ),
-                group="Cache",
-            ),
-        ),
-        "IGNORE_EXCEPTIONS": config(
-            "CACHE_NOTIFICATION_THROTTLE_IGNORE_EXCEPTIONS",
-            default=CACHES["default"]["OPTIONS"]["IGNORE_EXCEPTIONS"],
-            documentation=DocumentationParams(
-                help_text=(
-                    "Ignore connection errors of the notification rate limiting "
-                    "cache. If enabled, notifications are not rate limited while "
-                    "the cache is unavailable. Defaults to the setting of the "
-                    "default cache."
-                ),
-                group="Cache",
-            ),
-        ),
-    },
 }
 
 # Django solo caching
 SOLO_CACHE_TIMEOUT = 5  # 5 seconds
-SOLO_CACHE = "local"  # Avoid Redis overhead
+SOLO_CACHE = "django-solo"  # Avoid Redis overhead
 
 # ZGW API caches
 CACHE_ZGW_CATALOGI_TIMEOUT = config(

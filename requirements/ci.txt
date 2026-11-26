@@ -494,7 +494,7 @@ django-sniplates==0.7.2
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
-django-solo==2.2.0
+django-solo==2.8.0
     # via
     #   -c requirements/base.txt
     #   -r requirements/base.txt
