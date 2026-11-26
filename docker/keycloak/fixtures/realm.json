@@ -557,6 +557,117 @@
       "groups": []
     },
     {
+      "id": "c1ec7a5e-0000-4000-8000-000000000005",
+      "createdTimestamp": 1719999585061,
+      "username": "kvk2",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
+        "legalSubjectID": ["68727720"],
+        "actingSubjectID": ["6D97C20C329D5F58"],
+        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "kvk2",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "c1ec7a5e-0000-4000-8000-000000000004",
+      "createdTimestamp": 1719999585061,
+      "username": "vestiging2",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
+        "representeeBSN": ["111222333"],
+        "legalSubjectID": ["68750110"],
+        "actingSubjectID": ["4B75A0EA107B3D36"],
+        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"],
+        "vestiging": ["000037178601"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "vestiging2",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "c1ec7a5e-0000-4000-8000-000000000002",
+      "createdTimestamp": 1719999585061,
+      "username": "kvknew",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
+        "legalSubjectID": ["69599084"],
+        "actingSubjectID": ["5C86B1FB218C4E47"],
+        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "kvknew",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "c1ec7a5e-0000-4000-8000-000000000003",
+      "createdTimestamp": 1719999585061,
+      "username": "vestigingnew",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "service_uuid": ["81216fa4-80a1-4686-a8ac-5c8e5c030c93"],
+        "legalSubjectID": ["69599084"],
+        "actingSubjectID": ["5C86B1FB218C4E47"],
+        "service_id": ["urn:etoegang:DV:00000001002308836000:services:9113"],
+        "name_qualifier": ["urn:etoegang:1.9:EntityConcernedID:KvKnr"],
+        "vestiging": ["000038509504"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "vestigingnew",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
       "id": "144e4721-f065-4db6-a148-c55d1678af3c",
       "createdTimestamp": 1750067637607,
       "username": "eidas-company",
@@ -708,7 +819,7 @@
     {
       "id": "aa10cfc7-2c4d-41f6-8fac-7bf405c572c4",
       "createdTimestamp": 1707141446005,
-      "username": "testuser",
+      "username": "bsn",
       "enabled": true,
       "totp": false,
       "emailVerified": false,
@@ -721,12 +832,32 @@
       },
       "credentials": [
         {
-          "id": "7592b843-a7ab-4372-a133-d4d984ae687c",
           "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1707141485838,
-          "secretData": "{\"value\":\"s9LcIc++9CRM7/wgifxyz0jUFYfmn2VuNpLP3NwUcDw=\",\"salt\":\"JReLfJs5YgTCeB+7u0tgfA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+          "value": "bsn",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "b5a00000-0000-4000-8000-000000000002",
+      "createdTimestamp": 1719999585061,
+      "username": "bsn2",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "bsn": ["123456782"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bsn2",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
@@ -738,7 +869,7 @@
     {
       "id": "3f6d2b8e-9a41-4c57-8e0d-5b7a1c9e4d23",
       "createdTimestamp": 1707141446006,
-      "username": "newuser",
+      "username": "bsnnew",
       "enabled": true,
       "totp": false,
       "emailVerified": false,
@@ -752,8 +883,31 @@
       "credentials": [
         {
           "type": "password",
-          "userLabel": "My password",
-          "value": "newuser"
+          "value": "bsnnew",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": ["default-roles-test"],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "b5a00000-0000-4000-8000-000000000003",
+      "createdTimestamp": 1719999585061,
+      "username": "bsnbrp",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "attributes": {
+        "bsn": ["999993847"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bsnbrp",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],

@@ -45,7 +45,7 @@ else
     # Demo data for the "Samenwerken" page -- it has no satellite service of its
     # own, so there's no setup_configuration step to seed it through. The
     # citizen (pk 9002) is keyed by BSN, so first delete any other user with
-    # that BSN (e.g. a DigiD-mock testuser from an earlier login); otherwise
+    # that BSN (e.g. a DigiD user from an earlier login); otherwise
     # loading it would create a duplicate and break BSN lookups.
     src/manage.py shell -c "
 from django.db import transaction
@@ -70,16 +70,24 @@ with transaction.atomic():
     # live in Open Inwoner's own database like the demo data above.
     src/manage.py loaddata /app/setup_configuration/fixtures/producten.json
 
-    # Pre-registered eHerkenning users for the Keycloak `kvk` and `vestiging`
-    # users, so logging in skips the registration flow. As with the citizen
-    # above, first delete any other user with the same kvk/vestiging (e.g.
-    # from an earlier login); the (kvk, vestiging) pair must be unique.
+    # Pre-registered users for the Keycloak `bsn2` (digid.json) and `kvk`,
+    # `kvk2`, `vestiging` and `vestiging2` (eherkenning.json) users, so logging
+    # in skips the registration flow. As with the citizen above, first delete
+    # any other user with the same BSN or KvK (e.g. from an earlier login); the
+    # (kvk, vestiging) pair must be unique.
+    # BSN 444555666 and 999993847 and KvK 69599084 belong to the Keycloak
+    # `bsnnew`, `bsnbrp`, `kvknew` and `vestigingnew` users, which must start
+    # out unregistered, so drop those too.
     src/manage.py shell -c "
 from django.db import transaction
 from open_inwoner.accounts.models import User
 with transaction.atomic():
-    User.objects.filter(kvk='68750110').exclude(pk__in=[9101, 9102]).delete()
+    User.objects.filter(bsn='123456782').exclude(pk=9003).delete()
+    User.objects.filter(kvk__in=['68750110', '68727720']).exclude(pk__in=[9101, 9102, 9103, 9104]).delete()
+    User.objects.filter(bsn__in=['444555666', '999993847']).delete()
+    User.objects.filter(kvk='69599084').delete()
 "
+    src/manage.py loaddata /app/setup_configuration/fixtures/digid.json
     src/manage.py loaddata /app/setup_configuration/fixtures/eherkenning.json
 
     mkdir -p "$MARKER_DIR"
