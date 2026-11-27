@@ -54,6 +54,8 @@ class GetProductRenderedContentTest(TestCase):
         self.assertIn("Apply Now", html)
         self.assertIn('target="_blank"', html)
         self.assertIn("arrow_forward", html)
+        # The CTA button is a button, not an underlined text link
+        self.assertNotIn("link--underlined", html)
 
     def test_renders_ctabutton_with_form(self):
         """Test that [CTABUTTON] is replaced with a button when product has a form."""
@@ -161,5 +163,53 @@ class GetProductRenderedContentTest(TestCase):
         html = str(rendered)
 
         # Check that link gets default classes
-        self.assertIn('class="link link--secondary"', html)
+        self.assertIn('class="link link--secondary link--underlined"', html)
         self.assertIn("Regular Link", html)
+
+    def test_regular_links_classes_in_different_elements(self):
+        """Test that links get the underlined link classes in every rich text
+        component, so links in running text are not distinguishable by color
+        alone (WCAG 1.4.1)."""
+        product = ProductFactory.build(
+            content=html_to_doc(
+                '<h2><a href="/heading">Heading link</a></h2>'
+                '<p>See the <a href="/paragraph">paragraph link</a>.</p>'
+                '<ul><li><p><a href="/list-item">List item link</a></p></li></ul>'
+                '<table><tr><td><p><a href="/table-cell">Table cell link</a></p>'
+                "</td></tr></table>"
+                '<p>Visit <a href="https://example.com">our website</a>.</p>',
+                schema=ProsemirrorConfig(
+                    allowed_node_types=[
+                        NodeType.PARAGRAPH,
+                        NodeType.HEADING,
+                        NodeType.BULLET_LIST,
+                        NodeType.LIST_ITEM,
+                        NodeType.TABLE,
+                        NodeType.TABLE_ROW,
+                        NodeType.TABLE_CELL,
+                        NodeType.TABLE_HEADER,
+                    ],
+                    allowed_mark_types=[MarkType.LINK],
+                ).schema,
+            )
+        )
+
+        soup = get_product_rendered_content(product)
+
+        for href, container_tag in [
+            ("/heading", "h2"),
+            ("/paragraph", "p"),
+            ("/list-item", "li"),
+            ("/table-cell", "td"),
+            ("https://example.com", "p"),
+        ]:
+            with self.subTest(href=href):
+                link = soup.find("a", href=href)
+                self.assertIsNotNone(link)
+                self.assertIsNotNone(link.find_parent(container_tag))
+                self.assertEqual(link["class"], "link link--secondary link--underlined")
+
+        external_link = soup.find("a", href="https://example.com")
+        self.assertEqual(external_link["target"], "_blank")
+        self.assertIsNotNone(external_link.find("span", class_="material-icons"))
+        self.assertIsNotNone(external_link.find("span", class_="sr-only"))

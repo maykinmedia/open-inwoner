@@ -1629,7 +1629,7 @@ class TestCaseDetailView(
         self.assertContains(response, '<p class="nl-paragraph">')
         self.assertContains(
             response,
-            '<a class="link link--secondary" href="https://example.com" target="_blank">',
+            '<a class="link link--secondary link--underlined" href="https://example.com" target="_blank">',
         )
         self.assertContains(response, "our website")
         # Verify HTML is NOT escaped
@@ -2505,10 +2505,10 @@ class TestCaseDetailView(
         self.assertContains(response, '<p class="nl-paragraph">')
         self.assertContains(response, "<strong>Important:</strong>")
         self.assertContains(response, "<em>all required documents</em>")
-        # get_rendered_content adds "link link--secondary" class to external links
+        # get_rendered_content adds "link link--secondary link--underlined" class to external links
         self.assertContains(
             response,
-            '<a class="link link--secondary" href="https://help.example.com" target="_blank">',
+            '<a class="link link--secondary link--underlined" href="https://help.example.com" target="_blank">',
         )
 
         # Verify HTML is NOT escaped
