@@ -17,7 +17,7 @@
         {% render_grid %}
             {% render_column start=1 span=8 %}
                 {% if request.user.get_active_contacts %}
-                    {% render_form id="plan-form" form=form method="POST" %}
+                    {% render_form id="plan-form" form=form method="POST" show_required=True %}
                         {% csrf_token %}
                         {% input form.title %}
                         {% input form.goal %}

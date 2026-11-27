@@ -191,6 +191,10 @@
     display: none;
   }
 
+  &.form--show-required .label__label--required {
+    display: inline;
+  }
+
   /// Actions.
   &__actions {
     display: grid;

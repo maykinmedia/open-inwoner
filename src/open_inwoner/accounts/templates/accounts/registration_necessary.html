@@ -8,7 +8,7 @@
             {% get_solo 'configurations.SiteConfiguration' as config %}
             <h1 class="utrecht-heading-1">{% trans "Registratie voltooien" %}</h1><br>
             {% if config.registration_text %}<nl-paragraph>{{ config.registration_text|urlize|linebreaksbr }}</nl-paragraph>{% endif %}
-            <form method="POST" id="necessary-form" action="{{ request.get_full_path }}" class="form form__choice-list" novalidate>
+            {% render_form form=form method="POST" id="necessary-form" form_action=request.get_full_path extra_classes="form__choice-list" show_required=True %}
                 {% csrf_token %}
 
                 {% if form.first_name %}
@@ -88,7 +88,7 @@
                 <div class="choice-list__information--bottom-border"></div>
 
                 {% form_actions primary_icon='east' primary_text="Voltooi registratie" fullwidth=True %}
-            </form>
+            {% endrender_form %}
         {% endrender_column %}
     {% endrender_grid %}
 </div>

@@ -9,7 +9,7 @@
 
     {% render_grid %}
         {% render_column start=1 span=8 %}
-            {% render_form id="goal-edit" form=form method="POST" %}
+            {% render_form id="goal-edit" form=form method="POST" show_required=True %}
                 {% csrf_token %}
                 {% input form.goal %}
                 {% input form.description %}
