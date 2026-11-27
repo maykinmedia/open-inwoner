@@ -19,10 +19,16 @@ describe('Action', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the title', () => {
-    const action = factoryAction({ title: 'Mijn Uitkeringen' });
+  it('renders the label', () => {
+    const action = factoryAction({ label: 'Bekijk actie' });
     render(<Action {...action} />);
-    expect(screen.getByText(/Mijn Uitkeringen/)).toBeInTheDocument();
+    expect(screen.getByText(/Bekijk actie/)).toBeInTheDocument();
+  });
+
+  it('does not render a label when there is no label', () => {
+    const action = factoryAction({ label: undefined });
+    const { container } = render(<Action {...action} />);
+    expect(container.querySelector('.oip-action__label')).toBeNull();
   });
 
   it('renders the action URL as a link', () => {
@@ -48,17 +54,26 @@ describe('Action', () => {
     );
   });
 
-  it('renders title with correct CSS class', () => {
-    const action = factoryAction({ title: 'Test Titel' });
+  it('renders label with the class of its status', () => {
+    const action = factoryAction({ label: 'Test label', status: 'warning' });
     render(<Action {...action} />);
-    expect(screen.getByText(/Test Titel/)).toHaveClass(
-      'denhaag-action__content--oip-title'
+    expect(screen.getByText(/Test label/)).toHaveClass(
+      'utrecht-status-badge',
+      'utrecht-status-badge--warning'
+    );
+  });
+
+  it('falls back to neutral for an unknown status', () => {
+    const action = factoryAction({ label: 'Test label', status: 'onbekend' });
+    render(<Action {...action} />);
+    expect(screen.getByText(/Test label/)).toHaveClass(
+      'utrecht-status-badge--neutral'
     );
   });
 
   it('renders special characters correctly', () => {
     const action = factoryAction({
-      title: 'Test & Review',
+      label: 'Test & Review',
       message: 'Check <data> & verify',
       actionUrl: '/test?id=1&type=review',
     });
@@ -82,14 +97,16 @@ describe('Action', () => {
     });
 
     function mountAction(props: {
-      title: string;
       message: string;
       actionUrl: string;
+      label?: string;
+      status?: string;
     }) {
       const element = document.createElement('oip-action');
-      element.setAttribute('title', props.title);
       element.setAttribute('message', props.message);
       element.setAttribute('action-url', props.actionUrl);
+      if (props.label) element.setAttribute('label', props.label);
+      if (props.status) element.setAttribute('status', props.status);
       document.body.appendChild(element);
       return element;
     }
@@ -103,9 +120,10 @@ describe('Action', () => {
     });
 
     it('exposes the expected props', () => {
-      expect(ACTION_DEFINITION.propNames).toContain('title');
       expect(ACTION_DEFINITION.propNames).toContain('message');
       expect(ACTION_DEFINITION.propNames).toContain('actionUrl');
+      expect(ACTION_DEFINITION.propNames).toContain('label');
+      expect(ACTION_DEFINITION.propNames).toContain('status');
     });
 
     it('uses shadow DOM', () => {
@@ -114,7 +132,6 @@ describe('Action', () => {
 
     it('renders message into shadow DOM', () => {
       const element = mountAction({
-        title: 'Mijn Zaken',
         message: 'Er is een nieuwe zaak toegevoegd',
         actionUrl: '/cases',
       });
@@ -124,22 +141,24 @@ describe('Action', () => {
       expect(getByText(/Er is een nieuwe zaak toegevoegd/)).toBeInTheDocument();
     });
 
-    it('renders title into shadow DOM', () => {
+    it('renders label into shadow DOM', () => {
       const element = mountAction({
-        title: 'Mijn Uitkeringen',
-        message: 'Controleer uw uitkering',
-        actionUrl: '/uitkeringen',
+        label: 'U moet een document toevoegen',
+        status: 'warning',
+        message: 'Documenten nodig',
+        actionUrl: '/cases',
       });
       const { getByText } = within(
         element.shadowRoot as unknown as HTMLElement
       );
-      expect(getByText(/Mijn Uitkeringen/)).toBeInTheDocument();
+      expect(getByText(/U moet een document toevoegen/)).toBeInTheDocument();
     });
 
     it('renders action URL as a link in shadow DOM', () => {
       const element = mountAction({
-        title: 'Mijn Zaken',
-        message: 'Test',
+        status: 'warning',
+        label: 'document toevoegen',
+        message: 'document nodig',
         actionUrl: '/my-cases',
       });
       const { getByRole } = within(

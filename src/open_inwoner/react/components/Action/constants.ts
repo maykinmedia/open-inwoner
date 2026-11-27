@@ -8,7 +8,7 @@ export const ACTION_DEFINITION: WebComponentDefinition<
   IActionProps
 > = {
   tagName: 'oip-action',
-  propNames: ['title', 'message', 'actionUrl'],
+  propNames: ['message', 'actionUrl', 'status', 'label'],
   options: {
     shadow: true,
     adoptedStyleSheets: createStyleSheets(style),

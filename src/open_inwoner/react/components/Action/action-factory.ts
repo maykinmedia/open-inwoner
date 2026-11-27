@@ -4,26 +4,30 @@ export const factoryAction = (
   overrides: Partial<IActionProps> = {}
 ): IActionProps => ({
   actionUrl: 'https://example.com',
-  message: 'Er is een nieuwe zaak toegevoegd',
-  title: 'Mijn Zaken',
+  message: 'Documenten nodig voor aanvraag bijzondere bijstand',
+  label: 'U moet een document toevoegen',
+  status: 'warning',
   ...overrides,
 });
 
 export const factoryActions = (): IActionProps[] => [
   factoryAction({
-    message: 'Er is een nieuwe zaak toegevoegd',
-    title: 'Mijn Zaken',
+    message: 'Documenten nodig voor aanvraag bijzondere bijstand',
+    label: 'U moet een document toevoegen',
+    status: 'warning',
   }),
   factoryAction({
-    message: 'Controleer uitkeringen',
-    title: 'Mijn Uitkeringen',
+    message: 'Samenwerkingen: je moet een actie uitvoeren',
+    label: 'Bekijk actie',
+    status: 'info',
   }),
   factoryAction({
-    message: 'Stel een nieuwe vraag',
-    title: 'Mijn Vragen',
+    message: 'Status van aanvraag parkeervergunning verandert naar afgerond',
+    label: 'Afgerond',
+    status: 'success',
   }),
   factoryAction({
-    message: 'Start nieuwe samenwerking',
-    title: 'Mijn Samenwerkingen',
+    message: 'Verleng uw identiteitskaart',
+    label: undefined,
   }),
 ];

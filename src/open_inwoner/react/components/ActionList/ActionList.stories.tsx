@@ -22,8 +22,8 @@ A slot-only wrapper for \`oip-action\` items. Use this web component to group ac
 **Usage:**
 \`\`\`html
 <oip-action-list>
-  <oip-action title="Mijn Zaken" message="Er is een nieuwe zaak" action-url="/cases"></oip-action>
-  <oip-action title="Mijn Vragen" message="Er is een antwoord op de vraag" action-url="/mijn-vragen"></oip-action>
+  <oip-action message="Documenten nodig voor aanvraag bijzondere bijstand" status="warning" label="U moet een document toevoegen"  action-url="/cases"></oip-action>
+  <oip-action message="Er is een antwoord op de vraag" status="info" label="Bekijk antwoord"  action-url="/mijn-vragen"></oip-action>
 </oip-action-list>
 \`\`\`
 `,
@@ -48,7 +48,8 @@ export const Default: Story = {
         <oip-action
           action-url={x.actionUrl}
           message={x.message}
-          title={x.title}
+          status={x.status}
+          label={x.label}
         />
       ))}
     </oip-action-list>

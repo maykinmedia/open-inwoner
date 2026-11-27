@@ -190,7 +190,8 @@ export const WCCombinedWithActionList: Story = {
           <oip-action
             action-url={x.actionUrl}
             message={x.message}
-            title={x.title}
+            status={x.status}
+            label={x.label}
           />
         ))}
       </oip-action-list>
