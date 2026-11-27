@@ -14,7 +14,7 @@ CLASS_ADDERS = [
     ("img", "image"),
     ("li", "li"),
     ("p", "nl-paragraph"),
-    ("a", "link link--secondary"),
+    ("a", "link link--secondary link--underlined"),
     ("table", "table table--content"),
     ("thead", "table__heading"),
     ("tbody", "table__body"),

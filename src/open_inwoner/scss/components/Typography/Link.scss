@@ -96,4 +96,18 @@
   *[class*='icons' i]:first-child {
     transform: scale(1);
   }
+
+  &.link--underlined {
+    display: inline;
+    text-decoration: underline;
+
+    // Icons (e.g. external link) are inline-block so the underline does not
+    // propagate to them.
+    [class*='icons'] {
+      display: inline-block;
+      text-decoration: none;
+      transform: scale(0.75);
+      vertical-align: bottom;
+    }
+  }
 }
