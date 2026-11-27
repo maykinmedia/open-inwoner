@@ -1,0 +1,1 @@
+De openstaande acties op de homepagina zijn vernieuwd. Elke melding kan nu een gekleurd label krijgen dat de status laat zien. Er zijn vier statussen: info, warning, failure en success. Elke status heeft zijn eigen kleur.
